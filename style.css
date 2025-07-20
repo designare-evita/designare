@@ -133,6 +133,7 @@ body.dark-mode #theme-toggle .fa-moon {
     height: 180px; 
     margin-bottom: 1.5rem; 
     object-fit: cover;
+  
 }
 #hero h1 { 
     font-size: 3rem; 
@@ -197,15 +198,24 @@ body.dark-mode #ai-form {
     background: #d39a00;
 }
 
-/* GEÄNDERT: Feste Höhe entfernt, damit mehrzeilige Antworten passen */
+/* GEÄNDERT: Stile für das KI-Antwortfeld angepasst */
 #ai-status {
     font-size: 0.9rem;
-    min-height: 20px; /* Behält einen minimalen Platz, kann aber wachsen */
+    min-height: 40px; /* Etwas mehr Platz für mehrzeilige Antworten */
     margin-top: 10px;
-    opacity: 0.8;
+    padding: 10px;
+    opacity: 0.9;
     transition: opacity 0.3s ease;
-    text-align: left; /* Für bessere Lesbarkeit der Antworten */
+    text-align: left;
+    background-color: rgba(0,0,0,0.02);
+    border: 1px solid rgba(0,0,0,0.05);
+    border-radius: 8px;
 }
+body.dark-mode #ai-status {
+    background-color: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
 
 .cta-buttons { 
     display: flex; 
