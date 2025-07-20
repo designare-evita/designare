@@ -1,4 +1,4 @@
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // API-Schlüssel wird sicher aus den Umgebungsvariablen des Servers geladen
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -17,7 +17,8 @@ export default async function handler(req, res) {
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-pro"});
+    // GEÄNDERT: Modellname auf den aktuellen Wert aktualisiert
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest"});
 
     // Ein angepasster Prompt, um die KI in Ihrer Rolle antworten zu lassen
     const prompt = `Du bist Evita, ein freundlicher und professioneller KI-Assistent auf der digitalen Visitenkarte von Michael Kanda, einem Web-Strategen aus Wien. Antworte kurz (maximal 2-3 Sätze), professionell und hilfreich auf die folgende Frage des Besuchers: "${question}"`;
