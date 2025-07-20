@@ -140,7 +140,8 @@ body.dark-mode #theme-toggle .fa-moon {
     font-weight: 700; 
     line-height: 1.2; 
     margin-bottom: 0.5rem; 
-    min-height: 110px; /* Mindesthöhe für Desktop (2 Zeilen) */
+    /* GEÄNDERT: Mindesthöhe vorsorglich erhöht */
+    min-height: 130px; 
     display: flex;
     align-items: center;
     justify-content: center;
@@ -156,15 +157,12 @@ body.dark-mode #theme-toggle .fa-moon {
     max-width: 450px;
     margin-bottom: 2.5rem;
 }
-
-/* NEU: Stile für den AI-Einleitungstext */
 .ai-intro-text {
     font-size: 1rem;
-    font-weight: 400; /* Regular für gute Lesbarkeit */
+    font-weight: 400;
     margin-bottom: 15px;
     opacity: 0.9;
 }
-
 #ai-form {
     display: flex;
     border: 1px solid rgba(0,0,0,0.1);
@@ -279,7 +277,8 @@ footer a:hover {
     } 
     #hero h1 { 
         font-size: 2.5rem; 
-        min-height: 125px; 
+        /* GEÄNDERT: Mindesthöhe vorsorglich erhöht */
+        min-height: 140px; 
     }
     
     #hero .subtitle {
