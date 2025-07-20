@@ -12,10 +12,13 @@
 </head>
 <body>
 
-    <button id="theme-toggle" aria-label="Toggle dark mode">
-        <i class="fas fa-moon"></i>
-        <i class="fas fa-sun"></i>
-    </button>
+    <div id="top-right-controls">
+        <span id="clock"></span>
+        <button id="theme-toggle" aria-label="Toggle dark mode">
+            <i class="fas fa-moon"></i>
+            <i class="fas fa-sun"></i>
+        </button>
+    </div>
 
     <main id="hero">
         <div id="particles-js"></div>
@@ -31,7 +34,6 @@
             
             <div class="ai-container">
                 <p class="ai-intro-text">Hallo, ich bin Evita, Ihre KI-Assistentin.</p>
-
                 <form id="ai-form">
                     <input type="text" id="ai-question" placeholder="Wie kann ich helfen?" autocomplete="off" required>
                     <button type="submit" aria-label="Frage senden">

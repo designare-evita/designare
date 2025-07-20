@@ -1,6 +1,6 @@
 /*
  * script.js
- * Online-Visitenkarte - Finale Version
+ * Online-Visitenkarte mit automatischer Zeitsteuerung
 */
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -20,8 +20,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    // --- Effekt 0: Tag-/Nachtmodus Logik ---
+    // --- Effekt 0: Tag-/Nachtmodus & UHRZEIT ---
     const themeToggle = document.getElementById('theme-toggle');
+    const clockElement = document.getElementById('clock');
+
     const applyTheme = (theme) => {
         if (theme === 'dark') {
             body.classList.add('dark-mode');
@@ -30,15 +32,51 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         updateParticleColors();
     };
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    applyTheme(savedTheme);
+
+    // Funktion zur automatischen Umschaltung
+    const checkTimeAndSetTheme = () => {
+        // Holt die aktuelle Zeit in der Zeitzone Wien/MEZ
+        const now = new Date(new Date().toLocaleString("en-US", {timeZone: "Europe/Vienna"}));
+        const hours = now.getHours();
+        const minutes = now.getMinutes();
+
+        // Zeit in Minuten umrechnen für einfachen Vergleich
+        const currentTimeInMinutes = hours * 60 + minutes;
+        const dayStartInMinutes = 6 * 60 + 30; // 6:30
+        const nightStartInMinutes = 20 * 60 + 45; // 20:45
+
+        let newTheme = 'light';
+        if (currentTimeInMinutes >= nightStartInMinutes || currentTimeInMinutes < dayStartInMinutes) {
+            newTheme = 'dark';
+        }
+        
+        applyTheme(newTheme);
+    };
+
+    // Funktion zur Aktualisierung der Uhrzeitanzeige
+    const updateClock = () => {
+        const now = new Date(new Date().toLocaleString("en-US", {timeZone: "Europe/Vienna"}));
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        clockElement.textContent = `${hours}:${minutes}`;
+    };
+
+    // Manuelle Umschaltung per Klick
     themeToggle.addEventListener('click', () => {
         const newTheme = body.classList.contains('dark-mode') ? 'light' : 'dark';
-        localStorage.setItem('theme', newTheme);
         applyTheme(newTheme);
     });
-    
-    // --- Effekt 1: H1-Typewriter WIEDERHERGESTELLT ---
+
+    // Initialisierung beim Laden der Seite
+    checkTimeAndSetTheme();
+    updateClock();
+
+    // Uhrzeit und Theme-Check alle 60 Sekunden aktualisieren
+    setInterval(updateClock, 1000); // Uhrzeit jede Sekunde aktualisieren
+    setInterval(checkTimeAndSetTheme, 60000); // Theme jede Minute prüfen
+
+
+    // --- Effekt 1: H1-Typewriter ---
     const typewriterElement = document.getElementById('typewriter-h1');
     if (typewriterElement) {
         const textsToType = [ "Web Developer", "Digital Growth Strategist", "AI Enthusiast" ];
@@ -75,7 +113,7 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(typeWriter, 500);
     }
 
-    // --- GEÄNDERT: KI-Antworten werden im #ai-status-Feld angezeigt ---
+    // --- KI-Interaktion ---
     const aiForm = document.getElementById('ai-form');
     const aiQuestionInput = document.getElementById('ai-question');
     const aiStatus = document.getElementById('ai-status');
@@ -87,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const question = aiQuestionInput.value.trim();
             if (!question) return;
 
-            aiStatus.innerText = 'Evita denkt nach...';
+            aiStatus.innerText = 'KI denkt nach...';
             aiQuestionInput.disabled = true;
             submitButton.disabled = true;
 
@@ -103,7 +141,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
                 const data = await response.json();
-                aiStatus.innerText = data.answer; // Antwort hier anzeigen
+                aiStatus.innerText = data.answer;
 
             } catch (error) {
                 console.error("Fehler:", error);

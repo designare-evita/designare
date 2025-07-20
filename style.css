@@ -66,12 +66,30 @@ body {
     transition: background-color 0.4s ease, color 0.4s ease;
 }
 
-/* Stile für den Theme-Umschalter */
-#theme-toggle {
+/* NEU: Container für Uhr und Theme-Button */
+#top-right-controls {
     position: fixed;
     top: 20px;
     right: 20px;
     z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* NEU: Stile für die Uhrzeitanzeige */
+#clock {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-color);
+    opacity: 0.7;
+    transition: color 0.4s ease;
+}
+
+/* Stile für den Theme-Umschalter */
+#theme-toggle {
+    /* Positionierung wird jetzt vom Container übernommen */
     background: none;
     border: none;
     color: var(--text-color);
@@ -133,20 +151,19 @@ body.dark-mode #theme-toggle .fa-moon {
     height: 180px; 
     margin-bottom: 1.5rem; 
     object-fit: cover;
-   
+    border-radius: 50%;
 }
 #hero h1 { 
     font-size: 3rem; 
     font-weight: 700; 
     line-height: 1.2; 
     margin-bottom: 0.5rem; 
-    height: 140px;
+    height: 140px; 
     display: flex;
     align-items: center;
     justify-content: center;
-    /* GEÄNDERT: Feste Breite für die Überschrift hinzugefügt */
     width: 100%;
-    max-width: 800px; /* Passt sich der längsten Überschrift an */
+    max-width: 800px;
 }
 #hero .subtitle { 
     font-size: 1.2rem; 
@@ -155,8 +172,8 @@ body.dark-mode #theme-toggle .fa-moon {
 }
 
 .ai-container {
-    width: 500px;
-    max-width: 450px;
+    width: 100%;
+    max-width: 500px;
     margin-bottom: 2.5rem;
 }
 .ai-intro-text {
@@ -280,7 +297,7 @@ footer a:hover {
     #hero h1 { 
         font-size: 2.5rem; 
         height: 150px; 
-        max-width: 90%; /* Passt die Breite für schmale Bildschirme an */
+        max-width: 90%;
     }
     
     #hero .subtitle {
