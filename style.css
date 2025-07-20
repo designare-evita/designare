@@ -155,7 +155,7 @@ body.dark-mode #theme-toggle .fa-moon {
 }
 
 .ai-container {
-    width: 100%;
+    width: 600px;
     max-width: 450px;
     margin-bottom: 2.5rem;
 }
