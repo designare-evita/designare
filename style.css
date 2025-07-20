@@ -171,7 +171,7 @@ body.dark-mode #theme-toggle .fa-moon {
 }
 
 .ai-container {
-    width: 500px;
+    width: 450px;
     margin-bottom: 2.5rem;
 }
 .ai-intro-text {
@@ -241,12 +241,12 @@ body.dark-mode #ai-status {
 
 .cta-buttons { 
     display: flex; 
-    width: 100%;
+    width: 450px;
     max-width: 450px;
 }
 .cta-button { 
     display: block;
-    width: 100%;
+    width: 450px;
     background: transparent;
     color: var(--accent-color);
     padding: 12px 24px; 
@@ -306,6 +306,6 @@ footer a:hover {
         flex-direction: column; 
     } 
     .ai-container {
-        width: 100%;
+        width: 450px;
     }
 }
