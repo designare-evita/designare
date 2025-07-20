@@ -133,7 +133,6 @@ body.dark-mode #theme-toggle .fa-moon {
     height: 180px; 
     margin-bottom: 1.5rem; 
     object-fit: cover;
-    border-radius: 50%;
 }
 #hero h1 { 
     font-size: 3rem; 
