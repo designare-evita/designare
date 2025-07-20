@@ -133,18 +133,20 @@ body.dark-mode #theme-toggle .fa-moon {
     height: 180px; 
     margin-bottom: 1.5rem; 
     object-fit: cover;
-
+  
 }
 #hero h1 { 
     font-size: 3rem; 
     font-weight: 700; 
     line-height: 1.2; 
     margin-bottom: 0.5rem; 
-    /* GEÄNDERT: Mindesthöhe vorsorglich erhöht */
-    min-height: 130px; 
+    height: 140px;
     display: flex;
     align-items: center;
     justify-content: center;
+    /* GEÄNDERT: Feste Breite für die Überschrift hinzugefügt */
+    width: 100%;
+    max-width: 800px; /* Passt sich der längsten Überschrift an */
 }
 #hero .subtitle { 
     font-size: 1.2rem; 
@@ -213,79 +215,4 @@ body.dark-mode #ai-form {
     transition: opacity 0.3s ease;
     text-align: left;
     background-color: rgba(0,0,0,0.02);
-    border: 1px solid rgba(0,0,0,0.05);
-    border-radius: 8px;
-}
-body.dark-mode #ai-status {
-    background-color: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.08);
-}
-
-
-.cta-buttons { 
-    display: flex; 
-    width: 100%;
-    max-width: 450px;
-}
-.cta-button { 
-    display: block;
-    width: 100%;
-    background: transparent;
-    color: var(--accent-color);
-    padding: 12px 24px; 
-    border-radius: 5px; 
-    text-decoration: none; 
-    font-weight: 600; 
-    transition: all 0.3s ease; 
-    border: 2px solid var(--accent-color);
-    text-align: center;
-}
-.cta-button:hover { 
-    background-color: var(--accent-color);
-    color: #fff;
-    transform: translateY(-3px); 
-}
-
-/* Stile für den dezenten Footer-Link */
-footer {
-    position: fixed;
-    bottom: 10px;
-    right: 10px;
-    z-index: 1000;
-}
-
-footer a {
-    font-size: 0.8rem;
-    color: var(--text-color);
-    text-decoration: none;
-    opacity: 0.5;
-    transition: opacity 0.3s ease;
-    border: 1px solid var(--text-color);
-    padding: 4px 8px;
-    border-radius: 5px;
-}
-
-footer a:hover {
-    opacity: 1;
-}
-
-/* Responsive */
-@media (max-width: 768px) { 
-    .profile-picture { 
-        width: 144px; 
-        height: 144px; 
-    } 
-    #hero h1 { 
-        font-size: 2.5rem; 
-        /* GEÄNDERT: Mindesthöhe vorsorglich erhöht */
-        min-height: 140px; 
-    }
-    
-    #hero .subtitle {
-        margin-bottom: 1.7rem;
-    }
-
-    .cta-buttons { 
-        flex-direction: column; 
-    } 
-}
+    border: 1px solid rgba(
