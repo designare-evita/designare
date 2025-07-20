@@ -1,0 +1,134 @@
+/*
+ * legal-style.css
+ * Stile für die Impressum-Seite
+*/
+
+/* 1. Lokale Fonts laden (identisch zur Hauptseite) */
+@font-face {
+    font-family: 'Poppins';
+    src: url('Font/Poppins-Light.ttf') format('truetype');
+    font-weight: 300;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Poppins';
+    src: url('Font/Poppins-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Poppins';
+    src: url('Font/Poppins-SemiBold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Poppins';
+    src: url('Font/Poppins-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+}
+
+/* 2. Farbvariablen & Basis-Stile */
+:root {
+    --bg-color: #f8f9fa;
+    --text-color: #333333;
+    --accent-color: #FCB500;
+    --link-color: #0275d8;
+    --border-color: #eeeeee;
+}
+
+body.dark-mode {
+    --bg-color: #1a1a1a;
+    --text-color: #eeeeee;
+    --link-color: #FCB500;
+    --border-color: #333333;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    line-height: 1.7;
+    margin: 0;
+    padding: 2rem;
+    transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+/* 3. Container & Inhalt */
+.legal-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+h1, h2 {
+    font-weight: 600;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 1rem;
+}
+
+h3 {
+    font-weight: 600;
+    margin-top: 2.5rem;
+}
+
+p {
+    margin-bottom: 1rem;
+}
+
+a {
+    color: var(--link-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 0.5rem;
+}
+
+.contact-item i {
+    width: 20px;
+    text-align: center;
+    color: var(--accent-color);
+}
+
+/* 4. Zurück-Button */
+/* GEÄNDERT: Button-Stil mit Rahmen und Rundung hinzugefügt */
+.back-link {
+    display: inline-block;
+    margin-bottom: 3rem;
+    font-weight: 600;
+    color: var(--accent-color);
+    text-decoration: none;
+    border: 2px solid var(--accent-color);
+    padding: 8px 15px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+.back-link i {
+    margin-right: 8px;
+    transition: transform 0.3s ease;
+}
+
+/* NEU: Hover-Effekt für den Button */
+.back-link:hover {
+    background-color: var(--accent-color);
+    color: #fff;
+    text-decoration: none; /* Unterstreichung beim Hover entfernen */
+}
+
+.back-link:hover i {
+    transform: translateX(-5px);
+}
