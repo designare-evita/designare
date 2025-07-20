@@ -1,6 +1,6 @@
 /*
  * script.js
- * Online-Visitenkarte - Finale Version
+ * Online-Visitenkarte mit ECHTER Gemini-Anbindung
 */
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -38,80 +38,74 @@ document.addEventListener('DOMContentLoaded', function() {
         applyTheme(newTheme);
     });
     
-    // --- Effekt 1: Alter H1-Typewriter WIEDERHERGESTELLT ---
-    const typewriterElement = document.getElementById('typewriter-h1');
-    if (typewriterElement) {
-        const textsToType = [ "Web Developer", "Digital Growth Strategist", "AI Enthusiast" ];
-        let textIndex = 0; let charIndex = 0; let isDeleting = false;
-        const typingSpeed = 110, deletingSpeed = 55, delayBetweenTexts = 2000;
-        
-        function typeWriter() {
-            const currentText = textsToType[textIndex];
-            if (isDeleting) { 
-                typewriterElement.innerHTML = currentText.substring(0, charIndex - 1) + '<span class="cursor"></span>'; 
-                charIndex--;
-            } else { 
-                typewriterElement.innerHTML = currentText.substring(0, charIndex + 1) + '<span class="cursor"></span>'; 
-                charIndex++; 
-            }
-            if (!isDeleting && charIndex === currentText.length) { 
-                isDeleting = true; 
-                setTimeout(typeWriter, delayBetweenTexts); 
-                return; 
-            }
-            if (isDeleting && charIndex === 0) { 
-                isDeleting = false; 
-                textIndex = (textIndex + 1) % textsToType.length; 
-                setTimeout(typeWriter, 500); 
-                return; 
-            }
-            const currentSpeed = isDeleting ? deletingSpeed : typingSpeed; 
-            setTimeout(typeWriter, currentSpeed);
-        }
-        
-        const style = document.createElement('style');
-        style.innerHTML = `.cursor { display: inline-block; width: 3px; height: 1em; background-color: var(--accent-color); animation: blink 0.7s infinite; vertical-align: bottom; margin-left: 5px; } @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }`;
-        document.head.appendChild(style);
-        setTimeout(typeWriter, 500);
-    }
-    
-    // --- NEU: Angepasste Interaktive "Fake" AI Logik ---
+    // --- Effekt 1: ECHTE Gemini AI Interaktion ---
     const aiForm = document.getElementById('ai-form');
     const aiQuestionInput = document.getElementById('ai-question');
     const aiStatus = document.getElementById('ai-status');
+    const h1Element = document.getElementById('typewriter-h1');
+    const submitButton = aiForm.querySelector('button');
     
-    if (aiForm) {
-        const answerDatabase = {
-            "wer": "Ich bin ein KI-Assistent, trainiert von Michael Kanda, einem Web-Strategen aus Wien.",
-            "name": "Ich bin ein KI-Assistent, trainiert von Michael Kanda, einem Web-Strategen aus Wien.",
-            "michael": "Michael Kanda verbindet Design und künstliche Intelligenz, um einzigartige digitale Erlebnisse zu schaffen.",
-            "expertise": "Die Kernkompetenzen sind Web Development, SEO und die strategische Integration von KI in Unternehmensprozesse.",
-            "kompetenzen": "Die Kernkompetenzen sind Web Development, SEO und die strategische Integration von KI in Unternehmensprozesse.",
-            "was": "Die Kernkompetenzen sind Web Development, SEO und die strategische Integration von KI in Unternehmensprozesse.",
-            "kontakt": "Sie können Michael Kanda direkt über den 'Kontakt aufnehmen'-Button erreichen.",
-            "hilfe": "Stellen Sie Fragen zu 'Expertise', 'Kontakt' oder 'Wer Michael Kanda ist'.",
-            "hallo": "Hallo! Wie kann ich Ihnen heute helfen?",
-            "default": "Das ist eine interessante Frage. Für eine detaillierte Antwort kontaktieren Sie bitte Michael Kanda direkt."
-        };
+    let typingInterval = null;
+    function typeAnswer(text) {
+        let i = 0;
+        h1Element.innerHTML = '';
+        aiStatus.innerText = '';
 
-        aiForm.addEventListener('submit', (e) => {
+        clearInterval(typingInterval);
+        typingInterval = setInterval(() => {
+            if (i < text.length) {
+                h1Element.innerHTML += text.charAt(i);
+                i++;
+            } else {
+                clearInterval(typingInterval);
+            }
+        }, 40); // Schreibgeschwindigkeit
+    }
+
+    if (aiForm) {
+        // Initialer Text für die h1
+        typeAnswer("Ihre persönliche KI-Assistenz");
+
+        aiForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const question = aiQuestionInput.value.trim().toLowerCase();
+            const question = aiQuestionInput.value.trim();
             if (!question) return;
 
+            // UI für "Laden" vorbereiten
             aiStatus.innerText = 'KI denkt nach...';
-            setTimeout(() => {
-                let foundAnswer = answerDatabase.default;
-                for (const keyword in answerDatabase) {
-                    if (question.includes(keyword)) {
-                        foundAnswer = answerDatabase[keyword];
-                        break;
-                    }
+            aiQuestionInput.disabled = true;
+            submitButton.disabled = true;
+            clearInterval(typingInterval);
+            h1Element.innerHTML = '';
+
+            try {
+                // Anfrage an das Backend senden
+                const response = await fetch('/api/ask-gemini', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question: question })
+                });
+
+                if (!response.ok) {
+                    // Versucht, eine Fehlermeldung vom Server zu bekommen
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Netzwerk-Antwort war nicht OK.');
                 }
-                // Antwort wird jetzt in das ai-status Feld geschrieben
-                aiStatus.innerText = foundAnswer;
+
+                const data = await response.json();
+                
+                // Antwort mit dem Typewriter-Effekt anzeigen
+                typeAnswer(data.answer);
+
+            } catch (error) {
+                console.error("Fehler:", error);
+                aiStatus.innerText = 'Ein Fehler ist aufgetreten.';
+                h1Element.innerHTML = 'Assistent offline';
+            } finally {
                 aiQuestionInput.value = '';
-            }, 700); 
+                aiQuestionInput.disabled = false;
+                submitButton.disabled = false;
+            }
         });
     }
 
