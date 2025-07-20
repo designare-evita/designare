@@ -306,6 +306,8 @@ footer a:hover {
         flex-direction: column; 
     } 
     .ai-container {
-        width: 450px;
+        width: 400px;
+        margin-left: 10px;
+        margin-right: 10px;
     }
 }
