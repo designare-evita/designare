@@ -12,21 +12,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
 document.addEventListener('DOMContentLoaded', function() {
 
-    // NEU: Cookie Info Bar Logik - Start
+     // NEU: Cookie Info Bar Logik - Start
     const cookieInfoBar = document.getElementById('cookie-info-bar');
+    const closeCookieBarBtn = document.getElementById('close-cookie-bar'); // Neuer Button
 
-    // Prüfen, ob die Info-Bar bereits angezeigt wurde (optional, um sie nur einmal zu zeigen)
-    // Wenn du möchtest, dass sie bei JEDEM Seitenaufruf kurz erscheint, entferne diese if-Bedingung.
-    const hasSeenCookieInfo = localStorage.getItem('hasSeenCookieInfo');
+    const hasClosedCookieInfo = localStorage.getItem('hasClosedCookieInfo');
 
-    if (!hasSeenCookieInfo) {
+    if (!hasClosedCookieInfo) { // Nur anzeigen, wenn er noch nicht geschlossen wurde
         // Zeige die Info-Bar nach kurzer Verzögerung
         setTimeout(() => {
             cookieInfoBar.classList.add('show');
-            // Markiere, dass der Nutzer die Info gesehen hat, damit sie nicht bei jedem Reload kommt
-            // Wenn du sie IMMER anzeigen möchtest, entferne diese Zeile.
-            localStorage.setItem('hasSeenCookieInfo', 'true');
         }, 1500); // Zeigt den Bar nach 1.5 Sekunden an
+    }
+
+    // Event Listener für den Schließen-Button
+    if (closeCookieBarBtn) {
+        closeCookieBarBtn.addEventListener('click', () => {
+            cookieInfoBar.classList.remove('show');
+            localStorage.setItem('hasClosedCookieInfo', 'true'); // Merken, dass der Nutzer ihn geschlossen hat
+        });
     }
     // NEU: Cookie Info Bar Logik - Ende
 

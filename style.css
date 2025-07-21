@@ -264,81 +264,114 @@ footer a:hover { opacity: 1; }
     .ai-container { width: 100%; }
 }
 
-/* In style.css, am Ende der Datei */
+
 
 /* 8. Cookie Info Bar */
+
+
 .cookie-info-bar {
     position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
-    background-color: var(--text-color); /* Dunkler Hintergrund im Tag-Modus */
-    color: var(--bg-color); /* Heller Text im Tag-Modus */
+    background-color: var(--text-color);
+    color: var(--bg-color);
     padding: 12px 20px;
     text-align: center;
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
-    z-index: 1900; /* Unter dem Modal, aber über dem Footer */
-    transform: translateY(100%); /* Startet außerhalb des Bildschirms */
-    transition: transform 0.8s ease-out; /* Sanfte Animation */
-    display: flex; /* Für vertikale Zentrierung des Textes */
-    justify-content: center; /* Für horizontale Zentrierung des Textes */
-    align-items: center; /* Für vertikale Zentrierung des Textes */
+    z-index: 1900;
+    transform: translateY(100%);
+    transition: transform 0.8s ease-out;
+    display: flex; /* Flexbox für Ausrichtung */
+    justify-content: center;
+    align-items: center;
+    gap: 15px; /* Abstand zwischen Text und Button */
 }
 
 /* Anpassung für den Nachtmodus */
 body.dark-mode .cookie-info-bar {
-    background-color: #333333; /* Dunkleres Grau im Nachtmodus */
-    color: #eeeeee; /* Heller Text im Nachtmodus */
+    background-color: #333333;
+    color: #eeeeee;
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.4);
 }
 
 .cookie-info-bar.show {
-    transform: translateY(0); /* Fährt in den Bildschirm ein */
+    transform: translateY(0);
 }
 
 .cookie-info-bar p {
     margin: 0;
-    font-size: 1rem;
-    max-width: 800px; /* Begrenzt die Breite des Textes */
+    font-size: 0.95rem;
+    max-width: 800px;
+    flex-grow: 1; /* Lässt den Text den verfügbaren Platz einnehmen */
 }
 
 .cookie-info-bar a {
-    color: var(--accent-color); /* Akzentfarbe für den Link */
+    color: var(--accent-color);
     text-decoration: underline;
     font-weight: 600;
-    margin-left: 8px; /* Abstand zum Text */
-    white-space: nowrap; /* Link nicht umbrechen */
+    margin-left: 8px;
+    white-space: nowrap;
+    font-size: calc(0.95rem + 2pt);
 }
 
 .cookie-info-bar a:hover {
     text-decoration: none;
 }
 
-/* Anpassung des Footers, damit er nicht vom Cookie-Bar überdeckt wird,
-   falls beide gleichzeitig sichtbar sein sollten (was sie nicht sein sollten,
-   aber für den Übergang oder falls doch gewünscht) */
+/* NEU: Styling für den Schließen-Button */
+.close-cookie-bar {
+    background: none;
+    border: none;
+    color: var(--bg-color); /* Farbe passend zum Hintergrund des Bars */
+    font-size: 1.5rem;
+    cursor: pointer;
+    line-height: 1;
+    opacity: 0.7;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    padding: 0 5px; /* Kleiner Padding für Klickfläche */
+}
+
+body.dark-mode .close-cookie-bar {
+    color: #eeeeee; /* Farbe im Nachtmodus anpassen */
+}
+
+.close-cookie-bar:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+/* Anpassung des Footers, falls nötig - unverändert */
 footer {
     position: fixed;
-    bottom: 10px; /* Ursprünglicher Wert */
+    bottom: 10px;
     right: 10px;
     z-index: 1000;
-    /* Optional: margin-bottom hinzufügen, wenn der Cookie-Bar immer sichtbar ist
-       oder eine feste Höhe hat und den Footer verdecken würde.
-       Aktuell fahren sie übereinander, was okay ist. */
 }
 
 /* Responsive Anpassung */
 @media (max-width: 768px) {
     .cookie-info-bar {
         padding: 10px 15px;
+        flex-direction: column; /* Vertikal anordnen */
+        gap: 10px; /* Abstand zwischen den Elementen */
+        align-items: flex-start; /* Elemente linksbündig ausrichten */
     }
     .cookie-info-bar p {
-        font-size: 0.9rem;
-        text-align: center;
+        font-size: 0.85rem;
+        text-align: left; /* Text linksbündig */
+        width: 100%; /* Text nimmt volle Breite ein */
     }
     .cookie-info-bar a {
-        display: block; /* Link auf eigener Zeile für bessere Lesbarkeit */
-        margin-top: 5px;
-        margin-left: 0;
+        display: inline; /* Link bleibt inline */
+        margin-top: 0;
+        margin-left: 0; /* Kein zusätzlicher Margin-Left */
+        font-size: calc(0.85rem + 2pt);
+    }
+    .close-cookie-bar {
+        position: absolute; /* Position absolut im mobilen Layout */
+        top: 5px;
+        right: 5px;
+        font-size: 1.2rem; /* Etwas kleiner für Mobile */
     }
 }
