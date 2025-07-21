@@ -263,3 +263,82 @@ footer a:hover { opacity: 1; }
     #hero .subtitle { margin-bottom: 1.7rem; }
     .ai-container { width: 100%; }
 }
+
+/* In style.css, am Ende der Datei */
+
+/* 8. Cookie Info Bar */
+.cookie-info-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: var(--text-color); /* Dunkler Hintergrund im Tag-Modus */
+    color: var(--bg-color); /* Heller Text im Tag-Modus */
+    padding: 12px 20px;
+    text-align: center;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+    z-index: 1900; /* Unter dem Modal, aber über dem Footer */
+    transform: translateY(100%); /* Startet außerhalb des Bildschirms */
+    transition: transform 0.8s ease-out; /* Sanfte Animation */
+    display: flex; /* Für vertikale Zentrierung des Textes */
+    justify-content: center; /* Für horizontale Zentrierung des Textes */
+    align-items: center; /* Für vertikale Zentrierung des Textes */
+}
+
+/* Anpassung für den Nachtmodus */
+body.dark-mode .cookie-info-bar {
+    background-color: #333333; /* Dunkleres Grau im Nachtmodus */
+    color: #eeeeee; /* Heller Text im Nachtmodus */
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.4);
+}
+
+.cookie-info-bar.show {
+    transform: translateY(0); /* Fährt in den Bildschirm ein */
+}
+
+.cookie-info-bar p {
+    margin: 0;
+    font-size: 0.95rem;
+    max-width: 800px; /* Begrenzt die Breite des Textes */
+}
+
+.cookie-info-bar a {
+    color: var(--accent-color); /* Akzentfarbe für den Link */
+    text-decoration: underline;
+    font-weight: 600;
+    margin-left: 8px; /* Abstand zum Text */
+    white-space: nowrap; /* Link nicht umbrechen */
+}
+
+.cookie-info-bar a:hover {
+    text-decoration: none;
+}
+
+/* Anpassung des Footers, damit er nicht vom Cookie-Bar überdeckt wird,
+   falls beide gleichzeitig sichtbar sein sollten (was sie nicht sein sollten,
+   aber für den Übergang oder falls doch gewünscht) */
+footer {
+    position: fixed;
+    bottom: 10px; /* Ursprünglicher Wert */
+    right: 10px;
+    z-index: 1000;
+    /* Optional: margin-bottom hinzufügen, wenn der Cookie-Bar immer sichtbar ist
+       oder eine feste Höhe hat und den Footer verdecken würde.
+       Aktuell fahren sie übereinander, was okay ist. */
+}
+
+/* Responsive Anpassung */
+@media (max-width: 768px) {
+    .cookie-info-bar {
+        padding: 10px 15px;
+    }
+    .cookie-info-bar p {
+        font-size: 0.85rem;
+        text-align: center;
+    }
+    .cookie-info-bar a {
+        display: block; /* Link auf eigener Zeile für bessere Lesbarkeit */
+        margin-top: 5px;
+        margin-left: 0;
+    }
+}

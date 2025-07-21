@@ -5,6 +5,67 @@
 
 document.addEventListener('DOMContentLoaded', function() {
 
+    /*
+ * script.js
+ * Online-Visitenkarte - Finale Version
+*/
+
+document.addEventListener('DOMContentLoaded', function() {
+
+    // NEU: Cookie Info Bar Logik - Start
+    const cookieInfoBar = document.getElementById('cookie-info-bar');
+
+    // Prüfen, ob die Info-Bar bereits angezeigt wurde (optional, um sie nur einmal zu zeigen)
+    // Wenn du möchtest, dass sie bei JEDEM Seitenaufruf kurz erscheint, entferne diese if-Bedingung.
+    const hasSeenCookieInfo = localStorage.getItem('hasSeenCookieInfo');
+
+    if (!hasSeenCookieInfo) {
+        // Zeige die Info-Bar nach kurzer Verzögerung
+        setTimeout(() => {
+            cookieInfoBar.classList.add('show');
+            // Markiere, dass der Nutzer die Info gesehen hat, damit sie nicht bei jedem Reload kommt
+            // Wenn du sie IMMER anzeigen möchtest, entferne diese Zeile.
+            localStorage.setItem('hasSeenCookieInfo', 'true');
+        }, 1500); // Zeigt den Bar nach 1.5 Sekunden an
+    }
+    // NEU: Cookie Info Bar Logik - Ende
+
+
+    const body = document.body;
+
+    // --- HILFSFUNKTION FÜR PARTIKEL ---
+    const updateParticleColors = () => { /* ... unverändert ... */ };
+
+    // --- THEME-LOGIK ---
+    const themeToggle = document.getElementById('theme-toggle');
+    const applyTheme = (theme) => { /* ... unverändert ... */ };
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    applyTheme(savedTheme);
+    themeToggle.addEventListener('click', () => { /* ... unverändert ... */ });
+
+    // --- H1-TYPEWRITER ---
+    const typewriterElement = document.getElementById('typewriter-h1');
+    if (typewriterElement) { /* ... unverändert ... */ }
+
+    // --- KONTAKT-MODAL ---
+    const contactButton = document.getElementById('contact-button');
+    const closeModalButton = document.getElementById('close-modal');
+    const contactModal = document.getElementById('contact-modal');
+    if (contactButton && closeModalButton && contactModal) { /* ... unverändert ... */ }
+
+    // --- KI-INTERAKTION & DYNAMISCHER PLATZHALTER ---
+    const aiForm = document.getElementById('ai-form');
+    if (aiForm) { /* ... unverändert ... */ }
+
+    // --- PARTIKEL-HINTERGRUND ---
+    if (document.getElementById('particles-js')) { /* ... unverändert ... */ }
+
+    // --- 3D-SCHWEBEEFFEKT ---
+    const heroElement = document.getElementById('hero');
+    const container = document.querySelector('#hero .container');
+    if(heroElement && container) { /* ... unverändert ... */ }
+});
+
     const body = document.body;
 
     // --- HILFSFUNKTION FÜR PARTIKEL ---
