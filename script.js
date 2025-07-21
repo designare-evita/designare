@@ -32,7 +32,6 @@ document.addEventListener('DOMContentLoaded', function() {
         updateParticleColors();
     };
     
-    // Standard-Theme ist Nachtmodus
     const savedTheme = localStorage.getItem('theme') || 'dark';
     applyTheme(savedTheme);
 
@@ -93,9 +92,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- KI-INTERAKTION & DYNAMISCHER PLATZHALTER ---
     const aiForm = document.getElementById('ai-form');
-    const aiQuestionInput = document.getElementById('ai-question');
-
     if (aiForm) {
+        const aiQuestionInput = document.getElementById('ai-question');
+        const aiStatus = document.getElementById('ai-status');
+        const submitButton = aiForm.querySelector('button');
+
         const placeholderTexts = [
             "Hallo, ich bin Evita, Michaels KI-Assistentin.",
             "Was kann ich für Sie tun?"
@@ -116,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     charPlaceholderIndex = 0;
                     typePlaceholder();
                 }
-            }, 40); // Geschwindigkeit des Löschens
+            }, 40);
         }
 
         function typePlaceholder() {
@@ -128,45 +129,48 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else {
                     clearInterval(typeInterval);
                 }
-            }, 70); // Geschwindigkeit des Tippens
+            }, 70);
         }
+        
+        placeholderInterval = setInterval(cyclePlaceholder, 7000);
 
-        // GEÄNDERT: Intervall auf 5 Sekunden erhöht
-        placeholderInterval = setInterval(cyclePlaceholder, 5000);
-
-        aiQuestionInput.addEventListener('focus', () => {
-            clearInterval(placeholderInterval);
-        });
+        aiQuestionInput.addEventListener('focus', () => clearInterval(placeholderInterval));
         aiQuestionInput.addEventListener('blur', () => {
             if(aiQuestionInput.value === '') {
-                 placeholderInterval = setInterval(cyclePlaceholder, 5000);
+                 placeholderInterval = setInterval(cyclePlaceholder, 7000);
             }
         });
         
-        const aiStatus = document.getElementById('ai-status');
-        const submitButton = aiForm.querySelector('button');
-
         aiForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const question = aiQuestionInput.value.trim();
             if (!question) return;
 
             clearInterval(placeholderInterval);
-            // GEÄNDERT: Statusmeldung und Klassen-Änderung
             aiStatus.innerText = 'Evita denkt nach...';
-            aiStatus.classList.add('thinking'); // Rahmenfarbe ändern
+            aiStatus.classList.add('thinking');
             aiQuestionInput.disabled = true;
             submitButton.disabled = true;
 
             try {
-                const response = await fetch('/api/ask-gemini', {
+                // GEÄNDERT: Logik für die Mindest-Denkpause
+                const fetchPromise = fetch('/api/ask-gemini', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ question: question })
                 });
+
+                // Erzeugt eine künstliche Verzögerung von 1200 Millisekunden (1.2 Sekunden)
+                const delayPromise = new Promise(resolve => setTimeout(resolve, 1200));
+
+                // Wartet, bis BEIDE Aktionen abgeschlossen sind: der Fetch UND die Verzögerung
+                const [response] = await Promise.all([fetchPromise, delayPromise]);
+
                 if (!response.ok) { throw new Error('Netzwerk-Antwort war nicht OK.'); }
+                
                 const data = await response.json();
                 aiStatus.innerText = data.answer;
+
             } catch (error) {
                 console.error("Fehler:", error);
                 aiStatus.innerText = 'Ein Fehler ist aufgetreten.';
@@ -175,7 +179,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 aiQuestionInput.disabled = false;
                 submitButton.disabled = false;
                 aiQuestionInput.placeholder = "Haben Sie eine weitere Frage?";
-                // GEÄNDERT: Rahmenfarbe wieder zurücksetzen
                 aiStatus.classList.remove('thinking');
             }
         });
@@ -206,5 +209,4 @@ document.addEventListener('DOMContentLoaded', function() {
             container.style.transform = 'rotateX(0) rotateY(0)'; 
         });
     }
-
 });
