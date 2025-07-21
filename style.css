@@ -1,9 +1,9 @@
 /*
  * style.css
- * Online-Visitenkarte - Finale Version
+ * Online-Visitenkarte - Finale, optimierte Version
 */
 
-/* Lokale Fonts laden */
+/* 1. Lokale Fonts laden */
 @font-face {
     font-family: 'Poppins';
     src: url('Font/Poppins-Light.ttf') format('truetype');
@@ -29,7 +29,7 @@
     font-style: normal;
 }
 
-/* 1. Globale Einstellungen & Farbvariablen */
+/* 2. Globale Einstellungen & Farbvariablen */
 :root {
     --bg-color: #f8f9fa;
     --text-color: #333333;
@@ -37,14 +37,15 @@
     --accent-color-rgba: rgba(252, 181, 0, 0.85);
     --particle-color: #888888;
     --particle-line-color: #cccccc;
+    --border-color: #eeeeee;
 }
 
-/* Farbdefinitionen für den Nachtmodus */
 body.dark-mode {
     --bg-color: #1a1a1a;
     --text-color: #eeeeee;
     --particle-color: #bbbbbb;
     --particle-line-color: #666666;
+    --border-color: #333333;
 }
 
 * { 
@@ -66,7 +67,44 @@ body {
     transition: background-color 0.4s ease, color 0.4s ease;
 }
 
-/* Container für Uhr und Theme-Button */
+/* 3. Haupt-Layout & Container */
+.container { 
+    max-width: 1100px; 
+    margin: 0 auto; 
+    padding: 0 2rem; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    transform-style: preserve-3d; 
+    transition: transform 0.1s linear; 
+}
+
+#hero { 
+    height: 100vh; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    text-align: center; 
+    position: relative; 
+    overflow: hidden; 
+}
+
+#particles-js { 
+    position: absolute; 
+    width: 100%; 
+    height: 100%; 
+    top: 0; 
+    left: 0; 
+    z-index: 1; 
+}
+
+#hero .container { 
+    position: relative; 
+    z-index: 2; 
+}
+
+/* 4. Steuerungselemente (Uhr, Buttons) */
 #top-right-controls {
     position: fixed;
     top: 20px;
@@ -78,16 +116,13 @@ body {
 }
 
 #clock {
-    font-family: 'Poppins', sans-serif;
     font-size: 1.2rem;
-    /* GEÄNDERT: Schriftstärke auf normal gesetzt */
     font-weight: 400;
     color: var(--text-color);
     opacity: 0.7;
     transition: color 0.4s ease;
 }
 
-/* Stile für den Theme-Umschalter */
 #theme-toggle {
     background: none;
     border: none;
@@ -100,58 +135,42 @@ body {
     color: var(--accent-color);
     transform: scale(1.1);
 }
-#theme-toggle .fa-sun {
-    display: none;
+#theme-toggle .fa-sun { display: none; }
+body.dark-mode #theme-toggle .fa-sun { display: inline-block; }
+body.dark-mode #theme-toggle .fa-moon { display: none; }
+
+#contact-button {
+    background: none;
+    border: 1px solid var(--text-color);
+    color: var(--text-color);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    opacity: 0.7;
 }
-body.dark-mode #theme-toggle .fa-sun {
-    display: inline-block;
-}
-body.dark-mode #theme-toggle .fa-moon {
-    display: none;
+#contact-button:hover {
+    opacity: 1;
+    color: #fff;
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    transform: scale(1.1);
 }
 
-/* Haupt-Layout */
-.container { 
-    max-width: 1100px; 
-    margin: 0 auto; 
-    padding: 0 2rem; 
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
-    justify-content: center; 
-    transform-style: preserve-3d; 
-    transition: transform 0.1s linear; 
-}
-#hero { 
-    height: 100vh; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    text-align: center; 
-    position: relative; 
-    overflow: hidden; 
-}
-#particles-js { 
-    position: absolute; 
-    width: 100%; 
-    height: 100%; 
-    top: 0; 
-    left: 0; 
-    z-index: 1; 
-}
-#hero .container { 
-    position: relative; 
-    z-index: 2; 
-}
-
-/* Elemente */
+/* 5. Inhaltselemente */
 .profile-picture { 
     width: 180px; 
     height: 180px; 
     margin-bottom: 1.5rem; 
     object-fit: cover;
-    /* Runder Rahmen entfernt */
+    border-radius: 50%;
 }
+
 #hero h1 { 
     font-size: 3rem; 
     font-weight: 700; 
@@ -164,6 +183,7 @@ body.dark-mode #theme-toggle .fa-moon {
     width: 100%;
     max-width: 800px;
 }
+
 #hero .subtitle { 
     font-size: 1.2rem; 
     font-weight: 300; 
@@ -171,15 +191,17 @@ body.dark-mode #theme-toggle .fa-moon {
 }
 
 .ai-container {
-    width: 450px;
+    width: 500px;
     margin-bottom: 2.5rem;
 }
+
 .ai-intro-text {
     font-size: 1rem;
     font-weight: 400;
     margin-bottom: 15px;
     opacity: 0.9;
 }
+
 #ai-form {
     display: flex;
     border: 1px solid rgba(0,0,0,0.1);
@@ -188,11 +210,9 @@ body.dark-mode #theme-toggle .fa-moon {
     background-color: var(--bg-color);
     transition: border-color 0.3s ease;
 }
-
 body.dark-mode #ai-form {
     border-color: rgba(255,255,255,0.15);
 }
-
 #ai-form:focus-within {
     border-color: var(--accent-color);
 }
@@ -216,7 +236,6 @@ body.dark-mode #ai-form {
     font-size: 1rem;
     transition: background-color 0.3s ease;
 }
-
 #ai-form button:hover {
     background: #d39a00;
 }
@@ -238,15 +257,14 @@ body.dark-mode #ai-status {
     border: 1px solid rgba(255,255,255,0.08);
 }
 
-
 .cta-buttons { 
     display: flex; 
-    width: 450px;
+    width: 100%;
     max-width: 450px;
 }
 .cta-button { 
     display: block;
-    width: 450px;
+    width: 100%;
     background: transparent;
     color: var(--accent-color);
     padding: 12px 24px; 
@@ -263,14 +281,13 @@ body.dark-mode #ai-status {
     transform: translateY(-3px); 
 }
 
-/* Stile für den dezenten Footer-Link */
+/* 6. Footer & Kontakt-Modal */
 footer {
     position: fixed;
     bottom: 10px;
     right: 10px;
     z-index: 1000;
 }
-
 footer a {
     font-size: 0.8rem;
     color: var(--text-color);
@@ -281,12 +298,102 @@ footer a {
     padding: 4px 8px;
     border-radius: 5px;
 }
-
 footer a:hover {
     opacity: 1;
 }
 
-/* Responsive */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+.modal-overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-content {
+    background-color: var(--bg-color);
+    padding: 2rem;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+}
+.modal-overlay.visible .modal-content {
+    transform: scale(1);
+}
+
+.modal-content h2 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: var(--text-color);
+    opacity: 0.5;
+    cursor: pointer;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.close-button:hover {
+    opacity: 1;
+    transform: rotate(90deg);
+}
+
+.modal-content form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.modal-content input[type="text"],
+.modal-content input[type="email"],
+.modal-content textarea {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+    padding: 12px;
+    border-radius: 5px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: border-color 0.3s ease;
+}
+.modal-content input:focus,
+.modal-content textarea:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.privacy-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.8rem;
+}
+.privacy-checkbox input {
+    width: auto;
+}
+
+/* 7. Responsive Design */
 @media (max-width: 768px) { 
     .profile-picture { 
         width: 144px; 
@@ -303,20 +410,9 @@ footer a:hover {
     }
 
     .cta-buttons { 
-        flex-direction: column; 
+        display: none;
     } 
     .ai-container {
-        width: 400px;
-        margin-left: 10px;
-        margin-right: 10px;
+        width: 100%;
     }
-    .cta-button { 
-    width: 400px;
-    margin-left: 10px;
-    margin-right: 10px;
-    }
-    .cta-buttons { 
-    width: 400px;
-    margin-left: 10px;
-    margin-right: 10px;
 }

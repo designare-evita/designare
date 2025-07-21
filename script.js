@@ -77,41 +77,51 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
     // --- Effekt 1: H1-Typewriter ---
+    /*
+ * script.js
+ * Online-Visitenkarte - Finale Version
+*/
+
+document.addEventListener('DOMContentLoaded', function() {
+
+    // ... (Code für body, updateParticleColors, Theme-Logik bleibt unverändert) ...
+    
+    // --- Effekt 1: H1-Typewriter ---
     const typewriterElement = document.getElementById('typewriter-h1');
     if (typewriterElement) {
-        const textsToType = [ "Web Developer", "Digital Growth Strategist", "AI Enthusiast" ];
-        let textIndex = 0; let charIndex = 0; let isDeleting = false;
-        const typingSpeed = 110, deletingSpeed = 55, delayBetweenTexts = 2000;
-        
-        function typeWriter() {
-            const currentText = textsToType[textIndex];
-            if (isDeleting) { 
-                typewriterElement.innerHTML = currentText.substring(0, charIndex - 1) + '<span class="cursor"></span>'; 
-                charIndex--;
-            } else { 
-                typewriterElement.innerHTML = currentText.substring(0, charIndex + 1) + '<span class="cursor"></span>'; 
-                charIndex++; 
-            }
-            if (!isDeleting && charIndex === currentText.length) { 
-                isDeleting = true; 
-                setTimeout(typeWriter, delayBetweenTexts); 
-                return; 
-            }
-            if (isDeleting && charIndex === 0) { 
-                isDeleting = false; 
-                textIndex = (textIndex + 1) % textsToType.length; 
-                setTimeout(typeWriter, 500); 
-                return; 
-            }
-            const currentSpeed = isDeleting ? deletingSpeed : typingSpeed; 
-            setTimeout(typeWriter, currentSpeed);
-        }
-        
-        const style = document.createElement('style');
-        style.innerHTML = `.cursor { display: inline-block; width: 3px; height: 1em; background-color: var(--accent-color); animation: blink 0.7s infinite; vertical-align: bottom; margin-left: 5px; } @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }`;
-        document.head.appendChild(style);
-        setTimeout(typeWriter, 500);
+        // GEÄNDERT: Texte für den Typewriter angepasst
+        const textsToType = [ "Web Entwickler", "Web-Stratege", "KI Beratung" ];
+        // ... (Rest der Typewriter-Funktion bleibt unverändert) ...
     }
+    
+    // --- NEU: Logik für das Kontakt-Modal ---
+    const contactButton = document.getElementById('contact-button');
+    const closeModalButton = document.getElementById('close-modal');
+    const contactModal = document.getElementById('contact-modal');
+
+    if (contactButton) {
+        contactButton.addEventListener('click', () => {
+            contactModal.classList.add('visible');
+        });
+    }
+    if (closeModalButton) {
+        closeModalButton.addEventListener('click', () => {
+            contactModal.classList.remove('visible');
+        });
+    }
+    // Schliesst das Modal auch bei Klick auf den Hintergrund
+    if (contactModal) {
+        contactModal.addEventListener('click', (e) => {
+            if (e.target === contactModal) {
+                contactModal.classList.remove('visible');
+            }
+        });
+    }
+
+
+    // ... (Restlicher Code für KI, Partikel und 3D-Effekt bleibt unverändert) ...
+
+});
 
     // --- KI-Interaktion ---
     const aiForm = document.getElementById('ai-form');

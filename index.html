@@ -4,16 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ihr Web-Experte in Wien: Michael Kanda &#10153; Web & KI</title>
-<meta name="description" content="Von der Idee zur Top-Sichtbarkeit im Web: Als Ihr Partner in Wien verbinde ich Design, starkes SEO & KI zu einer Lösung, die neue Kunden für Sie gewinnt.">
+    <meta name="description" content="Von der Idee zur Top-Sichtbarkeit im Web: Als Ihr Partner in Wien verbinde ich Design, starkes SEO & KI zu einer Lösung, die neue Kunden für Sie gewinnt.">
     
+    <link rel="icon" href="images/favicon.png" type="image/png">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div id="top-right-controls">
         <span id="clock"></span>
+        <button id="contact-button" aria-label="Kontaktformular öffnen">
+            <i class="fas fa-envelope"></i>
+        </button>
         <button id="theme-toggle" aria-label="Toggle dark mode">
             <i class="fas fa-moon"></i>
             <i class="fas fa-sun"></i>
@@ -24,13 +28,10 @@
         <div id="particles-js"></div>
         
         <div class="container">
-            
-            <img src="images/Michael.png" alt="Profilbild Michael Kanda" class="profile-picture">
+            <img src="image/Michael.png" alt="Profilbild Michael Kanda" class="profile-picture">
 
             <h1 id="typewriter-h1"></h1>
-			<p class="subtitle">Web Development & AI Strategy<br>Michael Kanda | Based in Vienna
-
-</p>
+            <p class="subtitle">Web-Entwicklung & KI-Strategie<br>Michael Kanda | Lebt in Wien</p>
             
             <div class="ai-container">
                 <p class="ai-intro-text">Hallo, ich bin Evita, Ihre KI-Assistentin.</p>
@@ -49,6 +50,26 @@
         </div>
     </main>
 	
+    <div id="contact-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button id="close-modal" class="close-button">&times;</button>
+            <h2>Kontakt</h2>
+            <form action="https://formsubmit.co/michael@designare.at" method="POST">
+                <input type="text" name="name" placeholder="Ihr Name" required>
+                <input type="email" name="email" placeholder="Ihre E-Mail-Adresse" required>
+                <input type="text" name="_subject" placeholder="Betreff">
+                <textarea name="message" placeholder="Ihre Nachricht" rows="5" required></textarea>
+                <div class="privacy-checkbox">
+                    <input type="checkbox" name="privacy" id="privacy" required>
+                    <label for="privacy">Ich stimme der Datenschutzerklärung zu.</label>
+                </div>
+                <input type="text" name="_honey" style="display:none">
+                <input type="hidden" name="_next" value="https://designare.at/danke.html">
+                <button type="submit" class="cta-button">Absenden</button>
+            </form>
+        </div>
+    </div>
+
 	<footer>
         <a href="impressum.html" rel="nofollow" target="_blank">Impressum</a>
     </footer>
