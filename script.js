@@ -5,37 +5,6 @@
 
 document.addEventListener('DOMContentLoaded', function() {
 
-    // NEU/GEÄNDERT: Cookie Banner Logik - Start
-    const cookieBanner = document.getElementById('cookie-banner');
-    const acceptCookiesBtn = document.getElementById('accept-cookies'); // ID geändert
-
-    // Funktion zum Setzen der Cookie-Zustimmung
-    const setCookieConsent = () => {
-        localStorage.setItem('cookieConsent', 'accepted'); // Speichert einfach 'accepted'
-        cookieBanner.classList.remove('show');
-        console.log('Cookie Consent: accepted');
-        // Da laut Datenschutzerklärung ausschließlich technisch notwendige Cookies verwendet werden,
-        // gibt es hier keine weiteren optionalen Skripte zu laden oder zu steuern.
-    };
-
-    // Prüfen, ob bereits eine Zustimmung vorliegt
-    const cookieConsent = localStorage.getItem('cookieConsent');
-
-    if (!cookieConsent) {
-        // Wenn keine Zustimmung vorliegt, zeige den Banner nach kurzer Verzögerung
-        setTimeout(() => {
-            cookieBanner.classList.add('show');
-        }, 1000); // Zeigt den Banner nach 1 Sekunde an
-    } else {
-        console.log('Cookie Consent bereits vorhanden:', cookieConsent);
-    }
-
-    acceptCookiesBtn.addEventListener('click', () => {
-        setCookieConsent();
-    });
-    // NEU/GEÄNDERT: Cookie Banner Logik - Ende
-
-
     const body = document.body;
 
     // --- HILFSFUNKTION FÜR PARTIKEL ---
