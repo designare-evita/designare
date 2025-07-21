@@ -32,7 +32,6 @@ document.addEventListener('DOMContentLoaded', function() {
         updateParticleColors();
     };
     
-    // GEÄNDERT: Nachtmodus ist jetzt der Standard
     const savedTheme = localStorage.getItem('theme') || 'dark';
     applyTheme(savedTheme);
 
@@ -45,7 +44,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- H1-TYPEWRITER ---
     const typewriterElement = document.getElementById('typewriter-h1');
     if (typewriterElement) {
-        // GEÄNDERT: Texte angepasst
         const textsToType = [ "Web Entwickler", "Web-Stratege", "KI Beratung" ];
         let textIndex = 0; let charIndex = 0; let isDeleting = false;
         const typingSpeed = 110, deletingSpeed = 55, delayBetweenTexts = 2000;
@@ -95,24 +93,43 @@ document.addEventListener('DOMContentLoaded', function() {
     const aiQuestionInput = document.getElementById('ai-question');
 
     if (aiForm) {
+        // KORRIGIERT: Minimalistischer Type-Effekt für den Platzhalter wiederhergestellt
         const placeholderTexts = [
             "Hallo, ich bin Evita, Michaels KI-Assistentin.",
             "Was kann ich für Sie tun?"
         ];
         let placeholderIndex = 0;
-        
-        // GEÄNDERT: Geschwindigkeit und Intervall angepasst
-        const cyclePlaceholder = () => {
-            aiQuestionInput.classList.add('placeholder-fade');
-            
-            setTimeout(() => {
-                placeholderIndex = (placeholderIndex + 1) % placeholderTexts.length;
-                aiQuestionInput.placeholder = placeholderTexts[placeholderIndex];
-                aiQuestionInput.classList.remove('placeholder-fade');
-            }, 600); 
-        };
+        let charPlaceholderIndex = 0;
+        let placeholderInterval;
 
-        let placeholderInterval = setInterval(cyclePlaceholder, 5000); // Intervall auf 5 Sekunden
+        function cyclePlaceholder() {
+            let currentText = aiQuestionInput.placeholder;
+            let deleteInterval = setInterval(() => {
+                if (currentText.length > 0) {
+                    currentText = currentText.slice(0, -1);
+                    aiQuestionInput.placeholder = currentText;
+                } else {
+                    clearInterval(deleteInterval);
+                    placeholderIndex = (placeholderIndex + 1) % placeholderTexts.length;
+                    charPlaceholderIndex = 0;
+                    typePlaceholder();
+                }
+            }, 40); // Geschwindigkeit des Löschens
+        }
+
+        function typePlaceholder() {
+            let newText = placeholderTexts[placeholderIndex];
+            let typeInterval = setInterval(() => {
+                if (charPlaceholderIndex < newText.length) {
+                    aiQuestionInput.placeholder += newText.charAt(charPlaceholderIndex);
+                    charPlaceholderIndex++;
+                } else {
+                    clearInterval(typeInterval);
+                }
+            }, 70); // Geschwindigkeit des Tippens
+        }
+
+        placeholderInterval = setInterval(cyclePlaceholder, 5000);
 
         aiQuestionInput.addEventListener('focus', () => {
             clearInterval(placeholderInterval);
@@ -133,7 +150,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const question = aiQuestionInput.value.trim();
             if (!question) return;
 
-            clearInterval(placeholderInterval); // Stoppt die Placeholder-Animation bei Eingabe
+            clearInterval(placeholderInterval);
             aiStatus.innerText = 'KI denkt nach...';
             aiQuestionInput.disabled = true;
             submitButton.disabled = true;
