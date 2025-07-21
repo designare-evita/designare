@@ -31,7 +31,8 @@
 
 /* 2. Globale Einstellungen & Farbvariablen */
 :root {
-    --bg-color: #e9ecef;
+    /* GEÄNDERT: Hintergrundfarbe angepasst */
+    --bg-color: #F5F5F5;
     --text-color: #333333;
     --accent-color: #FCB500;
     --accent-color-rgba: rgba(252, 181, 0, 0.85);
@@ -136,7 +137,7 @@ body.dark-mode #theme-toggle .fa-moon { display: none; }
     width: 500px;
     margin-bottom: 2.5rem;
 }
-.ai-intro-text { font-size: 1rem; font-weight: 400; margin-bottom: 15px; opacity: 0.9; }
+/* ENTFERNT: Stil für .ai-intro-text gelöscht */
 #ai-form {
     display: flex; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px;
     overflow: hidden; background-color: var(--bg-color); transition: border-color 0.3s ease;
@@ -159,10 +160,7 @@ body.dark-mode #ai-form { border-color: rgba(255,255,255,0.15); }
 }
 body.dark-mode #ai-status { background-color: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); }
 
-/* ENTFERNT: .cta-buttons Stile sind nicht mehr nötig */
-
 .cta-button { 
-    /* Dieser Stil wird nur noch für den Senden-Button im Modal verwendet */
     display: block; width: 100%; background: transparent; color: var(--accent-color);
     padding: 12px 24px; border-radius: 5px; text-decoration: none; font-weight: 600; 
     transition: all 0.3s ease; border: 2px solid var(--accent-color); text-align: center;
@@ -216,6 +214,5 @@ footer a:hover { opacity: 1; }
     .profile-picture { width: 144px; height: 144px; } 
     #hero h1 { font-size: 1.9rem; white-space: nowrap; height: auto; min-height: 60px; max-width: 100%; }
     #hero .subtitle { margin-bottom: 1.7rem; }
-    /* .cta-buttons wird nicht mehr benötigt */
     .ai-container { width: 100%; }
 }
