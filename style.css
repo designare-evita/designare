@@ -89,7 +89,7 @@ body {
 body.dark-mode #theme-toggle .fa-sun { display: inline-block; }
 body.dark-mode #theme-toggle .fa-moon { display: none; }
 
-#contact-button {
+#contact-button, #cookie-info-button {
     background: none;
     border: none;
     color: var(--text-color);
@@ -97,7 +97,7 @@ body.dark-mode #theme-toggle .fa-moon { display: none; }
     cursor: pointer; display: flex; align-items: center; justify-content: center;
     transition: all 0.3s ease; opacity: 0.7;
 }
-#contact-button:hover {
+#contact-button:hover, #cookie-info-button:hover {
     opacity: 1; color: #fff; background-color: var(--accent-color);
     transform: scale(1.1);
 }
@@ -251,7 +251,7 @@ footer a:hover { opacity: 1; }
 .privacy-checkbox { display: flex; align-items: center; gap: 10px; font-size: 0.8rem; }
 .privacy-checkbox input { width: auto; }
 
-/* NEU: Styles für Cookie Lightbox Buttons */
+/* Styles für Cookie Lightbox Buttons */
 .cookie-lightbox-buttons {
     display: flex;
     flex-direction: column; /* Buttons untereinander */
@@ -330,6 +330,6 @@ body.dark-mode #privacy-policy-link-button {
         gap: 10px;
     }
     .lightbox-button {
-        font-size: 0.9rem; /* Etwas kleiner für Mobile, angepasst an Textgröße */
+        font-size: 0.9rem;
     }
 }

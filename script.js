@@ -7,20 +7,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- Cookie Info Lightbox Logik - Start ---
     const cookieInfoLightbox = document.getElementById('cookie-info-lightbox');
-    // const closeCookieLightboxBtn = document.getElementById('close-cookie-lightbox'); // X-Button wurde entfernt
     const acknowledgeCookieLightboxBtn = document.getElementById('acknowledge-cookie-lightbox');
     const privacyPolicyLinkButton = document.getElementById('privacy-policy-link-button');
+    const cookieInfoButton = document.getElementById('cookie-info-button');
 
     const hasSeenCookieInfoLightbox = localStorage.getItem('hasSeenCookieInfoLightbox');
 
-    if (!hasSeenCookieInfoLightbox) {
-        // Zeige die Lightbox nach kurzer Verzögerung
-        setTimeout(() => {
-            if (cookieInfoLightbox) {
-                cookieInfoLightbox.classList.add('visible');
-            }
-        }, 1000); // Zeigt die Lightbox nach 1 Sekunde an
-    }
+    // Funktion zum Öffnen der Lightbox
+    const openLightbox = () => {
+        if (cookieInfoLightbox) {
+            cookieInfoLightbox.classList.add('visible');
+        }
+    };
 
     // Funktion zum Schließen der Lightbox und Speichern im localStorage
     const closeLightbox = () => {
@@ -30,6 +28,23 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
+    // Beim Laden der Seite: Wenn die Lightbox noch nicht gesehen wurde, öffne sie automatisch
+    if (!hasSeenCookieInfoLightbox) {
+        setTimeout(() => {
+            openLightbox(); // Öffnet die Lightbox nach der Verzögerung
+        }, 1000); // Zeigt die Lightbox nach 1 Sekunde an
+    }
+
+    // Event Listener für den neuen Cookie Info Button
+    if (cookieInfoButton) {
+        cookieInfoButton.addEventListener('click', () => {
+            // Setzt den localStorage-Eintrag zurück, damit die Lightbox wieder automatisch erscheint,
+            // wenn die Seite das nächste Mal geladen wird, nachdem sie manuell geöffnet wurde.
+            localStorage.removeItem('hasSeenCookieInfoLightbox');
+            openLightbox();
+        });
+    }
+
     // Event Listener für den "Alles klar" Button
     if (acknowledgeCookieLightboxBtn) {
         acknowledgeCookieLightboxBtn.addEventListener('click', closeLightbox);
@@ -37,7 +52,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Event Listener für den "Datenschutzerklärung" Link-Button
     if (privacyPolicyLinkButton) {
-        privacyPolicyLinkButton.addEventListener('click', closeLightbox); // Schließt Lightbox beim Klick auf den Link
+        // Beim Klick auf den Link soll die Lightbox geschlossen werden, bevor zur Datenschutzerklärung navigiert wird
+        privacyPolicyLinkButton.addEventListener('click', (e) => {
+            e.preventDefault(); // Standardverhalten des Links verhindern
+            closeLightbox();
+            // Kleine Verzögerung, damit die Animation Zeit hat, bevor zur neuen Seite navigiert wird
+            setTimeout(() => {
+                window.open(e.target.href, '_blank'); // Link in neuem Tab öffnen
+            }, 300); // 300ms Verzögerung
+        });
     }
 
     // Event Listener für Klick auf den Hintergrund (außerhalb des Inhalts)
