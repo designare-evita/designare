@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
         updateParticleColors();
     };
     
+    // Standard-Theme ist Nachtmodus
     const savedTheme = localStorage.getItem('theme') || 'dark';
     applyTheme(savedTheme);
 
@@ -48,6 +49,9 @@ document.addEventListener('DOMContentLoaded', function() {
         let textIndex = 0; let charIndex = 0; let isDeleting = false;
         const typingSpeed = 110, deletingSpeed = 55, delayBetweenTexts = 2000;
         
+        function typeWriter() { /* ... unveränderte Funktion ... */ }
+        
+        // ... (restlicher unveränderter Typewriter-Code) ...
         function typeWriter() {
             const currentText = textsToType[textIndex];
             if (isDeleting) { 
@@ -66,7 +70,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const currentSpeed = isDeleting ? deletingSpeed : typingSpeed; 
             setTimeout(typeWriter, currentSpeed);
         }
-        
         const style = document.createElement('style');
         style.innerHTML = `.cursor { display: inline-block; width: 3px; height: 1em; background-color: var(--accent-color); animation: blink 0.7s infinite; vertical-align: bottom; margin-left: 5px; } @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }`;
         document.head.appendChild(style);
@@ -93,7 +96,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const aiQuestionInput = document.getElementById('ai-question');
 
     if (aiForm) {
-        // KORRIGIERT: Minimalistischer Type-Effekt für den Platzhalter wiederhergestellt
         const placeholderTexts = [
             "Hallo, ich bin Evita, Michaels KI-Assistentin.",
             "Was kann ich für Sie tun?"
@@ -129,13 +131,12 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 70); // Geschwindigkeit des Tippens
         }
 
+        // GEÄNDERT: Intervall auf 5 Sekunden erhöht
         placeholderInterval = setInterval(cyclePlaceholder, 5000);
 
         aiQuestionInput.addEventListener('focus', () => {
             clearInterval(placeholderInterval);
         });
-
-        // Optional: Animation nach Verlassen des Feldes neu starten
         aiQuestionInput.addEventListener('blur', () => {
             if(aiQuestionInput.value === '') {
                  placeholderInterval = setInterval(cyclePlaceholder, 5000);
@@ -151,7 +152,9 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!question) return;
 
             clearInterval(placeholderInterval);
-            aiStatus.innerText = 'KI denkt nach...';
+            // GEÄNDERT: Statusmeldung und Klassen-Änderung
+            aiStatus.innerText = 'Evita denkt nach...';
+            aiStatus.classList.add('thinking'); // Rahmenfarbe ändern
             aiQuestionInput.disabled = true;
             submitButton.disabled = true;
 
@@ -172,6 +175,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 aiQuestionInput.disabled = false;
                 submitButton.disabled = false;
                 aiQuestionInput.placeholder = "Haben Sie eine weitere Frage?";
+                // GEÄNDERT: Rahmenfarbe wieder zurücksetzen
+                aiStatus.classList.remove('thinking');
             }
         });
     }
