@@ -20,9 +20,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    // --- UHRZEIT & THEME-LOGIK ---
+    // --- THEME-LOGIK ---
     const themeToggle = document.getElementById('theme-toggle');
-    const clockElement = document.getElementById('clock');
 
     const applyTheme = (theme) => {
         if (theme === 'dark') {
@@ -32,42 +31,21 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         updateParticleColors();
     };
-
-    const checkTimeAndSetTheme = () => {
-        const now = new Date(new Date().toLocaleString("en-US", {timeZone: "Europe/Vienna"}));
-        const hours = now.getHours();
-        const minutes = now.getMinutes();
-        const currentTimeInMinutes = hours * 60 + minutes;
-        const dayStartInMinutes = 6 * 60 + 30; // 6:30
-        const nightStartInMinutes = 20 * 60 + 45; // 20:45
-        let newTheme = 'light';
-        if (currentTimeInMinutes >= nightStartInMinutes || currentTimeInMinutes < dayStartInMinutes) {
-            newTheme = 'dark';
-        }
-        applyTheme(newTheme);
-    };
-
-    const updateClock = () => {
-        const now = new Date(new Date().toLocaleString("en-US", {timeZone: "Europe/Vienna"}));
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        clockElement.textContent = `${hours}:${minutes}`;
-    };
+    
+    // GEÄNDERT: Nachtmodus ist jetzt der Standard
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    applyTheme(savedTheme);
 
     themeToggle.addEventListener('click', () => {
         const newTheme = body.classList.contains('dark-mode') ? 'light' : 'dark';
-        localStorage.setItem('theme-manual', newTheme); 
+        localStorage.setItem('theme', newTheme); 
         applyTheme(newTheme);
     });
-
-    checkTimeAndSetTheme();
-    updateClock();
-    setInterval(updateClock, 1000);
-    setInterval(checkTimeAndSetTheme, 60000);
 
     // --- H1-TYPEWRITER ---
     const typewriterElement = document.getElementById('typewriter-h1');
     if (typewriterElement) {
+        // GEÄNDERT: Texte angepasst
         const textsToType = [ "Web Entwickler", "Web-Stratege", "KI Beratung" ];
         let textIndex = 0; let charIndex = 0; let isDeleting = false;
         const typingSpeed = 110, deletingSpeed = 55, delayBetweenTexts = 2000;
@@ -117,60 +95,45 @@ document.addEventListener('DOMContentLoaded', function() {
     const aiQuestionInput = document.getElementById('ai-question');
 
     if (aiForm) {
-        // GEÄNDERT: Komplette Logik für den Platzhalter-Effekt
         const placeholderTexts = [
             "Hallo, ich bin Evita, Michaels KI-Assistentin.",
             "Was kann ich für Sie tun?"
         ];
         let placeholderIndex = 0;
-        let charPlaceholderIndex = 0;
-        let placeholderInterval;
+        
+        // GEÄNDERT: Geschwindigkeit und Intervall angepasst
+        const cyclePlaceholder = () => {
+            aiQuestionInput.classList.add('placeholder-fade');
+            
+            setTimeout(() => {
+                placeholderIndex = (placeholderIndex + 1) % placeholderTexts.length;
+                aiQuestionInput.placeholder = placeholderTexts[placeholderIndex];
+                aiQuestionInput.classList.remove('placeholder-fade');
+            }, 600); 
+        };
 
-        function cyclePlaceholder() {
-            // Lösch-Phase
-            let currentText = aiQuestionInput.placeholder;
-            let deleteInterval = setInterval(() => {
-                if (currentText.length > 0) {
-                    currentText = currentText.slice(0, -1);
-                    aiQuestionInput.placeholder = currentText;
-                } else {
-                    clearInterval(deleteInterval);
-                    // Nach dem Löschen, den nächsten Text holen und tippen
-                    placeholderIndex = (placeholderIndex + 1) % placeholderTexts.length;
-                    charPlaceholderIndex = 0;
-                    typePlaceholder();
-                }
-            }, 30); // Geschwindigkeit des Löschens
-        }
+        let placeholderInterval = setInterval(cyclePlaceholder, 5000); // Intervall auf 5 Sekunden
 
-        function typePlaceholder() {
-            let newText = placeholderTexts[placeholderIndex];
-            let typeInterval = setInterval(() => {
-                if (charPlaceholderIndex < newText.length) {
-                    aiQuestionInput.placeholder += newText.charAt(charPlaceholderIndex);
-                    charPlaceholderIndex++;
-                } else {
-                    clearInterval(typeInterval);
-                }
-            }, 50); // Geschwindigkeit des Tippens
-        }
+        aiQuestionInput.addEventListener('focus', () => {
+            clearInterval(placeholderInterval);
+        });
 
-        // Startet den Zyklus
-        placeholderInterval = setInterval(cyclePlaceholder, 4000); // Alle 4 Sekunden startet ein neuer Zyklus
-
+        // Optional: Animation nach Verlassen des Feldes neu starten
+        aiQuestionInput.addEventListener('blur', () => {
+            if(aiQuestionInput.value === '') {
+                 placeholderInterval = setInterval(cyclePlaceholder, 5000);
+            }
+        });
         
         const aiStatus = document.getElementById('ai-status');
         const submitButton = aiForm.querySelector('button');
-
-        aiQuestionInput.addEventListener('focus', () => {
-            clearInterval(placeholderInterval); // Stoppt die Animation, wenn der Nutzer in das Feld klickt
-        });
 
         aiForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const question = aiQuestionInput.value.trim();
             if (!question) return;
 
+            clearInterval(placeholderInterval); // Stoppt die Placeholder-Animation bei Eingabe
             aiStatus.innerText = 'KI denkt nach...';
             aiQuestionInput.disabled = true;
             submitButton.disabled = true;
@@ -191,6 +154,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 aiQuestionInput.value = '';
                 aiQuestionInput.disabled = false;
                 submitButton.disabled = false;
+                aiQuestionInput.placeholder = "Haben Sie eine weitere Frage?";
             }
         });
     }
@@ -213,7 +177,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const { clientX, clientY } = e; 
             const { offsetWidth, offsetHeight } = heroElement;
             const xRotation = 30 * ((clientY - offsetHeight / 2) / offsetHeight);
-            const yRotation = 30 * ((clientX - offsetWidth / 2) / offsetWidth);
+            const yRotation = 30 * ((clientX - offsetWidth / 2) / offsetHeight);
             container.style.transform = `rotateX(${xRotation * -1}deg) rotateY(${yRotation}deg)`;
         });
         heroElement.addEventListener('mouseleave', () => { 
