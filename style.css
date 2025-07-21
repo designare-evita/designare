@@ -251,10 +251,62 @@ footer a:hover { opacity: 1; }
 .privacy-checkbox { display: flex; align-items: center; gap: 10px; font-size: 0.8rem; }
 .privacy-checkbox input { width: auto; }
 
+/* NEU: Styles für Cookie Lightbox Buttons */
+.cookie-lightbox-buttons {
+    display: flex;
+    flex-direction: column; /* Buttons untereinander */
+    gap: 15px; /* Abstand zwischen den Buttons */
+    margin-top: 20px; /* Abstand nach oben zur Info */
+    width: 100%; /* Nehmen die volle Breite ein */
+    align-items: center; /* Zentriert die Buttons, wenn sie nicht die volle Breite einnehmen */
+}
+
+.lightbox-button {
+    display: block; /* Stellt sicher, dass Anchor-Tag sich wie ein Block verhält */
+    width: 100%; /* Buttons füllen die Breite des Containers */
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 1rem; /* Gleiche Schriftgröße wie Fließtext (passt zu default p) */
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none; /* Für den Link-Button */
+}
+
+/* Spezifische Farben für die Lightbox-Buttons */
+#acknowledge-cookie-lightbox {
+    background-color: var(--accent-color);
+    color: #fff;
+    border: 2px solid var(--accent-color);
+}
+
+#acknowledge-cookie-lightbox:hover {
+    background-color: #d39a00;
+    border-color: #d39a00;
+    transform: translateY(-2px);
+}
+
+#privacy-policy-link-button {
+    background: none;
+    color: var(--text-color);
+    border: 2px solid var(--text-color);
+}
+
+body.dark-mode #privacy-policy-link-button {
+    color: var(--text-color); /* Sicherstellen, dass der Text im Dark Mode sichtbar bleibt */
+    border-color: var(--text-color); /* Sicherstellen, dass der Rand im Dark Mode sichtbar bleibt */
+}
+
+#privacy-policy-link-button:hover {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    color: #fff;
+    transform: translateY(-2px);
+}
+
 /* 7. Responsive Design */
 @media (max-width: 768px) {
-    /* Sicherstellen, dass der Body auf mobilen Geräten scrollbar ist,
-       falls Inhalte über den Viewport hinausgehen */
     body {
         overflow: auto;
     }
@@ -272,15 +324,12 @@ footer a:hover { opacity: 1; }
     }
     #hero .subtitle { margin-bottom: 1.7rem; }
     .ai-container { width: 100%; }
-}
 
-/* ENTFERNT: Alter Cookie Info Bar CSS-Block */
-/*
-.cookie-info-bar { ... }
-body.dark-mode .cookie-info-bar { ... }
-.cookie-info-bar.show { ... }
-.cookie-info-bar p { ... }
-.cookie-info-bar a { ... }
-.cookie-info-bar a:hover { ... }
-@media (max-width: 768px) { ... .cookie-info-bar ... }
-*/
+    /* Responsive Anpassung für Lightbox-Buttons */
+    .cookie-lightbox-buttons {
+        gap: 10px;
+    }
+    .lightbox-button {
+        font-size: 0.9rem; /* Etwas kleiner für Mobile, angepasst an Textgröße */
+    }
+}

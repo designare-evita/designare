@@ -72,11 +72,12 @@
 
     <div id="cookie-info-lightbox" class="modal-overlay">
         <div class="modal-content">
-            <button id="close-cookie-lightbox" class="close-button">&times;</button>
-            <h2>Wichtiger Hinweis zu Cookies</h2>
+            <h2>Hinweis zu Cookies</h2>
             <p style="text-align: center;">Wir nutzen nur Cookies, die deine Website-Erfahrung technisch ermöglichen. Nichts weiter.</p>
-            <p style="text-align: center;"><a href="datenschutz.html" target="_blank" rel="noopener noreferrer">Datenschutzerklärung</a></p>
-            <button id="acknowledge-cookie-lightbox" class="cta-button">Verstanden</button>
+            <div class="cookie-lightbox-buttons">
+                <a href="datenschutz.html" target="_blank" rel="noopener noreferrer" id="privacy-policy-link-button" class="lightbox-button">Datenschutzerklärung</a>
+                <button id="acknowledge-cookie-lightbox" class="lightbox-button">Alles klar</button>
+            </div>
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>

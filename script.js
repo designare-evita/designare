@@ -7,8 +7,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- Cookie Info Lightbox Logik - Start ---
     const cookieInfoLightbox = document.getElementById('cookie-info-lightbox');
-    const closeCookieLightboxBtn = document.getElementById('close-cookie-lightbox');
+    // const closeCookieLightboxBtn = document.getElementById('close-cookie-lightbox'); // X-Button wurde entfernt
     const acknowledgeCookieLightboxBtn = document.getElementById('acknowledge-cookie-lightbox');
+    const privacyPolicyLinkButton = document.getElementById('privacy-policy-link-button');
 
     const hasSeenCookieInfoLightbox = localStorage.getItem('hasSeenCookieInfoLightbox');
 
@@ -29,14 +30,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    // Event Listener für den "X"-Button
-    if (closeCookieLightboxBtn) {
-        closeCookieLightboxBtn.addEventListener('click', closeLightbox);
-    }
-
-    // Event Listener für den "Verstanden" Button
+    // Event Listener für den "Alles klar" Button
     if (acknowledgeCookieLightboxBtn) {
         acknowledgeCookieLightboxBtn.addEventListener('click', closeLightbox);
+    }
+
+    // Event Listener für den "Datenschutzerklärung" Link-Button
+    if (privacyPolicyLinkButton) {
+        privacyPolicyLinkButton.addEventListener('click', closeLightbox); // Schließt Lightbox beim Klick auf den Link
     }
 
     // Event Listener für Klick auf den Hintergrund (außerhalb des Inhalts)
@@ -53,7 +54,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const body = document.body;
 
     // --- HILFSFUNKTION FÜR PARTIKEL ---
-    const updateParticleColors = () => { /* ... unverändert ... */ };
+    const updateParticleColors = () => {
+        if (window.pJSDom && window.pJSDom[0]) {
+            const pJS = window.pJSDom[0].pJS;
+            const styles = getComputedStyle(body);
+            const particleColor = styles.getPropertyValue('--particle-color').trim();
+            const lineColor = styles.getPropertyValue('--particle-line-color').trim();
+            pJS.particles.color.value = particleColor;
+            pJS.particles.line_linked.color = lineColor;
+            pJS.fn.particlesRefresh();
+        }
+    };
 
     // --- THEME-LOGIK ---
     const themeToggle = document.getElementById('theme-toggle');
