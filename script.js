@@ -117,10 +117,28 @@ document.addEventListener('DOMContentLoaded', function() {
     const aiQuestionInput = document.getElementById('ai-question');
 
     if (aiForm) {
-        // NEU: Logik für den dynamischen Platzhalter
-        setTimeout(() => {
-            aiQuestionInput.placeholder = "Was kann ich für Sie tun?";
-        }, 3000); // Ändert den Text nach 3 Sekunden
+        // NEU: Logik für den dynamischen Platzhalter in einer Schleife
+        const placeholderTexts = [
+            "Hallo, ich bin Evita, Michaels KI-Assistentin.",
+            "Was kann ich für Sie tun?"
+        ];
+        let placeholderIndex = 0;
+        
+        setInterval(() => {
+            // 1. Text ausblenden
+            aiQuestionInput.classList.add('placeholder-fade');
+            
+            setTimeout(() => {
+                // 2. Index wechseln
+                placeholderIndex = (placeholderIndex + 1) % placeholderTexts.length;
+                // 3. Neuen Text setzen
+                aiQuestionInput.placeholder = placeholderTexts[placeholderIndex];
+                // 4. Text wieder einblenden
+                aiQuestionInput.classList.remove('placeholder-fade');
+            }, 400); // Muss zur Transitions-Dauer in CSS passen
+
+        }, 3000); // Alle 3 Sekunden
+
 
         const aiStatus = document.getElementById('ai-status');
         const submitButton = aiForm.querySelector('button');
@@ -150,8 +168,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 aiQuestionInput.value = '';
                 aiQuestionInput.disabled = false;
                 submitButton.disabled = false;
-                // Setzt den Platzhalter nach der Antwort wieder zurück
-                aiQuestionInput.placeholder = "Haben Sie eine weitere Frage?";
             }
         });
     }
