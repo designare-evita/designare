@@ -44,8 +44,8 @@ body.dark-mode {
     --bg-color: #1a1a1a;
     --text-color: #eeeeee;
     --particle-color: #bbbbbb;
-    --particle-line-color: #888888; /* Um ca. 15% heller als original #666666 */
-    --border-color: #4a4a4a; /* Um ca. 15% heller als original #333333 */
+    --particle-line-color: #888888;
+    --border-color: #5e5e5e; /* Noch heller im Nachtmodus */
 }
 
 * {
@@ -138,7 +138,7 @@ body.dark-mode #theme-toggle .fa-moon { display: none; }
     transition: border-color 0.3s ease;
 }
 body.dark-mode #ai-form {
-    border-color: #4a4a4a; /* Im Nachtmodus: um ca. 15% heller als original rgba(255,255,255,0.15) */
+    border-color: #5e5e5e; /* Noch heller im Nachtmodus */
 }
 #ai-form:focus-within { border-color: var(--accent-color); }
 #ai-question {
@@ -168,7 +168,7 @@ body.dark-mode #ai-form {
 }
 body.dark-mode #ai-status {
     background-color: rgba(255,255,255,0.03);
-    border: 1px solid #4a4a4a; /* Im Nachtmodus: um ca. 15% heller als original rgba(255,255,255,0.08) */
+    border: 1px solid #5e5e5e; /* Noch heller im Nachtmodus */
 }
 
 /* KORRIGIERT: Regel für den "denkenden" Rahmen spezifischer gemacht */
