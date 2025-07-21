@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const aiQuestionInput = document.getElementById('ai-question');
 
     if (aiForm) {
-        // NEU: Logik für den dynamischen Platzhalter in einer Schleife
+        // GEÄNDERT: Timing für sanfteren Effekt angepasst
         const placeholderTexts = [
             "Hallo, ich bin Evita, Michaels KI-Assistentin.",
             "Was kann ich für Sie tun?"
@@ -125,19 +125,15 @@ document.addEventListener('DOMContentLoaded', function() {
         let placeholderIndex = 0;
         
         setInterval(() => {
-            // 1. Text ausblenden
             aiQuestionInput.classList.add('placeholder-fade');
             
             setTimeout(() => {
-                // 2. Index wechseln
                 placeholderIndex = (placeholderIndex + 1) % placeholderTexts.length;
-                // 3. Neuen Text setzen
                 aiQuestionInput.placeholder = placeholderTexts[placeholderIndex];
-                // 4. Text wieder einblenden
                 aiQuestionInput.classList.remove('placeholder-fade');
-            }, 400); // Muss zur Transitions-Dauer in CSS passen
+            }, 600); // Muss zur Transitions-Dauer in CSS passen (0.6s)
 
-        }, 3000); // Alle 3 Sekunden
+        }, 4000); // Gesamtdauer des Intervalls verlängert
 
 
         const aiStatus = document.getElementById('ai-status');
