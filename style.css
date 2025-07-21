@@ -137,23 +137,9 @@ body.dark-mode #theme-toggle .fa-moon { display: none; }
     font-size: 1.2rem;
     font-weight: 300;
     margin-bottom: 2.5rem;
-    /* ENTFERNT: Visitenkarten-Stile */
-    /* background-color: var(--bg-color); */
-    /* color: var(--text-color); */
-    /* padding: 15px 25px; */
-    /* border: 1px solid var(--border-color); */
-    /* border-radius: 8px; */
-    /* display: inline-block; */
-    /* box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); */
-    /* text-align: center; */
-    /* min-width: 280px; */
-    /* max-width: 80%; */
-    /* line-height: 1.5; */
+    padding-top: 15px;
+    
 }
-/* ENTFERNT: Dark Mode Anpassung für Subtitle */
-/* body.dark-mode .subtitle { */
-/* box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); */
-/* } */
 
 
 .ai-container {
