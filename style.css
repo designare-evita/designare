@@ -37,7 +37,7 @@
     --accent-color-rgba: rgba(252, 181, 0, 0.85);
     --particle-color: #888888;
     --particle-line-color: #cccccc;
-    --border-color: #bfbfbf; /* Um ca. 15% dunkler als original #dddddd */
+    --border-color: #bfbfbf;
 }
 
 body.dark-mode {
@@ -45,7 +45,7 @@ body.dark-mode {
     --text-color: #eeeeee;
     --particle-color: #bbbbbb;
     --particle-line-color: #888888;
-    --border-color: #5e5e5e; /* Noch heller im Nachtmodus */
+    --border-color: #5e5e5e;
 }
 
 * {
@@ -116,30 +116,45 @@ body.dark-mode #theme-toggle .fa-moon { display: none; }
 
 /* 5. Inhaltselemente */
 .profile-picture {
-    width: 200px; height: 200px; margin-bottom: 1.5rem; object-fit: cover;
+    width: 198px; /* Vorher 180px, jetzt 10% größer (180 * 1.1 = 198) */
+    height: 198px; /* Vorher 180px, jetzt 10% größer */
+    margin-bottom: 1.5rem;
+    object-fit: cover;
 }
 #hero h1 {
-    font-size: 3rem; font-weight: 700; line-height: 1.2; margin-bottom: 0.5rem;
-    height: 40px; display: flex; align-items: center; justify-content: center;
-    width: 100%; max-width: 800px;
+    font-size: 3rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+    min-height: 1.2em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 800px;
 }
-#hero .subtitle { font-size: 1.2rem; font-weight: 300; margin-bottom: 2.5rem;
-/* NEUE STYLES FÜR VISITEKARTEN-LOOK */
-    background-color: var(--bg-color); /* Hintergrundfarbe des Body für Integration */
-    color: var(--text-color); /* Textfarbe wie der Body */
-    padding: 15px 25px; /* Innenabstand */
-    border: 1px solid var(--border-color); /* Dezenter Rahmen */
-    border-radius: 8px; /* Leicht abgerundete Ecken */
-    display: inline-block; /* Damit der Hintergrund und Rahmen nur den Inhalt umschließen */
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); /* Leichter Schatten für Tiefe */
-    text-align: center; /* Text zentrieren */
-    min-width: 280px; /* Eine Mindestbreite, damit es nicht zu schmal wird */
-    max-width: 80%; /* Nicht breiter als 80% des Containers */
-    line-height: 1.5; /* Zeilenhöhe anpassen, falls nötig */ }
+#hero .subtitle {
+    font-size: 1.2rem;
+    font-weight: 300;
+    margin-bottom: 2.5rem;
+    /* ENTFERNT: Visitenkarten-Stile */
+    /* background-color: var(--bg-color); */
+    /* color: var(--text-color); */
+    /* padding: 15px 25px; */
+    /* border: 1px solid var(--border-color); */
+    /* border-radius: 8px; */
+    /* display: inline-block; */
+    /* box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); */
+    /* text-align: center; */
+    /* min-width: 280px; */
+    /* max-width: 80%; */
+    /* line-height: 1.5; */
+}
+/* ENTFERNT: Dark Mode Anpassung für Subtitle */
+/* body.dark-mode .subtitle { */
+/* box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); */
+/* } */
 
-body.dark-mode .subtitle {
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Etwas stärkerer Schatten im Dunkelmodus */
-}
 
 .ai-container {
     width: 500px;
@@ -147,14 +162,14 @@ body.dark-mode .subtitle {
 }
 #ai-form {
     display: flex;
-    border: 1px solid #bfbfbf; /* Im Tagmodus: um ca. 15% dunkler als original #dddddd */
+    border: 1px solid #bfbfbf;
     border-radius: 8px;
     overflow: hidden;
     background-color: var(--bg-color);
     transition: border-color 0.3s ease;
 }
 body.dark-mode #ai-form {
-    border-color: #5e5e5e; /* Noch heller im Nachtmodus */
+    border-color: #5e5e5e;
 }
 #ai-form:focus-within { border-color: var(--accent-color); }
 #ai-question {
@@ -178,13 +193,13 @@ body.dark-mode #ai-form {
     font-size: 0.9rem; min-height: 40px; margin-top: 10px; padding: 10px; opacity: 0.9;
     text-align: left;
     background-color: rgba(0,0,0,0.02);
-    border: 1px solid #bfbfbf; /* Im Tagmodus: um ca. 15% dunkler als original rgba(0,0,0,0.05) */
+    border: 1px solid #bfbfbf;
     border-radius: 8px;
     transition: opacity 0.3s ease, border-color 0.3s ease;
 }
 body.dark-mode #ai-status {
     background-color: rgba(255,255,255,0.03);
-    border: 1px solid #5e5e5e; /* Noch heller im Nachtmodus */
+    border: 1px solid #5e5e5e;
 }
 
 /* KORRIGIERT: Regel für den "denkenden" Rahmen spezifischer gemacht */
@@ -250,8 +265,17 @@ footer a:hover { opacity: 1; }
 
 /* 7. Responsive Design */
 @media (max-width: 768px) {
-    .profile-picture { width: 150px; height: 150px; }
-    #hero h1 { font-size: 1.9rem; white-space: nowrap; height: auto; min-height: 60px; max-width: 100%; }
+    .profile-picture {
+        width: 158px; /* Vorher 144px, jetzt 10% größer (144 * 1.1 = 158.4, gerundet) */
+        height: 158px; /* Vorher 144px, jetzt 10% größer */
+    }
+    #hero h1 {
+        font-size: 1.9rem;
+        white-space: normal;
+        height: auto;
+        min-height: 1.2em;
+        max-width: 100%;
+    }
     #hero .subtitle { margin-bottom: 1.7rem; }
     .ai-container { width: 100%; }
 }
