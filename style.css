@@ -45,13 +45,12 @@
 
 .cookie-buttons {
     display: flex;
-    gap: 15px;
-    flex-wrap: wrap; /* Buttons umbrechen auf kleineren Bildschirmen */
+    gap: 15px; /* Beibehalten, falls mal ein anderer Button hinzukommt */
+    flex-wrap: wrap;
     justify-content: center;
 }
 
 .cookie-buttons .cta-button {
-    /* Wiederverwendung des cta-button Stils aus dem Modal */
     background: var(--accent-color);
     color: #fff;
     padding: 10px 20px;
@@ -69,13 +68,14 @@
     transform: translateY(-2px);
 }
 
-.cookie-buttons .secondary-button {
+/* SEKUNDÄR-BUTTON STILE ENTFERNT, DA DER BUTTON NICHT MEHR EXISTIERT */
+/* .cookie-buttons .secondary-button {
     background: none;
     color: var(--text-color);
     padding: 10px 20px;
     border-radius: 5px;
     font-weight: 600;
-    border: 2px solid var(--text-color); /* Border-Farbe des Textes anpassen */
+    border: 2px solid var(--text-color);
     cursor: pointer;
     transition: all 0.3s ease;
 }
@@ -84,7 +84,7 @@
     color: var(--accent-color);
     border-color: var(--accent-color);
     transform: translateY(-2px);
-}
+} */
 
 /* Responsive Anpassung für den Cookie Banner */
 @media (max-width: 768px) {
@@ -99,6 +99,6 @@
         width: 100%;
     }
     .cookie-buttons button {
-        width: 100%; /* Buttons nehmen volle Breite ein */
+        width: 100%;
     }
 }
