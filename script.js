@@ -1,12 +1,12 @@
 /*
  * script.js
- * Online-Visitenkarte - Finale, korrigierte Version
+ * Online-Visitenkarte - Finale Version
 */
 
 document.addEventListener('DOMContentLoaded', function() {
 
     const body = document.body;
-
+    
     // --- HILFSFUNKTION FÜR PARTIKEL ---
     const updateParticleColors = () => {
         if (window.pJSDom && window.pJSDom[0]) {
@@ -112,10 +112,16 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // --- KI-INTERAKTION ---
+    // --- KI-INTERAKTION & DYNAMISCHER PLATZHALTER ---
     const aiForm = document.getElementById('ai-form');
+    const aiQuestionInput = document.getElementById('ai-question');
+
     if (aiForm) {
-        const aiQuestionInput = document.getElementById('ai-question');
+        // NEU: Logik für den dynamischen Platzhalter
+        setTimeout(() => {
+            aiQuestionInput.placeholder = "Was kann ich für Sie tun?";
+        }, 3000); // Ändert den Text nach 3 Sekunden
+
         const aiStatus = document.getElementById('ai-status');
         const submitButton = aiForm.querySelector('button');
 
@@ -144,6 +150,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 aiQuestionInput.value = '';
                 aiQuestionInput.disabled = false;
                 submitButton.disabled = false;
+                // Setzt den Platzhalter nach der Antwort wieder zurück
+                aiQuestionInput.placeholder = "Haben Sie eine weitere Frage?";
             }
         });
     }
@@ -166,7 +174,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const { clientX, clientY } = e; 
             const { offsetWidth, offsetHeight } = heroElement;
             const xRotation = 30 * ((clientY - offsetHeight / 2) / offsetHeight);
-            const yRotation = 30 * ((clientX - offsetWidth / 2) / offsetWidth);
+            const yRotation = 30 * ((clientX - offsetWidth / 2) / offsetHeight);
             container.style.transform = `rotateX(${xRotation * -1}deg) rotateY(${yRotation}deg)`;
         });
         heroElement.addEventListener('mouseleave', () => { 
