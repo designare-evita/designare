@@ -1,12 +1,12 @@
 /*
  * script.js
- * Online-Visitenkarte mit automatischer Zeitsteuerung
+ * Online-Visitenkarte - Finale, korrigierte Version
 */
 
 document.addEventListener('DOMContentLoaded', function() {
 
     const body = document.body;
-    
+
     // --- HILFSFUNKTION FÜR PARTIKEL ---
     const updateParticleColors = () => {
         if (window.pJSDom && window.pJSDom[0]) {
@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    // --- Effekt 0: Tag-/Nachtmodus & UHRZEIT ---
+    // --- UHRZEIT & THEME-LOGIK ---
     const themeToggle = document.getElementById('theme-toggle');
     const clockElement = document.getElementById('clock');
 
@@ -33,27 +33,20 @@ document.addEventListener('DOMContentLoaded', function() {
         updateParticleColors();
     };
 
-    // Funktion zur automatischen Umschaltung
     const checkTimeAndSetTheme = () => {
-        // Holt die aktuelle Zeit in der Zeitzone Wien/MEZ
         const now = new Date(new Date().toLocaleString("en-US", {timeZone: "Europe/Vienna"}));
         const hours = now.getHours();
         const minutes = now.getMinutes();
-
-        // Zeit in Minuten umrechnen für einfachen Vergleich
         const currentTimeInMinutes = hours * 60 + minutes;
         const dayStartInMinutes = 6 * 60 + 30; // 6:30
         const nightStartInMinutes = 20 * 60 + 45; // 20:45
-
         let newTheme = 'light';
         if (currentTimeInMinutes >= nightStartInMinutes || currentTimeInMinutes < dayStartInMinutes) {
             newTheme = 'dark';
         }
-        
         applyTheme(newTheme);
     };
 
-    // Funktion zur Aktualisierung der Uhrzeitanzeige
     const updateClock = () => {
         const now = new Date(new Date().toLocaleString("en-US", {timeZone: "Europe/Vienna"}));
         const hours = String(now.getHours()).padStart(2, '0');
@@ -61,56 +54,59 @@ document.addEventListener('DOMContentLoaded', function() {
         clockElement.textContent = `${hours}:${minutes}`;
     };
 
-    // Manuelle Umschaltung per Klick
     themeToggle.addEventListener('click', () => {
         const newTheme = body.classList.contains('dark-mode') ? 'light' : 'dark';
+        // Manuelle Auswahl im localStorage speichern, um sie ggf. später zu nutzen
+        localStorage.setItem('theme-manual', newTheme); 
         applyTheme(newTheme);
     });
 
-    // Initialisierung beim Laden der Seite
     checkTimeAndSetTheme();
     updateClock();
+    setInterval(updateClock, 1000);
+    setInterval(checkTimeAndSetTheme, 60000);
 
-    // Uhrzeit und Theme-Check alle 60 Sekunden aktualisieren
-    setInterval(updateClock, 1000); // Uhrzeit jede Sekunde aktualisieren
-    setInterval(checkTimeAndSetTheme, 60000); // Theme jede Minute prüfen
-
-
-    // --- Effekt 1: H1-Typewriter ---
-    /*
- * script.js
- * Online-Visitenkarte - Finale Version
-*/
-
-document.addEventListener('DOMContentLoaded', function() {
-
-    // ... (Code für body, updateParticleColors, Theme-Logik bleibt unverändert) ...
-    
-    // --- Effekt 1: H1-Typewriter ---
+    // --- H1-TYPEWRITER ---
     const typewriterElement = document.getElementById('typewriter-h1');
     if (typewriterElement) {
-        // GEÄNDERT: Texte für den Typewriter angepasst
+        // KORRIGIERT: Texte wie gewünscht
         const textsToType = [ "Web Entwickler", "Web-Stratege", "KI Beratung" ];
-        // ... (Rest der Typewriter-Funktion bleibt unverändert) ...
+        let textIndex = 0; let charIndex = 0; let isDeleting = false;
+        const typingSpeed = 110, deletingSpeed = 55, delayBetweenTexts = 2000;
+        
+        function typeWriter() {
+            const currentText = textsToType[textIndex];
+            if (isDeleting) { 
+                typewriterElement.innerHTML = currentText.substring(0, charIndex - 1) + '<span class="cursor"></span>'; 
+                charIndex--;
+            } else { 
+                typewriterElement.innerHTML = currentText.substring(0, charIndex + 1) + '<span class="cursor"></span>'; 
+                charIndex++; 
+            }
+            if (!isDeleting && charIndex === currentText.length) { 
+                isDeleting = true; setTimeout(typeWriter, delayBetweenTexts); return; 
+            }
+            if (isDeleting && charIndex === 0) { 
+                isDeleting = false; textIndex = (textIndex + 1) % textsToType.length; setTimeout(typeWriter, 500); return; 
+            }
+            const currentSpeed = isDeleting ? deletingSpeed : typingSpeed; 
+            setTimeout(typeWriter, currentSpeed);
+        }
+        
+        const style = document.createElement('style');
+        style.innerHTML = `.cursor { display: inline-block; width: 3px; height: 1em; background-color: var(--accent-color); animation: blink 0.7s infinite; vertical-align: bottom; margin-left: 5px; } @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }`;
+        document.head.appendChild(style);
+        setTimeout(typeWriter, 500);
     }
-    
-    // --- NEU: Logik für das Kontakt-Modal ---
+
+    // --- KONTAKT-MODAL ---
     const contactButton = document.getElementById('contact-button');
     const closeModalButton = document.getElementById('close-modal');
     const contactModal = document.getElementById('contact-modal');
 
-    if (contactButton) {
-        contactButton.addEventListener('click', () => {
-            contactModal.classList.add('visible');
-        });
-    }
-    if (closeModalButton) {
-        closeModalButton.addEventListener('click', () => {
-            contactModal.classList.remove('visible');
-        });
-    }
-    // Schliesst das Modal auch bei Klick auf den Hintergrund
-    if (contactModal) {
+    if (contactButton && closeModalButton && contactModal) {
+        contactButton.addEventListener('click', () => contactModal.classList.add('visible'));
+        closeModalButton.addEventListener('click', () => contactModal.classList.remove('visible'));
         contactModal.addEventListener('click', (e) => {
             if (e.target === contactModal) {
                 contactModal.classList.remove('visible');
@@ -118,18 +114,13 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-
-    // ... (Restlicher Code für KI, Partikel und 3D-Effekt bleibt unverändert) ...
-
-});
-
-    // --- KI-Interaktion ---
+    // --- KI-INTERAKTION ---
     const aiForm = document.getElementById('ai-form');
-    const aiQuestionInput = document.getElementById('ai-question');
-    const aiStatus = document.getElementById('ai-status');
-    const submitButton = aiForm.querySelector('button');
-
     if (aiForm) {
+        const aiQuestionInput = document.getElementById('ai-question');
+        const aiStatus = document.getElementById('ai-status');
+        const submitButton = aiForm.querySelector('button');
+
         aiForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const question = aiQuestionInput.value.trim();
@@ -145,14 +136,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ question: question })
                 });
-
-                if (!response.ok) {
-                    throw new Error('Netzwerk-Antwort war nicht OK.');
-                }
-
+                if (!response.ok) { throw new Error('Netzwerk-Antwort war nicht OK.'); }
                 const data = await response.json();
                 aiStatus.innerText = data.answer;
-
             } catch (error) {
                 console.error("Fehler:", error);
                 aiStatus.innerText = 'Ein Fehler ist aufgetreten.';
@@ -164,7 +150,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // --- Effekt 2: Partikel-Hintergrund Initialisierung ---
+    // --- PARTIKEL-HINTERGRUND ---
     if (document.getElementById('particles-js')) {
         particlesJS("particles-js", {
             "particles": { "number": { "value": 80, "density": { "enable": true, "value_area": 800 } }, "color": { "value": "#888888" }, "shape": { "type": "circle" }, "opacity": { "value": 0.5, "random": true }, "size": { "value": 3, "random": true }, "line_linked": { "enable": true, "distance": 150, "color": "#cccccc", "opacity": 0.4, "width": 1 }, "move": { "enable": true, "speed": 2, "direction": "none", "random": false, "straight": false, "out_mode": "out", "bounce": false }, "twinkle": { "particles": { "enable": true, "frequency": 0.05, "opacity": 1 } } },
@@ -174,7 +160,7 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(updateParticleColors, 500);
     }
 
-    // --- Effekt 3: 3D-Schwebeeffekt ---
+    // --- 3D-SCHWEBEEFFEKT ---
     const heroElement = document.getElementById('hero');
     const container = document.querySelector('#hero .container');
     if(heroElement && container) {
