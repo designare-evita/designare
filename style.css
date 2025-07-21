@@ -1,6 +1,6 @@
 /*
  * style.css
- * Online-Visitenkarte - Finale, korrigierte Version
+ * Online-Visitenkarte - Finale Version
 */
 
 /* 1. Lokale Fonts laden */
@@ -132,7 +132,6 @@ body.dark-mode #theme-toggle .fa-moon { display: none; }
 }
 #hero .subtitle { font-size: 1.2rem; font-weight: 300; margin-bottom: 2.5rem; }
 
-/* WIEDERHERGESTELLT: Stile für den AI-Container */
 .ai-container {
     width: 500px;
     margin-bottom: 2.5rem;
@@ -160,15 +159,17 @@ body.dark-mode #ai-form { border-color: rgba(255,255,255,0.15); }
 }
 body.dark-mode #ai-status { background-color: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); }
 
-/* WIEDERHERGESTELLT: Stile für den CTA-Button */
-.cta-buttons { display: flex; width: 100%; max-width: 450px; }
+/* ENTFERNT: .cta-buttons Stile sind nicht mehr nötig */
+
 .cta-button { 
+    /* Dieser Stil wird nur noch für den Senden-Button im Modal verwendet */
     display: block; width: 100%; background: transparent; color: var(--accent-color);
     padding: 12px 24px; border-radius: 5px; text-decoration: none; font-weight: 600; 
     transition: all 0.3s ease; border: 2px solid var(--accent-color); text-align: center;
     cursor: pointer;
 }
 .cta-button:hover { background-color: var(--accent-color); color: #fff; transform: translateY(-3px); }
+
 
 /* 6. Footer & Kontakt-Modal */
 footer { position: fixed; bottom: 10px; right: 10px; z-index: 1000; }
@@ -215,6 +216,6 @@ footer a:hover { opacity: 1; }
     .profile-picture { width: 144px; height: 144px; } 
     #hero h1 { font-size: 1.9rem; white-space: nowrap; height: auto; min-height: 60px; max-width: 100%; }
     #hero .subtitle { margin-bottom: 1.7rem; }
-    .cta-buttons { display: none; } 
+    /* .cta-buttons wird nicht mehr benötigt */
     .ai-container { width: 100%; }
 }
