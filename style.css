@@ -298,7 +298,7 @@ body.dark-mode .cookie-info-bar {
 
 .cookie-info-bar p {
     margin: 0;
-    font-size: 0.95rem;
+    font-size: 1rem;
     max-width: 800px; /* Begrenzt die Breite des Textes */
 }
 
@@ -333,7 +333,7 @@ footer {
         padding: 10px 15px;
     }
     .cookie-info-bar p {
-        font-size: 0.85rem;
+        font-size: 0.9rem;
         text-align: center;
     }
     .cookie-info-bar a {
