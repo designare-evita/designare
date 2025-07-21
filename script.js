@@ -56,7 +56,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     themeToggle.addEventListener('click', () => {
         const newTheme = body.classList.contains('dark-mode') ? 'light' : 'dark';
-        // Manuelle Auswahl im localStorage speichern, um sie ggf. später zu nutzen
         localStorage.setItem('theme-manual', newTheme); 
         applyTheme(newTheme);
     });
@@ -69,7 +68,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- H1-TYPEWRITER ---
     const typewriterElement = document.getElementById('typewriter-h1');
     if (typewriterElement) {
-        // KORRIGIERT: Texte wie gewünscht
         const textsToType = [ "Web Entwickler", "Web-Stratege", "KI Beratung" ];
         let textIndex = 0; let charIndex = 0; let isDeleting = false;
         const typingSpeed = 110, deletingSpeed = 55, delayBetweenTexts = 2000;
