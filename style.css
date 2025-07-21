@@ -36,26 +36,26 @@
     --accent-color: #FCB500;
     --accent-color-rgba: rgba(252, 181, 0, 0.85);
     --particle-color: #888888;
-    --particle-line-color: #cccccc;
-    --border-color: #dddddd;
+    --particle-line-color: #cccccc; /* Original: #cccccc */
+    --border-color: #bfbfbf; /* Um ca. 15% dunkler als original #dddddd */
 }
 
 body.dark-mode {
     --bg-color: #1a1a1a;
     --text-color: #eeeeee;
     --particle-color: #bbbbbb;
-    --particle-line-color: #666666;
-    --border-color: #333333;
+    --particle-line-color: #888888; /* Um ca. 15% heller als original #666666 */
+    --border-color: #4a4a4a; /* Um ca. 15% heller als original #333333 */
 }
 
-* { 
-    margin: 0; 
-    padding: 0; 
-    box-sizing: border-box; 
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-html, body { 
-    height: 100%; 
+html, body {
+    height: 100%;
 }
 
 body {
@@ -100,26 +100,26 @@ body.dark-mode #theme-toggle .fa-moon { display: none; }
 }
 
 /* 4. Haupt-Layout & Container */
-.container { 
-    max-width: 1100px; margin: 0 auto; padding: 0 2rem; display: flex; 
-    flex-direction: column; align-items: center; justify-content: center; 
-    transform-style: preserve-3d; transition: transform 0.1s linear; 
+.container {
+    max-width: 1100px; margin: 0 auto; padding: 0 2rem; display: flex;
+    flex-direction: column; align-items: center; justify-content: center;
+    transform-style: preserve-3d; transition: transform 0.1s linear;
 }
-#hero { 
-    height: 100vh; display: flex; align-items: center; justify-content: center; 
-    text-align: center; position: relative; overflow: hidden; 
+#hero {
+    height: 100vh; display: flex; align-items: center; justify-content: center;
+    text-align: center; position: relative; overflow: hidden;
 }
-#particles-js { 
-    position: absolute; width: 100%; height: 100%; top: 0; left: 0; z-index: 1; 
+#particles-js {
+    position: absolute; width: 100%; height: 100%; top: 0; left: 0; z-index: 1;
 }
 #hero .container { position: relative; z-index: 2; }
 
 /* 5. Inhaltselemente */
-.profile-picture { 
+.profile-picture {
     width: 180px; height: 180px; margin-bottom: 1.5rem; object-fit: cover;
 }
-#hero h1 { 
-    font-size: 3rem; font-weight: 700; line-height: 1.2; margin-bottom: 0.5rem; 
+#hero h1 {
+    font-size: 3rem; font-weight: 700; line-height: 1.2; margin-bottom: 0.5rem;
     height: 140px; display: flex; align-items: center; justify-content: center;
     width: 100%; max-width: 800px;
 }
@@ -206,7 +206,7 @@ footer a:hover { opacity: 1; }
 .modal-content form { display: flex; flex-direction: column; gap: 1rem; }
 .modal-content .cta-button {
     display: block; width: 100%; background: var(--accent-color); color: #fff;
-    padding: 12px 24px; border-radius: 5px; text-decoration: none; font-weight: 600; 
+    padding: 12px 24px; border-radius: 5px; text-decoration: none; font-weight: 600;
     transition: all 0.3s ease; border: 2px solid var(--accent-color); text-align: center;
     cursor: pointer;
 }
@@ -222,8 +222,8 @@ footer a:hover { opacity: 1; }
 .privacy-checkbox input { width: auto; }
 
 /* 7. Responsive Design */
-@media (max-width: 768px) { 
-    .profile-picture { width: 144px; height: 144px; } 
+@media (max-width: 768px) {
+    .profile-picture { width: 144px; height: 144px; }
     #hero h1 { font-size: 1.9rem; white-space: nowrap; height: auto; min-height: 60px; max-width: 100%; }
     #hero .subtitle { margin-bottom: 1.7rem; }
     .ai-container { width: 100%; }
