@@ -116,14 +116,30 @@ body.dark-mode #theme-toggle .fa-moon { display: none; }
 
 /* 5. Inhaltselemente */
 .profile-picture {
-    width: 180px; height: 180px; margin-bottom: 1.5rem; object-fit: cover;
+    width: 200px; height: 200px; margin-bottom: 1.5rem; object-fit: cover;
 }
 #hero h1 {
     font-size: 3rem; font-weight: 700; line-height: 1.2; margin-bottom: 0.5rem;
-    height: 140px; display: flex; align-items: center; justify-content: center;
+    display: flex; align-items: center; justify-content: center;
     width: 100%; max-width: 800px;
 }
-#hero .subtitle { font-size: 1.2rem; font-weight: 300; margin-bottom: 2.5rem; }
+#hero .subtitle { font-size: 1.2rem; font-weight: 300; margin-bottom: 2.5rem;
+/* NEUE STYLES FÜR VISITEKARTEN-LOOK */
+    background-color: var(--bg-color); /* Hintergrundfarbe des Body für Integration */
+    color: var(--text-color); /* Textfarbe wie der Body */
+    padding: 15px 25px; /* Innenabstand */
+    border: 1px solid var(--border-color); /* Dezenter Rahmen */
+    border-radius: 8px; /* Leicht abgerundete Ecken */
+    display: inline-block; /* Damit der Hintergrund und Rahmen nur den Inhalt umschließen */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); /* Leichter Schatten für Tiefe */
+    text-align: center; /* Text zentrieren */
+    min-width: 280px; /* Eine Mindestbreite, damit es nicht zu schmal wird */
+    max-width: 80%; /* Nicht breiter als 80% des Containers */
+    line-height: 1.5; /* Zeilenhöhe anpassen, falls nötig */ }
+
+body.dark-mode .subtitle {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Etwas stärkerer Schatten im Dunkelmodus */
+}
 
 .ai-container {
     width: 500px;
@@ -234,7 +250,7 @@ footer a:hover { opacity: 1; }
 
 /* 7. Responsive Design */
 @media (max-width: 768px) {
-    .profile-picture { width: 144px; height: 144px; }
+    .profile-picture { width: 150px; height: 150px; }
     #hero h1 { font-size: 1.9rem; white-space: nowrap; height: auto; min-height: 60px; max-width: 100%; }
     #hero .subtitle { margin-bottom: 1.7rem; }
     .ai-container { width: 100%; }
