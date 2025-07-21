@@ -117,27 +117,54 @@ document.addEventListener('DOMContentLoaded', function() {
     const aiQuestionInput = document.getElementById('ai-question');
 
     if (aiForm) {
-        // GEÄNDERT: Timing für sanfteren Effekt angepasst
+        // GEÄNDERT: Komplette Logik für den Platzhalter-Effekt
         const placeholderTexts = [
             "Hallo, ich bin Evita, Michaels KI-Assistentin.",
             "Was kann ich für Sie tun?"
         ];
         let placeholderIndex = 0;
+        let charPlaceholderIndex = 0;
+        let placeholderInterval;
+
+        function cyclePlaceholder() {
+            // Lösch-Phase
+            let currentText = aiQuestionInput.placeholder;
+            let deleteInterval = setInterval(() => {
+                if (currentText.length > 0) {
+                    currentText = currentText.slice(0, -1);
+                    aiQuestionInput.placeholder = currentText;
+                } else {
+                    clearInterval(deleteInterval);
+                    // Nach dem Löschen, den nächsten Text holen und tippen
+                    placeholderIndex = (placeholderIndex + 1) % placeholderTexts.length;
+                    charPlaceholderIndex = 0;
+                    typePlaceholder();
+                }
+            }, 30); // Geschwindigkeit des Löschens
+        }
+
+        function typePlaceholder() {
+            let newText = placeholderTexts[placeholderIndex];
+            let typeInterval = setInterval(() => {
+                if (charPlaceholderIndex < newText.length) {
+                    aiQuestionInput.placeholder += newText.charAt(charPlaceholderIndex);
+                    charPlaceholderIndex++;
+                } else {
+                    clearInterval(typeInterval);
+                }
+            }, 50); // Geschwindigkeit des Tippens
+        }
+
+        // Startet den Zyklus
+        placeholderInterval = setInterval(cyclePlaceholder, 4000); // Alle 4 Sekunden startet ein neuer Zyklus
+
         
-        setInterval(() => {
-            aiQuestionInput.classList.add('placeholder-fade');
-            
-            setTimeout(() => {
-                placeholderIndex = (placeholderIndex + 1) % placeholderTexts.length;
-                aiQuestionInput.placeholder = placeholderTexts[placeholderIndex];
-                aiQuestionInput.classList.remove('placeholder-fade');
-            }, 600); // Muss zur Transitions-Dauer in CSS passen (0.6s)
-
-        }, 4000); // Gesamtdauer des Intervalls verlängert
-
-
         const aiStatus = document.getElementById('ai-status');
         const submitButton = aiForm.querySelector('button');
+
+        aiQuestionInput.addEventListener('focus', () => {
+            clearInterval(placeholderInterval); // Stoppt die Animation, wenn der Nutzer in das Feld klickt
+        });
 
         aiForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -186,7 +213,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const { clientX, clientY } = e; 
             const { offsetWidth, offsetHeight } = heroElement;
             const xRotation = 30 * ((clientY - offsetHeight / 2) / offsetHeight);
-            const yRotation = 30 * ((clientX - offsetWidth / 2) / offsetHeight);
+            const yRotation = 30 * ((clientX - offsetWidth / 2) / offsetWidth);
             container.style.transform = `rotateX(${xRotation * -1}deg) rotateY(${yRotation}deg)`;
         });
         heroElement.addEventListener('mouseleave', () => { 
