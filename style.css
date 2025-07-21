@@ -36,7 +36,7 @@
     --accent-color: #FCB500;
     --accent-color-rgba: rgba(252, 181, 0, 0.85);
     --particle-color: #888888;
-    --particle-line-color: #cccccc; /* Original: #cccccc */
+    --particle-line-color: #cccccc;
     --border-color: #bfbfbf; /* Um ca. 15% dunkler als original #dddddd */
 }
 
@@ -130,10 +130,16 @@ body.dark-mode #theme-toggle .fa-moon { display: none; }
     margin-bottom: 2.5rem;
 }
 #ai-form {
-    display: flex; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px;
-    overflow: hidden; background-color: var(--bg-color); transition: border-color 0.3s ease;
+    display: flex;
+    border: 1px solid #bfbfbf; /* Im Tagmodus: um ca. 15% dunkler als original #dddddd */
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: var(--bg-color);
+    transition: border-color 0.3s ease;
 }
-body.dark-mode #ai-form { border-color: rgba(255,255,255,0.15); }
+body.dark-mode #ai-form {
+    border-color: #4a4a4a; /* Im Nachtmodus: um ca. 15% heller als original rgba(255,255,255,0.15) */
+}
 #ai-form:focus-within { border-color: var(--accent-color); }
 #ai-question {
     flex-grow: 1; border: none; background: none; padding: 12px 15px;
@@ -154,11 +160,16 @@ body.dark-mode #ai-form { border-color: rgba(255,255,255,0.15); }
 #ai-form button:hover { background: #d39a00; }
 #ai-status {
     font-size: 0.9rem; min-height: 40px; margin-top: 10px; padding: 10px; opacity: 0.9;
-    text-align: left; background-color: rgba(0,0,0,0.02);
-    border: 1px solid rgba(0,0,0,0.05); border-radius: 8px;
+    text-align: left;
+    background-color: rgba(0,0,0,0.02);
+    border: 1px solid #bfbfbf; /* Im Tagmodus: um ca. 15% dunkler als original rgba(0,0,0,0.05) */
+    border-radius: 8px;
     transition: opacity 0.3s ease, border-color 0.3s ease;
 }
-body.dark-mode #ai-status { background-color: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); }
+body.dark-mode #ai-status {
+    background-color: rgba(255,255,255,0.03);
+    border: 1px solid #4a4a4a; /* Im Nachtmodus: um ca. 15% heller als original rgba(255,255,255,0.08) */
+}
 
 /* KORRIGIERT: Regel für den "denkenden" Rahmen spezifischer gemacht */
 #ai-status.thinking,
