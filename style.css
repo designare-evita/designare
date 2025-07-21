@@ -1,267 +1,104 @@
-/*
- * style.css
- * Online-Visitenkarte - Finale Version
-*/
+/* In style.css, am Ende der Datei */
 
-/* 1. Lokale Fonts laden */
-@font-face {
-    font-family: 'Poppins';
-    src: url('Font/Poppins-Light.ttf') format('truetype');
-    font-weight: 300;
-    font-style: normal;
-}
-@font-face {
-    font-family: 'Poppins';
-    src: url('Font/Poppins-Regular.ttf') format('truetype');
-    font-weight: 400;
-    font-style: normal;
-}
-@font-face {
-    font-family: 'Poppins';
-    src: url('Font/Poppins-SemiBold.ttf') format('truetype');
-    font-weight: 600;
-    font-style: normal;
-}
-@font-face {
-    font-family: 'Poppins';
-    src: url('Font/Poppins-Bold.ttf') format('truetype');
-    font-weight: 700;
-    font-style: normal;
-}
-
-/* 2. Globale Einstellungen & Farbvariablen */
-:root {
-    --bg-color: #F8F7F4;
-    --text-color: #333333;
-    --accent-color: #FCB500;
-    --accent-color-rgba: rgba(252, 181, 0, 0.85);
-    --particle-color: #888888;
-    --particle-line-color: #cccccc;
-    --border-color: #bfbfbf;
-}
-
-body.dark-mode {
-    --bg-color: #1a1a1a;
-    --text-color: #eeeeee;
-    --particle-color: #bbbbbb;
-    --particle-line-color: #888888;
-    --border-color: #5e5e5e;
-}
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-html, body {
-    height: 100%;
-}
-
-body {
-    font-family: 'Poppins', sans-serif;
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    line-height: 1.6;
-    perspective: 1000px;
-    transition: background-color 0.4s ease, color 0.4s ease;
-}
-
-/* 3. Steuerungselemente (Uhr, Buttons) */
-#top-right-controls {
+/* 8. Cookie Banner */
+.cookie-banner {
     position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 1000;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: var(--bg-color); /* Nutzt die Theme-Farbe */
+    color: var(--text-color); /* Nutzt die Theme-Farbe */
+    padding: 15px 20px;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
     display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2500; /* Höher als andere Elemente */
+    transform: translateY(100%); /* Startet außerhalb des Bildschirms */
+    transition: transform 0.5s ease-out;
+}
+
+.cookie-banner.show {
+    transform: translateY(0); /* Fährt in den Bildschirm ein */
+}
+
+.cookie-content {
+    max-width: 900px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
     align-items: center;
     gap: 15px;
 }
-#theme-toggle {
-    background: none; border: none; color: var(--text-color); font-size: 1.5rem;
-    cursor: pointer; transition: color 0.4s ease, transform 0.3s ease;
-}
-#theme-toggle:hover { color: var(--accent-color); transform: scale(1.1); }
-#theme-toggle .fa-sun { display: none; }
-body.dark-mode #theme-toggle .fa-sun { display: inline-block; }
-body.dark-mode #theme-toggle .fa-moon { display: none; }
 
-#contact-button {
-    background: none;
-    border: none;
-    color: var(--text-color);
-    width: 40px; height: 40px; border-radius: 50%; font-size: 1.2rem;
-    cursor: pointer; display: flex; align-items: center; justify-content: center;
-    transition: all 0.3s ease; opacity: 0.7;
-}
-#contact-button:hover {
-    opacity: 1; color: #fff; background-color: var(--accent-color);
-    transform: scale(1.1);
+.cookie-content p {
+    margin: 0;
+    text-align: center;
+    line-height: 1.5;
 }
 
-/* 4. Haupt-Layout & Container */
-.container {
-    max-width: 1100px; margin: 0 auto; padding: 0 2rem; display: flex;
-    flex-direction: column; align-items: center; justify-content: center;
-    transform-style: preserve-3d; transition: transform 0.1s linear;
+.cookie-content a {
+    color: var(--accent-color);
+    text-decoration: underline;
+    font-weight: 600;
 }
-#hero {
-    height: 100vh; display: flex; align-items: center; justify-content: center;
-    text-align: center; position: relative; overflow: hidden;
-}
-#particles-js {
-    position: absolute; width: 100%; height: 100%; top: 0; left: 0; z-index: 1;
-}
-#hero .container { position: relative; z-index: 2; }
 
-/* 5. Inhaltselemente */
-.profile-picture {
-    width: 198px; /* Vorher 180px, jetzt 10% größer (180 * 1.1 = 198) */
-    height: 198px; /* Vorher 180px, jetzt 10% größer */
-    margin-bottom: 1.5rem;
-    object-fit: cover;
-}
-#hero h1 {
-    font-size: 3rem;
-    font-weight: 700;
-    line-height: 1.2;
-    margin-bottom: 0.5rem;
-    min-height: 1.2em;
+.cookie-buttons {
     display: flex;
-    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap; /* Buttons umbrechen auf kleineren Bildschirmen */
     justify-content: center;
-    width: 100%;
-    max-width: 800px;
-}
-#hero .subtitle {
-    font-size: 1.2rem;
-    font-weight: 300;
-    margin-bottom: 2.5rem;
-    padding-top: 15px;
-    
 }
 
-
-.ai-container {
-    width: 500px;
-    margin-bottom: 2.5rem;
-}
-#ai-form {
-    display: flex;
-    border: 1px solid #bfbfbf;
-    border-radius: 8px;
-    overflow: hidden;
-    background-color: var(--bg-color);
-    transition: border-color 0.3s ease;
-}
-body.dark-mode #ai-form {
-    border-color: #5e5e5e;
-}
-#ai-form:focus-within { border-color: var(--accent-color); }
-#ai-question {
-    flex-grow: 1; border: none; background: none; padding: 12px 15px;
-    font-size: 1rem; color: var(--text-color); outline: none;
-}
-#ai-question::placeholder {
-    color: var(--text-color);
-    opacity: 0.5;
-    transition: opacity 0.6s ease-in-out;
-}
-#ai-question.placeholder-fade::placeholder {
-    opacity: 0;
-}
-#ai-form button {
-    border: none; background: var(--accent-color); color: #fff; padding: 0 18px;
-    cursor: pointer; font-size: 1rem; transition: background-color 0.3s ease;
-}
-#ai-form button:hover { background: #d39a00; }
-#ai-status {
-    font-size: 0.9rem; min-height: 40px; margin-top: 10px; padding: 10px; opacity: 0.9;
-    text-align: left;
-    background-color: rgba(0,0,0,0.02);
-    border: 1px solid #bfbfbf;
-    border-radius: 8px;
-    transition: opacity 0.3s ease, border-color 0.3s ease;
-}
-body.dark-mode #ai-status {
-    background-color: rgba(255,255,255,0.03);
-    border: 1px solid #5e5e5e;
-}
-
-/* KORRIGIERT: Regel für den "denkenden" Rahmen spezifischer gemacht */
-#ai-status.thinking,
-body.dark-mode #ai-status.thinking {
-    border-color: #D39A00;
-}
-
-/* 6. Footer & Kontakt-Modal */
-footer {
-    position: fixed;
-    bottom: 10px;
-    right: 10px;
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-footer a {
-    font-size: 0.8rem; color: var(--text-color); text-decoration: none; opacity: 0.5;
-    transition: opacity 0.3s ease; border: 1px solid var(--text-color);
-    padding: 4px 8px; border-radius: 5px;
-}
-footer a:hover { opacity: 1; }
-
-.modal-overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background-color: rgba(0, 0, 0, 0.7); z-index: 2000; display: flex;
-    align-items: center; justify-content: center; opacity: 0;
-    pointer-events: none; transition: opacity 0.3s ease;
-}
-.modal-overlay.visible { opacity: 1; pointer-events: auto; }
-.modal-content {
-    background-color: var(--bg-color); padding: 2rem; border-radius: 10px;
-    width: 90%; max-width: 500px; position: relative;
-    transform: scale(0.95); transition: transform 0.3s ease;
-}
-.modal-overlay.visible .modal-content { transform: scale(1); }
-.modal-content h2 { margin-top: 0; margin-bottom: 1.5rem; text-align: center; }
-.close-button {
-    position: absolute; top: 10px; right: 15px; background: none; border: none;
-    font-size: 2rem; color: var(--text-color); opacity: 0.5; cursor: pointer;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-}
-.close-button:hover { opacity: 1; transform: rotate(90deg); }
-.modal-content form { display: flex; flex-direction: column; gap: 1rem; }
-.modal-content .cta-button {
-    display: block; width: 100%; background: var(--accent-color); color: #fff;
-    padding: 12px 24px; border-radius: 5px; text-decoration: none; font-weight: 600;
-    transition: all 0.3s ease; border: 2px solid var(--accent-color); text-align: center;
+.cookie-buttons .cta-button {
+    /* Wiederverwendung des cta-button Stils aus dem Modal */
+    background: var(--accent-color);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: 600;
+    border: 2px solid var(--accent-color);
     cursor: pointer;
+    transition: all 0.3s ease;
 }
-.modal-content .cta-button:hover { background-color: #d39a00; border-color: #d39a00; color: #fff; transform: translateY(-3px); }
-.modal-content input[type="text"], .modal-content input[type="email"], .modal-content textarea {
-    font-family: 'Poppins', sans-serif; font-size: 1rem; padding: 12px;
-    border-radius: 5px; border: 1px solid var(--border-color);
-    background-color: var(--bg-color); color: var(--text-color);
-    transition: border-color 0.3s ease;
-}
-.modal-content input:focus, .modal-content textarea:focus { outline: none; border-color: var(--accent-color); }
-.privacy-checkbox { display: flex; align-items: center; gap: 10px; font-size: 0.8rem; }
-.privacy-checkbox input { width: auto; }
 
-/* 7. Responsive Design */
+.cookie-buttons .cta-button:hover {
+    background-color: #d39a00;
+    border-color: #d39a00;
+    transform: translateY(-2px);
+}
+
+.cookie-buttons .secondary-button {
+    background: none;
+    color: var(--text-color);
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: 600;
+    border: 2px solid var(--text-color); /* Border-Farbe des Textes anpassen */
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.cookie-buttons .secondary-button:hover {
+    color: var(--accent-color);
+    border-color: var(--accent-color);
+    transform: translateY(-2px);
+}
+
+/* Responsive Anpassung für den Cookie Banner */
 @media (max-width: 768px) {
-    .profile-picture {
-        width: 158px; /* Vorher 144px, jetzt 10% größer (144 * 1.1 = 158.4, gerundet) */
-        height: 158px; /* Vorher 144px, jetzt 10% größer */
+    .cookie-banner {
+        padding: 10px 15px;
     }
-    #hero h1 {
-        font-size: 1.9rem;
-        white-space: normal;
-        height: auto;
-        min-height: 1.2em;
-        max-width: 100%;
+    .cookie-content p {
+        font-size: 0.9rem;
     }
-    #hero .subtitle { margin-bottom: 1.7rem; }
-    .ai-container { width: 100%; }
+    .cookie-buttons {
+        flex-direction: column;
+        width: 100%;
+    }
+    .cookie-buttons button {
+        width: 100%; /* Buttons nehmen volle Breite ein */
+    }
 }
