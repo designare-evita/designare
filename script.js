@@ -5,36 +5,22 @@
 
 document.addEventListener('DOMContentLoaded', function() {
 
-    // --- Cookie Info Bar Logik - Start ---
+// --- Cookie Info Bar Logik - Start ---
     const cookieInfoBar = document.getElementById('cookie-info-bar');
-    const closeCookieBarBtn = document.getElementById('close-cookie-bar');
 
-    // Optionaler Debug-Log: Prüfen, ob der Button gefunden wird
-    if (closeCookieBarBtn) {
-        console.log('Schließen-Button für Cookie-Bar gefunden.');
-    } else {
-        console.error('Schließen-Button für Cookie-Bar NICHT gefunden!');
-    }
+    // Der Banner wird jetzt IMMER beim Laden angezeigt und blendet sich dann aus.
+    // Keine localStorage-Prüfung mehr, da es keinen "Schließen"-Status gibt.
 
-    const hasClosedCookieInfo = localStorage.getItem('hasClosedCookieInfo');
-
-    if (!hasClosedCookieInfo) { // Nur anzeigen, wenn er noch nicht geschlossen wurde
+    if (cookieInfoBar) { // Sicherstellen, dass der Bar existiert
+        // Zeige die Info-Bar nach kurzer Verzögerung (z.B. 1.5 Sekunden)
         setTimeout(() => {
-            if (cookieInfoBar) { // Zusätzliche Prüfung, ob der Bar existiert
-                 cookieInfoBar.classList.add('show');
-            }
-        }, 1500); // Zeigt den Bar nach 1.5 Sekunden an
-    }
+            cookieInfoBar.classList.add('show');
+        }, 1500); // Fährt nach 1.5 Sekunden hoch
 
-    // Event Listener für den Schließen-Button
-    if (closeCookieBarBtn) { // Sicherstellen, dass der Button existiert, bevor ein Listener hinzugefügt wird
-        closeCookieBarBtn.addEventListener('click', () => {
-            if (cookieInfoBar) { // Sicherstellen, dass der Bar existiert
-                cookieInfoBar.classList.remove('show');
-                localStorage.setItem('hasClosedCookieInfo', 'true'); // Merken, dass der Nutzer ihn geschlossen hat
-                console.log('Cookie-Bar geschlossen und Status gespeichert.');
-            }
-        });
+        // Blende die Info-Bar nach 6 Sekunden wieder aus (6000ms)
+        setTimeout(() => {
+            cookieInfoBar.classList.remove('show');
+        }, 6000); // Bleibt 6 Sekunden sichtbar, dann fährt er wieder runter
     }
     // --- Cookie Info Bar Logik - Ende ---
 

@@ -265,9 +265,7 @@ footer a:hover { opacity: 1; }
 }
 
 
-
-/* 8. Cookie Info Bar */
-
+/* In style.css, in der Sektion "8. Cookie Info Bar" */
 
 .cookie-info-bar {
     position: fixed;
@@ -283,9 +281,9 @@ footer a:hover { opacity: 1; }
     transform: translateY(100%);
     transition: transform 0.8s ease-out;
     display: flex; /* Flexbox für Ausrichtung */
-    justify-content: center;
+    justify-content: center; /* Text zentrieren */
     align-items: center;
-    gap: 15px; /* Abstand zwischen Text und Button */
+    /* gap: 15px; */ /* Diese Zeile wird nicht mehr benötigt, da kein Button mehr da ist */
 }
 
 /* Anpassung für den Nachtmodus */
@@ -303,7 +301,7 @@ body.dark-mode .cookie-info-bar {
     margin: 0;
     font-size: 0.95rem;
     max-width: 800px;
-    flex-grow: 1; /* Lässt den Text den verfügbaren Platz einnehmen */
+    /* flex-grow: 1; */ /* Diese Zeile wird nicht mehr benötigt, da kein Button mehr da ist */
 }
 
 .cookie-info-bar a {
@@ -319,27 +317,29 @@ body.dark-mode .cookie-info-bar {
     text-decoration: none;
 }
 
-/* NEU: Styling für den Schließen-Button */
+/* NEU: Styling für den Schließen-Button - DIESER BLOCK WIRD ENTFERNT */
+/*
 .close-cookie-bar {
     background: none;
     border: none;
-    color: var(--bg-color); /* Farbe passend zum Hintergrund des Bars */
+    color: var(--bg-color);
     font-size: 1.5rem;
     cursor: pointer;
     line-height: 1;
     opacity: 0.7;
     transition: opacity 0.3s ease, transform 0.3s ease;
-    padding: 0 5px; /* Kleiner Padding für Klickfläche */
+    padding: 0 5px;
 }
 
 body.dark-mode .close-cookie-bar {
-    color: #eeeeee; /* Farbe im Nachtmodus anpassen */
+    color: #eeeeee;
 }
 
 .close-cookie-bar:hover {
     opacity: 1;
     transform: scale(1.1);
 }
+*/
 
 /* Anpassung des Footers, falls nötig - unverändert */
 footer {
@@ -353,25 +353,20 @@ footer {
 @media (max-width: 768px) {
     .cookie-info-bar {
         padding: 10px 15px;
-        flex-direction: column; /* Vertikal anordnen */
-        gap: 10px; /* Abstand zwischen den Elementen */
-        align-items: flex-start; /* Elemente linksbündig ausrichten */
+        /* flex-direction: column; */ /* Diese Zeile wird nicht mehr benötigt */
+        /* gap: 10px; */ /* Diese Zeile wird nicht mehr benötigt */
+        /* align-items: flex-start; */ /* Diese Zeile wird nicht mehr benötigt */
     }
     .cookie-info-bar p {
         font-size: 0.85rem;
-        text-align: left; /* Text linksbündig */
-        width: 100%; /* Text nimmt volle Breite ein */
+        text-align: center; /* Wieder zentrieren */
+        width: auto; /* Breite wieder automatisch */
     }
     .cookie-info-bar a {
-        display: inline; /* Link bleibt inline */
+        display: inline;
         margin-top: 0;
-        margin-left: 0; /* Kein zusätzlicher Margin-Left */
+        margin-left: 8px; /* Wieder den ursprünglichen Margin-Left */
         font-size: calc(0.85rem + 2pt);
     }
-    .close-cookie-bar {
-        position: absolute; /* Position absolut im mobilen Layout */
-        top: 5px;
-        right: 5px;
-        font-size: 1.2rem; /* Etwas kleiner für Mobile */
-    }
+    /* .close-cookie-bar { ... } */ /* Dieser responsive Block für den Button wird auch entfernt */
 }
