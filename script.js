@@ -361,7 +361,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // --- NEU: Legal-Seiten Lightbox Navigation ---
+    // --- Legal-Seiten Lightbox Navigation ---
     const impressumLink = document.getElementById('impressum-link');
     const datenschutzLink = document.getElementById('datenschutz-link');
     const legalModal = document.getElementById('legal-modal');
@@ -370,7 +370,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Funktion zum Laden und Anzeigen der Legal-Seite in der Lightbox
     async function loadLegalPageInModal(pageName) {
-        const url = `${pageName}.html`; // Die URL der vollständigen HTML-Datei
+        const url = `${pageName}.html`;
         
         try {
             const response = await fetch(url);
@@ -379,26 +379,93 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             const htmlContent = await response.text();
             
-            // Den Inhalt des legal-containers extrahieren
             const parser = new DOMParser();
             const doc = parser.parseFromString(htmlContent, 'text/html');
             const legalContainer = doc.querySelector('.legal-container');
 
             if (legalContainer) {
-                legalModalContentArea.innerHTML = legalContainer.innerHTML; // Nur den Inhalt einfügen
+                legalModalContentArea.innerHTML = ''; // Vorherigen Inhalt leeren
+
+                const children = Array.from(legalContainer.children);
+                // Finde den Index des <a class="back-link"> Elements
+                const backLinkIndex = children.findIndex(child => child.classList.contains('back-link'));
+                // Entferne den back-link aus der Liste der Kinder, damit er nicht doppelt hinzugefügt wird
+                // und wir ihn separat im Modal-Footer platzieren können oder ihn direkt steuern.
+                let backLinkElement = null;
+                if (backLinkIndex !== -1) {
+                    backLinkElement = children.splice(backLinkIndex, 1)[0]; // Element entfernen und speichern
+                }
+
+                // Split-Punkt: Versuche, nach der Hälfte der Elemente zu teilen
+                const splitIndex = Math.ceil(children.length * 0.5);
+
+                const part1Div = document.createElement('div');
+                const part2Div = document.createElement('div');
+                part2Div.style.display = 'none'; // Zweiter Teil initial versteckt
+
+                children.forEach((child, index) => {
+                    if (index < splitIndex) {
+                        part1Div.appendChild(child.cloneNode(true));
+                    } else {
+                        part2Div.appendChild(child.cloneNode(true));
+                    }
+                });
+
+                // Buttons für Paginierung erstellen
+                const paginationButtonsDiv = document.createElement('div');
+                paginationButtonsDiv.className = 'legal-modal-pagination-buttons';
+
+                const continueButton = document.createElement('button');
+                continueButton.id = 'legal-continue-button';
+                continueButton.textContent = 'Weiter';
+
+                const backButton = document.createElement('button');
+                backButton.id = 'legal-back-button';
+                backButton.textContent = 'Zurück';
+                backButton.style.display = 'none'; // Initial versteckt
+
+                paginationButtonsDiv.appendChild(backButton);
+                paginationButtonsDiv.appendChild(continueButton);
+
+                legalModalContentArea.appendChild(part1Div);
+                legalModalContentArea.appendChild(part2Div); // Zweiter Teil wird hinzugefügt, aber versteckt
+                legalModalContentArea.appendChild(paginationButtonsDiv); // Buttons am Ende
+
+                // Event Listener für "Weiter"
+                continueButton.addEventListener('click', () => {
+                    part1Div.style.display = 'none';
+                    continueButton.style.display = 'none';
+                    part2Div.style.display = 'block';
+                    backButton.style.display = 'block';
+                    legalModalContentArea.scrollTop = 0; // Nach oben scrollen
+                });
+
+                // Event Listener für "Zurück"
+                backButton.addEventListener('click', () => {
+                    part1Div.style.display = 'block';
+                    continueButton.style.display = 'block';
+                    part2Div.style.display = 'none';
+                    backButton.style.display = 'none';
+                    legalModalContentArea.scrollTop = 0; // Nach oben scrollen
+                });
+
+                // Den ursprünglichen "Zurück zur Startseite" Link im Modal behandeln
+                // Er sollte das Modal schließen, da wir nicht zur index.html navigieren
+                const backLinkInLoadedContent = legalModalContentArea.querySelector('.back-link');
+                if (backLinkInLoadedContent) {
+                    backLinkInLoadedContent.addEventListener('click', (e) => {
+                        e.preventDefault(); // Standardverhalten verhindern
+                        legalModal.classList.remove('visible'); // Modal schließen
+                        body.style.overflow = ''; // Scrollen wieder erlauben
+                        // Optional: Inhalt des Modals leeren, wenn es geschlossen wird
+                        legalModalContentArea.innerHTML = '';
+                    });
+                }
+
+
                 legalModal.classList.add('visible'); // Lightbox sichtbar machen
                 body.style.overflow = 'hidden'; // Scrollen des Haupt-Body verhindern
 
-                // Event Listener für den "Zurück zur Startseite" Link innerhalb des Modals
-                // Dieser Link muss das Modal schließen
-                const backLinkInModal = legalModalContentArea.querySelector('.back-link');
-                if (backLinkInModal) {
-                    backLinkInModal.addEventListener('click', (e) => {
-                        e.preventDefault(); // Standardverhalten des Links verhindern
-                        legalModal.classList.remove('visible'); // Modal schließen
-                        body.style.overflow = ''; // Scrollen wieder erlauben
-                    });
-                }
             } else {
                 console.error(`Could not find .legal-container in ${pageName}.html`);
                 alert(`Fehler: Inhalt von ${pageName} konnte nicht geladen werden.`);
@@ -431,6 +498,7 @@ document.addEventListener('DOMContentLoaded', function() {
         closeLegalModalBtn.addEventListener('click', () => {
             legalModal.classList.remove('visible');
             body.style.overflow = ''; // Scrollen wieder erlauben
+            legalModalContentArea.innerHTML = ''; // Inhalt leeren beim Schließen
         });
     }
 
@@ -440,10 +508,8 @@ document.addEventListener('DOMContentLoaded', function() {
             if (e.target === legalModal) {
                 legalModal.classList.remove('visible');
                 body.style.overflow = ''; // Scrollen wieder erlauben
+                legalModalContentArea.innerHTML = ''; // Inhalt leeren beim Schließen
             }
         });
     }
-
-    // ENTFERNT: Logik für den Browser-Zurück/Vorwärts-Button (onpopstate)
-    // ENTFERNT: Initialen Zustand der History setzen (history.replaceState)
 });
