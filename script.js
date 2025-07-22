@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (typewriterElement) {
         const textsToType = [ "Michael Kanda", "Web-Flüsterer", "KI-Therapeut" ];
         let textIndex = 0; let charIndex = 0; let isDeleting = false;
-        const typingSpeed = 100, deletingSpeed = 50, delayBetweenTexts = 2000;
+        const typingSpeed = 160, deletingSpeed = 80, delayBetweenTexts = 3000;
 
         function typeWriter() {
             const currentText = textsToType[textIndex];
