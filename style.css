@@ -65,19 +65,21 @@ body {
     color: var(--text-color);
     line-height: 1.6;
     perspective: 1000px;
-    /* transition: background-color 0.4s ease, color 0.4s ease, opacity 0.8s ease; */ /* GEÄNDERT: transition entfernen für Body, wird im JS gesteuert */
+    transition: background-color 0.4s ease, color 0.4s ease; /* ZURÜCKGESETZT: Nur diese Transitions behalten */
     overflow-x: hidden;
-    /* opacity: 0; */ /* GEÄNDERT: Initial unsichtbar entfernen, da es Probleme macht */
-    visibility: hidden; /* NEU: Statt Opacity, verwenden wir Visibility für initial */
-    transition: visibility 0s 0.8s, opacity 0.8s ease; /* NEU: Übergang für Visibility und Opacity */
-    opacity: 0; /* Opacity 0 behalten für den Fade-Effekt */
+    /* ENTFERNT: opacity: 0; */
+    /* ENTFERNT: visibility: hidden; */
+    /* ENTFERNT: transition: visibility 0s 0.8s, opacity 0.8s ease; */
 }
 
+/* ENTFERNT: body.loaded Klasse wird nicht mehr benötigt für den Einblendeffekt */
+/*
 body.loaded {
-    opacity: 1; /* Sichtbar, wenn die Klasse hinzugefügt wird */
-    visibility: visible; /* Sichtbar, wenn die Klasse hinzugefügt wird */
-    transition-delay: 0s; /* Keine Verzögerung beim Einblenden */
+    opacity: 1;
+    visibility: visible;
+    transition-delay: 0s;
 }
+*/
 
 
 /* 3. Steuerungselemente (Uhr, Buttons) */
@@ -199,8 +201,6 @@ body.dark-mode #ai-status {
     background-color: rgba(255,255,255,0.03);
     border: 1px solid #5e5e5e;
 }
-
-/* KORRIGIERT: Regel für den "denkenden" Rahmen spezifischer gemacht (wurde im letzten Schritt rückgängig gemacht, also hier nicht mehr vorhanden) */
 
 /* 6. Footer & Kontakt-Modal */
 footer {
