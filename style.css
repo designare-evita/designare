@@ -361,7 +361,10 @@ body.dark-mode .legal-modal-pagination-buttons button:disabled {
         min-height: 1.2em;
         max-width: 100%;
     }
-    #hero .subtitle { margin-bottom: 1.7rem; }
+    #hero .subtitle {
+        margin-bottom: 1.7rem;
+        font-size: 1rem; /* NEU: Schriftgröße des Subtitles auf Mobile */
+    }
     .ai-container { width: 100%; }
 
     /* Responsive Anpassung für Lightbox-Buttons */
