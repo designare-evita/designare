@@ -65,13 +65,18 @@ body {
     color: var(--text-color);
     line-height: 1.6;
     perspective: 1000px;
-    transition: background-color 0.4s ease, color 0.4s ease, opacity 0.8s ease; /* GEÄNDERT: Übergang für Opazität hinzugefügt */
+    /* transition: background-color 0.4s ease, color 0.4s ease, opacity 0.8s ease; */ /* GEÄNDERT: transition entfernen für Body, wird im JS gesteuert */
     overflow-x: hidden;
-    opacity: 0; /* NEU: Initial unsichtbar */
+    /* opacity: 0; */ /* GEÄNDERT: Initial unsichtbar entfernen, da es Probleme macht */
+    visibility: hidden; /* NEU: Statt Opacity, verwenden wir Visibility für initial */
+    transition: visibility 0s 0.8s, opacity 0.8s ease; /* NEU: Übergang für Visibility und Opacity */
+    opacity: 0; /* Opacity 0 behalten für den Fade-Effekt */
 }
 
 body.loaded {
-    opacity: 1; /* NEU: Sichtbar, wenn die Klasse hinzugefügt wird */
+    opacity: 1; /* Sichtbar, wenn die Klasse hinzugefügt wird */
+    visibility: visible; /* Sichtbar, wenn die Klasse hinzugefügt wird */
+    transition-delay: 0s; /* Keine Verzögerung beim Einblenden */
 }
 
 
