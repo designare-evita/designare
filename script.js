@@ -239,17 +239,35 @@ document.addEventListener('DOMContentLoaded', function() {
         const aiStatus = document.getElementById('ai-status');
         const submitButton = aiForm.querySelector('button');
 
-        // Platzhaltertexte für Evita
+        // GEÄNDERT: Platzhaltertexte für Evita
         const placeholderTexts = [
             "Hallo, ich bin Evita,",
-            "Michael's KI-Assistentin.",
+            "Michaels KI-Assistentin.",
             "Was kann ich für Dich tun?"
         ];
         let placeholderIndex = 0;
         let charPlaceholderIndex = 0;
-        let placeholderInterval;
+        // Entfernt: placeholderInterval, da wir jetzt eine sequentielle Kette nutzen
 
-        function cyclePlaceholder() {
+        // NEU: Startet den Typewriter-Effekt für den Platzhalter
+        typePlaceholder();
+
+        function typePlaceholder() {
+            let newText = placeholderTexts[placeholderIndex];
+            aiQuestionInput.placeholder = ""; // Platzhalter vor dem Tippen leeren
+            let typeInterval = setInterval(() => {
+                if (charPlaceholderIndex < newText.length) {
+                    aiQuestionInput.placeholder += newText.charAt(charPlaceholderIndex);
+                    charPlaceholderIndex++;
+                } else {
+                    clearInterval(typeInterval);
+                    // Nach dem Tippen, eine Pause machen, dann löschen
+                    setTimeout(deletePlaceholder, 2000); // 2 Sekunden Pause vor dem Löschen
+                }
+            }, 70); // Tippgeschwindigkeit
+        }
+
+        function deletePlaceholder() {
             let currentText = aiQuestionInput.placeholder;
             let deleteInterval = setInterval(() => {
                 if (currentText.length > 0) {
@@ -257,31 +275,30 @@ document.addEventListener('DOMContentLoaded', function() {
                     aiQuestionInput.placeholder = currentText;
                 } else {
                     clearInterval(deleteInterval);
+                    // Nach dem Löschen, zum nächsten Text wechseln und erneut tippen
                     placeholderIndex = (placeholderIndex + 1) % placeholderTexts.length;
                     charPlaceholderIndex = 0;
-                    typePlaceholder();
+                    setTimeout(typePlaceholder, 500); // 0.5 Sekunden Pause vor dem Tippen des nächsten Textes
                 }
-            }, 40);
+            }, 40); // Löschgeschwindigkeit
         }
 
-        function typePlaceholder() {
-            let newText = placeholderTexts[placeholderIndex];
-            let typeInterval = setInterval(() => {
-                if (charPlaceholderIndex < newText.length) {
-                    aiQuestionInput.placeholder += newText.charAt(charPlaceholderIndex);
-                    charPlaceholderIndex++;
-                } else {
-                    clearInterval(typeInterval);
-                }
-            }, 70);
-        }
+        // Entfernt: placeholderInterval = setInterval(cyclePlaceholder, 7000);
+        // Entfernt: cyclePlaceholder Funktion, da sie durch typePlaceholder/deletePlaceholder Kette ersetzt wird
 
-        placeholderInterval = setInterval(cyclePlaceholder, 7000);
+        aiQuestionInput.addEventListener('focus', () => {
+            // Beim Fokus den aktuellen Typewriter-Effekt stoppen und Platzhalter leeren
+            // Dies erfordert, dass typeInterval und deleteInterval globaler zugänglich sind oder über eine Funktion gesteuert werden.
+            // Für Einfachheit: Wir leeren den Platzhalter und stoppen die Intervalle, wenn der Benutzer tippt.
+            clearInterval(typeInterval); // Annahme: typeInterval ist hier zugänglich
+            clearInterval(deleteInterval); // Annahme: deleteInterval ist hier zugänglich
+            aiQuestionInput.placeholder = ""; // Leert den Platzhalter sofort
+        });
 
-        aiQuestionInput.addEventListener('focus', () => clearInterval(placeholderInterval));
         aiQuestionInput.addEventListener('blur', () => {
             if(aiQuestionInput.value === '') {
-                 placeholderInterval = setInterval(cyclePlaceholder, 7000);
+                 // Wenn das Feld leer ist und der Fokus verloren geht, den Typewriter-Effekt neu starten
+                 typePlaceholder(); // Startet die Kette neu
             }
         });
 
@@ -290,7 +307,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const question = aiQuestionInput.value.trim();
             if (!question) return;
 
-            clearInterval(placeholderInterval);
+            // Beim Absenden die Typewriter-Intervalle stoppen, falls sie noch laufen
+            clearInterval(typeInterval);
+            clearInterval(deleteInterval);
             
             aiStatus.innerText = "Einen Moment, Evita gleicht gerade ihre Bits und Bytes ab...";
             aiStatus.classList.add('thinking');
@@ -322,6 +341,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 submitButton.disabled = false;
                 aiQuestionInput.placeholder = "Haben Sie eine weitere Frage?";
                 aiStatus.classList.remove('thinking');
+                // Nach dem Senden den Typewriter-Effekt für den Platzhalter neu starten
+                typePlaceholder();
             }
         });
     }
