@@ -395,33 +395,44 @@ document.addEventListener('DOMContentLoaded', function() {
                     backLinkElement = children.splice(backLinkIndex, 1)[0]; // Element entfernen und speichern
                 }
 
-                let part1Elements = [];
-                let part2Elements = [];
-                let splitPointFound = false;
+                let allParts = []; // Array, das alle Teile enthält
+                let currentPage = 0; // Aktuelle Seite (0-indiziert)
+                let paginationButtonsDiv; // Referenz für die Buttons
 
-                // NEU: Spezifische Split-Logik für datenschutz.html mit Debug-Logs
+                // NEU: Spezifische Split-Logik für datenschutz.html mit 3 Teilen
                 if (pageName === 'datenschutz') {
-                    // Suche das Element mit der ID innerhalb der CHILDREN-Liste
-                    const datenschutzSplitElement = children.find(child => child.id === 'datenschutz-split-point');
-                    console.log('Datenschutz: Attempting to find split point #datenschutz-split-point:', datenschutzSplitElement);
-                    if (datenschutzSplitElement) {
-                        const splitIndex = children.indexOf(datenschutzSplitElement);
-                        console.log('Datenschutz: Found split point at index:', splitIndex);
-                        if (splitIndex !== -1) {
-                            part1Elements = children.slice(0, splitIndex);
-                            part2Elements = children.slice(splitIndex);
-                            splitPointFound = true;
-                            console.log('Datenschutz: Split at specific ID. Part1 length:', part1Elements.length, 'Part2 length:', part2Elements.length);
+                    const splitElement1 = children.find(child => child.id === 'datenschutz-split-point-1');
+                    const splitElement2 = children.find(child => child.id === 'datenschutz-split-point-2');
+
+                    console.log('Datenschutz: Attempting 3-part split.');
+                    console.log('Split Point 1 (#datenschutz-split-point-1):', splitElement1);
+                    console.log('Split Point 2 (#datenschutz-split-point-2):', splitElement2);
+
+                    if (splitElement1 && splitElement2) {
+                        const index1 = children.indexOf(splitElement1);
+                        const index2 = children.indexOf(splitElement2);
+
+                        if (index1 !== -1 && index2 !== -1 && index1 < index2) {
+                            allParts.push(children.slice(0, index1));
+                            allParts.push(children.slice(index1, index2));
+                            allParts.push(children.slice(index2));
+                            console.log('Datenschutz: Successfully split into 3 parts based on IDs.');
+                            console.log('Part 1 length:', allParts[0].length, 'Part 2 length:', allParts[1].length, 'Part 3 length:', allParts[2].length);
                         } else {
-                            console.log('Datenschutz: Specific ID found, but indexOf returned -1. Falling back.');
+                            console.warn('Datenschutz: Specific split points found but indices invalid. Falling back to 2-part split.');
+                            // Fallback, wenn IDs gefunden, aber Reihenfolge falsch oder indexOf -1
+                            const splitIndex = Math.ceil(children.length * 0.5);
+                            allParts.push(children.slice(0, splitIndex));
+                            allParts.push(children.slice(splitIndex));
                         }
                     } else {
-                        console.log('Datenschutz: Specific ID #datenschutz-split-point NOT found. Falling back.');
+                        console.warn('Datenschutz: One or both specific split points NOT found. Falling back to 2-part split.');
+                        // Fallback, wenn IDs nicht gefunden
+                        const splitIndex = Math.ceil(children.length * 0.5);
+                        allParts.push(children.slice(0, splitIndex));
+                        allParts.push(children.slice(splitIndex));
                     }
-                }
-
-                // Fallback zu H3 oder 50% Split, wenn kein spezifischer Split-Punkt gefunden wurde
-                if (!splitPointFound) {
+                } else { // Logik für Impressum oder andere Seiten (2-Teile-Split)
                     const targetSplitCount = Math.ceil(children.length * 0.5);
                     let h3SplitIndex = -1;
                     for (let i = 0; i < children.length; i++) {
@@ -433,96 +444,89 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
 
                     if (h3SplitIndex !== -1) {
-                        part1Elements = children.slice(0, h3SplitIndex);
-                        part2Elements = children.slice(h3SplitIndex);
-                        splitPointFound = true;
-                        console.log('Split at H3 near middle. Part1 length:', part1Elements.length, 'Part2 length:', part2Elements.length);
+                        allParts.push(children.slice(0, h3SplitIndex));
+                        allParts.push(children.slice(h3SplitIndex));
+                        console.log('2-Part Split: Found H3 near middle.');
                     } else {
-                        // Finaler Fallback, wenn kein H3 oder spezifischer Split-Punkt gefunden wurde
                         const splitIndex = Math.ceil(children.length * 0.5);
-                        part1Elements = children.slice(0, splitIndex);
-                        part2Elements = children.slice(splitIndex);
-                        console.log('Split at 50% element count. Part1 length:', part1Elements.length, 'Part2 length:', part2Elements.length);
+                        allParts.push(children.slice(0, splitIndex));
+                        allParts.push(children.slice(splitIndex));
+                        console.log('2-Part Split: 50% element count.');
                     }
                 }
 
-                const part1Div = document.createElement('div');
-                const part2Div = document.createElement('div');
-                part2Div.style.display = 'none'; // Zweiter Teil initial versteckt
+                // Erstelle die Divs für jeden Teil und füge den Inhalt hinzu
+                const partDivs = allParts.map(part => {
+                    const div = document.createElement('div');
+                    part.forEach(child => div.appendChild(child.cloneNode(true)));
+                    return div;
+                });
 
-                part1Elements.forEach(child => part1Div.appendChild(child.cloneNode(true)));
-                part2Elements.forEach(child => part2Div.appendChild(child.cloneNode(true)));
+                // Funktion zum Rendern des aktuellen Teils
+                const renderCurrentPart = () => {
+                    partDivs.forEach((div, index) => {
+                        div.style.display = (index === currentPage) ? 'block' : 'none';
+                    });
+                    legalModalContentArea.scrollTop = 0; // Nach oben scrollen
+                    updatePaginationButtons();
+                    console.log('Rendering part:', currentPage + 1);
+                };
 
+                // Funktion zum Aktualisieren der Button-Sichtbarkeit
+                const updatePaginationButtons = () => {
+                    const backButton = document.getElementById('legal-back-button');
+                    const continueButton = document.getElementById('legal-continue-button');
 
-                // Buttons für Paginierung erstellen
-                const paginationButtonsDiv = document.createElement('div');
-                paginationButtonsDiv.className = 'legal-modal-pagination-buttons';
+                    if (backButton) {
+                        backButton.style.display = (currentPage > 0) ? 'block' : 'none';
+                    }
+                    if (continueButton) {
+                        continueButton.style.display = (currentPage < allParts.length - 1) ? 'block' : 'none';
+                    }
+                };
 
-                const continueButton = document.createElement('button');
-                continueButton.id = 'legal-continue-button';
-                continueButton.textContent = 'Weiter';
+                // Füge alle Teile zum Modal hinzu (initial alle versteckt außer dem ersten)
+                partDivs.forEach(div => legalModalContentArea.appendChild(div));
 
-                const backButton = document.createElement('button');
-                backButton.id = 'legal-back-button';
-                backButton.textContent = 'Zurück';
-                backButton.style.display = 'none'; // Initial versteckt
+                // Buttons für Paginierung erstellen (nur wenn mehr als 1 Teil)
+                if (allParts.length > 1) {
+                    paginationButtonsDiv = document.createElement('div');
+                    paginationButtonsDiv.className = 'legal-modal-pagination-buttons';
 
-                paginationButtonsDiv.appendChild(backButton);
-                // Zeige "Weiter" nur, wenn es einen zweiten Teil gibt
-                if (part2Elements.length > 0) {
+                    const backButton = document.createElement('button');
+                    backButton.id = 'legal-back-button';
+                    backButton.textContent = 'Zurück';
+                    backButton.addEventListener('click', () => { currentPage--; renderCurrentPart(); });
+
+                    const continueButton = document.createElement('button');
+                    continueButton.id = 'legal-continue-button';
+                    continueButton.textContent = 'Weiter';
+                    continueButton.addEventListener('click', () => { currentPage++; renderCurrentPart(); });
+
+                    paginationButtonsDiv.appendChild(backButton);
                     paginationButtonsDiv.appendChild(continueButton);
-                } else {
-                    continueButton.style.display = 'none'; // Verstecke den Weiter-Button, wenn kein zweiter Teil
-                    console.log('No second part, "Weiter" button hidden.'); // Debug
-                }
-                
-
-                legalModalContentArea.appendChild(part1Div);
-                legalModalContentArea.appendChild(part2Div); // Zweiter Teil wird hinzugefügt, aber versteckt
-                
-                // Füge die Paginierungs-Buttons nur hinzu, wenn es einen zweiten Teil gibt
-                if (part2Elements.length > 0) {
-                    legalModalContentArea.appendChild(paginationButtonsDiv); // Buttons am Ende
+                    legalModalContentArea.appendChild(paginationButtonsDiv);
                 }
 
 
-                // Event Listener für "Weiter"
-                continueButton.addEventListener('click', () => {
-                    part1Div.style.display = 'none';
-                    continueButton.style.display = 'none';
-                    part2Div.style.display = 'block';
-                    backButton.style.display = 'block';
-                    legalModalContentArea.scrollTop = 0; // Nach oben scrollen
-                    console.log('Clicked Weiter, showing part 2.'); // Debug
-                });
-
-                // Event Listener für "Zurück"
-                backButton.addEventListener('click', () => {
-                    part1Div.style.display = 'block';
-                    continueButton.style.display = 'block';
-                    part2Div.style.display = 'none';
-                    backButton.style.display = 'none';
-                    legalModalContentArea.scrollTop = 0; // Nach oben scrollen
-                    console.log('Clicked Zurück, showing part 1.'); // Debug
-                });
+                renderCurrentPart(); // Ersten Teil rendern und Buttons aktualisieren
 
                 // Den ursprünglichen "Zurück zur Startseite" Link im Modal behandeln
-                // Er sollte das Modal schließen, da wir nicht zur index.html navigieren
                 const backLinkInLoadedContent = legalModalContentArea.querySelector('.back-link');
                 if (backLinkInLoadedContent) {
                     backLinkInLoadedContent.addEventListener('click', (e) => {
-                        e.preventDefault(); // Standardverhalten verhindern
-                        legalModal.classList.remove('visible'); // Modal schließen
-                        body.style.overflow = ''; // Scrollen wieder erlauben
-                        legalModalContentArea.innerHTML = ''; // Inhalt des Modals leeren
-                        console.log('Clicked "Zurück zur Startseite" in modal, closing modal.'); // Debug
+                        e.preventDefault();
+                        legalModal.classList.remove('visible');
+                        body.style.overflow = '';
+                        legalModalContentArea.innerHTML = '';
+                        console.log('Clicked "Zurück zur Startseite" in modal, closing modal.');
                     });
                 }
 
 
-                legalModal.classList.add('visible'); // Lightbox sichtbar machen
-                body.style.overflow = 'hidden'; // Scrollen des Haupt-Body verhindern
-                console.log('Legal modal opened.'); // Debug
+                legalModal.classList.add('visible');
+                body.style.overflow = 'hidden';
+                console.log('Legal modal opened. Total parts:', allParts.length);
 
             } else {
                 console.error(`Could not find .legal-container in ${pageName}.html`);
@@ -532,21 +536,21 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             console.error(`Fehler beim Laden der Seite ${url}:`, error);
             alert(`Die Seite ${pageName} konnte nicht geladen werden. Details: ${error.message}`);
-            body.style.overflow = ''; // Scrollen wieder erlauben bei Fehler
+            body.style.overflow = '';
         }
     }
 
     // Event Listener für Footer-Links
     if (impressumLink) {
         impressumLink.addEventListener('click', (e) => {
-            e.preventDefault(); // Standardverhalten des Links verhindern
+            e.preventDefault();
             loadLegalPageInModal('impressum');
         });
     }
 
     if (datenschutzLink) {
         datenschutzLink.addEventListener('click', (e) => {
-            e.preventDefault(); // Standardverhalten des Links verhindern
+            e.preventDefault();
             loadLegalPageInModal('datenschutz');
         });
     }
@@ -555,9 +559,9 @@ document.addEventListener('DOMContentLoaded', function() {
     if (closeLegalModalBtn) {
         closeLegalModalBtn.addEventListener('click', () => {
             legalModal.classList.remove('visible');
-            body.style.overflow = ''; // Scrollen wieder erlauben
-            legalModalContentArea.innerHTML = ''; // Inhalt leeren beim Schließen
-            console.log('Legal modal closed via X button.'); // Debug
+            body.style.overflow = '';
+            legalModalContentArea.innerHTML = '';
+            console.log('Legal modal closed via X button.');
         });
     }
 
@@ -566,9 +570,9 @@ document.addEventListener('DOMContentLoaded', function() {
         legalModal.addEventListener('click', (e) => {
             if (e.target === legalModal) {
                 legalModal.classList.remove('visible');
-                body.style.overflow = ''; // Scrollen wieder erlauben
-                legalModalContentArea.innerHTML = ''; // Inhalt leeren beim Schließen
-                console.log('Legal modal closed via overlay click.'); // Debug
+                body.style.overflow = '';
+                legalModalContentArea.innerHTML = '';
+                console.log('Legal modal closed via overlay click.');
             }
         });
     }
