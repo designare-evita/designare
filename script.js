@@ -243,9 +243,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const submitButton = aiForm.querySelector('button');
 
         const placeholderTexts = [
-            "Hallo, ich bin Evita,",
-            "Michaels KI-Assistentin.",
-            "Was kann ich für Dich tun?"
+            "Hallo! Evita hier.",
+            "Michael's geduldige KI-Assistentin.",
+            "Was kann ich für dich tun?"
         ];
         let placeholderIndex = 0;
         let charPlaceholderIndex = 0;
