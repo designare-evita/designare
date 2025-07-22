@@ -197,6 +197,25 @@ body.dark-mode #ai-status.thinking {
 }
 
 /* 6. Footer & Kontakt-Modal */
+
+/* In style.css, in der Sektion "6. Footer & Kontakt-Modal" */
+
+/* Beispiel für Styling der Dankesnachricht im Modal */
+#contact-success-message h2 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: var(--accent-color); /* Kann deine Akzentfarbe sein */
+}
+#contact-success-message p {
+    margin-bottom: 0.5rem;
+}
+#close-success-message {
+    /* Style wie ein normaler CTA-Button, wird durch cta-button Klasse übernommen */
+    width: auto; /* Button Breite anpassen */
+    padding: 10px 25px; /* Innenabstand anpassen */
+}
+
+/* Du könntest hier auch Animationen hinzufügen, falls gewünscht */
 footer {
     position: fixed;
     bottom: 10px;
