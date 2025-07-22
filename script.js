@@ -399,42 +399,46 @@ document.addEventListener('DOMContentLoaded', function() {
                 let currentPage = 0; // Aktuelle Seite (0-indiziert)
                 let paginationButtonsDiv; // Referenz für die Buttons
 
-                // NEU: Spezifische Split-Logik für datenschutz.html mit 4 Split-Punkten für 5 Teile
+                // NEU: Spezifische Split-Logik für datenschutz.html mit 5 Split-Punkten für 6 Teile
                 if (pageName === 'datenschutz') {
                     const splitElement1 = children.find(child => child.id === 'datenschutz-part-2-start');
-                    const splitElement2 = children.find(child => child.id === 'datenschutz-part-3-start');
+                    const splitElement2 = children.find(child => child.id === 'datenschutz.part-3-start');
                     const splitElement3 = children.find(child => child.id === 'datenschutz-part-4-start');
-                    const splitElement4 = children.find(child => child.id === 'datenschutz-part-5-start'); // NEU: Vierter Split-Punkt
+                    const splitElement4 = children.find(child => child.id === 'datenschutz-part-5-start');
+                    const splitElement5 = children.find(child => child.id === 'datenschutz-part-6-start'); // NEU: Fünfter Split-Punkt
 
-                    console.log('Datenschutz: Attempting multi-part split (5 parts).');
+                    console.log('Datenschutz: Attempting multi-part split (6 parts).');
                     console.log('Split Point 1 (#datenschutz-part-2-start):', splitElement1);
                     console.log('Split Point 2 (#datenschutz-part-3-start):', splitElement2);
                     console.log('Split Point 3 (#datenschutz-part-4-start):', splitElement3);
-                    console.log('Split Point 4 (#datenschutz-part-5-start):', splitElement4); // NEU: Debug-Log
+                    console.log('Split Point 4 (#datenschutz-part-5-start):', splitElement4);
+                    console.log('Split Point 5 (#datenschutz-part-6-start):', splitElement5); // NEU: Debug-Log
 
-                    if (splitElement1 && splitElement2 && splitElement3 && splitElement4) { // NEU: Prüfe alle 4 Split-Punkte
+                    if (splitElement1 && splitElement2 && splitElement3 && splitElement4 && splitElement5) { // NEU: Prüfe alle 5 Split-Punkte
                         const index1 = children.indexOf(splitElement1);
                         const index2 = children.indexOf(splitElement2);
                         const index3 = children.indexOf(splitElement3);
-                        const index4 = children.indexOf(splitElement4); // NEU: Index für vierten Split-Punkt
+                        const index4 = children.indexOf(splitElement4);
+                        const index5 = children.indexOf(splitElement5); // NEU: Index für fünften Split-Punkt
 
-                        if (index1 !== -1 && index2 !== -1 && index3 !== -1 && index4 !== -1 && index1 < index2 && index2 < index3 && index3 < index4) { // NEU: Prüfe alle Indizes und Reihenfolge
+                        if (index1 !== -1 && index2 !== -1 && index3 !== -1 && index4 !== -1 && index5 !== -1 && index1 < index2 && index2 < index3 && index3 < index4 && index4 < index5) { // NEU: Prüfe alle Indizes und Reihenfolge
                             allParts.push(children.slice(0, index1));
                             allParts.push(children.slice(index1, index2));
                             allParts.push(children.slice(index2, index3));
-                            allParts.push(children.slice(index3, index4)); // NEU: Vierter Teil
-                            allParts.push(children.slice(index4)); // NEU: Fünfter Teil
-                            console.log('Datenschutz: Successfully split into 5 parts based on IDs.');
-                            console.log('Part 1 length:', allParts[0].length, 'Part 2 length:', allParts[1].length, 'Part 3 length:', allParts[2].length, 'Part 4 length:', allParts[3].length, 'Part 5 length:', allParts[4].length); // NEU: Debug-Log
+                            allParts.push(children.slice(index3, index4));
+                            allParts.push(children.slice(index4, index5)); // NEU: Fünfter Teil
+                            allParts.push(children.slice(index5)); // NEU: Sechster Teil
+                            console.log('Datenschutz: Successfully split into 6 parts based on IDs.');
+                            console.log('Part 1 length:', allParts[0].length, 'Part 2 length:', allParts[1].length, 'Part 3 length:', allParts[2].length, 'Part 4 length:', allParts[3].length, 'Part 5 length:', allParts[4].length, 'Part 6 length:', allParts[5].length); // NEU: Debug-Log
                         } else {
-                            console.warn('Datenschutz: Specific IDs found but indices invalid/out of order for 5-part split. Falling back to 2-part split.');
+                            console.warn('Datenschutz: Specific IDs found but indices invalid/out of order for 6-part split. Falling back to 2-part split.');
                             // Fallback, wenn IDs gefunden, aber Reihenfolge falsch oder indexOf -1
                             const splitIndex = Math.ceil(children.length * 0.5);
                             allParts.push(children.slice(0, splitIndex));
                             allParts.push(children.slice(splitIndex));
                         }
                     } else {
-                        console.warn('Datenschutz: One or more specific split points NOT found for 5-part split. Falling back to 2-part split.');
+                        console.warn('Datenschutz: One or more specific split points NOT found for 6-part split. Falling back to 2-part split.');
                         // Fallback, wenn IDs nicht gefunden
                         const splitIndex = Math.ceil(children.length * 0.5);
                         allParts.push(children.slice(0, splitIndex));
