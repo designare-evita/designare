@@ -260,9 +260,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     charPlaceholderIndex++;
                 } else {
                     clearInterval(typeInterval);
-                    setTimeout(deletePlaceholder, 2000); // 2 Sekunden Pause vor dem Löschen
+                    setTimeout(deletePlaceholder, 2300); // 
                 }
-            }, 77); // GEÄNDERT: Tippgeschwindigkeit um 10% langsamer (70 * 1.1 = 77)
+            }, 81); // 
         }
 
         function deletePlaceholder() {
@@ -275,9 +275,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     clearInterval(deleteInterval);
                     placeholderIndex = (placeholderIndex + 1) % placeholderTexts.length;
                     charPlaceholderIndex = 0;
-                    setTimeout(typePlaceholder, 500); // 0.5 Sekunden Pause vor dem Tippen des nächsten Textes
+                    setTimeout(typePlaceholder, 575); // 
                 }
-            }, 44); // GEÄNDERT: Löschgeschwindigkeit um 10% langsamer (40 * 1.1 = 44)
+            }, 46); // 
         }
 
         aiQuestionInput.addEventListener('focus', () => {
