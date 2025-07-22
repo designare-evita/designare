@@ -216,7 +216,9 @@ footer a:hover { opacity: 1; }
 .modal-overlay.visible { opacity: 1; pointer-events: auto; }
 .modal-content {
     background-color: var(--bg-color); padding: 2rem; border-radius: 10px;
-    width: 90%; max-width: 500px; position: relative;
+    width: 90%;
+    max-width: 700px; /* GEÄNDERT: Maximale Breite für Modals erhöht */
+    position: relative;
     transform: scale(0.95); transition: transform 0.3s ease;
 }
 .modal-overlay.visible .modal-content { transform: scale(1); }
@@ -326,5 +328,11 @@ body.dark-mode #privacy-policy-link-button {
     }
     .lightbox-button {
         font-size: 0.9rem;
+    }
+
+    /* Responsive Anpassung für Modals */
+    .modal-content {
+        padding: 1.5rem; /* Etwas weniger Padding auf kleinen Bildschirmen */
+        max-width: 90%; /* Sicherstellen, dass es nicht zu breit wird */
     }
 }
