@@ -4,7 +4,7 @@
 */
 
 document.addEventListener('DOMContentLoaded', function() {
-    const body = document.body; // Referenz zum Body-Element
+    const body = document.body;
 
     // --- Cookie Info Lightbox Logik - Start ---
     const cookieInfoLightbox = document.getElementById('cookie-info-lightbox');
@@ -18,8 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const openLightbox = () => {
         if (cookieInfoLightbox) {
             cookieInfoLightbox.classList.add('visible');
-            // NEU: Scrollen der Seite verhindern, während Lightbox offen ist
-            body.style.overflow = 'hidden';
+            body.style.overflow = 'hidden'; // Scrollen des Body verhindern
         }
     };
 
@@ -27,34 +26,27 @@ document.addEventListener('DOMContentLoaded', function() {
     const closeLightbox = () => {
         if (cookieInfoLightbox) {
             cookieInfoLightbox.classList.remove('visible');
-            localStorage.setItem('hasSeenCookieInfoLightbox', 'true'); // Merken, dass der Nutzer die Lightbox gesehen hat
-            // NEU: Seite wieder sichtbar machen und Scrollen erlauben
-            body.classList.add('loaded'); // Fügt die Klasse hinzu, die die Seite einblendet
-            body.style.overflow = ''; // Ermöglicht das Scrollen wieder
+            localStorage.setItem('hasSeenCookieInfoLightbox', 'true');
+            body.classList.add('loaded'); // Seite einblenden
+            body.style.overflow = ''; // Scrollen wieder erlauben
         }
     };
 
-    // Beim Laden der Seite: Wenn die Lightbox noch nicht gesehen wurde, öffne sie sofort
+    // NEU: Initiales Einblenden der Seite und Öffnen der Lightbox
+    // Dieser Block wird direkt ausgeführt, sobald der DOM geladen ist
     if (!hasSeenCookieInfoLightbox) {
-        // Lightbox direkt öffnen, ohne setTimeout, damit sie sofort sichtbar ist
-        openLightbox();
-        // Das Laden der Hauptseite wird verzögert, bis die Lightbox geschlossen wird.
-        // Daher fügen wir hier NICHT body.classList.add('loaded') hinzu.
-        // Das geschieht erst in closeLightbox().
+        openLightbox(); // Lightbox sofort öffnen
     } else {
-        // Wenn Lightbox schon gesehen wurde, Seite sofort einblenden und normal scrollen
-        body.classList.add('loaded');
-        body.style.overflow = '';
+        body.classList.add('loaded'); // Seite sofort einblenden
+        body.style.overflow = ''; // Scrollen erlauben
     }
 
 
     // Event Listener für den neuen Cookie Info Button
     if (cookieInfoButton) {
         cookieInfoButton.addEventListener('click', () => {
-            // Beim erneuten Öffnen soll die Lightbox immer wieder erscheinen,
-            // daher den localStorage-Eintrag entfernen und Lightbox öffnen.
-            localStorage.removeItem('hasSeenCookieInfoLightbox');
-            openLightbox();
+            localStorage.removeItem('hasSeenCookieInfoLightbox'); // Status zurücksetzen
+            openLightbox(); // Lightbox öffnen
         });
     }
 
@@ -65,14 +57,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Event Listener für den "Datenschutzerklärung" Link-Button
     if (privacyPolicyLinkButton) {
-        // Beim Klick auf den Link soll die Lightbox geschlossen werden, bevor zur Datenschutzerklärung navigiert wird
         privacyPolicyLinkButton.addEventListener('click', (e) => {
-            e.preventDefault(); // Standardverhalten des Links verhindern
+            e.preventDefault();
             closeLightbox();
-            // Kleine Verzögerung, damit die Animation Zeit hat, bevor zur neuen Seite navigiert wird
             setTimeout(() => {
-                window.open(e.target.href, '_blank'); // Link in neuem Tab öffnen
-            }, 300); // 300ms Verzögerung
+                window.open(e.target.href, '_blank');
+            }, 300);
         });
     }
 
@@ -238,7 +228,6 @@ document.addEventListener('DOMContentLoaded', function() {
             closeSuccessMessageBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 contactModal.classList.remove('visible');
-                // Scrollen wieder erlauben, wenn die Dankesnachricht geschlossen wird
                 body.style.overflow = '';
                 if (contactForm) contactForm.style.display = 'flex';
                 if (contactSuccessMessage) contactSuccessMessage.style.display = 'none';
