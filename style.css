@@ -363,7 +363,7 @@ body.dark-mode .legal-modal-pagination-buttons button:disabled {
     }
     #hero .subtitle {
         margin-bottom: 1.7rem;
-        font-size: 1rem; /* NEU: Schriftgröße des Subtitles auf Mobile */
+        font-size: 1.1rem; /* NEU: Schriftgröße des Subtitles auf Mobile auf 1.1rem gesetzt */
     }
     .ai-container { width: 100%; }
 
