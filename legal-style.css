@@ -65,21 +65,52 @@ body {
     margin: 0 auto;
 }
 
-h1, h2 {
+/* GEÄNDERT: Schriftgrößen um 10% kleiner */
+.legal-container h1 {
+    font-size: 2.25rem; /* Ursprünglich 2.5rem - 10% */
     font-weight: 600;
     border-bottom: 1px solid var(--border-color);
     padding-bottom: 10px;
     margin-bottom: 1rem;
 }
 
-h3 {
+.legal-container h2 {
+    font-size: 1.62rem; /* Ursprünglich 1.8rem - 10% */
     font-weight: 600;
-    margin-top: 2.5rem;
-}
-
-p {
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
     margin-bottom: 1rem;
 }
+
+.legal-container h3 {
+    font-size: 1.17rem; /* Ursprünglich 1.3rem - 10% */
+    font-weight: 600;
+    margin-top: 2.25rem; /* Ursprünglich 2.5rem - 10% */
+}
+
+.legal-container h4 { /* Falls H4 verwendet wird */
+    font-size: 0.99rem; /* Ursprünglich 1.1rem - 10% */
+    font-weight: 600;
+    margin-top: 1.8rem; /* Anpassung */
+}
+
+.legal-container p,
+.legal-container ul,
+.legal-container ol,
+.legal-container li {
+    font-size: 0.9rem; /* Ursprünglich 1rem - 10% */
+    margin-bottom: 0.9rem; /* Anpassung */
+}
+
+.legal-container ul,
+.legal-container ol {
+    padding-left: 1.8rem; /* Ursprünglich 2rem - 10% */
+}
+
+.legal-container li {
+    margin-bottom: 0.5rem; /* Anpassung */
+}
+
 
 a {
     color: var(--link-color);
@@ -105,28 +136,27 @@ a:hover {
 }
 
 /* 4. Zurück-Button */
-/* GEÄNDERT: Button-Stil mit Rahmen und Rundung hinzugefügt */
 .back-link {
     display: inline-block;
-    margin-bottom: 3rem;
+    margin-bottom: 2.7rem; /* Ursprünglich 3rem - 10% */
     font-weight: 600;
     color: var(--accent-color);
     text-decoration: none;
     border: 2px solid var(--accent-color);
-    padding: 8px 15px;
+    padding: 7.2px 13.5px; /* Ursprünglich 8px 15px - 10% */
     border-radius: 5px;
     transition: all 0.3s ease;
+    font-size: 0.9rem; /* Auch den Back-Link Text anpassen */
 }
 .back-link i {
-    margin-right: 8px;
+    margin-right: 7.2px; /* Ursprünglich 8px - 10% */
     transition: transform 0.3s ease;
 }
 
-/* NEU: Hover-Effekt für den Button */
 .back-link:hover {
     background-color: var(--accent-color);
     color: #fff;
-    text-decoration: none; /* Unterstreichung beim Hover entfernen */
+    text-decoration: none;
 }
 
 .back-link:hover i {
