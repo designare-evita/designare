@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (typewriterElement) {
         const textsToType = [ "Michael Kanda", "Web-Flüsterer", "KI-Therapeut" ];
         let textIndex = 0; let charIndex = 0; let isDeleting = false;
-        const typingSpeed = 110, deletingSpeed = 55, delayBetweenTexts = 2000;
+        const typingSpeed = 100, deletingSpeed = 50, delayBetweenTexts = 2000;
 
         function typeWriter() {
             const currentText = textsToType[textIndex];
@@ -240,9 +240,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const submitButton = aiForm.querySelector('button');
 
         const placeholderTexts = [
-            "Hallo, ich bin Evita,",
-            "Michaels KI-Assistentin.",
-            "Was kann ich für Dich tun?"
+            "Hallo! Evita hier,",
+            "Michael's geduldige KI-Assistentin.",
+            "Was kann ich für dich tun?"
         ];
         let placeholderIndex = 0;
         let charPlaceholderIndex = 0;
