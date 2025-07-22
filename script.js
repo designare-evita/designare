@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const openLightbox = () => {
         if (cookieInfoLightbox) {
             cookieInfoLightbox.classList.add('visible');
-            body.style.overflow = 'hidden'; // Scrollen des Body verhindern
+            body.style.overflow = 'hidden'; // Scrollen des Body verhindern, wenn Lightbox offen ist
         }
     };
 
@@ -27,24 +27,27 @@ document.addEventListener('DOMContentLoaded', function() {
         if (cookieInfoLightbox) {
             cookieInfoLightbox.classList.remove('visible');
             localStorage.setItem('hasSeenCookieInfoLightbox', 'true');
-            body.classList.add('loaded'); // Seite einblenden
-            body.style.overflow = ''; // Scrollen wieder erlauben
+            // ZURÜCKGESETZT: body.classList.add('loaded'); hier entfernt
+            body.style.overflow = ''; // Scrollen wieder erlauben, nachdem Lightbox geschlossen
         }
     };
 
-    // NEU: Initiales Einblenden der Seite und Öffnen der Lightbox
-    // Dieser Block wird direkt ausgeführt, sobald der DOM geladen ist
+    // Beim Laden der Seite: Wenn die Lightbox noch nicht gesehen wurde, öffne sie nach Verzögerung
     if (!hasSeenCookieInfoLightbox) {
-        openLightbox(); // Lightbox sofort öffnen
+        setTimeout(() => {
+            openLightbox(); // Öffnet die Lightbox nach der Verzögerung
+        }, 1000); // Zeigt die Lightbox nach 1 Sekunde an
     } else {
-        body.classList.add('loaded'); // Seite sofort einblenden
-        body.style.overflow = ''; // Scrollen erlauben
+        // Wenn Lightbox schon gesehen wurde, Seite ist von Anfang an sichtbar, kein spezielles Einblenden
+        // ZURÜCKGESETZT: body.classList.add('loaded'); hier entfernt
+        body.style.overflow = ''; // Sicherstellen, dass Scrollen erlaubt ist, wenn kein Modal offen ist
     }
 
 
     // Event Listener für den neuen Cookie Info Button
     if (cookieInfoButton) {
         cookieInfoButton.addEventListener('click', () => {
+            // Beim erneuten Öffnen soll die Lightbox immer wieder erscheinen
             localStorage.removeItem('hasSeenCookieInfoLightbox'); // Status zurücksetzen
             openLightbox(); // Lightbox öffnen
         });
@@ -153,24 +156,20 @@ document.addEventListener('DOMContentLoaded', function() {
     if (contactButton && closeModalButton && contactModal) {
         contactButton.addEventListener('click', () => {
             contactModal.classList.add('visible');
-            // Beim Öffnen des Kontaktformulars soll Scrollen verhindert werden, nur wenn die Lightbox nicht offen ist
-            if (!cookieInfoLightbox || !cookieInfoLightbox.classList.contains('visible')) {
-                body.style.overflow = 'hidden';
-            }
+            // Beim Öffnen des Kontaktformulars soll Scrollen verhindert werden
+            body.style.overflow = 'hidden';
             if (contactForm) contactForm.style.display = 'flex';
             if (contactSuccessMessage) contactSuccessMessage.style.display = 'none';
         });
 
         closeModalButton.addEventListener('click', () => {
             contactModal.classList.remove('visible');
-            // Scrollen wieder erlauben, wenn das Kontaktmodal geschlossen wird
             body.style.overflow = '';
         });
         
         contactModal.addEventListener('click', (e) => {
             if (e.target === contactModal) {
                 contactModal.classList.remove('visible');
-                // Scrollen wieder erlauben, wenn das Kontaktmodal über Overlay geschlossen wird
                 body.style.overflow = '';
             }
         });
