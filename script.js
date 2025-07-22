@@ -27,7 +27,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (cookieInfoLightbox) {
             cookieInfoLightbox.classList.remove('visible');
             localStorage.setItem('hasSeenCookieInfoLightbox', 'true');
-            // ZURÜCKGESETZT: body.classList.add('loaded'); hier entfernt
             body.style.overflow = ''; // Scrollen wieder erlauben, nachdem Lightbox geschlossen
         }
     };
@@ -39,7 +38,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 1000); // Zeigt die Lightbox nach 1 Sekunde an
     } else {
         // Wenn Lightbox schon gesehen wurde, Seite ist von Anfang an sichtbar, kein spezielles Einblenden
-        // ZURÜCKGESETZT: body.classList.add('loaded'); hier entfernt
         body.style.overflow = ''; // Sicherstellen, dass Scrollen erlaubt ist, wenn kein Modal offen ist
     }
 
@@ -214,7 +212,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         alert('Fehler beim Senden der Nachricht. Bitte versuchen Sie es später erneut. Details: ' + data.message);
                     }
                 } catch (error) {
-                    console.error('Sende-Fehler:', error);
+                    console.error("Fehler:", error);
                     alert('Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.');
                 } finally {
                     e.submitter.innerText = originalButtonText; // Button-Text zurücksetzen
@@ -241,9 +239,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const aiStatus = document.getElementById('ai-status');
         const submitButton = aiForm.querySelector('button');
 
+        // GEÄNDERT: Platzhaltertexte für Evita
         const placeholderTexts = [
-            "Hallo, ich bin Evita, Michaels KI-Assistentin.",
-            "Was kann ich für Sie tun?"
+            "Hallo, ich bin Evita,",
+            "Michaels KI-Assistentin.",
+            "Was kann ich für Dich tun?"
         ];
         let placeholderIndex = 0;
         let charPlaceholderIndex = 0;
