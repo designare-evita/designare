@@ -6,61 +6,73 @@
 document.addEventListener('DOMContentLoaded', function() {
     const body = document.body;
 
-    // --- Cookie Info Lightbox Logik - Start ---
+    // --- KONSTANTEN FÜR GESCHWINDIGKEITEN & DELAYS ---
+    // H1 Typewriter Geschwindigkeiten (Sci-Fi-Stil)
+    const H1_TYPING_SPEED = 180; // ms pro Zeichen
+    const H1_DELETING_SPEED = 90; // ms pro Zeichen
+    const H1_DELAY_BETWEEN_TEXTS = 3500; // ms Pause nach Tippen
+
+    // KI-Platzhalter Typewriter Geschwindigkeiten (15% langsamer)
+    const AI_TYPING_SPEED = 81; // 70 * 1.15 = 80.5, gerundet
+    const AI_DELETING_SPEED = 46; // 40 * 1.15 = 46
+    const AI_DELAY_AFTER_TYPING = 2300; // 2000 * 1.15 = 2300
+    const AI_DELAY_BEFORE_NEXT_TEXT = 575; // 500 * 1.15 = 575
+
+
+    // --- Cookie Info Lightbox Logik ---
     const cookieInfoLightbox = document.getElementById('cookie-info-lightbox');
     const acknowledgeCookieLightboxBtn = document.getElementById('acknowledge-cookie-lightbox');
     const privacyPolicyLinkButton = document.getElementById('privacy-policy-link-button');
     const cookieInfoButton = document.getElementById('cookie-info-button');
 
-    const hasSeenCookieInfoLightbox = localStorage.getItem('hasSeenCookieInfoLightbox');
-
     // Funktion zum Öffnen der Lightbox
-    const openLightbox = () => {
-        if (cookieInfoLightbox) {
-            cookieInfoLightbox.classList.add('visible');
-            body.style.overflow = 'hidden'; // Scrollen des Body verhindern, wenn Lightbox offen ist
+    const openLightbox = (lightboxElement) => {
+        if (lightboxElement) {
+            lightboxElement.classList.add('visible');
+            body.style.overflow = 'hidden'; // Scrollen des Body verhindern
         }
     };
 
-    // Funktion zum Schließen der Lightbox und Speichern im localStorage
-    const closeLightbox = () => {
-        if (cookieInfoLightbox) {
-            cookieInfoLightbox.classList.remove('visible');
-            localStorage.setItem('hasSeenCookieInfoLightbox', 'true');
-            body.style.overflow = ''; // Scrollen wieder erlauben, nachdem Lightbox geschlossen
+    // Funktion zum Schließen der Lightbox
+    const closeLightbox = (lightboxElement) => {
+        if (lightboxElement) {
+            lightboxElement.classList.remove('visible');
+            body.style.overflow = ''; // Scrollen wieder erlauben
         }
     };
+
+    const hasSeenCookieInfoLightbox = localStorage.getItem('hasSeenCookieInfoLightbox');
 
     // Beim Laden der Seite: Wenn die Lightbox noch nicht gesehen wurde, öffne sie nach Verzögerung
     if (!hasSeenCookieInfoLightbox) {
         setTimeout(() => {
-            openLightbox(); // Öffnet die Lightbox nach der Verzögerung
+            openLightbox(cookieInfoLightbox);
         }, 1000); // Zeigt die Lightbox nach 1 Sekunde an
     } else {
-        // Wenn Lightbox schon gesehen wurde, Seite ist von Anfang an sichtbar, kein spezielles Einblenden
         body.style.overflow = ''; // Sicherstellen, dass Scrollen erlaubt ist, wenn kein Modal offen ist
     }
-
 
     // Event Listener für den neuen Cookie Info Button
     if (cookieInfoButton) {
         cookieInfoButton.addEventListener('click', () => {
-            // Beim erneuten Öffnen soll die Lightbox immer wieder erscheinen
             localStorage.removeItem('hasSeenCookieInfoLightbox'); // Status zurücksetzen
-            openLightbox(); // Lightbox öffnen
+            openLightbox(cookieInfoLightbox); // Lightbox öffnen
         });
     }
 
     // Event Listener für den "Alles klar" Button
     if (acknowledgeCookieLightboxBtn) {
-        acknowledgeCookieLightboxBtn.addEventListener('click', closeLightbox);
+        acknowledgeCookieLightboxBtn.addEventListener('click', () => {
+            closeLightbox(cookieInfoLightbox);
+            localStorage.setItem('hasSeenCookieInfoLightbox', 'true'); // Merken, dass der Nutzer die Lightbox gesehen hat
+        });
     }
 
     // Event Listener für den "Datenschutzerklärung" Link-Button
     if (privacyPolicyLinkButton) {
         privacyPolicyLinkButton.addEventListener('click', (e) => {
             e.preventDefault();
-            closeLightbox();
+            closeLightbox(cookieInfoLightbox);
             setTimeout(() => {
                 window.open(e.target.href, '_blank');
             }, 300);
@@ -71,11 +83,10 @@ document.addEventListener('DOMContentLoaded', function() {
     if (cookieInfoLightbox) {
         cookieInfoLightbox.addEventListener('click', (e) => {
             if (e.target === cookieInfoLightbox) {
-                closeLightbox();
+                closeLightbox(cookieInfoLightbox);
             }
         });
     }
-    // --- Cookie Info Lightbox Logik - Ende ---
 
 
     // --- HILFSFUNKTION FÜR PARTIKEL ---
@@ -115,10 +126,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- H1-TYPEWRITER ---
     const typewriterElement = document.getElementById('typewriter-h1');
     if (typewriterElement) {
-        const textsToType = [ "Michael Kanda", "Web-Flüsterer", "KI-Therapeut" ];
+        const textsToType = [ "Michael Kanda", "Web-Entwickler", "KI-Spezialist" ];
         let textIndex = 0; let charIndex = 0; let isDeleting = false;
-        const typingSpeed = 150, deletingSpeed = 80, delayBetweenTexts = 3000;
-
+        
         function typeWriter() {
             const currentText = textsToType[textIndex];
             if (isDeleting) {
@@ -129,12 +139,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 charIndex++;
             }
             if (!isDeleting && charIndex === currentText.length) {
-                isDeleting = true; setTimeout(typeWriter, delayBetweenTexts); return;
+                isDeleting = true; setTimeout(typeWriter, H1_DELAY_BETWEEN_TEXTS); return;
             }
             if (isDeleting && charIndex === 0) {
                 isDeleting = false; textIndex = (textIndex + 1) % textsToType.length; setTimeout(typeWriter, 500); return;
             }
-            const currentSpeed = isDeleting ? deletingSpeed : typingSpeed;
+            const currentSpeed = isDeleting ? H1_DELETING_SPEED : H1_TYPING_SPEED;
             setTimeout(typeWriter, currentSpeed);
         }
         const style = document.createElement('style');
@@ -143,32 +153,28 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(typeWriter, 500);
     }
 
-    // --- KONTAKT-MODAL (GEÄNDERT für Dankesmeldung) ---
+    // --- KONTAKT-MODAL ---
     const contactButton = document.getElementById('contact-button');
-    const closeModalButton = document.getElementById('close-modal');
     const contactModal = document.getElementById('contact-modal');
     const contactForm = document.getElementById('contact-form-inner');
     const contactSuccessMessage = document.getElementById('contact-success-message');
     const closeSuccessMessageBtn = document.getElementById('close-success-message');
+    const closeModalButton = document.getElementById('close-modal'); // X-Button des Kontakt-Modals
 
-    if (contactButton && closeModalButton && contactModal) {
+    if (contactButton && contactModal) {
         contactButton.addEventListener('click', () => {
-            contactModal.classList.add('visible');
-            // Beim Öffnen des Kontaktformulars soll Scrollen verhindert werden
-            body.style.overflow = 'hidden';
+            openLightbox(contactModal); // Nutze die allgemeine openLightbox Funktion
             if (contactForm) contactForm.style.display = 'flex';
             if (contactSuccessMessage) contactSuccessMessage.style.display = 'none';
         });
 
-        closeModalButton.addEventListener('click', () => {
-            contactModal.classList.remove('visible');
-            body.style.overflow = '';
-        });
+        if (closeModalButton) {
+            closeModalButton.addEventListener('click', () => closeLightbox(contactModal));
+        }
         
         contactModal.addEventListener('click', (e) => {
             if (e.target === contactModal) {
-                contactModal.classList.remove('visible');
-                body.style.overflow = '';
+                closeLightbox(contactModal);
             }
         });
 
@@ -186,11 +192,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 object['_honey'] = '';
 
-                // Text für den Sende-Status des Buttons
                 const originalButtonText = e.submitter.innerText;
                 e.submitter.innerText = "Sende...";
                 e.submitter.disabled = true;
-
 
                 try {
                     const response = await fetch('https://formsubmit.co/ajax/michael@designare.at', {
@@ -215,8 +219,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.error("Fehler:", error);
                     alert('Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.');
                 } finally {
-                    e.submitter.innerText = originalButtonText; // Button-Text zurücksetzen
-                    e.submitter.disabled = false; // Button wieder aktivieren
+                    e.submitter.innerText = originalButtonText;
+                    e.submitter.disabled = false;
                 }
             });
         }
@@ -224,8 +228,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (closeSuccessMessageBtn) {
             closeSuccessMessageBtn.addEventListener('click', (e) => {
                 e.preventDefault();
-                contactModal.classList.remove('visible');
-                body.style.overflow = '';
+                closeLightbox(contactModal);
                 if (contactForm) contactForm.style.display = 'flex';
                 if (contactSuccessMessage) contactSuccessMessage.style.display = 'none';
             });
@@ -240,34 +243,34 @@ document.addEventListener('DOMContentLoaded', function() {
         const submitButton = aiForm.querySelector('button');
 
         const placeholderTexts = [
-            "Hallo! Evita hier,",
-            "Michael's geduldige KI-Assistentin.",
-            "Was kann ich für dich tun?"
+            "Hallo, ich bin Evita,",
+            "Michaels KI-Assistentin.",
+            "Was kann ich für Dich tun?"
         ];
         let placeholderIndex = 0;
         let charPlaceholderIndex = 0;
-        let typeInterval; // Muss hier deklariert werden, damit focus/blur darauf zugreifen können
-        let deleteInterval; // Muss hier deklariert werden
+        let typeInterval;
+        let deleteInterval;
 
         typePlaceholder(); // Startet den Typewriter-Effekt für den Platzhalter
 
         function typePlaceholder() {
             let newText = placeholderTexts[placeholderIndex];
-            aiQuestionInput.placeholder = ""; // Platzhalter vor dem Tippen leeren
-            typeInterval = setInterval(() => { // Zuweisung zu globaler Variable
+            aiQuestionInput.placeholder = "";
+            typeInterval = setInterval(() => {
                 if (charPlaceholderIndex < newText.length) {
                     aiQuestionInput.placeholder += newText.charAt(charPlaceholderIndex);
                     charPlaceholderIndex++;
                 } else {
                     clearInterval(typeInterval);
-                    setTimeout(deletePlaceholder, 2300); // 
+                    setTimeout(deletePlaceholder, AI_DELAY_AFTER_TYPING);
                 }
-            }, 81); // 
+            }, AI_TYPING_SPEED);
         }
 
         function deletePlaceholder() {
             let currentText = aiQuestionInput.placeholder;
-            deleteInterval = setInterval(() => { // Zuweisung zu globaler Variable
+            deleteInterval = setInterval(() => {
                 if (currentText.length > 0) {
                     currentText = currentText.slice(0, -1);
                     aiQuestionInput.placeholder = currentText;
@@ -275,9 +278,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     clearInterval(deleteInterval);
                     placeholderIndex = (placeholderIndex + 1) % placeholderTexts.length;
                     charPlaceholderIndex = 0;
-                    setTimeout(typePlaceholder, 600); // 
+                    setTimeout(typePlaceholder, AI_DELAY_BEFORE_NEXT_TEXT);
                 }
-            }, 46); // 
+            }, AI_DELETING_SPEED);
         }
 
         aiQuestionInput.addEventListener('focus', () => {
@@ -390,7 +393,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Finde den Index des <a class="back-link"> Elements
                 const backLinkIndex = children.findIndex(child => child.classList.contains('back-link'));
                 // Entferne den back-link aus der Liste der Kinder, damit er nicht doppelt hinzugefügt wird
-                let backLinkElement = null;
                 if (backLinkIndex !== -1) {
                     children.splice(backLinkIndex, 1); // Element entfernen
                 }
@@ -399,46 +401,43 @@ document.addEventListener('DOMContentLoaded', function() {
                 let currentPage = 0; // Aktuelle Seite (0-indiziert)
                 let paginationButtonsDiv; // Referenz für die Buttons
 
+                // Helper function to find element by ID within the children array
+                const findElementById = (id) => children.find(child => child.id === id);
+
+                // Helper function to get index of element within the children array
+                const getIndexOfElement = (element) => children.indexOf(element);
+
                 // Spezifische Split-Logik für datenschutz.html mit mehreren Split-Punkten
                 if (pageName === 'datenschutz') {
-                    const splitElements = [
-                        children.find(child => child.id === 'datenschutz-part-2-start'),
-                        children.find(child => child.id === 'datenschutz-part-3-start'),
-                        children.find(child => child.id === 'datenschutz-part-4-start'),
-                        children.find(child => child.id === 'datenschutz-part-5-start'),
-                        children.find(child => child.id === 'datenschutz-part-6-start') // NEU: Fünfter Split-Punkt
-                    ].filter(el => el !== undefined); // Filtert undefined-Werte, falls ein Element nicht gefunden wird
+                    const splitPoints = [
+                        findElementById('datenschutz-part-2-start'),
+                        findElementById('datenschutz-part-3-start'),
+                        findElementById('datenschutz-part-4-start'),
+                        findElementById('datenschutz-part-5-start'),
+                        findElementById('datenschutz-part-6-start')
+                    ].filter(el => el); // Filtert null/undefined Werte
 
                     console.log('Datenschutz: Attempting multi-part split.');
-                    splitElements.forEach((el, idx) => console.log(`Split Point ${idx + 1}:`, el));
+                    splitPoints.forEach((el, idx) => console.log(`Split Point ${idx + 1}:`, el));
 
-                    if (splitElements.length > 0) {
-                        let currentSliceStart = 0;
-                        let validSplitsFound = true;
+                    if (splitPoints.length > 0) {
+                        const indices = splitPoints.map(getIndexOfElement).filter(idx => idx !== -1).sort((a, b) => a - b);
                         
-                        // Sortiere die gefundenen Elemente nach ihrem Index im originalen children-Array
-                        const sortedSplitElements = splitElements.map(el => ({ element: el, index: children.indexOf(el) }))
-                                                                 .sort((a, b) => a.index - b.index);
-
-                        // Überprüfe, ob alle Indizes gültig sind und in aufsteigender Reihenfolge
-                        for (let i = 0; i < sortedSplitElements.length; i++) {
-                            if (sortedSplitElements[i].index === -1 || (i > 0 && sortedSplitElements[i].index <= sortedSplitElements[i-1].index)) {
-                                validSplitsFound = false;
+                        // Check if indices are unique and strictly increasing
+                        let validIndices = true;
+                        for (let i = 1; i < indices.length; i++) {
+                            if (indices[i] <= indices[i-1]) {
+                                validIndices = false;
                                 break;
                             }
                         }
 
-                        if (validSplitsFound) {
-                            // Erster Teil
-                            allParts.push(children.slice(0, sortedSplitElements[0].index));
-                            
-                            // Mittlere Teile
-                            for (let i = 0; i < sortedSplitElements.length - 1; i++) {
-                                allParts.push(children.slice(sortedSplitElements[i].index, sortedSplitElements[i+1].index));
+                        if (validIndices && indices.length === splitPoints.length) { // Ensure all found elements have valid, sorted indices
+                            allParts.push(children.slice(0, indices[0]));
+                            for (let i = 0; i < indices.length - 1; i++) {
+                                allParts.push(children.slice(indices[i], indices[i+1]));
                             }
-                            
-                            // Letzter Teil
-                            allParts.push(children.slice(sortedSplitElements[sortedSplitElements.length - 1].index));
+                            allParts.push(children.slice(indices[indices.length - 1]));
                             
                             console.log(`Datenschutz: Successfully split into ${allParts.length} parts based on IDs.`);
                             allParts.forEach((part, idx) => console.log(`Part ${idx + 1} length:`, part.length));
