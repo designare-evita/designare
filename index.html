@@ -74,9 +74,9 @@
     </div>
 
 	<footer>
-        <!-- GEÄNDERT: Footer-Links rufen JS-Funktionen auf -->
-        <a href="#" id="impressum-link">Impressum</a>
-        <a href="#" id="datenschutz-link">Datenschutz</a>
+        <!-- GEÄNDERT: Footer-Links mit original hrefs, aber ohne target="_blank" und mit IDs für JS -->
+        <a href="impressum.html" id="impressum-link">Impressum</a>
+        <a href="datenschutz.html" id="datenschutz-link">Datenschutz</a>
     </footer>
 
     <!-- Cookie Info Lightbox HTML -->
@@ -92,9 +92,14 @@
     </div>
     <!-- ENDE Cookie Info Lightbox HTML -->
 
-    <!-- NEU: Container für die Legal-Seiten -->
-    <div id="legal-pages-wrapper" class="legal-pages-wrapper">
-        <!-- Inhalt der Impressum/Datenschutz-Seiten wird hier geladen -->
+    <!-- NEU: Lightbox für Impressum und Datenschutz -->
+    <div id="legal-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button id="close-legal-modal" class="close-button">&times;</button>
+            <div id="legal-modal-content-area">
+                <!-- Inhalt der geladenen HTML-Datei wird hier eingefügt -->
+            </div>
+        </div>
     </div>
     <!-- ENDE NEU -->
 
