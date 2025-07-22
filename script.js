@@ -399,31 +399,60 @@ document.addEventListener('DOMContentLoaded', function() {
                 let currentPage = 0; // Aktuelle Seite (0-indiziert)
                 let paginationButtonsDiv; // Referenz für die Buttons
 
-                // NEU: Spezifische Split-Logik für datenschutz.html mit einem Split-Punkt
+                // NEU: Spezifische Split-Logik für datenschutz.html mit mehreren Split-Punkten
                 if (pageName === 'datenschutz') {
-                    const splitElement = children.find(child => child.id === 'datenschutz-split-point');
-                    console.log('Datenschutz: Attempting split at #datenschutz-split-point.');
-                    console.log('Split Point (#datenschutz-split-point):', splitElement);
+                    const splitElement1 = children.find(child => child.id === 'datenschutz-part-2-start');
+                    const splitElement2 = children.find(child => child.id === 'datenschutz-part-3-start');
 
-                    if (splitElement) {
-                        const splitIndex = children.indexOf(splitElement);
-                        console.log('Datenschutz: Found split point at index:', splitIndex);
-                        if (splitIndex !== -1) {
+                    console.log('Datenschutz: Attempting multi-part split.');
+                    console.log('Split Point 1 (#datenschutz-part-2-start):', splitElement1);
+                    console.log('Split Point 2 (#datenschutz-part-3-start):', splitElement2);
+
+                    if (splitElement1 && splitElement2) {
+                        const index1 = children.indexOf(splitElement1);
+                        const index2 = children.indexOf(splitElement2);
+
+                        if (index1 !== -1 && index2 !== -1 && index1 < index2) {
+                            allParts.push(children.slice(0, index1));
+                            allParts.push(children.slice(index1, index2));
+                            allParts.push(children.slice(index2));
+                            console.log('Datenschutz: Successfully split into 3 parts based on IDs.');
+                            console.log('Part 1 length:', allParts[0].length, 'Part 2 length:', allParts[1].length, 'Part 3 length:', allParts[2].length);
+                        } else {
+                            console.warn('Datenschutz: Specific IDs found but indices invalid/out of order. Falling back to 2-part split.');
+                            // Fallback, wenn IDs gefunden, aber Reihenfolge falsch oder indexOf -1
+                            const splitIndex = Math.ceil(children.length * 0.5);
                             allParts.push(children.slice(0, splitIndex));
                             allParts.push(children.slice(splitIndex));
-                            console.log('Datenschutz: Successfully split into 2 parts based on ID.');
-                            console.log('Part 1 length:', allParts[0].length, 'Part 2 length:', allParts[1].length);
-                        } else {
-                            console.warn('Datenschutz: Specific ID found, but indexOf returned -1. Displaying as single part.');
-                            allParts.push(children); // Fallback zu einzelnem Teil
                         }
                     } else {
-                        console.warn('Datenschutz: Specific ID #datenschutz-split-point NOT found. Displaying as single part.');
-                        allParts.push(children); // Fallback zu einzelnem Teil
+                        console.warn('Datenschutz: One or both specific split points NOT found. Falling back to 2-part split.');
+                        // Fallback, wenn IDs nicht gefunden
+                        const splitIndex = Math.ceil(children.length * 0.5);
+                        allParts.push(children.slice(0, splitIndex));
+                        allParts.push(children.slice(splitIndex));
                     }
-                } else { // Logik für Impressum oder andere Seiten (immer ein Teil)
-                    allParts.push(children);
-                    console.log(`${pageName}: Displaying as single part.`);
+                } else { // Logik für Impressum oder andere Seiten (2-Teile-Split)
+                    const targetSplitCount = Math.ceil(children.length * 0.5);
+                    let h3SplitIndex = -1;
+                    for (let i = 0; i < children.length; i++) {
+                        const child = children[i];
+                        if (child.tagName === 'H3' && i >= targetSplitCount * 0.8 && i <= targetSplitCount * 1.2) {
+                            h3SplitIndex = i;
+                            break;
+                        }
+                    }
+
+                    if (h3SplitIndex !== -1) {
+                        allParts.push(children.slice(0, h3SplitIndex));
+                        allParts.push(children.slice(h3SplitIndex));
+                        console.log('2-Part Split: Found H3 near middle.');
+                    } else {
+                        const splitIndex = Math.ceil(children.length * 0.5);
+                        allParts.push(children.slice(0, splitIndex));
+                        allParts.push(children.slice(splitIndex));
+                        console.log('2-Part Split: 50% element count.');
+                    }
                 }
 
                 // Erstelle die Divs für jeden Teil und füge den Inhalt hinzu
