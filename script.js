@@ -31,15 +31,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Beim Laden der Seite: Wenn die Lightbox noch nicht gesehen wurde, öffne sie automatisch
     if (!hasSeenCookieInfoLightbox) {
         setTimeout(() => {
-            openLightbox(); // Öffnet die Lightbox nach der Verzögerung
-        }, 1000); // Zeigt die Lightbox nach 1 Sekunde an
+            openLightbox();
+        }, 1000);
     }
 
     // Event Listener für den neuen Cookie Info Button
     if (cookieInfoButton) {
         cookieInfoButton.addEventListener('click', () => {
-            // Setzt den localStorage-Eintrag zurück, damit die Lightbox wieder automatisch erscheint,
-            // wenn die Seite das nächste Mal geladen wird, nachdem sie manuell geöffnet wurde.
             localStorage.removeItem('hasSeenCookieInfoLightbox');
             openLightbox();
         });
@@ -52,14 +50,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Event Listener für den "Datenschutzerklärung" Link-Button
     if (privacyPolicyLinkButton) {
-        // Beim Klick auf den Link soll die Lightbox geschlossen werden, bevor zur Datenschutzerklärung navigiert wird
         privacyPolicyLinkButton.addEventListener('click', (e) => {
-            e.preventDefault(); // Standardverhalten des Links verhindern
+            e.preventDefault();
             closeLightbox();
-            // Kleine Verzögerung, damit die Animation Zeit hat, bevor zur neuen Seite navigiert wird
             setTimeout(() => {
-                window.open(e.target.href, '_blank'); // Link in neuem Tab öffnen
-            }, 300); // 300ms Verzögerung
+                window.open(e.target.href, '_blank');
+            }, 300);
         });
     }
 
@@ -141,110 +137,92 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(typeWriter, 500);
     }
 
-    // --- KONTAKT-MODAL ---
+    // --- KONTAKT-MODAL (GEÄNDERT für Dankesmeldung) ---
     const contactButton = document.getElementById('contact-button');
     const closeModalButton = document.getElementById('close-modal');
     const contactModal = document.getElementById('contact-modal');
+    const contactForm = document.getElementById('contact-form-inner'); // NEU: Referenz zum Formular
+    const contactSuccessMessage = document.getElementById('contact-success-message'); // NEU: Referenz zur Erfolgsnachricht
+    const closeSuccessMessageBtn = document.getElementById('close-success-message'); // NEU: Referenz zum "Schließen" Button der Erfolgsnachricht
 
     if (contactButton && closeModalButton && contactModal) {
-        contactButton.addEventListener('click', () => contactModal.classList.add('visible'));
+        contactButton.addEventListener('click', () => {
+            contactModal.classList.add('visible');
+            // Sicherstellen, dass das Formular sichtbar ist und die Nachricht versteckt ist,
+            // falls das Modal schon einmal geöffnet wurde.
+            if (contactForm) contactForm.style.display = 'flex';
+            if (contactSuccessMessage) contactSuccessMessage.style.display = 'none';
+        });
+
         closeModalButton.addEventListener('click', () => contactModal.classList.remove('visible'));
+        
         contactModal.addEventListener('click', (e) => {
             if (e.target === contactModal) {
                 contactModal.classList.remove('visible');
             }
         });
-    }
 
-    // --- KI-INTERAKTION & DYNAMISCHER PLATZHALTER ---
-    const aiForm = document.getElementById('ai-form');
-    if (aiForm) {
-        const aiQuestionInput = document.getElementById('ai-question');
-        const aiStatus = document.getElementById('ai-status');
-        const submitButton = aiForm.querySelector('button');
+        // NEU: Formular Submit Handler
+        if (contactForm) {
+            contactForm.addEventListener('submit', async (e) => {
+                e.preventDefault(); // Standard-Formularsendung verhindern
 
-        const placeholderTexts = [
-            "Hallo, ich bin Evita, Michaels KI-Assistentin.",
-            "Was kann ich für Sie tun?"
-        ];
-        let placeholderIndex = 0;
-        let charPlaceholderIndex = 0;
-        let placeholderInterval;
+                const formData = new FormData(contactForm);
+                // FormSubmit.co benötigt _subject und _next/honey-pot.
+                // Da _next nicht mehr für Weiterleitung genutzt wird, aber für FormSubmit benötigt wird,
+                // können wir es trotzdem senden, oder den honeypot nutzen um Spam zu reduzieren.
+                // Für dieses Szenario, fügen wir _subject manuell hinzu, falls es nicht da ist.
+                // Die _honey und _next Felder werden nicht direkt aus dem HTML gelesen.
 
-        function cyclePlaceholder() {
-            let currentText = aiQuestionInput.placeholder;
-            let deleteInterval = setInterval(() => {
-                if (currentText.length > 0) {
-                    currentText = currentText.slice(0, -1);
-                    aiQuestionInput.placeholder = currentText;
-                } else {
-                    clearInterval(deleteInterval);
-                    placeholderIndex = (placeholderIndex + 1) % placeholderTexts.length;
-                    charPlaceholderIndex = 0;
-                    typePlaceholder();
-                }
-            }, 40);
-        }
-
-        function typePlaceholder() {
-            let newText = placeholderTexts[placeholderIndex];
-            let typeInterval = setInterval(() => {
-                if (charPlaceholderIndex < newText.length) {
-                    aiQuestionInput.placeholder += newText.charAt(charPlaceholderIndex);
-                    charPlaceholderIndex++;
-                } else {
-                    clearInterval(typeInterval);
-                }
-            }, 70);
-        }
-
-        placeholderInterval = setInterval(cyclePlaceholder, 7000);
-
-        aiQuestionInput.addEventListener('focus', () => clearInterval(placeholderInterval));
-        aiQuestionInput.addEventListener('blur', () => {
-            if(aiQuestionInput.value === '') {
-                 placeholderInterval = setInterval(cyclePlaceholder, 7000);
-            }
-        });
-
-        aiForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const question = aiQuestionInput.value.trim();
-            if (!question) return;
-
-            clearInterval(placeholderInterval);
-            aiStatus.innerText = 'Evita denkt nach...';
-            aiStatus.classList.add('thinking');
-            aiQuestionInput.disabled = true;
-            submitButton.disabled = true;
-
-            try {
-                const fetchPromise = fetch('/api/ask-gemini', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ question: question })
+                const object = {};
+                formData.forEach((value, key) => {
+                    object[key] = value;
                 });
+                // Füge _subject manuell hinzu, falls das Feld im HTML _subject heißt
+                if (!object['_subject']) {
+                    object['_subject'] = 'Neue Kontaktanfrage von designare.at';
+                }
+                // Füge den Honeypot manuell hinzu, um Spam zu filtern, falls kein Feld im HTML ist
+                object['_honey'] = ''; // Leerer Wert für den Honeypot
 
-                const delayPromise = new Promise(resolve => setTimeout(resolve, 1200));
+                try {
+                    const response = await fetch('https://formsubmit.co/ajax/michael@designare.at', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify(object)
+                    });
 
-                const [response] = await Promise.all([fetchPromise, delayPromise]);
+                    const data = await response.json();
 
-                if (!response.ok) { throw new Error('Netzwerk-Antwort war nicht OK.'); }
+                    if (data.success) {
+                        // Bei Erfolg: Formular verstecken, Erfolgsnachricht anzeigen
+                        contactForm.style.display = 'none';
+                        contactSuccessMessage.style.display = 'block';
+                        contactForm.reset(); // Formularfelder leeren
+                    } else {
+                        // Bei Fehler: Fehlermeldung anzeigen (z.B. im aiStatus oder Alert)
+                        alert('Fehler beim Senden der Nachricht. Bitte versuchen Sie es später erneut. Details: ' + data.message);
+                    }
+                } catch (error) {
+                    console.error('Sende-Fehler:', error);
+                    alert('Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.');
+                }
+            });
+        }
 
-                const data = await response.json();
-                aiStatus.innerText = data.answer;
-
-            } catch (error) {
-                console.error("Fehler:", error);
-                aiStatus.innerText = 'Ein Fehler ist aufgetreten.';
-            } finally {
-                aiQuestionInput.value = '';
-                aiQuestionInput.disabled = false;
-                submitButton.disabled = false;
-                aiQuestionInput.placeholder = "Haben Sie eine weitere Frage?";
-                aiStatus.classList.remove('thinking');
-            }
-        });
+        // NEU: Event Listener für den Schließen-Button der Erfolgsnachricht
+        if (closeSuccessMessageBtn) {
+            closeSuccessMessageBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                contactModal.classList.remove('visible'); // Modal schließen
+                // Optional: Formular wieder anzeigen, wenn das Modal das nächste Mal geöffnet wird
+                if (contactForm) contactForm.style.display = 'flex';
+                if (contactSuccessMessage) contactSuccessMessage.style.display = 'none';
+            });
+        }
     }
 
     // --- PARTIKEL-HINTERGRUND ---
