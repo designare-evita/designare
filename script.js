@@ -395,32 +395,45 @@ document.addEventListener('DOMContentLoaded', function() {
                     backLinkElement = children.splice(backLinkIndex, 1)[0]; // Element entfernen und speichern
                 }
 
-                // NEU: Verbesserte Logik zum Teilen des Inhalts
                 let part1Elements = [];
                 let part2Elements = [];
                 let splitPointFound = false;
 
-                // Versuche, an einer H3-Überschrift zu teilen, die ungefähr in der Mitte liegt
-                // oder nach dem 5. Element, wenn keine H3 gefunden wird.
-                const targetSplitCount = Math.ceil(children.length * 0.5);
-                let currentElementCount = 0;
-
-                for (let i = 0; i < children.length; i++) {
-                    const child = children[i];
-                    if (!splitPointFound && child.tagName === 'H3' && i >= targetSplitCount * 0.8 && i <= targetSplitCount * 1.2) {
-                        // Teile, wenn H3 in der Nähe der Mitte gefunden wird
-                        part1Elements = children.slice(0, i);
-                        part2Elements = children.slice(i);
-                        splitPointFound = true;
-                        break;
+                // NEU: Spezifische Split-Logik für datenschutz.html
+                if (pageName === 'datenschutz') {
+                    const datenschutzSplitElement = legalContainer.querySelector('#datenschutz-split-point');
+                    if (datenschutzSplitElement) {
+                        const splitIndex = children.indexOf(datenschutzSplitElement);
+                        if (splitIndex !== -1) {
+                            part1Elements = children.slice(0, splitIndex);
+                            part2Elements = children.slice(splitIndex);
+                            splitPointFound = true;
+                            console.log('Datenschutz: Split at specific ID.'); // Debug
+                        }
                     }
-                    currentElementCount++;
                 }
 
-                // Wenn kein geeigneter H3-Splitpunkt gefunden wurde, teile einfach in der Mitte
+                // Fallback zu H3 oder 50% Split, wenn kein spezifischer Split-Punkt gefunden wurde
                 if (!splitPointFound) {
+                    const targetSplitCount = Math.ceil(children.length * 0.5);
+                    for (let i = 0; i < children.length; i++) {
+                        const child = children[i];
+                        if (child.tagName === 'H3' && i >= targetSplitCount * 0.8 && i <= targetSplitCount * 1.2) {
+                            part1Elements = children.slice(0, i);
+                            part2Elements = children.slice(i);
+                            splitPointFound = true;
+                            console.log('Split at H3 near middle.'); // Debug
+                            break;
+                        }
+                    }
+                }
+
+                // Finaler Fallback, wenn kein H3 oder spezifischer Split-Punkt gefunden wurde
+                if (!splitPointFound) {
+                    const splitIndex = Math.ceil(children.length * 0.5);
                     part1Elements = children.slice(0, splitIndex);
                     part2Elements = children.slice(splitIndex);
+                    console.log('Split at 50% element count.'); // Debug
                 }
 
                 const part1Div = document.createElement('div');
