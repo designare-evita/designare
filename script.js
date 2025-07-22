@@ -399,41 +399,50 @@ document.addEventListener('DOMContentLoaded', function() {
                 let part2Elements = [];
                 let splitPointFound = false;
 
-                // NEU: Spezifische Split-Logik für datenschutz.html
+                // NEU: Spezifische Split-Logik für datenschutz.html mit Debug-Logs
                 if (pageName === 'datenschutz') {
                     const datenschutzSplitElement = legalContainer.querySelector('#datenschutz-split-point');
+                    console.log('Datenschutz: Attempting to find split point #datenschutz-split-point:', datenschutzSplitElement);
                     if (datenschutzSplitElement) {
                         const splitIndex = children.indexOf(datenschutzSplitElement);
+                        console.log('Datenschutz: Found split point at index:', splitIndex);
                         if (splitIndex !== -1) {
                             part1Elements = children.slice(0, splitIndex);
                             part2Elements = children.slice(splitIndex);
                             splitPointFound = true;
-                            console.log('Datenschutz: Split at specific ID.'); // Debug
+                            console.log('Datenschutz: Split at specific ID. Part1 length:', part1Elements.length, 'Part2 length:', part2Elements.length);
+                        } else {
+                            console.log('Datenschutz: Specific ID found, but not in children array. Falling back.');
                         }
+                    } else {
+                        console.log('Datenschutz: Specific ID #datenschutz-split-point NOT found. Falling back.');
                     }
                 }
 
                 // Fallback zu H3 oder 50% Split, wenn kein spezifischer Split-Punkt gefunden wurde
                 if (!splitPointFound) {
                     const targetSplitCount = Math.ceil(children.length * 0.5);
+                    let h3SplitIndex = -1;
                     for (let i = 0; i < children.length; i++) {
                         const child = children[i];
                         if (child.tagName === 'H3' && i >= targetSplitCount * 0.8 && i <= targetSplitCount * 1.2) {
-                            part1Elements = children.slice(0, i);
-                            part2Elements = children.slice(i);
-                            splitPointFound = true;
-                            console.log('Split at H3 near middle.'); // Debug
+                            h3SplitIndex = i;
                             break;
                         }
                     }
-                }
 
-                // Finaler Fallback, wenn kein H3 oder spezifischer Split-Punkt gefunden wurde
-                if (!splitPointFound) {
-                    const splitIndex = Math.ceil(children.length * 0.5);
-                    part1Elements = children.slice(0, splitIndex);
-                    part2Elements = children.slice(splitIndex);
-                    console.log('Split at 50% element count.'); // Debug
+                    if (h3SplitIndex !== -1) {
+                        part1Elements = children.slice(0, h3SplitIndex);
+                        part2Elements = children.slice(h3SplitIndex);
+                        splitPointFound = true;
+                        console.log('Split at H3 near middle. Part1 length:', part1Elements.length, 'Part2 length:', part2Elements.length);
+                    } else {
+                        // Finaler Fallback, wenn kein H3 oder spezifischer Split-Punkt gefunden wurde
+                        const splitIndex = Math.ceil(children.length * 0.5);
+                        part1Elements = children.slice(0, splitIndex);
+                        part2Elements = children.slice(splitIndex);
+                        console.log('Split at 50% element count. Part1 length:', part1Elements.length, 'Part2 length:', part2Elements.length);
+                    }
                 }
 
                 const part1Div = document.createElement('div');
@@ -463,6 +472,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     paginationButtonsDiv.appendChild(continueButton);
                 } else {
                     continueButton.style.display = 'none'; // Verstecke den Weiter-Button, wenn kein zweiter Teil
+                    console.log('No second part, "Weiter" button hidden.'); // Debug
                 }
                 
 
@@ -482,6 +492,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     part2Div.style.display = 'block';
                     backButton.style.display = 'block';
                     legalModalContentArea.scrollTop = 0; // Nach oben scrollen
+                    console.log('Clicked Weiter, showing part 2.'); // Debug
                 });
 
                 // Event Listener für "Zurück"
@@ -491,6 +502,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     part2Div.style.display = 'none';
                     backButton.style.display = 'none';
                     legalModalContentArea.scrollTop = 0; // Nach oben scrollen
+                    console.log('Clicked Zurück, showing part 1.'); // Debug
                 });
 
                 // Den ursprünglichen "Zurück zur Startseite" Link im Modal behandeln
@@ -502,12 +514,14 @@ document.addEventListener('DOMContentLoaded', function() {
                         legalModal.classList.remove('visible'); // Modal schließen
                         body.style.overflow = ''; // Scrollen wieder erlauben
                         legalModalContentArea.innerHTML = ''; // Inhalt des Modals leeren
+                        console.log('Clicked "Zurück zur Startseite" in modal, closing modal.'); // Debug
                     });
                 }
 
 
                 legalModal.classList.add('visible'); // Lightbox sichtbar machen
                 body.style.overflow = 'hidden'; // Scrollen des Haupt-Body verhindern
+                console.log('Legal modal opened.'); // Debug
 
             } else {
                 console.error(`Could not find .legal-container in ${pageName}.html`);
@@ -542,6 +556,7 @@ document.addEventListener('DOMContentLoaded', function() {
             legalModal.classList.remove('visible');
             body.style.overflow = ''; // Scrollen wieder erlauben
             legalModalContentArea.innerHTML = ''; // Inhalt leeren beim Schließen
+            console.log('Legal modal closed via X button.'); // Debug
         });
     }
 
@@ -552,6 +567,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 legalModal.classList.remove('visible');
                 body.style.overflow = ''; // Scrollen wieder erlauben
                 legalModalContentArea.innerHTML = ''; // Inhalt leeren beim Schließen
+                console.log('Legal modal closed via overlay click.'); // Debug
             }
         });
     }
