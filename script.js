@@ -401,7 +401,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // NEU: Spezifische Split-Logik für datenschutz.html mit Debug-Logs
                 if (pageName === 'datenschutz') {
-                    const datenschutzSplitElement = legalContainer.querySelector('#datenschutz-split-point');
+                    // Suche das Element mit der ID innerhalb der CHILDREN-Liste
+                    const datenschutzSplitElement = children.find(child => child.id === 'datenschutz-split-point');
                     console.log('Datenschutz: Attempting to find split point #datenschutz-split-point:', datenschutzSplitElement);
                     if (datenschutzSplitElement) {
                         const splitIndex = children.indexOf(datenschutzSplitElement);
@@ -412,7 +413,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             splitPointFound = true;
                             console.log('Datenschutz: Split at specific ID. Part1 length:', part1Elements.length, 'Part2 length:', part2Elements.length);
                         } else {
-                            console.log('Datenschutz: Specific ID found, but not in children array. Falling back.');
+                            console.log('Datenschutz: Specific ID found, but indexOf returned -1. Falling back.');
                         }
                     } else {
                         console.log('Datenschutz: Specific ID #datenschutz-split-point NOT found. Falling back.');
