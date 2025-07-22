@@ -190,11 +190,7 @@ body.dark-mode #ai-status {
     border: 1px solid #5e5e5e;
 }
 
-/* KORRIGIERT: Regel für den "denkenden" Rahmen spezifischer gemacht */
-#ai-status.thinking,
-body.dark-mode #ai-status.thinking {
-    border-color: #D39A00;
-}
+
 
 /* 6. Footer & Kontakt-Modal */
 
