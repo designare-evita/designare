@@ -402,7 +402,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // NEU: Spezifische Split-Logik für datenschutz.html mit 5 Split-Punkten für 6 Teile
                 if (pageName === 'datenschutz') {
                     const splitElement1 = children.find(child => child.id === 'datenschutz-part-2-start');
-                    const splitElement2 = children.find(child => child.id === 'datenschutz.part-3-start');
+                    const splitElement2 = children.find(child => child.id === 'datenschutz-part-3-start');
                     const splitElement3 = children.find(child => child.id === 'datenschutz-part-4-start');
                     const splitElement4 = children.find(child => child.id === 'datenschutz-part-5-start');
                     const splitElement5 = children.find(child => child.id === 'datenschutz-part-6-start'); // NEU: Fünfter Split-Punkt
