@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- H1-TYPEWRITER ---
     const typewriterElement = document.getElementById('typewriter-h1');
     if (typewriterElement) {
-        const textsToType = [ "Michael Kanda", "Web-Entwickler", "KI-Spezialist" ];
+        const textsToType = [ "Michael Kanda", "Web-Magier", "KI-Therapeut" ];
         let textIndex = 0; let charIndex = 0; let isDeleting = false;
         
         function typeWriter() {
