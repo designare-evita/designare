@@ -30,7 +30,7 @@
         
         <div class="container">
             
-            <img src="images/Michael.png" alt="Michael Kanda" class="profile-picture">
+            <img src="images/Michael.png" alt="Profilbild Michael Kanda" class="profile-picture">
 
             <h1 id="typewriter-h1"></h1>
 			<p class="subtitle">Web-Entwicklung & KI-Lösungen<br>Michael Kanda | aus Wien</p>
@@ -52,7 +52,7 @@
         <div class="modal-content">
             <button id="close-modal" class="close-button">&times;</button>
             <h2>Kontakt</h2>
-            <form action="https://formsubmit.co/michael@designare.at" method="POST">
+            <form id="contact-form-inner">
                 <input type="text" name="name" placeholder="Ihr Name" required>
                 <input type="email" name="email" placeholder="Ihre E-Mail-Adresse" required>
                 <input type="text" name="_subject" placeholder="Betreff">
@@ -61,11 +61,16 @@
                     <input type="checkbox" name="privacy" id="privacy" required>
                     <label for="privacy">Ich stimme der Datenschutzerklärung zu.</label>
                 </div>
-                <input type="text" name="_honey" style="display:none">
-                <input type="hidden" name="_next" value="https://designare.at/danke.html">
                 <button type="submit" class="cta-button">Absenden</button>
             </form>
-        </div>
+            <div id="contact-success-message" style="display: none; text-align: center;">
+                <h2>Vielen Dank für Ihre Nachricht!</h2>
+                <p>Ich melde mich zeitnah bei Ihnen.</p>
+                <p style="margin-top: 20px;">
+                    <a href="#" id="close-success-message" class="cta-button">Schließen</a>
+                </p>
+            </div>
+            </div>
     </div>
 
 	<footer>
