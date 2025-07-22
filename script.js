@@ -275,7 +275,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     clearInterval(deleteInterval);
                     placeholderIndex = (placeholderIndex + 1) % placeholderTexts.length;
                     charPlaceholderIndex = 0;
-                    setTimeout(typePlaceholder, 575); // 
+                    setTimeout(typePlaceholder, 600); // 
                 }
             }, 46); // 
         }
