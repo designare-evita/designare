@@ -239,10 +239,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const aiStatus = document.getElementById('ai-status');
         const submitButton = aiForm.querySelector('button');
 
-        // GEÄNDERT: Platzhaltertexte für Evita
+        // Platzhaltertexte für Evita
         const placeholderTexts = [
             "Hallo, ich bin Evita,",
-            "Michaels KI-Assistentin.",
+            "Michael's KI-Assistentin.",
             "Was kann ich für Dich tun?"
         ];
         let placeholderIndex = 0;
