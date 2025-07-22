@@ -28,6 +28,9 @@
     font-weight: 700;
     src: url('Font/Poppins-Bold.ttf') format('truetype');
 }
+.accent-text-inline {
+    color: var(--accent-color);
+}
 
 /* 2. Globale Einstellungen & Farbvariablen */
 :root {
