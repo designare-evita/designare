@@ -6,52 +6,52 @@
 /* 1. Lokale Fonts laden */
 @font-face {
     font-family: 'Poppins';
-    src: url('Font/Poppins-Light.ttf') format('truetype');
+    font-style: normal;
     font-weight: 300;
-    font-style: normal;
+    src: url('Font/Poppins-Light.ttf') format('truetype');
 }
 @font-face {
     font-family: 'Poppins';
-    src: url('Font/Poppins-Regular.ttf') format('truetype');
+    font-style: normal;
     font-weight: 400;
-    font-style: normal;
+    src: url('Font/Poppins-Regular.ttf') format('truetype');
 }
 @font-face {
     font-family: 'Poppins';
-    src: url('Font/Poppins-SemiBold.ttf') format('truetype');
+    font-style: normal;
     font-weight: 600;
-    font-style: normal;
+    src: url('Font/Poppins-SemiBold.ttf') format('truetype');
 }
 @font-face {
     font-family: 'Poppins';
-    src: url('Font/Poppins-Bold.ttf') format('truetype');
-    font-weight: 700;
     font-style: normal;
+    font-weight: 700;
+    src: url('Font/Poppins-Bold.ttf') format('truetype');
 }
 
 /* 2. Globale Einstellungen & Farbvariablen */
 :root {
-    --bg-color: #F8F7F4;
-    --text-color: #333333;
     --accent-color: #FCB500;
     --accent-color-rgba: rgba(252, 181, 0, 0.85);
+    --bg-color: #F8F7F4;
+    --border-color: #bfbfbf;
     --particle-color: #888888;
     --particle-line-color: #cccccc;
-    --border-color: #bfbfbf;
+    --text-color: #333333;
 }
 
 body.dark-mode {
     --bg-color: #1a1a1a;
-    --text-color: #eeeeee;
+    --border-color: #5e5e5e;
     --particle-color: #bbbbbb;
     --particle-line-color: #888888;
-    --border-color: #5e5e5e;
+    --text-color: #eeeeee;
 }
 
 * {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
 }
 
 html {
@@ -59,82 +59,122 @@ html {
 }
 
 body {
-    height: 100%;
-    font-family: 'Poppins', sans-serif;
     background-color: var(--bg-color);
     color: var(--text-color);
+    font-family: 'Poppins', sans-serif;
+    height: 100%;
     line-height: 1.6;
+    overflow-x: hidden;
     perspective: 1000px;
     transition: background-color 0.4s ease, color 0.4s ease;
-    overflow-x: hidden;
 }
 
 
 /* 3. Steuerungselemente (Uhr, Buttons) */
 #top-right-controls {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 1000;
-    display: flex;
     align-items: center;
+    display: flex;
     gap: 15px;
+    position: fixed;
+    right: 20px;
+    top: 20px;
+    z-index: 1000;
 }
 #theme-toggle {
-    background: none; border: none; color: var(--text-color); font-size: 1.5rem;
-    cursor: pointer; transition: color 0.4s ease, transform 0.3s ease;
-}
-#theme-toggle:hover { color: var(--accent-color); transform: scale(1.1); }
-#theme-toggle .fa-sun { display: none; }
-body.dark-mode #theme-toggle .fa-sun { display: inline-block; }
-body.dark-mode #theme-toggle .fa-moon { display: none; }
-
-#contact-button, #cookie-info-button {
     background: none;
     border: none;
     color: var(--text-color);
-    width: 40px; height: 40px; border-radius: 50%; font-size: 1.2rem;
-    cursor: pointer; display: flex; align-items: center; justify-content: center;
-    transition: all 0.3s ease; opacity: 0.7;
+    cursor: pointer;
+    font-size: 1.5rem;
+    transition: color 0.4s ease, transform 0.3s ease;
+}
+#theme-toggle:hover {
+    color: var(--accent-color);
+    transform: scale(1.1);
+}
+#theme-toggle .fa-sun {
+    display: none;
+}
+body.dark-mode #theme-toggle .fa-sun {
+    display: inline-block;
+}
+body.dark-mode #theme-toggle .fa-moon {
+    display: none;
+}
+
+#contact-button, #cookie-info-button {
+    align-items: center;
+    background: none;
+    border: none;
+    border-radius: 50%;
+    color: var(--text-color);
+    cursor: pointer;
+    display: flex;
+    font-size: 1.2rem;
+    height: 40px;
+    justify-content: center;
+    opacity: 0.7;
+    transition: all 0.3s ease;
+    width: 40px;
 }
 #contact-button:hover, #cookie-info-button:hover {
-    opacity: 1; color: #fff; background-color: var(--accent-color);
+    background-color: var(--accent-color);
+    color: #fff;
+    opacity: 1;
     transform: scale(1.1);
 }
 
 /* 4. Haupt-Layout & Container */
 .container {
-    max-width: 1100px; margin: 0 auto; padding: 0 2rem; display: flex;
-    flex-direction: column; align-items: center; justify-content: center;
-    transform-style: preserve-3d; transition: transform 0.1s linear;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 0 auto;
+    max-width: 1100px;
+    padding: 0 2rem;
+    transform-style: preserve-3d;
+    transition: transform 0.1s linear;
 }
 #hero {
-    height: 100vh; display: flex; align-items: center; justify-content: center;
-    text-align: center; position: relative; overflow: hidden;
+    align-items: center;
+    display: flex;
+    height: 100vh;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    text-align: center;
 }
 #particles-js {
-    position: absolute; width: 100%; height: 100%; top: 0; left: 0; z-index: 1;
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: 1;
 }
-#hero .container { position: relative; z-index: 2; }
+#hero .container {
+    position: relative;
+    z-index: 2;
+}
 
 /* 5. Inhaltselemente */
 .profile-picture {
-    width: 198px;
     height: 198px;
     margin-bottom: 1.5rem;
     object-fit: cover;
+    width: 198px;
 }
 #hero h1 {
     font-size: 3rem;
     font-weight: 700;
+    height: 140px;
+    justify-content: center;
     line-height: 1.2;
     margin-bottom: 0.5rem;
-    min-height: 1.2em;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
     max-width: 800px;
+    min-height: 1.2em;
+    width: 100%;
 }
 #hero .subtitle {
     font-size: 1.2rem;
@@ -145,24 +185,31 @@ body.dark-mode #theme-toggle .fa-moon { display: none; }
 
 
 .ai-container {
-    width: 500px;
     margin-bottom: 2.5rem;
+    width: 500px;
 }
 #ai-form {
-    display: flex;
+    background-color: var(--bg-color);
     border: 1px solid #bfbfbf;
     border-radius: 8px;
+    display: flex;
     overflow: hidden;
-    background-color: var(--bg-color);
     transition: border-color 0.3s ease;
 }
 body.dark-mode #ai-form {
     border-color: #5e5e5e;
 }
-#ai-form:focus-within { border-color: var(--accent-color); }
+#ai-form:focus-within {
+    border-color: var(--accent-color);
+}
 #ai-question {
-    flex-grow: 1; border: none; background: none; padding: 12px 15px;
-    font-size: 1rem; color: var(--text-color); outline: none;
+    background: none;
+    border: none;
+    color: var(--text-color);
+    flex-grow: 1;
+    font-size: 1rem;
+    outline: none;
+    padding: 12px 15px;
 }
 #ai-question::placeholder {
     color: var(--text-color);
@@ -173,16 +220,27 @@ body.dark-mode #ai-form {
     opacity: 0;
 }
 #ai-form button {
-    border: none; background: var(--accent-color); color: #fff; padding: 0 18px;
-    cursor: pointer; font-size: 1rem; transition: background-color 0.3s ease;
+    background: var(--accent-color);
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0 18px;
+    transition: background-color 0.3s ease;
 }
-#ai-form button:hover { background: #d39a00; }
+#ai-form button:hover {
+    background: #d39a00;
+}
 #ai-status {
-    font-size: 0.9rem; min-height: 40px; margin-top: 10px; padding: 10px; opacity: 0.9;
-    text-align: left;
     background-color: rgba(0,0,0,0.02);
     border: 1px solid #bfbfbf;
     border-radius: 8px;
+    font-size: 0.9rem;
+    margin-top: 10px;
+    min-height: 40px;
+    opacity: 0.9;
+    padding: 10px;
+    text-align: left;
     transition: opacity 0.3s ease, border-color 0.3s ease;
 }
 body.dark-mode #ai-status {
@@ -192,90 +250,162 @@ body.dark-mode #ai-status {
 
 /* 6. Footer & Kontakt-Modal */
 footer {
-    position: fixed;
+    align-items: center;
     bottom: 10px;
+    display: flex;
+    gap: 8px;
+    position: fixed;
     right: 10px;
     z-index: 1000;
-    display: flex;
-    align-items: center;
-    gap: 8px;
 }
 footer a {
-    font-size: 0.8rem; color: var(--text-color); text-decoration: none; opacity: 0.5;
-    transition: opacity 0.3s ease; border: 1px solid var(--text-color);
-    padding: 4px 8px; border-radius: 5px;
+    border: 1px solid var(--text-color);
+    border-radius: 5px;
+    color: var(--text-color);
+    font-size: 0.8rem;
+    opacity: 0.5;
+    padding: 4px 8px;
+    text-decoration: none;
+    transition: opacity 0.3s ease;
 }
-footer a:hover { opacity: 1; }
+footer a:hover {
+    opacity: 1;
+}
 
 .modal-overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background-color: rgba(0, 0, 0, 0.7); z-index: 2000; display: flex;
-    align-items: center; justify-content: center; opacity: 0;
-    pointer-events: none; transition: opacity 0.3s ease;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    height: 100%;
+    justify-content: center;
+    left: 0;
+    opacity: 0;
+    pointer-events: none;
+    position: fixed;
+    top: 0;
+    transition: opacity 0.3s ease;
+    width: 100%;
+    z-index: 2000;
 }
-.modal-overlay.visible { opacity: 1; pointer-events: auto; }
+.modal-overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
 .modal-content {
-    background-color: var(--bg-color); padding: 2rem; border-radius: 10px;
-    width: 90%;
+    background-color: var(--bg-color);
+    border-radius: 10px;
     max-width: 700px; /* Maximale Breite für Modals */
+    padding: 2rem;
     position: relative;
-    transform: scale(0.95); transition: transform 0.3s ease;
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+    width: 90%;
 }
-.modal-overlay.visible .modal-content { transform: scale(1); }
-.modal-content h2 { margin-top: 0; margin-bottom: 1.5rem; text-align: center; }
+.modal-overlay.visible .modal-content {
+    transform: scale(1);
+}
+.modal-content h2 {
+    margin-bottom: 1.5rem;
+    margin-top: 0;
+    text-align: center;
+}
 .close-button {
-    position: absolute; top: 10px; right: 15px; background: none; border: none;
-    font-size: 2rem; color: var(--text-color); opacity: 0.5; cursor: pointer;
+    background: none;
+    border: none;
+    color: var(--text-color);
+    cursor: pointer;
+    font-size: 2rem;
+    opacity: 0.5;
+    position: absolute;
+    right: 15px;
+    top: 10px;
     transition: opacity 0.3s ease, transform 0.3s ease;
 }
-.close-button:hover { opacity: 1; transform: rotate(90deg); }
-.modal-content form { display: flex; flex-direction: column; gap: 1rem; }
-.modal-content .cta-button {
-    display: block; width: 100%; background: var(--accent-color); color: #fff;
-    padding: 12px 24px; border-radius: 5px; text-decoration: none; font-weight: 600;
-    transition: all 0.3s ease; border: 2px solid var(--accent-color); text-align: center;
-    cursor: pointer;
-    font-size: 1rem; /* Angepasst an die Größe des Platzhaltertextes */
+.close-button:hover {
+    opacity: 1;
+    transform: rotate(90deg);
 }
-.modal-content .cta-button:hover { background-color: #d39a00; border-color: #d39a00; color: #fff; transform: translateY(-3px); }
+.modal-content form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.modal-content .cta-button {
+    background: var(--accent-color);
+    border: 2px solid var(--accent-color);
+    border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
+    display: block;
+    font-size: 1rem; /* Angepasst an die Größe des Platzhaltertextes */
+    font-weight: 600;
+    padding: 12px 24px;
+    text-align: center;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+.modal-content .cta-button:hover {
+    background-color: #d39a00;
+    border-color: #d39a00;
+    color: #fff;
+    transform: translateY(-3px);
+}
 .modal-content input[type="text"], .modal-content input[type="email"], .modal-content textarea {
-    font-family: 'Poppins', sans-serif; font-size: 1rem; padding: 12px;
-    border-radius: 5px; border: 1px solid var(--border-color);
-    background-color: var(--bg-color); color: var(--text-color);
+    background-color: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    color: var(--text-color);
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+    padding: 12px;
     transition: border-color 0.3s ease;
 }
-.modal-content input:focus, .modal-content textarea:focus { outline: none; border-color: var(--accent-color); }
-.privacy-checkbox { display: flex; align-items: center; gap: 10px; font-size: 0.8rem; }
-.privacy-checkbox input { width: auto; }
+.modal-content input:focus, .modal-content textarea:focus {
+    border-color: var(--accent-color);
+    outline: none;
+}
+.privacy-checkbox {
+    align-items: center;
+    display: flex;
+    font-size: 0.8rem;
+    gap: 10px;
+}
+.privacy-checkbox input {
+    width: auto;
+}
 
 /* Styles für Cookie Lightbox Buttons */
 .cookie-lightbox-buttons {
+    align-items: center;
     display: flex;
     flex-direction: column; /* Buttons untereinander */
     gap: 15px; /* Abstand zwischen den Buttons */
     margin-top: 20px; /* Abstand nach oben zur Info */
     width: 100%; /* Nehmen die volle Breite ein */
-    align-items: center; /* Zentriert die Buttons, wenn sie nicht die volle Breite einnehmen */
 }
 
 .lightbox-button {
-    display: block; /* Stellt sicher, dass Anchor-Tag sich wie ein Block verhält */
-    width: 100%; /* Buttons füllen die Breite des Containers */
-    padding: 10px 15px;
+    background: none;
+    border: 2px solid var(--text-color);
     border-radius: 5px;
+    color: var(--text-color);
+    cursor: pointer;
+    display: block; /* Stellt sicher, dass Anchor-Tag sich wie ein Block verhält */
     font-size: 1rem; /* Gleiche Schriftgröße wie Fließtext (passt zu default p) */
     font-weight: 600;
+    padding: 10px 15px;
     text-align: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
     text-decoration: none; /* Für den Link-Button */
+    transition: all 0.3s ease;
+    width: 100%; /* Buttons füllen die Breite des Containers */
 }
 
 /* Spezifische Farben für die Lightbox-Buttons */
 #acknowledge-cookie-lightbox {
     background-color: var(--accent-color);
+    border-color: var(--accent-color);
     color: #fff;
-    border: 2px solid var(--accent-color);
 }
 
 #acknowledge-cookie-lightbox:hover {
@@ -286,13 +416,13 @@ footer a:hover { opacity: 1; }
 
 #privacy-policy-link-button {
     background: none;
-    color: var(--text-color);
     border: 2px solid var(--text-color);
+    color: var(--text-color);
 }
 
 body.dark-mode #privacy-policy-link-button {
-    color: var(--text-color); /* Sicherstellen, dass der Text im Dark Mode sichtbar bleibt */
     border-color: var(--text-color); /* Sicherstellen, dass der Rand im Dark Mode sichtbar bleibt */
+    color: var(--text-color); /* Sicherstellen, dass der Text im Dark Mode sichtbar bleibt */
 }
 
 #privacy-policy-link-button:hover {
@@ -304,23 +434,23 @@ body.dark-mode #privacy-policy-link-button {
 
 /* Styles für die Paginierungs-Buttons im Legal-Modal */
 .legal-modal-pagination-buttons {
+    border-top: 1px solid var(--border-color);
     display: flex;
-    justify-content: center;
     gap: 20px;
+    justify-content: center;
     margin-top: 25px;
     padding-top: 15px;
-    border-top: 1px solid var(--border-color);
 }
 
 .legal-modal-pagination-buttons button {
     background-color: var(--accent-color);
-    color: #fff;
-    padding: 10px 20px;
     border: 2px solid var(--accent-color);
     border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
     font-size: 1rem;
     font-weight: 600;
-    cursor: pointer;
+    padding: 10px 20px;
     transition: all 0.3s ease;
 }
 
@@ -334,8 +464,8 @@ body.dark-mode #privacy-policy-link-button {
     background-color: #cccccc;
     border-color: #cccccc;
     cursor: not-allowed;
-    transform: none;
     opacity: 0.7;
+    transform: none;
 }
 
 body.dark-mode .legal-modal-pagination-buttons button:disabled {
@@ -351,21 +481,23 @@ body.dark-mode .legal-modal-pagination-buttons button:disabled {
     }
 
     .profile-picture {
-        width: 158px;
         height: 158px;
+        width: 158px;
     }
     #hero h1 {
         font-size: 1.9rem;
-        white-space: normal;
         height: auto;
-        min-height: 1.2em;
         max-width: 100%;
+        min-height: 1.2em;
+        white-space: normal;
     }
     #hero .subtitle {
+        font-size: 1.1rem; /* Schriftgröße des Subtitles auf Mobile */
         margin-bottom: 1.7rem;
-        font-size: 1.1rem; /* NEU: Schriftgröße des Subtitles auf Mobile */
     }
-    .ai-container { width: 100%; }
+    .ai-container {
+        width: 100%;
+    }
 
     /* Responsive Anpassung für Lightbox-Buttons */
     .cookie-lightbox-buttons {
@@ -377,10 +509,10 @@ body.dark-mode .legal-modal-pagination-buttons button:disabled {
 
     /* Responsive Anpassung für Modals */
     .modal-content {
-        padding: 1.5rem; /* Etwas weniger Padding auf kleinen Bildschirmen */
-        max-width: 90%; /* Sicherstellen, dass es nicht zu breit wird */
         max-height: 90vh; /* Maximal 90% der Viewport-Höhe */
+        max-width: 90%; /* Sicherstellen, dass es nicht zu breit wird */
         overflow-y: auto; /* Internes Scrollen ermöglichen */
+        padding: 1.5rem; /* Etwas weniger Padding auf kleinen Bildschirmen */
         -webkit-overflow-scrolling: touch; /* Für flüssiges Scrollen auf iOS */
     }
 
@@ -403,8 +535,8 @@ body.dark-mode .legal-modal-pagination-buttons button:disabled {
     /* Anpassung des Back-Links im Modal für bessere Lesbarkeit auf Mobile */
     .legal-container .back-link {
         font-size: 0.8rem; /* Etwas kleiner für Mobile */
-        padding: 6px 12px; /* Weniger Padding */
         margin-bottom: 2rem; /* Weniger Abstand */
+        padding: 6px 12px; /* Weniger Padding */
     }
     /* Paginierungsbuttons auf Mobile */
     .legal-modal-pagination-buttons {
@@ -413,7 +545,7 @@ body.dark-mode .legal-modal-pagination-buttons button:disabled {
         padding-top: 10px; /* Weniger Padding */
     }
     .legal-modal-pagination-buttons button {
-        width: 100%;
         font-size: 0.9rem; /* Etwas kleiner */
+        width: 100%;
     }
 }
