@@ -9,7 +9,7 @@
     <link rel="icon" href="images/favicon.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="legal-style.css"> <!-- NEU: Link zu legal-style.css -->
+    <link rel="stylesheet" href="legal-style.css">
 </head>
 <body>
 
@@ -34,7 +34,8 @@
             <img src="images/Michael.png" alt="Profilbild Michael Kanda" class="profile-picture">
 
             <h1 id="typewriter-h1"></h1>
-			<p class="subtitle">Michael Kanda <span style="color:#D39A00;">&lt;/&gt;</span> Komplize für Web & KI aus Wien </p>
+            <!-- OPTIMIERUNG: Inline-Style entfernt, Klasse hinzugefügt -->
+			<p class="subtitle">Michael Kanda <span class="accent-text-inline">&lt;/&gt;</span> Komplize für Web & KI aus Wien </p>
             
             <div class="ai-container">
                 <form id="ai-form">
@@ -75,6 +76,7 @@
     </div>
 
 	<footer>
+        <!-- OPTIMIERUNG: rel="nofollow" und target="_blank" entfernt, da JS die Links im Modal öffnet -->
         <a href="impressum.html" id="impressum-link">Impressum</a>
         <a href="datenschutz.html" id="datenschutz-link">Datenschutz</a>
     </footer>
