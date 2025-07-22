@@ -4,6 +4,7 @@
 */
 
 document.addEventListener('DOMContentLoaded', function() {
+    const body = document.body; // Referenz zum Body-Element
 
     // --- Cookie Info Lightbox Logik - Start ---
     const cookieInfoLightbox = document.getElementById('cookie-info-lightbox');
@@ -17,6 +18,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const openLightbox = () => {
         if (cookieInfoLightbox) {
             cookieInfoLightbox.classList.add('visible');
+            // NEU: Scrollen der Seite verhindern, während Lightbox offen ist
+            body.style.overflow = 'hidden';
         }
     };
 
@@ -25,21 +28,31 @@ document.addEventListener('DOMContentLoaded', function() {
         if (cookieInfoLightbox) {
             cookieInfoLightbox.classList.remove('visible');
             localStorage.setItem('hasSeenCookieInfoLightbox', 'true'); // Merken, dass der Nutzer die Lightbox gesehen hat
+            // NEU: Seite wieder sichtbar machen und Scrollen erlauben
+            body.classList.add('loaded'); // Fügt die Klasse hinzu, die die Seite einblendet
+            body.style.overflow = ''; // Ermöglicht das Scrollen wieder
         }
     };
 
-    // Beim Laden der Seite: Wenn die Lightbox noch nicht gesehen wurde, öffne sie automatisch
+    // Beim Laden der Seite: Wenn die Lightbox noch nicht gesehen wurde, öffne sie sofort
     if (!hasSeenCookieInfoLightbox) {
-        setTimeout(() => {
-            openLightbox(); // Öffnet die Lightbox nach der Verzögerung
-        }, 1000); // Zeigt die Lightbox nach 1 Sekunde an
+        // Lightbox direkt öffnen, ohne setTimeout, damit sie sofort sichtbar ist
+        openLightbox();
+        // Das Laden der Hauptseite wird verzögert, bis die Lightbox geschlossen wird.
+        // Daher fügen wir hier NICHT body.classList.add('loaded') hinzu.
+        // Das geschieht erst in closeLightbox().
+    } else {
+        // Wenn Lightbox schon gesehen wurde, Seite sofort einblenden und normal scrollen
+        body.classList.add('loaded');
+        body.style.overflow = '';
     }
+
 
     // Event Listener für den neuen Cookie Info Button
     if (cookieInfoButton) {
         cookieInfoButton.addEventListener('click', () => {
-            // Setzt den localStorage-Eintrag zurück, damit die Lightbox wieder automatisch erscheint,
-            // wenn die Seite das nächste Mal geladen wird, nachdem sie manuell geöffnet wurde.
+            // Beim erneuten Öffnen soll die Lightbox immer wieder erscheinen,
+            // daher den localStorage-Eintrag entfernen und Lightbox öffnen.
             localStorage.removeItem('hasSeenCookieInfoLightbox');
             openLightbox();
         });
@@ -73,8 +86,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     // --- Cookie Info Lightbox Logik - Ende ---
 
-
-    const body = document.body;
 
     // --- HILFSFUNKTION FÜR PARTIKEL ---
     const updateParticleColors = () => {
@@ -152,15 +163,25 @@ document.addEventListener('DOMContentLoaded', function() {
     if (contactButton && closeModalButton && contactModal) {
         contactButton.addEventListener('click', () => {
             contactModal.classList.add('visible');
+            // Beim Öffnen des Kontaktformulars soll Scrollen verhindert werden, nur wenn die Lightbox nicht offen ist
+            if (!cookieInfoLightbox || !cookieInfoLightbox.classList.contains('visible')) {
+                body.style.overflow = 'hidden';
+            }
             if (contactForm) contactForm.style.display = 'flex';
             if (contactSuccessMessage) contactSuccessMessage.style.display = 'none';
         });
 
-        closeModalButton.addEventListener('click', () => contactModal.classList.remove('visible'));
+        closeModalButton.addEventListener('click', () => {
+            contactModal.classList.remove('visible');
+            // Scrollen wieder erlauben, wenn das Kontaktmodal geschlossen wird
+            body.style.overflow = '';
+        });
         
         contactModal.addEventListener('click', (e) => {
             if (e.target === contactModal) {
                 contactModal.classList.remove('visible');
+                // Scrollen wieder erlauben, wenn das Kontaktmodal über Overlay geschlossen wird
+                body.style.overflow = '';
             }
         });
 
@@ -217,6 +238,8 @@ document.addEventListener('DOMContentLoaded', function() {
             closeSuccessMessageBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 contactModal.classList.remove('visible');
+                // Scrollen wieder erlauben, wenn die Dankesnachricht geschlossen wird
+                body.style.overflow = '';
                 if (contactForm) contactForm.style.display = 'flex';
                 if (contactSuccessMessage) contactSuccessMessage.style.display = 'none';
             });
@@ -281,7 +304,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
             clearInterval(placeholderInterval);
             
-            // GEÄNDERT: Fester "Denk"-Text
             aiStatus.innerText = "Einen Moment, Evita gleicht gerade ihre Bits und Bytes ab...";
             aiStatus.classList.add('thinking');
             aiQuestionInput.disabled = true;
