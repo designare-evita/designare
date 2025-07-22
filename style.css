@@ -217,7 +217,7 @@ footer a:hover { opacity: 1; }
 .modal-content {
     background-color: var(--bg-color); padding: 2rem; border-radius: 10px;
     width: 90%;
-    max-width: 700px; /* GEÄNDERT: Maximale Breite für Modals erhöht */
+    max-width: 700px; /* Maximale Breite für Modals */
     position: relative;
     transform: scale(0.95); transition: transform 0.3s ease;
 }
@@ -302,7 +302,7 @@ body.dark-mode #privacy-policy-link-button {
     transform: translateY(-2px);
 }
 
-/* NEU: Styles für die Paginierungs-Buttons im Legal-Modal */
+/* Styles für die Paginierungs-Buttons im Legal-Modal */
 .legal-modal-pagination-buttons {
     display: flex;
     justify-content: center;
@@ -376,14 +376,41 @@ body.dark-mode .legal-modal-pagination-buttons button:disabled {
     .modal-content {
         padding: 1.5rem; /* Etwas weniger Padding auf kleinen Bildschirmen */
         max-width: 90%; /* Sicherstellen, dass es nicht zu breit wird */
+        max-height: 90vh; /* Maximal 90% der Viewport-Höhe */
+        overflow-y: auto; /* Internes Scrollen ermöglichen */
+        -webkit-overflow-scrolling: touch; /* Für flüssiges Scrollen auf iOS */
     }
 
-    /* Responsive Anpassung für Legal-Seiten Paginierung */
+    /* Anpassung der Schriftgrößen im legal-container für Mobile */
+    .legal-container h1 {
+        font-size: 1.8rem; /* Noch kleiner für Mobile */
+    }
+    .legal-container h2 {
+        font-size: 1.4rem;
+    }
+    .legal-container h3 {
+        font-size: 1.0rem;
+    }
+    .legal-container p,
+    .legal-container ul,
+    .legal-container ol,
+    .legal-container li {
+        font-size: 0.85rem; /* Etwas kleiner als 0.9rem */
+    }
+    /* Anpassung des Back-Links im Modal für bessere Lesbarkeit auf Mobile */
+    .legal-container .back-link {
+        font-size: 0.8rem; /* Etwas kleiner für Mobile */
+        padding: 6px 12px; /* Weniger Padding */
+        margin-bottom: 2rem; /* Weniger Abstand */
+    }
+    /* Paginierungsbuttons auf Mobile */
     .legal-modal-pagination-buttons {
         flex-direction: column;
         gap: 10px;
+        padding-top: 10px; /* Weniger Padding */
     }
     .legal-modal-pagination-buttons button {
         width: 100%;
+        font-size: 0.9rem; /* Etwas kleiner */
     }
 }
