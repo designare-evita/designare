@@ -70,14 +70,16 @@
                     <a href="#" id="close-success-message" class="cta-button">Schließen</a>
                 </p>
             </div>
-            </div>
+        </div>
     </div>
 
 	<footer>
-        <a href="impressum.html" rel="nofollow" target="_blank">Impressum</a>
-        <a href="datenschutz.html" rel="nofollow" target="_blank">Datenschutz</a>
+        <!-- GEÄNDERT: Footer-Links rufen JS-Funktionen auf -->
+        <a href="#" id="impressum-link">Impressum</a>
+        <a href="#" id="datenschutz-link">Datenschutz</a>
     </footer>
 
+    <!-- Cookie Info Lightbox HTML -->
     <div id="cookie-info-lightbox" class="modal-overlay">
         <div class="modal-content">
             <h2>Hinweis zu Cookies</h2>
@@ -88,6 +90,14 @@
             </div>
         </div>
     </div>
+    <!-- ENDE Cookie Info Lightbox HTML -->
+
+    <!-- NEU: Container für die Legal-Seiten -->
+    <div id="legal-pages-wrapper" class="legal-pages-wrapper">
+        <!-- Inhalt der Impressum/Datenschutz-Seiten wird hier geladen -->
+    </div>
+    <!-- ENDE NEU -->
+
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script src="script.js"></script>
 
