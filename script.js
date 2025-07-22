@@ -390,26 +390,46 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Finde den Index des <a class="back-link"> Elements
                 const backLinkIndex = children.findIndex(child => child.classList.contains('back-link'));
                 // Entferne den back-link aus der Liste der Kinder, damit er nicht doppelt hinzugefügt wird
-                // und wir ihn separat im Modal-Footer platzieren können oder ihn direkt steuern.
                 let backLinkElement = null;
                 if (backLinkIndex !== -1) {
                     backLinkElement = children.splice(backLinkIndex, 1)[0]; // Element entfernen und speichern
                 }
 
-                // Split-Punkt: Versuche, nach der Hälfte der Elemente zu teilen
-                const splitIndex = Math.ceil(children.length * 0.5);
+                // NEU: Verbesserte Logik zum Teilen des Inhalts
+                let part1Elements = [];
+                let part2Elements = [];
+                let splitPointFound = false;
+
+                // Versuche, an einer H3-Überschrift zu teilen, die ungefähr in der Mitte liegt
+                // oder nach dem 5. Element, wenn keine H3 gefunden wird.
+                const targetSplitCount = Math.ceil(children.length * 0.5);
+                let currentElementCount = 0;
+
+                for (let i = 0; i < children.length; i++) {
+                    const child = children[i];
+                    if (!splitPointFound && child.tagName === 'H3' && i >= targetSplitCount * 0.8 && i <= targetSplitCount * 1.2) {
+                        // Teile, wenn H3 in der Nähe der Mitte gefunden wird
+                        part1Elements = children.slice(0, i);
+                        part2Elements = children.slice(i);
+                        splitPointFound = true;
+                        break;
+                    }
+                    currentElementCount++;
+                }
+
+                // Wenn kein geeigneter H3-Splitpunkt gefunden wurde, teile einfach in der Mitte
+                if (!splitPointFound) {
+                    part1Elements = children.slice(0, splitIndex);
+                    part2Elements = children.slice(splitIndex);
+                }
 
                 const part1Div = document.createElement('div');
                 const part2Div = document.createElement('div');
                 part2Div.style.display = 'none'; // Zweiter Teil initial versteckt
 
-                children.forEach((child, index) => {
-                    if (index < splitIndex) {
-                        part1Div.appendChild(child.cloneNode(true));
-                    } else {
-                        part2Div.appendChild(child.cloneNode(true));
-                    }
-                });
+                part1Elements.forEach(child => part1Div.appendChild(child.cloneNode(true)));
+                part2Elements.forEach(child => part2Div.appendChild(child.cloneNode(true)));
+
 
                 // Buttons für Paginierung erstellen
                 const paginationButtonsDiv = document.createElement('div');
@@ -425,11 +445,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 backButton.style.display = 'none'; // Initial versteckt
 
                 paginationButtonsDiv.appendChild(backButton);
-                paginationButtonsDiv.appendChild(continueButton);
+                // Zeige "Weiter" nur, wenn es einen zweiten Teil gibt
+                if (part2Elements.length > 0) {
+                    paginationButtonsDiv.appendChild(continueButton);
+                } else {
+                    continueButton.style.display = 'none'; // Verstecke den Weiter-Button, wenn kein zweiter Teil
+                }
+                
 
                 legalModalContentArea.appendChild(part1Div);
                 legalModalContentArea.appendChild(part2Div); // Zweiter Teil wird hinzugefügt, aber versteckt
-                legalModalContentArea.appendChild(paginationButtonsDiv); // Buttons am Ende
+                
+                // Füge die Paginierungs-Buttons nur hinzu, wenn es einen zweiten Teil gibt
+                if (part2Elements.length > 0) {
+                    legalModalContentArea.appendChild(paginationButtonsDiv); // Buttons am Ende
+                }
+
 
                 // Event Listener für "Weiter"
                 continueButton.addEventListener('click', () => {
@@ -457,8 +488,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         e.preventDefault(); // Standardverhalten verhindern
                         legalModal.classList.remove('visible'); // Modal schließen
                         body.style.overflow = ''; // Scrollen wieder erlauben
-                        // Optional: Inhalt des Modals leeren, wenn es geschlossen wird
-                        legalModalContentArea.innerHTML = '';
+                        legalModalContentArea.innerHTML = ''; // Inhalt des Modals leeren
                     });
                 }
 
