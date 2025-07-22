@@ -239,7 +239,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const aiStatus = document.getElementById('ai-status');
         const submitButton = aiForm.querySelector('button');
 
-        // GEÄNDERT: Platzhaltertexte für Evita
         const placeholderTexts = [
             "Hallo, ich bin Evita,",
             "Michaels KI-Assistentin.",
@@ -247,21 +246,20 @@ document.addEventListener('DOMContentLoaded', function() {
         ];
         let placeholderIndex = 0;
         let charPlaceholderIndex = 0;
-        // Entfernt: placeholderInterval, da wir jetzt eine sequentielle Kette nutzen
+        let typeInterval; // Muss hier deklariert werden, damit focus/blur darauf zugreifen können
+        let deleteInterval; // Muss hier deklariert werden
 
-        // NEU: Startet den Typewriter-Effekt für den Platzhalter
-        typePlaceholder();
+        typePlaceholder(); // Startet den Typewriter-Effekt für den Platzhalter
 
         function typePlaceholder() {
             let newText = placeholderTexts[placeholderIndex];
             aiQuestionInput.placeholder = ""; // Platzhalter vor dem Tippen leeren
-            let typeInterval = setInterval(() => {
+            typeInterval = setInterval(() => { // Zuweisung zu globaler Variable
                 if (charPlaceholderIndex < newText.length) {
                     aiQuestionInput.placeholder += newText.charAt(charPlaceholderIndex);
                     charPlaceholderIndex++;
                 } else {
                     clearInterval(typeInterval);
-                    // Nach dem Tippen, eine Pause machen, dann löschen
                     setTimeout(deletePlaceholder, 2000); // 2 Sekunden Pause vor dem Löschen
                 }
             }, 70); // Tippgeschwindigkeit
@@ -269,13 +267,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         function deletePlaceholder() {
             let currentText = aiQuestionInput.placeholder;
-            let deleteInterval = setInterval(() => {
+            deleteInterval = setInterval(() => { // Zuweisung zu globaler Variable
                 if (currentText.length > 0) {
                     currentText = currentText.slice(0, -1);
                     aiQuestionInput.placeholder = currentText;
                 } else {
                     clearInterval(deleteInterval);
-                    // Nach dem Löschen, zum nächsten Text wechseln und erneut tippen
                     placeholderIndex = (placeholderIndex + 1) % placeholderTexts.length;
                     charPlaceholderIndex = 0;
                     setTimeout(typePlaceholder, 500); // 0.5 Sekunden Pause vor dem Tippen des nächsten Textes
@@ -283,22 +280,15 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 40); // Löschgeschwindigkeit
         }
 
-        // Entfernt: placeholderInterval = setInterval(cyclePlaceholder, 7000);
-        // Entfernt: cyclePlaceholder Funktion, da sie durch typePlaceholder/deletePlaceholder Kette ersetzt wird
-
         aiQuestionInput.addEventListener('focus', () => {
-            // Beim Fokus den aktuellen Typewriter-Effekt stoppen und Platzhalter leeren
-            // Dies erfordert, dass typeInterval und deleteInterval globaler zugänglich sind oder über eine Funktion gesteuert werden.
-            // Für Einfachheit: Wir leeren den Platzhalter und stoppen die Intervalle, wenn der Benutzer tippt.
-            clearInterval(typeInterval); // Annahme: typeInterval ist hier zugänglich
-            clearInterval(deleteInterval); // Annahme: deleteInterval ist hier zugänglich
-            aiQuestionInput.placeholder = ""; // Leert den Platzhalter sofort
+            clearInterval(typeInterval);
+            clearInterval(deleteInterval);
+            aiQuestionInput.placeholder = "";
         });
 
         aiQuestionInput.addEventListener('blur', () => {
             if(aiQuestionInput.value === '') {
-                 // Wenn das Feld leer ist und der Fokus verloren geht, den Typewriter-Effekt neu starten
-                 typePlaceholder(); // Startet die Kette neu
+                 typePlaceholder();
             }
         });
 
@@ -307,7 +297,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const question = aiQuestionInput.value.trim();
             if (!question) return;
 
-            // Beim Absenden die Typewriter-Intervalle stoppen, falls sie noch laufen
             clearInterval(typeInterval);
             clearInterval(deleteInterval);
             
@@ -341,7 +330,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 submitButton.disabled = false;
                 aiQuestionInput.placeholder = "Haben Sie eine weitere Frage?";
                 aiStatus.classList.remove('thinking');
-                // Nach dem Senden den Typewriter-Effekt für den Platzhalter neu starten
                 typePlaceholder();
             }
         });
@@ -372,4 +360,105 @@ document.addEventListener('DOMContentLoaded', function() {
             container.style.transform = 'rotateX(0) rotateY(0)';
         });
     }
+
+    // --- NEU: Legal-Seiten Navigation ---
+    const impressumLink = document.getElementById('impressum-link');
+    const datenschutzLink = document.getElementById('datenschutz-link');
+    const legalPagesWrapper = document.getElementById('legal-pages-wrapper');
+
+    // Funktion zum Laden und Anzeigen der Legal-Seite
+    // pageName: 'impressum' oder 'datenschutz'
+    // direction: 'right' (Standard für rein) oder 'left' (für zurück)
+    async function loadLegalPage(pageName, direction = 'right') {
+        const url = `${pageName}.html`; // Die URL der HTML-Teildatei
+        
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const htmlContent = await response.text();
+            
+            legalPagesWrapper.innerHTML = htmlContent; // Inhalt laden
+            body.style.overflow = 'hidden'; // Scrollen des Haupt-Body verhindern
+
+            // Animation starten
+            legalPagesWrapper.classList.remove('slide-in-left', 'slide-in-right', 'slide-out-left', 'slide-out-right');
+            legalPagesWrapper.style.transform = direction === 'right' ? 'translateX(100%)' : 'translateX(-100%)'; // Vorpositionieren
+            
+            // Kleine Verzögerung, um den Browser zu erlauben, die Startposition zu rendern
+            setTimeout(() => {
+                legalPagesWrapper.classList.add(direction === 'right' ? 'slide-in-right' : 'slide-in-left');
+                // Event Listener für den Zurück-Link innerhalb der geladenen Seite hinzufügen
+                const backLink = legalPagesWrapper.querySelector('.back-link');
+                if (backLink) {
+                    backLink.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        history.back(); // Browser-Historie zurückgehen
+                    });
+                }
+            }, 50); // Kurze Verzögerung
+
+
+            // URL in der Browser-Historie aktualisieren
+            history.pushState({ page: pageName }, '', `/${pageName}.html`);
+
+        } catch (error) {
+            console.error(`Fehler beim Laden der Seite ${url}:`, error);
+            alert(`Die Seite ${pageName} konnte nicht geladen werden.`);
+            body.style.overflow = ''; // Scrollen wieder erlauben bei Fehler
+        }
+    }
+
+    // Funktion zum Zurückgehen zur Hauptseite
+    function goBackToMain() {
+        legalPagesWrapper.classList.remove('slide-in-left', 'slide-in-right');
+        legalPagesWrapper.classList.add('slide-out-right'); // Animation nach rechts raus
+
+        // Nach der Animation den Wrapper leeren und verstecken
+        legalPagesWrapper.addEventListener('transitionend', function handler() {
+            legalPagesWrapper.removeEventListener('transitionend', handler);
+            legalPagesWrapper.innerHTML = '';
+            legalPagesWrapper.style.transform = 'translateX(100%)'; // Zurücksetzen für nächste Animation
+            body.style.overflow = ''; // Scrollen wieder erlauben
+        });
+        history.pushState({ page: 'index' }, '', '/'); // URL auf Hauptseite setzen
+    }
+
+    // Event Listener für Footer-Links
+    if (impressumLink) {
+        impressumLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            loadLegalPage('impressum', 'right');
+        });
+    }
+
+    if (datenschutzLink) {
+        datenschutzLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            loadLegalPage('datenschutz', 'right');
+        });
+    }
+
+    // NEU: Logik für den Browser-Zurück/Vorwärts-Button
+    window.onpopstate = function(event) {
+        if (event.state && event.state.page) {
+            if (event.state.page === 'index') {
+                goBackToMain();
+            } else {
+                // Hier müssen wir die Richtung basierend auf der Historie bestimmen
+                // Für Einfachheit: Wir laden die Seite einfach wieder ein,
+                // ohne spezifische "Zurück"-Animation, oder du implementierst eine komplexere Logik.
+                // Für den Moment: Einfaches Einblenden von links, wenn man zurück navigiert.
+                loadLegalPage(event.state.page, 'left');
+            }
+        } else {
+            // Wenn keine spezifische Seite im State ist, gehen wir zur Hauptseite
+            goBackToMain();
+        }
+    };
+
+    // Initialen Zustand der History setzen, damit goBackToMain funktioniert
+    history.replaceState({ page: 'index' }, '', '/');
+
 });
