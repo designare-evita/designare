@@ -386,10 +386,10 @@ body.dark-mode .legal-modal-pagination-buttons button:disabled {
 
     /* Anpassung der Schriftgrößen im legal-container für Mobile */
     .legal-container h1 {
-        font-size: 1.8rem; /* Noch kleiner für Mobile */
+        font-size: 1.6rem; /* Noch kleiner für Mobile */
     }
     .legal-container h2 {
-        font-size: 1.4rem;
+        font-size: 1.3rem;
     }
     .legal-container h3 {
         font-size: 1.0rem;
