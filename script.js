@@ -399,34 +399,38 @@ document.addEventListener('DOMContentLoaded', function() {
                 let currentPage = 0; // Aktuelle Seite (0-indiziert)
                 let paginationButtonsDiv; // Referenz für die Buttons
 
-                // NEU: Spezifische Split-Logik für datenschutz.html mit mehreren Split-Punkten
+                // NEU: Spezifische Split-Logik für datenschutz.html mit 3 Split-Punkten für 4 Teile
                 if (pageName === 'datenschutz') {
                     const splitElement1 = children.find(child => child.id === 'datenschutz-part-2-start');
                     const splitElement2 = children.find(child => child.id === 'datenschutz-part-3-start');
+                    const splitElement3 = children.find(child => child.id === 'datenschutz-part-4-start'); // NEU: Dritter Split-Punkt
 
-                    console.log('Datenschutz: Attempting multi-part split.');
+                    console.log('Datenschutz: Attempting multi-part split (4 parts).');
                     console.log('Split Point 1 (#datenschutz-part-2-start):', splitElement1);
                     console.log('Split Point 2 (#datenschutz-part-3-start):', splitElement2);
+                    console.log('Split Point 3 (#datenschutz-part-4-start):', splitElement3); // NEU: Debug-Log
 
-                    if (splitElement1 && splitElement2) {
+                    if (splitElement1 && splitElement2 && splitElement3) { // NEU: Prüfe alle 3 Split-Punkte
                         const index1 = children.indexOf(splitElement1);
                         const index2 = children.indexOf(splitElement2);
+                        const index3 = children.indexOf(splitElement3); // NEU: Index für dritten Split-Punkt
 
-                        if (index1 !== -1 && index2 !== -1 && index1 < index2) {
+                        if (index1 !== -1 && index2 !== -1 && index3 !== -1 && index1 < index2 && index2 < index3) { // NEU: Prüfe alle Indizes und Reihenfolge
                             allParts.push(children.slice(0, index1));
                             allParts.push(children.slice(index1, index2));
-                            allParts.push(children.slice(index2));
-                            console.log('Datenschutz: Successfully split into 3 parts based on IDs.');
-                            console.log('Part 1 length:', allParts[0].length, 'Part 2 length:', allParts[1].length, 'Part 3 length:', allParts[2].length);
+                            allParts.push(children.slice(index2, index3)); // NEU: Dritter Teil
+                            allParts.push(children.slice(index3)); // NEU: Vierter Teil
+                            console.log('Datenschutz: Successfully split into 4 parts based on IDs.');
+                            console.log('Part 1 length:', allParts[0].length, 'Part 2 length:', allParts[1].length, 'Part 3 length:', allParts[2].length, 'Part 4 length:', allParts[3].length); // NEU: Debug-Log
                         } else {
-                            console.warn('Datenschutz: Specific IDs found but indices invalid/out of order. Falling back to 2-part split.');
+                            console.warn('Datenschutz: Specific IDs found but indices invalid/out of order for 4-part split. Falling back to 2-part split.');
                             // Fallback, wenn IDs gefunden, aber Reihenfolge falsch oder indexOf -1
                             const splitIndex = Math.ceil(children.length * 0.5);
                             allParts.push(children.slice(0, splitIndex));
                             allParts.push(children.slice(splitIndex));
                         }
                     } else {
-                        console.warn('Datenschutz: One or both specific split points NOT found. Falling back to 2-part split.');
+                        console.warn('Datenschutz: One or more specific split points NOT found for 4-part split. Falling back to 2-part split.');
                         // Fallback, wenn IDs nicht gefunden
                         const splitIndex = Math.ceil(children.length * 0.5);
                         allParts.push(children.slice(0, splitIndex));
