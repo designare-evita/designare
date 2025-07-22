@@ -370,14 +370,17 @@ document.addEventListener('DOMContentLoaded', function() {
     // pageName: 'impressum' oder 'datenschutz'
     // direction: 'right' (Standard für rein) oder 'left' (für zurück)
     async function loadLegalPage(pageName, direction = 'right') {
+        console.log(`Attempting to load ${pageName}.html from direction: ${direction}`); // Debug-Log
         const url = `${pageName}.html`; // Die URL der HTML-Teildatei
         
         try {
             const response = await fetch(url);
             if (!response.ok) {
+                console.error(`Fetch error for ${url}: status ${response.status}`); // Debug-Log
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const htmlContent = await response.text();
+            console.log(`Content for ${pageName}.html fetched successfully.`); // Debug-Log
             
             legalPagesWrapper.innerHTML = htmlContent; // Inhalt laden
             body.style.overflow = 'hidden'; // Scrollen des Haupt-Body verhindern
@@ -389,29 +392,35 @@ document.addEventListener('DOMContentLoaded', function() {
             // Kleine Verzögerung, um den Browser zu erlauben, die Startposition zu rendern
             setTimeout(() => {
                 legalPagesWrapper.classList.add(direction === 'right' ? 'slide-in-right' : 'slide-in-left');
+                console.log(`Legal pages wrapper should be sliding in from ${direction}.`); // Debug-Log
                 // Event Listener für den Zurück-Link innerhalb der geladenen Seite hinzufügen
                 const backLink = legalPagesWrapper.querySelector('.back-link');
                 if (backLink) {
                     backLink.addEventListener('click', (e) => {
                         e.preventDefault();
+                        console.log('Back link clicked, going back in history.'); // Debug-Log
                         history.back(); // Browser-Historie zurückgehen
                     });
+                } else {
+                    console.warn('Back link not found in loaded legal page content.'); // Debug-Log
                 }
             }, 50); // Kurze Verzögerung
 
 
             // URL in der Browser-Historie aktualisieren
             history.pushState({ page: pageName }, '', `/${pageName}.html`);
+            console.log(`History pushed: ${pageName}.html`); // Debug-Log
 
         } catch (error) {
             console.error(`Fehler beim Laden der Seite ${url}:`, error);
-            alert(`Die Seite ${pageName} konnte nicht geladen werden.`);
+            alert(`Die Seite ${pageName} konnte nicht geladen werden. Details: ${error.message}`); // Zeigt Fehlermeldung an
             body.style.overflow = ''; // Scrollen wieder erlauben bei Fehler
         }
     }
 
     // Funktion zum Zurückgehen zur Hauptseite
     function goBackToMain() {
+        console.log('Going back to main page.'); // Debug-Log
         legalPagesWrapper.classList.remove('slide-in-left', 'slide-in-right');
         legalPagesWrapper.classList.add('slide-out-right'); // Animation nach rechts raus
 
@@ -421,44 +430,54 @@ document.addEventListener('DOMContentLoaded', function() {
             legalPagesWrapper.innerHTML = '';
             legalPagesWrapper.style.transform = 'translateX(100%)'; // Zurücksetzen für nächste Animation
             body.style.overflow = ''; // Scrollen wieder erlauben
+            console.log('Main page restored.'); // Debug-Log
         });
         history.pushState({ page: 'index' }, '', '/'); // URL auf Hauptseite setzen
     }
 
     // Event Listener für Footer-Links
     if (impressumLink) {
+        console.log('Impressum link found.'); // Debug-Log
         impressumLink.addEventListener('click', (e) => {
             e.preventDefault();
+            console.log('Impressum link clicked.'); // Debug-Log
             loadLegalPage('impressum', 'right');
         });
+    } else {
+        console.error('Impressum link NOT found!'); // Debug-Log
     }
 
     if (datenschutzLink) {
+        console.log('Datenschutz link found.'); // Debug-Log
         datenschutzLink.addEventListener('click', (e) => {
             e.preventDefault();
+            console.log('Datenschutz link clicked.'); // Debug-Log
             loadLegalPage('datenschutz', 'right');
         });
+    } else {
+        console.error('Datenschutz link NOT found!'); // Debug-Log
     }
 
     // NEU: Logik für den Browser-Zurück/Vorwärts-Button
     window.onpopstate = function(event) {
+        console.log('onpopstate event fired:', event.state); // Debug-Log
         if (event.state && event.state.page) {
             if (event.state.page === 'index') {
                 goBackToMain();
             } else {
-                // Hier müssen wir die Richtung basierend auf der Historie bestimmen
-                // Für Einfachheit: Wir laden die Seite einfach wieder ein,
-                // ohne spezifische "Zurück"-Animation, oder du implementierst eine komplexere Logik.
-                // Für den Moment: Einfaches Einblenden von links, wenn man zurück navigiert.
-                loadLegalPage(event.state.page, 'left');
+                loadLegalPage(event.state.page, 'left'); // Lade die Seite von links, wenn zurück navigiert wird
             }
         } else {
-            // Wenn keine spezifische Seite im State ist, gehen wir zur Hauptseite
-            goBackToMain();
+            // Wenn keine spezifische Seite im State ist (z.B. erster Seitenaufruf oder direkter Link zur Hauptseite)
+            goBackToMain(); // Gehe zur Hauptseite
         }
     };
 
     // Initialen Zustand der History setzen, damit goBackToMain funktioniert
-    history.replaceState({ page: 'index' }, '', '/');
+    // Dies sollte nur einmal beim Laden der Hauptseite geschehen
+    if (history.state === null || history.state.page !== 'index') {
+        history.replaceState({ page: 'index' }, '', '/');
+        console.log('Initial history state set to index.'); // Debug-Log
+    }
 
 });
