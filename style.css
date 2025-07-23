@@ -188,6 +188,7 @@ body.dark-mode #theme-toggle .fa-moon {
     overflow: hidden;
     position: relative;
     text-align: center;
+    padding-bottom: 10vh; /* NEU: Schiebt den Inhalt nach oben */
 }
 #particles-js {
     height: 100%;
@@ -644,12 +645,13 @@ body.dark-mode .legal-modal-pagination-buttons button:disabled {
         /* Passt die Höhe an den mobilen Header an */
         height: calc(100vh - var(--header-height-mobile));
         margin-top: var(--header-height-mobile);
+        padding-bottom: 10vh; /* NEU: Schiebt den Inhalt nach oben */
     }
 
     #hero h1 {
         font-size: 2rem; /* Schriftgröße für Mobilgeräte verkleinern */
         height: auto; /* Automatische Höhe statt fester 140px */
-        min-height: 1em; /* Platz für den Typewriter reservieren */
+        min-height: 1.2em; /* Platz für den Typewriter reservieren */
     }
 
     #hero .subtitle {
