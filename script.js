@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // H1 Typewriter Geschwindigkeiten (Sci-Fi-Stil)
     const H1_TYPING_SPEED = 120; // ms pro Zeichen
     const H1_DELETING_SPEED = 70; // ms pro Zeichen
-    const H1_DELAY_BETWEEN_TEXTS = 22000; // ms Pause nach Tippen
+    const H1_DELAY_BETWEEN_TEXTS = 2200; // ms Pause nach Tippen
 
     // KI-Platzhalter Typewriter Geschwindigkeiten 
     const AI_TYPING_SPEED = 120; // 
