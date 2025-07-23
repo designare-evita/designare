@@ -81,23 +81,22 @@ body.dark-mode {
         linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
 }
 
-/* 3. Top-Bar Steuerungselemente (Duplikate von style.css) */
-#top-right-controls {
+/* 3. Top-Bar Steuerungselemente */
+.main-header { /* NEU: Haupt-Container für die Top-Bar */
     position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 1000;
+    top: 0;
+    left: 0;
+    width: 100%;
     display: flex;
+    justify-content: space-between; /* Logo links, Buttons rechts */
     align-items: center;
-    gap: 15px;
+    padding: 20px; /* Abstand von den Rändern */
+    z-index: 1000;
+    box-sizing: border-box; /* Padding in die Breite einbeziehen */
 }
 
 /* Styling für das Top-Left Logo */
 #top-left-logo-link {
-    position: fixed; /* Fixiert am Viewport */
-    top: 20px;
-    left: 20px;
-    z-index: 1000;
     display: flex; /* Für vertikale Zentrierung des Bildes */
     align-items: center;
     justify-content: center;
@@ -105,6 +104,7 @@ body.dark-mode {
     width: 40px; /* Gleiche Breite wie die Buttons rechts */
     opacity: 0.8; /* Leichte Transparenz wie die Buttons */
     transition: opacity 0.3s ease, transform 0.3s ease;
+    text-decoration: none; /* Link-Unterstreichung entfernen */
 }
 
 #top-left-logo-link:hover {
@@ -113,9 +113,15 @@ body.dark-mode {
 }
 
 #top-left-logo-img {
-    height: 34.5px; /* 30px * 1.15 = 34.5px (15% größer) */
+    height: 39.675px; /* 34.5px * 1.15 = 39.675px (15% größer als aktuelle 34.5px) */
     width: auto;
     vertical-align: middle; /* Bild vertikal zentrieren */
+}
+
+.header-right-controls { /* NEU: Container für die rechten Buttons */
+    display: flex;
+    align-items: center;
+    gap: 15px;
 }
 
 /* Button-Stile für Top-Bar (Kontakt, Cookie, Theme-Toggle, Magazin-Link) */
@@ -277,7 +283,8 @@ footer a:hover {
 .modal-content h2 { margin-top: 0; margin-bottom: 1.5rem; text-align: center; }
 .close-button {
     position: absolute; top: 10px; right: 15px; background: none; border: none;
-    font-size: 2rem; color: var(--text-color); opacity: 0.5; cursor: pointer;
+    font-size: 2rem; color: var(--text-color);
+    cursor: pointer; opacity: 0.5;
     transition: opacity 0.3s ease, transform 0.3s ease;
 }
 .close-button:hover { opacity: 1; transform: rotate(90deg); }
@@ -354,165 +361,4 @@ body.dark-mode #privacy-policy-link-button {
     background-color: var(--accent-color);
     border-color: var(--accent-color);
     color: #fff;
-    transform: translateY(-2px);
-}
-
-/* Styles für die Paginierungs-Buttons im Legal-Modal */
-.legal-modal-pagination-buttons {
-    border-top: 1px solid var(--border-color);
-    display: flex;
-    gap: 20px;
-    justify-content: center;
-    margin-top: 25px;
-    padding-top: 15px;
-}
-
-.legal-modal-pagination-buttons button {
-    background-color: var(--accent-color);
-    color: #fff;
-    padding: 10px 20px;
-    border: 2px solid var(--accent-color);
-    border-radius: 5px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.legal-modal-pagination-buttons button:hover {
-    background-color: #d39a00;
-    border-color: #d39a00;
-    transform: translateY(-2px);
-}
-
-.legal-modal-pagination-buttons button:disabled {
-    background-color: #cccccc;
-    border-color: #cccccc;
-    cursor: not-allowed;
-    opacity: 0.7;
-    transform: none;
-}
-
-body.dark-mode .legal-modal-pagination-buttons button:disabled {
-    background-color: #555555;
-    border-color: #555555;
-}
-
-
-/* 8. Responsive Design (für Artikel-Seiten und Modals) */
-@media (max-width: 768px) {
-    body {
-        overflow: auto;
-    }
-
-    /* Top-Bar auf Mobilgeräten */
-    #top-right-controls {
-        right: 10px;
-        gap: 10px;
-    }
-    #top-left-logo-link { /* Mobile Anpassung für Logo-Link */
-        left: 10px;
-        height: 35px;
-        width: 35px;
-    }
-    #top-left-logo-img { /* Mobile Anpassung für Logo-Bild */
-        height: 30px; /* Angepasst auf 15% größer von 25px = 28.75px, gerundet 30px */
-    }
-    #contact-button, #cookie-info-button, #theme-toggle, #magazine-button { /* GEÄNDERT: #magazine-button hinzugefügt */
-        font-size: 1rem;
-        height: 35px;
-        width: 35px;
-    }
-
-    /* Artikel-Inhalt auf Mobilgeräten */
-    .article-page-main-content {
-        padding-top: 80px;
-        padding-bottom: 80px;
-    }
-    .article-container {
-        padding: 1rem;
-        margin: 1rem auto;
-    }
-    .article-content h1 {
-        font-size: 1.8rem;
-    }
-    .article-content h2 {
-        font-size: 1.4rem;
-    }
-    .article-content h3 {
-        font-size: 1.1rem;
-    }
-    .article-content h4 {
-        font-size: 0.95rem;
-    }
-    .article-content p,
-    .article-content ul,
-    .article-content ol,
-    .article-content li {
-        font-size: 0.9rem;
-    }
-    .article-content img {
-        margin: 1rem auto;
-    }
-
-    /* Footer auf Mobilgeräten */
-    footer {
-        right: 10px;
-        bottom: 10px;
-        gap: 5px;
-    }
-    footer a {
-        font-size: 0.7rem;
-        padding: 3px 6px;
-    }
-
-    /* Responsive Anpassung für Lightbox-Buttons */
-    .cookie-lightbox-buttons {
-        gap: 10px;
-    }
-    .lightbox-button {
-        font-size: 0.9rem;
-    }
-
-    /* Responsive Anpassung für Modals */
-    .modal-content {
-        max-height: 90vh;
-        max-width: 90%;
-        overflow-y: auto;
-        padding: 1.5rem;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    /* Anpassung der Schriftgrößen im legal-container für Mobile (innerhalb Modals) */
-    .legal-container h1 {
-        font-size: 1.6rem;
-    }
-    .legal-container h2 {
-        font-size: 1.3rem;
-    }
-    .legal-container h3 {
-        font-size: 1.0rem;
-    }
-    .legal-container p,
-    .legal-container ul,
-    .legal-container ol,
-    .legal-container li {
-        font-size: 0.85rem;
-    }
-    /* Anpassung des Back-Links im Modal für bessere Lesbarkeit auf Mobile */
-    .legal-container .back-link {
-        font-size: 0.8rem;
-        margin-bottom: 2rem;
-        padding: 6px 12px;
-    }
-    /* Paginierungsbuttons auf Mobile */
-    .legal-modal-pagination-buttons {
-        flex-direction: column;
-        gap: 10px;
-        padding-top: 10px;
-    }
-    .legal-modal-pagination-buttons button {
-        font-size: 0.9rem;
-        width: 100%;
-    }
-}
+    transf
