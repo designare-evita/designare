@@ -6,43 +6,43 @@
 /* 1. Lokale Fonts laden (identisch zur Hauptseite) */
 @font-face {
     font-family: 'Poppins';
-    src: url('Font/Poppins-Light.ttf') format('truetype');
+    font-style: normal;
     font-weight: 300;
-    font-style: normal;
+    src: url('Font/Poppins-Light.ttf') format('truetype');
 }
 @font-face {
     font-family: 'Poppins';
-    src: url('Font/Poppins-Regular.ttf') format('truetype');
+    font-style: normal;
     font-weight: 400;
-    font-style: normal;
+    src: url('Font/Poppins-Regular.ttf') format('truetype');
 }
 @font-face {
     font-family: 'Poppins';
-    src: url('Font/Poppins-SemiBold.ttf') format('truetype');
+    font-style: normal;
     font-weight: 600;
-    font-style: normal;
+    src: url('Font/Poppins-SemiBold.ttf') format('truetype');
 }
 @font-face {
     font-family: 'Poppins';
-    src: url('Font/Poppins-Bold.ttf') format('truetype');
-    font-weight: 700;
     font-style: normal;
+    font-weight: 700;
+    src: url('Font/Poppins-Bold.ttf') format('truetype');
 }
 
 /* 2. Farbvariablen & Basis-Stile */
 :root {
-    --bg-color: #f8f9fa;
-    --text-color: #333333;
     --accent-color: #FCB500;
-    --link-color: #0275d8;
+    --bg-color: #f8f9fa;
     --border-color: #eeeeee;
+    --link-color: #0275d8;
+    --text-color: #333333;
 }
 
 body.dark-mode {
     --bg-color: #1a1a1a;
-    --text-color: #eeeeee;
-    --link-color: #FCB500;
     --border-color: #333333;
+    --link-color: #FCB500;
+    --text-color: #eeeeee;
 }
 
 * {
@@ -50,9 +50,9 @@ body.dark-mode {
 }
 
 body {
-    font-family: 'Poppins', sans-serif;
     background-color: var(--bg-color);
     color: var(--text-color);
+    font-family: 'Poppins', sans-serif;
     line-height: 1.7;
     margin: 0;
     padding: 2rem;
@@ -61,25 +61,25 @@ body {
 
 /* 3. Container & Inhalt */
 .legal-container {
-    max-width: 800px;
     margin: 0 auto;
+    max-width: 800px;
 }
 
-/* GEÄNDERT: Schriftgrößen um 10% kleiner */
+/* Schriftgrößen um 10% kleiner und alphabetisch sortiert */
 .legal-container h1 {
+    border-bottom: 1px solid var(--border-color);
     font-size: 2.25rem; /* Ursprünglich 2.5rem - 10% */
     font-weight: 600;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 10px;
     margin-bottom: 1rem;
+    padding-bottom: 10px;
 }
 
 .legal-container h2 {
+    border-bottom: 1px solid var(--border-color);
     font-size: 1.62rem; /* Ursprünglich 1.8rem - 10% */
     font-weight: 600;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 10px;
     margin-bottom: 1rem;
+    padding-bottom: 10px;
 }
 
 .legal-container h3 {
@@ -94,21 +94,21 @@ body {
     margin-top: 1.8rem; /* Anpassung */
 }
 
+.legal-container li {
+    margin-bottom: 0.5rem; /* Anpassung */
+}
+
+.legal-container ol,
+.legal-container ul {
+    padding-left: 1.8rem; /* Ursprünglich 2rem - 10% */
+}
+
 .legal-container p,
 .legal-container ul,
 .legal-container ol,
 .legal-container li {
     font-size: 0.9rem; /* Ursprünglich 1rem - 10% */
     margin-bottom: 0.9rem; /* Anpassung */
-}
-
-.legal-container ul,
-.legal-container ol {
-    padding-left: 1.8rem; /* Ursprünglich 2rem - 10% */
-}
-
-.legal-container li {
-    margin-bottom: 0.5rem; /* Anpassung */
 }
 
 
@@ -123,33 +123,33 @@ a:hover {
 }
 
 .contact-item {
-    display: flex;
     align-items: center;
+    display: flex;
     gap: 15px;
     margin-bottom: 0.5rem;
 }
 
 .contact-item i {
-    width: 20px;
-    text-align: center;
     color: var(--accent-color);
+    text-align: center;
+    width: 20px;
 }
 
 /* 4. Zurück-Button */
 .back-link {
-    display: inline-block;
-    margin-bottom: 2.7rem; /* Ursprünglich 3rem - 10% */
-    font-weight: 600;
-    color: var(--accent-color);
-    text-decoration: none;
     border: 2px solid var(--accent-color);
-    padding: 7.2px 13.5px; /* Ursprünglich 8px 15px - 10% */
     border-radius: 5px;
-    transition: all 0.3s ease;
+    color: var(--accent-color);
+    display: inline-block;
     font-size: 0.9rem; /* Auch den Back-Link Text anpassen */
+    font-weight: 600;
+    margin-bottom: 2.7rem; /* Ursprünglich 3rem - 10% */
+    padding: 0.45rem 0.85rem; /* Ursprünglich 8px 15px - 10% */
+    text-decoration: none;
+    transition: all 0.3s ease;
 }
 .back-link i {
-    margin-right: 7.2px; /* Ursprünglich 8px - 10% */
+    margin-right: 0.45rem; /* Ursprünglich 8px - 10% */
     transition: transform 0.3s ease;
 }
 
