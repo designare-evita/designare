@@ -29,7 +29,7 @@
     src: url('Font/Poppins-Bold.ttf') format('truetype');
 }
 
-/* NEU: Klasse für Akzentfarbe im Text */
+/* Klasse für Akzentfarbe im Text */
 .accent-text-inline {
     color: var(--accent-color);
 }
@@ -39,7 +39,7 @@
     --accent-color: #FCB500;
     --accent-color-rgba: rgba(252, 181, 0, 0.85);
     --bg-color: #F8F7F4;
-    --border-color: #bfbfbf;
+    --border-color: #999999; /* GEÄNDERT: Dunkler für bessere Sichtbarkeit im Tagmodus */
     --particle-color: #888888;
     --particle-line-color: #cccccc;
     --text-color: #333333;
@@ -47,7 +47,7 @@
 
 body.dark-mode {
     --bg-color: #1a1a1a;
-    --border-color: #5e5e5e;
+    --border-color: #aaaaaa; /* GEÄNDERT: Heller für bessere Sichtbarkeit im Nachtmodus */
     --particle-color: #bbbbbb;
     --particle-line-color: #888888;
     --text-color: #eeeeee;
@@ -70,7 +70,6 @@ body {
     height: 100%;
     line-height: 1.6;
     overflow-x: hidden;
-    overflow-y: hidden; /* NEU: Vertikalen Scrollbalken standardmäßig verstecken */
     perspective: 1000px;
     transition: background-color 0.4s ease, color 0.4s ease;
 }
@@ -198,14 +197,14 @@ body.dark-mode #theme-toggle .fa-moon {
 }
 #ai-form {
     background-color: var(--bg-color);
-    border: 1px solid #bfbfbf;
+    border: 1px solid var(--border-color); /* Nutzt die neue --border-color */
     border-radius: 8px;
     display: flex;
     overflow: hidden;
     transition: border-color 0.3s ease;
 }
 body.dark-mode #ai-form {
-    border-color: #5e5e5e;
+    border-color: var(--border-color); /* Nutzt die neue --border-color */
 }
 #ai-form:focus-within {
     border-color: var(--accent-color);
@@ -241,7 +240,7 @@ body.dark-mode #ai-form {
 }
 #ai-status {
     background-color: rgba(0,0,0,0.02);
-    border: 1px solid #bfbfbf;
+    border: 1px solid var(--border-color); /* Nutzt die neue --border-color */
     border-radius: 8px;
     font-size: 0.9rem;
     margin-top: 10px;
@@ -253,7 +252,7 @@ body.dark-mode #ai-form {
 }
 body.dark-mode #ai-status {
     background-color: rgba(255,255,255,0.03);
-    border: 1px solid #5e5e5e;
+    border-color: var(--border-color); /* Nutzt die neue --border-color */
 }
 
 /* 6. Footer & Kontakt-Modal */
@@ -361,7 +360,7 @@ footer a:hover {
 }
 .modal-content input[type="text"], .modal-content input[type="email"], .modal-content textarea {
     background-color: var(--bg-color);
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--border-color); /* Nutzt die neue --border-color */
     border-radius: 5px;
     color: var(--text-color);
     font-family: 'Poppins', sans-serif;
