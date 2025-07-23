@@ -17,8 +17,12 @@ export default async function handler(req, res) {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest"});
 
     const today = new Date();
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'Europe/Vienna' };
-    const formattedDate = today.toLocaleDateString('de-AT', options);
+    const optionsDate = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'Europe/Vienna' };
+    const formattedDate = today.toLocaleDateString('de-AT', optionsDate);
+
+    // NEU HINZUGEFÜGT: Deklariere und weise formattedTime einen Wert zu
+    const optionsTime = { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'Europe/Vienna' };
+    const formattedTime = today.toLocaleTimeString('de-AT', optionsTime);
 
     const prompt = `
     --- ANWEISUNGEN FÜR DIE KI ---
