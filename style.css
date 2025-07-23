@@ -28,6 +28,8 @@
     font-weight: 700;
     src: url('Font/Poppins-Bold.ttf') format('truetype');
 }
+
+/* NEU: Klasse für Akzentfarbe im Text */
 .accent-text-inline {
     color: var(--accent-color);
 }
@@ -68,6 +70,7 @@ body {
     height: 100%;
     line-height: 1.6;
     overflow-x: hidden;
+    overflow-y: hidden; /* NEU: Vertikalen Scrollbalken standardmäßig verstecken */
     perspective: 1000px;
     transition: background-color 0.4s ease, color 0.4s ease;
 }
@@ -171,13 +174,15 @@ body.dark-mode #theme-toggle .fa-moon {
 #hero h1 {
     font-size: 3rem;
     font-weight: 700;
-    height: 20px;
+    height: 140px; /* Beibehalten, um den Platz für den Typewriter zu reservieren */
     justify-content: center;
     line-height: 1.2;
     margin-bottom: 0.5rem;
     max-width: 800px;
     min-height: 1.2em;
     width: 100%;
+    display: flex; /* Sicherstellen, dass Flexbox für Zentrierung aktiv bleibt */
+    align-items: center; /* Vertikale Zentrierung des Textes */
 }
 #hero .subtitle {
     font-size: 1.2rem;
