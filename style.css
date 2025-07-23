@@ -649,7 +649,7 @@ body.dark-mode .legal-modal-pagination-buttons button:disabled {
     #hero h1 {
         font-size: 2rem; /* Schriftgröße für Mobilgeräte verkleinern */
         height: auto; /* Automatische Höhe statt fester 140px */
-        min-height: 3em; /* Platz für den Typewriter reservieren */
+        min-height: 1em; /* Platz für den Typewriter reservieren */
     }
 
     #hero .subtitle {
