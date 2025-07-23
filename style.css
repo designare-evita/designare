@@ -107,7 +107,7 @@ body.dark-mode #theme-toggle .fa-moon {
     display: none;
 }
 
-#contact-button, #cookie-info-button {
+#contact-button, #cookie-info-button, #magazine-button { /* GEÄNDERT: #magazine-button hinzugefügt */
     align-items: center;
     background: none;
     border: none;
@@ -122,7 +122,7 @@ body.dark-mode #theme-toggle .fa-moon {
     transition: all 0.3s ease;
     width: 40px;
 }
-#contact-button:hover, #cookie-info-button:hover {
+#contact-button:hover, #cookie-info-button:hover, #magazine-button:hover { /* GEÄNDERT: #magazine-button hinzugefügt */
     background-color: var(--accent-color);
     color: #fff;
     opacity: 1;
@@ -252,7 +252,7 @@ body.dark-mode #ai-form {
 }
 body.dark-mode #ai-status {
     background-color: rgba(255,255,255,0.03);
-    border-color: var(--border-color); /* Nutzt die neue --border-color */
+    border: 1px solid var(--border-color); /* Nutzt die neue --border-color */
 }
 
 /* 6. Footer & Kontakt-Modal */
