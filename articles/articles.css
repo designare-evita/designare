@@ -92,7 +92,7 @@ body.dark-mode {
     gap: 15px;
 }
 
-/* NEU: Styling für das Top-Left Logo */
+/* Styling für das Top-Left Logo */
 #top-left-logo-link {
     position: fixed; /* Fixiert am Viewport */
     top: 20px;
@@ -117,10 +117,9 @@ body.dark-mode {
     width: auto;
     vertical-align: middle; /* Bild vertikal zentrieren */
 }
-/* ENDE NEU */
 
-/* Button-Stile für Top-Bar (Kontakt, Cookie, Theme-Toggle) */
-#contact-button, #cookie-info-button, #theme-toggle { /* GEÄNDERT: #magazine-button entfernt */
+/* Button-Stile für Top-Bar (Kontakt, Cookie, Theme-Toggle, Magazin-Link) */
+#contact-button, #cookie-info-button, #theme-toggle, #magazine-button { /* GEÄNDERT: #magazine-button hinzugefügt */
     background: none;
     border: none;
     color: var(--text-color);
@@ -129,7 +128,7 @@ body.dark-mode {
     transition: all 0.3s ease; opacity: 0.7;
     text-decoration: none; /* Für den Link */
 }
-#contact-button:hover, #cookie-info-button:hover, #theme-toggle:hover { /* GEÄNDERT: #magazine-button entfernt */
+#contact-button:hover, #cookie-info-button:hover, #theme-toggle:hover, #magazine-button:hover { /* GEÄNDERT: #magazine-button hinzugefügt */
     opacity: 1; color: #fff; background-color: var(--accent-color);
     transform: scale(1.1);
 }
@@ -370,13 +369,13 @@ body.dark-mode #privacy-policy-link-button {
 
 .legal-modal-pagination-buttons button {
     background-color: var(--accent-color);
+    color: #fff;
+    padding: 10px 20px;
     border: 2px solid var(--accent-color);
     border-radius: 5px;
-    color: #fff;
-    cursor: pointer;
     font-size: 1rem;
     font-weight: 600;
-    padding: 10px 20px;
+    cursor: pointer;
     transition: all 0.3s ease;
 }
 
@@ -411,15 +410,15 @@ body.dark-mode .legal-modal-pagination-buttons button:disabled {
         right: 10px;
         gap: 10px;
     }
-    #top-left-logo-link { /* NEU: Mobile Anpassung für Logo-Link */
+    #top-left-logo-link { /* Mobile Anpassung für Logo-Link */
         left: 10px;
         height: 35px;
         width: 35px;
     }
-    #top-left-logo-img { /* NEU: Mobile Anpassung für Logo-Bild */
+    #top-left-logo-img { /* Mobile Anpassung für Logo-Bild */
         height: 30px; /* Angepasst auf 15% größer von 25px = 28.75px, gerundet 30px */
     }
-    #contact-button, #cookie-info-button, #theme-toggle { /* GEÄNDERT: .top-control-link entfernt */
+    #contact-button, #cookie-info-button, #theme-toggle, #magazine-button { /* GEÄNDERT: #magazine-button hinzugefügt */
         font-size: 1rem;
         height: 35px;
         width: 35px;
