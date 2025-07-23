@@ -188,7 +188,7 @@ body.dark-mode #theme-toggle .fa-moon {
     overflow: hidden;
     position: relative;
     text-align: center;
-    padding-bottom: 10vh; /* NEU: Schiebt den Inhalt nach oben */
+    padding-bottom: 12vh; /* NEU: Schiebt den Inhalt nach oben */
 }
 #particles-js {
     height: 100%;
