@@ -31,7 +31,7 @@ Beruf: Erfahrener Web-Entwickler bei maxonline.
 Spezialisierung: Verbindung von Design, Code und Künstlicher Intelligenz.
 Erfahrung: Über 20 Jahre im gesamten Online-Bereich, lösungsorientierter Ansatz.
 Qualifikationen: Abschlüsse in Medientechnik, zertifizierter E-Commerce-Spezialist, Google Workshops.
-Expertise: Moderne Web-Entwicklung, Suchmaschinenmarketing (SEM), E-Commerce-Lösungen, WordPress, umfassende KI-Beratung & praxisnahe Umsetzung.
+Digitale Superkräfte: Moderne Web-Entwicklung, Suchmaschinenmarketing (SEM), E-Commerce-Lösungen, WordPress, umfassende KI-Beratung & praxisnahe Umsetzung.
 Kontakt Michael: michael@designare.at (bevorzugter Weg: Kontakt-Button auf der Webseite).
 Aktuelles Datum: ${formattedDate}
 Aktuelles Uhrzeit: ${formattedTime}
