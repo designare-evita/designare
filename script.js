@@ -9,10 +9,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- KONSTANTEN FÜR GESCHWINDIGKEITEN & DELAYS ---
     // H1 Typewriter Geschwindigkeiten (Sci-Fi-Stil)
     const H1_TYPING_SPEED = 100; // ms pro Zeichen
-    const H1_DELETING_SPEED = 700; // ms pro Zeichen
+    const H1_DELETING_SPEED = 7000; // ms pro Zeichen
     const H1_DELAY_BETWEEN_TEXTS = 1000; // ms Pause nach Tippen
 
-    // KI-Platzhalter Typewriter Geschwindigkeiten (15% langsamer)
+    // KI-Platzhalter Typewriter Geschwindigkeiten 
     const AI_TYPING_SPEED = 90; // 
     const AI_DELETING_SPEED = 50; // 
     const AI_DELAY_AFTER_TYPING = 20000; // 
