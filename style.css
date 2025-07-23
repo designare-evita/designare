@@ -638,4 +638,37 @@ body.dark-mode .legal-modal-pagination-buttons button:disabled {
         font-size: 0.9rem;
         width: 100%;
     }
+
+    /* Anpassungen für den Hero-Bereich */
+    #hero {
+        /* Passt die Höhe an den mobilen Header an */
+        height: calc(100vh - var(--header-height-mobile));
+        margin-top: var(--header-height-mobile);
+    }
+
+    #hero h1 {
+        font-size: 2rem; /* Schriftgröße für Mobilgeräte verkleinern */
+        height: auto; /* Automatische Höhe statt fester 140px */
+        min-height: 3em; /* Platz für den Typewriter reservieren */
+    }
+
+    #hero .subtitle {
+        font-size: 1rem; /* Untertitel verkleinern */
+        margin-bottom: 2rem;
+    }
+
+    /* AI-Container an die Bildschirmbreite anpassen */
+    .ai-container {
+        width: 100%; /* Volle Breite nutzen */
+        max-width: 500px; /* Maximale Breite beibehalten */
+        margin-bottom: 2rem;
+    }
+
+    /* Profilbild verkleinern */
+    .profile-picture {
+        width: 150px;
+        height: 150px;
+        margin-bottom: 1rem;
+    }
+}
 }
