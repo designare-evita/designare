@@ -10,22 +10,17 @@ document.addEventListener('DOMContentLoaded', function() {
     // H1 Typewriter Geschwindigkeiten (Sci-Fi-Stil)
     const H1_TYPING_SPEED = 300; // ms pro Zeichen
     const H1_DELETING_SPEED = 200; // ms pro Zeichen
-    const H1_DELAY_BETWEEN_TEXTS = 800; // ms Pause nach Tippen
+    const H1_DELAY_BETWEEN_TEXTS = 1000; // ms Pause nach Tippen
 
     // KI-Platzhalter Typewriter Geschwindigkeiten (15% langsamer)
-    const AI_TYPING_SPEED = 90; 
-    const AI_DELETING_SPEED = 50; 
-    const AI_DELAY_AFTER_TYPING = 20000; 
-    const AI_DELAY_BEFORE_NEXT_TEXT = 600; 
+    const AI_TYPING_SPEED = 90; // 
+    const AI_DELETING_SPEED = 50; // 
+    const AI_DELAY_AFTER_TYPING = 20000; // 
+    const AI_DELAY_BEFORE_NEXT_TEXT = 600; // 
 
 
-    // --- Cookie Info Lightbox Logik ---
-    const cookieInfoLightbox = document.getElementById('cookie-info-lightbox');
-    const acknowledgeCookieLightboxBtn = document.getElementById('acknowledge-cookie-lightbox');
-    const privacyPolicyLinkButton = document.getElementById('privacy-policy-link-button');
-    const cookieInfoButton = document.getElementById('cookie-info-button');
-
-    // Funktion zum Öffnen der Lightbox
+    // --- Allgemeine Lightbox Funktionen ---
+    // Diese Funktionen können für alle Modals verwendet werden
     const openLightbox = (lightboxElement) => {
         if (lightboxElement) {
             lightboxElement.classList.add('visible');
@@ -33,13 +28,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    // Funktion zum Schließen der Lightbox
     const closeLightbox = (lightboxElement) => {
         if (lightboxElement) {
             lightboxElement.classList.remove('visible');
             body.style.overflow = ''; // Scrollen wieder erlauben
         }
     };
+
+    // --- Cookie Info Lightbox Logik ---
+    const cookieInfoLightbox = document.getElementById('cookie-info-lightbox');
+    const acknowledgeCookieLightboxBtn = document.getElementById('acknowledge-cookie-lightbox');
+    const privacyPolicyLinkButton = document.getElementById('privacy-policy-link-button');
+    const cookieInfoButton = document.getElementById('cookie-info-button');
 
     const hasSeenCookieInfoLightbox = localStorage.getItem('hasSeenCookieInfoLightbox');
 
@@ -72,10 +72,9 @@ document.addEventListener('DOMContentLoaded', function() {
     if (privacyPolicyLinkButton) {
         privacyPolicyLinkButton.addEventListener('click', (e) => {
             e.preventDefault();
-            closeLightbox(cookieInfoLightbox);
-            setTimeout(() => {
-                window.open(e.target.href, '_blank');
-            }, 300);
+            closeLightbox(cookieInfoLightbox); // Cookie Lightbox schließen
+            // NEU: Öffne die Datenschutzerklärung in der Legal-Lightbox
+            loadLegalPageInModal('datenschutz'); 
         });
     }
 
@@ -126,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- H1-TYPEWRITER ---
     const typewriterElement = document.getElementById('typewriter-h1');
     if (typewriterElement) {
-        const textsToType = [ "Michael Kanda", "Web-Magier", "KI-Therapeut" ];
+        const textsToType = [ "Michael Kanda", "Web-Magier", "KI-Therapeut" ]; 
         let textIndex = 0; let charIndex = 0; let isDeleting = false;
         
         function typeWriter() {
@@ -159,11 +158,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const contactForm = document.getElementById('contact-form-inner');
     const contactSuccessMessage = document.getElementById('contact-success-message');
     const closeSuccessMessageBtn = document.getElementById('close-success-message');
-    const closeModalButton = document.getElementById('close-modal'); // X-Button des Kontakt-Modals
+    const closeModalButton = document.getElementById('close-modal');
 
     if (contactButton && contactModal) {
         contactButton.addEventListener('click', () => {
-            openLightbox(contactModal); // Nutze die allgemeine openLightbox Funktion
+            openLightbox(contactModal);
             if (contactForm) contactForm.style.display = 'flex';
             if (contactSuccessMessage) contactSuccessMessage.style.display = 'none';
         });
@@ -216,7 +215,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         alert('Fehler beim Senden der Nachricht. Bitte versuchen Sie es später erneut. Details: ' + data.message);
                     }
                 } catch (error) {
-                    console.error("Fehler:", error);
+                    console.error("Sende-Fehler:", error);
                     alert('Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.');
                 } finally {
                     e.submitter.innerText = originalButtonText;
@@ -315,7 +314,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     body: JSON.stringify({ question: question })
                 });
 
-                const delayPromise = new Promise(resolve => setTimeout(resolve, 1000));
+                const delayPromise = new Promise(resolve => setTimeout(resolve, 1000)); // Standardverzögerung beibehalten
 
                 const [response] = await Promise.all([fetchPromise, delayPromise]);
 
@@ -409,19 +408,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Spezifische Split-Logik für datenschutz.html mit mehreren Split-Punkten
                 if (pageName === 'datenschutz') {
-                    const splitPoints = [
+                    const splitElements = [
                         findElementById('datenschutz-part-2-start'),
                         findElementById('datenschutz-part-3-start'),
                         findElementById('datenschutz-part-4-start'),
                         findElementById('datenschutz-part-5-start'),
-                        findElementById('datenschutz-part-6-start')
-                    ].filter(el => el); // Filtert null/undefined Werte
+                        findElementById('datenschutz-part-6-start') 
+                    ].filter(el => el !== undefined); 
 
                     console.log('Datenschutz: Attempting multi-part split.');
-                    splitPoints.forEach((el, idx) => console.log(`Split Point ${idx + 1}:`, el));
+                    splitElements.forEach((el, idx) => console.log(`Split Point ${idx + 1}:`, el));
 
-                    if (splitPoints.length > 0) {
-                        const indices = splitPoints.map(getIndexOfElement).filter(idx => idx !== -1).sort((a, b) => a - b);
+                    if (splitElements.length > 0) {
+                        const indices = splitElements.map(getIndexOfElement).filter(idx => idx !== -1).sort((a, b) => a - b);
                         
                         // Check if indices are unique and strictly increasing
                         let validIndices = true;
@@ -432,11 +431,16 @@ document.addEventListener('DOMContentLoaded', function() {
                             }
                         }
 
-                        if (validIndices && indices.length === splitPoints.length) { // Ensure all found elements have valid, sorted indices
+                        if (validIndices && indices.length === splitElements.length) { // Ensure all found elements have valid, sorted indices
+                            // Erster Teil
                             allParts.push(children.slice(0, indices[0]));
+                            
+                            // Mittlere Teile
                             for (let i = 0; i < indices.length - 1; i++) {
                                 allParts.push(children.slice(indices[i], indices[i+1]));
                             }
+                            
+                            // Letzter Teil
                             allParts.push(children.slice(indices[indices.length - 1]));
                             
                             console.log(`Datenschutz: Successfully split into ${allParts.length} parts based on IDs.`);
@@ -537,16 +541,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (backLinkInLoadedContent) {
                     backLinkInLoadedContent.addEventListener('click', (e) => {
                         e.preventDefault();
-                        legalModal.classList.remove('visible');
-                        body.style.overflow = '';
-                        legalModalContentArea.innerHTML = '';
+                        closeLightbox(legalModal); // Nutze die allgemeine closeLightbox Funktion
+                        legalModalContentArea.innerHTML = ''; // Inhalt leeren beim Schließen
                         console.log('Clicked "Zurück zur Startseite" in modal, closing modal.');
                     });
                 }
 
 
-                legalModal.classList.add('visible');
-                body.style.overflow = 'hidden';
+                openLightbox(legalModal); // Nutze die allgemeine openLightbox Funktion
                 console.log('Legal modal opened. Total parts:', allParts.length);
 
             } else {
@@ -579,9 +581,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Event Listener für den Schließen-Button der Legal-Lightbox
     if (closeLegalModalBtn) {
         closeLegalModalBtn.addEventListener('click', () => {
-            legalModal.classList.remove('visible');
-            body.style.overflow = '';
-            legalModalContentArea.innerHTML = '';
+            closeLightbox(legalModal); // Nutze die allgemeine closeLightbox Funktion
+            legalModalContentArea.innerHTML = ''; // Inhalt leeren beim Schließen
             console.log('Legal modal closed via X button.');
         });
     }
@@ -590,9 +591,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (legalModal) {
         legalModal.addEventListener('click', (e) => {
             if (e.target === legalModal) {
-                legalModal.classList.remove('visible');
-                body.style.overflow = '';
-                legalModalContentArea.innerHTML = '';
+                closeLightbox(legalModal); // Nutze die allgemeine closeLightbox Funktion
+                legalModalContentArea.innerHTML = ''; // Inhalt leeren beim Schließen
                 console.log('Legal modal closed via overlay click.');
             }
         });
