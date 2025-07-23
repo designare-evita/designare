@@ -72,7 +72,7 @@ body {
     height: 100%;
     line-height: 1.6;
     overflow-x: hidden;
-    overflow-y: auto; /* GEÄNDERT: Standardmäßig Scrollen erlauben */
+    overflow-y: hidden; 
     perspective: 1000px;
     transition: background-color 0.4s ease, color 0.4s ease;
 }
@@ -522,7 +522,7 @@ body.dark-mode .legal-modal-pagination-buttons button:disabled {
 /* 7. Responsive Design */
 @media (max-width: 768px) {
     body {
-        overflow: auto;
+        overflow: hidden;
     }
 
     /* Top-Bar auf Mobilgeräten */
