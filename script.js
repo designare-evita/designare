@@ -245,7 +245,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const placeholderTexts = [
             "Hallo! Evita hier.",
             "Michael's geduldige KI-Assistentin.",
-            "Was kann ich für dich tun?"
+            "Frag Evtia!"
         ];
         let placeholderIndex = 0;
         let charPlaceholderIndex = 0;
