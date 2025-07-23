@@ -8,15 +8,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- KONSTANTEN FÜR GESCHWINDIGKEITEN & DELAYS ---
     // H1 Typewriter Geschwindigkeiten (Sci-Fi-Stil)
-    const H1_TYPING_SPEED = 180; // ms pro Zeichen
-    const H1_DELETING_SPEED = 90; // ms pro Zeichen
-    const H1_DELAY_BETWEEN_TEXTS = 3500; // ms Pause nach Tippen
+    const H1_TYPING_SPEED = 200; // ms pro Zeichen
+    const H1_DELETING_SPEED = 100; // ms pro Zeichen
+    const H1_DELAY_BETWEEN_TEXTS = 400; // ms Pause nach Tippen
 
     // KI-Platzhalter Typewriter Geschwindigkeiten (15% langsamer)
-    const AI_TYPING_SPEED = 81; // 70 * 1.15 = 80.5, gerundet
-    const AI_DELETING_SPEED = 46; // 40 * 1.15 = 46
-    const AI_DELAY_AFTER_TYPING = 2300; // 2000 * 1.15 = 2300
-    const AI_DELAY_BEFORE_NEXT_TEXT = 575; // 500 * 1.15 = 575
+    const AI_TYPING_SPEED = 90; 
+    const AI_DELETING_SPEED = 50; 
+    const AI_DELAY_AFTER_TYPING = 5000; 
+    const AI_DELAY_BEFORE_NEXT_TEXT = 600; 
 
 
     // --- Cookie Info Lightbox Logik ---
