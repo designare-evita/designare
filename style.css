@@ -212,7 +212,7 @@ body.dark-mode #theme-toggle .fa-moon {
 #hero h1 {
     font-size: 3rem;
     font-weight: 700;
-    height: 140px; /* Beibehalten, um den Platz für den Typewriter zu reservieren */
+    height: 14px; /* Beibehalten, um den Platz für den Typewriter zu reservieren */
     justify-content: center;
     line-height: 1.2;
     margin-bottom: 0.5rem;
