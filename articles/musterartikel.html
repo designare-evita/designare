@@ -13,12 +13,13 @@
 </head>
 <body>
 
-    <div id="top-right-controls">
-        <!-- Logo auf der linken Seite, verlinkt zur Startseite -->
-        <a href="../index.html" class="top-control-link top-left-logo" aria-label="Zur Startseite">
-            <img src="../images/favicon.png" alt="Logo" class="top-bar-logo-img">
-        </a>
+    <!-- NEU: Favicon als Logo auf der linken Seite (eigenständiges Element) -->
+    <a href="../index.html" id="top-left-logo-link" aria-label="Zur Startseite">
+        <img src="../images/favicon.png" alt="Michael Kanda Logo" id="top-left-logo-img">
+    </a>
+    <!-- ENDE NEU -->
 
+    <div id="top-right-controls">
         <!-- Buttons wie auf der Startseite (Funktionalität kommt von script.js) -->
         <button id="contact-button" aria-label="Kontaktformular öffnen">
             <i class="far fa-envelope"></i>
