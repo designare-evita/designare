@@ -315,7 +315,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     body: JSON.stringify({ question: question })
                 });
 
-                const delayPromise = new Promise(resolve => setTimeout(resolve, 1200));
+                const delayPromise = new Promise(resolve => setTimeout(resolve, 1000));
 
                 const [response] = await Promise.all([fetchPromise, delayPromise]);
 
