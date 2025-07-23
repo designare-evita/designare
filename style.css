@@ -655,8 +655,8 @@ body.dark-mode .legal-modal-pagination-buttons button:disabled {
     }
 
     #hero .subtitle {
-        font-size: 1.2rem; /* Untertitel verkleinern */
-        margin-bottom: 1.2rem;
+        font-size: 1.1rem; /* Untertitel verkleinern */
+        margin-bottom: 1.1rem;
     }
 
     /* AI-Container an die Bildschirmbreite anpassen */
