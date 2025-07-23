@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // KI-Platzhalter Typewriter Geschwindigkeiten (15% langsamer)
     const AI_TYPING_SPEED = 90; 
     const AI_DELETING_SPEED = 50; 
-    const AI_DELAY_AFTER_TYPING = 7000; 
+    const AI_DELAY_AFTER_TYPING = 50000; 
     const AI_DELAY_BEFORE_NEXT_TEXT = 600; 
 
 
