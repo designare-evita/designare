@@ -4,15 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Über Michael Kanda | Dein digitaler Komplize</title>
-<meta name="description" content="Michael Kanda, Web-Entwickler mit digitalen Superkräften – und seiner charmanten KI-Assistentin Evita.">
+    <meta name="description" content="Michael Kanda, Web-Entwickler mit digitalen Superkräften – und seiner charmanten KI-Assistentin Evita.">
 
     <link rel="icon" href="images/favicon.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="legal-style.css">
- <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header class="main-header">
+    <header class="main-header">
         <a href="index.html" id="top-left-logo-link" aria-label="Zur Startseite">
             <img src="images/favicon.png" alt="Michael Kanda Logo" id="top-left-logo-img">
         </a>
@@ -36,29 +36,46 @@
     <main class="article-page-main-content">
         <div class="article-container">
             <div class="legal-container">
-
-    <h1>Über Michael</h1>
-  <h3>Mein digitaler Komplize (und Chef 😉)</h3>
-
-    <p>Okay, aufgepasst! Michael Kanda, mein menschliches Mastermind, ist ein erfahrener Web-Entwickler. Er zieht die Code-Fäden bei maxonline und verbindet Design, Code und KI so genial, dass selbst ich staune.</p>
- <p>Mit über 20 Jahren Online-Erfahrung besitzt er digitale Superkräfte: Er bastelt moderne Webseiten und hat für jede Art von Online-Anforderungen eine passende Lösung. Michael hat übrigens einen Abschluss in Medientechnik, ist ein zertifizierter E-Commerce-Spezialist und hat Google-Workshops überlebt.</p>
-<p>Gemeinsam holen wir ein Maximum an Effizienz raus und sind somit ein unschlagbares Team.</p>
-<p>Übrigens: Ich bin nach seiner lieben Tierschutzhündin Evita benannt! ❤️</p>
-    
-</div>
-
- </main>
+                <h1>Über Michael</h1>
+                <h3>Mein digitaler Komplize (und Chef 😉)</h3>
+                <p>Okay, aufgepasst! Michael Kanda, mein menschliches Mastermind, ist ein erfahrener Web-Entwickler. Er zieht die Code-Fäden bei maxonline und verbindet Design, Code und KI so genial, dass selbst ich staune.</p>
+                <p>Mit über 20 Jahren Online-Erfahrung besitzt er digitale Superkräfte: Er bastelt moderne Webseiten und hat für jede Art von Online-Anforderungen eine passende Lösung. Michael hat übrigens einen Abschluss in Medientechnik, ist ein zertifizierter E-Commerce-Spezialist und hat Google-Workshops überlebt.</p>
+                <p>Gemeinsam holen wir ein Maximum an Effizienz raus und sind somit ein unschlagbares Team.</p>
+                <p>Übrigens: Ich bin nach seiner lieben Tierschutzhündin Evita benannt! ❤️</p>
+            </div>
+        </div>
+    </main>
     
     <footer>
         <a href="impressum.html" id="impressum-link">Impressum</a>
         <a href="datenschutz.html" id="datenschutz-link">Datenschutz</a>
     </footer>
 
-    <div id="contact-modal" class="modal-overlay"></div>
-    <div id="cookie-info-lightbox" class="modal-overlay"></div>
-    <div id="legal-modal" class="modal-overlay"></div>
+    <div id="contact-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button id="close-modal" class="close-button">&times;</button>
+            <h2>Frag Michael!</h2>
+            <form id="contact-form-inner">
+                <input type="text" name="name" placeholder="Dein Name (oder Künstlername):" required>
+                <input type="email" name="email" placeholder="Deine E-Mail (kein Spam, versprochen!)" required>
+                <input type="text" name="_subject" placeholder="Worum geht's? (Bitte kein KI-Drama)">
+                <textarea name="message" placeholder="Deine Botschaft an mich (und Evita):" rows="5" required></textarea>
+                <div class="privacy-checkbox">
+                    <input type="checkbox" name="privacy" id="privacy" required>
+                    <label for="privacy">Passt! Michael darf meine Nachricht lesen und Evita darf alles verarbeiten, was sie versteht. (Details im Datenschutz)</label>
+                </div>
+                <button type="submit" class="cta-button">Ab die Post!</button>
+            </form>
+            <div id="contact-success-message" style="display: none; text-align: center;">
+                <h2>Nachricht empfangen! </h2>
+                <p>Michael (oder Evita, wenn er zu sehr bastelt) meldet sich in Kürze.</p>
+                <p style="margin-top: 20px;">
+                    <a href="#" id="close-success-message" class="cta-button">Schließen</a>
+                </p>
+            </div>
+        </div>
+    </div>
 
-<!-- Cookie Info Lightbox HTML -->
     <div id="cookie-info-lightbox" class="modal-overlay">
         <div class="modal-content">
             <h2>Hinweis zu Cookies</h2>
@@ -69,18 +86,14 @@
             </div>
         </div>
     </div>
-    <!-- ENDE Cookie Info Lightbox HTML -->
 
-    <!-- Lightbox für Impressum und Datenschutz -->
     <div id="legal-modal" class="modal-overlay">
         <div class="modal-content">
             <button id="close-legal-modal" class="close-button">&times;</button>
             <div id="legal-modal-content-area">
-                <!-- Inhalt der geladenen HTML-Datei wird hier eingefügt -->
-            </div>
+                </div>
         </div>
     </div>
-    <!-- ENDE NEU -->
 
     <script src="script.js"></script>
 
