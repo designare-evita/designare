@@ -364,6 +364,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // --- Legal-Seiten Lightbox Navigation ---
+    const aboutMeButton = document.getElementById('about-me-button'); // NEU
     const impressumLink = document.getElementById('impressum-link');
     const datenschutzLink = document.getElementById('datenschutz-link');
     const legalModal = document.getElementById('legal-modal');
@@ -562,6 +563,14 @@ document.addEventListener('DOMContentLoaded', function() {
             body.style.overflow = '';
         }
     }
+
+    // Event Listener für "Über mich"-Button
+    if (aboutMeButton) { // NEU
+        aboutMeButton.addEventListener('click', (e) => { // NEU
+            e.preventDefault(); // NEU
+            loadLegalPageInModal('about'); // NEU
+        }); // NEU
+    } // NEU
 
     // Event Listener für Footer-Links
     if (impressumLink) {
