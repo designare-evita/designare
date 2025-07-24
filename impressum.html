@@ -64,13 +64,18 @@ Für externe Links gilt: Ich habe keinen Einfluss auf Inhalte Dritter und übern
     <p>Alle Inhalte und Werke auf dieser Webseite unterliegen dem österreichischen Urheberrecht. Eine Nutzung ist nur mit meiner schriftlichen Zustimmung erlaubt.
     </p>
 </div>
+ </main>
+    
+    <footer>
+        <a href="impressum.html" id="impressum-link">Impressum</a>
+        <a href="datenschutz.html" id="datenschutz-link">Datenschutz</a>
+    </footer>
 
-<script>
-    const savedTheme = localStorage.getItem('theme') || 'dark'; // Nachtmodus als Standard
-    if (savedTheme === 'dark') {
-        document.body.classList.add('dark-mode');
-    }
-</script>
+    <div id="contact-modal" class="modal-overlay"></div>
+    <div id="cookie-info-lightbox" class="modal-overlay"></div>
+    <div id="legal-modal" class="modal-overlay"></div>
+
+    <script src="script.js"></script>
 
 </body>
 </html>
