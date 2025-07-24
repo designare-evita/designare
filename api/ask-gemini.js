@@ -1,8 +1,15 @@
-perteimport { GoogleGenerativeAI } from "@google/generative-ai";
+/*
+ * ask-gemini.js
+ * API-Endpunkt für Gemini KI-Interaktion
+*/
+
+// Importieren Sie GoogleGenerativeAI mit CommonJS Syntax
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-export default async function handler(req, res) {
+// Exportieren Sie die Handler-Funktion mit CommonJS Syntax
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });
   }
