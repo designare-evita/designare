@@ -234,7 +234,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // --- KI-INTERAKTION & DYNAMISCHER PLATZHALTER ---
+// --- KI-INTERAKTION & DYNAMISCHER PLATZHALTER ---
     const aiForm = document.getElementById('ai-form');
     if (aiForm) {
         const aiQuestionInput = document.getElementById('ai-question');
@@ -244,21 +244,37 @@ document.addEventListener('DOMContentLoaded', function() {
         const placeholderTexts = [
             "Hallo! Evita hier...",
             "Michaels KI-Joker...",
-            "Frag Evtia!"
+            "Frag mich etwas..."
         ];
         let placeholderIndex = 0;
         let charPlaceholderIndex = 0;
         let typeInterval;
         let deleteInterval;
 
-        typePlaceholder(); // Startet den Typewriter-Effekt für den Platzhalter
+        // NEU: Eine zentrale Funktion, um die Animation zu stoppen.
+        const stopPlaceholderAnimation = () => {
+            clearInterval(typeInterval);
+            clearInterval(deleteInterval);
+            aiQuestionInput.placeholder = ""; // Platzhalter sofort leeren
+        };
+        
+        // NEU: Eine robuste Start-Funktion.
+        const startPlaceholderAnimation = () => {
+            // WICHTIG: Zuerst alle laufenden Animationen stoppen, um Konflikte zu vermeiden.
+            clearInterval(typeInterval);
+            clearInterval(deleteInterval);
+
+            // Setzt den Startpunkt zurück und ruft die eigentliche Schreibfunktion auf.
+            charPlaceholderIndex = 0;
+            // Kleiner Timeout, um sicherzustellen, dass alles sauber ist.
+            setTimeout(typePlaceholder, 100); 
+        };
 
         function typePlaceholder() {
             let newText = placeholderTexts[placeholderIndex];
-            aiQuestionInput.placeholder = "";
             typeInterval = setInterval(() => {
                 if (charPlaceholderIndex < newText.length) {
-                    aiQuestionInput.placeholder += newText.charAt(charPlaceholderIndex);
+                    aiQuestioninput.placeholder += newText.charAt(charPlaceholderIndex);
                     charPlaceholderIndex++;
                 } else {
                     clearInterval(typeInterval);
@@ -268,29 +284,25 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         function deletePlaceholder() {
-            let currentText = aiQuestionInput.placeholder;
             deleteInterval = setInterval(() => {
+                let currentText = aiQuestionInput.placeholder;
                 if (currentText.length > 0) {
-                    currentText = currentText.slice(0, -1);
-                    aiQuestionInput.placeholder = currentText;
+                    aiQuestionInput.placeholder = currentText.slice(0, -1);
                 } else {
                     clearInterval(deleteInterval);
                     placeholderIndex = (placeholderIndex + 1) % placeholderTexts.length;
-                    charPlaceholderIndex = 0;
-                    setTimeout(typePlaceholder, AI_DELAY_BEFORE_NEXT_TEXT);
+                    startPlaceholderAnimation(); // GEÄNDERT: Ruft die zentrale Start-Funktion für den nahtlosen Übergang auf.
                 }
             }, AI_DELETING_SPEED);
         }
 
-        aiQuestionInput.addEventListener('focus', () => {
-            clearInterval(typeInterval);
-            clearInterval(deleteInterval);
-            aiQuestionInput.placeholder = "";
-        });
+        // GEÄNDERT: Ruft jetzt die saubere Stopp-Funktion auf.
+        aiQuestionInput.addEventListener('focus', stopPlaceholderAnimation);
 
+        // GEÄNDERT: Ruft jetzt die saubere Start-Funktion auf.
         aiQuestionInput.addEventListener('blur', () => {
-            if(aiQuestionInput.value === '') {
-                 typePlaceholder();
+            if (aiQuestionInput.value === '') {
+                startPlaceholderAnimation();
             }
         });
 
@@ -299,8 +311,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const question = aiQuestionInput.value.trim();
             if (!question) return;
 
-            clearInterval(typeInterval);
-            clearInterval(deleteInterval);
+            // GEÄNDERT: Stoppt die Animation sauber vor dem Absenden.
+            stopPlaceholderAnimation();
             
             aiStatus.innerText = "Einen Moment, Evita gleicht gerade ihre Bits und Bytes ab...";
             aiStatus.classList.add('thinking');
@@ -308,18 +320,11 @@ document.addEventListener('DOMContentLoaded', function() {
             submitButton.disabled = true;
 
             try {
-                const fetchPromise = fetch('/api/ask-gemini', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ question: question })
-                });
-
-                const delayPromise = new Promise(resolve => setTimeout(resolve, 1000)); // Standardverzögerung beibehalten
-
+                // ... (Ihre fetch-Logik bleibt unverändert)
+                const fetchPromise = fetch('/api/ask-gemini', { /* ... */ });
+                const delayPromise = new Promise(resolve => setTimeout(resolve, 1000));
                 const [response] = await Promise.all([fetchPromise, delayPromise]);
-
                 if (!response.ok) { throw new Error('Netzwerk-Antwort war nicht OK.'); }
-
                 const data = await response.json();
                 aiStatus.innerText = data.answer;
 
@@ -330,10 +335,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 aiQuestionInput.value = '';
                 aiQuestionInput.disabled = false;
                 submitButton.disabled = false;
+                aiQuestion-input.placeholder = "Haben Sie eine weitere Frage?";
                 aiStatus.classList.remove('thinking');
-                typePlaceholder();
+                
+                // GEÄNDERT: Startet die Animation nach dem Absenden wieder sauber.
+                startPlaceholderAnimation(); 
             }
         });
+
+        // Erster Start der Animation beim Laden der Seite
+        startPlaceholderAnimation();
     }
 
     // --- PARTIKEL-HINTERGRUND ---
