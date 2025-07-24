@@ -15,8 +15,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // KI-Platzhalter Typewriter Geschwindigkeiten 
     const AI_TYPING_SPEED = 120; // 
     const AI_DELETING_SPEED = 50; // 
-    const AI_DELAY_AFTER_TYPING = 20000; // 
-    const AI_DELAY_BEFORE_NEXT_TEXT = 600; // 
+    const AI_DELAY_AFTER_TYPING = 10000; // 
+    const AI_DELAY_BEFORE_NEXT_TEXT = 500; // 
 
 
     // --- Allgemeine Lightbox Funktionen ---
@@ -243,7 +243,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const placeholderTexts = [
             "Hallo! Evita hier...",
-            "Michael's geduldige KI-Assistentin...",
+            "Michaels KI-Joker...",
             "Frag Evtia!"
         ];
         let placeholderIndex = 0;
