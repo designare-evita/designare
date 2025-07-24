@@ -144,7 +144,8 @@ body.dark-mode #theme-toggle .fa-moon {
     display: none;
 }
 
-#contact-button, #cookie-info-button, #magazine-button {
+#contact-button, #cookie-info-button, #about-me-button {
+
     align-items: center;
     background: none;
     border: none;
@@ -161,6 +162,7 @@ body.dark-mode #theme-toggle .fa-moon {
     text-decoration: none;
 }
 #contact-button:hover, #cookie-info-button:hover, #magazine-button:hover {
+
     background-color: var(--accent-color);
     color: #fff;
     opacity: 1;
