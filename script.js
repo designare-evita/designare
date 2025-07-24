@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // KI-Platzhalter Typewriter Geschwindigkeiten 
     const AI_TYPING_SPEED = 120; // 
     const AI_DELETING_SPEED = 50; // 
-    const AI_DELAY_AFTER_TYPING = 10000; // 
+    const AI_DELAY_AFTER_TYPING = 5000; // 
     const AI_DELAY_BEFORE_NEXT_TEXT = 500; // 
 
 
@@ -330,7 +330,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 aiQuestionInput.value = '';
                 aiQuestionInput.disabled = false;
                 submitButton.disabled = false;
-                aiQuestionInput.placeholder = "Haben Sie eine weitere Frage?";
                 aiStatus.classList.remove('thinking');
                 typePlaceholder();
             }
