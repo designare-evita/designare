@@ -47,12 +47,18 @@
     
 </div>
 
-<script>
-    const savedTheme = localStorage.getItem('theme') || 'dark'; // Nachtmodus als Standard
-    if (savedTheme === 'dark') {
-        document.body.classList.add('dark-mode');
-    }
-</script>
+ </main>
+    
+    <footer>
+        <a href="impressum.html" id="impressum-link">Impressum</a>
+        <a href="datenschutz.html" id="datenschutz-link">Datenschutz</a>
+    </footer>
+
+    <div id="contact-modal" class="modal-overlay"></div>
+    <div id="cookie-info-lightbox" class="modal-overlay"></div>
+    <div id="legal-modal" class="modal-overlay"></div>
+
+    <script src="script.js"></script>
 
 </body>
 </html>
