@@ -43,42 +43,36 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const hasSeenCookieInfoLightbox = localStorage.getItem('hasSeenCookieInfoLightbox');
 
-    // Beim Laden der Seite: Wenn die Lightbox noch nicht gesehen wurde, öffne sie nach Verzögerung
     if (!hasSeenCookieInfoLightbox) {
         setTimeout(() => {
             openLightbox(cookieInfoLightbox);
-        }, 1000); // Zeigt die Lightbox nach 1 Sekunde an
+        }, 1000);
     } else {
-        body.style.overflow = ''; // Sicherstellen, dass Scrollen erlaubt ist, wenn kein Modal offen ist
+        body.style.overflow = '';
     }
 
-    // Event Listener für den neuen Cookie Info Button
     if (cookieInfoButton) {
         cookieInfoButton.addEventListener('click', () => {
-            localStorage.removeItem('hasSeenCookieInfoLightbox'); // Status zurücksetzen
-            openLightbox(cookieInfoLightbox); // Lightbox öffnen
+            localStorage.removeItem('hasSeenCookieInfoLightbox');
+            openLightbox(cookieInfoLightbox);
         });
     }
 
-    // Event Listener für den "Alles klar" Button
     if (acknowledgeCookieLightboxBtn) {
         acknowledgeCookieLightboxBtn.addEventListener('click', () => {
             closeLightbox(cookieInfoLightbox);
-            localStorage.setItem('hasSeenCookieInfoLightbox', 'true'); // Merken, dass der Nutzer die Lightbox gesehen hat
+            localStorage.setItem('hasSeenCookieInfoLightbox', 'true');
         });
     }
 
-    // Event Listener für den "Datenschutzerklärung" Link-Button
     if (privacyPolicyLinkButton) {
         privacyPolicyLinkButton.addEventListener('click', (e) => {
             e.preventDefault();
-            closeLightbox(cookieInfoLightbox); // Cookie Lightbox schließen
-            // NEU: Öffne die Datenschutzerklärung in der Legal-Lightbox
+            closeLightbox(cookieInfoLightbox);
             loadLegalPageInModal('datenschutz'); 
         });
     }
 
-    // Event Listener für Klick auf den Hintergrund (außerhalb des Inhalts)
     if (cookieInfoLightbox) {
         cookieInfoLightbox.addEventListener('click', (e) => {
             if (e.target === cookieInfoLightbox) {
@@ -180,33 +174,23 @@ document.addEventListener('DOMContentLoaded', function() {
         if (contactForm) {
             contactForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-
                 const formData = new FormData(contactForm);
                 const object = {};
-                formData.forEach((value, key) => {
-                    object[key] = value;
-                });
+                formData.forEach((value, key) => { object[key] = value; });
                 if (!object['_subject']) {
                     object['_subject'] = 'Neue Kontaktanfrage von designare.at';
                 }
                 object['_honey'] = '';
-
                 const originalButtonText = e.submitter.innerText;
                 e.submitter.innerText = "Sende...";
                 e.submitter.disabled = true;
-
                 try {
                     const response = await fetch('https://formsubmit.co/ajax/michael@designare.at', {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json'
-                        },
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                         body: JSON.stringify(object)
                     });
-
                     const data = await response.json();
-
                     if (data.success) {
                         contactForm.style.display = 'none';
                         contactSuccessMessage.style.display = 'block';
@@ -234,119 +218,64 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-// --- KI-INTERAKTION & DYNAMISCHER PLATZHALTER ---
-const aiForm = document.getElementById('ai-form');
-if (aiForm) {
-    const aiQuestionInput = document.getElementById('ai-question');
-    const aiStatus = document.getElementById('ai-status');
-    const submitButton = aiForm.querySelector('button');
+    // --- KI-INTERAKTION & DYNAMISCHER PLATZHALTER ---
+    const aiForm = document.getElementById('ai-form');
+    if (aiForm) {
+        const aiQuestionInput = document.getElementById('ai-question');
+        const aiStatus = document.getElementById('ai-status');
+        const submitButton = aiForm.querySelector('button');
 
-    const placeholderTexts = [
-        "Hallo! Evita hier...",
-        "Michaels KI-Joker...",
-        "Frag mich etwas..."
-    ];
-    let placeholderIndex = 0;
-    let charPlaceholderIndex = 0;
-    let typeInterval;
-    let deleteInterval;
+        const placeholderTexts = [
+            "Hallo! Evita hier...",
+            "Michaels KI-Joker...",
+            "Frag mich etwas..."
+        ];
+        let placeholderIndex = 0;
+        let charPlaceholderIndex = 0;
+        let typeInterval;
+        let deleteInterval;
 
-    // Eine zentrale Funktion, um die Animation zu stoppen.
-    const stopPlaceholderAnimation = () => {
-        clearInterval(typeInterval);
-        clearInterval(deleteInterval);
-        aiQuestionInput.placeholder = ""; // Platzhalter sofort leeren
-    };
-    
-    // Eine robuste Start-Funktion.
-    const startPlaceholderAnimation = () => {
-        clearInterval(typeInterval);
-        clearInterval(deleteInterval);
-        charPlaceholderIndex = 0;
-        setTimeout(typePlaceholder, 100); 
-    };
-
-    function typePlaceholder() {
-        let newText = placeholderTexts[placeholderIndex];
-        typeInterval = setInterval(() => {
-            if (charPlaceholderIndex < newText.length) {
-                // KORRIGIERT: aiQuestionInput (großes 'I')
-                aiQuestionInput.placeholder += newText.charAt(charPlaceholderIndex);
-                charPlaceholderIndex++;
-            } else {
-                clearInterval(typeInterval);
-                setTimeout(deletePlaceholder, AI_DELAY_AFTER_TYPING);
-            }
-        }, AI_TYPING_SPEED);
-    }
-
-    function deletePlaceholder() {
-        deleteInterval = setInterval(() => {
-            let currentText = aiQuestionInput.placeholder;
-            if (currentText.length > 0) {
-                aiQuestionInput.placeholder = currentText.slice(0, -1);
-            } else {
-                clearInterval(deleteInterval);
-                placeholderIndex = (placeholderIndex + 1) % placeholderTexts.length;
-                startPlaceholderAnimation();
-            }
-        }, AI_DELETING_SPEED);
-    }
-
-    aiQuestionInput.addEventListener('focus', stopPlaceholderAnimation);
-
-    aiQuestionInput.addEventListener('blur', () => {
-        if (aiQuestionInput.value === '') {
-            startPlaceholderAnimation();
-        }
-    });
-
-    aiForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const question = aiQuestionInput.value.trim();
-        if (!question) return;
-
-        stopPlaceholderAnimation();
+        const stopPlaceholderAnimation = () => {
+            clearInterval(typeInterval);
+            clearInterval(deleteInterval);
+            if(aiQuestionInput) aiQuestionInput.placeholder = "";
+        };
         
-        aiStatus.innerText = "Einen Moment, Evita gleicht gerade ihre Bits und Bytes ab...";
-        aiStatus.classList.add('thinking');
-        aiQuestionInput.disabled = true;
-        submitButton.disabled = true;
+        const startPlaceholderAnimation = () => {
+            clearInterval(typeInterval);
+            clearInterval(deleteInterval);
+            charPlaceholderIndex = 0;
+            setTimeout(typePlaceholder, 100); 
+        };
 
-        try {
-            const fetchPromise = fetch('/api/ask-gemini', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ question: question })
-            });
-            const delayPromise = new Promise(resolve => setTimeout(resolve, 1000));
-            const [response] = await Promise.all([fetchPromise, delayPromise]);
-            if (!response.ok) { throw new Error('Netzwerk-Antwort war nicht OK.'); }
-            const data = await response.json();
-            aiStatus.innerText = data.answer;
-
-        } catch (error) {
-            console.error("Fehler:", error);
-            aiStatus.innerText = 'Ein Fehler ist aufgetreten.';
-        } finally {
-            aiQuestionInput.value = '';
-            aiQuestionInput.disabled = false;
-            submitButton.disabled = false;
-            // KORRIGIERT: aiQuestionInput (großes 'I')
-            aiQuestionInput.placeholder = "Haben Sie eine weitere Frage?";
-            aiStatus.classList.remove('thinking');
-            
-            startPlaceholderAnimation(); 
+        function typePlaceholder() {
+            let newText = placeholderTexts[placeholderIndex];
+            typeInterval = setInterval(() => {
+                if (charPlaceholderIndex < newText.length) {
+                    aiQuestionInput.placeholder += newText.charAt(charPlaceholderIndex);
+                    charPlaceholderIndex++;
+                } else {
+                    clearInterval(typeInterval);
+                    setTimeout(deletePlaceholder, AI_DELAY_AFTER_TYPING);
+                }
+            }, AI_TYPING_SPEED);
         }
-    });
 
-    // Erster Start der Animation beim Laden der Seite
-    startPlaceholderAnimation();
-}
-        // GEÄNDERT: Ruft jetzt die saubere Stopp-Funktion auf.
+        function deletePlaceholder() {
+            deleteInterval = setInterval(() => {
+                let currentText = aiQuestionInput.placeholder;
+                if (currentText.length > 0) {
+                    aiQuestionInput.placeholder = currentText.slice(0, -1);
+                } else {
+                    clearInterval(deleteInterval);
+                    placeholderIndex = (placeholderIndex + 1) % placeholderTexts.length;
+                    startPlaceholderAnimation();
+                }
+            }, AI_DELETING_SPEED);
+        }
+
         aiQuestionInput.addEventListener('focus', stopPlaceholderAnimation);
 
-        // GEÄNDERT: Ruft jetzt die saubere Start-Funktion auf.
         aiQuestionInput.addEventListener('blur', () => {
             if (aiQuestionInput.value === '') {
                 startPlaceholderAnimation();
@@ -358,7 +287,6 @@ if (aiForm) {
             const question = aiQuestionInput.value.trim();
             if (!question) return;
 
-            // GEÄNDERT: Stoppt die Animation sauber vor dem Absenden.
             stopPlaceholderAnimation();
             
             aiStatus.innerText = "Einen Moment, Evita gleicht gerade ihre Bits und Bytes ab...";
@@ -367,8 +295,11 @@ if (aiForm) {
             submitButton.disabled = true;
 
             try {
-                // ... (Ihre fetch-Logik bleibt unverändert)
-                const fetchPromise = fetch('/api/ask-gemini', { /* ... */ });
+                const fetchPromise = fetch('/api/ask-gemini', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question: question })
+                });
                 const delayPromise = new Promise(resolve => setTimeout(resolve, 1000));
                 const [response] = await Promise.all([fetchPromise, delayPromise]);
                 if (!response.ok) { throw new Error('Netzwerk-Antwort war nicht OK.'); }
@@ -382,17 +313,17 @@ if (aiForm) {
                 aiQuestionInput.value = '';
                 aiQuestionInput.disabled = false;
                 submitButton.disabled = false;
-                aiQuestion-input.placeholder = "Haben Sie eine weitere Frage?";
+                aiQuestionInput.placeholder = "Haben Sie eine weitere Frage?";
                 aiStatus.classList.remove('thinking');
                 
-                // GEÄNDERT: Startet die Animation nach dem Absenden wieder sauber.
                 startPlaceholderAnimation(); 
             }
         });
 
-        // Erster Start der Animation beim Laden der Seite
         startPlaceholderAnimation();
     }
+    
+    // KORREKTUR: Der doppelte Code-Block, der hier stand, wurde entfernt.
 
     // --- PARTIKEL-HINTERGRUND ---
     if (document.getElementById('particles-js')) {
@@ -421,14 +352,13 @@ if (aiForm) {
     }
 
     // --- Legal-Seiten Lightbox Navigation ---
-    const aboutMeButton = document.getElementById('about-me-button'); // NEU
+    const aboutMeButton = document.getElementById('about-me-button');
     const impressumLink = document.getElementById('impressum-link');
     const datenschutzLink = document.getElementById('datenschutz-link');
     const legalModal = document.getElementById('legal-modal');
     const closeLegalModalBtn = document.getElementById('close-legal-modal');
     const legalModalContentArea = document.getElementById('legal-modal-content-area');
 
-    // Funktion zum Laden und Anzeigen der Legal-Seite in der Lightbox
     async function loadLegalPageInModal(pageName) {
         const url = `${pageName}.html`;
         
@@ -444,27 +374,20 @@ if (aiForm) {
             const legalContainer = doc.querySelector('.legal-container');
 
             if (legalContainer) {
-                legalModalContentArea.innerHTML = ''; // Vorherigen Inhalt leeren
+                legalModalContentArea.innerHTML = '';
 
                 const children = Array.from(legalContainer.children);
-                // Finde den Index des <a class="back-link"> Elements
                 const backLinkIndex = children.findIndex(child => child.classList.contains('back-link'));
-                // Entferne den back-link aus der Liste der Kinder, damit er nicht doppelt hinzugefügt wird
                 if (backLinkIndex !== -1) {
-                    children.splice(backLinkIndex, 1); // Element entfernen
+                    children.splice(backLinkIndex, 1);
                 }
 
-                let allParts = []; // Array, das alle Teile enthält
-                let currentPage = 0; // Aktuelle Seite (0-indiziert)
-                let paginationButtonsDiv; // Referenz für die Buttons
+                let allParts = [];
+                let currentPage = 0;
 
-                // Helper function to find element by ID within the children array
                 const findElementById = (id) => children.find(child => child.id === id);
-
-                // Helper function to get index of element within the children array
                 const getIndexOfElement = (element) => children.indexOf(element);
 
-                // Spezifische Split-Logik für datenschutz.html mit mehreren Split-Punkten
                 if (pageName === 'datenschutz') {
                     const splitElements = [
                         findElementById('datenschutz-part-2-start'),
@@ -474,13 +397,8 @@ if (aiForm) {
                         findElementById('datenschutz-part-6-start') 
                     ].filter(el => el !== undefined); 
 
-                    console.log('Datenschutz: Attempting multi-part split.');
-                    splitElements.forEach((el, idx) => console.log(`Split Point ${idx + 1}:`, el));
-
                     if (splitElements.length > 0) {
                         const indices = splitElements.map(getIndexOfElement).filter(idx => idx !== -1).sort((a, b) => a - b);
-                        
-                        // Check if indices are unique and strictly increasing
                         let validIndices = true;
                         for (let i = 1; i < indices.length; i++) {
                             if (indices[i] <= indices[i-1]) {
@@ -489,33 +407,23 @@ if (aiForm) {
                             }
                         }
 
-                        if (validIndices && indices.length === splitElements.length) { // Ensure all found elements have valid, sorted indices
-                            // Erster Teil
+                        if (validIndices && indices.length === splitElements.length) {
                             allParts.push(children.slice(0, indices[0]));
-                            
-                            // Mittlere Teile
                             for (let i = 0; i < indices.length - 1; i++) {
                                 allParts.push(children.slice(indices[i], indices[i+1]));
                             }
-                            
-                            // Letzter Teil
                             allParts.push(children.slice(indices[indices.length - 1]));
-                            
-                            console.log(`Datenschutz: Successfully split into ${allParts.length} parts based on IDs.`);
-                            allParts.forEach((part, idx) => console.log(`Part ${idx + 1} length:`, part.length));
                         } else {
-                            console.warn('Datenschutz: Specific IDs found but indices invalid/out of order. Falling back to 2-part split.');
                             const splitIndex = Math.ceil(children.length * 0.5);
                             allParts.push(children.slice(0, splitIndex));
                             allParts.push(children.slice(splitIndex));
                         }
                     } else {
-                        console.warn('Datenschutz: No specific split points found. Falling back to 2-part split.');
                         const splitIndex = Math.ceil(children.length * 0.5);
                         allParts.push(children.slice(0, splitIndex));
                         allParts.push(children.slice(splitIndex));
                     }
-                } else { // Logik für Impressum oder andere Seiten (2-Teile-Split)
+                } else {
                     const targetSplitCount = Math.ceil(children.length * 0.5);
                     let h3SplitIndex = -1;
                     for (let i = 0; i < children.length; i++) {
@@ -529,85 +437,64 @@ if (aiForm) {
                     if (h3SplitIndex !== -1) {
                         allParts.push(children.slice(0, h3SplitIndex));
                         allParts.push(children.slice(h3SplitIndex));
-                        console.log('2-Part Split: Found H3 near middle.');
                     } else {
                         const splitIndex = Math.ceil(children.length * 0.5);
                         allParts.push(children.slice(0, splitIndex));
                         allParts.push(children.slice(splitIndex));
-                        console.log('2-Part Split: 50% element count.');
                     }
                 }
 
-                // Erstelle die Divs für jeden Teil und füge den Inhalt hinzu
                 const partDivs = allParts.map(part => {
                     const div = document.createElement('div');
                     part.forEach(child => div.appendChild(child.cloneNode(true)));
                     return div;
                 });
 
-                // Funktion zum Rendern des aktuellen Teils
                 const renderCurrentPart = () => {
                     partDivs.forEach((div, index) => {
                         div.style.display = (index === currentPage) ? 'block' : 'none';
                     });
-                    legalModalContentArea.scrollTop = 0; // Nach oben scrollen
+                    legalModalContentArea.scrollTop = 0;
                     updatePaginationButtons();
-                    console.log('Rendering part:', currentPage + 1);
                 };
 
-                // Funktion zum Aktualisieren der Button-Sichtbarkeit
                 const updatePaginationButtons = () => {
                     const backButton = document.getElementById('legal-back-button');
                     const continueButton = document.getElementById('legal-continue-button');
-
-                    if (backButton) {
-                        backButton.style.display = (currentPage > 0) ? 'block' : 'none';
-                    }
-                    if (continueButton) {
-                        continueButton.style.display = (currentPage < allParts.length - 1) ? 'block' : 'none';
-                    }
+                    if (backButton) backButton.style.display = (currentPage > 0) ? 'block' : 'none';
+                    if (continueButton) continueButton.style.display = (currentPage < allParts.length - 1) ? 'block' : 'none';
                 };
 
-                // Füge alle Teile zum Modal hinzu (initial alle versteckt außer dem ersten)
                 partDivs.forEach(div => legalModalContentArea.appendChild(div));
 
-                // Buttons für Paginierung erstellen (nur wenn mehr als 1 Teil)
                 if (allParts.length > 1) {
-                    paginationButtonsDiv = document.createElement('div');
+                    const paginationButtonsDiv = document.createElement('div');
                     paginationButtonsDiv.className = 'legal-modal-pagination-buttons';
-
                     const backButton = document.createElement('button');
                     backButton.id = 'legal-back-button';
                     backButton.textContent = 'Zurück';
                     backButton.addEventListener('click', () => { currentPage--; renderCurrentPart(); });
-
                     const continueButton = document.createElement('button');
                     continueButton.id = 'legal-continue-button';
                     continueButton.textContent = 'Weiter';
                     continueButton.addEventListener('click', () => { currentPage++; renderCurrentPart(); });
-
                     paginationButtonsDiv.appendChild(backButton);
                     paginationButtonsDiv.appendChild(continueButton);
                     legalModalContentArea.appendChild(paginationButtonsDiv);
                 }
 
+                renderCurrentPart();
 
-                renderCurrentPart(); // Ersten Teil rendern und Buttons aktualisieren
-
-                // Den ursprünglichen "Zurück zur Startseite" Link im Modal behandeln
                 const backLinkInLoadedContent = legalModalContentArea.querySelector('.back-link');
                 if (backLinkInLoadedContent) {
                     backLinkInLoadedContent.addEventListener('click', (e) => {
                         e.preventDefault();
-                        closeLightbox(legalModal); // Nutze die allgemeine closeLightbox Funktion
-                        legalModalContentArea.innerHTML = ''; // Inhalt leeren beim Schließen
-                        console.log('Clicked "Zurück zur Startseite" in modal, closing modal.');
+                        closeLightbox(legalModal);
+                        legalModalContentArea.innerHTML = '';
                     });
                 }
 
-
-                openLightbox(legalModal); // Nutze die allgemeine openLightbox Funktion
-                console.log('Legal modal opened. Total parts:', allParts.length);
+                openLightbox(legalModal);
 
             } else {
                 console.error(`Could not find .legal-container in ${pageName}.html`);
@@ -621,15 +508,13 @@ if (aiForm) {
         }
     }
 
-    // Event Listener für "Über mich"-Button
-    if (aboutMeButton) { // NEU
-        aboutMeButton.addEventListener('click', (e) => { // NEU
-            e.preventDefault(); // NEU
-            loadLegalPageInModal('about'); // NEU
-        }); // NEU
-    } // NEU
+    if (aboutMeButton) {
+        aboutMeButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            loadLegalPageInModal('about');
+        });
+    }
 
-    // Event Listener für Footer-Links
     if (impressumLink) {
         impressumLink.addEventListener('click', (e) => {
             e.preventDefault();
@@ -644,22 +529,18 @@ if (aiForm) {
         });
     }
 
-    // Event Listener für den Schließen-Button der Legal-Lightbox
     if (closeLegalModalBtn) {
         closeLegalModalBtn.addEventListener('click', () => {
-            closeLightbox(legalModal); // Nutze die allgemeine closeLightbox Funktion
-            legalModalContentArea.innerHTML = ''; // Inhalt leeren beim Schließen
-            console.log('Legal modal closed via X button.');
+            closeLightbox(legalModal);
+            legalModalContentArea.innerHTML = '';
         });
     }
 
-    // Event Listener für Klick auf den Hintergrund (außerhalb des Inhalts) der Legal-Lightbox
     if (legalModal) {
         legalModal.addEventListener('click', (e) => {
             if (e.target === legalModal) {
-                closeLightbox(legalModal); // Nutze die allgemeine closeLightbox Funktion
-                legalModalContentArea.innerHTML = ''; // Inhalt leeren beim Schließen
-                console.log('Legal modal closed via overlay click.');
+                closeLightbox(legalModal);
+                legalModalContentArea.innerHTML = '';
             }
         });
     }
