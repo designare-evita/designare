@@ -84,13 +84,18 @@
     <h3>7. Webfonts (Lokale Einbindung)</h3>
     <p>Wir nutzen auf dieser Webseite Schriftarten, die lokal von unserem eigenen Webspace geladen werden. Dadurch werden beim Aufruf unserer Seite keine personenbezogenen Daten (wie z.B. Ihre IP-Adresse) an externe Schriften-Anbieter (wie z.B. Google Fonts) übermittelt.</p>
 </div>
+ </main>
+    
+    <footer>
+        <a href="impressum.html" id="impressum-link">Impressum</a>
+        <a href="datenschutz.html" id="datenschutz-link">Datenschutz</a>
+    </footer>
 
-<script>
-    const savedTheme = localStorage.getItem('theme') || 'dark'; // Nachtmodus als Standard
-    if (savedTheme === 'dark') {
-        document.body.classList.add('dark-mode');
-    }
-</script>
+    <div id="contact-modal" class="modal-overlay"></div>
+    <div id="cookie-info-lightbox" class="modal-overlay"></div>
+    <div id="legal-modal" class="modal-overlay"></div>
+
+    <script src="script.js"></script>
 
 </body>
 </html>
