@@ -235,67 +235,114 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
 // --- KI-INTERAKTION & DYNAMISCHER PLATZHALTER ---
-    const aiForm = document.getElementById('ai-form');
-    if (aiForm) {
-        const aiQuestionInput = document.getElementById('ai-question');
-        const aiStatus = document.getElementById('ai-status');
-        const submitButton = aiForm.querySelector('button');
+const aiForm = document.getElementById('ai-form');
+if (aiForm) {
+    const aiQuestionInput = document.getElementById('ai-question');
+    const aiStatus = document.getElementById('ai-status');
+    const submitButton = aiForm.querySelector('button');
 
-        const placeholderTexts = [
-            "Hallo! Evita hier...",
-            "Michaels KI-Joker...",
-            "Frag mich etwas..."
-        ];
-        let placeholderIndex = 0;
-        let charPlaceholderIndex = 0;
-        let typeInterval;
-        let deleteInterval;
+    const placeholderTexts = [
+        "Hallo! Evita hier...",
+        "Michaels KI-Joker...",
+        "Frag mich etwas..."
+    ];
+    let placeholderIndex = 0;
+    let charPlaceholderIndex = 0;
+    let typeInterval;
+    let deleteInterval;
 
-        // NEU: Eine zentrale Funktion, um die Animation zu stoppen.
-        const stopPlaceholderAnimation = () => {
-            clearInterval(typeInterval);
-            clearInterval(deleteInterval);
-            aiQuestionInput.placeholder = ""; // Platzhalter sofort leeren
-        };
+    // Eine zentrale Funktion, um die Animation zu stoppen.
+    const stopPlaceholderAnimation = () => {
+        clearInterval(typeInterval);
+        clearInterval(deleteInterval);
+        aiQuestionInput.placeholder = ""; // Platzhalter sofort leeren
+    };
+    
+    // Eine robuste Start-Funktion.
+    const startPlaceholderAnimation = () => {
+        clearInterval(typeInterval);
+        clearInterval(deleteInterval);
+        charPlaceholderIndex = 0;
+        setTimeout(typePlaceholder, 100); 
+    };
+
+    function typePlaceholder() {
+        let newText = placeholderTexts[placeholderIndex];
+        typeInterval = setInterval(() => {
+            if (charPlaceholderIndex < newText.length) {
+                // KORRIGIERT: aiQuestionInput (großes 'I')
+                aiQuestionInput.placeholder += newText.charAt(charPlaceholderIndex);
+                charPlaceholderIndex++;
+            } else {
+                clearInterval(typeInterval);
+                setTimeout(deletePlaceholder, AI_DELAY_AFTER_TYPING);
+            }
+        }, AI_TYPING_SPEED);
+    }
+
+    function deletePlaceholder() {
+        deleteInterval = setInterval(() => {
+            let currentText = aiQuestionInput.placeholder;
+            if (currentText.length > 0) {
+                aiQuestionInput.placeholder = currentText.slice(0, -1);
+            } else {
+                clearInterval(deleteInterval);
+                placeholderIndex = (placeholderIndex + 1) % placeholderTexts.length;
+                startPlaceholderAnimation();
+            }
+        }, AI_DELETING_SPEED);
+    }
+
+    aiQuestionInput.addEventListener('focus', stopPlaceholderAnimation);
+
+    aiQuestionInput.addEventListener('blur', () => {
+        if (aiQuestionInput.value === '') {
+            startPlaceholderAnimation();
+        }
+    });
+
+    aiForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const question = aiQuestionInput.value.trim();
+        if (!question) return;
+
+        stopPlaceholderAnimation();
         
-        // NEU: Eine robuste Start-Funktion.
-        const startPlaceholderAnimation = () => {
-            // WICHTIG: Zuerst alle laufenden Animationen stoppen, um Konflikte zu vermeiden.
-            clearInterval(typeInterval);
-            clearInterval(deleteInterval);
+        aiStatus.innerText = "Einen Moment, Evita gleicht gerade ihre Bits und Bytes ab...";
+        aiStatus.classList.add('thinking');
+        aiQuestionInput.disabled = true;
+        submitButton.disabled = true;
 
-            // Setzt den Startpunkt zurück und ruft die eigentliche Schreibfunktion auf.
-            charPlaceholderIndex = 0;
-            // Kleiner Timeout, um sicherzustellen, dass alles sauber ist.
-            setTimeout(typePlaceholder, 100); 
-        };
+        try {
+            const fetchPromise = fetch('/api/ask-gemini', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ question: question })
+            });
+            const delayPromise = new Promise(resolve => setTimeout(resolve, 1000));
+            const [response] = await Promise.all([fetchPromise, delayPromise]);
+            if (!response.ok) { throw new Error('Netzwerk-Antwort war nicht OK.'); }
+            const data = await response.json();
+            aiStatus.innerText = data.answer;
 
-        function typePlaceholder() {
-            let newText = placeholderTexts[placeholderIndex];
-            typeInterval = setInterval(() => {
-                if (charPlaceholderIndex < newText.length) {
-                    aiQuestioninput.placeholder += newText.charAt(charPlaceholderIndex);
-                    charPlaceholderIndex++;
-                } else {
-                    clearInterval(typeInterval);
-                    setTimeout(deletePlaceholder, AI_DELAY_AFTER_TYPING);
-                }
-            }, AI_TYPING_SPEED);
+        } catch (error) {
+            console.error("Fehler:", error);
+            aiStatus.innerText = 'Ein Fehler ist aufgetreten.';
+        } finally {
+            aiQuestionInput.value = '';
+            aiQuestionInput.disabled = false;
+            submitButton.disabled = false;
+            // KORRIGIERT: aiQuestionInput (großes 'I')
+            aiQuestionInput.placeholder = "Haben Sie eine weitere Frage?";
+            aiStatus.classList.remove('thinking');
+            
+            startPlaceholderAnimation(); 
         }
+    });
 
-        function deletePlaceholder() {
-            deleteInterval = setInterval(() => {
-                let currentText = aiQuestionInput.placeholder;
-                if (currentText.length > 0) {
-                    aiQuestionInput.placeholder = currentText.slice(0, -1);
-                } else {
-                    clearInterval(deleteInterval);
-                    placeholderIndex = (placeholderIndex + 1) % placeholderTexts.length;
-                    startPlaceholderAnimation(); // GEÄNDERT: Ruft die zentrale Start-Funktion für den nahtlosen Übergang auf.
-                }
-            }, AI_DELETING_SPEED);
-        }
-
+    // Erster Start der Animation beim Laden der Seite
+    startPlaceholderAnimation();
+}
         // GEÄNDERT: Ruft jetzt die saubere Stopp-Funktion auf.
         aiQuestionInput.addEventListener('focus', stopPlaceholderAnimation);
 
