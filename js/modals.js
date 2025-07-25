@@ -27,7 +27,10 @@ function setupCookieModal() {
     if (!localStorage.getItem('hasSeenCookieInfoLightbox')) {
         setTimeout(() => openLightbox(cookieInfoLightbox), 1000);
     }
-    if (cookieInfoButton) cookieInfoButton.addEventListener('click', () => openLightbox(cookieInfoLightbox));
+    if (cookieInfoButton) cookieInfoButton.addEventListener('click', () => {
+        localStorage.removeItem('hasSeenCookieInfoLightbox');
+        openLightbox(cookieInfoLightbox);
+    });
     if (acknowledgeCookieLightboxBtn) acknowledgeCookieLightboxBtn.addEventListener('click', () => {
         closeLightbox(cookieInfoLightbox);
         localStorage.setItem('hasSeenCookieInfoLightbox', 'true');
@@ -44,7 +47,6 @@ function setupCookieModal() {
 
 // Kontakt-Modal-Logik
 function setupContactModal() {
-    // ... die Kontakt-Modal-Logik bleibt unverändert ...
     const contactButton = document.getElementById('contact-button');
     const contactModal = document.getElementById('contact-modal');
     const contactForm = document.getElementById('contact-form-inner');
@@ -98,7 +100,8 @@ function setupContactModal() {
     });
 }
 
-// KORRIGIERT: Legal-Seiten-Navigation mit Paginierung
+
+// KORRIGIERT: Legal-Seiten-Navigation mit der vollständig wiederhergestellten Paginierungslogik
 async function loadLegalPageInModal(pageName) {
     const legalModal = document.getElementById('legal-modal');
     const legalModalContentArea = document.getElementById('legal-modal-content-area');
@@ -114,13 +117,12 @@ async function loadLegalPageInModal(pageName) {
         const legalContainer = doc.querySelector('.legal-container');
 
         if (legalContainer) {
-            legalModalContentArea.innerHTML = ''; // Leeren
+            legalModalContentArea.innerHTML = '';
             const children = Array.from(legalContainer.children);
             
             let allParts = [];
             let currentPage = 0;
 
-            // Logik zum Aufteilen des Inhalts (Paginierung)
             if (pageName === 'datenschutz') {
                 const findElementById = (id) => children.find(child => child.id === id);
                 const getIndexOfElement = (element) => children.indexOf(element);
@@ -138,7 +140,9 @@ async function loadLegalPageInModal(pageName) {
                     });
                     allParts.push(children.slice(lastIndex));
                 } else {
-                    allParts.push(children); // Fallback, falls keine IDs gefunden
+                    const splitIndex = Math.ceil(children.length / 2);
+                    allParts.push(children.slice(0, splitIndex));
+                    allParts.push(children.slice(splitIndex));
                 }
             } else {
                  allParts.push(children); // Impressum und About nicht paginieren
@@ -161,8 +165,8 @@ async function loadLegalPageInModal(pageName) {
             const updatePaginationButtons = () => {
                 let backButton = legalModalContentArea.querySelector('#legal-back-button');
                 let continueButton = legalModalContentArea.querySelector('#legal-continue-button');
-                if (backButton) backButton.style.display = (currentPage > 0) ? 'block' : 'none';
-                if (continueButton) continueButton.style.display = (currentPage < allParts.length - 1) ? 'block' : 'none';
+                if (backButton) backButton.style.display = (currentPage > 0) ? 'inline-block' : 'none';
+                if (continueButton) continueButton.style.display = (currentPage < allParts.length - 1) ? 'inline-block' : 'none';
             };
 
             partDivs.forEach(div => legalModalContentArea.appendChild(div));
