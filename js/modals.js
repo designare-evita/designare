@@ -101,7 +101,7 @@ function setupContactModal() {
 }
 
 
-// KORRIGIERT: Legal-Seiten-Navigation mit der vollständig wiederhergestellten Paginierungslogik
+// Legal-Seiten-Navigation mit Paginierung
 async function loadLegalPageInModal(pageName) {
     const legalModal = document.getElementById('legal-modal');
     const legalModalContentArea = document.getElementById('legal-modal-content-area');
@@ -140,14 +140,37 @@ async function loadLegalPageInModal(pageName) {
                     });
                     allParts.push(children.slice(lastIndex));
                 } else {
+                    // Fallback für Datenschutz, falls IDs nicht gefunden werden
                     const splitIndex = Math.ceil(children.length / 2);
                     allParts.push(children.slice(0, splitIndex));
                     allParts.push(children.slice(splitIndex));
                 }
             } else {
-                 allParts.push(children); // Impressum und About nicht paginieren
+                 // KORRIGIERT: Die intelligente Aufteilungslogik für about und impressum
+                const targetSplitCount = Math.ceil(children.length * 0.5);
+                let h3SplitIndex = -1;
+                // Sucht nach einer H3-Überschrift in der Mitte des Textes
+                for (let i = 0; i < children.length; i++) {
+                    const child = children[i];
+                    if (child.tagName === 'H3' && i >= targetSplitCount * 0.8 && i <= targetSplitCount * 1.2) {
+                        h3SplitIndex = i;
+                        break;
+                    }
+                }
+
+                if (h3SplitIndex !== -1) {
+                    // Teilt an der H3-Überschrift
+                    allParts.push(children.slice(0, h3SplitIndex));
+                    allParts.push(children.slice(h3SplitIndex));
+                } else {
+                    // Fallback: Teilt den Inhalt einfach in der Mitte
+                    const splitIndex = Math.ceil(children.length / 2);
+                    allParts.push(children.slice(0, splitIndex));
+                    allParts.push(children.slice(splitIndex));
+                }
             }
 
+            // Der Rest der Funktion, die die Seiten und Buttons rendert, bleibt gleich.
             const partDivs = allParts.map(part => {
                 const div = document.createElement('div');
                 part.forEach(child => div.appendChild(child.cloneNode(true)));
