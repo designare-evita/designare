@@ -161,8 +161,7 @@ body.dark-mode #theme-toggle .fa-moon {
     width: 40px;
     text-decoration: none;
 }
-#contact-button:hover, #cookie-info-button:hover, #magazine-button:hover {
-
+#contact-button:hover, #cookie-info-button:hover, #about-me-button:hover {
     background-color: var(--accent-color);
     color: #fff;
     opacity: 1;
