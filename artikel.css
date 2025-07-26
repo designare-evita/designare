@@ -50,7 +50,7 @@ footer {
 
 .two-column-container {
     display: flex;
-    align-items: flex-start; 
+    align-items: flex-start;
     gap: 3rem;
     margin-top: 1.5rem;
 }
@@ -130,9 +130,9 @@ body.dark-mode .fazit-box {
         max-width: 100%;
         position: relative;
         top: 0;
-        flex-basis: auto; 
+        flex-basis: auto;
     }
-    
+
     .column-image .ai-container {
         margin-top: 2rem; /* Stellt den Abstand auf Mobilgeräten wieder her */
         margin-bottom: 0;
