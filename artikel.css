@@ -108,18 +108,18 @@ body.dark-mode .fazit-box {
 }
 
 /* -- NEU: Eigene Listenpunkte mit Favicon -- */
-.column-text ul {
+.ul {
     list-style-type: none; /* Entfernt die Standard-Punkte */
     padding-left: 0;
 }
 
-.column-text ul li {
+.ul li {
     padding-left: 30px; /* Schafft Platz für das Icon */
     position: relative;
     margin-bottom: 0.8rem; /* Abstand zwischen den Punkten */
 }
 
-.column-text ul li::before {
+.ul li::before {
     content: ''; /* Erforderlich für Pseudo-Elemente */
     display: inline-block;
     position: absolute;
