@@ -64,10 +64,12 @@ footer {
     display: flex;
     align-items: flex-start; 
     gap: 3rem;              /* Abstand zwischen den Spalten leicht erhöht */
-    margin-top: 1.5rem;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
 }
 
 .column-text {
+margin-top: 2rem;
     flex: 1;                /* Text-Spalte füllt den verfügbaren Platz flexibel auf */
     min-width: 0;
 }
