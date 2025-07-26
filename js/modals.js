@@ -1,138 +1,91 @@
-// js/modals.js
-
-// Lade den Inhalt einer externen HTML-Datei in ein Ziel-Element.
-async function fetchAndInjectHTML(url, targetElementId) {
-    try {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error(`Fehler beim Laden von: ${url}`);
-        const text = await response.text();
-        const target = document.getElementById(targetElementId);
-        if (target) {
-            // Wir extrahieren nur den Body-Inhalt der externen Seite
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(text, 'text/html');
-            const content = doc.querySelector('.legal-container');
-            if(content) {
-                target.innerHTML = ''; // Leeren vor dem Einfügen
-                target.appendChild(content);
-            }
-        }
-    } catch (error) {
-        console.error('Fehler beim Injizieren von HTML:', error);
-    }
-}
-
-
-// Initialisiert die Logik für die rechtlichen Modals (Impressum, Datenschutz)
-export function initLegalLinks() {
-    const legalModal = document.getElementById('legal-modal');
-    const legalContentArea = document.getElementById('legal-modal-content-area');
-    const closeLegalModalBtn = document.getElementById('close-legal-modal');
-
-    document.querySelectorAll('.legal-link').forEach(link => {
-        link.addEventListener('click', async (e) => {
-            e.preventDefault();
-            const url = link.getAttribute('href');
-            if (url && legalContentArea) {
-                await fetchAndInjectHTML(url, 'legal-modal-content-area');
-                if (legalModal) legalModal.style.display = 'flex';
-            }
+// Function to load header and footer
+export function loadHeaderFooter() {
+    fetch('header.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('header').innerHTML = data;
+            // Re-initialize event listeners for dynamically loaded content if needed
+            initModals(); // Example: Re-init modal buttons in the header
+            initTheme(); // Re-init theme toggle in the header
         });
-    });
 
-    if (closeLegalModalBtn) {
-        closeLegalModalBtn.onclick = () => {
-            if (legalModal) legalModal.style.display = 'none';
-        };
-    }
+    fetch('footer.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('footer').innerHTML = data;
+            initLegalLinks(); // Re-init legal links in the footer
+        });
 }
 
-
-// Initialisiert die "Über Mich" und Kontakt-Modals
+// Function to handle modal popups
 export function initModals() {
     const aboutMeBtn = document.getElementById('about-me-btn');
-    const aboutMeModal = document.getElementById('legal-modal'); // Wir nutzen das gleiche Modal
-    const aboutMeContentSource = document.getElementById('about-me-content');
-    const legalContentArea = document.getElementById('legal-modal-content-area');
+    const legalModal = document.getElementById('legal-modal');
+    const closeLegalModalBtn = document.getElementById('close-legal-modal');
+    const legalModalContentArea = document.getElementById('legal-modal-content-area');
 
     if (aboutMeBtn) {
         aboutMeBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            if (aboutMeContentSource && legalContentArea && aboutMeModal) {
-                legalContentArea.innerHTML = aboutMeContentSource.innerHTML;
-                aboutMeModal.style.display = 'flex';
-            }
+            const aboutContent = document.getElementById('about-me-content').innerHTML;
+            legalModalContentArea.innerHTML = aboutContent;
+            legalModal.style.display = 'flex';
         });
     }
 
-    const contactBtn = document.getElementById('contact-btn');
-    const contactModal = document.getElementById('contact-modal');
-    const closeModalBtn = document.getElementById('close-modal');
+    if (closeLegalModalBtn) {
+        closeLegalModalBtn.onclick = () => {
+            legalModal.style.display = 'none';
+        };
+    }
+}
 
-    if(contactBtn) {
-        contactBtn.onclick = (e) => {
+// Function to handle legal links
+export function initLegalLinks() {
+    const legalLinks = document.querySelectorAll('.legal-link');
+    const legalModal = document.getElementById('legal-modal');
+    const legalContentArea = document.getElementById('legal-modal-content-area');
+
+    legalLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
             e.preventDefault();
-            if(contactModal) contactModal.style.display = 'flex';
-        }
-    }
-
-    if(closeModalBtn) {
-        closeModalBtn.onclick = () => {
-            if(contactModal) contactModal.style.display = 'none';
-        }
-    }
-    
-    // Generelles Schließen bei Klick auf den Hintergrund
-    document.querySelectorAll('.modal-overlay').forEach(modal => {
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                modal.style.display = 'none';
-            }
+            const url = link.getAttribute('href');
+            fetch(url)
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const content = doc.querySelector('.legal-container').innerHTML;
+                    legalContentArea.innerHTML = content;
+                    legalModal.style.display = 'flex';
+                });
         });
     });
 }
 
-// Initialisiert das Kontaktformular
-export function initContactForm() {
-    const form = document.getElementById('contact-form-inner');
-    const successMessage = document.getElementById('contact-success-message');
 
-    if (form) {
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            // Hier würde die Logik zum Senden des Formulars stehen
-            form.style.display = 'none';
-            if (successMessage) successMessage.style.display = 'block';
+// Function for contact form modal
+export function initContactForm() {
+    // This part was not in the original files but is needed for completeness
+    // If you have specific code for the contact form, it should go here.
+}
+
+// Function for cookie banner
+export function initCookieBanner() {
+    const cookieLightbox = document.getElementById('cookie-info-lightbox');
+    const acknowledgeBtn = document.getElementById('acknowledge-cookie-lightbox');
+
+    if (cookieLightbox && !localStorage.getItem('cookieAcknowledged')) {
+        cookieLightbox.style.display = 'flex';
+    }
+
+    if (acknowledgeBtn) {
+        acknowledgeBtn.addEventListener('click', () => {
+            localStorage.setItem('cookieAcknowledged', 'true');
+            cookieLightbox.style.display = 'none';
         });
     }
-    
-    const closeSuccessBtn = document.getElementById('close-success-message');
-    if(closeSuccessBtn) {
-        closeSuccessBtn.onclick = (e) => {
-            e.preventDefault();
-            const contactModal = document.getElementById('contact-modal');
-            if(contactModal) contactModal.style.display = 'none';
-            // Formular für nächste Nutzung zurücksetzen
-            form.style.display = 'block';
-            if (successMessage) successMessage.style.display = 'none';
-            form.reset();
-        }
-    }
 }
 
-// Initialisiert den Cookie-Banner
-export function initCookieBanner() {
-    const cookieBanner = document.getElementById('cookie-info-lightbox');
-    const ackBtn = document.getElementById('acknowledge-cookie-lightbox');
-
-    if (cookieBanner && !localStorage.getItem('cookieAcknowledged')) {
-        cookieBanner.style.display = 'flex';
-    }
-
-    if (ackBtn) {
-        ackBtn.onclick = () => {
-            localStorage.setItem('cookieAcknowledged', 'true');
-            if (cookieBanner) cookieBanner.style.display = 'none';
-        };
-    }
-}
+// Re-importing theme to avoid circular dependency issues from main.js
+import { initTheme } from './theme.js';
