@@ -1,138 +1,95 @@
-// js/modals.js
+// js/typewriter.js
 
-const body = document.body;
+function initH1Typewriter() {
+    const typewriterElement = document.getElementById('typewriter-h1');
+    if (!typewriterElement) return;
 
-// Allgemeine Lightbox-Funktionen
-const openLightbox = (lightboxElement) => {
-    if (lightboxElement) {
-        lightboxElement.classList.add('visible');
-        body.style.overflow = 'hidden';
-    }
-};
+    const H1_TYPING_SPEED = 120, H1_DELETING_SPEED = 70, H1_DELAY_BETWEEN_TEXTS = 2200;
+    const textsToType = ["Michael Kanda", "Web-Magier", "KI-Therapeut"];
+    let textIndex = 0, charIndex = 0, isDeleting = false;
 
-const closeLightbox = (lightboxElement) => {
-    if (lightboxElement) {
-        lightboxElement.classList.remove('visible');
-        body.style.overflow = '';
-    }
-};
-
-// Cookie-Lightbox-Logik
-function setupCookieModal() {
-    const cookieInfoLightbox = document.getElementById('cookie-info-lightbox');
-    const acknowledgeCookieLightboxBtn = document.getElementById('acknowledge-cookie-lightbox');
-    const privacyPolicyLinkButton = document.getElementById('privacy-policy-link-button');
-    const cookieInfoButton = document.getElementById('cookie-info-button');
-
-    if (!localStorage.getItem('hasSeenCookieInfoLightbox')) {
-        setTimeout(() => openLightbox(cookieInfoLightbox), 1000);
-    }
-    if (cookieInfoButton) cookieInfoButton.addEventListener('click', () => {
-        localStorage.removeItem('hasSeenCookieInfoLightbox');
-        openLightbox(cookieInfoLightbox);
-    });
-    if (acknowledgeCookieLightboxBtn) acknowledgeCookieLightboxBtn.addEventListener('click', () => {
-        closeLightbox(cookieInfoLightbox);
-        localStorage.setItem('hasSeenCookieInfoLightbox', 'true');
-    });
-    if (privacyPolicyLinkButton) privacyPolicyLinkButton.addEventListener('click', (e) => {
-        e.preventDefault();
-        closeLightbox(cookieInfoLightbox);
-        loadLegalPageInModal('datenschutz'); 
-    });
-    if (cookieInfoLightbox) cookieInfoLightbox.addEventListener('click', (e) => {
-        if (e.target === cookieInfoLightbox) closeLightbox(cookieInfoLightbox);
-    });
-}
-
-// Kontakt-Modal-Logik
-function setupContactModal() {
-    const contactButton = document.getElementById('contact-button');
-    const contactModal = document.getElementById('contact-modal');
-    // ... (Restlicher Code für das Kontakt-Modal bleibt unverändert)
-}
-
-// Funktion, die HTML-Inhalt entgegennimmt und die Paginierung anwendet.
-function paginateAndShowModal(htmlContentString, pageName = '') {
-    const legalModal = document.getElementById('legal-modal');
-    const legalModalContentArea = document.getElementById('legal-modal-content-area');
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(htmlContentString, 'text/html');
-    const legalContainer = doc.querySelector('.legal-container');
-
-    if (legalContainer) {
-        legalModalContentArea.innerHTML = '';
-        const children = Array.from(legalContainer.children);
-        let allParts = [];
-        let currentPage = 0;
-
-        // Paginierungslogik
-        if (pageName === 'datenschutz') {
-            // ... (Ihre Paginierungslogik für Datenschutz)
+    function typeWriter() {
+        const currentText = textsToType[textIndex];
+        if (isDeleting) {
+            typewriterElement.innerHTML = currentText.substring(0, charIndex - 1) + '<span class="cursor"></span>';
+            charIndex--;
         } else {
-            // 50%-Regel für "Über Mich" und Impressum
-            const splitIndex = Math.ceil(children.length / 2);
-            allParts.push(children.slice(0, splitIndex));
-            allParts.push(children.slice(splitIndex));
+            typewriterElement.innerHTML = currentText.substring(0, charIndex + 1) + '<span class="cursor"></span>';
+            charIndex++;
         }
-
-        // ... (Restlicher Code zum Rendern der Paginierung)
-
-        openLightbox(legalModal);
+        if (!isDeleting && charIndex === currentText.length) {
+            isDeleting = true; setTimeout(typeWriter, H1_DELAY_BETWEEN_TEXTS); return;
+        }
+        if (isDeleting && charIndex === 0) {
+            isDeleting = false; textIndex = (textIndex + 1) % textsToType.length; setTimeout(typeWriter, 500); return;
+        }
+        setTimeout(typeWriter, isDeleting ? H1_DELETING_SPEED : H1_TYPING_SPEED);
     }
+    setTimeout(typeWriter, 500);
 }
 
-// Funktion zum Laden von externen Seiten
-async function loadLegalPageInModal(pageName) {
-    const url = `${pageName}.html`;
-    try {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error('Seite nicht gefunden');
-        const htmlContent = await response.text();
-        paginateAndShowModal(htmlContent, pageName);
-    } catch (error) {
-        console.error(`Fehler beim Laden von ${pageName}.html:`, error);
-    }
+// Die Steuerungslogik für den AI-Platzhalter
+let aiQuestionInput, typeInterval, deleteInterval;
+let placeholderIndex = 0, charPlaceholderIndex = 0;
+const AI_TYPING_SPEED = 120, AI_DELETING_SPEED = 50, AI_DELAY_AFTER_TYPING = 5000;
+const placeholderTexts = ["Hallo! Evita hier...", "Michaels KI-Joker...", "Frag mich etwas..."];
+
+// Diese Funktionen werden jetzt korrekt exportiert und greifen auf die oben deklarierten Variablen zu
+export const stopPlaceholderAnimation = () => {
+    clearInterval(typeInterval); clearInterval(deleteInterval);
+    if (aiQuestionInput) aiQuestionInput.placeholder = "";
+};
+
+export const startPlaceholderAnimation = () => {
+    if (!aiQuestionInput) return;
+    clearInterval(typeInterval); clearInterval(deleteInterval);
+    aiQuestionInput.placeholder = "";
+    charPlaceholderIndex = 0;
+    setTimeout(typePlaceholder, 100);
+};
+
+function typePlaceholder() {
+    let newText = placeholderTexts[placeholderIndex];
+    typeInterval = setInterval(() => {
+        if (charPlaceholderIndex < newText.length) {
+            aiQuestionInput.placeholder += newText.charAt(charPlaceholderIndex++);
+        } else {
+            clearInterval(typeInterval); setTimeout(deletePlaceholder, AI_DELAY_AFTER_TYPING);
+        }
+    }, AI_TYPING_SPEED);
 }
 
-function setupLegalModals() {
-    const aboutMeButton = document.getElementById('about-me-button');
-    const impressumLink = document.getElementById('impressum-link');
-    const datenschutzLink = document.getElementById('datenschutz-link');
-    const legalModal = document.getElementById('legal-modal');
-    const closeLegalModalBtn = document.getElementById('close-legal-modal');
+function deletePlaceholder() {
+    deleteInterval = setInterval(() => {
+        let currentText = aiQuestionInput.placeholder;
+        if (currentText.length > 0) {
+            aiQuestionInput.placeholder = currentText.slice(0, -1);
+        } else {
+            clearInterval(deleteInterval);
+            placeholderIndex = (placeholderIndex + 1) % placeholderTexts.length;
+            startPlaceholderAnimation();
+        }
+    }, AI_DELETING_SPEED);
+}
 
-    // KORRIGIERTE LOGIK
-    if (aboutMeButton) {
-        aboutMeButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            const aboutContentSource = document.getElementById('about-me-content');
-            if (aboutContentSource) {
-                // Liest den Inhalt von der Seite und wendet Paginierung an
-                paginateAndShowModal(aboutContentSource.innerHTML);
-            }
-        });
-    }
-
-    if (impressumLink) {
-        impressumLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            loadLegalPageInModal('impressum'); // Lädt externe Datei
-        });
-    }
-
-    if (datenschutzLink) {
-        datenschutzLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            loadLegalPageInModal('datenschutz'); // Lädt externe Datei
-        });
-    }
+// Diese Funktion initialisiert nur die visuellen Aspekte und Event Listener
+function initAiPlaceholderVisuals() {
+    // KORREKTUR: Das Element wird erst hier gesucht, NACHDEM die Seite geladen ist.
+    aiQuestionInput = document.getElementById('ai-question');
+    if (!aiQuestionInput) return;
     
-    // ... (Restlicher Code für die Schliessen-Buttons)
+    aiQuestionInput.addEventListener('focus', stopPlaceholderAnimation);
+    aiQuestionInput.addEventListener('blur', () => { if (aiQuestionInput.value === '') startPlaceholderAnimation(); });
+    
+    startPlaceholderAnimation();
 }
 
-export function initModals() {
-    setupCookieModal();
-    setupContactModal();
-    setupLegalModals();
+// Die Haupt-Initialisierungsfunktion für dieses Modul
+export function initTypewriters() {
+    initH1Typewriter();
+    initAiPlaceholderVisuals();
+
+    const style = document.createElement('style');
+    style.innerHTML = `.cursor { display: inline-block; width: 3px; height: 1em; background-color: var(--accent-color); animation: blink 0.7s infinite; vertical-align: bottom; margin-left: 5px; } @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }`;
+    document.head.appendChild(style);
 }
