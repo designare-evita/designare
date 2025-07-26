@@ -1,10 +1,9 @@
 /*
  * =============================================
- * Stile für Artikelseiten (artikel.css) - KORRIGIERTE VERSION
+ * Stile für Artikelseiten (artikel.css) - FINALE KORRIGIERTE VERSION
  * =============================================
- * - Header-Höhe angepasst und Scrollbars aktiviert.
- * - Behebt fehlende globale Stile und passt das Layout für bessere Lesbarkeit an.
- * - Nutzt CSS-Variablen für die nahtlose Integration in den Dark/Light-Mode.
+ * - Header-Höhe und Abstände an style.css angeglichen (80px Desktop / 65px Mobile).
+ * - Stellt sicher, dass das Layout auf allen Seiten konsistent ist.
  */
 
 /* Globale Farbvariablen & Basis-Stile (aus style.css übernommen) */
@@ -19,6 +18,9 @@
     --headline-color: #ffffff;
     --background-secondary: #2c2c2c;
     --code-background: #222222;
+    /* Variablen für Header-Höhe direkt aus style.css übernommen */
+    --header-height-desktop: 80px;
+    --header-height-mobile: 65px;
 }
 
 body:not(.dark-mode) {
@@ -40,10 +42,10 @@ body {
     margin: 0;
     padding: 0;
     transition: background-color 0.4s ease, color 0.4s ease;
-    overflow-y: auto; /* Stellt sicher, dass die vertikale Scrollbar immer da ist, wenn benötigt */
+    overflow-y: auto; 
 }
 
-/* Header-Stile (aus style.css übernommen) */
+/* ## KORRIGIERTE HEADER-STILE ## */
 .main-header {
     position: fixed;
     top: 0;
@@ -52,16 +54,16 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 20px;
+    padding: 20px;
     z-index: 1000;
-    height: 30px; /* ## NEUE HÖHE ## */
+    height: var(--header-height-desktop); /* Korrekte Desktop-Höhe */
     background-color: var(--bg-color);
     border-bottom: 1px solid var(--border-color);
     box-sizing: border-box;
 }
 
 #top-left-logo-img {
-    height: 40px; /* Angepasst an neue Header-Höhe */
+    height: 46px; /* Korrekte Logo-Höhe wie auf der Startseite */
     width: auto;
 }
 
@@ -86,11 +88,10 @@ body {
     transform: scale(1.1);
 }
 
-
-/* Container und grundlegendes Layout für den Artikel */
+/* ## KORRIGIERTER ABSTAND FÜR ARTIKEL-INHALT ## */
 #article-page {
     max-width: 1200px;
-    margin: 110px auto 40px auto; /* ## Platz für den Header angepasst (70px + 40px Abstand) ## */
+    margin: 120px auto 40px auto; /* Korrekter Abstand (80px Header + 40px Puffer) */
     padding: 2rem 3rem;
     background-color: var(--background-secondary);
     border-radius: 8px;
@@ -119,7 +120,6 @@ body {
     opacity: 0.8;
     margin-bottom: 1rem;
 }
-
 
 /* Hauptinhalt des Artikels */
 #article-page section {
@@ -287,11 +287,11 @@ body {
 
 @media (max-width: 768px) {
     .main-header {
-        height: 65px;
+        height: var(--header-height-mobile); /* Korrekte Mobile-Höhe */
         padding: 15px 10px;
     }
     #article-page {
-        margin: 85px auto 20px auto;
+        margin: 85px auto 20px auto; /* Korrekter Abstand für Mobile-Header */
         padding: 1.5rem;
     }
     #article-page h1 {
