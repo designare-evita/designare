@@ -37,9 +37,10 @@ body {
 }
 
 .legal-container h1 {
-    font-size: 2rem;      /* Ca. 33% kleiner als die ursprünglichen 3rem */
-    line-height: 1.3;     /* Stellt sicher, dass der Zeilenabstand gut aussieht */
-    margin-bottom: 0.5rem; /* Reduziert den Abstand zum Untertitel leicht */
+    font-size: 2rem;
+    line-height: 1.3;
+    height: auto; 
+    margin-bottom: 1rem; 
 }
 
 footer {
