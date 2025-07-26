@@ -107,5 +107,5 @@ flex-basis: auto;
 
 /* Abstand für den AI-Container in der Bild-Spalte */
 .column-image .ai-container {
-    margin-top: 2rem;
+    margin-top: 0rem;
 }
