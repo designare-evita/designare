@@ -62,25 +62,25 @@ footer {
 
 .two-column-container {
     display: flex;
-    align-items: flex-start; /* Richtet Text und Bild oben aus */
-    gap: 2.5rem;             /* Abstand zwischen Text und Bild */
-    margin-top: 1.5rem;      /* Abstand nach dem Untertitel */
+    align-items: flex-start; 
+    gap: 3rem;              /* Abstand zwischen den Spalten leicht erhöht */
+    margin-top: 1.5rem;
 }
 
 .column-text {
-    flex: 1; /* Text-Spalte füllt den verfügbaren Platz */
+    flex: 1;                /* Text-Spalte füllt den verfügbaren Platz flexibel auf */
     min-width: 0;
 }
 
 .column-image {
-    flex: 0 0 35%;     /* Bild-Spalte: Feste Breite von 35% */
-    max-width: 35%;
-    position: sticky;  /* Lässt das Bild beim Scrollen "kleben" */
-    top: 120px;        /* Abstand vom oberen Rand beim "Kleben" */
+    flex-basis: 45%;        /* Bild-Spalte: Breite auf 45% erhöht */
+    max-width: 45%;         /* Stellt sicher, dass die Spalte nicht breiter wird */
+    position: sticky;
+    top: 120px;
 }
 
 .column-image img {
-    width: 100%;       /* Bild füllt die Spalte komplett aus */
+    width: 100%;
     height: auto;
     border-radius: 8px;
 }
@@ -95,6 +95,7 @@ footer {
         max-width: 100%;   /* Bild nimmt die volle Breite ein */
         position: relative; /* Hebt das "Kleben" auf */
         top: 0;
+flex-basis: auto; 
     }
 }
 
