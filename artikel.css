@@ -1,35 +1,27 @@
-/* ki-integration-style.css */
+/* artikel.css */
 
-/* Stellt sicher, dass die Seite immer einen Scrollbalken hat,
-   auch wenn der Inhalt theoretisch auf den Bildschirm passt. */
 body {
     overflow-y: scroll;
 }
 
-/* Haupt-Layout für die Inhaltsseite */
 #hero {
-    /* Hebt die Zentrierung auf und richtet den Inhalt oben aus */
     align-items: flex-start;
-    padding-top: 5vh; /* Abstand vom oberen Rand */
-    height: auto; /* Höhe passt sich dem Inhalt an */
+    padding-top: 5vh;
+    height: auto;
     min-height: calc(100vh - var(--header-height-desktop));
 }
 
 #hero .container {
-    /* Setzt die maximale Breite und richtet linksbündig aus */
-    max-width: 1400px;
-    align-items: flex-start; /* Text und Elemente im Container linksbündig */
-    margin: 0 auto; /* Zentriert den Container selbst auf dem Bildschirm */
-
-    /* ENTFERNT DEN 3D-SCHWEBEEFFEKT */
+    max-width: 1200px;
+    align-items: flex-start;
+    margin: 0 auto;
     transform: none !important;
     transition: none;
 }
 
-/* Zusätzliche Anpassungen für den Inhalt, damit er linksbündig sauber aussieht */
 .legal-container {
     text-align: left;
-    width: 100%; /* Stellt sicher, dass der Container die volle Breite nutzt */
+    width: 100%;
 }
 
 .legal-container .subtitle {
@@ -39,21 +31,21 @@ body {
 #hero h1 {
     font-size: 2rem;
     line-height: 1.3;
-    height: auto; /* Hebt die feste Höhe auf */
-    margin-bottom: 1rem; /* Sorgt für sauberen Abstand */
+    height: auto !important;
+    margin-bottom: 1rem;
 }
 
 .legal-container .subtitle {
-    margin-top: 0; /* Stellt sicher, dass der Untertitel keinen zusätzlichen Abstand nach oben hat */
+    margin-top: 0;
 }
 
 footer {
-    position: relative; /* Hebt die 'fixed' Positionierung auf */
+    position: relative;
     width: 100%;
-    padding: 20px 0;    /* Fügt Abstand oben/unten hinzu */
-    margin-top: 50px;   /* Sorgt für Abstand zum Hauptinhalt */
-    justify-content: center; /* Zentriert die Links im Footer */
-    border-top: 1px solid var(--border-color); /* Fügt eine dezente Trennlinie hinzu */
+    padding: 20px 0;
+    margin-top: 50px;
+    justify-content: center;
+    border-top: 1px solid var(--border-color);
 }
 
 .two-column-container {
@@ -73,10 +65,8 @@ footer {
     max-width: 45%;
     position: sticky;
     top: 120px;
-
-    /* NEU: Flexbox-Eigenschaften für die vertikale Ausrichtung */
     display: flex;
-    flex-direction: column; /* Stapelt Bild und AI-Box untereinander */
+    flex-direction: column;
 }
 
 .column-image img {
@@ -85,7 +75,6 @@ footer {
     border-radius: 8px;
 }
 
-/* NEU: Zentriert den AI-Container im verfügbaren Platz */
 .column-image .ai-container {
     margin-top: auto;
     margin-bottom: auto;
@@ -94,61 +83,58 @@ footer {
 .fazit-box {
     margin-top: 2rem;
     padding: 1.5rem;
-    border-left: 4px solid var(--accent-color); /* Dicker Rand in Akzentfarbe links */
-    background-color: rgba(0, 0, 0, 0.05); /* Leichter Hintergrund */
-    border-radius: 0 8px 8px 0; /* Abgerundete Ecken rechts */
+    border-left: 4px solid var(--accent-color);
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 0 8px 8px 0;
 }
 
 body.dark-mode .fazit-box {
-    background-color: rgba(255, 255, 255, 0.05); /* Leichter Hintergrund im Dark Mode */
+    background-color: rgba(255, 255, 255, 0.05);
 }
 
 .fazit-box h3 {
-    margin-top: 0; /* Entfernt den oberen Abstand bei der Überschrift in der Box */
+    margin-top: 0;
 }
 
-/* -- NEU: Eigene Listenpunkte mit Favicon -- */
-.ul {
-    list-style-type: none; /* Entfernt die Standard-Punkte */
+/* KORREKTUR: Falscher Selektor von .ul auf .column-text ul geändert */
+.column-text ul {
+    list-style-type: none;
     padding-left: 0;
 }
 
-.ul li {
-    padding-left: 30px; /* Schafft Platz für das Icon */
+.column-text ul li {
+    padding-left: 30px;
     position: relative;
-    margin-bottom: 0.8rem; /* Abstand zwischen den Punkten */
+    margin-bottom: 0.8rem;
 }
 
-.ul li::before {
-    content: ''; /* Erforderlich für Pseudo-Elemente */
+.column-text ul li::before {
+    content: '';
     display: inline-block;
     position: absolute;
     left: 0;
-    top: 5px; /* Vertikale Ausrichtung des Icons anpassen */
-    
-    width: 16px;  /* Grösse des Icons */
-    height: 16px; /* Grösse des Icons */
-    
-    background-image: url('/images/favicon.png'); /* Pfad zu Ihrem Favicon */
+    top: 5px;
+    width: 16px;
+    height: 16px;
+    background-image: url('/images/favicon.png');
     background-size: contain;
     background-repeat: no-repeat;
 }
 
-/* Responsive Anpassung für Smartphones */
 @media (max-width: 768px) {
     .two-column-container {
-        flex-direction: column; /* Spalten untereinander anordnen */
+        flex-direction: column;
     }
 
     .column-image {
-        max-width: 100%;   /* Bild nimmt die volle Breite ein */
-        position: relative; /* Hebt das "Kleben" auf */
+        max-width: 100%;
+        position: relative;
         top: 0;
-flex-basis: auto; 
+        flex-basis: auto; 
     }
-}
-
-/* Abstand für den AI-Container in der Bild-Spalte */
-.column-image .ai-container {
-    margin-top: 0rem;
+    
+    .column-image .ai-container {
+        margin-top: 2rem; /* Stellt den Abstand auf Mobilgeräten wieder her */
+        margin-bottom: 0;
+    }
 }
