@@ -39,25 +39,33 @@ font-display: swap;
 }
 
 /* 2. Globale Einstellungen & Farbvariablen */
+/* in style.css */
+
+/* 2. Globale Einstellungen & Farbvariablen */
 :root {
+    /* NEU: Die Dark-Mode-Farben sind jetzt der Standard */
     --accent-color: #FCB500;
     --accent-color-rgba: rgba(252, 181, 0, 0.85);
-    --bg-color: #F8F7F4;
-    --border-color: #999999; /* Dunkler für bessere Sichtbarkeit im Tagmodus */
-    --particle-color: #888888;
-    --particle-line-color: #cccccc;
-    --text-color: #333333;
-    --header-height-desktop: 80px; /* NEU: Variable für Header-Höhe Desktop */
-    --header-height-mobile: 65px; /* NEU: Variable für Header-Höhe Mobile */
-}
-
-body.dark-mode {
     --bg-color: #1a1a1a;
-    --border-color: #aaaaaa; /* Heller für bessere Sichtbarkeit im Nachtmodus */
+    --border-color: #aaaaaa;
     --particle-color: #bbbbbb;
     --particle-line-color: #888888;
     --text-color: #eeeeee;
+    --header-height-desktop: 80px;
+    --header-height-mobile: 65px;
 }
+
+/* NEU: Der Light Mode wird nur aktiviert, wenn die .dark-mode Klasse NICHT vorhanden ist. */
+/* Wir verwenden :not(.dark-mode) auf dem html- oder body-Tag */
+body:not(.dark-mode) {
+    --bg-color: #F8F7F4;
+    --border-color: #999999;
+    --particle-color: #888888;
+    --particle-line-color: #cccccc;
+    --text-color: #333333;
+}
+
+/* WICHTIG: Die alte body.dark-mode Regel kann jetzt entfernt werden. */
 
 .legal-container h2 {
 font-size: 2em;
