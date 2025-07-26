@@ -1,20 +1,19 @@
 // js/modals.js
 
 // KORREKTUR: Die problematische Zeile "const body = document.body;" wurde entfernt.
-// Wir greifen direkt auf document.body zu, wenn wir es brauchen.
 
 // Allgemeine Lightbox-Funktionen
 const openLightbox = (lightboxElement) => {
     if (lightboxElement) {
         lightboxElement.classList.add('visible');
-        document.body.style.overflow = 'hidden';
+        document.body.style.overflow = 'hidden'; // Greift direkt auf document.body zu
     }
 };
 
 const closeLightbox = (lightboxElement) => {
     if (lightboxElement) {
         lightboxElement.classList.remove('visible');
-        document.body.style.overflow = '';
+        document.body.style.overflow = ''; // Greift direkt auf document.body zu
     }
 };
 
