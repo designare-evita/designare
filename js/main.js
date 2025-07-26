@@ -1,17 +1,19 @@
-import { initTheme } from './theme.js';
-import { initEffects } from './effects.js';
-import { initTypewriter } from './typewriter.js';
-import { initModals, loadHeaderFooter, initLegalLinks, initContactForm, initCookieBanner } from './modals.js';
-import { initAIForm } from './ai-form.js';
+// js/main.js
 
-document.addEventListener('DOMContentLoaded', () => {
-    loadHeaderFooter();
-    initTheme();
+import { initEffects } from './effects.js';
+import { initTheme } from './theme.js';
+import { initTypewriters } from './typewriter.js';
+import { initModals } from './modals.js';
+import { initAiForm } from './ai-form.js'; // NEU: Importiert das AI-Form-Modul
+
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // Initialisiert alle importierten Module
     initEffects();
-    initTypewriter();
+    initTheme();
+    initTypewriters();
     initModals();
-    initLegalLinks();
-    initContactForm();
-    initCookieBanner();
-    initAIForm();
+    initAiForm(); // NEU: Initialisiert das AI-Form-Modul
+
+    console.log("Alle Module erfolgreich initialisiert.");
 });

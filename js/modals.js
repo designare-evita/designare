@@ -1,91 +1,217 @@
-// Function to load header and footer
-export function loadHeaderFooter() {
-    fetch('header.html')
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('header').innerHTML = data;
-            // Re-initialize event listeners for dynamically loaded content if needed
-            initModals(); // Example: Re-init modal buttons in the header
-            initTheme(); // Re-init theme toggle in the header
-        });
+// js/modals.js
 
-    fetch('footer.html')
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('footer').innerHTML = data;
-            initLegalLinks(); // Re-init legal links in the footer
-        });
-}
+const body = document.body;
 
-// Function to handle modal popups
-export function initModals() {
-    const aboutMeBtn = document.getElementById('about-me-btn');
-    const legalModal = document.getElementById('legal-modal');
-    const closeLegalModalBtn = document.getElementById('close-legal-modal');
-    const legalModalContentArea = document.getElementById('legal-modal-content-area');
-
-    if (aboutMeBtn) {
-        aboutMeBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            const aboutContent = document.getElementById('about-me-content').innerHTML;
-            legalModalContentArea.innerHTML = aboutContent;
-            legalModal.style.display = 'flex';
-        });
+// Allgemeine Lightbox-Funktionen
+const openLightbox = (lightboxElement) => {
+    if (lightboxElement) {
+        lightboxElement.classList.add('visible');
+        body.style.overflow = 'hidden';
     }
+};
 
-    if (closeLegalModalBtn) {
-        closeLegalModalBtn.onclick = () => {
-            legalModal.style.display = 'none';
-        };
+const closeLightbox = (lightboxElement) => {
+    if (lightboxElement) {
+        lightboxElement.classList.remove('visible');
+        body.style.overflow = '';
     }
-}
+};
 
-// Function to handle legal links
-export function initLegalLinks() {
-    const legalLinks = document.querySelectorAll('.legal-link');
-    const legalModal = document.getElementById('legal-modal');
-    const legalContentArea = document.getElementById('legal-modal-content-area');
+// Cookie-Lightbox-Logik
+function setupCookieModal() {
+    const cookieInfoLightbox = document.getElementById('cookie-info-lightbox');
+    const acknowledgeCookieLightboxBtn = document.getElementById('acknowledge-cookie-lightbox');
+    const privacyPolicyLinkButton = document.getElementById('privacy-policy-link-button');
+    const cookieInfoButton = document.getElementById('cookie-info-button');
 
-    legalLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const url = link.getAttribute('href');
-            fetch(url)
-                .then(response => response.text())
-                .then(html => {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
-                    const content = doc.querySelector('.legal-container').innerHTML;
-                    legalContentArea.innerHTML = content;
-                    legalModal.style.display = 'flex';
-                });
-        });
+    if (!localStorage.getItem('hasSeenCookieInfoLightbox')) {
+        setTimeout(() => openLightbox(cookieInfoLightbox), 1000);
+    }
+    if (cookieInfoButton) cookieInfoButton.addEventListener('click', () => openLightbox(cookieInfoLightbox));
+    if (acknowledgeCookieLightboxBtn) acknowledgeCookieLightboxBtn.addEventListener('click', () => {
+        closeLightbox(cookieInfoLightbox);
+        localStorage.setItem('hasSeenCookieInfoLightbox', 'true');
+    });
+    if (privacyPolicyLinkButton) privacyPolicyLinkButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        closeLightbox(cookieInfoLightbox);
+        loadLegalPageInModal('datenschutz'); 
+    });
+    if (cookieInfoLightbox) cookieInfoLightbox.addEventListener('click', (e) => {
+        if (e.target === cookieInfoLightbox) closeLightbox(cookieInfoLightbox);
     });
 }
 
+// Kontakt-Modal-Logik
+function setupContactModal() {
+    // ... die Kontakt-Modal-Logik bleibt unverändert ...
+    const contactButton = document.getElementById('contact-button');
+    const contactModal = document.getElementById('contact-modal');
+    const contactForm = document.getElementById('contact-form-inner');
+    const contactSuccessMessage = document.getElementById('contact-success-message');
+    const closeSuccessMessageBtn = document.getElementById('close-success-message');
+    const closeModalButton = document.getElementById('close-modal');
 
-// Function for contact form modal
-export function initContactForm() {
-    // This part was not in the original files but is needed for completeness
-    // If you have specific code for the contact form, it should go here.
-}
+    if (contactButton) contactButton.addEventListener('click', () => openLightbox(contactModal));
+    if (closeModalButton) closeModalButton.addEventListener('click', () => closeLightbox(contactModal));
+    if (contactModal) contactModal.addEventListener('click', (e) => { if (e.target === contactModal) closeLightbox(contactModal); });
 
-// Function for cookie banner
-export function initCookieBanner() {
-    const cookieLightbox = document.getElementById('cookie-info-lightbox');
-    const acknowledgeBtn = document.getElementById('acknowledge-cookie-lightbox');
-
-    if (cookieLightbox && !localStorage.getItem('cookieAcknowledged')) {
-        cookieLightbox.style.display = 'flex';
-    }
-
-    if (acknowledgeBtn) {
-        acknowledgeBtn.addEventListener('click', () => {
-            localStorage.setItem('cookieAcknowledged', 'true');
-            cookieLightbox.style.display = 'none';
+    if (contactForm) {
+        contactForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(contactForm);
+            const object = {};
+            formData.forEach((value, key) => { object[key] = value; });
+            if (!object['_subject']) {
+                object['_subject'] = 'Neue Kontaktanfrage von designare.at';
+            }
+            object['_honey'] = '';
+            const originalButtonText = e.submitter.innerText;
+            e.submitter.innerText = "Sende...";
+            e.submitter.disabled = true;
+            try {
+                const response = await fetch('https://formsubmit.co/ajax/michael@designare.at', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify(object)
+                });
+                const data = await response.json();
+                if (data.success) {
+                    contactForm.style.display = 'none';
+                    contactSuccessMessage.style.display = 'block';
+                    contactForm.reset();
+                } else {
+                    alert('Fehler: ' + data.message);
+                }
+            } catch (error) {
+                alert('Ein unerwarteter Fehler ist aufgetreten.');
+            } finally {
+                e.submitter.innerText = originalButtonText;
+                e.submitter.disabled = false;
+            }
         });
     }
+
+    if (closeSuccessMessageBtn) closeSuccessMessageBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        closeLightbox(contactModal);
+    });
 }
 
-// Re-importing theme to avoid circular dependency issues from main.js
-import { initTheme } from './theme.js';
+// KORRIGIERT: Legal-Seiten-Navigation mit Paginierung
+async function loadLegalPageInModal(pageName) {
+    const legalModal = document.getElementById('legal-modal');
+    const legalModalContentArea = document.getElementById('legal-modal-content-area');
+    const url = `${pageName}.html`;
+    
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        
+        const htmlContent = await response.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlContent, 'text/html');
+        const legalContainer = doc.querySelector('.legal-container');
+
+        if (legalContainer) {
+            legalModalContentArea.innerHTML = ''; // Leeren
+            const children = Array.from(legalContainer.children);
+            
+            let allParts = [];
+            let currentPage = 0;
+
+            // Logik zum Aufteilen des Inhalts (Paginierung)
+            if (pageName === 'datenschutz') {
+                const findElementById = (id) => children.find(child => child.id === id);
+                const getIndexOfElement = (element) => children.indexOf(element);
+                const splitElements = [
+                    'datenschutz-part-2-start', 'datenschutz-part-3-start', 'datenschutz-part-4-start',
+                    'datenschutz-part-5-start', 'datenschutz-part-6-start'
+                ].map(id => findElementById(id)).filter(el => el);
+                
+                if (splitElements.length > 0) {
+                    const indices = splitElements.map(getIndexOfElement).sort((a, b) => a - b);
+                    let lastIndex = 0;
+                    indices.forEach(index => {
+                        allParts.push(children.slice(lastIndex, index));
+                        lastIndex = index;
+                    });
+                    allParts.push(children.slice(lastIndex));
+                } else {
+                    allParts.push(children); // Fallback, falls keine IDs gefunden
+                }
+            } else {
+                 allParts.push(children); // Impressum und About nicht paginieren
+            }
+
+            const partDivs = allParts.map(part => {
+                const div = document.createElement('div');
+                part.forEach(child => div.appendChild(child.cloneNode(true)));
+                return div;
+            });
+
+            const renderCurrentPart = () => {
+                partDivs.forEach((div, index) => {
+                    div.style.display = (index === currentPage) ? 'block' : 'none';
+                });
+                legalModalContentArea.scrollTop = 0;
+                updatePaginationButtons();
+            };
+
+            const updatePaginationButtons = () => {
+                let backButton = legalModalContentArea.querySelector('#legal-back-button');
+                let continueButton = legalModalContentArea.querySelector('#legal-continue-button');
+                if (backButton) backButton.style.display = (currentPage > 0) ? 'block' : 'none';
+                if (continueButton) continueButton.style.display = (currentPage < allParts.length - 1) ? 'block' : 'none';
+            };
+
+            partDivs.forEach(div => legalModalContentArea.appendChild(div));
+
+            if (allParts.length > 1) {
+                const paginationButtonsDiv = document.createElement('div');
+                paginationButtonsDiv.className = 'legal-modal-pagination-buttons';
+                const backButton = document.createElement('button');
+                backButton.id = 'legal-back-button';
+                backButton.textContent = 'Zurück';
+                backButton.addEventListener('click', () => { currentPage--; renderCurrentPart(); });
+                const continueButton = document.createElement('button');
+                continueButton.id = 'legal-continue-button';
+                continueButton.textContent = 'Weiter';
+                continueButton.addEventListener('click', () => { currentPage++; renderCurrentPart(); });
+                paginationButtonsDiv.appendChild(backButton);
+                paginationButtonsDiv.appendChild(continueButton);
+                legalModalContentArea.appendChild(paginationButtonsDiv);
+            }
+
+            renderCurrentPart();
+            openLightbox(legalModal);
+
+        } else {
+             alert(`Fehler: .legal-container in ${pageName}.html nicht gefunden.`);
+        }
+    } catch (error) {
+        alert(`Die Seite ${pageName} konnte nicht geladen werden.`);
+    }
+}
+
+
+function setupLegalModals() {
+    const aboutMeButton = document.getElementById('about-me-button');
+    const impressumLink = document.getElementById('impressum-link');
+    const datenschutzLink = document.getElementById('datenschutz-link');
+    const legalModal = document.getElementById('legal-modal');
+    const closeLegalModalBtn = document.getElementById('close-legal-modal');
+
+    if (aboutMeButton) aboutMeButton.addEventListener('click', (e) => { e.preventDefault(); loadLegalPageInModal('about'); });
+    if (impressumLink) impressumLink.addEventListener('click', (e) => { e.preventDefault(); loadLegalPageInModal('impressum'); });
+    if (datenschutzLink) datenschutzLink.addEventListener('click', (e) => { e.preventDefault(); loadLegalPageInModal('datenschutz'); });
+    
+    if (closeLegalModalBtn) closeLegalModalBtn.addEventListener('click', () => closeLightbox(legalModal));
+    if (legalModal) legalModal.addEventListener('click', (e) => { if (e.target === legalModal) closeLightbox(legalModal); });
+}
+
+export function initModals() {
+    setupCookieModal();
+    setupContactModal();
+    setupLegalModals();
+}
