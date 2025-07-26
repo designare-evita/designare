@@ -97,18 +97,18 @@ body.dark-mode .fazit-box {
 }
 
 /* KORREKTUR: Falscher Selektor von .ul auf .column-text ul geändert */
-.column-text ul {
+.ul {
     list-style-type: none;
     padding-left: 0;
 }
 
-.column-text ul li {
+.ul li {
     padding-left: 30px;
     position: relative;
     margin-bottom: 0.8rem;
 }
 
-.column-text ul li::before {
+.ul li::before {
     content: '';
     display: inline-block;
     position: absolute;
