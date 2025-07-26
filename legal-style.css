@@ -166,3 +166,8 @@ a:hover {
 .back-link:hover i {
     transform: translateX(-5px);
 }
+
+.legal-container h2 {
+    text-align: left;
+    margin-bottom: 15px;
+}
