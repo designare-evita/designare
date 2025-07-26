@@ -1,5 +1,72 @@
 // js/typewriter.js
 
+// --- Globale Variablen für den AI Placeholder ---
+const AI_TYPING_SPEED = 120;
+const AI_DELETING_SPEED = 50;
+const AI_DELAY_AFTER_TYPING = 5000;
+const placeholderTexts = ["Hallo! Evita hier...", "Michaels KI-Joker...", "Frag mich etwas..."];
+let placeholderIndex = 0;
+let charPlaceholderIndex = 0;
+let typeInterval;
+let deleteInterval;
+let aiQuestionInput; // Wird in initAiPlaceholderTypewriter initialisiert
+
+/**
+ * Stoppt die Typewriter-Animation für das AI-Input-Feld.
+ * Wichtig, damit der Benutzer tippen kann.
+ */
+export function stopPlaceholderAnimation() {
+    clearInterval(typeInterval);
+    clearInterval(deleteInterval);
+    if (aiQuestionInput) {
+        aiQuestionInput.placeholder = ""; // Bestehenden Platzhalter löschen
+    }
+}
+
+/**
+ * Startet die Typewriter-Animation für das AI-Input-Feld neu.
+ */
+export function startPlaceholderAnimation() {
+    // Sicherstellen, dass keine alten Animationen laufen
+    stopPlaceholderAnimation(); 
+    if (!aiQuestionInput) return;
+    
+    // Setzt den Startpunkt zurück und beginnt mit dem Tippen
+    charPlaceholderIndex = 0;
+    aiQuestionInput.placeholder = ""; 
+    setTimeout(typePlaceholder, 100);
+}
+
+function typePlaceholder() {
+    let newText = placeholderTexts[placeholderIndex];
+    typeInterval = setInterval(() => {
+        if (charPlaceholderIndex < newText.length) {
+            if (aiQuestionInput) {
+                aiQuestionInput.placeholder += newText.charAt(charPlaceholderIndex++);
+            }
+        } else {
+            clearInterval(typeInterval);
+            setTimeout(deletePlaceholder, AI_DELAY_AFTER_TYPING);
+        }
+    }, AI_TYPING_SPEED);
+}
+
+function deletePlaceholder() {
+    deleteInterval = setInterval(() => {
+        if (aiQuestionInput) {
+            let currentText = aiQuestionInput.placeholder;
+            if (currentText.length > 0) {
+                aiQuestionInput.placeholder = currentText.slice(0, -1);
+            } else {
+                clearInterval(deleteInterval);
+                placeholderIndex = (placeholderIndex + 1) % placeholderTexts.length;
+                // Starte die Animation für den nächsten Text von vorne
+                startPlaceholderAnimation(); 
+            }
+        }
+    }, AI_DELETING_SPEED);
+}
+
 function initH1Typewriter() {
     const typewriterElement = document.getElementById('typewriter-h1');
     if (!typewriterElement) return;
@@ -32,71 +99,15 @@ function initH1Typewriter() {
 
 function initAiPlaceholderTypewriter() {
     const aiForm = document.getElementById('ai-form');
-    if (!aiForm) return;
-
-    const aiQuestionInput = document.getElementById('ai-question');
-    const AI_TYPING_SPEED = 120, AI_DELETING_SPEED = 50, AI_DELAY_AFTER_TYPING = 5000;
-    const placeholderTexts = ["Hallo! Evita hier...", "Michaels KI-Joker...", "Frag mich etwas..."];
-    let placeholderIndex = 0, charPlaceholderIndex = 0, typeInterval, deleteInterval;
-
-    const stopPlaceholderAnimation = () => {
-        clearInterval(typeInterval); clearInterval(deleteInterval);
-        if (aiQuestionInput) aiQuestionInput.placeholder = "";
-    };
-
-    const startPlaceholderAnimation = () => {
-        clearInterval(typeInterval); clearInterval(deleteInterval);
-        if (aiQuestionInput) aiQuestionInput.placeholder = "";
-        charPlaceholderIndex = 0;
-        setTimeout(typePlaceholder, 100);
-    };
-
-    function typePlaceholder() {
-        let newText = placeholderTexts[placeholderIndex];
-        typeInterval = setInterval(() => {
-            if (charPlaceholderIndex < newText.length) {
-                aiQuestionInput.placeholder += newText.charAt(charPlaceholderIndex++);
-            } else {
-                clearInterval(typeInterval); setTimeout(deletePlaceholder, AI_DELAY_AFTER_TYPING);
-            }
-        }, AI_TYPING_SPEED);
-    }
-
-    function deletePlaceholder() {
-        deleteInterval = setInterval(() => {
-            let currentText = aiQuestionInput.placeholder;
-            if (currentText.length > 0) {
-                aiQuestionInput.placeholder = currentText.slice(0, -1);
-            } else {
-                clearInterval(deleteInterval);
-                placeholderIndex = (placeholderIndex + 1) % placeholderTexts.length;
-                startPlaceholderAnimation();
-            }
-        }, AI_DELETING_SPEED);
-    }
+    aiQuestionInput = document.getElementById('ai-question'); // Weise die globale Variable zu
+    if (!aiForm || !aiQuestionInput) return;
     
     aiQuestionInput.addEventListener('focus', stopPlaceholderAnimation);
     aiQuestionInput.addEventListener('blur', () => { if (aiQuestionInput.value === '') startPlaceholderAnimation(); });
     
-    aiForm.addEventListener('submit', () => stopPlaceholderAnimation());
-    const originalSubmitHandler = aiForm.onsubmit;
-    aiForm.onsubmit = (e) => {
-        if(originalSubmitHandler) originalSubmitHandler(e);
-        const thinkingMessage = "Einen Moment, Evita gleicht gerade ihre Bits und Bytes ab...";
-        // ... Logik um nach dem Submit die Animation wieder zu starten
-    };
-
     startPlaceholderAnimation();
 }
-
 
 // Exportiert eine Haupt-Initialisierungsfunktion für alle Typewriter
 export function initTypewriters() {
     initH1Typewriter();
-    initAiPlaceholderTypewriter();
-
-    // Stellt den Cursor-Stil bereit
-    const style = document.createElement('style');
-    style.innerHTML = `.cursor { display: inline-block; width: 3px; height: 1em; background-color: var(--accent-color); animation: blink 0.7s infinite; vertical-align: bottom; margin-left: 5px; } @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }`;
-    document.head.appendChild(style);
-}
