@@ -55,3 +55,45 @@ footer {
     justify-content: center; /* Zentriert die Links im Footer */
     border-top: 1px solid var(--border-color); /* Fügt eine dezente Trennlinie hinzu */
 }
+
+/* in artikel.css */
+
+/* -- NEU: 2-Spalten-Layout für Artikel -- */
+
+.two-column-container {
+    display: flex;
+    align-items: flex-start; /* Richtet Text und Bild oben aus */
+    gap: 2.5rem;             /* Abstand zwischen Text und Bild */
+    margin-top: 1.5rem;      /* Abstand nach dem Untertitel */
+}
+
+.column-text {
+    flex: 1; /* Text-Spalte füllt den verfügbaren Platz */
+    min-width: 0;
+}
+
+.column-image {
+    flex: 0 0 35%;     /* Bild-Spalte: Feste Breite von 35% */
+    max-width: 35%;
+    position: sticky;  /* Lässt das Bild beim Scrollen "kleben" */
+    top: 120px;        /* Abstand vom oberen Rand beim "Kleben" */
+}
+
+.column-image img {
+    width: 100%;       /* Bild füllt die Spalte komplett aus */
+    height: auto;
+    border-radius: 8px;
+}
+
+/* Responsive Anpassung für Smartphones */
+@media (max-width: 768px) {
+    .two-column-container {
+        flex-direction: column; /* Spalten untereinander anordnen */
+    }
+
+    .column-image {
+        max-width: 100%;   /* Bild nimmt die volle Breite ein */
+        position: relative; /* Hebt das "Kleben" auf */
+        top: 0;
+    }
+}
