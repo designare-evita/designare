@@ -107,6 +107,33 @@ body.dark-mode .fazit-box {
     margin-top: 0; /* Entfernt den oberen Abstand bei der Überschrift in der Box */
 }
 
+/* -- NEU: Eigene Listenpunkte mit Favicon -- */
+.column-text ul {
+    list-style-type: none; /* Entfernt die Standard-Punkte */
+    padding-left: 0;
+}
+
+.column-text ul li {
+    padding-left: 30px; /* Schafft Platz für das Icon */
+    position: relative;
+    margin-bottom: 0.8rem; /* Abstand zwischen den Punkten */
+}
+
+.column-text ul li::before {
+    content: ''; /* Erforderlich für Pseudo-Elemente */
+    display: inline-block;
+    position: absolute;
+    left: 0;
+    top: 5px; /* Vertikale Ausrichtung des Icons anpassen */
+    
+    width: 16px;  /* Grösse des Icons */
+    height: 16px; /* Grösse des Icons */
+    
+    background-image: url('/images/favicon.png'); /* Pfad zu Ihrem Favicon */
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
 /* Responsive Anpassung für Smartphones */
 @media (max-width: 768px) {
     .two-column-container {
