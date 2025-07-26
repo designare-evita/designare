@@ -40,7 +40,7 @@ export const stopPlaceholderAnimation = () => {
 };
 
 export const startPlaceholderAnimation = () => {
-    if (!aiQuestionInput) return; // Sicherstellen, dass das Element existiert
+    if (!aiQuestionInput) return;
     clearInterval(typeInterval); clearInterval(deleteInterval);
     aiQuestionInput.placeholder = "";
     charPlaceholderIndex = 0;
@@ -72,7 +72,8 @@ function deletePlaceholder() {
 }
 
 function initAiPlaceholderVisuals() {
-    aiQuestionInput = document.getElementById('ai-question'); // KORREKTUR: Zuweisung erst hier
+    // KORREKTUR: Das Element wird erst hier gesucht, NACHDEM die Seite geladen ist.
+    aiQuestionInput = document.getElementById('ai-question');
     if (!aiQuestionInput) return;
     
     aiQuestionInput.addEventListener('focus', stopPlaceholderAnimation);
