@@ -34,6 +34,7 @@ let placeholderIndex = 0, charPlaceholderIndex = 0;
 const AI_TYPING_SPEED = 120, AI_DELETING_SPEED = 50, AI_DELAY_AFTER_TYPING = 5000;
 const placeholderTexts = ["Hallo! Evita hier...", "Michaels KI-Joker...", "Frag mich etwas..."];
 
+// KORREKTUR: Die Funktionen werden jetzt exportiert, damit ai-form.js sie importieren kann
 export const stopPlaceholderAnimation = () => {
     clearInterval(typeInterval); clearInterval(deleteInterval);
     if (aiQuestionInput) aiQuestionInput.placeholder = "";
@@ -71,8 +72,8 @@ function deletePlaceholder() {
     }, AI_DELETING_SPEED);
 }
 
+// Diese Funktion initialisiert nur die visuellen Aspekte und Event Listener des Platzhalters
 function initAiPlaceholderVisuals() {
-    // KORREKTUR: Das Element wird erst hier gesucht, NACHDEM die Seite geladen ist.
     aiQuestionInput = document.getElementById('ai-question');
     if (!aiQuestionInput) return;
     
@@ -82,11 +83,7 @@ function initAiPlaceholderVisuals() {
     startPlaceholderAnimation();
 }
 
+// Die Haupt-Initialisierungsfunktion für dieses Modul
 export function initTypewriters() {
     initH1Typewriter();
-    initAiPlaceholderVisuals();
-
-    const style = document.createElement('style');
-    style.innerHTML = `.cursor { display: inline-block; width: 3px; height: 1em; background-color: var(--accent-color); animation: blink 0.7s infinite; vertical-align: bottom; margin-left: 5px; } @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }`;
-    document.head.appendChild(style);
-}
+    initAiPlaceholderVisual
