@@ -43,6 +43,10 @@ body {
     margin-bottom: 1rem; 
 }
 
+.legal-container .subtitle {
+    margin-top: 0; /* Stellt sicher, dass der Untertitel keinen zusätzlichen Abstand nach oben hat */
+}
+
 footer {
     position: relative; /* Hebt die 'fixed' Positionierung auf */
     width: 100%;
