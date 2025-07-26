@@ -1,180 +1,148 @@
-/* artikel.css - DEBUG VERSION mit maximaler Spezifität */
+/*
+ * =============================================
+ * Stile für Artikelseiten (artikel.css)
+ * =============================================
+ * - Überschreibt gezielt die Basis-Stile für eine bessere Lesbarkeit von Artikeln.
+ * - Verwendet die ID #article-page, um Spezifität zu gewährleisten und !important zu vermeiden.
+ * - Nutzt CSS-Variablen für die nahtlose Integration in den Dark/Light-Mode.
+ */
 
-body {
-    overflow-y: scroll;
+/* Container und grundlegendes Layout für den Artikel */
+#article-page {
+    max-width: 800px; /* Begrenzt die Breite für bessere Lesbarkeit */
+    margin: 4rem auto;
+    padding: 2rem;
+    background-color: var(--background-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease;
 }
-#hero {
-    align-items: flex-start;
-    padding-top: 5vh;
-    height: auto;
-    min-height: calc(100vh - var(--header-height-desktop, 80px));
+
+/* Header-Bereich des Artikels */
+#article-page .article-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 2rem;
 }
-#hero .container {
-    max-width: 1200px;
-    align-items: flex-start;
-    margin: 0 auto;
-    transform: none !important;
-    transition: none;
+
+#article-page h1 {
+    font-size: 2.8rem;
+    color: var(--headline-color);
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
 }
-.legal-container {
-    text-align: left;
-    width: 100%;
-}
-.legal-container .subtitle {
-    text-align: left;
-}
-#hero h1 {
-    font-size: 2rem;
-    line-height: 1.3;
-    height: auto !important;
+
+#article-page .subtitle {
+    font-size: 1.2rem;
+    color: var(--text-color-secondary);
     margin-bottom: 1rem;
 }
-.legal-container .subtitle {
-    margin-top: 0;
+
+#article-page .meta-info {
+    font-size: 0.9rem;
+    color: var(--text-color-secondary);
 }
-footer {
+
+/* Hauptinhalt des Artikels */
+#article-page section {
+    margin-bottom: 2.5rem;
+}
+
+#article-page h2 {
+    font-size: 2rem;
+    color: var(--headline-color);
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--accent-color);
+}
+
+#article-page p {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--text-color);
+    margin-bottom: 1.5rem;
+}
+
+#article-page strong {
+    color: var(--accent-color);
+    font-weight: 600;
+}
+
+/* Spezifische Stile für die Liste mit Stichpunkten */
+#article-page .column-text ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 1.5rem 0;
+}
+
+#article-page .column-text ul li {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--text-color);
+    padding-left: 2rem;
     position: relative;
-    width: 100%;
-    padding: 20px 0;
-    margin-top: 50px;
-    justify-content: center;
-    border-top: 1px solid var(--border-color, #ccc);
+    margin-bottom: 1rem;
 }
-.two-column-container {
-    display: flex;
-    align-items: flex-start; 
-    gap: 3rem;
-    margin-top: 1.5rem;
+
+/* Eigener Bullet Point im Akzentfarbton */
+#article-page .column-text ul li::before {
+    content: '✔'; /* Oder '▶' oder ein anderes Symbol */
+    position: absolute;
+    left: 0;
+    top: 2px;
+    color: var(--accent-color);
+    font-weight: bold;
+    font-size: 1.2rem;
 }
-.column-text {
-    flex: 1;
-    min-width: 0;
-}
-.column-image {
-    flex-basis: 45%;
-    max-width: 45%;
-    position: sticky;
-    top: 120px;
-    display: flex;
-    flex-direction: column;
-}
-.column-image img {
-    width: 100%;
-    height: auto;
+
+/* Code-Block für das Prompt-Beispiel */
+#article-page .code-box {
+    background-color: var(--code-background);
     border-radius: 8px;
-}
-.column-image .ai-container {
-    margin-top: auto;
-    margin-bottom: auto;
-}
-
-/* FAZIT-BOX - Mit maximaler Spezifität und Fallback-Werten */
-main#hero .container .legal-container .two-column-container .column-text .fazit-box,
-.fazit-box {
-    margin-top: 2rem !important;
-    padding: 1.5rem !important;
-    border-left: 4px solid #007bff !important; /* Fallback für --accent-color */
-    background-color: rgba(0, 0, 0, 0.05) !important;
-    border-radius: 0 8px 8px 0 !important;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important; /* Debug: Sichtbarer Schatten */
+    padding: 1.5rem;
+    margin: 2rem 0;
+    overflow-x: auto;
+    border: 1px solid var(--border-color);
 }
 
-/* Dark mode für fazit-box */
-body.dark-mode main#hero .container .legal-container .two-column-container .column-text .fazit-box,
-body.dark-mode .fazit-box {
-    background-color: rgba(255, 255, 255, 0.05) !important;
-    border-left-color: #4dabf7 !important; /* Helleres Blau für Dark Mode */
+#article-page .code-box pre {
+    margin: 0;
 }
 
-/* Fazit-box h3 */
-main#hero .container .legal-container .two-column-container .column-text .fazit-box h3,
-.fazit-box h3 {
-    margin-top: 0 !important;
-    color: #007bff !important; /* Debug: Blaue Farbe */
-    font-size: 1.2rem !important;
+#article-page .code-box code {
+    font-family: 'Fira Code', 'Courier New', monospace;
+    font-size: 0.95rem;
+    color: var(--text-color);
 }
 
-/* LISTEN-STYLING - Mit maximaler Spezifität */
-main#hero .container .legal-container .two-column-container .column-text ul,
-.column-text ul {
-    list-style-type: none !important;
-    padding-left: 0 !important;
-    margin: 1rem 0 !important;
-    border: 1px dashed red; /* DEBUG: Rote gestrichelte Umrandung */
+/* Box für das Fazit */
+#article-page .fazit-box {
+    margin-top: 3rem;
+    padding: 2rem;
+    border-left: 5px solid var(--accent-color);
+    background-color: var(--background-secondary);
+    border-radius: 0 8px 8px 0;
 }
 
-main#hero .container .legal-container .two-column-container .column-text ul li,
-.column-text ul li {
-    padding-left: 30px !important;
-    position: relative !important;
-    margin-bottom: 0.8rem !important;
-    line-height: 1.5 !important;
-    background-color: rgba(255, 0, 0, 0.1) !important; /* DEBUG: Leicht roter Hintergrund */
+#article-page .fazit-box h2 {
+    border-bottom: none; /* Im Fazit keine extra Linie unter der Überschrift */
+    padding-bottom: 0;
+    margin-bottom: 1rem;
 }
 
-/* Favicon als Listenpunkt */
-main#hero .container .legal-container .two-column-container .column-text ul li::before,
-.column-text ul li::before {
-    content: '' !important;
-    display: inline-block !important;
-    position: absolute !important;
-    left: 0 !important;
-    top: 5px !important;
-    width: 16px !important;
-    height: 16px !important;
-    background-image: url('images/favicon.png') !important;
-    background-size: contain !important;
-    background-repeat: no-repeat !important;
-    background-color: yellow !important; /* DEBUG: Gelber Hintergrund falls Bild nicht lädt */
-}
-
-/* Fallback: Wenn Favicon nicht lädt, zeige blauen Punkt */
-main#hero .container .legal-container .two-column-container .column-text ul li::after,
-.column-text ul li::after {
-    content: '●' !important;
-    position: absolute !important;
-    left: 5px !important;
-    top: 0 !important;
-    color: #007bff !important;
-    font-weight: bold !important;
-    font-size: 16px !important;
-}
-
+/* Responsive Anpassungen für kleinere Bildschirme */
 @media (max-width: 768px) {
-    .two-column-container {
-        flex-direction: column;
+    #article-page {
+        margin: 2rem auto;
+        padding: 1.5rem;
     }
-    .column-image {
-        max-width: 100%;
-        position: relative;
-        top: 0;
-        flex-basis: auto; 
-    }
-    .column-image .ai-container {
-        margin-top: 2rem;
-        margin-bottom: 0;
-    }
-    
-    /* Mobile: Fazit-box */
-    .fazit-box {
-        margin-left: -1rem !important;
-        margin-right: -1rem !important;
-        border-radius: 0 !important;
-    }
-}
 
-/* DEBUG: Zusätzliche Styles um zu testen ob CSS überhaupt geladen wird */
-.debug-test {
-    background-color: lime !important;
-    padding: 10px !important;
-    color: black !important;
-}
+    #article-page h1 {
+        font-size: 2.2rem;
+    }
 
-/* Notfall-CSS falls andere Stylesheets überschreiben */
-[class*="fazit"] {
-    border: 2px solid red !important; /* Falls fazit-box nicht greift */
-}
-
-[class*="column-text"] ul {
-    border: 2px solid blue !important; /* Falls column-text ul nicht greift */
+    #article-page h2 {
+        font-size: 1.8rem;
+    }
 }
