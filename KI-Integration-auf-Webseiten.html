@@ -13,26 +13,7 @@
     <link rel="canonical" href="https://designare.at/KI-Integration-auf-Webseiten.html" />
 </head>
 <body>
-   <header class="main-header">
-        <a href="index.html" id="top-left-logo-link" aria-label="Zur Startseite">
-            <img src="images/favicon.webp" alt="Michael Kanda Logo" id="top-left-logo-img">
-        </a>
-        <div class="header-right-controls">
-          <button id="about-me-button" aria-label="Über mich öffnen">
-            <i class="fa-regular fa-user"></i>
-          </button>
-          <button id="contact-button" aria-label="Kontaktformular öffnen">
-              <i class="far fa-envelope"></i>
-          </button>
-          <button id="cookie-info-button" aria-label="Cookie Informationen anzeigen">
-              <i class="fas fa-cookie-bite"></i>
-          </button>
-          <button id="theme-toggle" aria-label="Toggle dark mode">
-              <i class="fas fa-moon"></i>
-              <i class="fas fa-sun"></i>
-          </button>
-        </div>
-    </header>
+    <header id="header" class="main-header"></header>
 
     <main id="hero">
         <div id="particles-js"></div>
@@ -111,6 +92,16 @@ export default async function handler(req, res) {
         </div>
     </main>
 
+    <footer id="footer"></footer>
+
+    <div id="contact-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-button">&times;</button>
+            <h2>Kontakt</h2>
+            <p>Kontaktformular Inhalt würde hier stehen...</p>
+        </div>
+    </div>
+
     <div id="cookie-info-lightbox" class="modal-overlay">
         <div class="modal-content">
             <h2>Hinweis zu Cookies</h2>
@@ -145,10 +136,8 @@ export default async function handler(req, res) {
         </div>
     </div>
 
-    <footer>
-        <a href="impressum.html" id="impressum-link">Impressum</a>
-        <a href="datenschutz.html" id="datenschutz-link">Datenschutz</a>
-    </footer>
+    <div id="impressum-content" style="display: none;"></div>
+    <div id="datenschutz-content" style="display: none;"></div>
 
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script type="module" src="js/main.js"></script>
