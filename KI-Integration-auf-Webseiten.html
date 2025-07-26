@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moderne KI-Integration: Serverless vs. Klassisches Hosting – Ein Vergleich</title>
+    <meta name="description" content="Warum ist eine KI-Anbindung via Serverless Function auf Vercel oft schneller als ein Plugin in einem klassischen Hosting-Paket? Ein technischer Vergleich.">
+    
+    <link rel="icon" href="images/favicon.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"></noscript>
+    
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="legal-style.css">
+    <link rel="canonical" href="https://designare.at/KI-Integration-auf-Webseiten.html" />
+
+    <script>
+      (function() {
+        try {
+          var theme = localStorage.getItem('theme');
+          if (theme === 'dark' || !theme) {
+            document.documentElement.classList.add('dark-mode');
+          }
+        } catch (e) {}
+      })();
+    </script>
+</head>
+<body>
+
+    <header class="main-header">
+        <a href="index.html" id="top-left-logo-link" aria-label="Zur Startseite">
+            <img src="images/favicon.png" alt="Michael Kanda Logo" id="top-left-logo-img">
+        </a>
+        <div class="header-right-controls">
+          <button id="about-me-button" aria-label="Über mich öffnen">
+            <i class="fas fa-user"></i>
+          </button>
+          <button id="contact-button" aria-label="Kontaktformular öffnen">
+              <i class="far fa-envelope"></i>
+          </button>
+          <button id="cookie-info-button" aria-label="Cookie Informationen anzeigen">
+              <i class="fas fa-cookie-bite"></i>
+          </button>
+          <button id="theme-toggle" aria-label="Toggle dark mode">
+              <i class="fas fa-moon"></i>
+              <i class="fas fa-sun"></i>
+          </button>
+        </div>
+    </header>
+
+    <main id="hero">
+        <div id="particles-js"></div>
+        
+        <div class="container">
+            <div class="legal-container" style="max-width: 800px; background: transparent; padding: 0;">
+                <h1>Serverless vs. Klassisches Hosting</h1>
+                <p class="subtitle" style="margin-bottom: 2rem;">Warum die Architektur über die Geschwindigkeit Ihrer KI-Anbindung entscheidet</p>
+                
+                <h2>Die direkte Verbindung: Serverless Functions</h2>
+                <p>Auf dieser Webseite kommt eine moderne Architektur zum Einsatz. Eine Anfrage an die KI (z.B. an Gemini) nimmt den kürzesten Weg: Der Browser spricht direkt mit einer hochspezialisierten, "serverlosen" Funktion. Diese hat nur eine Aufgabe: die Anfrage an die KI weiterzuleiten und die Antwort zurückzuschicken. Es gibt keinen unnötigen Ballast. Dieser Ansatz ist auf maximale Geschwindigkeit und Skalierbarkeit ausgelegt, da die Infrastruktur global verteilt ist und bei Bedarf sofort reagiert.</p>
+
+                <h2>Der Umweg: KI-Plugins in klassischen Systemen</h2>
+                <p>In traditionellen Hosting-Paketen, oft mit Systemen wie WordPress, läuft ein KI-Plugin als Teil einer grossen Maschinerie. Eine Anfrage muss viele Stationen durchlaufen: Webserver, PHP-Interpreter, den WordPress-Kern, alle anderen aktiven Plugins und schliesslich die Datenbank. Jede dieser Stationen fügt wertvolle Millisekunden zur Antwortzeit hinzu. Das System ist ein Alleskönner, aber kein Spezialist für blitzschnelle API-Anfragen.</p>
+                
+                <p style="margin-top: 2rem; font-weight: 600;">Fazit: Für spezialisierte Aufgaben wie eine KI-Anbindung ist eine schlanke, serverlose Architektur oft deutlich performanter als die Integration in ein monolithisches All-in-One-System.</p>
+            </div>
+            </div>
+    </main>
+	
+    <div id="contact-modal" class="modal-overlay"> ... </div>
+    <div id="cookie-info-lightbox" class="modal-overlay"> ... </div>
+    <div id="legal-modal" class="modal-overlay"> ... </div>
+    <div id="about-me-content" style="display: none;"> ... </div>
+
+	<footer>
+        <a href="impressum.html" id="impressum-link">Impressum</a>
+        <a href="datenschutz.html" id="datenschutz-link">Datenschutz</a>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script type="module" src="js/main.js"></script>
+
+</body>
+</html>
