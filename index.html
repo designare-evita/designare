@@ -3,71 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Michael Kanda | Wo Webseiten & KI sich begegnen</title>
-    <link rel="icon" href="images/favicon.webp" type="image/webp">
+    <title>Michael Kanda | Wo Webseiten & KI sich begegnen (und manchmal streiten)</title>
+    <meta name="description" content="Michael Kanda bastelt Webseiten und bringt KI zum verzweifeln! Fragen? Evita, meine KI-Assistentin, hat die Antworten – und mehr Geduld als ich.">
+    
+    <link rel="icon" href="images/favicon.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/legal-style.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="legal-style.css">
 </head>
 <body>
-    <header id="header" class="main-header">
-        <div class="container header-container">
-            <a href="index.html" class="logo">MK</a>
-            <nav>
-                <a href="ueber-mich.html">Über Mich</a>
-                <a href="#" id="contact-btn">Kontakt</a>
-                <a href="https://medium.com/@michaelkanda" target="_blank" rel="noopener noreferrer">Blog</a>
-            </nav>
-            <button id="theme-toggle" aria-label="Theme wechseln"><i class="fas fa-sun"></i><i class="fas fa-moon"></i></button>
+
+    <!-- NEU: Einheitliche Top-Bar Struktur -->
+    <header class="main-header">
+        <a href="index.html" id="top-left-logo-link" aria-label="Zur Startseite">
+            <img src="images/favicon.png" alt="Michael Kanda Logo" id="top-left-logo-img">
+        </a>
+        <div class="header-right-controls">
+          <button id="about-me-button" aria-label="Über mich öffnen">
+    <i class="fa-regular fa-user"></i>
+            </button>
+            <button id="contact-button" aria-label="Kontaktformular öffnen">
+                <i class="far fa-envelope"></i>
+            </button>
+            <button id="cookie-info-button" aria-label="Cookie Informationen anzeigen">
+                <i class="fas fa-cookie-bite"></i>
+            </button>
+            <button id="theme-toggle" aria-label="Toggle dark mode">
+                <i class="fas fa-moon"></i>
+                <i class="fas fa-sun"></i>
+            </button>
         </div>
     </header>
+    <!-- ENDE NEU -->
 
     <main id="hero">
         <div id="particles-js"></div>
+        
         <div class="container">
-            <img src="images/Michael.webp" alt="Illustration Michael und Evita" class="profile-picture">
+            
+            <img src="images/Michael.png" alt="Illustration Michael und Evita" class="profile-picture">
+
             <h1 id="typewriter-h1"></h1>
             <p class="subtitle">Michael Kanda <span class="accent-text-inline">&lt;/&gt;</span> Komplize für Web & KI aus Wien </p>
+            
             <div class="ai-container">
                 <form id="ai-form">
                     <input type="text" id="ai-question" placeholder="Hallo, ich bin Evita, Michaels KI-Assistentin." autocomplete="off" required>
-                    <button type="submit" aria-label="Frage senden"><i class="fas fa-paper-plane"></i></button>
+                    <button type="submit" aria-label="Frage senden">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
                 </form>
                 <p id="ai-status"></p>
             </div>
+
         </div>
     </main>
 	
-    <footer id="footer">
-        <div class="container">
-            <p>&copy; 2025 Michael Kanda</p>
-            <div class="footer-links">
-                <a href="impressum.html">Impressum</a>
-                <a href="datenschutz.html">Datenschutz</a>
-            </div>
-        </div>
-    </footer>
-
     <div id="contact-modal" class="modal-overlay">
         <div class="modal-content">
             <button id="close-modal" class="close-button">&times;</button>
             <h2>Frag Michael!</h2>
-            <p style="text-align: center;">Der direkte Draht. E-Mail an: <a href="mailto:mail@michaelkanda.com">mail@michaelkanda.com</a></p>
-        </div>
-    </div>
-    
-    <div id="cookie-info-lightbox" class="modal-overlay">
-        <div class="modal-content">
-            <h2>Hinweis zu Cookies</h2>
-            <p>Diese Seite nutzt nur technisch notwendige Cookies (z.B. für den Dark Mode). Kein Tracking, keine Analyse, kein Schnickschnack.</p>
-            <div class="cookie-lightbox-buttons">
-                 <a href="datenschutz.html" class="lightbox-button">Mehr erfahren</a>
-                 <button id="acknowledge-cookie-lightbox" class="lightbox-button">Alles klar</button>
+            <form id="contact-form-inner">
+                <input type="text" name="name" placeholder="Dein Name (oder Künstlername):" required>
+                <input type="email" name="email" placeholder="Deine E-Mail (Anti-Spam-Zone!)" required>
+                <input type="text" name="_subject" placeholder="Worum geht's? (Bitte kein KI-Drama)">
+                <textarea name="message" placeholder="Deine Botschaft an mich (und Evita):" rows="5" required></textarea>
+                <div class="privacy-checkbox">
+                    <input type="checkbox" name="privacy" id="privacy" required>
+                    <label for="privacy">Michael darf meine Nachricht lesen und Evita darf alles verarbeiten, was sie versteht. (Details im Datenschutz)</label>
+                </div>
+                <button type="submit" class="cta-button">Ab die Post!</button>
+            </form>
+            <div id="contact-success-message" style="display: none; text-align: center;">
+                <h2>Nachricht empfangen! </h2>
+                <p>Michael (oder Evita, wenn er zu sehr bastelt) meldet sich in Kürze.</p>
+                <p style="margin-top: 20px;">
+                    <a href="#" id="close-success-message" class="cta-button">Schließen</a>
+                </p>
             </div>
         </div>
     </div>
 
+	<footer>
+        <a href="impressum.html" id="impressum-link">Impressum</a>
+        <a href="datenschutz.html" id="datenschutz-link">Datenschutz</a>
+    </footer>
+
+    <!-- Cookie Info Lightbox HTML -->
+    <div id="cookie-info-lightbox" class="modal-overlay">
+        <div class="modal-content">
+            <h2>Hinweis zu Cookies</h2>
+            <p style="text-align: center;">Wir backen hier nur Cookies, die unsere Website am Laufen halten. Reine Technik, kein Schnickschnack!</p>
+            <div class="cookie-lightbox-buttons">
+                <a href="datenschutz.html" target="_blank" rel="noopener noreferrer" id="privacy-policy-link-button" class="lightbox-button">Datenschutzerklärung</a>
+                <button id="acknowledge-cookie-lightbox" class="lightbox-button">Alles klar</button>
+            </div>
+        </div>
+    </div>
+    <!-- ENDE Cookie Info Lightbox HTML -->
+
+    <!-- Lightbox für Impressum und Datenschutz -->
+    <div id="legal-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button id="close-legal-modal" class="close-button">&times;</button>
+            <div id="legal-modal-content-area">
+                <!-- Inhalt der geladenen HTML-Datei wird hier eingefügt -->
+            </div>
+        </div>
+    </div>
+    <!-- ENDE NEU -->
+
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-    <script src="js/script.js"></script>
+   <script type="module" src="js/main.js"></script>
+
+
 </body>
 </html>
