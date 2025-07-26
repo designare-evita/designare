@@ -1,56 +1,49 @@
 // js/main.js
 
-// Importiere alle notwendigen Module
+// Importiere alle notwendigen Initialisierungsfunktionen aus den anderen Modulen
 import { initTheme } from './theme.js';
 import { initEffects } from './effects.js';
-import { initModals, initLegalLinks, initContactForm } from './modals.js';
-import { initTypewriter, initAIForm } from './chatbot.js';
+import { initModals, initLegalLinks, initContactForm, initCookieBanner } from './modals.js';
+import { initTypewriter } from './typewriter.js';
+import { initAIForm } from './ai-form.js';
 
 /**
- * Lädt externe HTML-Komponenten (wie Header und Footer) in die Seite.
- * @param {string} elementId - Die ID des Elements, in das der Inhalt geladen wird.
- * @param {string} url - Der Pfad zur HTML-Datei, die geladen werden soll.
+ * Lädt externe HTML-Komponenten (Header, Footer).
+ * Dies ist der Schlüssel für ein einheitliches Design.
  */
 async function loadComponent(elementId, url) {
     try {
         const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`Komponente konnte nicht geladen werden: ${url}`);
-        }
+        if (!response.ok) throw new Error(`Datei nicht gefunden: ${url}`);
         const text = await response.text();
         const element = document.getElementById(elementId);
-        if (element) {
-            element.innerHTML = text;
-        } else {
-            console.warn(`Element mit der ID '${elementId}' nicht gefunden.`);
-        }
+        if (element) element.innerHTML = text;
     } catch (error) {
-        console.error(`Fehler beim Laden der Komponente '${elementId}':`, error);
+        console.error(`Fehler beim Laden von ${elementId}:`, error);
     }
 }
 
 /**
- * Hauptfunktion, die nach dem vollständigen Laden des DOMs ausgeführt wird.
- * Sie orchestriert das Laden der Komponenten und die Initialisierung der Skripte.
+ * Die Hauptfunktion, die alles in der korrekten Reihenfolge startet.
  */
-async function main() {
-    // 1. Lade zuerst die grundlegenden Bausteine der Seite (Header, Footer).
-    // Promise.all sorgt dafür, dass wir warten, bis BEIDE geladen sind.
+async function start() {
+    // 1. Zuerst die HTML-Bausteine laden und darauf warten, dass sie fertig sind.
     await Promise.all([
         loadComponent('header', 'header.html'),
         loadComponent('footer', 'footer.html')
     ]);
 
-    // 2. Initialisiere DANACH alle Funktionen, die von diesen Komponenten abhängen.
-    // Die Reihenfolge hier ist jetzt sicher.
+    // 2. Erst DANACH alle anderen Funktionen initialisieren.
+    // Jetzt sind alle Buttons und Elemente garantiert vorhanden.
     initTheme();
     initEffects();
+    initTypewriter();
+    initAIForm();
     initModals();
     initLegalLinks();
     initContactForm();
-    initTypewriter();
-    initAIForm();
+    initCookieBanner();
 }
 
-// Starte den gesamten Prozess, sobald die HTML-Struktur bereit ist.
-document.addEventListener('DOMContentLoaded', main);
+// Starte den gesamten Prozess, sobald die Seite geladen ist.
+document.addEventListener('DOMContentLoaded', start);
