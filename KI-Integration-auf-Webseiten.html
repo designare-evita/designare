@@ -110,10 +110,47 @@ export default async function handler(req, res) {
         <a href="datenschutz.html" id="datenschutz-link">Datenschutz</a>
     </footer>
 
-    <div id="contact-modal" class="modal-overlay"></div>
-    <div id="cookie-info-lightbox" class="modal-overlay"></div>
-    <div id="legal-modal" class="modal-overlay"></div>
-    <div id="about-me-content" style="display: none;"></div>
+    <div id="contact-modal" class="modal-overlay">
+      <div class="modal-content">
+        <button class="close-modal"><i class="fas fa-times"></i></button>
+        <h2>Kontakt</h2>
+        <p>Ich freue mich auf Ihre Nachricht!</p>
+        <form id="contact-form" action="https://formspree.io/f/deine-form-id" method="POST">
+          <input type="text" name="name" placeholder="Ihr Name" required>
+          <input type="email" name="email" placeholder="Ihre E-Mail" required>
+          <textarea name="message" placeholder="Ihre Nachricht" required></textarea>
+          <button type="submit">Senden</button>
+        </form>
+      </div>
+    </div>
+    
+    <div id="cookie-info-lightbox" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-modal"><i class="fas fa-times"></i></button>
+            <h2>Cookie-Richtlinie</h2>
+            <p>Diese Website verwendet nur technisch notwendige Cookies, die für die Grundfunktionen wie das Dark-Mode-Theme unerlässlich sind. Es werden keine Tracking- oder Analyse-Cookies eingesetzt.</p>
+        </div>
+    </div>
+    
+    <div id="legal-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-modal"><i class="fas fa-times"></i></button>
+            <div id="legal-content"></div>
+        </div>
+    </div>
+
+    <div id="about-me-content" class="modal-overlay">
+      <div class="modal-content">
+          <button class="close-modal"><i class="fas fa-times"></i></button>
+          <h2>Über Mich</h2>
+          <p>
+              Hallo, ich bin Michael Kanda, ein Web-Entwickler aus Wien mit einer Leidenschaft für die Schnittstelle von Design und Technologie. Mein Ziel ist es, nicht nur ästhetisch ansprechende, sondern auch hochfunktionale und performante Web-Erlebnisse zu schaffen.
+          </p>
+          <p>
+              Mit einem starken Fokus auf moderne JavaScript-Frameworks und die Jamstack-Architektur baue ich schnelle, sichere und skalierbare Websites. Meine besondere Faszination gilt der Integration von künstlicher Intelligenz, um interaktive und intelligente Funktionen wie meine KI-Assistentin "Evita" zu entwickeln.
+          </p>
+      </div>
+    </div>
     
     <script type="module" src="js/main.js"></script>
 </body>
