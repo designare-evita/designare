@@ -54,7 +54,7 @@ body {
     align-items: center;
     padding: 15px 20px;
     z-index: 1000;
-    height: 70px; /* ## NEUE HÖHE ## */
+    height: 30px; /* ## NEUE HÖHE ## */
     background-color: var(--bg-color);
     border-bottom: 1px solid var(--border-color);
     box-sizing: border-box;
