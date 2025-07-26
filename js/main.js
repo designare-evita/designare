@@ -1,19 +1,35 @@
 // js/main.js
-
-import { initEffects } from './effects.js';
 import { initTheme } from './theme.js';
-import { initTypewriters } from './typewriter.js';
-import { initModals } from './modals.js';
-import { initAiForm } from './ai-form.js'; // NEU: Importiert das AI-Form-Modul
+import './modals.js'; 
+import { initEffects } from './effects.js';
+import { initChatbot } from './chatbot.js';
 
-document.addEventListener('DOMContentLoaded', function() {
-    
-    // Initialisiert alle importierten Module
-    initEffects();
-    initTheme();
-    initTypewriters();
-    initModals();
-    initAiForm(); // NEU: Initialisiert das AI-Form-Modul
+// Funktion zum Laden von HTML-Komponenten (Header, Footer)
+async function loadComponent(elementId, url) {
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`Datei nicht gefunden: ${url}`);
+        const data = await response.text();
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.innerHTML = data;
+        }
+    } catch (error) {
+        console.error(`Fehler beim Laden von ${url}:`, error);
+    }
+}
 
-    console.log("Alle Module erfolgreich initialisiert.");
+// Hauptfunktion, die nach dem Laden des DOMs ausgeführt wird
+document.addEventListener('DOMContentLoaded', async () => {
+    // Lade zuerst die grundlegenden Bausteine der Seite
+    await Promise.all([
+        loadComponent('header', 'header.html'),
+        loadComponent('footer', 'footer.html')
+    ]);
+
+    // Initialisiere danach alle Skripte, die Elemente aus Header/Footer benötigen
+    initTheme();      // Initialisiert den Dark/Light-Mode-Button im Header
+    initEffects();    // Initialisiert Effekte auf der Seite
+    initChatbot();    // Initialisiert den Chatbot
+    // modals.js initialisiert sich dank des eigenen DOMContentLoaded-Listeners von selbst
 });
