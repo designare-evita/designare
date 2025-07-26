@@ -35,3 +35,18 @@ body {
 .legal-container .subtitle {
     text-align: left;
 }
+
+.legal-container h1 {
+    font-size: 2rem;      /* Ca. 33% kleiner als die ursprünglichen 3rem */
+    line-height: 1.3;     /* Stellt sicher, dass der Zeilenabstand gut aussieht */
+    margin-bottom: 0.5rem; /* Reduziert den Abstand zum Untertitel leicht */
+}
+
+footer {
+    position: relative; /* Hebt die 'fixed' Positionierung auf */
+    width: 100%;
+    padding: 20px 0;    /* Fügt Abstand oben/unten hinzu */
+    margin-top: 50px;   /* Sorgt für Abstand zum Hauptinhalt */
+    justify-content: center; /* Zentriert die Links im Footer */
+    border-top: 1px solid var(--border-color); /* Fügt eine dezente Trennlinie hinzu */
+}
