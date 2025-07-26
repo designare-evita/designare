@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Michael Kanda | Wo Webseiten & KI sich begegnen</title>
+    <title>Test</title>
     <meta name="description" content="Michael Kanda bastelt Webseiten und bringt KI zum Verzweifeln! Fragen? Evita, meine KI-Assistentin, hat die Antworten – und mehr Geduld als ich.">
     
     <link rel="icon" href="images/favicon.webp" type="image/webp">
@@ -12,7 +12,7 @@
     
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="legal-style.css">
-    <link rel="canonical" href="https://designare.at/" />
+    <link rel="canonical" href="https://designare.at/test.html" />
 
     <script>
       (function() {
@@ -25,22 +25,7 @@
       })();
     </script>
 
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Person",
-      "name": "Michael Kanda",
-      "url": "https://designare.at",
-      "jobTitle": "Web-Entwickler und KI-Enthusiast",
-      "description": "Michael Kanda ist ein Web-Entwickler aus Wien, der sich auf die Schnittstelle von Web-Technologien und künstlicher Intelligenz spezialisiert hat.",
-      "address": {
-        "@type": "PostalAddress",
-        "addressLocality": "Wien",
-        "addressCountry": "AT"
-      },
-      "image": "https://designare.at/images/Michael-Kanda.jpg"
-    }
-    </script>
+   
 </head>
 <body>
 
@@ -63,20 +48,74 @@
               <i class="fas fa-sun"></i>
           </button>
         </div>
+
     </header>
 
-    <main id="hero">
-        <div id="particles-js"></div>
-        <div class="container">
-            <img fetchpriority="high" src="images/Michael.webp" alt="Illustration Michael und Evita" class="profile-picture">
-            <h1 id="typewriter-h1"></h1>
-            <p class="subtitle">Michael Kanda <span class="accent-text-inline">&lt;/&gt;</span> Komplize für Web & KI aus Wien </p>
-            <div class="ai-container">
-                <form id="ai-form">
-                    <input type="text" id="ai-question" placeholder="Hallo, ich bin Evita, Michaels KI-Assistentin." autocomplete="off" required>
-                    <button type="submit" aria-label="Frage senden"><i class="fas fa-paper-plane"></i></button>
-                </form>
-                <p id="ai-status"></p>
+ <main>
+ <div id="article-page">
+            <div class="article-header">
+                <h1>Warum meine KI schneller plaudert als deine: Ein Blick hinter die digitalen Kulissen</h1>
+                <p class="subtitle">Oder: Wenn Serverless auf das "Schweizer Taschenmesser" trifft und Evita Gas gibt.</p>
+            </div>
+            
+            <div class="two-column-container">
+                <div class="column-text">
+                    <section>
+                        <p>Hallo, liebe Digital-Enthusiasten! Michael hier, euer Komplize für Web & KI. Heute spreche ich über ein Thema, das für einige erstaunte Blicke sorgt: Warum plaudern KI-Assistenten auf manchen Websites blitzschnell, während sie auf anderen Content-Management-Plattformen manchmal... nun ja, sagen wir, eine "Denkpause" einlegen?</p>
+                    </section>
+                    
+                    <section>
+                        <h2>Serverless-Hosting (das Formel-1-Auto):</h2>
+                        <p>Wenn ihr einer KI-Assistentin auf einer modernen Website eine Frage stellt, ist das wie ein Formel-1-Rennen...</p>
+                        <ul>
+                            <li><strong>Kein Schnickschnack:</strong> Purer, spezialisierter Speed.</li>
+                            <li><strong>Globale Startrampen:</strong> Minimale Latenz, maximale Rasanz.</li>
+                            <li><strong>Direkte API-Verbindung:</strong> Keine Umwege über komplexe Server-Strukturen.</li>
+                            <li><strong>Automatische Skalierung:</strong> Passt sich blitzschnell an die Anfragen an.</li>
+                        </ul>
+                    </section>
+                    
+                    <section>
+                        <h2>Traditional Hosting (das Schweizer Taschenmesser):</h2>
+                        <p>Jetzt stellt euch vor, ihr wollt mit eurem vielseitigen Schweizer Taschenmesser einen Sprint hinlegen...</p>
+                        <ul>
+                            <li><strong>Der Hausmeister muss erstmal aufräumen:</strong> Shared Hosting bedeutet geteilte Ressourcen.</li>
+                            <li><strong>PHP wird aus dem Schlaf gerissen:</strong> Jede Anfrage muss den gesamten Server-Stack durchlaufen.</li>
+                            <li><strong>Jeder will mitreden:</strong> Plugins, Themes und andere Prozesse verlangsamen die Antwort.</li>
+                            <li><strong>Datenbank-Ping-Pong:</strong> Mehrere Datenbankabfragen für simple Operationen.</li>
+                        </ul>
+                    </section>
+
+                    <div class="code-box">
+                        <h3>Beispiel: Serverless Function</h3>
+                        <pre><code>// Schnelle API-Anfrage an KI-Service
+export default async function handler(req, res) {
+  const response = await fetch('https://api.openai.com/...', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ...` },
+    body: JSON.stringify({ model: 'gpt-4', messages: ... })
+  });
+  return res.json(await response.json());
+}</code></pre>
+                    </div>
+
+                    <div class="fazit-box">
+                        <h2>Mein Fazit (und ein Kommentar von Evita):</h2>
+                        <p>Die Serverless-Lösung ist für direkte API-Anbindungen von Natur aus deutlich schneller. Während traditionelle Hosting-Umgebungen viele Vorteile haben, sind sie für hochperformante KI-Integrationen oft überdimensioniert.</p>
+                        <p><strong>Evitas Kommentar:</strong> "Wuff! Das ist wie der Unterschied zwischen einem Sprinter und einem Allrounder. Beide haben ihre Berechtigung, aber wenn's um pure Geschwindigkeit geht, gewinnt der Spezialist!"</p>
+                    </div>
+                </div>
+                
+                <div class="column-image">
+                    <img src="https://designare.at/images/KI-Integration-auf-Webseiten.webp" alt="KI Integration auf Webseiten" />
+                    <div class="ai-container">
+                        <form id="ai-form">
+                            <input type="text" id="ai-question" placeholder="Gleich hier testen..." autocomplete="off" required>
+                            <button type="submit" aria-label="Frage senden"><i class="fas fa-paper-plane"></i></button>
+                        </form>
+                        <p id="ai-status"></p>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
