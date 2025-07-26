@@ -623,7 +623,9 @@ body.dark-mode .legal-modal-pagination-buttons button:disabled {
         font-size: 1.6rem;
     }
     .legal-container h2 {
-        font-size: 1.3rem;
+        font-size: 1.2rem;
+        line-height: 1.3;
+
     }
     .legal-container h3 {
         font-size: 1.0rem;
