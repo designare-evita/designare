@@ -228,15 +228,58 @@ function setupLegalModals() {
     const datenschutzLink = document.getElementById('datenschutz-link');
     const legalModal = document.getElementById('legal-modal');
     const closeLegalModalBtn = document.getElementById('close-legal-modal');
+    const legalModalContentArea = document.getElementById('legal-modal-content-area');
 
-    if (aboutMeButton) aboutMeButton.addEventListener('click', (e) => { e.preventDefault(); loadLegalPageInModal('about'); });
-    if (impressumLink) impressumLink.addEventListener('click', (e) => { e.preventDefault(); loadLegalPageInModal('impressum'); });
-    if (datenschutzLink) datenschutzLink.addEventListener('click', (e) => { e.preventDefault(); loadLegalPageInModal('datenschutz'); });
+    // NEU: Angepasste Logik für den "Über Mich"-Button
+    if (aboutMeButton) {
+        aboutMeButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            const aboutContentSource = document.getElementById('about-me-content');
+            
+            if (aboutContentSource && legalModalContentArea) {
+                // Inhalt aus dem versteckten Div in die Lightbox kopieren
+                legalModalContentArea.innerHTML = aboutContentSource.innerHTML;
+                openLightbox(legalModal);
+            } else {
+                console.error('Fehler: Inhalt für "Über Mich" oder Lightbox-Container nicht gefunden.');
+            }
+        });
+    }
+
+    // Die Logik für Impressum und Datenschutz bleibt unverändert
+    if (impressumLink) {
+        impressumLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            loadLegalPageInModal('impressum');
+        });
+    }
+
+    if (datenschutzLink) {
+        datenschutzLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            loadLegalPageInModal('datenschutz');
+        });
+    }
     
-    if (closeLegalModalBtn) closeLegalModalBtn.addEventListener('click', () => closeLightbox(legalModal));
-    if (legalModal) legalModal.addEventListener('click', (e) => { if (e.target === legalModal) closeLightbox(legalModal); });
+    if (closeLegalModalBtn) {
+        closeLegalModalBtn.addEventListener('click', () => {
+            closeLightbox(legalModal);
+            // Wichtig: Inhalt nach dem Schliessen leeren
+            if(legalModalContentArea) legalModalContentArea.innerHTML = '';
+        });
+    }
+    
+    if (legalModal) {
+        legalModal.addEventListener('click', (e) => {
+            if (e.target === legalModal) {
+                closeLightbox(legalModal);
+                // Wichtig: Inhalt nach dem Schliessen leeren
+                if(legalModalContentArea) legalModalContentArea.innerHTML = '';
+            }
+        });
+    }
 }
-
 export function initModals() {
     setupCookieModal();
     setupContactModal();
