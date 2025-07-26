@@ -308,12 +308,9 @@ function setupLegalModals() {
     }
 }
 
-// Hauptinitialisierungsfunktion
-function initModals() {
+// Hauptinitialisierungsfunktion - ES6 Export
+export function initModals() {
     setupCookieModal();
     setupContactModal();
     setupLegalModals();
 }
-
-// Mache die Funktion global verfügbar
-window.initModals = initModals;
