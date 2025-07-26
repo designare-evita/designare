@@ -9,32 +9,29 @@ let placeholderIndex = 0;
 let charPlaceholderIndex = 0;
 let typeInterval;
 let deleteInterval;
-let aiQuestionInput; // Wird in initAiPlaceholderTypewriter initialisiert
+let aiQuestionInput; // Wird später zugewiesen
 
 /**
  * Stoppt die Typewriter-Animation für das AI-Input-Feld.
- * Wichtig, damit der Benutzer tippen kann.
+ * Diese Funktion wird exportiert, damit andere Module sie nutzen können.
  */
 export function stopPlaceholderAnimation() {
     clearInterval(typeInterval);
     clearInterval(deleteInterval);
-    if (aiQuestionInput) {
-        aiQuestionInput.placeholder = ""; // Bestehenden Platzhalter löschen
-    }
 }
 
 /**
  * Startet die Typewriter-Animation für das AI-Input-Feld neu.
+ * Diese Funktion wird ebenfalls exportiert.
  */
 export function startPlaceholderAnimation() {
     // Sicherstellen, dass keine alten Animationen laufen
-    stopPlaceholderAnimation(); 
+    stopPlaceholderAnimation();
     if (!aiQuestionInput) return;
     
-    // Setzt den Startpunkt zurück und beginnt mit dem Tippen
     charPlaceholderIndex = 0;
-    aiQuestionInput.placeholder = ""; 
-    setTimeout(typePlaceholder, 100);
+    aiQuestionInput.placeholder = ""; // Platzhalter leeren vor dem Start
+    typePlaceholder();
 }
 
 function typePlaceholder() {
@@ -60,7 +57,6 @@ function deletePlaceholder() {
             } else {
                 clearInterval(deleteInterval);
                 placeholderIndex = (placeholderIndex + 1) % placeholderTexts.length;
-                // Starte die Animation für den nächsten Text von vorne
                 startPlaceholderAnimation(); 
             }
         }
@@ -98,16 +94,27 @@ function initH1Typewriter() {
 }
 
 function initAiPlaceholderTypewriter() {
-    const aiForm = document.getElementById('ai-form');
-    aiQuestionInput = document.getElementById('ai-question'); // Weise die globale Variable zu
-    if (!aiForm || !aiQuestionInput) return;
+    aiQuestionInput = document.getElementById('ai-question');
+    if (!aiQuestionInput) return;
     
+    // Animation steuern, wenn der Nutzer mit dem Feld interagiert
     aiQuestionInput.addEventListener('focus', stopPlaceholderAnimation);
-    aiQuestionInput.addEventListener('blur', () => { if (aiQuestionInput.value === '') startPlaceholderAnimation(); });
+    aiQuestionInput.addEventListener('blur', () => { 
+        if (aiQuestionInput.value === '') {
+            startPlaceholderAnimation();
+        }
+    });
     
     startPlaceholderAnimation();
 }
 
-// Exportiert eine Haupt-Initialisierungsfunktion für alle Typewriter
+// Exportiert die Haupt-Initialisierungsfunktion
 export function initTypewriters() {
     initH1Typewriter();
+    initAiPlaceholderTypewriter();
+
+    // Stellt den Cursor-Stil für die H1-Animation bereit
+    const style = document.createElement('style');
+    style.innerHTML = `.cursor { display: inline-block; width: 3px; height: 1em; background-color: var(--accent-color); animation: blink 0.7s infinite; vertical-align: bottom; margin-left: 5px; } @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }`;
+    document.head.appendChild(style);
+}
