@@ -1,19 +1,20 @@
 // js/modals.js
 
-const body = document.body;
+// KORREKTUR: Die problematische Zeile "const body = document.body;" wurde entfernt.
+// Wir greifen direkt auf document.body zu, wenn wir es brauchen.
 
 // Allgemeine Lightbox-Funktionen
 const openLightbox = (lightboxElement) => {
     if (lightboxElement) {
         lightboxElement.classList.add('visible');
-        body.style.overflow = 'hidden';
+        document.body.style.overflow = 'hidden';
     }
 };
 
 const closeLightbox = (lightboxElement) => {
     if (lightboxElement) {
         lightboxElement.classList.remove('visible');
-        body.style.overflow = '';
+        document.body.style.overflow = '';
     }
 };
 
@@ -38,7 +39,7 @@ function setupCookieModal() {
     if (privacyPolicyLinkButton) privacyPolicyLinkButton.addEventListener('click', (e) => {
         e.preventDefault();
         closeLightbox(cookieInfoLightbox);
-        loadLegalPageInModal('datenschutz'); 
+        loadLegalPageInModal('datenschutz');
     });
     if (cookieInfoLightbox) cookieInfoLightbox.addEventListener('click', (e) => {
         if (e.target === cookieInfoLightbox) closeLightbox(cookieInfoLightbox);
@@ -226,7 +227,7 @@ function setupLegalModals() {
     if (legalModal) legalModal.addEventListener('click', (e) => { if (e.target === legalModal) closeLightbox(legalModal); });
 }
 
-// KORREKTUR: Das 'export'-Schlüsselwort wird hier hinzugefügt.
+// KORREKTUR: Das 'export'-Schlüsselwort ist hier und stellt sicher, dass die Funktion exportiert wird.
 export function initModals() {
     setupCookieModal();
     setupContactModal();
