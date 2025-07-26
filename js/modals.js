@@ -27,7 +27,10 @@ function setupCookieModal() {
     if (!localStorage.getItem('hasSeenCookieInfoLightbox')) {
         setTimeout(() => openLightbox(cookieInfoLightbox), 1000);
     }
-    if (cookieInfoButton) cookieInfoButton.addEventListener('click', () => openLightbox(cookieInfoLightbox));
+    if (cookieInfoButton) cookieInfoButton.addEventListener('click', () => {
+        localStorage.removeItem('hasSeenCookieInfoLightbox');
+        openLightbox(cookieInfoLightbox);
+    });
     if (acknowledgeCookieLightboxBtn) acknowledgeCookieLightboxBtn.addEventListener('click', () => {
         closeLightbox(cookieInfoLightbox);
         localStorage.setItem('hasSeenCookieInfoLightbox', 'true');
@@ -44,7 +47,6 @@ function setupCookieModal() {
 
 // Kontakt-Modal-Logik
 function setupContactModal() {
-    // ... die Kontakt-Modal-Logik bleibt unverändert ...
     const contactButton = document.getElementById('contact-button');
     const contactModal = document.getElementById('contact-modal');
     const contactForm = document.getElementById('contact-form-inner');
@@ -98,7 +100,8 @@ function setupContactModal() {
     });
 }
 
-// KORRIGIERT: Legal-Seiten-Navigation mit Paginierung
+
+// Legal-Seiten-Navigation mit Paginierung
 async function loadLegalPageInModal(pageName) {
     const legalModal = document.getElementById('legal-modal');
     const legalModalContentArea = document.getElementById('legal-modal-content-area');
@@ -114,13 +117,12 @@ async function loadLegalPageInModal(pageName) {
         const legalContainer = doc.querySelector('.legal-container');
 
         if (legalContainer) {
-            legalModalContentArea.innerHTML = ''; // Leeren
+            legalModalContentArea.innerHTML = '';
             const children = Array.from(legalContainer.children);
             
             let allParts = [];
             let currentPage = 0;
 
-            // Logik zum Aufteilen des Inhalts (Paginierung)
             if (pageName === 'datenschutz') {
                 const findElementById = (id) => children.find(child => child.id === id);
                 const getIndexOfElement = (element) => children.indexOf(element);
@@ -138,12 +140,37 @@ async function loadLegalPageInModal(pageName) {
                     });
                     allParts.push(children.slice(lastIndex));
                 } else {
-                    allParts.push(children); // Fallback, falls keine IDs gefunden
+                    // Fallback für Datenschutz, falls IDs nicht gefunden werden
+                    const splitIndex = Math.ceil(children.length / 2);
+                    allParts.push(children.slice(0, splitIndex));
+                    allParts.push(children.slice(splitIndex));
                 }
             } else {
-                 allParts.push(children); // Impressum und About nicht paginieren
+                 // KORRIGIERT: Die intelligente Aufteilungslogik für about und impressum
+                const targetSplitCount = Math.ceil(children.length * 0.5);
+                let h3SplitIndex = -1;
+                // Sucht nach einer H3-Überschrift in der Mitte des Textes
+                for (let i = 0; i < children.length; i++) {
+                    const child = children[i];
+                    if (child.tagName === 'H3' && i >= targetSplitCount * 0.8 && i <= targetSplitCount * 1.2) {
+                        h3SplitIndex = i;
+                        break;
+                    }
+                }
+
+                if (h3SplitIndex !== -1) {
+                    // Teilt an der H3-Überschrift
+                    allParts.push(children.slice(0, h3SplitIndex));
+                    allParts.push(children.slice(h3SplitIndex));
+                } else {
+                    // Fallback: Teilt den Inhalt einfach in der Mitte
+                    const splitIndex = Math.ceil(children.length / 2);
+                    allParts.push(children.slice(0, splitIndex));
+                    allParts.push(children.slice(splitIndex));
+                }
             }
 
+            // Der Rest der Funktion, die die Seiten und Buttons rendert, bleibt gleich.
             const partDivs = allParts.map(part => {
                 const div = document.createElement('div');
                 part.forEach(child => div.appendChild(child.cloneNode(true)));
@@ -161,8 +188,8 @@ async function loadLegalPageInModal(pageName) {
             const updatePaginationButtons = () => {
                 let backButton = legalModalContentArea.querySelector('#legal-back-button');
                 let continueButton = legalModalContentArea.querySelector('#legal-continue-button');
-                if (backButton) backButton.style.display = (currentPage > 0) ? 'block' : 'none';
-                if (continueButton) continueButton.style.display = (currentPage < allParts.length - 1) ? 'block' : 'none';
+                if (backButton) backButton.style.display = (currentPage > 0) ? 'inline-block' : 'none';
+                if (continueButton) continueButton.style.display = (currentPage < allParts.length - 1) ? 'inline-block' : 'none';
             };
 
             partDivs.forEach(div => legalModalContentArea.appendChild(div));
