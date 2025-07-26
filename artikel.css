@@ -67,29 +67,43 @@ footer {
     margin-top: auto;
     margin-bottom: auto;
 }
-.fazit-box {
+
+/* KORRIGIERT: Fazit-Box Selektoren - sowohl innerhalb als auch außerhalb der column-text */
+.fazit-box,
+.column-text .fazit-box {
     margin-top: 2rem;
     padding: 1.5rem;
     border-left: 4px solid var(--accent-color);
     background-color: rgba(0, 0, 0, 0.05);
     border-radius: 0 8px 8px 0;
 }
-body.dark-mode .fazit-box {
+
+/* KORRIGIERT: Dark mode für fazit-box */
+body.dark-mode .fazit-box,
+body.dark-mode .column-text .fazit-box {
     background-color: rgba(255, 255, 255, 0.05);
 }
-.fazit-box h3 {
+
+/* KORRIGIERT: Fazit-box h3 Styling */
+.fazit-box h3,
+.column-text .fazit-box h3 {
     margin-top: 0;
 }
-/* KORREKTUR: Falscher Selektor von .ul auf .column-text ul geändert */
+
+/* KORRIGIERT: Listen-Styling - spezifischere Selektoren */
 .column-text ul {
     list-style-type: none;
     padding-left: 0;
+    margin: 1rem 0;
 }
+
 .column-text ul li {
     padding-left: 30px;
     position: relative;
     margin-bottom: 0.8rem;
+    line-height: 1.5;
 }
+
 .column-text ul li::before {
     content: '';
     display: inline-block;
@@ -102,6 +116,23 @@ body.dark-mode .fazit-box {
     background-size: contain;
     background-repeat: no-repeat;
 }
+
+/* Fallback für den Fall, dass das Favicon nicht lädt */
+.column-text ul li::after {
+    content: '•';
+    position: absolute;
+    left: 5px;
+    top: 0;
+    color: var(--accent-color, #007bff);
+    font-weight: bold;
+    display: none;
+}
+
+/* Zeige Fallback-Bullet nur wenn Bild nicht lädt */
+.column-text ul li::before:not([src]) + li::after {
+    display: block;
+}
+
 @media (max-width: 768px) {
     .two-column-container {
         flex-direction: column;
@@ -116,5 +147,12 @@ body.dark-mode .fazit-box {
         margin-top: 2rem;
         margin-bottom: 0;
     }
+    
+    /* Mobile Anpassungen für fazit-box */
+    .fazit-box,
+    .column-text .fazit-box {
+        margin-left: -1rem;
+        margin-right: -1rem;
+        border-radius: 0;
+    }
 }
-/* KORREKTUR: Überflüssige schliessende Klammer entfernt */
