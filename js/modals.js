@@ -62,8 +62,7 @@ function setupContactModal() {
         contactForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(contactForm);
-            const object = {};
-            formData.forEach((value, key) => { object[key] = value; });
+            const object = Object.fromEntries(formData.entries());
             if (!object['_subject']) {
                 object['_subject'] = 'Neue Kontaktanfrage von designare.at';
             }
