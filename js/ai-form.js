@@ -1,6 +1,5 @@
 // js/ai-form.js
 
-// Importiert die Funktionen zur Steuerung des Typewriters
 import { startPlaceholderAnimation, stopPlaceholderAnimation } from './typewriter.js';
 
 export function initAiForm() {
@@ -16,7 +15,6 @@ export function initAiForm() {
         const question = aiQuestionInput.value.trim();
         if (!question) return;
 
-        // Typewriter-Animation stoppen
         stopPlaceholderAnimation();
         
         aiStatus.innerText = "Einen Moment, Evita gleicht gerade ihre Bits und Bytes ab...";
@@ -50,8 +48,12 @@ export function initAiForm() {
             aiQuestionInput.placeholder = "Haben Sie eine weitere Frage?";
             aiStatus.classList.remove('thinking');
             
-            // Typewriter-Animation wieder sauber starten
-            startPlaceholderAnimation(); 
+            // Warten einen kurzen Moment, bevor die Animation neu gestartet wird
+            setTimeout(() => {
+                if(document.activeElement !== aiQuestionInput) {
+                    startPlaceholderAnimation();
+                }
+            }, 100);
         }
     });
 }
