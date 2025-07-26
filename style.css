@@ -59,6 +59,11 @@ body.dark-mode {
     --text-color: #eeeeee;
 }
 
+.legal-container h2 {
+    text-align: left;
+    margin-bottom: 15px;
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
