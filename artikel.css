@@ -1,3 +1,11 @@
+/*
+ * =============================================
+ * Stile für Artikelseiten (artikel.css) - KORRIGIERTE VERSION
+ * =============================================
+ * - Header-Höhe angepasst und Scrollbars aktiviert.
+ * - Behebt fehlende globale Stile und passt das Layout für bessere Lesbarkeit an.
+ * - Nutzt CSS-Variablen für die nahtlose Integration in den Dark/Light-Mode.
+ */
 
 /* Globale Farbvariablen & Basis-Stile (aus style.css übernommen) */
 :root {
@@ -32,6 +40,7 @@ body {
     margin: 0;
     padding: 0;
     transition: background-color 0.4s ease, color 0.4s ease;
+    overflow-y: auto; /* Stellt sicher, dass die vertikale Scrollbar immer da ist, wenn benötigt */
 }
 
 /* Header-Stile (aus style.css übernommen) */
@@ -43,15 +52,16 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px;
+    padding: 15px 20px;
     z-index: 1000;
-    height: 80px; /* Feste Höhe */
+    height: 70px; /* ## NEUE HÖHE ## */
     background-color: var(--bg-color);
     border-bottom: 1px solid var(--border-color);
+    box-sizing: border-box;
 }
 
 #top-left-logo-img {
-    height: 46px;
+    height: 40px; /* Angepasst an neue Header-Höhe */
     width: auto;
 }
 
@@ -80,7 +90,7 @@ body {
 /* Container und grundlegendes Layout für den Artikel */
 #article-page {
     max-width: 1200px;
-    margin: 120px auto 40px auto; /* Platz für den fixierten Header */
+    margin: 110px auto 40px auto; /* ## Platz für den Header angepasst (70px + 40px Abstand) ## */
     padding: 2rem 3rem;
     background-color: var(--background-secondary);
     border-radius: 8px;
