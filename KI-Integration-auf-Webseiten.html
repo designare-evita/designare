@@ -150,74 +150,7 @@ export default async function handler(req, res) {
         <a href="datenschutz.html" id="datenschutz-link">Datenschutz</a>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-    <script>
-        // Grundlegende JavaScript-Funktionalität für die Buttons
-        document.addEventListener('DOMContentLoaded', function() {
-            // Cookie Info Button
-            const cookieButton = document.getElementById('cookie-info-button');
-            const cookieLightbox = document.getElementById('cookie-info-lightbox');
-            const acknowledgeCookie = document.getElementById('acknowledge-cookie-lightbox');
-            
-            if (cookieButton && cookieLightbox) {
-                cookieButton.addEventListener('click', () => {
-                    cookieLightbox.style.display = 'block';
-                });
-            }
-            
-            if (acknowledgeCookie && cookieLightbox) {
-                acknowledgeCookie.addEventListener('click', () => {
-                    cookieLightbox.style.display = 'none';
-                });
-            }
-            
-            // About Me Button
-            const aboutButton = document.getElementById('about-me-button');
-            const legalModal = document.getElementById('legal-modal');
-            const legalContent = document.getElementById('legal-modal-content-area');
-            const aboutContent = document.getElementById('about-me-content');
-            const closeLegalModal = document.getElementById('close-legal-modal');
-            
-            if (aboutButton && legalModal && legalContent && aboutContent) {
-                aboutButton.addEventListener('click', () => {
-                    legalContent.innerHTML = aboutContent.innerHTML;
-                    legalModal.style.display = 'block';
-                });
-            }
-            
-            if (closeLegalModal && legalModal) {
-                closeLegalModal.addEventListener('click', () => {
-                    legalModal.style.display = 'none';
-                });
-            }
-            
-            // Theme Toggle (basic implementation)
-            const themeToggle = document.getElementById('theme-toggle');
-            if (themeToggle) {
-                themeToggle.addEventListener('click', () => {
-                    document.body.classList.toggle('dark-mode');
-                });
-            }
-            
-            // Contact Button (placeholder)
-            const contactButton = document.getElementById('contact-button');
-            if (contactButton) {
-                contactButton.addEventListener('click', () => {
-                    alert('Kontaktformular würde hier geöffnet werden');
-                });
-            }
-            
-            // AI Form (placeholder)
-            const aiForm = document.getElementById('ai-form');
-            const aiStatus = document.getElementById('ai-status');
-            
-            if (aiForm && aiStatus) {
-                aiForm.addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    aiStatus.textContent = 'KI-Funktion würde hier aktiv werden...';
-                });
-            }
-        });
-    </script>
+     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>
