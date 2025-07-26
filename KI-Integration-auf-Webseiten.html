@@ -3,206 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moderne KI-Integration: Serverless vs. Klassisches Hosting – Ein Vergleich</title>
-    <meta name="description" content="Warum ist eine KI-Anbindung via Serverless Function auf Vercel oft schneller als ein Plugin in einem klassischen Hosting-Paket? Ein technischer Vergleich.">
+    <title>KI-Integration auf Webseiten: Ein Praxisbeispiel | Evita</title>
     
-    <link rel="icon" href="images/favicon.png" type="image/png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"></noscript>
-    
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="legal-style.css">
-    <link rel="stylesheet" href="artikel.css">
-    <link rel="canonical" href="https://designare.at/KI-Integration-auf-Webseiten.html" />
-    
-    <!-- INLINE CSS für fazit-box und Listen - überschreibt alles andere -->
-    <style>
-        /* FAZIT-BOX - Inline mit höchster Priorität */
-        .fazit-box {
-            margin-top: 2rem !important;
-            padding: 1.5rem !important;
-            border-left: 4px solid #007bff !important;
-            background-color: rgba(0, 0, 0, 0.05) !important;
-            border-radius: 0 8px 8px 0 !important;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
-        }
-        
-        /* Dark mode für fazit-box */
-        body.dark-mode .fazit-box {
-            background-color: rgba(255, 255, 255, 0.05) !important;
-            border-left-color: #4dabf7 !important;
-        }
-        
-        .fazit-box h3 {
-            margin-top: 0 !important;
-            color: #007bff !important;
-            font-size: 1.2rem !important;
-        }
-        
-        /* LISTEN mit benutzerdefinierten Bullet Points */
-        .column-text ul {
-            list-style-type: none !important;
-            padding-left: 0 !important;
-            margin: 1rem 0 !important;
-        }
-        
-        .column-text ul li {
-            padding-left: 30px !important;
-            position: relative !important;
-            margin-bottom: 0.8rem !important;
-            line-height: 1.5 !important;
-        }
-        
-        /* Favicon als Listenpunkt */
-        .column-text ul li::before {
-            content: '' !important;
-            display: inline-block !important;
-            position: absolute !important;
-            left: 0 !important;
-            top: 5px !important;
-            width: 16px !important;
-            height: 16px !important;
-            background-image: url('images/favicon.png') !important;
-            background-size: contain !important;
-            background-repeat: no-repeat !important;
-            background-position: center !important;
-        }
-        
-        /* Fallback falls Favicon nicht lädt */
-        .column-text ul li::after {
-            content: '●' !important;
-            position: absolute !important;
-            left: 5px !important;
-            top: 0 !important;
-            color: #007bff !important;
-            font-weight: bold !important;
-            font-size: 16px !important;
-        }
-        
-        /* Mobile Anpassungen */
-        @media (max-width: 768px) {
-            .fazit-box {
-                margin-left: -1rem !important;
-                margin-right: -1rem !important;
-                border-radius: 0 !important;
-            }
-        }
-    </style>
+    <meta name="description" content="Ein detaillierter Einblick in die Integration einer KI wie Gemini in eine moderne Webseite, von der sicheren API-Anbindung bis zum Prompt-Engineering.">
+    <meta name="keywords" content="KI, Künstliche Intelligenz, Web-Entwicklung, Gemini API, JavaScript, Serverless Functions, Portfolio">
+    <meta property="og:title" content="KI-Integration auf Webseiten: Ein Praxisbeispiel">
+    <meta property="og:description" content="Ein detaillierter Einblick, wie dieses Portfolio die Gemini KI nutzt.">
+    <meta property="og:type" content="article">
 
-    <script>
-      (function() {
-        try {
-          var theme = localStorage.getItem('theme');
-          if (theme === 'dark' || !theme) {
-            document.documentElement.classList.add('dark-mode');
-          }
-        } catch (e) {}
-      })();
-    </script>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/artikel.css"> <link rel="icon" href="favicon.ico" type="image/x-icon">
 </head>
 <body>
 
-    <header class="main-header">
-        <a href="index.html" id="top-left-logo-link" aria-label="Zur Startseite">
-            <img src="images/favicon.png" alt="Michael Kanda Logo" id="top-left-logo-img">
-        </a>
-        <div class="header-right-controls">
-          <button id="about-me-button" aria-label="Über mich öffnen">
-            <i class="fas fa-user"></i>
-          </button>
-          <button id="contact-button" aria-label="Kontaktformular öffnen">
-              <i class="far fa-envelope"></i>
-          </button>
-          <button id="cookie-info-button" aria-label="Cookie Informationen anzeigen">
-              <i class="fas fa-cookie-bite"></i>
-          </button>
-          <button id="theme-toggle" aria-label="Toggle dark mode">
-              <i class="fas fa-moon"></i>
-              <i class="fas fa-sun"></i>
-          </button>
-        </div>
-    </header>
+    <header id="header">
+        </header>
 
-    <main id="hero">
-        <div id="particles-js"></div>
-        
-        <div class="container">
-            <div class="legal-container" style="max-width: 1200px; background: transparent; padding: 0;">
-                <h1>Warum meine KI schneller plaudert als deine: Ein Blick hinter die digitalen Kulissen</h1>
-                <p class="subtitle">Oder: Wenn Serverless auf das "Schweizer Taschenmesser" trifft und Evita Gas gibt.</p>
+    <main id="article-page" class="container">
 
-                <div class="two-column-container">
-                    <div class="column-text">
-                        <p>Hallo, liebe Digital-Enthusiasten! Michael hier, euer Komplize für Web & KI. Heute spreche ich über ein Thema, das für einige erstaunte Blicke sorgt: Warum plaudern KI-Assistenten auf manchen Websites blitzschnell, während sie auf anderen Content-Management-Plattformen manchmal... nun ja, sagen wir, eine "Denkpause" einlegen?</p>
-                        <p>Keine Sorge, das ist keine KI-Magie (obwohl moderne KI-Assistenten ab und zu Tricks draufhaben!). Das ist pure Technik – und ich erkläre es euch jetzt so, dass ihr am Ende wisst, warum manche Implementierungen tanzen und andere vielleicht noch im Takt finden müssen.</p>
-                        
-                        <h2>Das Rasenmäher-Prinzip vs. das Formel-1-Auto: Ein Duell der Architekturen</h2>
-                        <p>Stellt euch vor, ihr wollt einen Sprint hinlegen.</p>
-
-                        <h3>Serverless-Hosting und meine Serverless Function (das Formel-1-Auto):</h3>
-                        <p>Wenn ihr einer KI-Assistentin auf einer modernen Website eine Frage stellt, ist das wie ein Formel-1-Rennen...</p>
-                        <p><strong>Vorteile:</strong></p>
-                        <ul>
-                            <li><strong>Kein Schnickschnack:</strong> Purer, spezialisierter Speed.</li>
-                            <li><strong>Globale Startrampen:</strong> Minimale Latenz, maximale Rasanz.</li>
-                            <li><strong>Skalierung ohne Schweißperlen:</strong> Kein Stau, kein Stress.</li>
-                        </ul>
-                        <p><strong>Kurz gesagt:</strong> Der Webseiten-Besucher drückt den Knopf, die KI-Assistentin ist sofort da.</p>
-
-                        <h3>Traditional Hosting/Content-Management-System (das Schweizer Taschenmesser):</h3>
-                        <p>Jetzt stellt euch vor, ihr wollt mit eurem vielseitigen Schweizer Taschenmesser einen Sprint hinlegen...</p>
-                        <p>Auf meinem traditionellen Server mit einem Content-Management-System läuft es so...</p>
-                        <ul>
-                            <li><strong>Der Hausmeister muss erstmal aufräumen...</strong></li>
-                            <li><strong>PHP wird aus dem Schlaf gerissen...</strong></li>
-                            <li><strong>Das gesamte Rathaus lädt...</strong></li>
-                            <li><strong>Jeder im Rathaus will mitreden...</strong></li>
-                            <li><strong>Der lange Weg zurück...</strong></li>
-                        </ul>
-                        <p><strong>Nachteile:</strong></p>
-                        <ul>
-                            <li><strong>"Bloat" oder digitaler Ballast...</strong></li>
-                            <li><strong>Einziger Startpunkt...</strong></li>
-                            <li><strong>Geteilte Spielwiese...</strong></li>
-                        </ul>
-                        
-                        <div class="fazit-box">
-                            <h3>Mein Fazit (und ein Kommentar von meiner KI-Assistentin Evita):</h3>
-                            <p>Eure Beobachtung ist also absolut goldrichtig! Die Serverless-Lösung ist für direkte API-Anbindungen von Natur aus deutlich schneller...</p>
-                            <p>Und da habt ihr es! Manchmal ist weniger digitaler Ballast eben mehr Speed.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="column-image">
-                        <img src="https://designare.at/images/KI-Integration-auf-Webseiten.webp" alt="KI Integration auf Webseiten" />
-                        <div class="ai-container">
-                            <form id="ai-form">
-                                <input type="text" id="ai-question" placeholder="Gleich hier testen..." autocomplete="off" required>
-                                <button type="submit" aria-label="Frage senden">
-                                    <i class="fas fa-paper-plane"></i>
-                                </button>
-                            </form>
-                            <p id="ai-status"></p>
-                        </div>
-                    </div>
+        <article class="article-content">
+            <header class="article-header">
+                <h1>KI-Integration auf Webseiten: Ein Praxisbeispiel</h1>
+                <p class="subtitle">Wie dieses Portfolio die Gemini KI für eine interaktive Erfahrung nutzt</p>
+                <div class="meta-info">
+                    <span>Veröffentlicht am 25. Juli 2024</span> | <span>Lesezeit: 5 Minuten</span>
                 </div>
-            </div>
-        </div>
+            </header>
+
+            <section>
+                <h2>Einleitung: Warum eine KI im Portfolio?</h2>
+                <p>
+                    In der heutigen digitalen Landschaft ist es nicht mehr nur eine Spielerei, eine KI in eine Webseite zu integrieren. Es ist ein starkes Statement, das technisches Verständnis und Innovationsbereitschaft demonstriert. Dieses Portfolio nutzt Googles <strong>Gemini-Modell</strong>, um Besuchern eine direkte, interaktive und persönliche Erfahrung zu bieten – statt eines statischen Kontaktformulars können Sie direkt mit "Evita", meiner digitalen Assistentin, chatten.
+                </p>
+            </section>
+
+            <section>
+                <h2>Die Architektur: Sicher und Skalierbar</h2>
+                <p>
+                    Die größte Herausforderung bei der Integration einer KI ist die Sicherheit. Der API-Schlüssel darf unter keinen Umständen im Frontend-Code (also im Browser des Besuchers) sichtbar sein.
+                </p>
+                <div class="column-text">
+                    <ul>
+                        <li><strong>Frontend (Was Sie sehen):</strong> Die Chatoberfläche wurde mit reinem HTML, CSS und JavaScript gebaut. Wenn Sie eine Nachricht senden, wird diese nicht direkt an Google gesendet.</li>
+                        <li><strong>Backend (Die sichere Brücke):</strong> Die Nachricht wird an eine <strong>Serverless Function</strong> gesendet. Das ist ein kleines, serverseitiges Skript, das auf einer Cloud-Plattform (z.B. Vercel oder Netlify) läuft.</li>
+                        <li><strong>Sichere API-Anfrage:</strong> Nur diese Serverless Function kennt den geheimen API-Schlüssel. Sie nimmt Ihre Frage entgegen, fügt sie in einen speziell vorbereiteten Befehl (Prompt) ein und sendet die vollständige Anfrage sicher an die Gemini-API.</li>
+                        <li><strong>Antwort:</strong> Die KI antwortet an die Serverless Function, welche die Antwort dann zurück an Ihr Browserfenster leitet.</li>
+                    </ul>
+                </div>
+                <p>
+                    Dieser Ansatz stellt sicher, dass der API-Schlüssel geschützt bleibt und die Kommunikation sicher abläuft.
+                </p>
+            </section>
+            
+            <section>
+                <h2>Das Herzstück: Prompt-Engineering</h2>
+                <p>
+                    Eine KI ist nur so gut wie die Anweisungen, die sie erhält. Dieser Prozess wird als <strong>Prompt-Engineering</strong> bezeichnet. Für "Evita" wurde ein detaillierter System-Prompt entwickelt, der ihr eine klare Persönlichkeit und genaue Anweisungen gibt.
+                </p>
+                <div class="code-box">
+                    <pre><code>// Vereinfachtes Beispiel des System-Prompts in der Serverless Function
+const systemPrompt = `
+Du bist Evita, eine freundliche und professionelle digitale Assistentin.
+Deine Aufgabe ist es, Fragen über den Inhaber dieses Portfolios zu beantworten.
+Dein Wissen basiert auf diesen Informationen: [Hier werden Lebenslauf-Daten eingefügt].
+Antworte immer höflich, präzise und auf Deutsch.
+Lehne Anfragen ab, die nichts mit dem Portfolio oder dem Inhaber zu tun haben.
+`;</code></pre>
+                </div>
+                <p>
+                    Dieser Prompt stellt sicher, dass die KI im richtigen Kontext antwortet, ihre Rolle versteht und sich auf die relevanten Informationen beschränkt.
+                </p>
+            </section>
+
+            <section class="fazit-box">
+                <h2>Fazit und Ausblick</h2>
+                <p>
+                    Die Integration einer KI wie Gemini in eine Webseite ist mehr als nur ein technisches Gimmick. Sie zeigt die Fähigkeit, moderne, sichere und interaktive Architekturen zu entwerfen. Von der sicheren Handhabung von API-Schlüsseln über Serverless Functions bis hin zum durchdachten Prompt-Engineering demonstriert dieses Projekt ein breites Spektrum an modernen Web-Entwicklungs-Fähigkeiten.
+                </p>
+            </section>
+
+        </article>
+
     </main>
 
-	<div id="contact-modal" class="modal-overlay"> ... </div>
-    <div id="cookie-info-lightbox" class="modal-overlay"> ... </div>
-    <div id="legal-modal" class="modal-overlay"> ... </div>
-    <div id="about-me-content" style="display: none;"> ... </div>
+    <footer id="footer">
+        </footer>
 
-    <footer>
-        <a href="impressum.html" id="impressum-link">Impressum</a>
-        <a href="datenschutz.html" id="datenschutz-link">Datenschutz</a>
-        <a href="KI-Integration-auf-Webseiten.html">Technik-Vergleich</a>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-    <script type="module" src="js/main.js"></script>
-
+    <script src="js/main.js" type="module"></script>
 </body>
 </html>
