@@ -56,35 +56,39 @@ footer {
     border-top: 1px solid var(--border-color); /* Fügt eine dezente Trennlinie hinzu */
 }
 
-/* in artikel.css */
-
-/* -- NEU: 2-Spalten-Layout für Artikel -- */
-
 .two-column-container {
     display: flex;
     align-items: flex-start; 
-    gap: 3rem;              /* Abstand zwischen den Spalten leicht erhöht */
-    margin-top: 2rem;
-    margin-bottom: 2rem;
+    gap: 3rem;
+    margin-top: 1.5rem;
 }
 
 .column-text {
-margin-top: 2rem;
-    flex: 1;                /* Text-Spalte füllt den verfügbaren Platz flexibel auf */
+    flex: 1;
     min-width: 0;
 }
 
 .column-image {
-    flex-basis: 45%;        /* Bild-Spalte: Breite auf 45% erhöht */
-    max-width: 45%;         /* Stellt sicher, dass die Spalte nicht breiter wird */
+    flex-basis: 45%;
+    max-width: 45%;
     position: sticky;
     top: 120px;
+
+    /* NEU: Flexbox-Eigenschaften für die vertikale Ausrichtung */
+    display: flex;
+    flex-direction: column; /* Stapelt Bild und AI-Box untereinander */
 }
 
 .column-image img {
     width: 100%;
     height: auto;
     border-radius: 8px;
+}
+
+/* NEU: Zentriert den AI-Container im verfügbaren Platz */
+.column-image .ai-container {
+    margin-top: auto;
+    margin-bottom: auto;
 }
 
 /* Responsive Anpassung für Smartphones */
