@@ -31,7 +31,8 @@
     }
     </script>
 </head>
-<body class="dark-mode"> <!-- Die Klasse 'dark-mode' wird permanent hinzugefügt -->
+<!-- KORREKTUR: Die Klasse 'no-scroll' wurde hinzugefügt, um das Scrollen nur hier zu verhindern -->
+<body class="dark-mode no-scroll">
 
     <header class="main-header">
         <a href="index.html" id="top-left-logo-link" aria-label="Zur Startseite">
@@ -47,7 +48,6 @@
           <button id="cookie-info-button" aria-label="Cookie Informationen anzeigen">
               <i class="fas fa-cookie-bite"></i>
           </button>
-          <!-- GELÖSCHT: Der Theme-Toggle-Button wurde entfernt -->
         </div>
     </header>
 
@@ -67,7 +67,6 @@
         </div>
     </main>
 	
-    <!-- Der Rest Ihrer HTML-Struktur bleibt unverändert -->
     <div id="contact-modal" class="modal-overlay">
         <div class="modal-content">
             <button id="close-modal" class="close-button">&times;</button>
