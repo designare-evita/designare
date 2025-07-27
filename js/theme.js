@@ -1,6 +1,5 @@
 // js/theme.js
 
-// Importiert die Funktion zum Aktualisieren der Farben aus dem effects-Modul
 import { updateParticleColors } from './effects.js';
 
 const body = document.body;
@@ -28,8 +27,5 @@ export function initTheme() {
         const savedTheme = localStorage.getItem('theme') || 'dark';
         applyTheme(savedTheme);
         themeToggle.addEventListener('click', handleThemeToggle);
-        
-        // Stellt sicher, dass die Partikel nach dem ersten Laden die richtige Farbe haben
-        setTimeout(updateParticleColors, 500);
     }
 }
