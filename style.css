@@ -57,9 +57,9 @@ font-display: swap;
 
 /* NEU: Der Light Mode wird nur aktiviert, wenn die .dark-mode Klasse NICHT vorhanden ist. */
 /* Wir verwenden :not(.dark-mode) auf dem html- oder body-Tag */
-body:not(.dark-mode) {
+body.light-mode {
     --bg-color: #F8F7F4;
-    --border-color: #999999;
+    --text-color: #333333;
     --particle-color: #888888;
     --particle-line-color: #cccccc;
     --text-color: #333333;
@@ -196,8 +196,8 @@ body.dark-mode #theme-toggle .fa-moon {
     margin: 0 auto;
     max-width: 1100px;
     padding: 0 2rem;
-    transform-style: preserve-3d;
-    transition: transform 0.1s linear;
+     /*transform-style: preserve-3d; */  /* <-- DIESE ZEILE AUSKOMMENTIEREN *
+     /*transition: transform 0.1s linear; */ /* <-- UND DIESE ZEILE AUSKOMMENTIEREN */
 }
 #hero {
     align-items: center;
