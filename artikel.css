@@ -1,6 +1,6 @@
 /*
- * artikel.css
- * Korrigierte Version mit Layout-Fixes
+ * artikel.css - KORRIGIERTE VERSION
+ * Alle CSS-Syntax-Fehler behoben
  */
 
 /* Lokale Fonts laden */
@@ -66,7 +66,6 @@ body {
     font-family: 'Poppins', sans-serif;
     line-height: 1.6;
     overflow-x: hidden;
-    /* KORREKTUR: Normales Scrolling für Artikel-Seiten */
     transition: background-color 0.4s ease, color 0.4s ease;
 }
 
@@ -79,7 +78,7 @@ body {
     z-index: 1;
 }
 
-/* KORREKTUR: Header mit transparentem Hintergrund */
+/* Header mit transparentem Hintergrund */
 .main-header {
     position: fixed;
     top: 0;
@@ -148,15 +147,15 @@ body {
     transform: scale(1.1);
 }
 
-/* KORREKTUR: Hero Layout für Artikel-Seiten */
+/* Hero Layout für Artikel-Seiten */
 #hero {
     position: relative;
     min-height: 100vh;
     padding-top: var(--header-height-desktop);
-    padding-bottom: 100px; /* Platz für Footer */
+    padding-bottom: 100px;
 }
 
-/* KORREKTUR: Container für Artikel */
+/* Container für Artikel */
 .article-container {
     max-width: 1000px;
     margin: 0 auto;
@@ -186,7 +185,7 @@ body {
     font-size: 1.6rem;
     font-weight: 600;
     margin: 2rem 0 1rem 0;
-    var(--accent-color);
+    color: var(--accent-color); /* KORRIGIERT */
     line-height: 1.4;
 }
 
@@ -240,23 +239,23 @@ body {
 }
 
 .article-content .flex-container {
-  display: flex;
-  align-items: center;
-  gap: 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
 }
 
 .flex-container img {
-  max-width: 200px;
+    max-width: 200px;
 }
 
 .article-content .text-wrapper {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
 }
 
-/* AI Container - KORRIGIERT */
+/* KORRIGIERT: AI Container */
 .ai-container {
     margin-bottom: 2.5rem;
     width: 500px;
@@ -322,7 +321,28 @@ body {
     transition: opacity 0.3s ease, border-color 0.3s ease;
 }
 
-/* KORREKTUR: Footer wieder sichtbar */
+/* Performance-Tipp Box Styling */
+.performance-tip {
+    background: linear-gradient(135deg, rgba(252, 181, 0, 0.1), rgba(252, 181, 0, 0.05));
+    border: 2px solid var(--accent-color);
+    border-radius: 12px;
+    padding: 2rem;
+    margin: 2rem 0;
+    position: relative;
+}
+
+.performance-tip h3 {
+    color: var(--accent-color);
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+}
+
+.performance-tip p {
+    margin-bottom: 1rem;
+    line-height: 1.7;
+}
+
+/* Footer */
 footer {
     align-items: center;
     bottom: 20px;
@@ -443,7 +463,9 @@ footer a:hover {
     transform: translateY(-3px);
 }
 
-.modal-content input[type="text"], .modal-content input[type="email"], .modal-content textarea {
+.modal-content input[type="text"], 
+.modal-content input[type="email"], 
+.modal-content textarea {
     font-family: 'Poppins', sans-serif;
     font-size: 1rem;
     padding: 12px;
@@ -454,7 +476,8 @@ footer a:hover {
     transition: border-color 0.3s ease;
 }
 
-.modal-content input:focus, .modal-content textarea:focus {
+.modal-content input:focus, 
+.modal-content textarea:focus {
     border-color: var(--accent-color);
     outline: none;
 }
@@ -613,6 +636,11 @@ footer a:hover {
     padding-top: 10px;
 }
 
+/* Liste Styling */
+.custom-list {
+    list-style-type: square;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .main-header {
@@ -671,6 +699,16 @@ footer a:hover {
         margin-top: 2rem;
         width: 100%;
         max-width: 500px;
+    }
+
+    .flex-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .flex-container img {
+        max-width: 100%;
+        margin-bottom: 1rem;
     }
 
     footer {
