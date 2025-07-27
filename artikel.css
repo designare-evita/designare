@@ -239,6 +239,16 @@ body {
     font-weight: 600;
 }
 
+.article-content .flex-container {
+  display: flex; /* Aktiviert Flexbox */
+  align-items: center; /* Zentriert die Elemente vertikal (optional) */
+  gap: 20px; /* Fügt einen Abstand zwischen Bild und Text hinzu (optional) */
+}
+
+.flex-container img {
+  max-width: 350px; /* Stellt sicher, dass das Bild nicht zu groß wird */
+}
+
 /* AI Container */
 .ai-container {
     margin-top: 3rem;
