@@ -247,6 +247,14 @@ body {
 
 .flex-container img {
   max-width: 200px; /* Stellt sicher, dass das Bild nicht zu groß wird */
+
+.article-content .text-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%; /* Nimmt den restlichen Platz ein */
+}
+
 }
 
 /* AI Container */
