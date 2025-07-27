@@ -74,7 +74,7 @@ body {
     height: 100%;
     line-height: 1.6;
     overflow-x: hidden;
-    perspective: 1000px;
+    /* KORREKTUR: Die 'perspective'-Eigenschaft wurde entfernt, da sie den Fehler verursacht. */
     transition: background-color 0.4s ease, color 0.4s ease;
 }
 
@@ -94,7 +94,7 @@ body.no-scroll {
     justify-content: space-between;
     align-items: center;
     padding: 20px;
-    z-index: 1001; /* KORREKTUR: z-index erhöht */
+    z-index: 1001;
     box-sizing: border-box;
     height: var(--header-height-desktop);
 }
@@ -278,7 +278,7 @@ footer {
     gap: 8px;
     position: fixed;
     right: 10px;
-    z-index: 1001; /* KORREKTUR: z-index erhöht */
+    z-index: 1001;
 }
 footer a {
     border: 1px solid var(--text-color);
