@@ -246,7 +246,7 @@ body {
 }
 
 .flex-container img {
-  max-width: 150px; /* Stellt sicher, dass das Bild nicht zu groß wird */
+  max-width: 200px; /* Stellt sicher, dass das Bild nicht zu groß wird */
 }
 
 /* AI Container */
