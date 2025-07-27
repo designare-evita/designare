@@ -261,6 +261,7 @@ body {
     height: auto;
     flex-shrink: 0; /* Verhindert, dass das Bild schrumpft */
     object-fit: cover; /* Für bessere Bilddarstellung */
+align-items: center;
 }
 
 .article-content .text-wrapper {
@@ -277,7 +278,8 @@ body {
     width: 100%; /* Nutzt die volle verfügbare Breite */
 max-width: 400px;
 flex-shrink: 1; /* Erlaubt Schrumpfen wenn nötig */
-flex-wrap: nowrap; 
+flex-wrap: nowrap;
+align-items: center;
 }
 
 #ai-form {
@@ -719,6 +721,7 @@ footer a:hover {
         width: 100%;
         max-width: none;
         min-width: auto;
+align-items: center;
     }
 
     .flex-container {
@@ -731,6 +734,7 @@ footer a:hover {
       max-width: 100%;
         min-width: auto;
         align-self: center;
+align-items: center;
     }
 
     footer {
