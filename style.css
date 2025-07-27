@@ -78,12 +78,10 @@ body {
     font-family: 'Poppins', sans-serif;
     height: 100%;
     line-height: 1.6;
-    overflow-x: hidden;
-    /* KORREKTUR: Kein overflow-y: hidden mehr für bessere Sichtbarkeit */
+    overflow-x: hidden !important;
     transition: background-color 0.4s ease, color 0.4s ease;
 }
 
-/* KORREKTUR: no-scroll Klasse entfernt - war das Hauptproblem */
 
 /* Top-Bar Steuerungselemente - KORREKTUR: Positioning optimiert */
 .main-header {
@@ -494,6 +492,10 @@ footer a:hover {
 
 /* Responsive Design - KORREKTUR: Mobile Layout angepasst */
 @media (max-width: 768px) {
+
+     body {
+	overflow-x: hidden !important;
+	 }
     .main-header {
         padding: 15px 10px;
         height: var(--header-height-mobile);
