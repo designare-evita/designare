@@ -251,7 +251,7 @@ body {
 
 /* AI Container */
 .ai-container {
-    margin-top: 3rem;
+    margin-top: 0.5rem;
     width: 100%;
     max-width: 500px;
     margin-left: auto;
