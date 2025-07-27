@@ -240,27 +240,24 @@ body {
 }
 
 .article-content .flex-container {
-  display: flex; /* Aktiviert Flexbox */
-  align-items: center; /* Zentriert die Elemente vertikal (optional) */
-  gap: 20px; /* Fügt einen Abstand zwischen Bild und Text hinzu (optional) */
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }
 
 .flex-container img {
-  max-width: 200px; /* Stellt sicher, dass das Bild nicht zu groß wird */
+  max-width: 200px;
 }
 
 .article-content .text-wrapper {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  width: 100%; /* Nimmt den restlichen Platz ein */
+  width: 100%;
 }
 
-}
-
-/* AI Container */
+/* AI Container - KORRIGIERT */
 .ai-container {
-    .ai-container {
     margin-bottom: 2.5rem;
     width: 500px;
 }
