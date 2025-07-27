@@ -1,8 +1,13 @@
-/* style.css
-  Vereinfacht: Nur noch Dark Mode & Finaler Layout-Fix
-*/
-
-/* 1. Lokale Fonts laden */
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Michael Kanda | Wo Webseiten & KI sich begegnen</title>
+    <meta name="description" content="Michael Kanda bastelt Webseiten und bringt KI zum Verzweifeln! Fragen? Evita, meine KI-Assistentin, hat die Antworten – und mehr Geduld als ich.">
+    
+    <style>
+/* Lokale Fonts laden */
 @font-face {
     font-family: 'Poppins';
     font-style: normal;
@@ -37,7 +42,7 @@
     color: var(--accent-color);
 }
 
-/* 2. Globale Einstellungen & Farbvariablen */
+/* Globale Einstellungen & Farbvariablen */
 :root {
     --accent-color: #FCB500;
     --accent-color-rgba: rgba(252, 181, 0, 0.85);
@@ -74,17 +79,13 @@ body {
     height: 100%;
     line-height: 1.6;
     overflow-x: hidden;
-    /* KORREKTUR: Die 'perspective'-Eigenschaft wurde entfernt, da sie den Fehler verursacht. */
+    /* KORREKTUR: Kein overflow-y: hidden mehr für bessere Sichtbarkeit */
     transition: background-color 0.4s ease, color 0.4s ease;
 }
 
-/* Regel, die das Scrollen nur auf der Startseite verhindert */
-body.no-scroll {
-    overflow-y: hidden;
-}
+/* KORREKTUR: no-scroll Klasse entfernt - war das Hauptproblem */
 
-
-/* 3. Top-Bar Steuerungselemente */
+/* Top-Bar Steuerungselemente - KORREKTUR: Positioning optimiert */
 .main-header {
     position: fixed;
     top: 0;
@@ -97,6 +98,8 @@ body.no-scroll {
     z-index: 1001;
     box-sizing: border-box;
     height: var(--header-height-desktop);
+    background-color: rgba(26, 26, 26, 0.95); /* Leicht transparenter Hintergrund */
+    backdrop-filter: blur(10px);
 }
 
 #top-left-logo-link {
@@ -150,7 +153,7 @@ body.no-scroll {
     transform: scale(1.1);
 }
 
-/* 4. Haupt-Layout & Container */
+/* Haupt-Layout & Container - KORREKTUR: Hero Layout komplett überarbeitet */
 .container {
     align-items: center;
     display: flex;
@@ -160,17 +163,20 @@ body.no-scroll {
     max-width: 1100px;
     padding: 0 2rem;
 }
+
 #hero {
     align-items: center;
     display: flex;
-    height: calc(100vh - var(--header-height-desktop));
-    margin-top: var(--header-height-desktop);
+    /* KORREKTUR: Vereinfachtes Height-System */
+    min-height: 100vh;
     justify-content: center;
     overflow: hidden;
     position: relative;
     text-align: center;
-    padding-bottom: 12vh;
+    /* KORREKTUR: Padding-top für Header-Abstand */
+    padding-top: var(--header-height-desktop);
 }
+
 #particles-js {
     height: 100%;
     left: 0;
@@ -184,7 +190,7 @@ body.no-scroll {
     z-index: 2;
 }
 
-/* 5. Inhaltselemente */
+/* Inhaltselemente */
 .profile-picture {
     height: 200px;
     margin-bottom: 1.5rem;
@@ -210,7 +216,6 @@ body.no-scroll {
     margin-bottom: 1.5rem;
     padding-top: 15px;
 }
-
 
 .ai-container {
     margin-bottom: 2.5rem;
@@ -270,14 +275,14 @@ body.no-scroll {
     transition: opacity 0.3s ease, border-color 0.3s ease;
 }
 
-/* 6. Footer & Kontakt-Modal */
+/* Footer - KORREKTUR: Footer wieder sichtbar machen */
 footer {
     align-items: center;
-    bottom: 10px;
+    bottom: 20px;
     display: flex;
     gap: 8px;
     position: fixed;
-    right: 10px;
+    right: 20px;
     z-index: 1001;
 }
 footer a {
@@ -285,13 +290,18 @@ footer a {
     border-radius: 5px;
     color: var(--text-color);
     font-size: 0.8rem;
-    opacity: 0.5;
+    opacity: 0.7;
     padding: 4px 8px;
     text-decoration: none;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.3s ease, background-color 0.3s ease;
+    background-color: rgba(26, 26, 26, 0.8);
+    backdrop-filter: blur(5px);
 }
 footer a:hover {
     opacity: 1;
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    color: #fff;
 }
 
 .modal-overlay {
@@ -482,19 +492,13 @@ footer a:hover {
     transform: none;
 }
 
-
-/* 7. Responsive Design */
+/* Responsive Design - KORREKTUR: Mobile Layout angepasst */
 @media (max-width: 768px) {
-    body.no-scroll {
-        overflow: hidden;
-    }
-
     .main-header {
         padding: 15px 10px;
         height: var(--header-height-mobile);
     }
     #top-left-logo-link {
-        left: 10px;
         height: 35px;
         width: 35px;
     }
@@ -502,43 +506,12 @@ footer a:hover {
         height: 30px;
     }
     .header-right-controls {
-        right: 10px;
         gap: 10px;
     }
-    #contact-button, #cookie-info-button, #magazine-button {
+    #contact-button, #cookie-info-button, #about-me-button {
         font-size: 1rem;
         height: 35px;
         width: 35px;
-    }
-
-    .article-page-main-content {
-        padding-top: var(--header-height-mobile);
-        padding-bottom: 80px;
-    }
-    .article-container {
-        padding: 1rem;
-        margin: 1rem auto;
-    }
-    .article-content h1 {
-        font-size: 1.8rem;
-    }
-    .article-content h2 {
-        font-size: 1.4rem;
-    }
-    .article-content h3 {
-        font-size: 1.1rem;
-    }
-    .article-content h4 {
-        font-size: 0.95rem;
-    }
-    .article-content p,
-    .article-content ul,
-    .article-content ol,
-    .article-content li {
-        font-size: 0.9rem;
-    }
-    .article-content img {
-        margin: 1rem auto;
     }
 
     footer {
@@ -583,11 +556,6 @@ footer a:hover {
     .legal-container li {
         font-size: 0.85rem;
     }
-    .legal-container .back-link {
-        font-size: 0.8rem;
-        margin-bottom: 2rem;
-        padding: 6px 12px;
-    }
     .legal-modal-pagination-buttons {
         flex-direction: column;
         gap: 10px;
@@ -598,10 +566,10 @@ footer a:hover {
         width: 100%;
     }
 
+    /* KORREKTUR: Mobile Hero Layout */
     #hero {
-        height: calc(100vh - var(--header-height-mobile));
-        margin-top: var(--header-height-mobile);
-        padding-bottom: 18vh;
+        min-height: 100vh;
+        padding-top: var(--header-height-mobile);
     }
 
     #hero h1 {
@@ -627,3 +595,227 @@ footer a:hover {
         margin-bottom: 1rem;
     }
 }
+    </style>
+    
+    <link rel="icon" href="images/favicon.webp" type="image/webp">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+
+<body class="dark-mode">
+    <header class="main-header">
+        <a href="index.html" id="top-left-logo-link" aria-label="Zur Startseite">
+            <img src="https://via.placeholder.com/46x46/FCB500/ffffff?text=MK" alt="Michael Kanda Logo" id="top-left-logo-img">
+        </a>
+        <div class="header-right-controls">
+          <button id="about-me-button" aria-label="Über mich öffnen">
+            <i class="fa-regular fa-user"></i>
+          </button>
+          <button id="contact-button" aria-label="Kontaktformular öffnen">
+              <i class="far fa-envelope"></i>
+          </button>
+          <button id="cookie-info-button" aria-label="Cookie Informationen anzeigen">
+              <i class="fas fa-cookie-bite"></i>
+          </button>
+        </div>
+    </header>
+
+    <main id="hero">
+        <div id="particles-js"></div>
+        <div class="container">
+            <img fetchpriority="high" src="https://via.placeholder.com/200x200/FCB500/ffffff?text=MICHAEL" alt="Illustration Michael und Evita" class="profile-picture">
+            <h1 id="typewriter-h1">Hallo, ich bin Michael!</h1>
+            <p class="subtitle">Michael Kanda <span class="accent-text-inline">&lt;/&gt;</span> Komplize für Web & KI aus Wien </p>
+            <div class="ai-container">
+                <form id="ai-form">
+                    <input type="text" id="ai-question" placeholder="Hallo, ich bin Evita, Michaels KI-Assistentin." autocomplete="off" required>
+                    <button type="submit" aria-label="Frage senden"><i class="fas fa-paper-plane"></i></button>
+                </form>
+                <p id="ai-status">Bereit für deine Frage...</p>
+            </div>
+        </div>
+    </main>
+	
+    <div id="contact-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button id="close-modal" class="close-button">&times;</button>
+            <h2>Frag Michael!</h2>
+            <form id="contact-form-inner">
+                <input type="text" name="name" placeholder="Dein Name (oder Künstlername):" required>
+                <input type="email" name="email" placeholder="Deine E-Mail (Anti-Spam-Zone!)" required>
+                <input type="text" name="_subject" placeholder="Worum geht's? (Bitte kein KI-Drama)">
+                <textarea name="message" placeholder="Deine Botschaft an mich (und Evita):" rows="5" required></textarea>
+                <div class="privacy-checkbox">
+                    <input type="checkbox" name="privacy" id="privacy" required>
+                    <label for="privacy">Michael darf meine Nachricht lesen und Evita darf alles verarbeiten, was sie versteht. (Details im Datenschutz)</label>
+                </div>
+                <button type="submit" class="cta-button">Ab die Post!</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="cookie-info-lightbox" class="modal-overlay">
+        <div class="modal-content">
+            <h2>Hinweis zu Cookies</h2>
+            <p style="text-align: center;">Wir backen hier nur Cookies, die unsere Website am Laufen halten. Reine Technik, kein Schnickschnack!</p>
+            <div class="cookie-lightbox-buttons">
+                <a href="datenschutz.html" id="privacy-policy-link-button" class="lightbox-button">Datenschutzerklärung</a>
+                <button id="acknowledge-cookie-lightbox" class="lightbox-button">Alles klar</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <a href="impressum.html" id="impressum-link">Impressum</a>
+        <a href="datenschutz.html" id="datenschutz-link">Datenschutz</a>
+    </footer>
+
+    <script>
+        // Simpler Particle-Effekt (falls das externe Script nicht lädt)
+        function createParticles() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const container = document.getElementById('particles-js');
+            
+            if (!container) return;
+            
+            container.appendChild(canvas);
+            
+            function resize() {
+                canvas.width = container.offsetWidth;
+                canvas.height = container.offsetHeight;
+            }
+            
+            resize();
+            window.addEventListener('resize', resize);
+            
+            const particles = [];
+            const particleCount = 50;
+            
+            for (let i = 0; i < particleCount; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * 0.5,
+                    vy: (Math.random() - 0.5) * 0.5,
+                    size: Math.random() * 2 + 1
+                });
+            }
+            
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                particles.forEach(particle => {
+                    particle.x += particle.vx;
+                    particle.y += particle.vy;
+                    
+                    if (particle.x < 0 || particle.x > canvas.width) particle.vx *= -1;
+                    if (particle.y < 0 || particle.y > canvas.height) particle.vy *= -1;
+                    
+                    ctx.beginPath();
+                    ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+                    ctx.fillStyle = '#bbbbbb';
+                    ctx.globalAlpha = 0.6;
+                    ctx.fill();
+                });
+                
+                requestAnimationFrame(animate);
+            }
+            
+            animate();
+        }
+        
+        // Modal Funktionalität
+        function initModals() {
+            const contactButton = document.getElementById('contact-button');
+            const contactModal = document.getElementById('contact-modal');
+            const closeModal = document.getElementById('close-modal');
+            const cookieButton = document.getElementById('cookie-info-button');
+            const cookieModal = document.getElementById('cookie-info-lightbox');
+            const acknowledgeButton = document.getElementById('acknowledge-cookie-lightbox');
+            
+            if (contactButton && contactModal) {
+                contactButton.addEventListener('click', () => {
+                    contactModal.classList.add('visible');
+                });
+            }
+            
+            if (closeModal && contactModal) {
+                closeModal.addEventListener('click', () => {
+                    contactModal.classList.remove('visible');
+                });
+            }
+            
+            if (cookieButton && cookieModal) {
+                cookieButton.addEventListener('click', () => {
+                    cookieModal.classList.add('visible');
+                });
+            }
+            
+            if (acknowledgeButton && cookieModal) {
+                acknowledgeButton.addEventListener('click', () => {
+                    cookieModal.classList.remove('visible');
+                });
+            }
+            
+            // Modal schließen bei Klick außerhalb
+            [contactModal, cookieModal].forEach(modal => {
+                if (modal) {
+                    modal.addEventListener('click', (e) => {
+                        if (e.target === modal) {
+                            modal.classList.remove('visible');
+                        }
+                    });
+                }
+            });
+        }
+        
+        // Typewriter Effekt
+        function typewriterEffect() {
+            const h1 = document.getElementById('typewriter-h1');
+            if (!h1) return;
+            
+            const text = 'Hallo, ich bin Michael!';
+            let i = 0;
+            
+            function type() {
+                if (i < text.length) {
+                    h1.textContent += text.charAt(i);
+                    i++;
+                    setTimeout(type, 100);
+                }
+            }
+            
+            h1.textContent = '';
+            type();
+        }
+        
+        // AI Form Simulation
+        function initAIForm() {
+            const form = document.getElementById('ai-form');
+            const status = document.getElementById('ai-status');
+            
+            if (form && status) {
+                form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const input = document.getElementById('ai-question');
+                    if (input && input.value.trim()) {
+                        status.textContent = 'Evita denkt nach... 🤖';
+                        setTimeout(() => {
+                            status.textContent = 'Tolle Frage! Michael wird sich bald bei dir melden.';
+                            input.value = '';
+                        }, 2000);
+                    }
+                });
+            }
+        }
+        
+        // Initialisierung
+        document.addEventListener('DOMContentLoaded', () => {
+            createParticles();
+            initModals();
+            typewriterEffect();
+            initAIForm();
+        });
+    </script>
+</body>
+</html>
