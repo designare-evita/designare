@@ -1,1 +1,514 @@
+.legal-container h2 {
+font-size: 2em;
+    text-align: left;
+    margin-bottom: 15px;
+line-height: 1.3;
+}
 
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Poppins', sans-serif;
+    height: 100%;
+    line-height: 1.6;
+    overflow-x: hidden;
+    overflow-y: hidden; 
+    perspective: 1000px;
+    transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+
+/* 3. Top-Bar Steuerungselemente */
+.main-header { /* Haupt-Container für die Top-Bar */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between; /* Logo links, Buttons rechts */
+    align-items: center;
+    padding: 20px; /* Abstand von den Rändern */
+    z-index: 1000;
+    box-sizing: border-box; /* Padding in die Breite einbeziehen */
+    height: var(--header-height-desktop); /* NEU: Feste Höhe für den Header */
+}
+
+/* Styling für das Top-Left Logo */
+#top-left-logo-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px; /* Gleiche Höhe wie die Buttons rechts, für Ausrichtung */
+    width: 40px; /* Gleiche Breite wie die Buttons rechts */
+    opacity: 0.8;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    text-decoration: none;
+}
+
+#top-left-logo-link:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+#top-left-logo-img {
+    height: 46px; /* 39.675px * 1.15 = 45.626px (15% größer als aktuelle 39.675px) */
+    width: auto;
+    vertical-align: middle;
+}
+
+.header-right-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+#theme-toggle {
+    background: none;
+    border: none;
+    color: var(--text-color);
+    cursor: pointer;
+    font-size: 1.5rem;
+    transition: color 0.4s ease, transform 0.3s ease;
+}
+#theme-toggle:hover {
+    color: var(--accent-color);
+    transform: scale(1.1);
+}
+#theme-toggle .fa-sun {
+    display: none;
+}
+body.dark-mode #theme-toggle .fa-sun {
+    display: inline-block;
+}
+body.dark-mode #theme-toggle .fa-moon {
+    display: none;
+}
+
+#contact-button, #cookie-info-button, #about-me-button {
+    align-items: center;
+    background: none;
+    border: none;
+    border-radius: 50%;
+    color: var(--text-color);
+    cursor: pointer;
+    display: flex;
+    font-size: 1.2rem;
+    height: 40px;
+    justify-content: center;
+    opacity: 0.7;
+    transition: all 0.3s ease;
+    width: 40px;
+    text-decoration: none;
+}
+#contact-button:hover, #cookie-info-button:hover, #about-me-button:hover {
+    background-color: var(--accent-color);
+    color: #fff;
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+#particles-js {
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: 1;
+}
+
+.ai-container {
+    margin-bottom: 2.5rem;
+    width: 500px;
+}
+#ai-form {
+    background-color: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    display: flex;
+    overflow: hidden;
+    transition: border-color 0.3s ease;
+}
+body.dark-mode #ai-form {
+    border-color: var(--border-color);
+}
+#ai-form:focus-within {
+    border-color: var(--accent-color);
+}
+#ai-question {
+    background: none;
+    border: none;
+    color: var(--text-color);
+    flex-grow: 1;
+    font-size: 1rem;
+    outline: none;
+    padding: 12px 15px;
+}
+#ai-question::placeholder {
+    color: var(--text-color);
+    opacity: 0.5;
+    transition: opacity 0.6s ease-in-out;
+}
+#ai-question.placeholder-fade::placeholder {
+    opacity: 0;
+}
+#ai-form button {
+    background: var(--accent-color);
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0 18px;
+    transition: background-color 0.3s ease;
+}
+#ai-form button:hover {
+    background: #d39a00;
+}
+#ai-status {
+    background-color: rgba(0,0,0,0.02);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    margin-top: 10px;
+    min-height: 40px;
+    opacity: 0.9;
+    padding: 10px;
+    text-align: left;
+    transition: opacity 0.3s ease, border-color 0.3s ease;
+}
+body.dark-mode #ai-status {
+    background-color: rgba(255,255,255,0.03);
+    border: 1px solid var(--border-color);
+}
+
+/* 6. Footer & Kontakt-Modal */
+footer {
+    align-items: center;
+    bottom: 10px;
+    display: flex;
+    gap: 8px;
+    position: fixed;
+    right: 10px;
+    z-index: 1000;
+}
+footer a {
+    border: 1px solid var(--text-color);
+    border-radius: 5px;
+    color: var(--text-color);
+    font-size: 0.8rem;
+    opacity: 0.5;
+    padding: 4px 8px;
+    text-decoration: none;
+    transition: opacity 0.3s ease;
+}
+footer a:hover {
+    opacity: 1;
+}
+
+.modal-overlay {
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    height: 100%;
+    justify-content: center;
+    left: 0;
+    opacity: 0;
+    pointer-events: none;
+    position: fixed;
+    top: 0;
+    transition: opacity 0.3s ease;
+    width: 100%;
+    z-index: 2000;
+}
+.modal-overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+.modal-content {
+    background-color: var(--bg-color);
+    border-radius: 10px;
+    max-width: 700px; /* Maximale Breite für Modals */
+    padding: 2rem;
+    position: relative;
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+    width: 90%;
+}
+.modal-overlay.visible .modal-content {
+    transform: scale(1);
+}
+.modal-content h2 {
+    margin-bottom: 1.5rem;
+    margin-top: 0;
+    text-align: center;
+}
+.close-button {
+    background: none;
+    border: none;
+    color: var(--text-color);
+    cursor: pointer;
+    font-size: 2rem;
+    opacity: 0.5;
+    position: absolute;
+    right: 15px;
+    top: 10px;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.close-button:hover {
+    opacity: 1;
+    transform: rotate(90deg);
+}
+.modal-content form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.modal-content .cta-button {
+    display: block;
+    width: 100%;
+    background: var(--accent-color);
+    border: 2px solid var(--accent-color);
+    border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 12px 24px;
+    text-align: center;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+.modal-content .cta-button:hover {
+    background-color: #d39a00;
+    border-color: #d39a00;
+    color: #fff;
+    transform: translateY(-3px);
+}
+.modal-content input[type="text"], .modal-content input[type="email"], .modal-content textarea {
+    font-family: 'Poppins', sans-serif; font-size: 1rem; padding: 12px;
+    border-radius: 5px; border: 1px solid var(--border-color);
+    background-color: var(--bg-color); color: var(--text-color);
+    transition: border-color 0.3s ease;
+}
+.modal-content input:focus, .modal-content textarea:focus {
+    border-color: var(--accent-color);
+    outline: none;
+}
+.privacy-checkbox {
+    align-items: center;
+    display: flex;
+    font-size: 0.8rem;
+    gap: 10px;
+}
+.privacy-checkbox input {
+    width: auto;
+}
+
+/* Styles für Cookie Lightbox Buttons */
+.cookie-lightbox-buttons {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+    width: 100%;
+    align-items: center;
+}
+
+.lightbox-button {
+    background: none;
+    border: 2px solid var(--text-color);
+    border-radius: 5px;
+    color: var(--text-color);
+    cursor: pointer;
+    display: block;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 10px 15px;
+    text-align: center;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+/* Spezifische Farben für die Lightbox-Buttons */
+#acknowledge-cookie-lightbox {
+    background-color: var(--accent-color);
+    color: #fff;
+    border: 2px solid var(--accent-color);
+}
+
+#acknowledge-cookie-lightbox:hover {
+    background-color: #d39a00;
+    border-color: #d39a00;
+    transform: translateY(-2px);
+}
+
+#privacy-policy-link-button {
+    background: none;
+    border: 2px solid var(--text-color);
+    color: var(--text-color);
+}
+
+body.dark-mode #privacy-policy-link-button {
+    color: var(--text-color);
+    border-color: var(--text-color);
+}
+
+#privacy-policy-link-button:hover {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+/* Styles für die Paginierungs-Buttons im Legal-Modal */
+.legal-modal-pagination-buttons {
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 25px;
+    padding-top: 15px;
+}
+
+.legal-modal-pagination-buttons button {
+    background-color: var(--accent-color);
+    color: #fff;
+    padding: 10px 20px;
+    border: 2px solid var(--accent-color);
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.legal-modal-pagination-buttons button:hover {
+    background-color: #d39a00;
+    border-color: #d39a00;
+    transform: translateY(-2px);
+}
+
+.legal-modal-pagination-buttons button:disabled {
+    background-color: #cccccc;
+    border-color: #cccccc;
+    cursor: not-allowed;
+    opacity: 0.7;
+    transform: none;
+}
+
+body.dark-mode .legal-modal-pagination-buttons button:disabled {
+    background-color: #555555;
+    border-color: #555555;
+}
+
+
+/* 7. Responsive Design */
+@media (max-width: 768px) {
+    body {
+        overflow: hidden;
+    }
+
+    /* Top-Bar auf Mobilgeräten */
+    .main-header { /* Mobile Anpassung für den Header */
+        padding: 15px 10px; /* Weniger Padding */
+        height: var(--header-height-mobile); /* Mobile Höhe des Headers */
+    }
+    #top-left-logo-link { /* Mobile Anpassung für Logo-Link */
+        left: 10px;
+        height: 35px;
+        width: 35px;
+    }
+    #top-left-logo-img { /* Mobile Anpassung für Logo-Bild */
+        height: 30px; /* Angepasst auf 15% größer von 25px = 28.75px, gerundet 30px */
+    }
+    .header-right-controls {
+        right: 10px;
+        gap: 10px;
+    }
+    #contact-button, #cookie-info-button, #theme-toggle, #magazine-button {
+        font-size: 1rem;
+        height: 35px;
+        width: 35px;
+    }
+
+ /* Footer auf Mobilgeräten */
+    footer {
+        right: 10px;
+        bottom: 10px;
+        gap: 5px;
+    }
+    footer a {
+        font-size: 0.7rem;
+        padding: 3px 6px;
+    }
+
+    /* Responsive Anpassung für Lightbox-Buttons */
+    .cookie-lightbox-buttons {
+        gap: 10px;
+    }
+    .lightbox-button {
+        font-size: 0.9rem;
+    }
+
+    /* Responsive Anpassung für Modals */
+    .modal-content {
+        max-height: 90vh;
+        max-width: 90%;
+        overflow-y: auto;
+        padding: 1.5rem;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Anpassung der Schriftgrößen im legal-container für Mobile (innerhalb Modals) */
+    .legal-container h1 {
+        font-size: 1.6rem;
+    }
+    .legal-container h2 {
+        font-size: 1.2rem;
+        line-height: 1.3;
+ margin-bottom: 10px;
+    }
+    .legal-container h3 {
+        font-size: 1.0rem;
+    }
+    .legal-container p,
+    .legal-container ul,
+    .legal-container ol,
+    .legal-container li {
+        font-size: 0.85rem;
+    }
+    /* Anpassung des Back-Links im Modal für bessere Lesbarkeit auf Mobile */
+    .legal-container .back-link {
+        font-size: 0.8rem;
+        margin-bottom: 2rem;
+        padding: 6px 12px;
+    }
+    /* Paginierungsbuttons auf Mobile */
+    .legal-modal-pagination-buttons {
+        flex-direction: column;
+        gap: 10px;
+        padding-top: 10px;
+    }
+    .legal-modal-pagination-buttons button {
+        font-size: 0.9rem;
+        width: 100%;
+    }
+
+  /* AI-Container an die Bildschirmbreite anpassen */
+    .ai-container {
+        width: 100%; /* Volle Breite nutzen */
+        max-width: 500px; /* Maximale Breite beibehalten */
+        margin-bottom: 2rem;
+    }
