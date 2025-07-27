@@ -1,5 +1,5 @@
 /* style.css
-  Vereinfacht: Nur noch Dark Mode & Layout-Fix
+  Vereinfacht: Nur noch Dark Mode & Finaler Layout-Fix
 */
 
 /* 1. Lokale Fonts laden */
@@ -74,12 +74,11 @@ body {
     height: 100%;
     line-height: 1.6;
     overflow-x: hidden;
-    /* KORREKTUR: overflow-y wird entfernt, damit Unterseiten scrollen können */
     perspective: 1000px;
     transition: background-color 0.4s ease, color 0.4s ease;
 }
 
-/* KORREKTUR: Neue Regel, die das Scrollen nur auf der Startseite verhindert */
+/* Regel, die das Scrollen nur auf der Startseite verhindert */
 body.no-scroll {
     overflow-y: hidden;
 }
@@ -95,7 +94,7 @@ body.no-scroll {
     justify-content: space-between;
     align-items: center;
     padding: 20px;
-    z-index: 1000;
+    z-index: 1001; /* KORREKTUR: z-index erhöht */
     box-sizing: border-box;
     height: var(--header-height-desktop);
 }
@@ -279,7 +278,7 @@ footer {
     gap: 8px;
     position: fixed;
     right: 10px;
-    z-index: 1000;
+    z-index: 1001; /* KORREKTUR: z-index erhöht */
 }
 footer a {
     border: 1px solid var(--text-color);
@@ -486,7 +485,6 @@ footer a:hover {
 
 /* 7. Responsive Design */
 @media (max-width: 768px) {
-    /* KORREKTUR: Scroll-Verbot nur für die no-scroll Seite */
     body.no-scroll {
         overflow: hidden;
     }
