@@ -1,5 +1,5 @@
 /* style.css
-  Korrektur: Dark Mode als Standard und korrekte Icon-Anzeige
+  Vereinfacht: Nur noch Dark Mode & Layout-Fix
 */
 
 /* 1. Lokale Fonts laden */
@@ -39,7 +39,6 @@
 
 /* 2. Globale Einstellungen & Farbvariablen */
 :root {
-    /* Die Dark-Mode-Farben sind jetzt der Standard */
     --accent-color: #FCB500;
     --accent-color-rgba: rgba(252, 181, 0, 0.85);
     --bg-color: #1a1a1a;
@@ -49,15 +48,6 @@
     --text-color: #eeeeee;
     --header-height-desktop: 80px;
     --header-height-mobile: 65px;
-}
-
-/* KORREKTUR: Der Light Mode wird nur aktiviert, wenn die Klasse .light-mode explizit gesetzt ist. */
-body.light-mode {
-    --bg-color: #F8F7F4;
-    --border-color: #999999;
-    --particle-color: #888888;
-    --particle-line-color: #cccccc;
-    --text-color: #333333;
 }
 
 .legal-container h2 {
@@ -84,9 +74,14 @@ body {
     height: 100%;
     line-height: 1.6;
     overflow-x: hidden;
-    overflow-y: hidden; 
+    /* KORREKTUR: overflow-y wird entfernt, damit Unterseiten scrollen können */
     perspective: 1000px;
     transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+/* KORREKTUR: Neue Regel, die das Scrollen nur auf der Startseite verhindert */
+body.no-scroll {
+    overflow-y: hidden;
 }
 
 
@@ -132,34 +127,6 @@ body {
     align-items: center;
     gap: 15px;
 }
-
-#theme-toggle {
-    background: none;
-    border: none;
-    color: var(--text-color);
-    cursor: pointer;
-    font-size: 1.5rem;
-    transition: color 0.4s ease, transform 0.3s ease;
-}
-#theme-toggle:hover {
-    color: var(--accent-color);
-    transform: scale(1.1);
-}
-
-/* KORREKTUR: Die Logik für das Sonnen/Mond-Icon wird angepasst */
-.dark-mode #theme-toggle .fa-sun {
-    display: none;
-}
-.dark-mode #theme-toggle .fa-moon {
-    display: inline-block;
-}
-.light-mode #theme-toggle .fa-sun {
-    display: inline-block;
-}
-.light-mode #theme-toggle .fa-moon {
-    display: none;
-}
-
 
 #contact-button, #cookie-info-button, #about-me-button {
     align-items: center;
@@ -292,7 +259,7 @@ body {
     background: #d39a00;
 }
 #ai-status {
-    background-color: rgba(0,0,0,0.02);
+    background-color: rgba(255,255,255,0.03);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     font-size: 1rem;
@@ -302,9 +269,6 @@ body {
     padding: 10px;
     text-align: left;
     transition: opacity 0.3s ease, border-color 0.3s ease;
-}
-body.dark-mode #ai-status {
-    background-color: rgba(255,255,255,0.03);
 }
 
 /* 6. Footer & Kontakt-Modal */
@@ -476,11 +440,6 @@ footer a:hover {
     color: var(--text-color);
 }
 
-body.dark-mode #privacy-policy-link-button {
-    color: var(--text-color);
-    border-color: var(--text-color);
-}
-
 #privacy-policy-link-button:hover {
     background-color: var(--accent-color);
     border-color: var(--accent-color);
@@ -517,22 +476,18 @@ body.dark-mode #privacy-policy-link-button {
 }
 
 .legal-modal-pagination-buttons button:disabled {
-    background-color: #cccccc;
-    border-color: #cccccc;
+    background-color: #555555;
+    border-color: #555555;
     cursor: not-allowed;
     opacity: 0.7;
     transform: none;
 }
 
-body.dark-mode .legal-modal-pagination-buttons button:disabled {
-    background-color: #555555;
-    border-color: #555555;
-}
-
 
 /* 7. Responsive Design */
 @media (max-width: 768px) {
-    body {
+    /* KORREKTUR: Scroll-Verbot nur für die no-scroll Seite */
+    body.no-scroll {
         overflow: hidden;
     }
 
@@ -552,7 +507,7 @@ body.dark-mode .legal-modal-pagination-buttons button:disabled {
         right: 10px;
         gap: 10px;
     }
-    #contact-button, #cookie-info-button, #theme-toggle, #magazine-button {
+    #contact-button, #cookie-info-button, #magazine-button {
         font-size: 1rem;
         height: 35px;
         width: 35px;
