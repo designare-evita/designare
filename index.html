@@ -31,7 +31,7 @@
     }
     </script>
 </head>
-<body>
+<body class="dark-mode"> <!-- Die Klasse 'dark-mode' wird permanent hinzugefügt -->
 
     <header class="main-header">
         <a href="index.html" id="top-left-logo-link" aria-label="Zur Startseite">
@@ -47,10 +47,7 @@
           <button id="cookie-info-button" aria-label="Cookie Informationen anzeigen">
               <i class="fas fa-cookie-bite"></i>
           </button>
-          <button id="theme-toggle" aria-label="Toggle dark mode">
-              <i class="fas fa-moon"></i>
-              <i class="fas fa-sun"></i>
-          </button>
+          <!-- GELÖSCHT: Der Theme-Toggle-Button wurde entfernt -->
         </div>
     </header>
 
@@ -70,6 +67,7 @@
         </div>
     </main>
 	
+    <!-- Der Rest Ihrer HTML-Struktur bleibt unverändert -->
     <div id="contact-modal" class="modal-overlay">
         <div class="modal-content">
             <button id="close-modal" class="close-button">&times;</button>
@@ -127,7 +125,6 @@
 	<footer>
         <a href="impressum.html" id="impressum-link">Impressum</a>
         <a href="datenschutz.html" id="datenschutz-link">Datenschutz</a>
-       
     </footer>
 
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
