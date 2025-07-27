@@ -1,8 +1,13 @@
+/*
+ * artikel.css
+ * Vereinfacht: Nur noch Dark Mode
+*/
+
 .legal-container h2 {
-font-size: 2em;
+    font-size: 2em;
     text-align: left;
     margin-bottom: 15px;
-line-height: 1.3;
+    line-height: 1.3;
 }
 
 * {
@@ -13,12 +18,12 @@ line-height: 1.3;
 
 /* Container für den Artikel-Inhalt */
 .article-container {
-    max-width: 1200px; /* Maximale Breite des Inhalts */
-    margin: 130px auto 50px auto; /* Abstand: 130px oben, dann zentriert, 50px unten */
-    padding: 2rem; /* Innenabstand für den Text */
-    position: relative; /* Notwendig, damit der Inhalt über dem Hintergrund liegt */
-    z-index: 2; /* Stellt sicher, dass der Container über dem Partikel-Hintergrund liegt */
-    background-color: rgba(0, 0, 0, 0.3); /* Optional: Ein halbtransparenter Hintergrund für bessere Lesbarkeit */
+    max-width: 1200px;
+    margin: 130px auto 50px auto;
+    padding: 2rem;
+    position: relative;
+    z-index: 2;
+    background-color: rgba(0, 0, 0, 0.3);
     border-radius: 8px;
 }
 
@@ -34,18 +39,18 @@ body {
 
 
 /* 3. Top-Bar Steuerungselemente */
-.main-header { /* Haupt-Container für die Top-Bar */
+.main-header {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     display: flex;
-    justify-content: space-between; /* Logo links, Buttons rechts */
+    justify-content: space-between;
     align-items: center;
-    padding: 20px; /* Abstand von den Rändern */
+    padding: 20px;
     z-index: 1000;
-    box-sizing: border-box; /* Padding in die Breite einbeziehen */
-    height: var(--header-height-desktop); /* NEU: Feste Höhe für den Header */
+    box-sizing: border-box;
+    height: var(--header-height-desktop);
 }
 
 /* Styling für das Top-Left Logo */
@@ -53,8 +58,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 40px; /* Gleiche Höhe wie die Buttons rechts, für Ausrichtung */
-    width: 40px; /* Gleiche Breite wie die Buttons rechts */
+    height: 40px;
+    width: 40px;
     opacity: 0.8;
     transition: opacity 0.3s ease, transform 0.3s ease;
     text-decoration: none;
@@ -66,7 +71,7 @@ body {
 }
 
 #top-left-logo-img {
-    height: 46px; /* 39.675px * 1.15 = 45.626px (15% größer als aktuelle 39.675px) */
+    height: 46px;
     width: auto;
     vertical-align: middle;
 }
@@ -77,27 +82,7 @@ body {
     gap: 15px;
 }
 
-#theme-toggle {
-    background: none;
-    border: none;
-    color: var(--text-color);
-    cursor: pointer;
-    font-size: 1.5rem;
-    transition: color 0.4s ease, transform 0.3s ease;
-}
-#theme-toggle:hover {
-    color: var(--accent-color);
-    transform: scale(1.1);
-}
-#theme-toggle .fa-sun {
-    display: none;
-}
-body.dark-mode #theme-toggle .fa-sun {
-    display: inline-block;
-}
-body.dark-mode #theme-toggle .fa-moon {
-    display: none;
-}
+/* GELÖSCHT: Alle Regeln für #theme-toggle wurden entfernt. */
 
 #contact-button, #cookie-info-button, #about-me-button {
     align-items: center;
@@ -143,9 +128,6 @@ body.dark-mode #theme-toggle .fa-moon {
     overflow: hidden;
     transition: border-color 0.3s ease;
 }
-body.dark-mode #ai-form {
-    border-color: var(--border-color);
-}
 #ai-form:focus-within {
     border-color: var(--accent-color);
 }
@@ -179,7 +161,7 @@ body.dark-mode #ai-form {
     background: #d39a00;
 }
 #ai-status {
-    background-color: rgba(0,0,0,0.02);
+    background-color: rgba(255,255,255,0.03);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     font-size: 1rem;
@@ -189,10 +171,6 @@ body.dark-mode #ai-form {
     padding: 10px;
     text-align: left;
     transition: opacity 0.3s ease, border-color 0.3s ease;
-}
-body.dark-mode #ai-status {
-    background-color: rgba(255,255,255,0.03);
-    border: 1px solid var(--border-color);
 }
 
 /* 6. Footer & Kontakt-Modal */
@@ -241,7 +219,7 @@ footer a:hover {
 .modal-content {
     background-color: var(--bg-color);
     border-radius: 10px;
-    max-width: 700px; /* Maximale Breite für Modals */
+    max-width: 700px;
     padding: 2rem;
     position: relative;
     transform: scale(0.95);
@@ -346,7 +324,6 @@ footer a:hover {
     width: 100%;
 }
 
-/* Spezifische Farben für die Lightbox-Buttons */
 #acknowledge-cookie-lightbox {
     background-color: var(--accent-color);
     color: #fff;
@@ -363,11 +340,6 @@ footer a:hover {
     background: none;
     border: 2px solid var(--text-color);
     color: var(--text-color);
-}
-
-body.dark-mode #privacy-policy-link-button {
-    color: var(--text-color);
-    border-color: var(--text-color);
 }
 
 #privacy-policy-link-button:hover {
@@ -406,46 +378,39 @@ body.dark-mode #privacy-policy-link-button {
 }
 
 .legal-modal-pagination-buttons button:disabled {
-    background-color: #cccccc;
-    border-color: #cccccc;
+    background-color: #555555;
+    border-color: #555555;
     cursor: not-allowed;
     opacity: 0.7;
     transform: none;
-}
-
-body.dark-mode .legal-modal-pagination-buttons button:disabled {
-    background-color: #555555;
-    border-color: #555555;
 }
 
 
 /* 7. Responsive Design */
 @media (max-width: 768px) {
    
-    /* Top-Bar auf Mobilgeräten */
-    .main-header { /* Mobile Anpassung für den Header */
-        padding: 15px 10px; /* Weniger Padding */
-        height: var(--header-height-mobile); /* Mobile Höhe des Headers */
+    .main-header {
+        padding: 15px 10px;
+        height: var(--header-height-mobile);
     }
-    #top-left-logo-link { /* Mobile Anpassung für Logo-Link */
+    #top-left-logo-link {
         left: 10px;
         height: 35px;
         width: 35px;
     }
-    #top-left-logo-img { /* Mobile Anpassung für Logo-Bild */
-        height: 30px; /* Angepasst auf 15% größer von 25px = 28.75px, gerundet 30px */
+    #top-left-logo-img {
+        height: 30px;
     }
     .header-right-controls {
         right: 10px;
         gap: 10px;
     }
-    #contact-button, #cookie-info-button, #theme-toggle, #magazine-button {
+    #contact-button, #cookie-info-button, #magazine-button {
         font-size: 1rem;
         height: 35px;
         width: 35px;
     }
 
- /* Footer auf Mobilgeräten */
     footer {
         right: 10px;
         bottom: 10px;
@@ -456,7 +421,6 @@ body.dark-mode .legal-modal-pagination-buttons button:disabled {
         padding: 3px 6px;
     }
 
-    /* Responsive Anpassung für Lightbox-Buttons */
     .cookie-lightbox-buttons {
         gap: 10px;
     }
@@ -464,7 +428,6 @@ body.dark-mode .legal-modal-pagination-buttons button:disabled {
         font-size: 0.9rem;
     }
 
-    /* Responsive Anpassung für Modals */
     .modal-content {
         max-height: 90vh;
         max-width: 90%;
@@ -473,14 +436,13 @@ body.dark-mode .legal-modal-pagination-buttons button:disabled {
         -webkit-overflow-scrolling: touch;
     }
 
-    /* Anpassung der Schriftgrößen im legal-container für Mobile (innerhalb Modals) */
     .legal-container h1 {
         font-size: 1.6rem;
     }
     .legal-container h2 {
         font-size: 1.2rem;
         line-height: 1.3;
- margin-bottom: 10px;
+        margin-bottom: 10px;
     }
     .legal-container h3 {
         font-size: 1.0rem;
@@ -491,13 +453,11 @@ body.dark-mode .legal-modal-pagination-buttons button:disabled {
     .legal-container li {
         font-size: 0.85rem;
     }
-    /* Anpassung des Back-Links im Modal für bessere Lesbarkeit auf Mobile */
     .legal-container .back-link {
         font-size: 0.8rem;
         margin-bottom: 2rem;
         padding: 6px 12px;
     }
-    /* Paginierungsbuttons auf Mobile */
     .legal-modal-pagination-buttons {
         flex-direction: column;
         gap: 10px;
@@ -508,9 +468,9 @@ body.dark-mode .legal-modal-pagination-buttons button:disabled {
         width: 100%;
     }
 
-  /* AI-Container an die Bildschirmbreite anpassen */
     .ai-container {
-        width: 100%; /* Volle Breite nutzen */
-        max-width: 500px; /* Maximale Breite beibehalten */
+        width: 100%;
+        max-width: 500px;
         margin-bottom: 2rem;
     }
+}
