@@ -246,25 +246,25 @@ body {
 }
 
 .flex-container img {
-    max-width: 300px; /* Erhöhe von 200px auf 300px */
-    min-width: 250px;  /* Mindestbreite für das Bild */
+    max-width: 300px;
+    min-width: 250px;
     height: auto;
     flex-shrink: 0; /* Verhindert, dass das Bild schrumpft */
+    object-fit: cover; /* Für bessere Bilddarstellung */
 }
 
 .article-content .text-wrapper {
     display: flex;
     flex-direction: column;
-    justify-content: flex-start; /* Ändere von center zu flex-start */
+    justify-content: flex-start;
     flex: 1; /* Nimmt den verfügbaren Platz ein */
     min-width: 0; /* Wichtig für Flexbox-Verhalten */
 }
 
 /* KORRIGIERT: AI Container */
 .ai-container {
-    margin-bottom: 2.5rem;
-    width: 100%;
-max-width: 500px;
+ margin-bottom: 2.5rem;
+    width: 100%; /* Nutzt die volle verfügbare Breite */
 }
 
 #ai-form {
@@ -709,15 +709,14 @@ footer a:hover {
     }
 
     .flex-container {
-        flex-direction: column;
-        align-items: stretch;
-gap: 1.5rem;
+       flex-direction: column; /* Stapelt vertikal auf mobilen Geräten */
+        align-items: center; /* Zentriert die Elemente */
+        gap: 1.5rem;
     }
 
     .flex-container img {
-        max-width: 100%;
+      max-width: 100%;
         min-width: auto;
-        margin-bottom: 0; /* Entferne den unteren Margin */
         align-self: center;
     }
 
