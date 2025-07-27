@@ -11,8 +11,15 @@ line-height: 1.3;
     padding: 0;
 }
 
-html {
-    height: 100%;
+/* Container für den Artikel-Inhalt */
+.article-container {
+    max-width: 1200px; /* Maximale Breite des Inhalts */
+    margin: 130px auto 50px auto; /* Abstand: 130px oben, dann zentriert, 50px unten */
+    padding: 2rem; /* Innenabstand für den Text */
+    position: relative; /* Notwendig, damit der Inhalt über dem Hintergrund liegt */
+    z-index: 2; /* Stellt sicher, dass der Container über dem Partikel-Hintergrund liegt */
+    background-color: rgba(0, 0, 0, 0.3); /* Optional: Ein halbtransparenter Hintergrund für bessere Lesbarkeit */
+    border-radius: 8px;
 }
 
 body {
