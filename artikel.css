@@ -421,10 +421,7 @@ body.dark-mode .legal-modal-pagination-buttons button:disabled {
 
 /* 7. Responsive Design */
 @media (max-width: 768px) {
-    body {
-        overflow: hidden;
-    }
-
+   
     /* Top-Bar auf Mobilgeräten */
     .main-header { /* Mobile Anpassung für den Header */
         padding: 15px 10px; /* Weniger Padding */
