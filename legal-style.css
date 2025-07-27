@@ -1,53 +1,49 @@
 /*
  * legal-style.css
- * Stile für die Impressum-Seite
+ * Vereinfacht: Nur noch Dark Mode
 */
 
-/* 1. Lokale Fonts laden (identisch zur Hauptseite) */
+/* 1. Lokale Fonts laden */
 @font-face {
     font-family: 'Poppins';
     font-style: normal;
     font-weight: 300;
     src: url('Font/Poppins-Light.ttf') format('truetype');
-font-display: swap; 
+    font-display: swap; 
 }
 @font-face {
     font-family: 'Poppins';
     font-style: normal;
     font-weight: 400;
     src: url('Font/Poppins-Regular.ttf') format('truetype');
-font-display: swap; 
+    font-display: swap; 
 }
 @font-face {
     font-family: 'Poppins';
     font-style: normal;
     font-weight: 600;
     src: url('Font/Poppins-SemiBold.ttf') format('truetype');
-font-display: swap; 
+    font-display: swap; 
 }
 @font-face {
     font-family: 'Poppins';
     font-style: normal;
     font-weight: 700;
     src: url('Font/Poppins-Bold.ttf') format('truetype');
-font-display: swap; 
+    font-display: swap; 
 }
 
 /* 2. Farbvariablen & Basis-Stile */
 :root {
+    /* KORREKTUR: Die Dark-Mode-Farben sind jetzt der Standard */
     --accent-color: #FCB500;
-    --bg-color: #f8f9fa;
-    --border-color: #eeeeee;
-    --link-color: #0275d8;
-    --text-color: #333333;
-}
-
-body.dark-mode {
     --bg-color: #1a1a1a;
     --border-color: #333333;
     --link-color: #FCB500;
     --text-color: #eeeeee;
 }
+
+/* GELÖSCHT: Die body.dark-mode Regel ist nicht mehr nötig. */
 
 * {
     box-sizing: border-box;
@@ -59,7 +55,7 @@ body {
     font-family: 'Poppins', sans-serif;
     line-height: 1.7;
     margin: 0;
-    padding: 2rem;
+    /* padding: 2rem; */ /* Padding wird von anderen Containern gesteuert */
     transition: background-color 0.4s ease, color 0.4s ease;
 }
 
@@ -69,10 +65,10 @@ body {
     max-width: 800px;
 }
 
-/* Schriftgrößen um 10% kleiner und alphabetisch sortiert */
+/* Schriftgrößen und Stile bleiben gleich */
 .legal-container h1 {
     border-bottom: 1px solid var(--border-color);
-    font-size: 2.25rem; /* Ursprünglich 2.5rem - 10% */
+    font-size: 2.25rem;
     font-weight: 600;
     margin-bottom: 1rem;
     padding-bottom: 10px;
@@ -80,41 +76,41 @@ body {
 
 .legal-container h2 {
     border-bottom: 1px solid var(--border-color);
-    font-size: 1.62rem; /* Ursprünglich 1.8rem - 10% */
+    font-size: 1.62rem;
     font-weight: 600;
     margin-bottom: 1rem;
     padding-bottom: 10px;
+    text-align: left;
 }
 
 .legal-container h3 {
-    font-size: 1.17rem; /* Ursprünglich 1.3rem - 10% */
+    font-size: 1.17rem;
     font-weight: 600;
-    margin-top: 2.25rem; /* Ursprünglich 2.5rem - 10% */
+    margin-top: 2.25rem;
 }
 
-.legal-container h4 { /* Falls H4 verwendet wird */
-    font-size: 0.99rem; /* Ursprünglich 1.1rem - 10% */
+.legal-container h4 {
+    font-size: 0.99rem;
     font-weight: 600;
-    margin-top: 1.8rem; /* Anpassung */
+    margin-top: 1.8rem;
 }
 
 .legal-container li {
-    margin-bottom: 0.5rem; /* Anpassung */
+    margin-bottom: 0.5rem;
 }
 
 .legal-container ol,
 .legal-container ul {
-    padding-left: 1.8rem; /* Ursprünglich 2rem - 10% */
+    padding-left: 1.8rem;
 }
 
 .legal-container p,
 .legal-container ul,
 .legal-container ol,
 .legal-container li {
-    font-size: 0.9rem; /* Ursprünglich 1rem - 10% */
-    margin-bottom: 0.9rem; /* Anpassung */
+    font-size: 0.9rem;
+    margin-bottom: 0.9rem;
 }
-
 
 a {
     color: var(--link-color);
@@ -145,15 +141,15 @@ a:hover {
     border-radius: 5px;
     color: var(--accent-color);
     display: inline-block;
-    font-size: 0.9rem; /* Auch den Back-Link Text anpassen */
+    font-size: 0.9rem;
     font-weight: 600;
-    margin-bottom: 2.7rem; /* Ursprünglich 3rem - 10% */
-    padding: 0.45rem 0.85rem; /* Ursprünglich 8px 15px - 10% */
+    margin-bottom: 2.7rem;
+    padding: 0.45rem 0.85rem;
     text-decoration: none;
     transition: all 0.3s ease;
 }
 .back-link i {
-    margin-right: 0.45rem; /* Ursprünglich 8px - 10% */
+    margin-right: 0.45rem;
     transition: transform 0.3s ease;
 }
 
@@ -165,9 +161,4 @@ a:hover {
 
 .back-link:hover i {
     transform: translateX(-5px);
-}
-
-.legal-container h2 {
-    text-align: left;
-    margin-bottom: 15px;
 }
