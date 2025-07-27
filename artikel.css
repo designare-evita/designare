@@ -247,6 +247,7 @@ body {
 
 .flex-container img {
   max-width: 200px; /* Stellt sicher, dass das Bild nicht zu groß wird */
+}
 
 .article-content .text-wrapper {
   display: flex;
@@ -259,11 +260,9 @@ body {
 
 /* AI Container */
 .ai-container {
-    margin-top: 0.5rem;
-    width: 100%;
-    max-width: 500px;
-    margin-left: auto;
-    margin-right: auto;
+    .ai-container {
+    margin-bottom: 2.5rem;
+    width: 500px;
 }
 
 #ai-form {
