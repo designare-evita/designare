@@ -265,6 +265,9 @@ body {
 .ai-container {
  margin-bottom: 2.5rem;
     width: 100%; /* Nutzt die volle verfügbare Breite */
+max-width: 400px;
+flex-shrink: 1; /* Erlaubt Schrumpfen wenn nötig */
+flex-wrap: nowrap; 
 }
 
 #ai-form {
