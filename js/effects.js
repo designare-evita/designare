@@ -12,6 +12,7 @@ function setupParticles() {
     }
 }
 
+/*
  // Initialisiert den 3D-Schwebeeffekt für den Hero-Bereich
 function setup3dHover() {
     const heroElement = document.getElementById('hero');
@@ -28,12 +29,12 @@ function setup3dHover() {
             container.style.transform = 'rotateX(0) rotateY(0)';
         });
     }
-} 
+}  */
 
 // Exportiert eine Haupt-Initialisierungsfunktion für alle Effekte
 export function initEffects() {
     setupParticles();
-    setup3dHover();
+    // setup3dHover();
 }
 
 // Exportiert die Funktion zum Aktualisieren der Partikelfarben, damit andere Module sie nutzen können
