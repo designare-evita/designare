@@ -37,14 +37,21 @@ export function initAiForm() {
     const aiStatus = document.getElementById('ai-status');
     const submitButton = aiForm.querySelector('button');
     
-    // Elemente für die neue AI-Antwort-Lightbox
+    // Elemente für die AI-Antwort-Lightbox
     const aiResponseModal = document.getElementById('ai-response-modal');
     const aiResponseContentArea = document.getElementById('ai-response-content-area');
-    const closeAiResponseModalBtn = document.getElementById('close-ai-response-modal');
+    
+    // KORRIGIERT: Wir holen uns jetzt BEIDE Schließen-Buttons mit den korrekten IDs
+    const closeAiResponseModalBtnTop = document.getElementById('close-ai-response-modal-top');
+    const closeAiResponseModalBtnBottom = document.getElementById('close-ai-response-modal-bottom');
 
-    // Event-Listener zum Schließen der Lightbox (Button, Klick daneben)
-    if (closeAiResponseModalBtn) {
-        closeAiResponseModalBtn.addEventListener('click', () => closeLightbox(aiResponseModal));
+
+    // KORRIGIERT: Event-Listener für BEIDE Buttons und den Hintergrund-Klick hinzufügen
+    if (closeAiResponseModalBtnTop) {
+        closeAiResponseModalBtnTop.addEventListener('click', () => closeLightbox(aiResponseModal));
+    }
+    if (closeAiResponseModalBtnBottom) {
+        closeAiResponseModalBtnBottom.addEventListener('click', () => closeLightbox(aiResponseModal));
     }
     if (aiResponseModal) {
         aiResponseModal.addEventListener('click', (e) => {
