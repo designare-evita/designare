@@ -13,3 +13,16 @@
     padding-top: 1.5rem;
     border-top: 1px solid #e0e0e0; /* Eine feine Trennlinie */
 }
+
+.modal-footer .button {
+    background-color: var(--primary-color); /* Verwendet die Hauptfarbe (Lila) */
+    color: var(--button-text-color);      /* Verwendet die Haupt-Textfarbe für Buttons (Weiß) */
+    font-weight: bold;
+    border: none; /* Stellt sicher, dass kein Rahmen angezeigt wird */
+    transition: background-color 0.3s ease; /* Fügt eine sanfte Animation hinzu */
+}
+
+/* Hover-Effekt, damit der Button beim Überfahren mit der Maus dunkler wird. */
+.modal-footer .button:hover {
+    background-color: var(--primary-color-dark);
+}
