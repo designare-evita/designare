@@ -3,9 +3,7 @@
     overflow-y: auto;
     padding-right: 15px;
     text-align: left;
-    white-space: pre-wrap;
-border: 2px solid rgb(211, 154, 0); 
-border-radius: 5px;     
+    white-space: pre-wrap;  
 }
 
 /* Stile für den Lightbox-Footer */
