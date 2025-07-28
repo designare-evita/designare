@@ -1,6 +1,6 @@
 #ai-response-content-area {
     max-height: 60vh;
-    overflow-y: hidden; 
+    overflow-y: hidden !important; 
     padding-right: 15px;
     text-align: left;
     white-space: pre-wrap;  
