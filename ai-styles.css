@@ -1,0 +1,9 @@
+/* ai-styles.css */
+
+#ai-response-content-area {
+    max-height: 60vh; /* Maximale Höhe auf 60% der Bildschirmhöhe begrenzen */
+    overflow-y: auto; /* Vertikalen Scrollbalken nur bei Bedarf anzeigen */
+    padding-right: 15px; /* Etwas Platz für den Scrollbalken, damit er den Text nicht überlappt */
+    text-align: left; /* Text linksbündig für bessere Lesbarkeit */
+    white-space: pre-wrap; /* Wichtig: Stellt Zeilenumbrüche und Absätze aus der KI-Antwort korrekt dar */
+}
