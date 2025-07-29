@@ -279,7 +279,6 @@ align-items: center;
     align-items: center; /* Zentriert den Inhalt vertikal (in der Höhe) */
     width: 100%;
     max-width: 500px;
-    margin: 0 auto; /* Oben/Unten 0, Seiten auto (zentriert den Block), U
     flex-shrink: 1;
     flex-wrap: nowrap;
 }
