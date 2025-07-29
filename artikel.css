@@ -274,13 +274,12 @@ align-items: center;
 
 /* KORRIGIERT: AI Container */
 .ai-container {
-    display: flex; /* Macht den Container zu einem Flex-Container */
-    justify-content: center; /* Zentriert den Inhalt horizontal (in der Breite) */
-    align-items: center; /* Zentriert den Inhalt vertikal (in der Höhe) */
-    width: 100%;
-    max-width: 500px;
-    flex-shrink: 1;
-    flex-wrap: nowrap;
+margin-bottom: 2.5rem;
+width: 100%; /* Nutzt die volle verfügbare Breite */
+max-width: 500px;
+flex-shrink: 1; /* Erlaubt Schrumpfen wenn nötig */
+flex-wrap: nowrap;
+align-items: center;
 }
 
 #ai-form {
