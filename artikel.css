@@ -239,11 +239,12 @@ body {
 }
 
 .flex-container {
-    display: flex; 
-    align-items: flex-start; 
+    display: flex;
+    align-items: flex-start;
+    align-self: flex-start; /* Verhindert, dass der Container gestreckt wird */
     gap: 20px;
     margin-top: 2rem;
-    width: 100%; /* Stelle sicher, dass der Container die volle Breite nutzt */
+    width: 100%;
 }
 
 
