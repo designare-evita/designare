@@ -349,8 +349,8 @@ align-items: center;
     border: 2px solid var(--accent-color);
     border-radius: 12px;
     padding: 2rem;
+padding: 1rem;
     margin: 2rem 0;
-magrin-top: 1rem;
     position: relative;
 }
 
