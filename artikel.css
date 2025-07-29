@@ -341,6 +341,15 @@ align-items: center;
     text-align: left;
     transition: opacity 0.3s ease, border-color 0.3s ease;
 }
+.fraglich {
+    background: linear-gradient(135deg, rgba(252, 181, 0, 0.1), rgba(252, 181, 0, 0.05));
+    border: 2px solid var(--accent-color);
+    border-radius: 12px;
+    padding: 1rem 2rem 0.5rem; 
+    margin: 2rem 0;
+    align-self: flex-start;
+    position: relative;
+}
 
 /* Performance-Tipp Box Styling */
 .performance-tip {
