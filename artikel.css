@@ -173,7 +173,7 @@ body {
 /* --- HIER IST DIE ÄNDERUNG --- */
 .fraglich .article-content p {
     margin-bottom: 3rem;
-    font-size: 1.2rem; /* 20% größer als die 1rem Standardgröße */
+    font-size: 1.1rem; 
 }
 .article-content {
     margin-bottom: 3rem;
