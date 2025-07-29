@@ -274,7 +274,7 @@ align-items: center;
 
 /* KORRIGIERT: AI Container */
 .ai-container {
-margin: 2rem;
+padding: 1rem;
 width: 100%; /* Nutzt die volle verfügbare Breite */
 max-width: 500px;
 flex-shrink: 1; /* Erlaubt Schrumpfen wenn nötig */
