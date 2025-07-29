@@ -169,6 +169,11 @@ body {
 }
 
 /* Artikel-Content Styling */
+
+.fraglich .article-content {
+    margin-bottom: 3rem;
+    font-size:1.2em;
+}
 .article-content {
     margin-bottom: 3rem;
 }
