@@ -1,6 +1,8 @@
 // js/ai-form.js
-
 import { startPlaceholderAnimation, stopPlaceholderAnimation } from './typewriter.js';
+
+// NEU: Maximale Anzahl an Konversationen (Frage + Antwort), die gespeichert werden
+const MAX_HISTORY_LENGTH = 10;
 
 /**
  * Öffnet eine Lightbox/Modal.
@@ -28,25 +30,17 @@ const closeLightbox = (lightboxElement) => {
  * Initialisiert das KI-Formular und die zugehörige Antwort-Lightbox.
  */
 export function initAiForm() {
-    // Finde das Formular auf der aktuellen Seite. Wenn nicht vorhanden, tue nichts.
     const aiForm = document.getElementById('ai-form');
     if (!aiForm) return;
 
-    // Hole alle benötigten Elemente aus dem DOM
     const aiQuestionInput = document.getElementById('ai-question');
     const aiStatus = document.getElementById('ai-status');
     const submitButton = aiForm.querySelector('button');
-    
-    // Elemente für die AI-Antwort-Lightbox
     const aiResponseModal = document.getElementById('ai-response-modal');
     const aiResponseContentArea = document.getElementById('ai-response-content-area');
-    
-    // KORRIGIERT: Wir holen uns jetzt BEIDE Schließen-Buttons mit den korrekten IDs
     const closeAiResponseModalBtnTop = document.getElementById('close-ai-response-modal-top');
     const closeAiResponseModalBtnBottom = document.getElementById('close-ai-response-modal-bottom');
 
-
-    // KORRIGIERT: Event-Listener für BEIDE Buttons und den Hintergrund-Klick hinzufügen
     if (closeAiResponseModalBtnTop) {
         closeAiResponseModalBtnTop.addEventListener('click', () => closeLightbox(aiResponseModal));
     }
@@ -61,13 +55,11 @@ export function initAiForm() {
         });
     }
 
-    // Hauptfunktion bei Formular-Absendung
     aiForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const question = aiQuestionInput.value.trim();
         if (!question) return;
 
-        // UI für den Ladezustand vorbereiten
         stopPlaceholderAnimation();
         aiStatus.innerText = "Einen Moment, Evita gleicht gerade ihre Bits und Bytes ab...";
         aiStatus.classList.add('thinking');
@@ -75,23 +67,38 @@ export function initAiForm() {
         submitButton.disabled = true;
 
         try {
-            // API-Anfrage an den Server senden
+            // NEU: Verlauf aus dem localStorage laden
+            const history = JSON.parse(localStorage.getItem('chatHistory')) || [];
+
+            // NEU: API-Anfrage sendet jetzt Frage UND Verlauf
             const response = await fetch('/api/ask-gemini', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ question: question })
+                body: JSON.stringify({ question: question, history: history })
             });
 
-            if (!response.ok) { 
-                throw new Error('Netzwerk-Antwort war nicht OK.'); 
+            if (!response.ok) {
+                throw new Error('Netzwerk-Antwort war nicht OK.');
             }
 
             const data = await response.json();
-            
-            // ANTWORT IN DIE LIGHTBOX FÜLLEN UND ANZEIGEN
-            aiStatus.innerText = ""; // Status-Text leeren
-            if(aiResponseContentArea) {
-                aiResponseContentArea.innerText = data.answer;
+            const answer = data.answer;
+
+            // NEU: Neuen Austausch zum Verlauf hinzufügen
+            history.push({ question: question, answer: answer });
+
+            // NEU: Verlauf kürzen, falls er zu lang ist
+            while (history.length > MAX_HISTORY_LENGTH) {
+                history.shift(); // Entfernt das älteste Element
+            }
+
+            // NEU: Aktualisierten Verlauf im localStorage speichern
+            localStorage.setItem('chatHistory', JSON.stringify(history));
+
+            // Antwort in die Lightbox füllen und anzeigen
+            aiStatus.innerText = "";
+            if (aiResponseContentArea) {
+                aiResponseContentArea.innerText = answer;
             }
             openLightbox(aiResponseModal);
 
@@ -99,15 +106,14 @@ export function initAiForm() {
             console.error("Fehler bei der KI-Anfrage:", error);
             aiStatus.innerText = 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.';
         } finally {
-            // UI nach der Antwort zurücksetzen
             aiQuestionInput.value = '';
             aiQuestionInput.disabled = false;
             submitButton.disabled = false;
             aiQuestionInput.placeholder = "Haben Sie eine weitere Frage?";
             aiStatus.classList.remove('thinking');
-            
+
             setTimeout(() => {
-                if(document.activeElement !== aiQuestionInput) {
+                if (document.activeElement !== aiQuestionInput) {
                     startPlaceholderAnimation();
                 }
             }, 100);
