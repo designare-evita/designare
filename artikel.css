@@ -347,7 +347,7 @@ align-items: center;
     background: linear-gradient(135deg, rgba(252, 181, 0, 0.1), rgba(252, 181, 0, 0.05));
     border: 2px solid var(--accent-color);
     border-radius: 12px;
-    padding: 1rem 2rem 1.5rem; /* Oben: 1rem, Seiten: 2rem, Unten: 2rem */
+    padding: 1rem 2rem 2rem; /* Oben: 1rem, Seiten: 2rem, Unten: 2rem */
     margin: 2rem 0;
     align-self: flex-start;
     position: relative;
