@@ -42,97 +42,41 @@
                 
                 <p class="article-subtitle">Das Geheimnis blitzschneller KI-Performance und warum nicht jeder Service gleich schnell ist.</p>
                 
-                <p>Warum antworten KI-Assistenten auf manchen Websites blitzschnell, während sie anderswo Denkpausen einlegen? Die Antwort liegt in der technischen Architektur.</p>
+                <p>Warum antworten KI-Assistenten auf manchen Websites blitzschnell, während sie anderswo Denkpausen einlegen? Die Antwort liegt in der technischen Architektur – und ich erkläre es euch mit einer einfachen Restaurant-Analogie.</p>
                 
-                <p>Das liegt nicht an KI-Magie, sondern an reiner Technik. Ich erkläre es euch so, dass ihr am Ende wisst, warum manche Implementierungen performen und andere noch optimiert werden müssen.</p>
+                <h2>Das 5-Sterne-Restaurant: Serverless Computing</h2>
                 
-                <h2>Das 5-Sterne-Restaurant-Prinzip: Schlank, schnell - Serverless Computing</h2>
+                <p>Stellt euch vor, eure Frage an die KI ist ein hungriger Gast im Restaurant. Bei Serverless-Hosting läuft das wie in einem perfekt organisierten 5-Sterne-Restaurant:</p>
                 
-                <h3>Spezialisierter Service ohne Umwege</h3>
+                <p>Ihr gebt eurem spezialisierten Profi-Kellner (Serverless Function) die Bestellung. Dieser sprintet direkt zur Sterneküche (KI-API), ohne Umwege oder andere Aufgaben. Die Antwort kommt blitzschnell zurück.</p>
                 
-                <p>Stellt euch vor, eure Frage an die KI-Assistentin ist ein hungriger Gast, der im Restaurant bestellen möchte.</p>
-                
-                <p>Auf modernen Webseiten mit Serverless-Hosting läuft das wie in einem top-organisierten 5-Sterne-Restaurant:</p>
-                
-                <ol>
-                    <li>
-                        <strong>Der Gast bestellt (Eure Frage):</strong> Ihr gebt eurem persönlichen Profi-Kellner (einer spezialisierten Serverless Function) eure Bestellung auf.
-                    </li>
-                    <li>
-                        <strong>Der Profi-Kellner sprintet los:</strong> Dieser Kellner ist ausschließlich darauf trainiert, eure Bestellung sofort und direkt zur Küche zu bringen – ohne Umwege, ohne andere Aufgaben.
-                    </li>
-                    <li>
-                        <strong>Die Sterneküche arbeitet (die KI-API):</strong> Die Bestellung kommt direkt in der Sterneküche (der Google Gemini API) an, wo sie sofort bearbeitet wird.
-                    </li>
-                    <li>
-                        <strong>Die Antwort sprintet zurück:</strong> Der Kellner bringt eure Antwort direkt zurück zu eurem Tisch.
-                    </li>
-                </ol>
-
-                
-                <h3>Warum dieser Service so schnell ist:</h3>
+                <h3>Warum das so schnell ist:</h3>
                 
                 <ul style="list-style-type: square;">
-                    <li>
-                        <strong>Kein digitaler Ballast:</strong> Da wird kein System hochgefahren, keine zusätzlichen Module geladen, kein Umweg über andere Funktionen. Purer, spezialisierter Speed.
-                    </li>
-                    <li>
-                        <strong>Globale Verfügbarkeit:</strong> Das Restaurant hat überall auf der Welt spezialisierte Küchen (Server). Eure Bestellung nimmt immer den kürzesten Weg zur nächsten Küche. Minimale Latenz, maximale Performance.
-                    </li>
-                    <li>
-                        <strong>Unbegrenzte Kapazität:</strong> Ob ein Gast bestellt oder Tausende gleichzeitig – das System öffnet parallel Tausende von Spezial-Küchen mit Profi-Kellnern. Kein Stau, kein Engpass.
-                    </li>
+                    <li><strong>Kein digitaler Ballast:</strong> Kein System muss hochgefahren werden, keine zusätzlichen Module geladen. Purer, spezialisierter Speed.</li>
+                    <li><strong>Globale Verfügbarkeit:</strong> Überall auf der Welt spezialisierte Server. Minimale Latenz, maximale Performance.</li>
+                    <li><strong>Unbegrenzte Kapazität:</strong> Ob ein Gast oder Tausende – das System skaliert automatisch ohne Engpässe.</li>
                 </ul>
                 
-                <h2>Das traditionelle Gasthaus-Prinzip: Vielseitig, aber mit Verzögerungen - Traditionelles Hosting</h2>
+                <h2>Das traditionelle Gasthaus: CMS-basierte Lösungen</h2>
                 
-                <h3>Wenn der Kellner zu viele Aufgaben hat</h3>
+                <p>Bei WordPress und ähnlichen CMS läuft es wie in einem gemütlichen Gasthaus mit einem Allround-Kellner:</p>
                 
-                <p>Jetzt stellt euch ein gemütliches, aber traditionelles Gasthaus vor, wo ein Allround-Kellner arbeitet.</p>
+                <p>Der Kellner (KI-Plugin) muss erst das komplette Gasthaus hochfahren – Webserver, PHP-Prozess, WordPress-Kern. Dann wachen alle Aushilfen (andere Plugins) auf. Erst danach geht die Bestellung zur Sterneküche und muss den ganzen Weg durch alle Schichten zurück.</p>
                 
-                <p>Auf einem traditionellen Server mit Content-Management-System (CMS) wie WordPress läuft es so:</p>
-                
-                <ol>
-                    <li>
-                        <strong>Der Gast bestellt</strong> (Eure Frage): Ihr gebt eurem Kellner die Bestellung auf.
-                    </li>
-                    <li>
-                        <strong>Der Kellner muss erst organisieren</strong>: Dieser Kellner (euer KI-Plugin) muss erstmal das gesamte Gasthaus (das CMS) hochfahren. Er öffnet die Schank (Webserver), die Rezeption (PHP-Prozess) und die komplette Küche (WordPress-Kern).
-                    </li>
-                    <li>
-                        <strong>Alle wollen mithelfen</strong> (andere Plugins): Dann müssen noch alle Aushilfen (andere Plugins und Datenbankverbindungen) aufwachen und sich bereitmachen. Jeder davon braucht Zeit und Ressourcen.
-                    </li>
-                    <li>
-                        <strong>Die Bestellung geht zur Küche</strong>: Erst dann kann der Kellner die Bestellung an die Sterneküche (die KI-API) weitergeben.
-                    </li>
-                    <li>
-                        <strong>Der lange Weg zurück</strong>: Die Antwort muss den ganzen Weg zurück durch alle Schichten des Gasthauses – von der Küche über die Aushilfen bis zum Kellner und dann zu eurem Tisch.
-                    </li>
-                </ol>
-                
-                <h3>Was die KI-Assistenten ausbremst:</h3>
+                <h3>Was die KI ausbremst:</h3>
                  <ul style="list-style-type: square;">
-                   <li><strong>Digitaler Ballast</strong>: Jeder Schritt, jedes geladene Modul, jedes Plugin kostet Millisekunden. Der Overhead summiert sich.</li>
-                    
-                   <li><strong>Fester Standort</strong>: Das Gasthaus steht an einem Ort. Von dort geht die Bestellung zur Sterneküche – ohne global optimierte Abkürzungen.</li>
-                    
-                  <li><strong>Geteilte Ressourcen</strong>: Das KI-Plugin muss sich die Ressourcen des Gasthauses mit allen anderen Funktionen teilen. Das ist, als würden alle gleichzeitig bedient werden wollen, aber nur wenige Hände sind da.</li>
+                   <li><strong>Digitaler Ballast:</strong> Jedes geladene Modul kostet Millisekunden.</li>
+                   <li><strong>Geteilte Ressourcen:</strong> Das KI-Plugin teilt sich die Ressourcen mit allen anderen Funktionen.</li>
                 </ul>
 
-                <h2>Fazit</h2>
-                <h3>Architektur entscheidet über Performance</h3>
-                <p>Eure Beobachtung ist goldrichtig! Die Serverless-Lösung ist für direkte API-Anbindungen deutlich schneller, weil sie wie ein spezialisierter Service konzipiert ist.</p>
-                <p>Ein CMS-Plugin hingegen trägt immer den digitalen Ballast des Content-Management-Systems mit sich, was Zeit kostet.</p>
-                <p><strong>Übertragen auf die Technik:</strong> Die Serverless-Architektur ermöglicht meiner KI-Assistentin Evita, ohne die üblichen CMS-Verzögerungen zu antworten. Weniger Zwischenschritte bedeuten mehr Geschwindigkeit.</p>
-                <p>Ob ihr Webseiten entwickelt oder KI-Assistenten integriert: Wählt die richtige Architektur für eure Bedürfnisse. Weniger digitaler Ballast, mehr Performance.</p>
+                <h2>Fazit: Architektur entscheidet</h2>
+                <p>Die Serverless-Lösung ist für direkte API-Anbindungen deutlich schneller, weil sie wie ein spezialisierter Service konzipiert ist. Ein CMS-Plugin trägt immer den digitalen Ballast des Content-Management-Systems mit sich.</p>
 
                 <div class="performance-tip">
-                    <h3>Michaels Performance-Tipp: Maximale KI-Geschwindigkeit auf jeder Webseite</h3>
-                    <p>Ich werde oft gefragt, ob man die außergewöhnliche Geschwindigkeit von Serverless KI-Assistenten auch auf einer herkömmlichen WordPress-Website nutzen kann. Die Antwort lautet: Ja – und es ist einfacher, als du denkst!</p>
-                    <p>Der Schlüssel liegt darin, den KI-Assistenten auf einer spezialisierten Serverless-Plattform wie Vercel zu hosten. Diese Umgebungen sind darauf optimiert, Anfragen blitzschnell und direkt zu verarbeiten.</p>
-                    <p>Wenn du diesen Serverless KI-Assistenten anschließend per iFrame in deine WordPress-Seite einbindest, läuft die gesamte Kommunikation zwischen deinem Browser und der KI direkt über diese hochperformante Infrastruktur. Das bedeutet: keine Umwege, kein digitaler Ballast durch die WordPress-Umgebung. Die KI verarbeitet deine Anfrage direkt über die Gemini API und liefert die Antwort in Rekordzeit.</p>
-                    <p>Deine WordPress-Seite bleibt dabei völlig unberührt und funktioniert wie gewohnt. Für die KI-Interaktion profitierst du jedoch von der maximalen Geschwindigkeit einer Serverless-Architektur.</p>
-                    <p>Ein eleganter Weg, um KI-Antworten auf jeder Plattform zu beschleunigen!</p>
+                    <h3>Michaels Performance-Tipp</h3>
+                    <p>Du kannst die Geschwindigkeit von Serverless KI-Assistenten auch auf WordPress nutzen! Hoste den KI-Assistenten auf einer Serverless-Plattform wie Vercel und binde ihn per iFrame in deine WordPress-Seite ein.</p>
+                    <p>So läuft die KI-Kommunikation direkt über die hochperformante Infrastruktur – ohne Umwege durch WordPress. Deine Seite bleibt unberührt, aber die KI antwortet in Rekordzeit!</p>
                 </div>
 
             </div>
@@ -214,7 +158,7 @@
     <div id="ai-response-content-area"></div>
 
             <div class="modal-footer">
-                <button id="close-ai-response-modal-bottom" class="button">Frag Evita (Die weiß mehr!)</button>
+                <button id="close-ai-response-modal-bottom" class="button">Hoffe, ich konnte helfen!</button>
             </div>
 
         </div>
