@@ -173,7 +173,7 @@ body {
 /* --- HIER IST DIE ÄNDERUNG --- */
 .fraglich .article-content p {
     margin-bottom: 3rem;
-    font-size: 1.1rem; 
+    font-size: 1.05rem; 
 }
 
 .fraglich .article-content p:last-child {
