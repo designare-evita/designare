@@ -40,11 +40,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             const aiMessage = data.text;
 
-            // Typewriter-Effekt für die KI-Antwort starten
-            await displayMessage(aiMessage, 'ai');
-
-            // Verlauf aktualisieren, NACHDEM die Antwort komplett angezeigt wurde
+            // WICHTIG: Verlauf SOFORT aktualisieren, bevor der Typewriter-Effekt startet
             updateHistory(userMessage, aiMessage);
+
+            // Typewriter-Effekt für die KI-Antwort starten (ohne await für den History)
+            await displayMessage(aiMessage, 'ai');
 
         } catch (error) {
             console.error('Fehler beim Abrufen der KI-Antwort:', error);
