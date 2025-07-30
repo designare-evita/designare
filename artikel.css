@@ -3,6 +3,16 @@
  * Alle CSS-Syntax-Fehler behoben
  */
 
+/* NEU: Angepasste Fallback-Schriftart zur Vermeidung von Layout-Shifts */
+@font-face {
+  font-family: 'Poppins Fallback';
+  src: local('Arial'); /* Nutzt die lokale Arial-Schriftart als Basis */
+  ascent-override: 90%;
+  descent-override: 22%;
+  line-gap-override: 0%;
+  size-adjust: 107%;
+}
+
 /* Lokale Fonts laden */
 @font-face {
     font-family: 'Poppins';
@@ -67,7 +77,7 @@ html {
 body {
     background-color: var(--bg-color);
     color: var(--text-color);
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Poppins', 'Poppins Fallback', sans-serif;
     line-height: 1.6;
     overflow-x: hidden;
     transition: background-color 0.4s ease, color 0.4s ease;
