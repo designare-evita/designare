@@ -1,11 +1,18 @@
 // js/ai-form.js
 
-document.addEventListener('DOMContentLoaded', () => {
+// Hauptfunktion als Export verfügbar machen
+export function initAiForm() {
     // DOM-Elemente abrufen
     const aiForm = document.getElementById('ai-form');
     const messageInput = document.getElementById('message-input');
     const chatContainer = document.querySelector('.chat-container');
     const loader = document.querySelector('.loader');
+
+    // Prüfen ob alle Elemente existieren
+    if (!aiForm || !messageInput || !chatContainer || !loader) {
+        console.error('AI-Form: Erforderliche DOM-Elemente nicht gefunden');
+        return;
+    }
 
     // "Memory" der KI: Speichert den Gesprächsverlauf
     let history = [];
@@ -41,8 +48,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const aiMessage = data.text;
 
             // KRITISCH: Verlauf SOFORT aktualisieren, bevor der Typewriter-Effekt startet
-            // So wird sichergestellt, dass bei schnellen aufeinanderfolgenden Nachrichten
-            // der Konversationsverlauf korrekt und vollständig ist
             updateHistory(userMessage, aiMessage);
 
             // Typewriter-Effekt für die KI-Antwort starten
@@ -58,10 +63,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /**
      * Zeigt eine Nachricht im Chat an. Implementiert einen Typewriter-Effekt für die KI.
-     * Gibt ein Promise zurück, das erfüllt ist, wenn der Typewriter fertig ist.
-     * @param {string} message - Die anzuzeigende Nachricht.
-     * @param {string} sender - 'user', 'ai', oder 'ai-error'.
-     * @returns {Promise<void>}
      */
     function displayMessage(message, sender) {
         return new Promise(resolve => {
@@ -125,4 +126,11 @@ document.addEventListener('DOMContentLoaded', () => {
             messageInput.focus();
         }
     }
+
+    console.log('AI-Form erfolgreich initialisiert');
+}
+
+// Auto-Initialisierung wenn DOM geladen ist (für Kompatibilität)
+document.addEventListener('DOMContentLoaded', () => {
+    initAiForm();
 });
