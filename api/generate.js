@@ -17,8 +17,34 @@ export default async function handler(req, res) {
     // Daten aus der Anfrage des Frontends auslesen
     const { history, prompt } = req.body;
 
-    // KI-Modell initialisieren
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    // WICHTIG: Aktualisierte Modellnamen für 2025
+    // Probiere verschiedene verfügbare Modelle in der Reihenfolge ihrer Verfügbarkeit
+    const modelNames = [
+      "gemini-2.0-flash-exp",      // Neuestes experimentelles Modell
+      "gemini-1.5-flash",          // Falls noch verfügbar
+      "gemini-1.5-pro",            // Falls noch verfügbar
+      "gemini-pro"                 // Fallback (möglicherweise veraltet)
+    ];
+
+    let model = null;
+    let lastError = null;
+
+    // Versuche verschiedene Modelle, bis eines funktioniert
+    for (const modelName of modelNames) {
+      try {
+        model = genAI.getGenerativeModel({ model: modelName });
+        console.log(`Erfolgreich Modell geladen: ${modelName}`);
+        break;
+      } catch (error) {
+        console.warn(`Modell ${modelName} nicht verfügbar:`, error.message);
+        lastError = error;
+        continue;
+      }
+    }
+
+    if (!model) {
+      throw new Error(`Kein verfügbares Modell gefunden. Letzter Fehler: ${lastError?.message}`);
+    }
 
     const chat = model.startChat({
       history: history || [], // Benutze den übergebenen Verlauf
@@ -34,7 +60,18 @@ export default async function handler(req, res) {
   } catch (error) {
     // Loggt den detaillierten Fehler auf dem Vercel-Server (sichtbar im Dashboard)
     console.error("Error in /api/generate:", error); 
-    // Sendet eine generische Fehlermeldung an den Benutzer
-    res.status(500).json({ error: 'Fehler bei der Kommunikation mit der KI.' });
+    
+    // Detailliertere Fehlermeldung für Debugging
+    const errorMessage = error.message || 'Unbekannter Fehler';
+    console.error("Detaillierter Fehler:", {
+      message: errorMessage,
+      stack: error.stack,
+      name: error.name
+    });
+    
+    // Sendet eine spezifischere Fehlermeldung an den Benutzer
+    res.status(500).json({ 
+      error: `Fehler bei der Kommunikation mit der KI: ${errorMessage}` 
+    });
   }
 }
