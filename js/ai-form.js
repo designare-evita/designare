@@ -1,136 +1,116 @@
 // js/ai-form.js
 
-// Hauptfunktion als Export verfügbar machen
-export function initAiForm() {
-    // DOM-Elemente abrufen
-    const aiForm = document.getElementById('ai-form');
-    const messageInput = document.getElementById('message-input');
-    const chatContainer = document.querySelector('.chat-container');
-    const loader = document.querySelector('.loader');
+import { startPlaceholderAnimation, stopPlaceholderAnimation } from './typewriter.js';
 
-    // Prüfen ob alle Elemente existieren
-    if (!aiForm || !messageInput || !chatContainer || !loader) {
-        console.error('AI-Form: Erforderliche DOM-Elemente nicht gefunden');
-        return;
+/**
+ * Öffnet eine Lightbox/Modal.
+ * @param {HTMLElement} lightboxElement - Das DOM-Element der Lightbox.
+ */
+const openLightbox = (lightboxElement) => {
+    if (lightboxElement) {
+        lightboxElement.classList.add('visible');
+        document.body.style.overflow = 'hidden'; // Scrollen des Hintergrunds verhindern
+    }
+};
+
+/**
+ * Schließt eine Lightbox/Modal.
+ * @param {HTMLElement} lightboxElement - Das DOM-Element der Lightbox.
+ */
+const closeLightbox = (lightboxElement) => {
+    if (lightboxElement) {
+        lightboxElement.classList.remove('visible');
+        document.body.style.overflow = ''; // Scrollen wieder erlauben
+    }
+};
+
+/**
+ * Initialisiert das KI-Formular und die zugehörige Antwort-Lightbox.
+ */
+export function initAiForm() {
+    // Finde das Formular auf der aktuellen Seite. Wenn nicht vorhanden, tue nichts.
+    const aiForm = document.getElementById('ai-form');
+    if (!aiForm) return;
+
+    // Hole alle benötigten Elemente aus dem DOM
+    const aiQuestionInput = document.getElementById('ai-question');
+    const aiStatus = document.getElementById('ai-status');
+    const submitButton = aiForm.querySelector('button');
+    
+    // Elemente für die AI-Antwort-Lightbox
+    const aiResponseModal = document.getElementById('ai-response-modal');
+    const aiResponseContentArea = document.getElementById('ai-response-content-area');
+    
+    // KORRIGIERT: Wir holen uns jetzt BEIDE Schließen-Buttons mit den korrekten IDs
+    const closeAiResponseModalBtnTop = document.getElementById('close-ai-response-modal-top');
+    const closeAiResponseModalBtnBottom = document.getElementById('close-ai-response-modal-bottom');
+
+
+    // KORRIGIERT: Event-Listener für BEIDE Buttons und den Hintergrund-Klick hinzufügen
+    if (closeAiResponseModalBtnTop) {
+        closeAiResponseModalBtnTop.addEventListener('click', () => closeLightbox(aiResponseModal));
+    }
+    if (closeAiResponseModalBtnBottom) {
+        closeAiResponseModalBtnBottom.addEventListener('click', () => closeLightbox(aiResponseModal));
+    }
+    if (aiResponseModal) {
+        aiResponseModal.addEventListener('click', (e) => {
+            if (e.target === aiResponseModal) {
+                closeLightbox(aiResponseModal);
+            }
+        });
     }
 
-    // "Memory" der KI: Speichert den Gesprächsverlauf
-    let history = [];
-    const MAX_HISTORY_LENGTH = 10; // Max. 10 Interaktionen (Frage + Antwort)
-
-    // Event-Listener für das Absenden des Formulars
-    aiForm.addEventListener('submit', handleFormSubmit);
-
-    /**
-     * Verarbeitet das Absenden des Formulars.
-     */
-    async function handleFormSubmit(e) {
+    // Hauptfunktion bei Formular-Absendung
+    aiForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const userMessage = messageInput.value.trim();
-        if (!userMessage) return;
+        const question = aiQuestionInput.value.trim();
+        if (!question) return;
 
-        displayMessage(userMessage, 'user');
-        setLoading(true);
+        // UI für den Ladezustand vorbereiten
+        stopPlaceholderAnimation();
+        aiStatus.innerText = "Einen Moment, Evita gleicht gerade ihre Bits und Bytes ab...";
+        aiStatus.classList.add('thinking');
+        aiQuestionInput.disabled = true;
+        submitButton.disabled = true;
 
         try {
-            const response = await fetch('/api/generate', {
+            // API-Anfrage an den Server senden
+            const response = await fetch('/api/ask-gemini', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ history, prompt: userMessage }),
+                body: JSON.stringify({ question: question })
             });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || `Server-Fehler: ${response.status}`);
+            if (!response.ok) { 
+                throw new Error('Netzwerk-Antwort war nicht OK.'); 
             }
 
             const data = await response.json();
-            const aiMessage = data.text;
-
-            // KRITISCH: Verlauf SOFORT aktualisieren, bevor der Typewriter-Effekt startet
-            updateHistory(userMessage, aiMessage);
-
-            // Typewriter-Effekt für die KI-Antwort starten
-            await displayMessage(aiMessage, 'ai');
+            
+            // ANTWORT IN DIE LIGHTBOX FÜLLEN UND ANZEIGEN
+            aiStatus.innerText = ""; // Status-Text leeren
+            if(aiResponseContentArea) {
+                aiResponseContentArea.innerText = data.answer;
+            }
+            openLightbox(aiResponseModal);
 
         } catch (error) {
-            console.error('Fehler beim Abrufen der KI-Antwort:', error);
-            displayMessage(`Entschuldigung, ein Fehler ist aufgetreten: ${error.message}`, 'ai-error');
+            console.error("Fehler bei der KI-Anfrage:", error);
+            aiStatus.innerText = 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.';
         } finally {
-            setLoading(false);
-        }
-    }
-
-    /**
-     * Zeigt eine Nachricht im Chat an. Implementiert einen Typewriter-Effekt für die KI.
-     */
-    function displayMessage(message, sender) {
-        return new Promise(resolve => {
-            const messageWrapper = document.createElement('div');
-            messageWrapper.classList.add('chat-message', `${sender}-message`);
-
-            const p = document.createElement('p');
-            messageWrapper.appendChild(p);
-            chatContainer.appendChild(messageWrapper);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-
-            // Wenn der Absender der User ist oder ein Fehler auftritt, sofort anzeigen
-            if (sender !== 'ai') {
-                p.textContent = message;
-                resolve();
-                return;
-            }
-
-            // --- TYPEWRITER EFFEKT LOGIK ---
-            let i = 0;
-            const speed = 30; // Geschwindigkeit in Millisekunden
-
-            function typeWriter() {
-                if (i < message.length) {
-                    p.textContent += message.charAt(i);
-                    i++;
-                    chatContainer.scrollTop = chatContainer.scrollHeight;
-                    setTimeout(typeWriter, speed);
-                } else {
-                    resolve(); // Promise auflösen, wenn fertig
+            // UI nach der Antwort zurücksetzen
+            aiQuestionInput.value = '';
+            aiQuestionInput.disabled = false;
+            submitButton.disabled = false;
+            aiQuestionInput.placeholder = "Haben Sie eine weitere Frage?";
+            aiStatus.classList.remove('thinking');
+            
+            setTimeout(() => {
+                if(document.activeElement !== aiQuestionInput) {
+                    startPlaceholderAnimation();
                 }
-            }
-            typeWriter();
-        });
-    }
-    
-    /**
-     * Aktualisiert den Gesprächsverlauf und kürzt ihn bei Bedarf.
-     */
-    function updateHistory(userMessage, aiMessage) {
-        history.push({ role: 'user', parts: [{ text: userMessage }] });
-        history.push({ role: 'model', parts: [{ text: aiMessage }] });
-
-        while (history.length > MAX_HISTORY_LENGTH * 2) {
-            history.shift();
-            history.shift();
+            }, 100);
         }
-    }
-
-    /**
-     * Steuert den Ladezustand der Benutzeroberfläche.
-     */
-    function setLoading(isLoading) {
-        const submitButton = aiForm.querySelector('button');
-        loader.style.display = isLoading ? 'block' : 'none';
-        messageInput.disabled = isLoading;
-        submitButton.disabled = isLoading;
-
-        if (!isLoading) {
-            messageInput.value = '';
-            messageInput.focus();
-        }
-    }
-
-    console.log('AI-Form erfolgreich initialisiert');
+    });
 }
-
-// Auto-Initialisierung wenn DOM geladen ist (für Kompatibilität)
-document.addEventListener('DOMContentLoaded', () => {
-    initAiForm();
-});
