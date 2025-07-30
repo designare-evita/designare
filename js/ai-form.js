@@ -40,10 +40,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             const aiMessage = data.text;
 
-            // WICHTIG: Verlauf SOFORT aktualisieren, bevor der Typewriter-Effekt startet
+            // KRITISCH: Verlauf SOFORT aktualisieren, bevor der Typewriter-Effekt startet
+            // So wird sichergestellt, dass bei schnellen aufeinanderfolgenden Nachrichten
+            // der Konversationsverlauf korrekt und vollständig ist
             updateHistory(userMessage, aiMessage);
 
-            // Typewriter-Effekt für die KI-Antwort starten (ohne await für den History)
+            // Typewriter-Effekt für die KI-Antwort starten
             await displayMessage(aiMessage, 'ai');
 
         } catch (error) {
