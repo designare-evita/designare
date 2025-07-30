@@ -88,4 +88,4 @@ ${historyText}
     } else {
         res.status(500).json({ answer: 'Da ist wohl ein Pixelfehler im System! Michael ist sicher schon dran. Bitte versuch\'s gleich noch mal.' });
     }
-}
+}}
