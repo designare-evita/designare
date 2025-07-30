@@ -1,122 +1,125 @@
-// js/ai-form.js
-import { startPlaceholderAnimation, stopPlaceholderAnimation } from './typewriter.js';
-
-// NEU: Maximale Anzahl an Konversationen (Frage + Antwort), die gespeichert werden
-const MAX_HISTORY_LENGTH = 10;
-
-/**
- * Öffnet eine Lightbox/Modal.
- * @param {HTMLElement} lightboxElement - Das DOM-Element der Lightbox.
- */
-const openLightbox = (lightboxElement) => {
-    if (lightboxElement) {
-        lightboxElement.classList.add('visible');
-        document.body.style.overflow = 'hidden'; // Scrollen des Hintergrunds verhindern
-    }
-};
-
-/**
- * Schließt eine Lightbox/Modal.
- * @param {HTMLElement} lightboxElement - Das DOM-Element der Lightbox.
- */
-const closeLightbox = (lightboxElement) => {
-    if (lightboxElement) {
-        lightboxElement.classList.remove('visible');
-        document.body.style.overflow = ''; // Scrollen wieder erlauben
-    }
-};
-
-/**
- * Initialisiert das KI-Formular und die zugehörige Antwort-Lightbox.
- */
-export function initAiForm() {
+document.addEventListener('DOMContentLoaded', () => {
+    // Elemente aus dem DOM abrufen
     const aiForm = document.getElementById('ai-form');
-    if (!aiForm) return;
+    const messageInput = document.getElementById('message-input');
+    const chatContainer = document.querySelector('.chat-container');
+    const loader = document.querySelector('.loader');
 
-    const aiQuestionInput = document.getElementById('ai-question');
-    const aiStatus = document.getElementById('ai-status');
-    const submitButton = aiForm.querySelector('button');
-    const aiResponseModal = document.getElementById('ai-response-modal');
-    const aiResponseContentArea = document.getElementById('ai-response-content-area');
-    const closeAiResponseModalBtnTop = document.getElementById('close-ai-response-modal-top');
-    const closeAiResponseModalBtnBottom = document.getElementById('close-ai-response-modal-bottom');
+    // "Memory" der KI: Speichert den bisherigen Gesprächsverlauf
+    let history = [];
 
-    if (closeAiResponseModalBtnTop) {
-        closeAiResponseModalBtnTop.addEventListener('click', () => closeLightbox(aiResponseModal));
-    }
-    if (closeAiResponseModalBtnBottom) {
-        closeAiResponseModalBtnBottom.addEventListener('click', () => closeLightbox(aiResponseModal));
-    }
-    if (aiResponseModal) {
-        aiResponseModal.addEventListener('click', (e) => {
-            if (e.target === aiResponseModal) {
-                closeLightbox(aiResponseModal);
-            }
-        });
-    }
+    // Obergrenze für den Verlauf, um das Token-Limit nicht zu überschreiten
+    const MAX_HISTORY_LENGTH = 10; // Speichert die letzten 10 Interaktionen
 
-    aiForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const question = aiQuestionInput.value.trim();
-        if (!question) return;
+    // Event-Listener für das Absenden des Formulars
+    aiForm.addEventListener('submit', handleFormSubmit);
 
-        stopPlaceholderAnimation();
-        aiStatus.innerText = "Einen Moment, Evita gleicht gerade ihre Bits und Bytes ab...";
-        aiStatus.classList.add('thinking');
-        aiQuestionInput.disabled = true;
-        submitButton.disabled = true;
+    /**
+     * Verarbeitet das Absenden des Formulars, sendet die Daten an die KI
+     * und zeigt die Antworten im Chat-Fenster an.
+     * @param {Event} e - Das Submit-Event des Formulars.
+     */
+    async function handleFormSubmit(e) {
+        e.preventDefault(); // Verhindert das Neuladen der Seite
+
+        const userMessage = messageInput.value.trim();
+        if (!userMessage) return; // Nichts tun, wenn die Eingabe leer ist
+
+        // Nachricht des Benutzers im Chat anzeigen
+        displayMessage(userMessage, 'user');
+
+        // Zustand während des Ladens setzen
+        setLoading(true);
 
         try {
-            // NEU: Verlauf aus dem localStorage laden
-            const history = JSON.parse(localStorage.getItem('chatHistory')) || [];
-
-            // NEU: API-Anfrage sendet jetzt Frage UND Verlauf
-            const response = await fetch('/api/ask-gemini', {
+            // ANFRAGE AN DIE SICHERE SERVERLESS FUNCTION
+            const response = await fetch('/api/generate', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ question: question, history: history })
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                // Sende den bisherigen Verlauf und die neue Nachricht
+                body: JSON.stringify({
+                    history: history,
+                    prompt: userMessage
+                }),
             });
 
             if (!response.ok) {
-                throw new Error('Netzwerk-Antwort war nicht OK.');
+                // Fängt HTTP-Fehler wie 500 oder 405 ab
+                throw new Error(`Server-Fehler: ${response.statusText}`);
             }
 
             const data = await response.json();
-            const answer = data.answer;
+            const aiMessage = data.text;
 
-            // NEU: Neuen Austausch zum Verlauf hinzufügen
-            history.push({ question: question, answer: answer });
+            // Antwort der KI im Chat anzeigen
+            displayMessage(aiMessage, 'ai');
 
-            // NEU: Verlauf kürzen, falls er zu lang ist
-            while (history.length > MAX_HISTORY_LENGTH) {
-                history.shift(); // Entfernt das älteste Element
-            }
-
-            // NEU: Aktualisierten Verlauf im localStorage speichern
-            localStorage.setItem('chatHistory', JSON.stringify(history));
-
-            // Antwort in die Lightbox füllen und anzeigen
-            aiStatus.innerText = "";
-            if (aiResponseContentArea) {
-                aiResponseContentArea.innerText = answer;
-            }
-            openLightbox(aiResponseModal);
+            // Gesprächsverlauf aktualisieren
+            updateHistory(userMessage, aiMessage);
 
         } catch (error) {
-            console.error("Fehler bei der KI-Anfrage:", error);
-            aiStatus.innerText = 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.';
+            console.error('Fehler beim Abrufen der KI-Antwort:', error);
+            displayMessage('Entschuldigung, es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.', 'ai-error');
         } finally {
-            aiQuestionInput.value = '';
-            aiQuestionInput.disabled = false;
-            submitButton.disabled = false;
-            aiQuestionInput.placeholder = "Haben Sie eine weitere Frage?";
-            aiStatus.classList.remove('thinking');
-
-            setTimeout(() => {
-                if (document.activeElement !== aiQuestionInput) {
-                    startPlaceholderAnimation();
-                }
-            }, 100);
+            // Ladezustand in jedem Fall beenden
+            setLoading(false);
         }
-    });
-}
+    }
+
+    /**
+     * Zeigt eine Nachricht im Chat-Fenster an.
+     * @param {string} message - Die anzuzeigende Nachricht.
+     * @param {string} sender - Der Absender ('user', 'ai', oder 'ai-error').
+     */
+    function displayMessage(message, sender) {
+        // Erstellt die Nachricht als HTML-String
+        const messageHTML = `
+            <div class="chat-message ${sender}-message">
+                <p>${message}</p>
+            </div>
+        `;
+        // Fügt die Nachricht am Ende des Chat-Containers ein
+        chatContainer.insertAdjacentHTML('beforeend', messageHTML);
+
+        // Automatisch nach unten scrollen, um die neueste Nachricht zu sehen
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    /**
+     * Aktualisiert den Gesprächsverlauf und kürzt ihn bei Bedarf.
+     * @param {string} userMessage - Die Nachricht des Benutzers.
+     * @param {string} aiMessage - Die Antwort der KI.
+     */
+    function updateHistory(userMessage, aiMessage) {
+        history.push({ role: 'user', parts: [{ text: userMessage }] });
+        history.push({ role: 'model', parts: [{ text: aiMessage }] });
+
+        // Verlauf kürzen, falls er die maximale Länge überschreitet
+        while (history.length > MAX_HISTORY_LENGTH * 2) { // *2, da jede Interaktion aus 2 Teilen besteht
+            history.shift(); // Entfernt das älteste Element (Frage)
+            history.shift(); // Entfernt das zweitälteste Element (Antwort)
+        }
+    }
+
+    /**
+     * Steuert den Ladezustand der Benutzeroberfläche.
+     * @param {boolean} isLoading - True, wenn geladen wird, sonst false.
+     */
+    function setLoading(isLoading) {
+        const submitButton = aiForm.querySelector('button');
+
+        if (isLoading) {
+            loader.style.display = 'block'; // Ladeanzeige einblenden
+            messageInput.disabled = true;  // Eingabefeld deaktivieren
+            submitButton.disabled = true;  // Button deaktivieren
+        } else {
+            loader.style.display = 'none';   // Ladeanzeige ausblenden
+            messageInput.disabled = false; // Eingabefeld aktivieren
+            submitButton.disabled = false; // Button aktivieren
+            messageInput.value = '';       // Eingabefeld leeren
+            messageInput.focus();          // Fokus zurück auf das Eingabefeld
+        }
+    }
+});
