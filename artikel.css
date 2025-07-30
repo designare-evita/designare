@@ -50,6 +50,10 @@
     color: var(--accent-color);
 }
 
+white-text {
+    color: #ffffff !important;
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
