@@ -81,8 +81,11 @@ ${historyText}
     const text = response.text();
 
     res.status(200).json({ answer: text });
-  } catch (error) {
+ } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Fehler bei der Kommunikation mit der KI." });
-  }
+    if (error.message.includes('503')) {
+        res.status(503).json({ answer: 'Ups, kurz mal digitaler Overload! Gib mir einen Moment, dann bin ich wieder ganz die Alte.' });
+    } else {
+        res.status(500).json({ answer: 'Da ist wohl ein Pixelfehler im System! Michael ist sicher schon dran. Bitte versuch\'s gleich noch mal.' });
+    }
 }
