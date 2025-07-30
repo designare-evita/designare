@@ -2,6 +2,14 @@
  * legal-style.css
  * Vereinfacht: Nur noch Dark Mode
 */
+@font-face {
+  font-family: 'Poppins Fallback';
+  src: local('Arial'); /* Nutzt die lokale Arial-Schriftart als Basis */
+  ascent-override: 90%;
+  descent-override: 22%;
+  line-gap-override: 0%;
+  size-adjust: 107%;
+}
 
 /* 1. Lokale Fonts laden */
 @font-face {
@@ -52,7 +60,7 @@
 body {
     background-color: var(--bg-color);
     color: var(--text-color);
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Poppins', 'Poppins Fallback', sans-serif;
     line-height: 1.7;
     margin: 0;
     /* padding: 2rem; */ /* Padding wird von anderen Containern gesteuert */
