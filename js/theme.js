@@ -11,7 +11,7 @@ function applyTheme(theme) {
     } else {
         body.classList.remove('dark-mode');
     }
-    // Nach jeder Theme-Änderung die Partikelfarben aktualisieren
+    // Aktualisiert die Partikelfarben nach jeder Änderung.
     updateParticleColors();
 }
 
@@ -21,9 +21,10 @@ function handleThemeToggle() {
     applyTheme(newTheme);
 }
 
-// Exportiert eine Haupt-Initialisierungsfunktion für das Theme
+// Initialisiert das Theme und die Umschalt-Logik.
 export function initTheme() {
     if (themeToggle) {
+        // Stellt sicher, dass der Dark Mode der Standard ist, wenn nichts gespeichert ist.
         const savedTheme = localStorage.getItem('theme') || 'dark';
         applyTheme(savedTheme);
         themeToggle.addEventListener('click', handleThemeToggle);
