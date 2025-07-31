@@ -191,25 +191,21 @@
     border: none;
     color: #fff;
     cursor: pointer;
-    font-size: 1rem;
     padding: 0 18px;
     transition: background-color 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
+    font-size: 0; /* Text verstecken */
+    flex-shrink: 0; /* Button behält seine Größe */
 }
 
 #chat-form button:hover {
     background: #d39a00;
 }
 
-/* Text im Button verstecken, nur Icon anzeigen */
-#chat-form button {
-    font-size: 0; /* Text wird unsichtbar */
-}
-
 #chat-form button i {
-    font-size: 1rem; /* Icon bleibt sichtbar */
+    font-size: 1rem; /* Icon sichtbar */
 }
 
 /* Close-Button */
@@ -248,6 +244,16 @@
     
     #ai-chat-container {
         height: 350px;
+    }
+    
+    #chat-form {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    #chat-form button {
+        width: 100%;
+        justify-content: center;
     }
     
     .user-message,
