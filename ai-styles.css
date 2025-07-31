@@ -31,3 +31,76 @@
     background-color: var(--primary-color-dark);
     border-color: rgb(231, 174, 0); /* Lässt den Rahmen beim Hovern heller leuchten */
 }
+
+/* Stile für den Chat-Container */
+#ai-chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 400px; /* Beispielhöhe, anpassen nach Bedarf */
+}
+
+#chat-history {
+    flex-grow: 1;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
+}
+
+.user-message {
+    text-align: right;
+    margin: 5px 0;
+    padding: 8px 12px;
+    background-color: #dcf8c6;
+    border-radius: 10px;
+    display: inline-block;
+    max-width: 80%;
+    align-self: flex-end;
+}
+
+.ai-message {
+    text-align: left;
+    margin: 5px 0;
+    padding: 8px 12px;
+    background-color: #fff;
+    border: 1px solid #eee;
+    border-radius: 10px;
+    display: inline-block;
+    max-width: 80%;
+    align-self: flex-start;
+}
+
+#chat-form {
+    display: flex;
+}
+
+#chat-input {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#chat-form button {
+    padding: 10px 15px;
+    margin-left: 10px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#chat-form button:hover {
+    background-color: #0056b3;
+}
+
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+}
