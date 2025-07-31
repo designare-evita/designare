@@ -121,17 +121,24 @@
         </div>
     </div>
 
-<div id="ai-response-modal" class="modal-overlay">
-        <div class="modal-content">
-            <button id="close-ai-response-modal-top" class="close-button">&times;</button>
-    <div id="ai-response-content-area"></div>
-
-            <div class="modal-footer">
-                <button id="close-ai-response-modal-bottom" class="button">Frag Evita (Die weiß mehr!)</button>
-            </div>
-
+<div id="ai-response-modal" class="modal">
+    <div class="modal-content">
+        <div id="initial-ai-response">
+            <div id="ai-response-content"></div>
+            <button id="start-chat-button" class="modal-button">Frag Evita</button>
         </div>
+
+        <div id="ai-chat-container" style="display: none;">
+            <div id="chat-history"></div>
+            <form id="chat-form">
+                <input type="text" id="chat-input" placeholder="Stelle eine Folgefrage...">
+                <button type="submit" class="cta-button">Senden<i class="fas fa-arrow-right"></i>
+</button>
+            </form>
+        </div>
+        <button id="close-modal-button" class="close-button" style="display: none;">&times;</button>
     </div>
+</div>
 
 	<footer>
         <a href="impressum.html" id="impressum-link">Impressum</a>
