@@ -234,6 +234,54 @@
     color: var(--accent-color, #FCB500);
 }
 
+#chat-form button {
+    background: var(--accent-color, #FCB500);
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    padding: 0 18px;
+    transition: background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0; /* Text verstecken */
+    flex-shrink: 0; /* Button behält seine Größe */
+}
+
+#chat-form button:hover {
+    background: #d39a00;
+}
+
+#chat-form button i {
+    font-size: 1rem; /* Icon sichtbar */
+}
+
+/* Spezielle Styles für cta-button in chat-form */
+#chat-form .cta-button {
+    background: var(--accent-color, #FCB500);
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    padding: 0 18px;
+    transition: background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0; /* Text verstecken */
+    flex-shrink: 0; /* Button behält seine Größe */
+    border-radius: 0; /* Kein border-radius für nahtlosen Übergang */
+    margin: 0; /* Keine Margins */
+    width: auto; /* Nicht die volle Breite */
+}
+
+#chat-form .cta-button:hover {
+    background: #d39a00;
+}
+
+#chat-form .cta-button i {
+    font-size: 1rem; /* Icon sichtbar */
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .modal .modal-content {
