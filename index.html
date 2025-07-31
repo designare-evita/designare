@@ -1,152 +1,150 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Michael Kanda | Wo Webseiten & KI sich begegnen</title>
-    <meta name="description" content="Michael Kanda bastelt Webseiten und bringt KI zum Verzweifeln! Fragen? Evita, meine KI-Assistentin, hat die Antworten – und mehr Geduld als ich.">
-    <link rel="preload" href="Font/Poppins-Regular.ttf" as="font" type="font/ttf" crossorigin>
-    <link rel="icon" href="images/favicon.webp" type="image/webp">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"></noscript>
-    <link rel="stylesheet" href="ai-styles.css">
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="legal-style.css">
-    <link rel="canonical" href="https://designare.at/" />
+// js/ai-form.js
 
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Person",
-      "name": "Michael Kanda",
-      "url": "https://designare.at",
-      "jobTitle": "Web-Entwickler und KI-Enthusiast",
-      "description": "Michael Kanda ist ein Web-Entwickler aus Wien, der sich auf die Schnittstelle von Web-Technologien und künstlicher Intelligenz spezialisiert hat.",
-      "address": {
-        "@type": "PostalAddress",
-        "addressLocality": "Wien",
-        "addressCountry": "AT"
-      },
-      "image": "https://designare.at/images/Michael-Kanda.jpg"
+import { startPlaceholderAnimation, stopPlaceholderAnimation } from './typewriter.js';
+
+export function initAiForm() {
+    const aiForm = document.getElementById('ai-form');
+    if (!aiForm) return;
+
+    // Alle DOM-Elemente holen
+    const aiQuestionInput = document.getElementById('ai-question');
+    const aiStatus = document.getElementById('ai-status');
+    const submitButton = aiForm.querySelector('button[type="submit"]');
+
+    const modal = document.getElementById('ai-response-modal');
+    if (!modal) {
+        console.error("Das AI-Response-Modal wurde nicht im DOM gefunden.");
+        return;
     }
-    </script>
-</head>
-<!-- KORREKTUR: Die Klasse 'no-scroll' wurde hinzugefügt, um das Scrollen nur hier zu verhindern -->
-<body class="dark-mode no-scroll">
 
-    <header class="main-header">
-        <a href="index.html" id="top-left-logo-link" aria-label="Zur Startseite">
-            <img src="images/favicon.webp" alt="Michael Kanda Logo" id="top-left-logo-img">
-        </a>
-        <div class="header-right-controls">
-          <button id="about-me-button" aria-label="Über mich öffnen">
-            <i class="fa-regular fa-user"></i>
-          </button>
-          <button id="contact-button" aria-label="Kontaktformular öffnen">
-              <i class="far fa-envelope"></i>
-          </button>
-          <button id="cookie-info-button" aria-label="Cookie Informationen anzeigen">
-              <i class="fas fa-cookie-bite"></i>
-          </button>
-        </div>
-    </header>
+    const responseContent = document.getElementById('ai-response-content');
+    const startChatButton = document.getElementById('start-chat-button');
+    const closeModalButton = document.getElementById('close-modal-button');
+    const initialResponseContainer = document.getElementById('initial-ai-response');
+    const chatContainer = document.getElementById('ai-chat-container');
+    const chatHistory = document.getElementById('chat-history');
+    const chatForm = document.getElementById('chat-form');
+    const chatInput = document.getElementById('chat-input');
 
-    <main id="hero">
-        <div id="particles-js"></div>
-        <div class="container">
-            <img fetchpriority="high" src="images/Michael.webp" alt="Illustration Michael und Evita" class="profile-picture">
-            <h1 id="typewriter-h1"></h1>
-            <p class="subtitle">Michael Kanda <span class="accent-text-inline">&lt;/&gt;</span> Komplize für Web & KI aus Wien </p>
-            <div class="ai-container">
-                <form id="ai-form">
-                    <input type="text" id="ai-question" placeholder="Hallo, ich bin Evita, Michaels KI-Assistentin." autocomplete="off" required>
-                    <button type="submit" aria-label="Frage senden"><i class="fas fa-paper-plane"></i></button>
-                </form>
-                <p id="ai-status"></p>
-            </div>
-        </div>
-    </main>
-	
-    <div id="contact-modal" class="modal-overlay">
-        <div class="modal-content">
-            <button id="close-modal" class="close-button">&times;</button>
-            <h2>Frag Michael!</h2>
-            <form id="contact-form-inner">
-                <input type="text" name="name" placeholder="Dein Name (oder Künstlername):" required>
-                <input type="email" name="email" placeholder="Deine E-Mail (Anti-Spam-Zone!)" required>
-                <input type="text" name="_subject" placeholder="Worum geht's? (Bitte kein KI-Drama)">
-                <textarea name="message" placeholder="Deine Botschaft an mich (und Evita):" rows="5" required></textarea>
-                <div class="privacy-checkbox">
-                    <input type="checkbox" name="privacy" id="privacy" required>
-                    <label for="privacy">Michael darf meine Nachricht lesen und Evita darf alles verarbeiten, was sie versteht. (Details im Datenschutz)</label>
-                </div>
-                <button type="submit" class="cta-button">Ab die Post!</button>
-            </form>
-            <div id="contact-success-message" style="display: none; text-align: center;">
-                <h2>Nachricht empfangen! </h2>
-                <p>Michael (oder Evita, wenn er zu sehr bastelt) meldet sich in Kürze.</p>
-                <p style="margin-top: 20px;"><a href="#" id="close-success-message" class="cta-button">Schließen</a></p>
-            </div>
-        </div>
-    </div>
-    <div id="cookie-info-lightbox" class="modal-overlay">
-        <div class="modal-content">
-            <h2>Hinweis zu Cookies</h2>
-            <p style="text-align: center;">Wir backen hier nur Cookies, die unsere Website am Laufen halten. Reine Technik, kein Schnickschnack!</p>
-            <div class="cookie-lightbox-buttons">
-                <a href="datenschutz.html" id="privacy-policy-link-button" class="lightbox-button">Datenschutzerklärung</a>
-                <button id="acknowledge-cookie-lightbox" class="lightbox-button">Alles klar</button>
-            </div>
-        </div>
-    </div>
-    <div id="legal-modal" class="modal-overlay">
-        <div class="modal-content">
-            <button id="close-legal-modal" class="close-button">&times;</button>
-            <div id="legal-modal-content-area"></div>
-        </div>
-    </div>
-    <div id="about-me-content" style="display: none;">
-        <div class="legal-container">
-            <h1>Über Michael</h1>
-            <h3>Der Mann hinter den Pixeln</h3>
-            <p style="text-align: center; padding-top: 5px; padding-bottom: 5px;">
-                <img src="https://designare.at/images/Michael@work.webp" alt="Michael@work" />
-            </p>
-            <p>Okay, aufgepasst! Michael besitzt digitale Superkräfte! Bei maxonline arbeitet er als Web-Entwickler und verbindet dort Design, Code und KI so genial, dass selbst ich staune. Michael hat einen Abschluss in Medientechnik, ist zertifizierter E-Commerce-Experte und hat Google-Workshops überlebt.</p>
-            <h2 style="text-align: left;">Doch Michael ist mehr als nur Code und Pixel</h2>
-            <p>Um den Kopf freizubekommen, verbringt Michael viel Zeit mit seiner Tierschutzhündin Evita (nach der ich benannt wurde ❤️). Regelmäßig quält er sich zudem beim Sport – schließlich weiß man ja nie, wann man vor einem KI-Aufstand flüchten muss! Seine Playlist? Ein wilder Mix aus Frei.Wild, Helene Fischer und Kim Wilde. Ich vermute ja, das ist Michaels geheime Waffe um die KI zur Kapitulation zu bringen...</p>
-            <p style="text-align: center; padding-top: 10px;">
-                <img src="https://designare.at/images/Evita&KI.webp" alt="Evita & KI" />
-            </p>        
-        </div>
-    </div>
+    // ----- HILFSFUNKTIONEN FÜR DAS MODAL -----
+    const openModal = () => {
+        modal.classList.add('visible');
+        document.body.classList.add('no-scroll'); // Verhindert das Scrollen des Hintergrunds
+    };
 
-<div id="ai-response-modal" class="modal">
-    <div class="modal-content">
-        <div id="initial-ai-response">
-            <div id="ai-response-content"></div>
-            <button id="start-chat-button" class="modal-button">Frag Evita</button>
-        </div>
+    const closeModal = () => {
+        modal.classList.remove('visible');
+        document.body.classList.remove('no-scroll');
+    };
 
-        <div id="ai-chat-container" style="display: none;">
-            <div id="chat-history"></div>
-            <form id="chat-form">
-                <input type="text" id="chat-input" placeholder="Stelle eine Folgefrage...">
-                <button type="submit" class="cta-button">Senden<i class="fas fa-arrow-right"></i>
-</button>
-            </form>
-        </div>
-        <button id="close-modal-button" class="close-button" style="display: none;">&times;</button>
-    </div>
-</div>
+    // ----- HAUPTLOGIK -----
 
-	<footer>
-        <a href="impressum.html" id="impressum-link">Impressum</a>
-        <a href="datenschutz.html" id="datenschutz-link">Datenschutz</a>
-    </footer>
+    // Formular-Absendung für die ERSTE Frage
+    aiForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const question = aiQuestionInput.value.trim();
+        if (!question) return;
 
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-    <script type="module" src="js/main.js"></script>
+        stopPlaceholderAnimation();
+        aiStatus.innerText = "Einen Moment, Evita gleicht gerade ihre Bits und Bytes ab...";
+        aiStatus.classList.add('thinking');
+        aiQuestionInput.disabled = true;
+        submitButton.disabled = true;
 
-</body>
-</html>
+        try {
+            const response = await fetch('/api/ask-gemini', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ question: question })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ error: 'Netzwerk-Antwort war nicht OK.' }));
+                throw new Error(errorData.error);
+            }
+
+            const data = await response.json();
+            const aiAnswer = data.answer || "Ich habe leider keine Antwort erhalten.";
+
+            // Antwort ins Modal füllen
+            responseContent.innerHTML = aiAnswer;
+
+            // Modal im initialen Zustand anzeigen
+            initialResponseContainer.style.display = 'block';
+            chatContainer.style.display = 'none';
+            closeModalButton.style.display = 'none';
+            openModal(); // Korrekte Funktion zum Öffnen verwenden!
+
+            // Event-Listener für "Frag Evita"-Button (wird hier gesetzt, da aiAnswer bekannt sein muss)
+            startChatButton.onclick = function() {
+                initialResponseContainer.style.display = 'none';
+                chatContainer.style.display = 'block';
+                closeModalButton.style.display = 'block';
+                chatHistory.innerHTML = `<div class="ai-message">${aiAnswer}</div>`;
+                chatInput.focus();
+            };
+
+        } catch (error) {
+            console.error("Fehler bei der KI-Anfrage:", error);
+            aiStatus.innerText = `Fehler: ${error.message}`;
+        } finally {
+            aiQuestionInput.value = '';
+            aiQuestionInput.disabled = false;
+            submitButton.disabled = false;
+            aiStatus.classList.remove('thinking');
+            if (!aiStatus.innerText.startsWith('Fehler')) {
+                aiStatus.innerText = '';
+            }
+            startPlaceholderAnimation();
+        }
+    });
+
+    // Formular-Absendung für den Chat
+    chatForm.onsubmit = async function(event) {
+        event.preventDefault();
+        const userMessage = chatInput.value.trim();
+        if (!userMessage) return;
+
+        chatHistory.innerHTML += `<div class="user-message">${userMessage}</div>`;
+        chatInput.value = '';
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+
+        const thinkingElement = document.createElement('div');
+        thinkingElement.className = 'ai-message thinking';
+        thinkingElement.innerHTML = '<i>... tippt ...</i>';
+        chatHistory.appendChild(thinkingElement);
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+
+        try {
+            const response = await fetch('/api/ask-gemini', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ question: userMessage, context: chatHistory.innerText })
+            });
+
+             if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ error: 'Chat-Antwort war nicht OK.' }));
+                throw new Error(errorData.error);
+            }
+
+            const data = await response.json();
+            thinkingElement.innerHTML = data.answer || "Ich konnte keine Antwort finden.";
+            thinkingElement.classList.remove('thinking');
+
+        } catch (error) {
+            thinkingElement.innerHTML = `Entschuldigung, ein Fehler ist aufgetreten.`;
+            thinkingElement.classList.add('error-message');
+            console.error('Error fetching AI chat response:', error);
+        } finally {
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }
+    };
+
+    // Schließen des Modals
+    closeModalButton.onclick = closeModal;
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+}
