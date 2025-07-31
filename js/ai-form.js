@@ -114,3 +114,73 @@ export function initAiForm() {
         }
     });
 }
+// Bestehenden Code zur Anzeige der AI-Antwort anpassen
+function displayAIResponse(response) {
+    const modal = document.getElementById('ai-response-modal');
+    const responseContent = document.getElementById('ai-response-content');
+    const startChatButton = document.getElementById('start-chat-button');
+    const closeModalButton = document.getElementById('close-modal-button');
+    const initialResponseContainer = document.getElementById('initial-ai-response');
+    const chatContainer = document.getElementById('ai-chat-container');
+    const chatHistory = document.getElementById('chat-history');
+    const chatForm = document.getElementById('chat-form');
+    const chatInput = document.getElementById('chat-input');
+
+    // Ursprüngliche Antwort anzeigen
+    responseContent.innerHTML = response;
+    modal.style.display = 'block';
+    initialResponseContainer.style.display = 'block';
+    chatContainer.style.display = 'none';
+    closeModalButton.style.display = 'none';
+
+
+    // Event Listener für "Frag Evita"-Button
+    startChatButton.onclick = function() {
+        // Verstecke die ursprüngliche Antwort und zeige den Chat-Container
+        initialResponseContainer.style.display = 'none';
+        chatContainer.style.display = 'block';
+        closeModalButton.style.display = 'block';
+
+        // Füge die erste AI-Antwort zum Chatverlauf hinzu
+        chatHistory.innerHTML = `<div class="ai-message">${response}</div>`;
+    };
+
+    // Event Listener für das Senden im Chat
+    chatForm.onsubmit = async function(event) {
+        event.preventDefault();
+        const userMessage = chatInput.value;
+        if (!userMessage.trim()) return;
+
+        // Zeige die Nachricht des Nutzers im Chat an
+        chatHistory.innerHTML += `<div class="user-message">${userMessage}</div>`;
+        chatInput.value = '';
+
+        // Hier rufst du deine API erneut auf, um eine Antwort zu bekommen
+        // Annahme: Du hast eine Funktion `askGemini` die eine Frage entgegennimmt
+        try {
+            const aiResponse = await fetch('/api/ask-gemini', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: userMessage })
+            }).then(res => res.json());
+
+            // Zeige die AI-Antwort im Chat an
+            chatHistory.innerHTML += `<div class="ai-message">${aiResponse.text}</div>`;
+        } catch (error) {
+            chatHistory.innerHTML += `<div class="error-message">Entschuldigung, es ist ein Fehler aufgetreten.</div>`;
+            console.error('Error fetching AI response:', error);
+        }
+    };
+
+
+    // Schließen des Modals
+    closeModalButton.onclick = function() {
+        modal.style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = 'none';
+        }
+    }
+}
