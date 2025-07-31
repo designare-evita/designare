@@ -250,16 +250,6 @@
         height: 350px;
     }
     
-    #chat-form {
-        flex-direction: column;
-        gap: 8px;
-    }
-    
-    #chat-form button {
-        width: 100%;
-        justify-content: center;
-    }
-    
     .user-message,
     .ai-message {
         max-width: 90%;
