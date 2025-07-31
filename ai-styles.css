@@ -203,8 +203,13 @@
     background: #d39a00;
 }
 
+/* Text im Button verstecken, nur Icon anzeigen */
+#chat-form button {
+    font-size: 0; /* Text wird unsichtbar */
+}
+
 #chat-form button i {
-    font-size: 1rem;
+    font-size: 1rem; /* Icon bleibt sichtbar */
 }
 
 /* Close-Button */
