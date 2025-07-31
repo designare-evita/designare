@@ -2,64 +2,33 @@
 
 import { startPlaceholderAnimation, stopPlaceholderAnimation } from './typewriter.js';
 
-/**
- * Öffnet eine Lightbox/Modal.
- * @param {HTMLElement} lightboxElement - Das DOM-Element der Lightbox.
- */
-const openLightbox = (lightboxElement) => {
-    if (lightboxElement) {
-        lightboxElement.classList.add('visible');
-        document.body.style.overflow = 'hidden'; // Scrollen des Hintergrunds verhindern
-    }
-};
-
-/**
- * Schließt eine Lightbox/Modal.
- * @param {HTMLElement} lightboxElement - Das DOM-Element der Lightbox.
- */
-const closeLightbox = (lightboxElement) => {
-    if (lightboxElement) {
-        lightboxElement.classList.remove('visible');
-        document.body.style.overflow = ''; // Scrollen wieder erlauben
-    }
-};
-
-/**
- * Initialisiert das KI-Formular und die zugehörige Antwort-Lightbox.
- */
 export function initAiForm() {
-    // Finde das Formular auf der aktuellen Seite. Wenn nicht vorhanden, tue nichts.
+    // Finde das Formular. Wenn nicht vorhanden, tue nichts.
     const aiForm = document.getElementById('ai-form');
     if (!aiForm) return;
 
     // Hole alle benötigten Elemente aus dem DOM
     const aiQuestionInput = document.getElementById('ai-question');
     const aiStatus = document.getElementById('ai-status');
-    const submitButton = aiForm.querySelector('button');
-    
-    // Elemente für die AI-Antwort-Lightbox
-    const aiResponseModal = document.getElementById('ai-response-modal');
-    const aiResponseContentArea = document.getElementById('ai-response-content-area');
-    
-    // KORRIGIERT: Wir holen uns jetzt BEIDE Schließen-Buttons mit den korrekten IDs
-    const closeAiResponseModalBtnTop = document.getElementById('close-ai-response-modal-top');
-    const closeAiResponseModalBtnBottom = document.getElementById('close-ai-response-modal-bottom');
+    const submitButton = aiForm.querySelector('button[type="submit"]');
 
+    // Elemente für das AI-Antwort-Modal
+    const modal = document.getElementById('ai-response-modal');
+    const responseContent = document.getElementById('ai-response-content');
+    const startChatButton = document.getElementById('start-chat-button');
+    const closeModalButton = document.getElementById('close-modal-button');
+    const initialResponseContainer = document.getElementById('initial-ai-response');
+    const chatContainer = document.getElementById('ai-chat-container');
+    const chatHistory = document.getElementById('chat-history');
+    const chatForm = document.getElementById('chat-form');
+    const chatInput = document.getElementById('chat-input');
+    
+    // Sicherstellen, dass alle Modal-Elemente vorhanden sind
+    if (!modal || !responseContent || !startChatButton || !closeModalButton || !initialResponseContainer || !chatContainer || !chatHistory || !chatForm || !chatInput) {
+        console.error("Ein oder mehrere Modal-Elemente für den KI-Chat wurden nicht gefunden. Bitte HTML prüfen.");
+        return;
+    }
 
-    // KORRIGIERT: Event-Listener für BEIDE Buttons und den Hintergrund-Klick hinzufügen
-    if (closeAiResponseModalBtnTop) {
-        closeAiResponseModalBtnTop.addEventListener('click', () => closeLightbox(aiResponseModal));
-    }
-    if (closeAiResponseModalBtnBottom) {
-        closeAiResponseModalBtnBottom.addEventListener('click', () => closeLightbox(aiResponseModal));
-    }
-    if (aiResponseModal) {
-        aiResponseModal.addEventListener('click', (e) => {
-            if (e.target === aiResponseModal) {
-                closeLightbox(aiResponseModal);
-            }
-        });
-    }
 
     // Hauptfunktion bei Formular-Absendung
     aiForm.addEventListener('submit', async (e) => {
@@ -75,103 +44,106 @@ export function initAiForm() {
         submitButton.disabled = true;
 
         try {
-            // API-Anfrage an den Server senden
+            // API-Anfrage senden
             const response = await fetch('/api/ask-gemini', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ question: question })
             });
 
-            if (!response.ok) { 
-                throw new Error('Netzwerk-Antwort war nicht OK.'); 
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Netzwerk-Antwort war nicht OK.');
             }
 
             const data = await response.json();
+            const aiAnswer = data.answer; // Die Antwort von der API
+
+            // ---- NEUE LOGIK ZUM ANZEIGEN DES MODALS ----
             
-            // ANTWORT IN DIE LIGHTBOX FÜLLEN UND ANZEIGEN
-            aiStatus.innerText = ""; // Status-Text leeren
-            if(aiResponseContentArea) {
-                aiResponseContentArea.innerText = data.answer;
-            }
-            openLightbox(aiResponseModal);
+            // 1. Antwort in das Modal füllen
+            responseContent.innerHTML = aiAnswer;
+
+            // 2. Modal im initialen Zustand anzeigen
+            modal.style.display = 'block';
+            initialResponseContainer.style.display = 'block';
+            chatContainer.style.display = 'none';
+            closeModalButton.style.display = 'none';
+
+            // 3. Event-Listener für "Frag Evita"-Button (Chat starten)
+            startChatButton.onclick = function() {
+                initialResponseContainer.style.display = 'none';
+                chatContainer.style.display = 'block';
+                closeModalButton.style.display = 'block';
+                // Füge die erste AI-Antwort zum Chatverlauf hinzu
+                chatHistory.innerHTML = `<div class="ai-message">${aiAnswer}</div>`;
+                chatInput.focus();
+            };
 
         } catch (error) {
             console.error("Fehler bei der KI-Anfrage:", error);
-            aiStatus.innerText = 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.';
+            aiStatus.innerText = `Fehler: ${error.message}`;
         } finally {
             // UI nach der Antwort zurücksetzen
             aiQuestionInput.value = '';
             aiQuestionInput.disabled = false;
             submitButton.disabled = false;
-            aiQuestionInput.placeholder = "Haben Sie eine weitere Frage?";
             aiStatus.classList.remove('thinking');
-            
-            setTimeout(() => {
-                if(document.activeElement !== aiQuestionInput) {
-                    startPlaceholderAnimation();
-                }
-            }, 100);
+            // Status-Text nur leeren, wenn kein Fehler aufgetreten ist
+            if (!aiStatus.innerText.startsWith('Fehler')) {
+                aiStatus.innerText = '';
+            }
+            startPlaceholderAnimation();
         }
     });
-}
-// Bestehenden Code zur Anzeige der AI-Antwort anpassen
-function displayAIResponse(response) {
-    const modal = document.getElementById('ai-response-modal');
-    const responseContent = document.getElementById('ai-response-content');
-    const startChatButton = document.getElementById('start-chat-button');
-    const closeModalButton = document.getElementById('close-modal-button');
-    const initialResponseContainer = document.getElementById('initial-ai-response');
-    const chatContainer = document.getElementById('ai-chat-container');
-    const chatHistory = document.getElementById('chat-history');
-    const chatForm = document.getElementById('chat-form');
-    const chatInput = document.getElementById('chat-input');
-
-    // Ursprüngliche Antwort anzeigen
-    responseContent.innerHTML = response;
-    modal.style.display = 'block';
-    initialResponseContainer.style.display = 'block';
-    chatContainer.style.display = 'none';
-    closeModalButton.style.display = 'none';
-
-
-    // Event Listener für "Frag Evita"-Button
-    startChatButton.onclick = function() {
-        // Verstecke die ursprüngliche Antwort und zeige den Chat-Container
-        initialResponseContainer.style.display = 'none';
-        chatContainer.style.display = 'block';
-        closeModalButton.style.display = 'block';
-
-        // Füge die erste AI-Antwort zum Chatverlauf hinzu
-        chatHistory.innerHTML = `<div class="ai-message">${response}</div>`;
-    };
 
     // Event Listener für das Senden im Chat
     chatForm.onsubmit = async function(event) {
         event.preventDefault();
-        const userMessage = chatInput.value;
-        if (!userMessage.trim()) return;
+        const userMessage = chatInput.value.trim();
+        if (!userMessage) return;
 
         // Zeige die Nachricht des Nutzers im Chat an
         chatHistory.innerHTML += `<div class="user-message">${userMessage}</div>`;
+        const currentMessageElement = chatHistory.lastElementChild; // Das Element der Benutzernachricht
         chatInput.value = '';
+        chatHistory.scrollTop = chatHistory.scrollHeight; // Nach unten scrollen
 
-        // Hier rufst du deine API erneut auf, um eine Antwort zu bekommen
-        // Annahme: Du hast eine Funktion `askGemini` die eine Frage entgegennimmt
+        // Platzhalter für die KI-Antwort hinzufügen
+        const thinkingElement = document.createElement('div');
+        thinkingElement.className = 'ai-message thinking';
+        thinkingElement.innerText = '...';
+        chatHistory.appendChild(thinkingElement);
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+
         try {
-            const aiResponse = await fetch('/api/ask-gemini', {
+            // API erneut aufrufen für die Folgefrage
+            const response = await fetch('/api/ask-gemini', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt: userMessage })
-            }).then(res => res.json());
+                // Sende den bisherigen Kontext und die neue Frage
+                body: JSON.stringify({ question: userMessage, context: chatHistory.innerText })
+            });
 
-            // Zeige die AI-Antwort im Chat an
-            chatHistory.innerHTML += `<div class="ai-message">${aiResponse.text}</div>`;
+            if(!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Fehler bei der Chat-Antwort.');
+            }
+
+            const data = await response.json();
+            
+            // Zeige die AI-Antwort im Chat an, indem der Platzhalter ersetzt wird
+            thinkingElement.innerText = data.answer;
+            thinkingElement.classList.remove('thinking');
+
         } catch (error) {
-            chatHistory.innerHTML += `<div class="error-message">Entschuldigung, es ist ein Fehler aufgetreten.</div>`;
-            console.error('Error fetching AI response:', error);
+            thinkingElement.innerText = `Entschuldigung, ein Fehler ist aufgetreten: ${error.message}`;
+            thinkingElement.classList.add('error-message');
+            console.error('Error fetching AI chat response:', error);
+        } finally {
+            chatHistory.scrollTop = chatHistory.scrollHeight;
         }
     };
-
 
     // Schließen des Modals
     closeModalButton.onclick = function() {
