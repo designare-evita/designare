@@ -150,7 +150,7 @@
     color: #ff6b6b;
 }
 
-/* Chat-Form - 1:1 wie Index-Seite */
+/* Chat-Form - WICHTIG: Diese Regel war in der alten Datei vergessen! */
 #chat-form {
     background-color: var(--bg-color, #1a1a1a);
     border: 1px solid var(--border-color, #aaaaaa);
