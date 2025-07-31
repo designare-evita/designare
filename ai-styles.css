@@ -1,3 +1,5 @@
+/* ai-styles.css - Korrigierte Version */
+
 #ai-response-content-area {
     max-height: 60vh;
     overflow-y: hidden !important; 
@@ -6,112 +8,249 @@
     white-space: pre-wrap;  
 }
 
+/* Vollständige Modal-Styles für AI-Response */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    align-items: center;
+    justify-content: center;
+}
+
+.modal .modal-content {
+    background-color: var(--bg-color, #1a1a1a);
+    color: var(--text-color, #eeeeee);
+    border-radius: 10px;
+    max-width: 800px;
+    width: 90%;
+    max-height: 90vh;
+    padding: 2rem;
+    position: relative;
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+    overflow-y: auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* Modal wird sichtbar */
+.modal[style*="block"] .modal-content {
+    transform: scale(1);
+}
+
 /* Stile für den Lightbox-Footer */
 .modal-footer {
     text-align: center;
     margin-top: 2rem;
     padding-top: 1.5rem;
-    border-top: 1px solid #e0e0e0; /* Eine feine Trennlinie */
+    border-top: 1px solid #e0e0e0;
 }
 
 .modal-footer .button {
-    /* Beibehaltung des Hintergrunds und der Textfarbe */
-    background-color: var(--primary-color);
-    color: var(--button-text-color);
-    cursor: pointer; /* Stellt sicher, dass der Mauszeiger eine Hand ist */
-    padding: 0.75rem 1.5rem; /* Sorgt für angenehmen Innenabstand */
-    transition: all 0.3s ease; /* Allgemeine, sanfte Animation */
+    background-color: var(--primary-color, #FCB500);
+    color: var(--button-text-color, #fff);
+    cursor: pointer;
+    padding: 0.75rem 1.5rem;
+    transition: all 0.3s ease;
     border: 2px solid rgb(211, 154, 0); 
     font-size: 1rem;                      
     border-radius: 5px;                    
 }
 
-/* Ein passender Hover-Effekt, der den goldenen Rahmen hervorhebt */
 .modal-footer .button:hover {
-    background-color: var(--primary-color-dark);
-    border-color: rgb(231, 174, 0); /* Lässt den Rahmen beim Hovern heller leuchten */
+    background-color: var(--primary-color-dark, #d39a00);
+    border-color: rgb(231, 174, 0);
+}
+
+/* Modal-Button Styles */
+.modal-button {
+    background-color: var(--accent-color, #FCB500);
+    color: #fff;
+    border: 2px solid var(--accent-color, #FCB500);
+    border-radius: 5px;
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 1.5rem;
+    width: 100%;
+}
+
+.modal-button:hover {
+    background-color: #d39a00;
+    border-color: #d39a00;
+    transform: translateY(-2px);
 }
 
 /* Stile für den Chat-Container */
 #ai-chat-container {
     display: flex;
     flex-direction: column;
-    height: 400px; /* Beispielhöhe, anpassen nach Bedarf */
+    height: 400px;
+    margin-top: 1rem;
 }
 
 #chat-history {
     flex-grow: 1;
     overflow-y: auto;
-    border: 1px solid #ddd;
-    padding: 10px;
-    margin-bottom: 10px;
-    background-color: #f9f9f9;
+    border: 1px solid var(--border-color, #aaaaaa);
+    padding: 15px;
+    margin-bottom: 15px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    max-height: 300px;
 }
 
+/* Chat-Nachrichten */
 .user-message {
     text-align: right;
-    margin: 5px 0;
-    padding: 8px 12px;
-    background-color: #dcf8c6;
-    border-radius: 10px;
-    display: inline-block;
+    margin: 8px 0;
+    padding: 10px 15px;
+    background-color: var(--accent-color, #FCB500);
+    color: #fff;
+    border-radius: 15px 15px 5px 15px;
+    display: block;
     max-width: 80%;
-    align-self: flex-end;
+    margin-left: auto;
+    word-wrap: break-word;
 }
 
 .ai-message {
     text-align: left;
-    margin: 5px 0;
-    padding: 8px 12px;
-    background-color: #fff;
-    border: 1px solid #eee;
-    border-radius: 10px;
-    display: inline-block;
+    margin: 8px 0;
+    padding: 10px 15px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-color, #eeeeee);
+    border: 1px solid var(--border-color, #aaaaaa);
+    border-radius: 15px 15px 15px 5px;
+    display: block;
     max-width: 80%;
-    align-self: flex-start;
+    margin-right: auto;
+    word-wrap: break-word;
 }
 
+.ai-message.thinking {
+    opacity: 0.7;
+    font-style: italic;
+}
+
+.ai-message.error-message {
+    background-color: rgba(220, 53, 69, 0.2);
+    border-color: #dc3545;
+    color: #ff6b6b;
+}
+
+/* Chat-Form */
 #chat-form {
     display: flex;
+    gap: 10px;
+    align-items: stretch;
+    margin-top: auto;
 }
 
 #chat-input {
     flex-grow: 1;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    padding: 12px 15px;
+    border: 1px solid var(--border-color, #aaaaaa);
+    border-radius: 8px;
+    background-color: var(--bg-color, #1a1a1a);
+    color: var(--text-color, #eeeeee);
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+#chat-input:focus {
+    border-color: var(--accent-color, #FCB500);
+}
+
+#chat-input::placeholder {
+    color: var(--text-color, #eeeeee);
+    opacity: 0.5;
 }
 
 #chat-form button {
-    padding: 10px 15px;
-    margin-left: 10px;
+    padding: 12px 20px;
     border: none;
-    background-color: #007bff;
-    color: white;
-    border-radius: 5px;
+    background-color: var(--accent-color, #FCB500);
+    color: #fff;
+    border-radius: 8px;
     cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 #chat-form button:hover {
-    background-color: #0056b3;
+    background-color: #d39a00;
+    transform: translateY(-1px);
 }
 
+#chat-form button i {
+    font-size: 0.9rem;
+}
+
+/* Close-Button */
 .close-button {
     position: absolute;
-    top: 10px;
-    right: 15px;
+    top: 15px;
+    right: 20px;
     font-size: 24px;
     font-weight: bold;
     cursor: pointer;
+    background: none;
+    border: none;
+    color: var(--text-color, #eeeeee);
+    opacity: 0.7;
+    transition: all 0.3s ease;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.5);
+.close-button:hover {
+    opacity: 1;
+    transform: rotate(90deg);
+    color: var(--accent-color, #FCB500);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .modal .modal-content {
+        width: 95%;
+        padding: 1.5rem;
+        max-height: 95vh;
+    }
+    
+    #ai-chat-container {
+        height: 350px;
+    }
+    
+    #chat-form {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    #chat-form button {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .user-message,
+    .ai-message {
+        max-width: 90%;
+        font-size: 0.9rem;
+    }
 }
