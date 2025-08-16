@@ -103,3 +103,59 @@
 #download-csv .fas {
     margin-right: 10px; /* Abstand zwischen Icon und Text */
 }
+
+/* Stile für die neue Keyword-Liste */
+.keyword-list-container {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    border: 1px solid #444;
+    border-radius: 10px;
+    background-color: rgba(45, 45, 45, 0.5);
+}
+
+.keyword-list-container h4 {
+    margin-top: 0;
+    color: #ffc107;
+    text-align: center;
+}
+
+#keyword-display-list {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0;
+    max-height: 200px;
+    overflow-y: auto;
+    background-color: rgba(0,0,0,0.2);
+    border-radius: 5px;
+    padding: 0.5rem;
+}
+
+#keyword-display-list li {
+    background-color: rgba(255, 255, 255, 0.05);
+    margin-bottom: 0.5rem;
+    padding: 0.8rem 1rem;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.95rem;
+}
+
+.keyword-list-controls {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+/* Stil für den sekundären Button (Liste leeren) */
+.cta-button.secondary {
+    background-color: transparent;
+    border-color: #666;
+    color: #999;
+}
+
+.cta-button.secondary:hover {
+    background-color: #333;
+    color: #fff;
+}
