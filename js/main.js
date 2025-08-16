@@ -3,7 +3,8 @@
 import { initEffects } from './effects.js';
 import { initTypewriters } from './typewriter.js';
 import { initModals } from './modals.js';
-import { initAiForm } from './ai-form.js'; // NEU: Importiert das AI-Form-Modul
+import { initAiForm } from './ai-form.js'; 
+import { initSilasForm } from './silas-form.js';
 
 document.addEventListener('DOMContentLoaded', function() {
     
@@ -11,7 +12,8 @@ document.addEventListener('DOMContentLoaded', function() {
     initEffects();
     initTypewriters();
     initModals();
-    initAiForm(); // NEU: Initialisiert das AI-Form-Modul
+    initAiForm();
+initSilasForm(); 
 
     console.log("Alle Module erfolgreich initialisiert.");
 });
