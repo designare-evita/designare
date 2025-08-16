@@ -49,17 +49,36 @@ Er zaubert dir passende Titel, Beschreibungen und Textblöcke – direkt als CSV
      </div>
 </div></div>
                                
-<div class="performance-tip">		 
-<div class="flex-container">
-    <img src="https://designare.at/images/KI-Integration-auf-Webseiten.webp" alt="KI-Integration-auf-Webseiten">
-                
-                <div class="ai-container">
- <h3><span style="color: #ffffff;">Silas</span> Content Küche</h2>
-    <form id="silas-form">
-        <textarea id="silas-keyword-list" placeholder="Gib hier deine Keywords ein, eines pro Zeile..." rows="5" required></textarea>
-        <button type="submit" aria-label="Frage senden"><i class="fas fa-paper-plane"></i></button>
-    </form>
-    <p id="silas-status" style="text-align: center; width: 100%;"></p>
+<div class="fraglich">
+    <div class="flex-container">
+        <img src="https://designare.at/images/KI-Assistenten-Performance.webp" alt="KI-Assistenten-Performance">
+        <div class="article-content">
+            <p>Sag Silas, meinem neuen KI-Helfer, einfach, was du brauchst.
+                Er zaubert dir passende Titel, Beschreibungen und Textblöcke – direkt als CSV zum Download. Einfacher geht's wirklich nicht!</p>
+        </div>
+    </div>
+    <div class="ai-container">
+        <form id="silas-form">
+            <input type="text" id="silas-keyword-input" placeholder="Gib ein Keyword ein und drücke Enter..." autocomplete="off">
+            <button type="submit" aria-label="Keyword hinzufügen"><i class="fas fa-plus"></i></button>
+        </form>
+    </div>
+
+    <div class="keyword-list-container">
+        <h4>Keywords für die Produktion:</h4>
+        <ul id="keyword-display-list">
+            </ul>
+        <div class="keyword-list-controls">
+            <button id="start-generation-btn" class="cta-button">
+                <i class="fas fa-cogs"></i> Produktion starten
+            </button>
+            <button id="clear-list-btn" class="cta-button secondary">
+                <i class="fas fa-trash"></i> Liste leeren
+            </button>
+        </div>
+    </div>
+
+    <p id="silas-status" style="text-align: center; width: 100%; margin-top: 1rem;"></p>
     <div id="silas-response-container" style="display: none; margin-top: 1rem; text-align: left;">
         <h3>Erstellung abgeschlossen!</h3>
         <div id="silas-response-content" style="background-color: rgba(255,255,255,0.05); border-radius: 5px; padding: 10px; margin-bottom: 1rem;"></div>
@@ -67,7 +86,7 @@ Er zaubert dir passende Titel, Beschreibungen und Textblöcke – direkt als CSV
             <i class="fas fa-download"></i> CSV Herunterladen
         </button>
     </div>
-</div>   
+</div>
         </main>
     </div>
 	
