@@ -41,21 +41,20 @@
             <div class="article-content">
                 <h1><span style="color: #ffffff;">Silas</span> – mein neuer digitaler Komplize für Text-Power!</h1>
                 
-               <div class="fraglich">
+   <div class="fraglich">
     <div class="flex-container">
         <img src="https://designare.at/images/KI-Assistenten-Performance.webp" alt="KI-Assistenten-Performance">
         <div class="article-content">
             <p>Sag Silas, einfach, was du brauchst. Er zaubert dir passende Titel, Beschreibungen und Textblöcke – direkt als CSV zum Download. Einfacher geht's wirklich nicht!</p>
-<div class="ai-container">
+        </div>
+    </div>
+    <div class="ai-container">
         <form id="silas-form">
             <input type="text" id="silas-keyword-input" placeholder="Gib ein Keyword ein und drücke Enter..." autocomplete="off">
             <button type="submit" aria-label="Keyword hinzufügen"><i class="fas fa-plus"></i></button>
         </form>
     </div>
-        </div>
-    </div>
-    
-<div class="ai-container">
+
     <div class="keyword-list-container">
         <h4>Deine Content-Themen:</h4>
         <ul id="keyword-display-list">
@@ -69,6 +68,16 @@
             </button>
         </div>
     </div>
+
+    <p id="silas-status" style="text-align: center; width: 100%; margin-top: 1rem;"></p>
+    <div id="silas-response-container" style="display: none; margin-top: 1rem; text-align: left;">
+        <h3>Erstellung abgeschlossen!</h3>
+        <div id="silas-response-content" style="background-color: rgba(255,255,255,0.05); border-radius: 5px; padding: 10px; margin-bottom: 1rem;"></div>
+        <button id="download-csv" class="cta-button">
+            <i class="fas fa-download"></i> CSV Herunterladen
+        </button>
+    </div>
+</div>
 
     <p id="silas-status" style="text-align: center; width: 100%; margin-top: 1rem;"></p>
     <div id="silas-response-container" style="display: none; margin-top: 1rem; text-align: left;">
