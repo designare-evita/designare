@@ -69,13 +69,63 @@ export function initSilasForm() {
             silasStatus.innerText = `[${i + 1}/${keywordList.length}] Generiere Landingpage für: "${keyword}"...`;
 
             try {
+                // --- VOLLSTÄNDIGER MASTER-PROMPT ---
                 const prompt = `
 # DEINE ROLLE
-Du bist ein weltweit führender Experte für SEO-Content-Strategie und Texterstellung...
-// ... (der gesamte, lange Master-Prompt kommt hier rein) ...
+Du bist ein weltweit führender Experte für SEO-Content-Strategie und Texterstellung. Deine Aufgabe ist es, den gesamten Inhalt für eine professionelle, SEO-optimierte und überzeugende Landingpage zu erstellen, die für ein WordPress-Plugin über einen CSV-Import verwendet wird.
+
 # ZIEL
-Erstelle einen vollständigen Text von ca. 500-600 Wörtern zum Thema "${keyword}".
-// ... (der Rest des Prompts bleibt ebenfalls unverändert) ...
+Erstelle einen vollständigen Text von ca. 500-600 Wörtern zum Thema "${keyword}". Das Ergebnis muss ein einziges, valides JSON-Objekt sein, das in einen Markdown-Codeblock (\`\`\`json ... \`\`\`) eingeschlossen ist.
+
+# GEWÜNSCHTES JSON-FORMAT & ANWEISUNGEN
+Das JSON-Objekt muss exakt die folgende Struktur und die folgenden Schlüssel haben:
+
+{
+  "post_title": "...",
+  "post_name": "...",
+  "meta_title": "...",
+  "meta_description": "...",
+  "h1": "...",
+  "intro_text": "...",
+  "content_sections": [
+    {
+      "h2": "...",
+      "paragraph": "..."
+    },
+    {
+      "h2": "...",
+      "paragraph": "..."
+    },
+    {
+      "h2": "...",
+      "paragraph": "..."
+    }
+  ],
+  "cta_headline": "...",
+  "cta_text": "..."
+}
+
+# DETAILLIERTE ANWEISUNGEN FÜR JEDEN SCHLÜSSEL
+
+1.  **post_title**: Erstelle einen klickstarken, SEO-optimierten Titel. Er muss das Keyword "${keyword}" enthalten. Länge: 50-60 Zeichen.
+2.  **post_name**: Erstelle daraus einen SEO-freundlichen URL-Slug. Nur Kleinbuchstaben, Zahlen und Bindestriche. Keine Umlaute oder Sonderzeichen.
+3.  **meta_title**: Erstelle einen alternativen, ebenfalls fesselnden SEO-Titel, der das Keyword "${keyword}" enthält. Länge: 50-60 Zeichen.
+4.  **meta_description**: Schreibe eine ansprechende Meta-Beschreibung, die neugierig macht und zum Klicken anregt. Sie muss das Keyword "${keyword}" enthalten und eine klare Handlungsaufforderung (Call-to-Action) beinhalten. Länge: 150-160 Zeichen.
+5.  **h1**: Formuliere eine kraftvolle H1-Überschrift. Sie muss das Keyword "${keyword}" prominent enthalten und den Hauptnutzen für den Leser kommunizieren.
+6.  **intro_text**: Schreibe einen fesselnden Einleitungstext (ca. 80-100 Wörter). Beginne mit einem Haken, der das Hauptproblem des Lesers anspricht, und stelle eine Lösung in Aussicht. Das Keyword "${keyword}" muss in den ersten 50 Wörtern vorkommen.
+7.  **content_sections**: Erstelle genau 3-4 Abschnitte. Jeder Abschnitt muss ein Objekt mit einem "h2"-Schlüssel und einem "paragraph"-Schlüssel sein.
+    * **h2**: Eine relevante, interessante Zwischenüberschrift, die einen Aspekt des Themas "${keyword}" behandelt.
+    * **paragraph**: Ein informativer und gut lesbarer Textblock von ca. 120-150 Wörtern. Bringe hier dein Expertenwissen ein, gib Tipps, erkläre Zusammenhänge oder präsentiere Lösungen.
+8.  **cta_headline**: Eine kurze, aktivierende Überschrift für den abschließenden Call-to-Action-Block.
+9.  **cta_text**: Ein kurzer Text, der den Leser zu einer Handlung auffordert (z.B. "Kontakt aufnehmen", "Mehr erfahren").
+
+# QUALITÄTSANFORDERUNGEN
+- **Stil**: Professionell, kompetent und überzeugend.
+- **Einzigartigkeit**: Der gesamte Inhalt muss zu 100% einzigartig sein.
+- **SEO**: Baue semantisch verwandte Begriffe und LSI-Keywords zum Thema "${keyword}" natürlich in den Text ein.
+- **Lesbarkeit**: Verwende kurze Sätze, aktive Sprache und vermeide Füllwörter.
+
+Führe diese Anweisungen exakt aus.
                 `;
 
                 const response = await fetch('/api/ask-gemini', {
@@ -111,9 +161,8 @@ Erstelle einen vollständigen Text von ca. 500-600 Wörtern zum Thema "${keyword
         silasResponseContainer.style.display = 'block';
     });
 
-    // --- FUNKTION 5: CSV-Download (unverändert) ---
+    // --- FUNKTION 5: CSV-Download ---
     downloadCsvButton.addEventListener('click', () => {
-        // ... (Die Logik für den CSV-Download von der vorherigen Nachricht bleibt hier exakt gleich) ...
         if (allGeneratedData.length === 0) {
             alert("Bitte zuerst Content generieren!");
             return;
