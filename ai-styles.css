@@ -36,7 +36,7 @@
 /* Globale Stile für alle AI-Formulare */
 .ai-container form {
     display: flex;
-    border-radius: 10px; 
+    border-radius: 7px; 
     overflow: hidden;
     border: 1px solid #444;
     background-color: #2d2d2d;
@@ -87,7 +87,7 @@
     background-color: transparent;
     color: #ffc107;
     padding: 12px 20px;
-    border-radius: 25px; /* Passender Radius zum Formular */
+    border-radius: 7px; /* Passender Radius zum Formular */
     cursor: pointer;
     transition: all 0.3s ease;
     font-size: 1rem;
