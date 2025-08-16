@@ -40,56 +40,48 @@
         <main class="article-container">
             <div class="article-content">
                 <h1><span style="color: #ffffff;">Silas</span> – mein neuer digitaler Komplize für Text-Power!</h1>
-  <div class="fraglich">            
-  <div class="flex-container">
-    <img src="https://designare.at/images/KI-Assistenten-Performance.webp" alt="KI-Assistenten-Performance">
-    <div class="article-content">
-        <p>Sag Silas, einfach, was du brauchst. 
-Er zaubert dir passende Titel, Beschreibungen und Textblöcke – direkt als CSV zum Download. Einfacher geht's wirklich nicht!</p>
-     </div>
-</div></div>
-                               
-<div class="fraglich">
-    <div class="flex-container">
-        <img src="https://designare.at/images/KI-Assistenten-Performance.webp" alt="KI-Assistenten-Performance">
-        <div class="article-content">
-            <p>Sag Silas, meinem neuen KI-Helfer, einfach, was du brauchst.
-                Er zaubert dir passende Titel, Beschreibungen und Textblöcke – direkt als CSV zum Download. Einfacher geht's wirklich nicht!</p>
-        </div>
-    </div>
-    <div class="ai-container">
-        <form id="silas-form">
-            <input type="text" id="silas-keyword-input" placeholder="Gib ein Keyword ein und drücke Enter..." autocomplete="off">
-            <button type="submit" aria-label="Keyword hinzufügen"><i class="fas fa-plus"></i></button>
-        </form>
-    </div>
+                
+                <div class="fraglich">
+                    <div class="flex-container">
+                        <img src="https://designare.at/images/KI-Assistenten-Performance.webp" alt="KI-Assistenten-Performance">
+                        <div class="article-content">
+                            <p>Sag Silas, einfach, was du brauchst. Er zaubert dir passende Titel, Beschreibungen und Textblöcke – direkt als CSV zum Download. Einfacher geht's wirklich nicht!</p>
+                        </div>
+                    </div>
+                    <div class="ai-container">
+                        <form id="silas-form">
+                            <input type="text" id="silas-keyword-input" placeholder="Gib ein Keyword ein und drücke Enter..." autocomplete="off">
+                            <button type="submit" aria-label="Keyword hinzufügen"><i class="fas fa-plus"></i></button>
+                        </form>
+                    </div>
 
-    <div class="keyword-list-container">
-        <h4>Keywords für die Produktion:</h4>
-        <ul id="keyword-display-list">
-            </ul>
-        <div class="keyword-list-controls">
-            <button id="start-generation-btn" class="cta-button">
-                <i class="fas fa-cogs"></i> Produktion starten
-            </button>
-            <button id="clear-list-btn" class="cta-button secondary">
-                <i class="fas fa-trash"></i> Liste leeren
-            </button>
-        </div>
-    </div>
+                    <div class="keyword-list-container">
+                        <h4>Keywords für die Produktion:</h4>
+                        <ul id="keyword-display-list">
+                            </ul>
+                        <div class="keyword-list-controls">
+                            <button id="start-generation-btn" class="cta-button">
+                                <i class="fas fa-cogs"></i> Produktion starten
+                            </button>
+                            <button id="clear-list-btn" class="cta-button secondary">
+                                <i class="fas fa-trash"></i> Liste leeren
+                            </button>
+                        </div>
+                    </div>
 
-    <p id="silas-status" style="text-align: center; width: 100%; margin-top: 1rem;"></p>
-    <div id="silas-response-container" style="display: none; margin-top: 1rem; text-align: left;">
-        <h3>Erstellung abgeschlossen!</h3>
-        <div id="silas-response-content" style="background-color: rgba(255,255,255,0.05); border-radius: 5px; padding: 10px; margin-bottom: 1rem;"></div>
-        <button id="download-csv" class="cta-button">
-            <i class="fas fa-download"></i> CSV Herunterladen
-        </button>
-    </div>
-</div>
+                    <p id="silas-status" style="text-align: center; width: 100%; margin-top: 1rem;"></p>
+                    <div id="silas-response-container" style="display: none; margin-top: 1rem; text-align: left;">
+                        <h3>Erstellung abgeschlossen!</h3>
+                        <div id="silas-response-content" style="background-color: rgba(255,255,255,0.05); border-radius: 5px; padding: 10px; margin-bottom: 1rem;"></div>
+                        <button id="download-csv" class="cta-button">
+                            <i class="fas fa-download"></i> CSV Herunterladen
+                        </button>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
-	
+    
     <div id="contact-modal" class="modal-overlay">
         <div class="modal-content">
             <button id="close-modal" class="close-button">&times;</button>
@@ -147,19 +139,16 @@ Er zaubert dir passende Titel, Beschreibungen und Textblöcke – direkt als CSV
         </div>
     </div>
 
-<div id="ai-response-modal" class="modal-overlay">
+    <div id="ai-response-modal" class="modal-overlay">
         <div class="modal-content">
             <button id="close-ai-response-modal-top" class="close-button">&times;</button>
-    <div id="ai-response-content-area"></div>
-
+            <div id="ai-response-content-area"></div>
             <div class="modal-footer">
                 <button id="close-ai-response-modal-bottom" class="button">Frag Evita (Die weiß mehr!)</button>
             </div>
-
         </div>
     </div>
   
-
 	<footer>
         <a href="impressum.html" id="impressum-link">Impressum</a>
         <a href="datenschutz.html" id="datenschutz-link">Datenschutz</a>
