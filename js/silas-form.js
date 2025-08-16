@@ -157,7 +157,7 @@ Führe diese Anweisungen exakt aus.
         clearListBtn.disabled = false;
         
         const successCount = allGeneratedData.filter(d => !d.error).length;
-        silasResponseContent.innerHTML = `<p><strong>${successCount} von ${keywordList.length} Landingpages erfolgreich erstellt!</strong></p>`;
+        silasResponseContent.innerHTML = `<p><strong>${successCount} von ${keywordList.length} Content Themen erfolgreich erstellt!</strong></p>`;
         silasResponseContainer.style.display = 'block';
     });
 
