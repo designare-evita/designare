@@ -32,11 +32,11 @@
     border-color: rgb(231, 174, 0); /* Lässt den Rahmen beim Hovern heller leuchten */
 }
 
-/* Globale Stile für alle AI-Formulare */
+
 /* Globale Stile für alle AI-Formulare */
 .ai-container form {
     display: flex;
-    border-radius: 50px; /* Korrigierter Border-Radius für die runde Form */
+    border-radius: 10px; 
     overflow: hidden;
     border: 1px solid #444;
     background-color: #2d2d2d;
