@@ -4,39 +4,75 @@ export function initSilasForm() {
     const silasForm = document.getElementById('silas-form');
     if (!silasForm) return;
 
-    // Wir holen uns die neuen Elemente
-    const silasKeywordTextarea = document.getElementById('silas-keyword-list');
+    // Alle DOM-Elemente holen
+    const keywordInput = document.getElementById('silas-keyword-input');
+    const keywordDisplayList = document.getElementById('keyword-display-list');
+    const startGenerationBtn = document.getElementById('start-generation-btn');
+    const clearListBtn = document.getElementById('clear-list-btn');
+    
     const silasStatus = document.getElementById('silas-status');
     const silasResponseContainer = document.getElementById('silas-response-container');
     const silasResponseContent = document.getElementById('silas-response-content');
     const downloadCsvButton = document.getElementById('download-csv');
-    const submitButton = silasForm.querySelector('button');
-    let allGeneratedData = []; // Hier sammeln wir alle Ergebnisse
 
-    silasForm.addEventListener('submit', async (e) => {
+    // Speicher für unsere Keywords und Ergebnisse
+    let keywordList = [];
+    let allGeneratedData = [];
+
+    // --- FUNKTION 1: Keyword zur Liste hinzufügen ---
+    silasForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        const keywords = silasKeywordTextarea.value.split('\n').map(kw => kw.trim()).filter(kw => kw);
-        if (keywords.length === 0) return;
+        const keyword = keywordInput.value.trim();
+        if (keyword && !keywordList.includes(keyword)) {
+            keywordList.push(keyword);
+            updateKeywordDisplay();
+        }
+        keywordInput.value = '';
+        keywordInput.focus();
+    });
+
+    // --- FUNKTION 2: Die Keyword-Anzeige aktualisieren ---
+    const updateKeywordDisplay = () => {
+        keywordDisplayList.innerHTML = '';
+        keywordList.forEach(kw => {
+            const li = document.createElement('li');
+            li.textContent = kw;
+            keywordDisplayList.appendChild(li);
+        });
+    };
+    
+    // --- FUNKTION 3: Liste leeren ---
+    clearListBtn.addEventListener('click', () => {
+        keywordList = [];
+        updateKeywordDisplay();
+        silasResponseContainer.style.display = 'none'; // Ergebnis-Box ausblenden
+    });
+
+    // --- FUNKTION 4: Die große Massenproduktion starten ---
+    startGenerationBtn.addEventListener('click', async () => {
+        if (keywordList.length === 0) {
+            alert('Bitte füge zuerst mindestens ein Keyword zur Liste hinzu.');
+            return;
+        }
 
         // UI für den Ladezustand vorbereiten
         silasStatus.innerText = "Starte die Massenproduktion...";
         silasStatus.classList.add('thinking');
         silasResponseContainer.style.display = 'none';
-        submitButton.disabled = true;
-        silasKeywordTextarea.disabled = true;
+        startGenerationBtn.disabled = true;
+        clearListBtn.disabled = true;
         allGeneratedData = [];
 
         // Schleife, die für jedes Keyword eine Landingpage generiert
-        for (let i = 0; i < keywords.length; i++) {
-            const keyword = keywords[i];
-            silasStatus.innerText = `[${i + 1}/${keywords.length}] Generiere Landingpage für: "${keyword}"...`;
+        for (let i = 0; i < keywordList.length; i++) {
+            const keyword = keywordList[i];
+            silasStatus.innerText = `[${i + 1}/${keywordList.length}] Generiere Landingpage für: "${keyword}"...`;
 
             try {
-                // Der "Master-Prompt" bleibt derselbe, nur das Keyword wird dynamisch eingesetzt
                 const prompt = `
 # DEINE ROLLE
-Du bist ein weltweit führender Experte für SEO-Content-Strategie...
-// ... (der gesamte, lange Master-Prompt von der vorherigen Nachricht kommt hier rein) ...
+Du bist ein weltweit führender Experte für SEO-Content-Strategie und Texterstellung...
+// ... (der gesamte, lange Master-Prompt kommt hier rein) ...
 # ZIEL
 Erstelle einen vollständigen Text von ca. 500-600 Wörtern zum Thema "${keyword}".
 // ... (der Rest des Prompts bleibt ebenfalls unverändert) ...
@@ -55,33 +91,29 @@ Erstelle einen vollständigen Text von ca. 500-600 Wörtern zum Thema "${keyword
                 if (!jsonMatch || !jsonMatch[1]) throw new Error(`Ungültige Antwort für "${keyword}"`);
                 
                 const jsonData = JSON.parse(jsonMatch[1]);
-                
-                // Füge das Keyword zum Ergebnis hinzu und speichere es
                 allGeneratedData.push({ ...jsonData, Keyword: keyword });
 
             } catch (error) {
                 console.error(error);
-                // Wenn ein Fehler auftritt, fügen wir eine leere Zeile hinzu, damit der Prozess weiterläuft
                 allGeneratedData.push({ error: `Fehler bei der Generierung für "${keyword}"` });
-                continue; // Mache mit dem nächsten Keyword weiter
+                continue;
             }
         }
 
         // UI nach Abschluss aktualisieren
         silasStatus.innerText = "";
         silasStatus.classList.remove('thinking');
-        submitButton.disabled = false;
-        silasKeywordTextarea.disabled = false;
+        startGenerationBtn.disabled = false;
+        clearListBtn.disabled = false;
         
         const successCount = allGeneratedData.filter(d => !d.error).length;
-        silasResponseContent.innerHTML = `
-            <p><strong>${successCount} von ${keywords.length} Landingpages erfolgreich erstellt!</strong></p>
-            <p>Die CSV-Datei mit allen Inhalten steht jetzt zum Download bereit.</p>
-        `;
+        silasResponseContent.innerHTML = `<p><strong>${successCount} von ${keywordList.length} Landingpages erfolgreich erstellt!</strong></p>`;
         silasResponseContainer.style.display = 'block';
     });
 
+    // --- FUNKTION 5: CSV-Download (unverändert) ---
     downloadCsvButton.addEventListener('click', () => {
+        // ... (Die Logik für den CSV-Download von der vorherigen Nachricht bleibt hier exakt gleich) ...
         if (allGeneratedData.length === 0) {
             alert("Bitte zuerst Content generieren!");
             return;
@@ -95,7 +127,6 @@ Erstelle einen vollständigen Text von ca. 500-600 Wörtern zum Thema "${keyword
         let csvContent = headers.join(",") + "\n";
 
         allGeneratedData.forEach(rowData => {
-            // Überspringe Zeilen, bei denen ein Fehler aufgetreten ist
             if (rowData.error) return;
 
             const postContent = (rowData.content_sections || [])
