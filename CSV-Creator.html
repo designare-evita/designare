@@ -56,19 +56,18 @@ Er zaubert dir passende Titel, Beschreibungen und Textblöcke – direkt als CSV
                 <div class="ai-container">
  <h3><span style="color: #ffffff;">Silas</span> Content Küche</h2>
     <form id="silas-form">
-        <input type="text" id="silas-keyword" placeholder="Gib dein Keyword ein..." autocomplete="off" required>
+        <textarea id="silas-keyword-list" placeholder="Gib hier deine Keywords ein, eines pro Zeile..." rows="5" required></textarea>
         <button type="submit" aria-label="Frage senden"><i class="fas fa-paper-plane"></i></button>
     </form>
-    <p id="silas-status"></p>
+    <p id="silas-status" style="text-align: center; width: 100%;"></p>
     <div id="silas-response-container" style="display: none; margin-top: 1rem; text-align: left;">
-        <h3>Erstellter Content:</h3>
+        <h3>Erstellung abgeschlossen!</h3>
         <div id="silas-response-content" style="background-color: rgba(255,255,255,0.05); border-radius: 5px; padding: 10px; margin-bottom: 1rem;"></div>
         <button id="download-csv" class="cta-button">
             <i class="fas fa-download"></i> CSV Herunterladen
         </button>
     </div>
-</div>
-            </div>       
+</div>   
         </main>
     </div>
 	
