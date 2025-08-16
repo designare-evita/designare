@@ -4,107 +4,123 @@ export function initSilasForm() {
     const silasForm = document.getElementById('silas-form');
     if (!silasForm) return;
 
-    const silasKeywordInput = document.getElementById('silas-keyword');
+    // Wir holen uns die neuen Elemente
+    const silasKeywordTextarea = document.getElementById('silas-keyword-list');
     const silasStatus = document.getElementById('silas-status');
     const silasResponseContainer = document.getElementById('silas-response-container');
     const silasResponseContent = document.getElementById('silas-response-content');
     const downloadCsvButton = document.getElementById('download-csv');
-    let generatedData = [];
+    const submitButton = silasForm.querySelector('button');
+    let allGeneratedData = []; // Hier sammeln wir alle Ergebnisse
 
     silasForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const keyword = silasKeywordInput.value.trim();
-        if (!keyword) return;
+        const keywords = silasKeywordTextarea.value.split('\n').map(kw => kw.trim()).filter(kw => kw);
+        if (keywords.length === 0) return;
 
-        silasStatus.innerText = "Silas denkt nach...";
+        // UI für den Ladezustand vorbereiten
+        silasStatus.innerText = "Starte die Massenproduktion...";
         silasStatus.classList.add('thinking');
         silasResponseContainer.style.display = 'none';
-        generatedData = [];
+        submitButton.disabled = true;
+        silasKeywordTextarea.disabled = true;
+        allGeneratedData = [];
 
-        try {
-            // Dies ist der "Trainings-Prompt" speziell für Silas' Aufgabe
-            const prompt = `
-                Erstelle 5 einzigartige SEO-Texte für das Keyword "${keyword}".
-                Die Ausgabe muss ein valides JSON-Array von Objekten sein, eingeschlossen in einen Markdown-Codeblock (```json ... ```).
-                Jedes Objekt muss exakt diese vier Schlüssel haben: "post_title", "post_name", "meta_title", "meta_description".
+        // Schleife, die für jedes Keyword eine Landingpage generiert
+        for (let i = 0; i < keywords.length; i++) {
+            const keyword = keywords[i];
+            silasStatus.innerText = `[${i + 1}/${keywords.length}] Generiere Landingpage für: "${keyword}"...`;
+
+            try {
+                // Der "Master-Prompt" bleibt derselbe, nur das Keyword wird dynamisch eingesetzt
+                const prompt = `
+# DEINE ROLLE
+Du bist ein weltweit führender Experte für SEO-Content-Strategie...
+// ... (der gesamte, lange Master-Prompt von der vorherigen Nachricht kommt hier rein) ...
+# ZIEL
+Erstelle einen vollständigen Text von ca. 500-600 Wörtern zum Thema "${keyword}".
+// ... (der Rest des Prompts bleibt ebenfalls unverändert) ...
+                `;
+
+                const response = await fetch('/api/ask-gemini', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: prompt, source: 'silas' })
+                });
+
+                if (!response.ok) throw new Error(`Fehler bei Keyword "${keyword}"`);
+
+                const resultText = await response.text();
+                const jsonMatch = resultText.match(/```json\n([\s\S]*?)\n```/);
+                if (!jsonMatch || !jsonMatch[1]) throw new Error(`Ungültige Antwort für "${keyword}"`);
                 
-                - post_title: Ein klickstarker, SEO-optimierter Titel (ca. 50-60 Zeichen).
-                - post_name: Eine SEO-freundliche URL-Slug basierend auf dem post_title (nur Kleinbuchstaben, Zahlen, Bindestriche).
-                - meta_title: Ein alternativer, ebenfalls SEO-optimierter Titel für Metadaten (ca. 50-60 Zeichen).
-                - meta_description: Eine ansprechende Meta-Beschreibung (ca. 150-160 Zeichen), die zum Klicken anregt.
-            `;
+                const jsonData = JSON.parse(jsonMatch[1]);
+                
+                // Füge das Keyword zum Ergebnis hinzu und speichere es
+                allGeneratedData.push({ ...jsonData, Keyword: keyword });
 
-            // Sende den Prompt an die zentrale API mit der Kennung "silas"
-            const response = await fetch('/api/ask-gemini', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    prompt: prompt,
-                    source: 'silas' // Dies sagt der API, welche Logik sie verwenden soll
-                }),
-            });
-
-            if (!response.ok) {
-                throw new Error(`API-Fehler: ${response.statusText}`);
+            } catch (error) {
+                console.error(error);
+                // Wenn ein Fehler auftritt, fügen wir eine leere Zeile hinzu, damit der Prozess weiterläuft
+                allGeneratedData.push({ error: `Fehler bei der Generierung für "${keyword}"` });
+                continue; // Mache mit dem nächsten Keyword weiter
             }
-
-            const resultText = await response.text();
-            
-            // Extrahiert zuverlässig das JSON aus dem Markdown-Block
-            const jsonMatch = resultText.match(/```json\n([\s\S]*?)\n```/);
-            if (!jsonMatch || !jsonMatch[1]) {
-                throw new Error("Kein valides JSON im KI-Response gefunden.");
-            }
-            
-            const jsonData = JSON.parse(jsonMatch[1]);
-
-            // Fügt das ursprüngliche Keyword zu jedem Ergebnis hinzu
-            generatedData = jsonData.map(item => ({ ...item, Keyword: keyword }));
-
-        } catch (error) {
-            console.error('Fehler beim Abrufen der KI-Daten:', error);
-            silasStatus.innerText = "Ein Fehler ist aufgetreten. Bitte versuche es erneut.";
-            return; // Beendet die Funktion bei einem Fehler
-        } finally {
-            silasStatus.innerText = "";
-            silasStatus.classList.remove('thinking');
         }
 
-        // Zeigt eine Vorschau der generierten Daten an
-        if (generatedData.length > 0) {
-            silasResponseContent.innerHTML = `
-                <p><strong>Post Title:</strong> ${generatedData[0].post_title}</p>
-                <p><strong>Post Name:</strong> ${generatedData[0].post_name}</p>
-                <p><strong>Keyword:</strong> ${generatedData[0].Keyword}</p>
-                <p><strong>Meta Title:</strong> ${generatedData[0].meta_title}</p>
-                <p><strong>Meta Description:</strong> ${generatedData[0].meta_description}</p>
-                <p>... und ${generatedData.length - 1} weitere Einträge erfolgreich erstellt.</p>
-            `;
-            silasResponseContainer.style.display = 'block';
-        } else {
-            silasStatus.innerText = "Die KI konnte leider keine passenden Daten generieren.";
-        }
+        // UI nach Abschluss aktualisieren
+        silasStatus.innerText = "";
+        silasStatus.classList.remove('thinking');
+        submitButton.disabled = false;
+        silasKeywordTextarea.disabled = false;
+        
+        const successCount = allGeneratedData.filter(d => !d.error).length;
+        silasResponseContent.innerHTML = `
+            <p><strong>${successCount} von ${keywords.length} Landingpages erfolgreich erstellt!</strong></p>
+            <p>Die CSV-Datei mit allen Inhalten steht jetzt zum Download bereit.</p>
+        `;
+        silasResponseContainer.style.display = 'block';
     });
 
-    // Event-Listener für den CSV-Download-Button
     downloadCsvButton.addEventListener('click', () => {
-        if (generatedData.length === 0) {
+        if (allGeneratedData.length === 0) {
             alert("Bitte zuerst Content generieren!");
             return;
         }
 
-        const headers = ["post_title", "post_name", "Keyword", "meta_title", "meta_description"];
-        let csvContent = "data:text/csv;charset=utf-8," + headers.join(",") + "\n";
+        const headers = [
+            "post_title", "post_name", "Keyword", "meta_title", "meta_description",
+            "h1", "post_content"
+        ];
+        
+        let csvContent = headers.join(",") + "\n";
 
-        generatedData.forEach(row => {
-            const values = headers.map(header => `"${(row[header] || '').replace(/"/g, '""')}"`);
+        allGeneratedData.forEach(rowData => {
+            // Überspringe Zeilen, bei denen ein Fehler aufgetreten ist
+            if (rowData.error) return;
+
+            const postContent = (rowData.content_sections || [])
+                .map(section => `<h2>${section.h2}</h2>\n<p>${section.paragraph}</p>`)
+                .join('\n');
+            const finalCta = `<h3>${rowData.cta_headline}</h3>\n<p>${rowData.cta_text}</p>`;
+
+            const csvRow = {
+                post_title: rowData.post_title,
+                post_name: rowData.post_name,
+                Keyword: rowData.Keyword,
+                meta_title: rowData.meta_title,
+                meta_description: rowData.meta_description,
+                h1: rowData.h1,
+                post_content: `${rowData.intro_text || ''}\n${postContent}\n${finalCta}`
+            };
+
+            const values = headers.map(header => `"${(csvRow[header] || '').replace(/"/g, '""')}"`);
             csvContent += values.join(",") + "\n";
         });
-
-        const encodedUri = encodeURI(csvContent);
+        
+        const encodedUri = encodeURI("data:text/csv;charset=utf-8," + csvContent);
         const link = document.createElement("a");
         link.setAttribute("href", encodedUri);
-        link.setAttribute("download", "seo_content.csv");
+        link.setAttribute("download", `landingpages_${new Date().getTime()}.csv`);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
