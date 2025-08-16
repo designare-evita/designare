@@ -1,1 +1,84 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF--8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Silas: SEO Content Creator - designare</title>
+    <meta name="description" content="Erstellen Sie SEO-optimierten Content und exportieren Sie ihn direkt als CSV-Datei mit unserem KI-Assistenten Silas.">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="artikel.css">
+    <link rel="stylesheet" href="ai-styles.css">
+    <link rel="icon" href="images/favicon.png" type="image/png">
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="index.html" class="logo">designare</a>
+            <ul>
+                <li><a href="index.html#leistungen">Leistungen</a></li>
+                <li><a href="index.html#ueber-mich">Über Mich</a></li>
+                <li><a href="index.html#kontakt">Kontakt</a></li>
+                <li><a href="KI-Integration-auf-Webseiten.html">Artikel</a></li>
+            </ul>
+            <div class="theme-switch-wrapper">
+                <label class="theme-switch" for="checkbox">
+                    <input type="checkbox" id="checkbox" />
+                    <div class="slider round"></div>
+                </label>
+            </div>
+        </nav>
+    </header>
 
+    <main>
+        <article class="article-content">
+            <header class="article-header">
+                <h1>Silas: Dein KI-Assistent für SEO-Content</h1>
+                <p class="article-meta">Veröffentlicht am 16. August 2025</p>
+            </header>
+
+            <picture>
+                <source srcset="images/KI-Assistenten-Performance.webp" type="image/webp">
+                <img src="images/KI-Assistenten-Performance.png" alt="KI SEO Content Erstellung" class="article-image">
+            </picture>
+
+            <p>Willkommen bei Silas, Ihrem intelligenten Werkzeug zur Erstellung von hochwertigem, SEO-optimiertem Content. Geben Sie einfach Ihr Thema oder Ihre Keywords ein, und Silas generiert für Sie passende Titel, Beschreibungen und Inhalte, die Sie direkt als CSV-Datei für Ihren Import herunterladen können.</p>
+
+            <div class="ai-interaction-container">
+                <h2>Content-Erstellung mit Silas</h2>
+                <p>Beschreiben Sie den gewünschten Inhalt. Nennen Sie zum Beispiel das Hauptkeyword, das Thema und die Zielgruppe.</p>
+                
+                <form id="silas-form" class="ai-form">
+                    <div class="form-group">
+                        <label for="user-prompt">Ihre Anweisung:</label>
+                        <textarea id="user-prompt" name="prompt" rows="4" placeholder="z.B. Erstelle mir 5 SEO-Texte zum Thema 'Nachhaltigkeit im Büro' für einen Blog."></textarea>
+                    </div>
+                    <div class="form-actions">
+                         <button type="submit" class="button-primary">Content generieren</button>
+                         <div class="loading-spinner" style="display: none;"></div>
+                    </div>
+                </form>
+                
+                <div id="silas-response" class="ai-response" style="display: none;">
+                    <h3>Generierter Content:</h3>
+                    <pre><code></code></pre>
+                    <a href="#" id="download-csv" class="button-secondary" style="display: none;">CSV Herunterladen</a>
+                </div>
+            </div>
+
+        </article>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2025 designare</p>
+            <ul>
+                <li><a href="impressum.html">Impressum</a></li>
+                <li><a href="datenschutz.html">Datenschutz</a></li>
+            </ul>
+        </div>
+    </footer>
+
+    <script src="js/theme.js"></script>
+    <script src="js/silas-form.js"></script>
+</body>
+</html>
