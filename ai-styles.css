@@ -31,3 +31,55 @@
     background-color: var(--primary-color-dark);
     border-color: rgb(231, 174, 0); /* Lässt den Rahmen beim Hovern heller leuchten */
 }
+
+/* Globale Stile für alle AI-Formulare */
+.ai-container form {
+    display: flex;
+    border-radius: 25px;
+    overflow: hidden;
+    border: 1px solid #444;
+    background-color: #2d2d2d;
+    transition: all 0.3s ease-in-out;
+}
+
+.ai-container form:hover,
+.ai-container form:focus-within {
+    border-color: #ffc107;
+    box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
+}
+
+.ai-container input[type="text"] {
+    flex-grow: 1;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    background-color: transparent;
+    color: #fff;
+}
+
+.ai-container input[type="text"]:focus {
+    outline: none;
+}
+
+.ai-container button {
+    background: transparent;
+    border: none;
+    color: #ffc107;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: color 0.3s ease;
+}
+
+.ai-container button:hover {
+    color: #fff;
+}
+
+/* Spezifische Anpassungen, falls nötig (optional) */
+#silas-form {
+    /* Hier könnten bei Bedarf spezifische Stile für Silas stehen */
+}
+
+#ai-form {
+    /* Hier könnten bei Bedarf spezifische Stile für Evita stehen */
+}
