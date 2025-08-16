@@ -182,7 +182,7 @@
     padding: 12px 25px;
     font-size: 1rem;
     font-weight: 600; /* Etwas fetter für mehr Präsenz */
-    border-radius: 50px; /* Vollständig abgerundete Ecken */
+    border-radius: 7px; /* Vollständig abgerundete Ecken */
     cursor: pointer;
     border: 2px solid; /* Vorbereitung für den Rahmen */
     transition: all 0.3s ease;
