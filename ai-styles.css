@@ -159,3 +159,70 @@
     background-color: #333;
     color: #fff;
 }
+
+/* ============================================= */
+/* Verbessertes Button-Design für Silas-Steuerung */
+/* ============================================= */
+
+/* Container, der die Buttons zentriert und anordnet */
+.keyword-list-controls {
+    display: flex;
+    justify-content: center;
+    gap: 1rem; /* Abstand zwischen den Buttons */
+    margin-top: 1.5rem;
+    flex-wrap: wrap; /* Sorgt für Umbruch auf kleinen Bildschirmen */
+}
+
+/* Allgemeiner Stil für ALLE Call-to-Action-Buttons in diesem Bereich */
+.keyword-list-controls .cta-button,
+#silas-response-container .cta-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 25px;
+    font-size: 1rem;
+    font-weight: 600; /* Etwas fetter für mehr Präsenz */
+    border-radius: 50px; /* Vollständig abgerundete Ecken */
+    cursor: pointer;
+    border: 2px solid; /* Vorbereitung für den Rahmen */
+    transition: all 0.3s ease;
+    text-decoration: none; /* Entfernt Unterstreichungen von a-Tags */
+}
+
+.keyword-list-controls .cta-button .fas,
+#silas-response-container .cta-button .fas {
+    margin-right: 10px; /* Abstand zwischen Icon und Text */
+}
+
+/* Primärer Button-Stil (Content erstellen & Download) */
+.keyword-list-controls .cta-button,
+#silas-response-container .cta-button {
+    background-color: #ffc107; /* Goldener Hintergrund */
+    border-color: #ffc107;
+    color: #1a1a1a; /* Dunkler Text für besseren Kontrast */
+}
+
+/* Hover-Effekt für primäre Buttons */
+.keyword-list-controls .cta-button:hover,
+#silas-response-container .cta-button:hover {
+    background-color: #ffca2c;
+    border-color: #ffca2c;
+    color: #000;
+    transform: translateY(-2px); /* Leichter Schwebe-Effekt */
+    box-shadow: 0 4px 15px rgba(255, 193, 7, 0.2);
+}
+
+/* Sekundärer Button-Stil (Liste leeren) */
+.keyword-list-controls .cta-button.secondary {
+    background-color: transparent;
+    border-color: #555; /* Dunkelgrauer Rahmen */
+    color: #aaa; /* Hellerer grauer Text */
+}
+
+/* Hover-Effekt für sekundären Button */
+.keyword-list-controls .cta-button.secondary:hover {
+    background-color: #333;
+    border-color: #777;
+    color: #fff;
+    box-shadow: none; /* Kein Leuchten für den sekundären Button */
+}
