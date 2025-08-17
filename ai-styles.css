@@ -290,3 +290,10 @@
     color: #1a1a1a;
 }
 
+/* Korrektur für die volle Breite des Silas-Interfaces */
+.fraglich .ai-container,
+.fraglich .keyword-list-container {
+    max-width: none; /* Hebt die Breitenbeschränkung auf */
+    width: 100%;    /* Nutzt die volle verfügbare Breite */
+}
+
