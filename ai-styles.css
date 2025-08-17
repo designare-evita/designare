@@ -226,3 +226,65 @@
     color: #fff;
     box-shadow: none; /* Kein Leuchten für den sekundären Button */
 }
+
+/* ======================================== */
+/* Stile für die Silas Content-Vorschau   */
+/* ======================================== */
+
+.modal-content.preview-modal-content {
+    max-width: 800px; /* Breiteres Modal für bessere Lesbarkeit */
+    text-align: left;
+}
+
+#preview-content-area {
+    max-height: 70vh;
+    overflow-y: auto;
+    padding-right: 15px; /* Platz für die Scrollbar */
+}
+
+#preview-content-area h1 {
+    font-size: 2rem;
+    color: #ffc107;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+}
+
+#preview-content-area h2 {
+    font-size: 1.5rem;
+    color: #eee;
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+    border-bottom: 1px solid #444;
+    padding-bottom: 0.5rem;
+}
+
+#preview-content-area p {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #ccc;
+    margin-bottom: 1rem;
+}
+
+#preview-content-area h3 {
+    font-size: 1.2rem;
+    color: #ffc107;
+    margin-top: 2.5rem;
+}
+
+/* Stil für den kleinen Vorschau-Button in der Liste */
+.preview-button {
+    background-color: transparent;
+    border: 1px solid #555;
+    color: #aaa;
+    padding: 5px 10px;
+    font-size: 0.8rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.preview-button:hover {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: #1a1a1a;
+}
