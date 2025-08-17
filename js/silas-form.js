@@ -4,22 +4,36 @@ export function initSilasForm() {
     const silasForm = document.getElementById('silas-form');
     if (!silasForm) return;
 
-    // Alle DOM-Elemente holen
+    // Alle DOM-Elemente holen, inklusive der neuen Modal-Elemente
     const keywordInput = document.getElementById('silas-keyword-input');
     const keywordDisplayList = document.getElementById('keyword-display-list');
     const startGenerationBtn = document.getElementById('start-generation-btn');
     const clearListBtn = document.getElementById('clear-list-btn');
-    
     const silasStatus = document.getElementById('silas-status');
     const silasResponseContainer = document.getElementById('silas-response-container');
     const silasResponseContent = document.getElementById('silas-response-content');
     const downloadCsvButton = document.getElementById('download-csv');
+    
+    // NEU: Elemente für das Vorschau-Modal
+    const previewModal = document.getElementById('silas-preview-modal');
+    const closePreviewModalBtn = document.getElementById('close-preview-modal');
+    const previewContentArea = document.getElementById('preview-content-area');
 
-    // Speicher für unsere Keywords und Ergebnisse
     let keywordList = [];
     let allGeneratedData = [];
 
-    // --- FUNKTION 1: Keyword zur Liste hinzufügen ---
+    // --- FUNKTIONEN FÜR DIE VORSCHAU ---
+    const openPreviewModal = () => previewModal.classList.add('visible');
+    const closePreviewModal = () => previewModal.classList.remove('visible');
+
+    closePreviewModalBtn.addEventListener('click', closePreviewModal);
+    previewModal.addEventListener('click', (e) => {
+        if (e.target === previewModal) {
+            closePreviewModal();
+        }
+    });
+
+    // --- FUNKTION: Keyword zur Liste hinzufügen ---
     silasForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const keyword = keywordInput.value.trim();
@@ -31,45 +45,70 @@ export function initSilasForm() {
         keywordInput.focus();
     });
 
-    // --- FUNKTION 2: Die Keyword-Anzeige aktualisieren ---
+    // --- FUNKTION: Die Keyword-Anzeige aktualisieren ---
     const updateKeywordDisplay = () => {
         keywordDisplayList.innerHTML = '';
-        keywordList.forEach(kw => {
+        keywordList.forEach((kw, index) => {
             const li = document.createElement('li');
-            li.textContent = kw;
+            
+            const keywordText = document.createElement('span');
+            keywordText.textContent = kw;
+            li.appendChild(keywordText);
+            
+            // Prüfen, ob für dieses Keyword bereits Content existiert
+            const generatedContent = allGeneratedData.find(data => data.Keyword === kw && !data.error);
+            if (generatedContent) {
+                const previewBtn = document.createElement('button');
+                previewBtn.textContent = 'Vorschau';
+                previewBtn.className = 'preview-button';
+                previewBtn.onclick = () => showPreview(generatedContent);
+                li.appendChild(previewBtn);
+            }
+            
             keywordDisplayList.appendChild(li);
         });
     };
     
-    // --- FUNKTION 3: Liste leeren ---
+    // --- FUNKTION: Zeigt den Content im Modal an ---
+    const showPreview = (content) => {
+        previewContentArea.innerHTML = `
+            <h1>${content.h1}</h1>
+            <p>${content.intro_text}</p>
+            ${content.content_sections.map(section => `
+                <h2>${section.h2}</h2>
+                <p>${section.paragraph}</p>
+            `).join('')}
+            <h3>${content.cta_headline}</h3>
+            <p>${content.cta_text}</p>
+        `;
+        openPreviewModal();
+    };
+    
+    // --- FUNKTION: Liste leeren ---
     clearListBtn.addEventListener('click', () => {
         keywordList = [];
+        allGeneratedData = []; // Auch die generierten Daten löschen
         updateKeywordDisplay();
-        silasResponseContainer.style.display = 'none'; // Ergebnis-Box ausblenden
+        silasResponseContainer.style.display = 'none';
     });
 
-    // --- FUNKTION 4: Die große Massenproduktion starten ---
+    // --- FUNKTION: Massenproduktion starten ---
     startGenerationBtn.addEventListener('click', async () => {
+        // ... (Die Logik für die Massenproduktion von der vorherigen Nachricht bleibt hier exakt gleich)
         if (keywordList.length === 0) {
             alert('Bitte füge zuerst mindestens ein Keyword zur Liste hinzu.');
             return;
         }
-
-        // UI für den Ladezustand vorbereiten
         silasStatus.innerText = "Starte die Massenproduktion...";
         silasStatus.classList.add('thinking');
         silasResponseContainer.style.display = 'none';
         startGenerationBtn.disabled = true;
         clearListBtn.disabled = true;
         allGeneratedData = [];
-
-        // Schleife, die für jedes Keyword eine Landingpage generiert
         for (let i = 0; i < keywordList.length; i++) {
             const keyword = keywordList[i];
-            silasStatus.innerText = `[${i + 1}/${keywordList.length}] Generiere Landingpage für: "${keyword}"...`;
-
+            silasStatus.innerText = `[${i + 1}/${keywordList.length}] Generiere Content für: "${keyword}"...`;
             try {
-                // --- VOLLSTÄNDIGER MASTER-PROMPT ---
                 const prompt = `
 # DEINE ROLLE
 Du bist ein weltweit führender Experte für SEO-Content-Strategie und Texterstellung. Deine Aufgabe ist es, den gesamten Inhalt für eine professionelle, SEO-optimierte und überzeugende Landingpage zu erstellen, die für ein WordPress-Plugin über einen CSV-Import verwendet wird.
@@ -133,56 +172,42 @@ Führe diese Anweisungen exakt aus.
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ prompt: prompt, source: 'silas' })
                 });
-
-                if (!response.ok) throw new Error(`Fehler bei Keyword "${keyword}"`);
-
+                if (!response.ok) throw new Error(`API-Fehler`);
                 const resultText = await response.text();
                 const jsonMatch = resultText.match(/```json\n([\s\S]*?)\n```/);
-                if (!jsonMatch || !jsonMatch[1]) throw new Error(`Ungültige Antwort für "${keyword}"`);
-                
+                if (!jsonMatch || !jsonMatch[1]) throw new Error(`Ungültige JSON-Antwort`);
                 const jsonData = JSON.parse(jsonMatch[1]);
                 allGeneratedData.push({ ...jsonData, Keyword: keyword });
-
             } catch (error) {
-                console.error(error);
-                allGeneratedData.push({ error: `Fehler bei der Generierung für "${keyword}"` });
+                allGeneratedData.push({ error: `Fehler bei "${keyword}"`, Keyword: keyword });
                 continue;
             }
         }
-
-        // UI nach Abschluss aktualisieren
         silasStatus.innerText = "";
         silasStatus.classList.remove('thinking');
         startGenerationBtn.disabled = false;
         clearListBtn.disabled = false;
-        
         const successCount = allGeneratedData.filter(d => !d.error).length;
-        silasResponseContent.innerHTML = `<p><strong>${successCount} von ${keywordList.length} Content Themen erfolgreich erstellt!</strong></p>`;
+        silasResponseContent.innerHTML = `<p><strong>${successCount} von ${keywordList.length} Contentthemen erfolgreich erstellt!</strong></p>`;
         silasResponseContainer.style.display = 'block';
+
+        // Nach der Generierung die Liste aktualisieren, um die Vorschau-Buttons anzuzeigen
+        updateKeywordDisplay(); 
     });
 
-    // --- FUNKTION 5: CSV-Download ---
+    // --- FUNKTION: CSV-Download (unverändert) ---
     downloadCsvButton.addEventListener('click', () => {
+        // ... (Die Logik für den CSV-Download bleibt exakt gleich)
         if (allGeneratedData.length === 0) {
             alert("Bitte zuerst Content generieren!");
             return;
         }
-
-        const headers = [
-            "post_title", "post_name", "Keyword", "meta_title", "meta_description",
-            "h1", "post_content"
-        ];
-        
+        const headers = ["post_title", "post_name", "Keyword", "meta_title", "meta_description", "h1", "post_content"];
         let csvContent = headers.join(",") + "\n";
-
         allGeneratedData.forEach(rowData => {
             if (rowData.error) return;
-
-            const postContent = (rowData.content_sections || [])
-                .map(section => `<h2>${section.h2}</h2>\n<p>${section.paragraph}</p>`)
-                .join('\n');
+            const postContent = (rowData.content_sections || []).map(section => `<h2>${section.h2}</h2>\n<p>${section.paragraph}</p>`).join('\n');
             const finalCta = `<h3>${rowData.cta_headline}</h3>\n<p>${rowData.cta_text}</p>`;
-
             const csvRow = {
                 post_title: rowData.post_title,
                 post_name: rowData.post_name,
@@ -192,11 +217,9 @@ Führe diese Anweisungen exakt aus.
                 h1: rowData.h1,
                 post_content: `${rowData.intro_text || ''}\n${postContent}\n${finalCta}`
             };
-
             const values = headers.map(header => `"${(csvRow[header] || '').replace(/"/g, '""')}"`);
             csvContent += values.join(",") + "\n";
         });
-        
         const encodedUri = encodeURI("data:text/csv;charset=utf-8," + csvContent);
         const link = document.createElement("a");
         link.setAttribute("href", encodedUri);
