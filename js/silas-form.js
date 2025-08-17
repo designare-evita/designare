@@ -48,10 +48,7 @@ export function initSilasForm() {
             const keywordText = document.createElement('span');
             keywordText.textContent = kw;
             li.appendChild(keywordText);
-            
-            // KORREKTUR HIER: 'data.keyword' (kleingeschrieben) wird verwendet, um die Daten zu finden
             const generatedContent = allGeneratedData.find(data => data.keyword === kw && !data.error);
-            
             if (generatedContent) {
                 const previewBtn = document.createElement('button');
                 previewBtn.textContent = 'Vorschau';
@@ -63,19 +60,48 @@ export function initSilasForm() {
         });
     };
     
-    // --- FUNKTION: Zeigt eine KURATIERTE Vorschau im Modal an ---
+    // =================================================================
+    // ÜBERARBEITETE VORSCHAU-FUNKTION (ZEIGT ALLES AN)
+    // =================================================================
     const showPreview = (content) => {
         previewContentArea.innerHTML = `
             <h1>${content.h1}</h1>
             <p><em>${content.hero_subtext}</em></p>
             <p>${content.hero_text}</p>
-            <h2>Vorteile</h2>
+
+            <h2>${content.h2_1}</h2>
+            <h3>Vorteile</h3>
             ${content.benefits_list}
-            <h2>Kundenstimme</h2>
+            <h3>Merkmale</h3>
+            ${content.features_list}
+
+            <h2>${content.h2_2}</h2>
+            <p>${content.social_proof}</p>
             <blockquote>"${content.testimonial_1}"</blockquote>
-            <h2>FAQ</h2>
-            <h3>${content.faq_1}</h3>
+            <blockquote>"${content.testimonial_2}"</blockquote>
+
+            <h2>${content.h2_3}</h2>
+            <h3>${content.pricing_title}</h3>
+            <ul>
+                <li>${content.price_1}</li>
+                <li>${content.price_2}</li>
+                <li>${content.price_3}</li>
+            </ul>
+
+            <h2>${content.h2_4}</h2>
+            <h3>Häufig gestellte Fragen (FAQ)</h3>
+            <h4>${content.faq_1}</h4>
             <p>${content.faq_answer_1}</p>
+            <h4>${content.faq_2}</h4>
+            <p>${content.faq_answer_2}</p>
+            <h4>${content.faq_3}</h4>
+            <p>${content.faq_answer_3}</p>
+
+            <hr>
+            <p><strong>Kontakt:</strong> ${content.contact_info}</p>
+            <p><strong>Garantie:</strong> ${content.guarantee_text}</p>
+            <p><strong>Vertrauen:</strong> ${content.trust_signals}</p>
+            <h3>${content.footer_cta}</h3>
         `;
         openPreviewModal();
     };
@@ -87,7 +113,7 @@ export function initSilasForm() {
         silasResponseContainer.style.display = 'none';
     });
 
-    // --- DIE MASSENPRODUKTION ---
+    // --- DIE MASSENPRODUKTION (unverändert) ---
     startGenerationBtn.addEventListener('click', async () => {
         if (keywordList.length === 0) {
             alert('Bitte füge zuerst mindestens ein Keyword zur Liste hinzu.');
@@ -106,7 +132,6 @@ export function initSilasForm() {
             silasStatus.innerText = `[${i + 1}/${keywordList.length}] Generiere Content für: "${keyword}"...`;
 
             try {
-                // Der Master-Prompt für die 33 Spalten bleibt unverändert
                 const prompt = `
 # HAUPTAUFGABE
 Erstelle den gesamten Textinhalt für eine professionelle Landingpage zum Thema "${keyword}". Konzentriere dich zu 100% auf das Thema.
