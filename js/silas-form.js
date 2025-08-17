@@ -48,7 +48,10 @@ export function initSilasForm() {
             const keywordText = document.createElement('span');
             keywordText.textContent = kw;
             li.appendChild(keywordText);
-            const generatedContent = allGeneratedData.find(data => data.keyword === kw && !data.error);
+            
+            // KORRIGIERTE SUCHE: Findet jetzt auch Keywords mit Leerzeichen zuverlässig
+            const generatedContent = allGeneratedData.find(data => data.keyword && data.keyword.trim() === kw.trim() && !data.error);
+            
             if (generatedContent) {
                 const previewBtn = document.createElement('button');
                 previewBtn.textContent = 'Vorschau';
@@ -60,9 +63,7 @@ export function initSilasForm() {
         });
     };
     
-    // =================================================================
-    // ÜBERARBEITETE VORSCHAU-FUNKTION (ZEIGT ALLES AN)
-    // =================================================================
+    // --- FUNKTION: Vollständige Vorschau im Modal ---
     const showPreview = (content) => {
         previewContentArea.innerHTML = `
             <h1>${content.h1}</h1>
