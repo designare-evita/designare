@@ -49,8 +49,12 @@ export function initSilasForm() {
             keywordText.textContent = kw;
             li.appendChild(keywordText);
             
-            // KORRIGIERTE SUCHE: Findet jetzt auch Keywords mit Leerzeichen zuverlässig
-            const generatedContent = allGeneratedData.find(data => data.keyword && data.keyword.trim() === kw.trim() && !data.error);
+            // FINALE KORREKTUR: Vergleich auf Kleinschreibung umgestellt
+            const generatedContent = allGeneratedData.find(data => 
+                data.keyword && 
+                data.keyword.trim().toLowerCase() === kw.trim().toLowerCase() && 
+                !data.error
+            );
             
             if (generatedContent) {
                 const previewBtn = document.createElement('button');
@@ -69,18 +73,15 @@ export function initSilasForm() {
             <h1>${content.h1}</h1>
             <p><em>${content.hero_subtext}</em></p>
             <p>${content.hero_text}</p>
-
             <h2>${content.h2_1}</h2>
             <h3>Vorteile</h3>
             ${content.benefits_list}
             <h3>Merkmale</h3>
             ${content.features_list}
-
             <h2>${content.h2_2}</h2>
             <p>${content.social_proof}</p>
             <blockquote>"${content.testimonial_1}"</blockquote>
             <blockquote>"${content.testimonial_2}"</blockquote>
-
             <h2>${content.h2_3}</h2>
             <h3>${content.pricing_title}</h3>
             <ul>
@@ -88,7 +89,6 @@ export function initSilasForm() {
                 <li>${content.price_2}</li>
                 <li>${content.price_3}</li>
             </ul>
-
             <h2>${content.h2_4}</h2>
             <h3>Häufig gestellte Fragen (FAQ)</h3>
             <h4>${content.faq_1}</h4>
@@ -97,7 +97,6 @@ export function initSilasForm() {
             <p>${content.faq_answer_2}</p>
             <h4>${content.faq_3}</h4>
             <p>${content.faq_answer_3}</p>
-
             <hr>
             <p><strong>Kontakt:</strong> ${content.contact_info}</p>
             <p><strong>Garantie:</strong> ${content.guarantee_text}</p>
