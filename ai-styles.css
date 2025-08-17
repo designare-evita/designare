@@ -291,9 +291,9 @@
 }
 
 /* Korrektur für die volle Breite des Silas-Interfaces */
-.fraglich .ai-container,
-.fraglich .keyword-list-container {
-    max-width: none; /* Hebt die Breitenbeschränkung auf */
-    width: 100%;    /* Nutzt die volle verfügbare Breite */
+.performance-tip .ai-container,
+.performance-tip .keyword-list-container {
+    max-width: none !important; /* Hebt die Breitenbeschränkung auf */
+    width: 100% !important;    /* Nutzt die volle verfügbare Breite */
 }
 
