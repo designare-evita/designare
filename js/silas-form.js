@@ -48,7 +48,10 @@ export function initSilasForm() {
             const keywordText = document.createElement('span');
             keywordText.textContent = kw;
             li.appendChild(keywordText);
+            
+            // KORREKTUR HIER: 'data.keyword' (kleingeschrieben) wird verwendet, um die Daten zu finden
             const generatedContent = allGeneratedData.find(data => data.keyword === kw && !data.error);
+            
             if (generatedContent) {
                 const previewBtn = document.createElement('button');
                 previewBtn.textContent = 'Vorschau';
@@ -103,9 +106,7 @@ export function initSilasForm() {
             silasStatus.innerText = `[${i + 1}/${keywordList.length}] Generiere Content f체r: "${keyword}"...`;
 
             try {
-                // =================================================================
-                // NEUER, EXTREM DETAILLIERTER MASTER-PROMPT
-                // =================================================================
+                // Der Master-Prompt f체r die 33 Spalten bleibt unver채ndert
                 const prompt = `
 # HAUPTAUFGABE
 Erstelle den gesamten Textinhalt f체r eine professionelle Landingpage zum Thema "${keyword}". Konzentriere dich zu 100% auf das Thema.
@@ -185,11 +186,10 @@ Das JSON-Objekt muss exakt die folgenden 33 Schl체ssel haben. F체lle jeden Schl�
         updateKeywordDisplay(); 
     });
 
-    // --- CSV-DOWNLOAD (Komplett 체berarbeitet f체r die 33 Spalten) ---
+    // --- CSV-DOWNLOAD (unver채ndert) ---
     downloadCsvButton.addEventListener('click', () => {
         if (allGeneratedData.length === 0) return;
         
-        // Definiert die exakte Reihenfolge der Spalten in der CSV
         const headers = [
             "keyword", "post_title", "post_name", "meta_title", "meta_description", "h1",
             "h2_1", "h2_2", "h2_3", "h2_4", "primary_cta", "secondary_cta", "hero_text",
@@ -203,10 +203,8 @@ Das JSON-Objekt muss exakt die folgenden 33 Schl체ssel haben. F체lle jeden Schl�
 
         allGeneratedData.forEach(rowData => {
             if (rowData.error) return;
-
             const values = headers.map(header => {
-                const value = rowData[header] || ''; // Stellt sicher, dass leere Felder als leere Strings behandelt werden
-                // Umschlie횩t den Wert in Anf체hrungszeichen und escaped bestehende Anf체hrungszeichen
+                const value = rowData[header] || '';
                 return `"${String(value).replace(/"/g, '""')}"`;
             });
             csvContent += values.join(",") + "\n";
