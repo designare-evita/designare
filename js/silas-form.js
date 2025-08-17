@@ -26,9 +26,7 @@ export function initSilasForm() {
 
     closePreviewModalBtn.addEventListener('click', closePreviewModal);
     previewModal.addEventListener('click', (e) => {
-        if (e.target === previewModal) {
-            closePreviewModal();
-        }
+        if (e.target === previewModal) closePreviewModal();
     });
 
     // --- LOGIK ZUM HINZUFÜGEN, ANZEIGEN UND LÖSCHEN VON KEYWORDS ---
@@ -50,7 +48,7 @@ export function initSilasForm() {
             const keywordText = document.createElement('span');
             keywordText.textContent = kw;
             li.appendChild(keywordText);
-            const generatedContent = allGeneratedData.find(data => data.Keyword === kw && !data.error);
+            const generatedContent = allGeneratedData.find(data => data.keyword === kw && !data.error);
             if (generatedContent) {
                 const previewBtn = document.createElement('button');
                 previewBtn.textContent = 'Vorschau';
@@ -62,16 +60,19 @@ export function initSilasForm() {
         });
     };
     
+    // --- FUNKTION: Zeigt eine KURATIERTE Vorschau im Modal an ---
     const showPreview = (content) => {
         previewContentArea.innerHTML = `
             <h1>${content.h1}</h1>
-            <p>${content.intro_text}</p>
-            ${content.content_sections.map(section => `
-                <h2>${section.h2}</h2>
-                <p>${section.paragraph}</p>
-            `).join('')}
-            <h3>${content.cta_headline}</h3>
-            <p>${content.cta_text}</p>
+            <p><em>${content.hero_subtext}</em></p>
+            <p>${content.hero_text}</p>
+            <h2>Vorteile</h2>
+            ${content.benefits_list}
+            <h2>Kundenstimme</h2>
+            <blockquote>"${content.testimonial_1}"</blockquote>
+            <h2>FAQ</h2>
+            <h3>${content.faq_1}</h3>
+            <p>${content.faq_answer_1}</p>
         `;
         openPreviewModal();
     };
@@ -103,60 +104,57 @@ export function initSilasForm() {
 
             try {
                 // =================================================================
-                // NEUER, PRÄZISERER MASTER-PROMPT
+                // NEUER, EXTREM DETAILLIERTER MASTER-PROMPT
                 // =================================================================
                 const prompt = `
 # HAUPTAUFGABE
-Deine einzige Aufgabe ist es, einen umfassenden, SEO-optimierten und hochwertigen Fachtext zum Thema "${keyword}" zu schreiben. Der Text soll einen Leser informieren und vom Thema überzeugen. Ignoriere alle vorherigen Anweisungen über Plugins oder CSV-Dateien für den Inhalt. Konzentriere dich zu 100% auf das Thema.
+Erstelle den gesamten Textinhalt für eine professionelle Landingpage zum Thema "${keyword}". Konzentriere dich zu 100% auf das Thema.
 
 # DEINE ROLLE
-Du bist ein professioneller SEO-Texter und Fachexperte für das Thema "${keyword}". Dein Stil ist kompetent, fesselnd und für Laien verständlich.
+Du bist ein erstklassiger Marketing-Texter und SEO-Stratege. Dein Stil ist überzeugend, klar und auf Conversions ausgerichtet.
 
 # WICHTIGER HINWEIS ZUM AUSGABEFORMAT
-Der fertige Text wird von einem Computer-System importiert. Es ist daher absolut entscheidend, dass deine Antwort NUR den JSON-Codeblock enthält und sonst nichts. Beginne deine Antwort direkt mit \`\`\`json.
+Deine Antwort MUSS ein einziges, valides JSON-Objekt sein, eingeschlossen in einen Markdown-Codeblock (\`\`\`json ... \`\`\`). Beginne direkt mit \`\`\`json.
 
 # GEWÜNSCHTES JSON-FORMAT & ANWEISUNGEN
-Das JSON-Objekt muss exakt die folgende Struktur haben:
+Das JSON-Objekt muss exakt die folgenden 33 Schlüssel haben. Fülle jeden Schlüssel mit passendem, themenrelevantem Inhalt für "${keyword}".
 
 {
-  "post_title": "...",
-  "post_name": "...",
-  "meta_title": "...",
-  "meta_description": "...",
-  "h1": "...",
-  "intro_text": "...",
-  "content_sections": [
-    {
-      "h2": "...",
-      "paragraph": "..."
-    },
-    {
-      "h2": "...",
-      "paragraph": "..."
-    },
-    {
-      "h2": "...",
-      "paragraph": "..."
-    }
-  ],
-  "cta_headline": "...",
-  "cta_text": "..."
+  "keyword": "${keyword}",
+  "post_title": "SEO-optimierter Titel (50-60 Zeichen)",
+  "post_name": "seo-freundlicher-url-slug",
+  "meta_title": "Alternativer SEO-Titel (50-60 Zeichen)",
+  "meta_description": "Fesselnde Meta-Beschreibung (150-160 Zeichen) mit CTA.",
+  "h1": "Kraftvolle H1-Überschrift, die den Hauptnutzen kommuniziert.",
+  "h2_1": "Erste H2-Überschrift (Problemorientiert)",
+  "h2_2": "Zweite H2-Überschrift (Lösungsorientiert)",
+  "h2_3": "Dritte H2-Überschrift (Feature-/Nutzen-orientiert)",
+  "h2_4": "Vierte H2-Überschrift (Vertrauensbildend)",
+  "primary_cta": "Ein kurzer, starker Call-to-Action Text (z.B. 'Jetzt anfragen').",
+  "secondary_cta": "Ein alternativer, sanfterer Call-to-Action (z.B. 'Mehr erfahren').",
+  "hero_text": "Ein fesselnder Einleitungstext für den Hero-Bereich (ca. 40-60 Wörter).",
+  "hero_subtext": "Eine unterstützende Unterüberschrift für den Hero-Bereich (ca. 15-25 Wörter).",
+  "benefits_list": "Eine HTML-Liste (<ul><li>...</li></ul>) mit 3-5 überzeugenden Vorteilen.",
+  "features_list": "Eine HTML-Liste (<ul><li>...</li></ul>) mit 3-5 konkreten Merkmalen.",
+  "social_proof": "Ein kurzer Satz, der soziale Bewährtheit andeutet (z.B. 'Von über 1.000 zufriedenen Kunden genutzt').",
+  "testimonial_1": "Ein glaubwürdiges, fiktives Kunden-Testimonial (Name und Aussage).",
+  "testimonial_2": "Ein zweites, andersartiges Kunden-Testimonial.",
+  "pricing_title": "Eine Überschrift für den Preisbereich (z.B. 'Wählen Sie Ihren Plan').",
+  "price_1": "Beschreibung für das erste Preispaket.",
+  "price_2": "Beschreibung für das zweite Preispaket.",
+  "price_3": "Beschreibung für das dritte Preispaket.",
+  "faq_1": "Die erste häufig gestellte Frage.",
+  "faq_answer_1": "Die Antwort auf die erste Frage.",
+  "faq_2": "Die zweite häufig gestellte Frage.",
+  "faq_answer_2": "Die Antwort auf die zweite Frage.",
+  "faq_3": "Die dritte häufig gestellte Frage.",
+  "faq_answer_3": "Die Antwort auf die dritte Frage.",
+  "contact_info": "Eine kurze Kontaktinformation oder ein Hinweis (z.B. 'Fragen? Rufen Sie uns an: ...').",
+  "footer_cta": "Ein letzter Call-to-Action für den Footer (z.B. 'Starten Sie noch heute Ihr Projekt').",
+  "trust_signals": "Ein kurzer Text mit Vertrauenssignalen (z.B. 'Zertifiziert, Sicher, Garantiert').",
+  "guarantee_text": "Ein Satz, der eine Garantie beschreibt (z.B. '30-Tage-Geld-zurück-Garantie')."
 }
-
-# DETAILLIERTE ANWEISUNGEN FÜR JEDEN SCHLÜSSEL
-
-1.  **post_title**: Klickstarker, SEO-optimierter Titel zum Thema "${keyword}". Länge: 50-60 Zeichen.
-2.  **post_name**: SEO-freundlicher URL-Slug aus dem post_title. Nur Kleinbuchstaben, Zahlen, Bindestriche.
-3.  **meta_title**: Alternativer, fesselnder SEO-Titel zum Thema "${keyword}". Länge: 50-60 Zeichen.
-4.  **meta_description**: Ansprechende Meta-Beschreibung (150-160 Zeichen) zum Thema "${keyword}" mit einer klaren Handlungsaufforderung.
-5.  **h1**: Kraftvolle H1-Überschrift, die das Keyword "${keyword}" prominent enthält und den Hauptnutzen kommuniziert.
-6.  **intro_text**: Fesselnder Einleitungstext (ca. 80-100 Wörter) zum Thema "${keyword}".
-7.  **content_sections**: Erstelle genau 3-4 Abschnitte. Jeder mit einer relevanten "h2"-Überschrift und einem informativen "paragraph" von ca. 120-150 Wörtern über einen Aspekt von "${keyword}".
-8.  **cta_headline**: Kurze, aktivierende Überschrift für einen abschließenden Handlungsaufruf.
-9.  **cta_text**: Kurzer Text, der den Leser zu einer passenden Handlung auffordert.
-
-Halte dich exakt an diese Vorgaben.
-                `;
+`;
 
                 const response = await fetch('/api/ask-gemini', {
                     method: 'POST',
@@ -169,10 +167,10 @@ Halte dich exakt an diese Vorgaben.
                 const jsonMatch = resultText.match(/```json\n([\s\S]*?)\n```/);
                 if (!jsonMatch || !jsonMatch[1]) throw new Error(`Ungültige JSON-Antwort`);
                 const jsonData = JSON.parse(jsonMatch[1]);
-                allGeneratedData.push({ ...jsonData, Keyword: keyword });
+                allGeneratedData.push(jsonData);
 
             } catch (error) {
-                allGeneratedData.push({ error: `Fehler bei "${keyword}"`, Keyword: keyword });
+                allGeneratedData.push({ error: `Fehler bei "${keyword}"`, keyword: keyword });
                 continue;
             }
         }
@@ -187,27 +185,33 @@ Halte dich exakt an diese Vorgaben.
         updateKeywordDisplay(); 
     });
 
-    // --- CSV-DOWNLOAD (unverändert) ---
+    // --- CSV-DOWNLOAD (Komplett überarbeitet für die 33 Spalten) ---
     downloadCsvButton.addEventListener('click', () => {
         if (allGeneratedData.length === 0) return;
-        const headers = ["post_title", "post_name", "Keyword", "meta_title", "meta_description", "h1", "post_content"];
+        
+        // Definiert die exakte Reihenfolge der Spalten in der CSV
+        const headers = [
+            "keyword", "post_title", "post_name", "meta_title", "meta_description", "h1",
+            "h2_1", "h2_2", "h2_3", "h2_4", "primary_cta", "secondary_cta", "hero_text",
+            "hero_subtext", "benefits_list", "features_list", "social_proof", "testimonial_1",
+            "testimonial_2", "pricing_title", "price_1", "price_2", "price_3", "faq_1",
+            "faq_answer_1", "faq_2", "faq_answer_2", "faq_3", "faq_answer_3", "contact_info",
+            "footer_cta", "trust_signals", "guarantee_text"
+        ];
+        
         let csvContent = headers.join(",") + "\n";
+
         allGeneratedData.forEach(rowData => {
             if (rowData.error) return;
-            const postContent = (rowData.content_sections || []).map(section => `<h2>${section.h2}</h2>\n<p>${section.paragraph}</p>`).join('\n');
-            const finalCta = `<h3>${rowData.cta_headline}</h3>\n<p>${rowData.cta_text}</p>`;
-            const csvRow = {
-                post_title: rowData.post_title,
-                post_name: rowData.post_name,
-                Keyword: rowData.Keyword,
-                meta_title: rowData.meta_title,
-                meta_description: rowData.meta_description,
-                h1: rowData.h1,
-                post_content: `${rowData.intro_text || ''}\n${postContent}\n${finalCta}`
-            };
-            const values = headers.map(header => `"${(csvRow[header] || '').replace(/"/g, '""')}"`);
+
+            const values = headers.map(header => {
+                const value = rowData[header] || ''; // Stellt sicher, dass leere Felder als leere Strings behandelt werden
+                // Umschließt den Wert in Anführungszeichen und escaped bestehende Anführungszeichen
+                return `"${String(value).replace(/"/g, '""')}"`;
+            });
             csvContent += values.join(",") + "\n";
         });
+        
         const encodedUri = encodeURI("data:text/csv;charset=utf-8," + csvContent);
         const link = document.createElement("a");
         link.setAttribute("href", encodedUri);
