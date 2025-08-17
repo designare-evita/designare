@@ -256,6 +256,7 @@
     margin-bottom: 0.75rem;
     border-bottom: 1px solid #444;
     padding-bottom: 0.5rem;
+    text-align: left !important;
 }
 
 #preview-content-area p {
@@ -289,6 +290,3 @@
     color: #1a1a1a;
 }
 
-#preview-content-area h2 {
-    text-align: left; /* Überschreibt die Zentrierung */
-}
