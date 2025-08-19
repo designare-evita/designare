@@ -94,6 +94,13 @@ line-height: 1.2; /* Sorgt für die gleiche Zeilenhöhe wie der Text */
     color: var(--accent-color);
 }
 
+/* --- Styling für den aktiven Menüpunkt --- */
+
+.side-menu-content li.active a {
+    color: var(--accent-color);
+}
+
+
 /* --- FINALE & EINHEITLICHE KORREKTUR FÜR ALLE HEADER-ICONS --- */
 
 /* 1. Ein gemeinsamer Grundstil für ALLE Buttons rechts im Header */
