@@ -8,6 +8,24 @@ import { initSilasForm } from './silas-form.js';
 
 document.addEventListener('DOMContentLoaded', function() {
     
+// --- Code für das neue Page-Menü ---
+const menuToggleButton = document.getElementById('menu-toggle-button');
+const pageMenuOverlay = document.getElementById('page-menu-overlay');
+
+if (menuToggleButton && pageMenuOverlay) {
+    menuToggleButton.addEventListener('click', () => {
+        menuToggleButton.classList.toggle('is-active');
+        pageMenuOverlay.classList.toggle('is-active');
+    });
+
+    // Optional: Menü schließen, wenn ein Link geklickt wird
+    pageMenuOverlay.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+            menuToggleButton.classList.remove('is-active');
+            pageMenuOverlay.classList.remove('is-active');
+        });
+    });
+
     // Initialisiert alle importierten Module
     initEffects();
     initTypewriters();
@@ -17,3 +35,4 @@ initSilasForm();
 
     console.log("Alle Module erfolgreich initialisiert.");
 });
+}
