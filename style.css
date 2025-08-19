@@ -88,6 +88,7 @@ line-height: 1.6;
     font-weight: 700;
     transition: all 0.3s ease; /* Übergang für Farbe UND Hintergrund */
     border-radius: 5px; /* Abgerundete Ecken für den Hintergrund */
+line-height: 1.6; 
 }
 
 /* 2. Kombinierter Stil für den aktiven UND den Hover-Zustand */
