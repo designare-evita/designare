@@ -24,23 +24,6 @@ a {
 
 /* --- Styling für das neue Slide-in Menü --- */
 
-/* Allgemeiner Stil für beide Bilder */
-.side-menu-image {
-    width: 65%; 
-    height: auto; /* Behält das korrekte Seitenverhältnis bei */
-    border-radius: 10px; /* Leichte Abrundung der Ecken, sieht moderner aus. Kannst du entfernen für scharfe Kanten. */
-    margin: 0 auto; /* Zentriert die Bilder */
-}
-
-/* Spezifische Abstände */
-.side-menu .top-image {
-    margin-bottom: 30px; /* Abstand nach unten zur Navigation */
-}
-
-.side-menu .bottom-image {
-    margin-top: auto; 
-    margin-bottom: 20px;
-}
 
 .side-menu {
  padding-top: 80px;
@@ -96,7 +79,7 @@ display: flex;
 
 .side-menu-content a {
     color: #fff;
-    font-size: 1.8rem;
+    font-size: 2.2rem;
     font-weight: 600;
     padding: 5px 10px;
     transition: color 0.3s ease;
