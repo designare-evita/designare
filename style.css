@@ -98,6 +98,10 @@ line-height: 1.0;
     background-color: rgba(51, 51, 51, 0.25); 
 }
 
+.side-menu-content li.multi-line a {
+    line-height: 1; 
+}
+
 /* --- FINALE & EINHEITLICHE KORREKTUR FÜR ALLE HEADER-ICONS --- */
 
 /* 1. Ein gemeinsamer Grundstil für ALLE Buttons rechts im Header */
