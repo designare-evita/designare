@@ -66,6 +66,7 @@ padding-bottom: 20px;
 .side-menu-content li {
     display: flex; /* Macht das li zum Flex-Container */
     align-items: baseline; /* KORREKTUR: Richtet an der Text-Grundlinie aus */
+line-height: 1.6; 
 }
 
 /* 4. Der statische Listenpunkt (der Bindestrich) */
