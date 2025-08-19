@@ -8,7 +8,7 @@
     position: fixed;
     top: 0;
     right: 0;
-    width: 300px; /* Breite des Menüs */
+    width: 500px; /* Breite des Menüs */
     max-width: 80%; /* Maximalbreite auf kleinen Bildschirmen */
     height: 100%;
     background-color: #1a1a21; /* Dunkler Hintergrund, passt zum Stil */
@@ -61,6 +61,7 @@ text-decoration: none;
 .side-menu-content a:hover {
     color: #fff;
 background-color: #FCB500;
+text-decoration: none;
 }
 
 /* --- FINALE & EINHEITLICHE KORREKTUR FÜR ALLE HEADER-ICONS --- */
