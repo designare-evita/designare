@@ -33,6 +33,26 @@ if (menuToggleButton && sideMenuPanel && closeMenuButton) {
     });
 }
 
+// --- Setzt den aktiven Menüpunkt ---
+function setActiveMenuItem() {
+    const currentPageUrl = window.location.pathname;
+    const menuLinks = document.querySelectorAll('.side-menu-content li a');
+
+    menuLinks.forEach(link => {
+        // Holt den Pfad aus dem href-Attribut des Links
+        const linkPath = new URL(link.href).pathname;
+
+        // Wenn der Pfad des Links mit dem der aktuellen Seite übereinstimmt
+        if (linkPath === currentPageUrl) {
+            // Füge die 'active'-Klasse zum übergeordneten <li>-Element hinzu
+            link.parentElement.classList.add('active');
+        }
+    });
+}
+
+// Rufe die Funktion auf, um den aktiven Link zu setzen
+setActiveMenuItem();
+
     // Initialisiert alle importierten Module
     initEffects();
     initTypewriters();
