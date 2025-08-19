@@ -61,18 +61,20 @@
     color: var(--primary-color, #00ffff); /* Deine Akzentfarbe */
 }
 
-#menu-toggle-button {
+.header-right-controls button {
     background-color: transparent;
     border: none;
-    padding: 0; /* Entfernt Standard-Abstände */
+    padding: 0;
     cursor: pointer;
-    color: white; /* Setzt die Farbe des Icons auf weiß */
-    font-size: 1.5rem; /* Passt die Größe an die anderen Icons an */
-    line-height: 1; /* Verhindert zusätzlichen vertikalen Abstand */
+    color: white; /* Weiße Icons */
+    font-size: 1.5rem; /* Einheitliche Größe */
+    line-height: 1;
+    transition: color 0.3s ease; /* Sanfter Hover-Effekt */
 }
 
-#menu-toggle-button:hover {
-    color: var(--primary-color, #00ffff); /* Deine Akzentfarbe für den Hover-Effekt */
+/* Hover-Effekt für alle Icon-Buttons */
+.header-right-controls button:hover {
+    color: var(--primary-color, #00ffff); /* Deine Akzentfarbe */
 }
 
 /* NEU: Angepasste Fallback-Schriftart zur Vermeidung von Layout-Shifts */
