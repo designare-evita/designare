@@ -65,18 +65,7 @@ a {
     color:  #FCB500;
 }
 
-.side-menu-content a i {
-    transition: transform 0.3s ease, color 0.3s ease;
-    font-size: 1.3rem;
-    width: 25px;
-    text-align: center;
-}
 
-/* Das Pulsieren beim Hover */
-.side-menu-content a:hover i {
-    transform: scale(1.3); /* Icon wird größer */
-    color: var(--accent-color); /* Leuchtet in deiner Akzentfarbe */
-}
 
 /* --- FINALE & EINHEITLICHE KORREKTUR FÜR ALLE HEADER-ICONS --- */
 
