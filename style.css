@@ -44,11 +44,7 @@ padding-bottom: 20px;
     line-height: 1;
 }
 
-/* Der Inhalt (die Links) */
-/* --- NEUES STYLING: Menü als Liste mit blinkendem Listenpunkt --- */
-
-/* Grund-Styling für die Liste selbst */
-/* --- FINALE KORREKTUR für das Menü als Liste --- */
+/* --- FINALE KORREKTUR für das Menü als Liste (mit Zeilenumbruch) --- */
 
 /* 1. Der Hauptcontainer, der die Liste vertikal zentriert */
 .side-menu-content {
@@ -60,48 +56,43 @@ padding-bottom: 20px;
 
 /* 2. Die Liste selbst */
 .side-menu-content ul {
-    list-style: none; /* Entfernt die Standard-Listenpunkte */
+    list-style: none;
     padding: 0;
     margin: 0;
     width: 100%;
 }
 
-/* 3. Jeder einzelne Listenpunkt */
+/* 3. Jeder einzelne Listenpunkt (li) wird zum Flex-Container */
 .side-menu-content li {
-    position: relative;
-    padding-left: 25px; /* Schafft Platz für unseren blinkenden Cursor */
+    display: flex; /* Macht das li zum Flex-Container */
+    align-items: flex-start; /* Richtet den Listenpunkt oben an der ersten Zeile aus */
 }
 
-/* 4. Der blinkende Cursor als Listenpunkt */
+/* 4. Der statische Listenpunkt (der Bindestrich) */
 .side-menu-content li::before {
-    content: '-'; /* Das Zeichen, das blinken soll */
+    content: '-'; /* Das Zeichen */
     color: #FCB500; /* Deine Akzentfarbe */
     font-weight: 700;
-    
-    position: absolute;
-    left: 0;
-    /* Vertikale Zentrierung des Cursors zur Textzeile */
-    top: 50%;
-    transform: translateY(-50%);
-
+    padding-right: 15px; /* Abstand zum Text */
+    line-height: 1.6; /* Sorgt für die gleiche Zeilenhöhe wie der Text */
+}
 
 /* 5. Der Link-Text in der Liste */
 .side-menu-content li a {
-    display: block;
-    padding: 12px 0; /* Vertikaler Abstand zwischen den Links */
+    flex-grow: 1; /* Der Link füllt den restlichen Platz */
+    padding: 12px 0;
     color: #fff;
     text-decoration: none;
     font-size: 2.5rem;
     font-weight: 700;
+    line-height: 1.6; /* Wichtig für die korrekte Ausrichtung */
     transition: color 0.3s ease;
 }
 
-/* 6. Der Hover-Effekt für die Links */
+/* 6. Der Hover-Effekt */
 .side-menu-content li a:hover {
     color: var(--accent-color);
 }
-
-
 
 /* --- FINALE & EINHEITLICHE KORREKTUR FÜR ALLE HEADER-ICONS --- */
 
