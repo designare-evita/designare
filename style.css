@@ -30,9 +30,6 @@ padding-bottom: 20px;
     transform: translateX(0); /* Sichtbar machen */
 }
 
-.side-menu .side-menu-content {
-    margin-top: 0;
-}
 
 /* Der Schließen-Button (das "X") */
 .side-menu .close-button {
@@ -48,31 +45,59 @@ padding-bottom: 20px;
 }
 
 /* Der Inhalt (die Links) */
-.side-menu-content {
-    margin-top: 0px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start; /* Links sollen linksbündig sein */
-flex-grow: 1; 
-display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
+/* --- NEUES STYLING: Menü als Liste mit blinkendem Listenpunkt --- */
 
-.side-menu-content a {
-    color: #fff;
-    font-size: 2.2rem;
-    font-weight: 600;
-    padding: 5px 10px;
-    transition: color 0.3s ease;
+/* Grund-Styling für die Liste selbst */
+.side-menu-content ul {
+    list-style: none; /* Entfernt die Standard-Listenpunkte */
+    padding: 0;
+    margin: 0;
     width: 100%;
-    text-align: left;
 }
 
-.side-menu-content a:hover {
-    color:  #FCB500;
+/* Styling für jeden einzelnen Listenpunkt (li) */
+.side-menu-content li {
+    position: relative; /* Wichtig für die Positionierung des Listenpunkts */
+    padding-left: 25px; /* Schafft Platz für unseren blinkenden Cursor */
 }
 
+/* Der blinkende Cursor als Listenpunkt (Pseudo-Element) */
+.side-menu-content li::before {
+    content: '-'; /* Das Zeichen, das blinken soll */
+    color: #FCB500; /* Deine Akzentfarbe */
+    font-weight: 700;
+    
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%); /* Zentriert den Cursor vertikal */
+
+    /* Wendet die bestehende Blink-Animation an */
+    animation: blink-animation 1.2s infinite;
+}
+
+/* Styling für den eigentlichen Link-Text */
+.side-menu-content li a {
+    display: block; /* Sorgt dafür, dass der Link die ganze Zeile einnimmt */
+    padding: 12px 0; /* Vertikaler Abstand zwischen den Links */
+    color: #fff;
+    text-decoration: none;
+    font-size: 1.5rem;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.side-menu-content li a:hover {
+    color: var(--accent-color);
+}
+
+/* Die Blink-Animation (falls noch nicht vorhanden) */
+@keyframes blink-animation {
+  0% { opacity: 1; }
+  49% { opacity: 1; }
+  50% { opacity: 0; }
+  100% { opacity: 0; }
+}
 
 
 /* --- FINALE & EINHEITLICHE KORREKTUR FÜR ALLE HEADER-ICONS --- */
