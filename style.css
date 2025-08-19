@@ -46,6 +46,9 @@ padding-bottom: 20px;
 
 /* --- FINALE KORREKTUR für das Menü als Liste (mit Zeilenumbruch) --- */
 
+/* --- FINALE KORREKTUR für Menü-Layout & Abstände --- */
+
+/* 1. Der Hauptcontainer, der die Liste vertikal zentriert */
 .side-menu-content {
     flex-grow: 1; 
     display: flex;
@@ -60,9 +63,11 @@ padding-bottom: 20px;
     margin: 0;
 }
 
-/* 3. Jeder Listenpunkt bekommt einen AUSSEN-Abstand nach unten */
+/* 3. Jeder einzelne Listenpunkt */
 .side-menu-content li {
-    margin-bottom: 30px; /* <--- HIER stellst du den großen Abstand zwischen den Menüpunkten ein */
+    display: flex; /* Stellt die Flexbox-Basis für die Ausrichtung wieder her */
+    align-items: baseline; /* Richtet den Listenpunkt an der Text-Grundlinie aus */
+    margin-bottom: 20px; /* <--- Der große Abstand ZWISCHEN den Menüpunkten */
 }
 
 /* Letzter Listenpunkt braucht keinen Abstand nach unten */
@@ -70,28 +75,36 @@ padding-bottom: 20px;
     margin-bottom: 0;
 }
 
-/* 4. Der Link-Text in der Liste */
+/* 4. Der statische Listenpunkt (der Bindestrich) */
+.side-menu-content li::before {
+    content: '-';
+    color: #FCB500;
+    font-weight: 700;
+    padding-right: 15px; /* Abstand zum Text */
+}
+
+/* 5. Der Link-Text in der Liste */
 .side-menu-content li a {
-    display: inline-block; /* Wichtig für die korrekte Darstellung */
-    padding: 5px 10px; /* Kleiner Innenabstand für den Hintergrund-Effekt */
+    padding: 5px 10px;
     color: #fff;
     text-decoration: none;
     font-size: 1.5rem;
-    font-weight: 600;
-    line-height: 2; /* Standard-Zeilenhöhe für Einzeiler */
+    font-weight: 700;
+    line-height: 1.6; /* Standard-Zeilenhöhe */
     transition: all 0.3s ease;
     border-radius: 8px;
 }
 
-/* 5. Spezielle, kleinere Zeilenhöhe NUR für den Zweizeiler */
+/* 6. Kleinere Zeilenhöhe NUR für den Zweizeiler */
 .side-menu-content li.multi-line a {
-    line-height: 1.4; /* <--- HIER stellst du den kleinen Abstand für den Zweizeiler ein */
+    line-height: 1.2; /* <--- Der kleine Abstand INNERHALB des Zweizeilers */
 }
 
-/* 6. Kombinierter Stil für den aktiven UND den Hover-Zustand */
+/* 7. Kombinierter Stil für den aktiven UND den Hover-Zustand */
 .side-menu-content li.active a,
 .side-menu-content li a:hover {
     color: var(--accent-color);
+    background-color: rgba(255, 255, 255, 0.05);
 }
 
 /* --- FINALE & EINHEITLICHE KORREKTUR FÜR ALLE HEADER-ICONS --- */
