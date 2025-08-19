@@ -2,6 +2,10 @@
   Vereinfacht: Nur noch Dark Mode & Finaler Layout-Fix
 */
 
+a {
+    text-decoration: none !important;
+}
+
 /* --- Styling für das neue Slide-in Menü --- */
 
 .side-menu {
