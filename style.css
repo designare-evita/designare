@@ -38,28 +38,35 @@
     line-height: 1;
 }
 
-/* Der Inhalt (die Links) */
-.side-menu-content {
-    margin-top: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start; /* Links sollen linksbündig sein */
-}
+/* --- EINZIGARTIGER HOVER-EFFEKT FÜR DAS MENÜ --- */
 
 .side-menu-content a {
-    color: #fff;
-    text-decoration: none;
-    font-size: 1.4rem;
-    font-weight: 600;
-    padding: 15px 10px;
-    transition: color 0.3s ease;
+    position: relative;
+    overflow: hidden; /* Wichtig für den Scanline-Effekt */
+    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.2); /* Dünne Kontur für die Schrift */
+    color: transparent; /* Macht die Füllfarbe durchsichtig */
+}
+
+/* Die Scanline, die beim Hover erscheint */
+.side-menu-content a::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%; /* Startet außerhalb des Sichtfelds */
     width: 100%;
-    text-align: left;
+    height: 100%;
+    background: var(--accent-color, #FCB500); /* Deine Akzentfarbe */
+    transition: left 0.3s ease-in-out;
+    z-index: -1; /* Liegt hinter dem Text */
+}
+
+.side-menu-content a:hover::before {
+    left: 0; /* Bewegt die Scanline über den Text */
 }
 
 .side-menu-content a:hover {
-    color: #FCB500;
- text-decoration: none;
+    color: #1a1a21; /* Ändert die Textfarbe beim Hover, um sie lesbar zu machen */
+    -webkit-text-stroke: 0px; /* Entfernt die Kontur beim Hover */
 }
 
 /* --- FINALE & EINHEITLICHE KORREKTUR FÜR ALLE HEADER-ICONS --- */
