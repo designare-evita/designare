@@ -65,7 +65,7 @@ padding-bottom: 20px;
 /* 3. Jeder einzelne Listenpunkt (li) wird zum Flex-Container */
 .side-menu-content li {
     display: flex; /* Macht das li zum Flex-Container */
-    align-items: flex-start; /* Richtet den Listenpunkt oben an der ersten Zeile aus */
+    align-items: baseline; /* KORREKTUR: Richtet an der Text-Grundlinie aus */
 }
 
 /* 4. Der statische Listenpunkt (der Bindestrich) */
