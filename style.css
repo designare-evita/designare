@@ -84,9 +84,6 @@ padding-bottom: 20px;
     top: 50%;
     transform: translateY(-50%);
 
-    /* Die Blink-Animation */
-    animation: blink-animation 1.2s infinite;
-}
 
 /* 5. Der Link-Text in der Liste */
 .side-menu-content li a {
