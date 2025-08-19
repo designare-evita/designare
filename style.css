@@ -61,31 +61,45 @@
     color: var(--primary-color, #00ffff); /* Deine Akzentfarbe */
 }
 
-/* --- FINALE KORREKTUR für den Menü-Toggle-Button --- */
+/* --- FINALE & EINHEITLICHE KORREKTUR FÜR ALLE HEADER-ICONS --- */
 
-/* 1. Gib dem Menü-Button die gleiche Grundform wie den anderen Icons */
-#menu-toggle-button {
+/* 1. Ein gemeinsamer Grundstil für ALLE Buttons rechts im Header */
+.header-right-controls button {
     background: none;
     border: none;
+    padding: 0;
+    margin: 0;
     color: var(--text-color);
     cursor: pointer;
+    
+    /* Wichtig für die einheitliche Größe und Positionierung */
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.2rem;
     height: 40px;
     width: 40px;
+    font-size: 1.2rem;
+    
     opacity: 0.7;
     transition: all 0.3s ease;
-    padding: 0; /* WICHTIG: Kein Innenabstand */
-    border-radius: 0; /* WICHTIG: Keine runden Ecken */
 }
 
-/* 2. Definiere einen eigenen, sauberen Hover-Effekt NUR für den Menü-Button */
+/* 2. Der Hover-Effekt für die drei originalen Icons (mit rundem Hintergrund) */
+#contact-button:hover, 
+#cookie-info-button:hover, 
+#about-me-button:hover {
+    background-color: var(--accent-color);
+    color: #fff;
+    opacity: 1;
+    transform: scale(1.1);
+    border-radius: 50%; /* Nur hier die runden Ecken! */
+}
+
+/* 3. Der separate, saubere Hover-Effekt NUR für den Menü-Button */
 #menu-toggle-button:hover {
     opacity: 1;
     transform: scale(1.1);
-    color: var(--accent-color); /* Ändert nur die Farbe, nicht den Hintergrund */
+    color: var(--accent-color); /* Nur die Farbe ändern */
 }
 
 /* NEU: Angepasste Fallback-Schriftart zur Vermeidung von Layout-Shifts */
