@@ -78,28 +78,24 @@ padding-bottom: 20px;
 }
 
 /* 5. Der Link-Text in der Liste */
+/* 1. Styling für den Link-Text in der Liste */
 .side-menu-content li a {
-    flex-grow: 1; /* Der Link füllt den restlichen Platz */
-    padding: 12px 0;
+    display: block;
+    padding: 12px 15px; /* Etwas mehr seitliches Padding für den Hintergrund */
     color: #fff;
     text-decoration: none;
     font-size: 2.5rem;
     font-weight: 700;
-line-height: 1.2; /* Sorgt für die gleiche Zeilenhöhe wie der Text */
-    transition: color 0.3s ease;
+    transition: all 0.3s ease; /* Übergang für Farbe UND Hintergrund */
+    border-radius: 8px; /* Abgerundete Ecken für den Hintergrund */
 }
 
-/* 6. Der Hover-Effekt */
+/* 2. Kombinierter Stil für den aktiven UND den Hover-Zustand */
+.side-menu-content li.active a,
 .side-menu-content li a:hover {
     color: var(--accent-color);
+    background-color: rgba(255, 255, 255, 0.05); /* Sehr dezenter, heller Hintergrund */
 }
-
-/* --- Styling für den aktiven Menüpunkt --- */
-
-.side-menu-content li.active a {
-    color: var(--accent-color);
-}
-
 
 /* --- FINALE & EINHEITLICHE KORREKTUR FÜR ALLE HEADER-ICONS --- */
 
