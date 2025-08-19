@@ -66,7 +66,6 @@ padding-bottom: 20px;
 .side-menu-content li {
     display: flex; /* Macht das li zum Flex-Container */
     align-items: baseline; /* KORREKTUR: Richtet an der Text-Grundlinie aus */
-line-height: 1.0;
 }
 
 /* 4. Der statische Listenpunkt (der Bindestrich) */
@@ -75,7 +74,6 @@ line-height: 1.0;
     color: #FCB500; /* Deine Akzentfarbe */
     font-weight: 700;
     padding-right: 15px; /* Abstand zum Text */
-    line-height: 1.2; /* Sorgt für die gleiche Zeilenhöhe wie der Text */
 }
 
 /* 5. Der Link-Text in der Liste */
@@ -99,7 +97,7 @@ line-height: 1.0;
 }
 
 .side-menu-content li.multi-line a {
-    line-height: 1; 
+    line-height: 1.2; 
 }
 
 /* --- FINALE & EINHEITLICHE KORREKTUR FÜR ALLE HEADER-ICONS --- */
