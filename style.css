@@ -66,7 +66,7 @@ padding-bottom: 20px;
 .side-menu-content li {
     display: flex; /* Macht das li zum Flex-Container */
     align-items: baseline; /* KORREKTUR: Richtet an der Text-Grundlinie aus */
-line-height: 1.6; 
+line-height: 2; 
 }
 
 /* 4. Der statische Listenpunkt (der Bindestrich) */
@@ -88,7 +88,7 @@ line-height: 1.6;
     font-weight: 700;
     transition: all 0.3s ease; /* Übergang für Farbe UND Hintergrund */
     border-radius: 5px; /* Abgerundete Ecken für den Hintergrund */
-line-height: 1.6; 
+line-height: 2; 
 }
 
 /* 2. Kombinierter Stil für den aktiven UND den Hover-Zustand */
@@ -99,7 +99,7 @@ line-height: 1.6;
 }
 
 .side-menu-content li.multi-line a {
-    line-height: 1.4; 
+    line-height: 1.5; 
 }
 
 /* --- FINALE & EINHEITLICHE KORREKTUR FÜR ALLE HEADER-ICONS --- */
