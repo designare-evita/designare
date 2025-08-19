@@ -59,13 +59,10 @@ a {
     transition: color 0.3s ease;
     width: 100%;
     text-align: left;
-text-decoration: none;
 }
 
 .side-menu-content a:hover {
-    color: #fff;
-background-color: #FCB500;
-text-decoration: none;
+    color:  #FCB500;
 }
 
 /* --- FINALE & EINHEITLICHE KORREKTUR FÜR ALLE HEADER-ICONS --- */
