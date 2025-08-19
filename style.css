@@ -2,72 +2,63 @@
   Vereinfacht: Nur noch Dark Mode & Finaler Layout-Fix
 */
 
-/* --- Styling für das neue Page-Menü --- */
+/* --- Styling für das neue Slide-in Menü --- */
 
-/* Das Overlay selbst */
-.menu-overlay {
+.side-menu {
     position: fixed;
     top: 0;
-    left: 0;
-    width: 100%;
+    right: 0;
+    width: 300px; /* Breite des Menüs */
+    max-width: 80%; /* Maximalbreite auf kleinen Bildschirmen */
     height: 100%;
-    background-color: rgba(26, 26, 33, 0.85); /* Fester Wert für den Dark-Mode-Look */
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
+    background-color: #1a1a21; /* Dunkler Hintergrund, passt zum Stil */
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
+    z-index: 1002; /* Über allem anderen */
+    transform: translateX(100%); /* Standardmäßig außerhalb des Bildschirms */
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Weiche Animation */
     display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1001; /* Über dem Header */
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.4s ease, visibility 0.4s ease;
+    flex-direction: column;
+    padding: 60px 20px 20px;
 }
 
-.menu-overlay.is-active {
-    opacity: 1;
-    visibility: visible;
+.side-menu.is-active {
+    transform: translateX(0); /* Sichtbar machen */
 }
 
-/* Der Inhalt im Overlay */
-.overlay-content {
-    text-align: center;
+/* Der Schließen-Button (das "X") */
+.side-menu .close-button {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 2.5rem;
+    color: #fff;
+    background: none;
+    border: none;
+    cursor: pointer;
+    line-height: 1;
 }
 
-.overlay-content a {
-    display: block;
-    color: #fff; /* Fester Wert für Lesbarkeit auf dunklem Grund */
-    font-size: clamp(1.8rem, 5vw, 2.5rem); /* Responsive Schriftgröße */
-    font-weight: 600;
-    margin: 20px 0;
+/* Der Inhalt (die Links) */
+.side-menu-content {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Links sollen linksbündig sein */
+}
+
+.side-menu-content a {
+    color: #fff;
     text-decoration: none;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.3s ease, transform 0.3s ease, color 0.3s ease;
+    font-size: 1.5rem;
+    font-weight: 500;
+    padding: 15px 10px;
+    transition: color 0.3s ease;
+    width: 100%;
+    text-align: left;
 }
 
-.overlay-content a:hover {
-    color: var(--primary-color, #00ffff); /* Nutzt deine Primärfarbe für den Hover */
-}
-
-
-/* Gestaffelte Animation für die Links */
-.menu-overlay.is-active .overlay-content a {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.menu-overlay.is-active .overlay-content a:nth-child(1) { transition-delay: 0.2s; }
-.menu-overlay.is-active .overlay-content a:nth-child(2) { transition-delay: 0.3s; }
-.menu-overlay.is-active .overlay-content a:nth-child(3) { transition-delay: 0.4s; }
-.menu-overlay.is-active .overlay-content a:nth-child(4) { transition-delay: 0.5s; }
-
-/* Styling für das neue Menü-Icon, damit es zu den anderen passt */
-#menu-toggle-button i {
-    transition: transform 0.3s ease-in-out;
-}
-
-#menu-toggle-button.is-active i {
-    transform: rotate(90deg); /* Kleiner Effekt für den Klick */
+.side-menu-content a:hover {
+    color: var(--primary-color, #00ffff); /* Deine Akzentfarbe */
 }
 
 /* NEU: Angepasste Fallback-Schriftart zur Vermeidung von Layout-Shifts */
