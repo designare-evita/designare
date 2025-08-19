@@ -61,6 +61,20 @@
     color: var(--primary-color, #00ffff); /* Deine Akzentfarbe */
 }
 
+#menu-toggle-button {
+    background-color: transparent;
+    border: none;
+    padding: 0; /* Entfernt Standard-Abstände */
+    cursor: pointer;
+    color: white; /* Setzt die Farbe des Icons auf weiß */
+    font-size: 1.5rem; /* Passt die Größe an die anderen Icons an */
+    line-height: 1; /* Verhindert zusätzlichen vertikalen Abstand */
+}
+
+#menu-toggle-button:hover {
+    color: var(--primary-color, #00ffff); /* Deine Akzentfarbe für den Hover-Effekt */
+}
+
 /* NEU: Angepasste Fallback-Schriftart zur Vermeidung von Layout-Shifts */
 @font-face {
   font-family: 'Poppins Fallback';
