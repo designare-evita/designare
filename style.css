@@ -76,10 +76,9 @@ padding-bottom: 20px;
 
 .side-menu-content a {
     color: #fff;
-    text-decoration: none;
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     font-weight: 600;
-    padding: 15px 10px;
+    padding: 5px 10px;
     transition: color 0.3s ease;
     width: 100%;
     text-align: left;
