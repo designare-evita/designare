@@ -10,7 +10,7 @@ a {
 
 /* Allgemeiner Stil für beide Bilder */
 .side-menu-image {
-    width: 80%; 
+    width: 65%; 
     height: auto; /* Behält das korrekte Seitenverhältnis bei */
     border-radius: 10px; /* Leichte Abrundung der Ecken, sieht moderner aus. Kannst du entfernen für scharfe Kanten. */
     margin: 0 auto; /* Zentriert die Bilder */
