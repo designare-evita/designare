@@ -8,24 +8,30 @@ import { initSilasForm } from './silas-form.js';
 
 document.addEventListener('DOMContentLoaded', function() {
 
-    // --- Code für das neue Page-Menü ---
-    const menuToggleButton = document.getElementById('menu-toggle-button');
-    const pageMenuOverlay = document.getElementById('page-menu-overlay');
+   // --- Code für das neue Slide-in Menü ---
+const menuToggleButton = document.getElementById('menu-toggle-button');
+const sideMenuPanel = document.getElementById('side-menu-panel');
+const closeMenuButton = document.getElementById('close-menu-button');
 
-    if (menuToggleButton && pageMenuOverlay) {
-        menuToggleButton.addEventListener('click', () => {
-            menuToggleButton.classList.toggle('is-active');
-            pageMenuOverlay.classList.toggle('is-active');
-        });
+if (menuToggleButton && sideMenuPanel && closeMenuButton) {
 
-        // Optional: Menü schließen, wenn ein Link geklickt wird
-        pageMenuOverlay.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', () => {
-                menuToggleButton.classList.remove('is-active');
-                pageMenuOverlay.classList.remove('is-active');
-            });
+    // Menü öffnen
+    menuToggleButton.addEventListener('click', () => {
+        sideMenuPanel.classList.add('is-active');
+    });
+
+    // Menü mit dem "X" schließen
+    closeMenuButton.addEventListener('click', () => {
+        sideMenuPanel.classList.remove('is-active');
+    });
+
+    // Menü schließen, wenn ein Link geklickt wird
+    sideMenuPanel.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+            sideMenuPanel.classList.remove('is-active');
         });
-    } // Die if-Abfrage endet hier korrekterweise
+    });
+}
 
     // Initialisiert alle importierten Module
     initEffects();
