@@ -70,7 +70,7 @@ padding-bottom: 20px;
 
 /* 4. Der statische Listenpunkt (der Bindestrich) */
 .side-menu-content li::before {
-    content: '<i class="fa-solid fa-grip-lines"></i>'; /* Das Zeichen */
+    content: '-'; /* Das Zeichen */
     color: #FCB500; /* Deine Akzentfarbe */
     font-weight: 700;
     padding-right: 15px; /* Abstand zum Text */
