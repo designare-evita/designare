@@ -48,6 +48,17 @@ padding-bottom: 20px;
 /* --- NEUES STYLING: Menü als Liste mit blinkendem Listenpunkt --- */
 
 /* Grund-Styling für die Liste selbst */
+/* --- FINALE KORREKTUR für das Menü als Liste --- */
+
+/* 1. Der Hauptcontainer, der die Liste vertikal zentriert */
+.side-menu-content {
+    flex-grow: 1; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* 2. Die Liste selbst */
 .side-menu-content ul {
     list-style: none; /* Entfernt die Standard-Listenpunkte */
     padding: 0;
@@ -55,13 +66,13 @@ padding-bottom: 20px;
     width: 100%;
 }
 
-/* Styling für jeden einzelnen Listenpunkt (li) */
+/* 3. Jeder einzelne Listenpunkt */
 .side-menu-content li {
-    position: relative; /* Wichtig für die Positionierung des Listenpunkts */
+    position: relative;
     padding-left: 25px; /* Schafft Platz für unseren blinkenden Cursor */
 }
 
-/* Der blinkende Cursor als Listenpunkt (Pseudo-Element) */
+/* 4. Der blinkende Cursor als Listenpunkt */
 .side-menu-content li::before {
     content: '-'; /* Das Zeichen, das blinken soll */
     color: #FCB500; /* Deine Akzentfarbe */
@@ -69,36 +80,36 @@ padding-bottom: 20px;
     
     position: absolute;
     left: 0;
+    /* Vertikale Zentrierung des Cursors zur Textzeile */
     top: 50%;
-    transform: translateY(-50%); /* Zentriert den Cursor vertikal */
+    transform: translateY(-50%);
 
-    /* Wendet die bestehende Blink-Animation an */
+    /* Die Blink-Animation */
     animation: blink-animation 1.2s infinite;
 }
 
-/* Styling für den eigentlichen Link-Text */
+/* 5. Der Link-Text in der Liste */
 .side-menu-content li a {
-    display: block; /* Sorgt dafür, dass der Link die ganze Zeile einnimmt */
+    display: block;
     padding: 12px 0; /* Vertikaler Abstand zwischen den Links */
     color: #fff;
     text-decoration: none;
-    font-size: 1.5rem;
-    font-weight: 600;
+    font-size: 2.5rem;
+    font-weight: 700;
     transition: color 0.3s ease;
+    white-space: nowrap; /* Verhindert ungewollte Zeilenumbrüche */
 }
 
+/* 6. Der Hover-Effekt für die Links */
 .side-menu-content li a:hover {
     color: var(--accent-color);
 }
 
-/* Die Blink-Animation (falls noch nicht vorhanden) */
+/* 7. Die Blink-Animation (falls du sie noch nicht hast) */
 @keyframes blink-animation {
-  0% { opacity: 1; }
-  49% { opacity: 1; }
-  50% { opacity: 0; }
-  100% { opacity: 0; }
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
 }
-
 
 /* --- FINALE & EINHEITLICHE KORREKTUR FÜR ALLE HEADER-ICONS --- */
 
