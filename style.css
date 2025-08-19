@@ -89,7 +89,7 @@ padding-bottom: 20px;
     width: 100%; /* Wichtig, damit der Link die ganze Breite einnimmt */
     
     /* NEU: Vertikaler Abstand als Padding */
-    padding: 15px 10px; /* <--- HIER steuerst du den vertikalen Abstand */
+    padding: 25px 20px; /* <--- HIER steuerst du den vertikalen Abstand */
 }
 
 /* 6. Kleinere Zeilenhöhe NUR für den Zweizeiler */
