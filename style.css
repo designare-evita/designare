@@ -10,12 +10,10 @@ a {
 
 /* Allgemeiner Stil für beide Bilder */
 .side-menu-image {
-    width: 120px; /* Größe der Bilder */
-    height: 120px;
-    border-radius: 50%; /* Macht die Bilder rund */
-    object-fit: cover; /* Stellt sicher, dass das Bild den Kreis ausfüllt */
-    border: 3px solid var(--accent-color); /* Ein Rahmen in deiner Akzentfarbe */
-    margin: 0 auto; /* Zentriert die Bilder horizontal */
+    width: 100%; /* Nutzt die volle Breite des Menüs */
+    height: auto; /* Behält das korrekte Seitenverhältnis bei */
+    border-radius: 10px; /* Leichte Abrundung der Ecken, sieht moderner aus. Kannst du entfernen für scharfe Kanten. */
+    margin: 0 auto; /* Zentriert die Bilder */
 }
 
 /* Spezifische Abstände */
@@ -24,8 +22,8 @@ a {
 }
 
 .side-menu .bottom-image {
-    margin-top: auto; /* Schiebt das Bild ganz nach unten */
-    margin-bottom: 20px; /* Etwas Abstand zum unteren Rand */
+    margin-top: auto; 
+    margin-bottom: 20px;
 }
 
 .side-menu {
@@ -49,6 +47,10 @@ padding-bottom: 20px;
 
 .side-menu.is-active {
     transform: translateX(0); /* Sichtbar machen */
+}
+
+.side-menu .side-menu-content {
+    margin-top: 0;
 }
 
 /* Der Schließen-Button (das "X") */
