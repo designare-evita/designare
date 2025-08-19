@@ -84,7 +84,7 @@ line-height: 1.6;
     padding: 10px 10px; /* Etwas mehr seitliches Padding für den Hintergrund */
     color: #fff;
     text-decoration: none;
-    font-size: 2.5rem;
+    font-size: 2.5em;
     font-weight: 700;
     transition: all 0.3s ease; /* Übergang für Farbe UND Hintergrund */
     border-radius: 5px; /* Abgerundete Ecken für den Hintergrund */
