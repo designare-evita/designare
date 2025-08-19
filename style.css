@@ -8,7 +8,29 @@ a {
 
 /* --- Styling für das neue Slide-in Menü --- */
 
+/* Allgemeiner Stil für beide Bilder */
+.side-menu-image {
+    width: 120px; /* Größe der Bilder */
+    height: 120px;
+    border-radius: 50%; /* Macht die Bilder rund */
+    object-fit: cover; /* Stellt sicher, dass das Bild den Kreis ausfüllt */
+    border: 3px solid var(--accent-color); /* Ein Rahmen in deiner Akzentfarbe */
+    margin: 0 auto; /* Zentriert die Bilder horizontal */
+}
+
+/* Spezifische Abstände */
+.side-menu .top-image {
+    margin-bottom: 30px; /* Abstand nach unten zur Navigation */
+}
+
+.side-menu .bottom-image {
+    margin-top: auto; /* Schiebt das Bild ganz nach unten */
+    margin-bottom: 20px; /* Etwas Abstand zum unteren Rand */
+}
+
 .side-menu {
+ padding-top: 80px;
+padding-bottom: 20px;
     position: fixed;
     top: 0;
     right: 0;
@@ -44,7 +66,7 @@ a {
 
 /* Der Inhalt (die Links) */
 .side-menu-content {
-    margin-top: 20px;
+    margin-top: 0px;
     display: flex;
     flex-direction: column;
     align-items: flex-start; /* Links sollen linksbündig sein */
