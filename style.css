@@ -46,7 +46,6 @@ padding-bottom: 20px;
 
 /* --- FINALE KORREKTUR für das Menü als Liste (mit Zeilenumbruch) --- */
 
-/* 1. Der Hauptcontainer, der die Liste vertikal zentriert */
 .side-menu-content {
     flex-grow: 1; 
     display: flex;
@@ -59,47 +58,41 @@ padding-bottom: 20px;
     list-style: none;
     padding: 0;
     margin: 0;
-    width: 100%;
 }
 
-/* 3. Jeder einzelne Listenpunkt (li) wird zum Flex-Container */
+/* 3. Jeder Listenpunkt bekommt einen AUSSEN-Abstand nach unten */
 .side-menu-content li {
-    display: flex; /* Macht das li zum Flex-Container */
-    align-items: baseline; /* KORREKTUR: Richtet an der Text-Grundlinie aus */
-line-height: 2; 
+    margin-bottom: 20px; /* <--- HIER stellst du den großen Abstand zwischen den Menüpunkten ein */
 }
 
-/* 4. Der statische Listenpunkt (der Bindestrich) */
-.side-menu-content li::before {
-    content: ''; /* Das Zeichen */
-    color: #FCB500; /* Deine Akzentfarbe */
-    font-weight: 700;
-    padding-right: 15px; /* Abstand zum Text */
+/* Letzter Listenpunkt braucht keinen Abstand nach unten */
+.side-menu-content li:last-child {
+    margin-bottom: 0;
 }
 
-/* 5. Der Link-Text in der Liste */
-/* 1. Styling für den Link-Text in der Liste */
+/* 4. Der Link-Text in der Liste */
 .side-menu-content li a {
-    display: block;
-    padding: 10px 10px; /* Etwas mehr seitliches Padding für den Hintergrund */
+    display: inline-block; /* Wichtig für die korrekte Darstellung */
+    padding: 5px 10px; /* Kleiner Innenabstand für den Hintergrund-Effekt */
     color: #fff;
     text-decoration: none;
-    font-size: 2.5em;
-    font-weight: 700;
-    transition: all 0.3s ease; /* Übergang für Farbe UND Hintergrund */
-    border-radius: 5px; /* Abgerundete Ecken für den Hintergrund */
-line-height: 2; 
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 1.6; /* Standard-Zeilenhöhe für Einzeiler */
+    transition: all 0.3s ease;
+    border-radius: 8px;
 }
 
-/* 2. Kombinierter Stil für den aktiven UND den Hover-Zustand */
+/* 5. Spezielle, kleinere Zeilenhöhe NUR für den Zweizeiler */
+.side-menu-content li.multi-line a {
+    line-height: 1.2; /* <--- HIER stellst du den kleinen Abstand für den Zweizeiler ein */
+}
+
+/* 6. Kombinierter Stil für den aktiven UND den Hover-Zustand */
 .side-menu-content li.active a,
 .side-menu-content li a:hover {
     color: var(--accent-color);
-    background-color: rgba(51, 51, 51, 0.25); 
-}
-
-.side-menu-content li.multi-line a {
-    line-height: 1.5; 
+    background-color: rgba(255, 255, 255, 0.05);
 }
 
 /* --- FINALE & EINHEITLICHE KORREKTUR FÜR ALLE HEADER-ICONS --- */
