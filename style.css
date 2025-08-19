@@ -6,24 +6,6 @@ a {
     text-decoration: none !important;
 }
 
-/* --- Animation für den blinkenden Cursor im Menü --- */
-
-/* 1. Die Animation selbst definieren */
-@keyframes blink-animation {
-  0% { opacity: 1; }
-  49% { opacity: 1; }
-  50% { opacity: 0; }
-  100% { opacity: 0; }
-}
-
-/* 2. Die Animation auf unsere Klasse anwenden */
-.blinking-cursor {
-  animation: blink-animation 12.2s infinite;
-  font-weight: 700; /* Macht den Unterstrich etwas dicker */
-}
-
-/* --- Styling für das neue Slide-in Menü --- */
-
 
 .side-menu {
  padding-top: 80px;
