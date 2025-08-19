@@ -62,7 +62,7 @@ padding-bottom: 20px;
 
 /* 3. Jeder Listenpunkt bekommt einen AUSSEN-Abstand nach unten */
 .side-menu-content li {
-    margin-bottom: 20px; /* <--- HIER stellst du den großen Abstand zwischen den Menüpunkten ein */
+    margin-bottom: 30px; /* <--- HIER stellst du den großen Abstand zwischen den Menüpunkten ein */
 }
 
 /* Letzter Listenpunkt braucht keinen Abstand nach unten */
@@ -78,21 +78,20 @@ padding-bottom: 20px;
     text-decoration: none;
     font-size: 1.5rem;
     font-weight: 600;
-    line-height: 1.6; /* Standard-Zeilenhöhe für Einzeiler */
+    line-height: 2; /* Standard-Zeilenhöhe für Einzeiler */
     transition: all 0.3s ease;
     border-radius: 8px;
 }
 
 /* 5. Spezielle, kleinere Zeilenhöhe NUR für den Zweizeiler */
 .side-menu-content li.multi-line a {
-    line-height: 1.2; /* <--- HIER stellst du den kleinen Abstand für den Zweizeiler ein */
+    line-height: 1.4; /* <--- HIER stellst du den kleinen Abstand für den Zweizeiler ein */
 }
 
 /* 6. Kombinierter Stil für den aktiven UND den Hover-Zustand */
 .side-menu-content li.active a,
 .side-menu-content li a:hover {
     color: var(--accent-color);
-    background-color: rgba(255, 255, 255, 0.05);
 }
 
 /* --- FINALE & EINHEITLICHE KORREKTUR FÜR ALLE HEADER-ICONS --- */
