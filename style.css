@@ -49,7 +49,7 @@
 .side-menu-content a {
     color: #fff;
     text-decoration: none;
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     font-weight: 600;
     padding: 15px 10px;
     transition: color 0.3s ease;
@@ -58,7 +58,8 @@
 }
 
 .side-menu-content a:hover {
-    color: var(--primary-color, #00ffff); /* Deine Akzentfarbe */
+    color: #FCB500;
+ text-decoration: none;
 }
 
 /* --- FINALE & EINHEITLICHE KORREKTUR FÜR ALLE HEADER-ICONS --- */
