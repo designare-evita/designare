@@ -12,8 +12,8 @@ padding-bottom: 20px;
     position: fixed;
     top: 0;
     right: 0;
-    width: 500px; /* Breite des Menüs */
-    max-width: 80%; /* Maximalbreite auf kleinen Bildschirmen */
+    width: 600px; /* Breite des Menüs */
+    max-width: 85%; /* Maximalbreite auf kleinen Bildschirmen */
     height: 100%;
     background-color: #1a1a21; /* Dunkler Hintergrund, passt zum Stil */
     box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
