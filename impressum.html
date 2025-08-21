@@ -16,24 +16,35 @@
 <body>
     <header class="main-header">
         <a href="index.html" id="top-left-logo-link" aria-label="Zur Startseite">
-            <img src="images/favicon.png" alt="Michael Kanda Logo" id="top-left-logo-img">
+            <img src="images/favicon.webp" alt="Michael Kanda Logo" id="top-left-logo-img">
         </a>
         <div class="header-right-controls">
-            <button id="about-me-button" aria-label="Über mich öffnen">
-               <i class="fa-regular fa-user"></i>
-            </button>
-            <button id="contact-button" aria-label="Kontaktformular öffnen">
-                <i class="far fa-envelope"></i>
-            </button>
-            <button id="cookie-info-button" aria-label="Cookie Informationen anzeigen">
-                <i class="fas fa-cookie-bite"></i>
-            </button>
-            <button id="theme-toggle" aria-label="Toggle dark mode">
-                <i class="fas fa-moon"></i>
-                <i class="fas fa-sun"></i>
-            </button>
+          <button id="about-me-button" aria-label="Über mich öffnen">
+            <i class="fa-regular fa-user"></i>
+          </button>
+          <button id="contact-button" aria-label="Kontaktformular öffnen">
+              <i class="far fa-envelope"></i>
+          </button>
+          <button id="cookie-info-button" aria-label="Cookie Informationen anzeigen">
+              <i class="fas fa-cookie-bite"></i>
+          </button>
+          <button id="menu-toggle-button" aria-label="Menü öffnen">
+              <i class="fa-solid fa-bars"></i>
+          </button>
         </div>
     </header>
+
+    <div id="side-menu-panel" class="side-menu">
+        <button id="close-menu-button" class="close-button">&times;</button>
+        <div class="side-menu-content">
+            <ul>
+                <li><a href="index.html">Michael & Evita</a></li>
+                <li class="multi-line"><a href="KI-Integration-auf-Webseiten.html">KI-Integration auf Webseiten</a></li>
+                <li><a href="CSV-Creator.html">Silas KI Creator</a></li>
+                <li><a href="CSV-Importer-PRO.html">CSV Importer PRO</a></li>
+            </ul>
+        </div>
+    </div>
 
     <main class="article-page-main-content">
         <div class="article-container">
