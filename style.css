@@ -67,7 +67,7 @@ padding-bottom: 20px;
 
 /* 4. Der statische Listenpunkt (bleibt gleich) */
 .side-menu-content li::before {
-    content: '-';
+    content: '';
     color: #FCB500;
     font-weight: 700;
     padding-right: 15px;
@@ -85,7 +85,7 @@ padding-bottom: 20px;
     width: 100%; /* Wichtig, damit der Link die ganze Breite einnimmt */
     
     /* NEU: Vertikaler Abstand als Padding */
-    padding: 125px 20px; /* <--- HIER steuerst du den vertikalen Abstand */
+    padding: 30px 20px; /* <--- HIER steuerst du den vertikalen Abstand */
 }
 
 /* 6. Kleinere Zeilenhöhe NUR für den Zweizeiler */
