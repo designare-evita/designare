@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Prüfen, ob der Platzhalter für den Header existiert
     if (headerPlaceholder) {
         // Lade den Header aus der externen Datei
-        fetch('header.html')
+        fetch('/header.html')
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Netzwerk-Antwort war nicht ok.');
