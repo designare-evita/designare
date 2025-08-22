@@ -1,10 +1,17 @@
 // js/silas-form.js
 
 export function initSilasForm() {
+    // Diese Prüfung ist die Lösung:
+    // Wir suchen das Hauptformular von Silas.
     const silasForm = document.getElementById('silas-form');
-    if (!silasForm) return;
+    
+    // Wenn das Formular nicht existiert, sind wir nicht auf der richtigen Seite.
+    // Die Funktion wird sofort beendet, um Fehler zu vermeiden.
+    if (!silasForm) {
+        return;
+    }
 
-    // Alle DOM-Elemente für Silas holen
+    // Ab hier läuft der Code nur noch, wenn wir auf der CSV-Creator.html Seite sind.
     const keywordInput = document.getElementById('silas-keyword-input');
     const addKeywordBtn = document.getElementById('add-keyword-btn');
     const keywordDisplayList = document.getElementById('keyword-display-list');
@@ -75,7 +82,6 @@ export function initSilasForm() {
             const keyword = keywordList[i];
             silasStatus.textContent = `Generiere Text für "${keyword}" (${i + 1}/${keywordList.length})...`;
             
-            // Der korrekte, detaillierte Prompt wird hier erstellt
             const userPrompt = createSilasPrompt(keyword, textIntent);
 
             try {
@@ -102,9 +108,8 @@ export function initSilasForm() {
         startGenerationBtn.disabled = false;
     });
 
-    // --- HIER IST DEIN DETAILLIERTER PROMPT INTEGRIERT ---
+    // --- PROMPT ERSTELLUNG ---
     function createSilasPrompt(keyword, intent) {
-        // Die detaillierten Anweisungen für die KI, die du bereitgestellt hast.
         const jsonFormatInstructions = `
 {
     "post_title": "SEO-optimierter Titel (50-60 Zeichen)",
@@ -141,15 +146,13 @@ export function initSilasForm() {
     "guarantee_text": "Ein Satz, der eine Garantie beschreibt (z.B. '30-Tage-Geld-zurück-Garantie')."
 }`;
 
-        // Die Rolle und Aufgabe wird jetzt hier definiert
         let roleAndTask = '';
         if (intent === 'commercial') {
             roleAndTask = `Du bist ein erstklassiger Marketing-Texter und SEO-Stratege. Dein Stil ist überzeugend, klar und auf Conversions ausgerichtet. Erstelle einen kommerziell ausgerichteten Text.`;
-        } else { // informational
+        } else {
             roleAndTask = `Du bist ein Fachexperte und SEO-Redakteur. Dein Stil ist informativ, klar und hilfreich. Erstelle einen informationsorientierten Text.`;
         }
 
-        // Der finale Prompt, der alles zusammensetzt
         return `
 # HAUPTAUFGABE
 Erstelle den gesamten Textinhalt für eine professionelle Landingpage zum Thema "${keyword}". Konzentriere dich zu 100% auf das Thema.
