@@ -1,4 +1,72 @@
-// js/silas-form.js
+function checkRateLimit() {
+        // Master Mode bypass
+        if (isMasterModeActive()) {
+            console.log('🔓 Rate limit bypassed - Master Mode');
+            return true;
+        }
+        
+        const now = Date.now();
+        const dailyData = JSON.parse(localStorage.getItem('silas_daily') || '{}');
+        const hourlyData = JSON.parse(localStorage.getItem('silas_hourly') || '{}');
+        const lastRequest = parseInt(localStorage.getItem('silas_last_request') || '0');
+        
+        if (now - lastRequest < DEMO_LIMITS.cooldownBetweenRequests) {
+            const remainingSeconds = Math.ceil((DEMO_LIMITS.cooldownBetweenRequests - (now - lastRequest)) / 1000);
+            throw new Error(`⏱️ Bitte warte noch ${remainingSeconds} Sekunden vor der nächsten Anfrage.`);
+        }
+        
+        if (dailyData.count >= DEMO_LIMITS.maxGenerationsPerDay) {
+            throw new Error(`📅 Tägliches Demo-Limit erreicht (${DEMO_LIMITS.maxGenerationsPerDay} Generierungen). Versuche es morgen wieder.`);
+        }
+        
+        if (hourlyData.count >= DEMO_LIMITS.maxGenerationsPerHour) {
+            throw new Error(`⏰ Stündliches Demo-Limit erreicht (${DEMO_LIMITS.maxGenerationsPerHour} Generierungen). Versuche es in einer Stunde wieder.`);
+        }
+        
+        return true;
+    }
+
+    function validateKeyword(keyword) {
+        // Master Mode relaxed validation
+        if (isMasterModeActive()) {
+            if (keyword.length > 100) {
+                throw new Error('📏 Keyword zu lang (max. 100 Zeichen im Master Mode).');
+            }
+            console.log('🔓 Keyword validation relaxed - Master Mode');
+            return true;
+        }
+        
+        const forbidden = ['adult', 'porn', 'sex', 'drugs', 'illegal', 'hack', 'crack', 'bitcoin', 'crypto', 'gambling', 'casino', 'pharma'];
+        const lowerKeyword = keyword.toLowerCase();
+        
+        for (const word of forbidden) {
+            if (lowerKeyword.includes(word)) {
+                throw new Error(`🚫 Das Keyword "${keyword}" ist für die Demo nicht erlaubt.`);
+            }
+        }
+        
+        if (keyword.length > 50) {
+            throw new Error('📏 Keywords dürfen maximal 50 Zeichen lang sein.');
+        }
+        
+        if (!/^[a-zA-ZäöüÄÖÜß\s\-_0-9]+$/.test(keyword)) {
+            throw new Error('✏️ Keywords dürfen nur Buchstaben, Zahlen, Leerzeichen und Bindestriche enthalten.');
+        }
+        
+        return true;
+    }
+
+    function showDemoStatus() {
+        const dailyData = JSON.parse(localStorage.getItem('silas_daily') || '{}');
+        const hourlyData = JSON.parse(localStorage.getItem('silas_hourly') || '{}');
+        
+        const dailyRemaining = DEMO_LIMITS.maxGenerationsPerDay - (dailyData.count || 0);
+        const hourlyRemaining = DEMO_LIMITS.maxGenerationsPerHour - (hourlyData.count || 0);
+        
+        // Master Mode Status
+        if (isMasterModeActive()) {
+            demoStatusContainer.innerHTML = `
+                <div style="background: linear-gradient(135deg, rgba(40,167,69,0.1) 0%, rgba(32,201,151,0.1) 100%); border: 1px soli// js/silas-form.js
 
 export function initSilasForm() {
     // DIES IST DIE LÖSUNG:
@@ -10,6 +78,59 @@ export function initSilasForm() {
     if (!silasForm) {
         return;
     }
+
+    // === MASTER PASSWORD SYSTEM ===
+    const MASTER_PASSWORD = "SilasUnlimited2024!"; // Ändere dieses Passwort!
+    
+    // Master Mode Check
+    function isMasterModeActive() {
+        const masterMode = sessionStorage.getItem('silas_master_mode');
+        const timestamp = parseInt(sessionStorage.getItem('silas_master_timestamp') || '0');
+        const now = Date.now();
+        
+        // Master-Mode läuft 8 Stunden
+        if (masterMode === 'true' && (now - timestamp) < (8 * 60 * 60 * 1000)) {
+            return true;
+        }
+        
+        if (masterMode === 'true') {
+            sessionStorage.removeItem('silas_master_mode');
+            sessionStorage.removeItem('silas_master_timestamp');
+        }
+        
+        return false;
+    }
+
+    // === DEMO-SCHUTZ INITIALISIEREN ===
+    let DEMO_LIMITS = {
+        maxKeywordsPerSession: 3,
+        maxGenerationsPerHour: 5,
+        maxGenerationsPerDay: 10,
+        cooldownBetweenRequests: 30000
+    };
+
+    // Master Mode Limits
+    const MASTER_LIMITS = {
+        maxKeywordsPerSession: 50,
+        maxGenerationsPerHour: 100,
+        maxGenerationsPerDay: 500,
+        cooldownBetweenRequests: 1000
+    };
+
+    // Aktuelle Limits setzen
+    if (isMasterModeActive()) {
+        DEMO_LIMITS = { ...MASTER_LIMITS };
+        console.log('🔓 Master Mode bereits aktiv');
+    }
+
+    // Demo-Tracking initialisieren
+    initDemoTracking();
+    
+    // Demo-Status anzeigen
+    showDemoStatus();
+
+    // Master Password UI erstellen
+    createMasterPasswordUI();
 
     // Ab hier wird der Code nur noch ausgeführt, wenn wir auf der CSV-Creator.html Seite sind.
     const keywordInput = document.getElementById('silas-keyword-input');
@@ -27,30 +148,283 @@ export function initSilasForm() {
     let keywordList = [];
     let allGeneratedData = [];
 
+    // Demo-Status Container hinzufügen
+    const demoStatusContainer = document.createElement('div');
+    demoStatusContainer.id = 'silas-demo-status';
+    silasForm.parentNode.insertBefore(demoStatusContainer, silasForm);
+
+    // === MASTER PASSWORD UI ===
+    function createMasterPasswordUI() {
+        // Unlock Button (nur wenn nicht im Master Mode)
+        if (!isMasterModeActive() && !document.getElementById('master-unlock-btn')) {
+            const unlockBtn = document.createElement('button');
+            unlockBtn.id = 'master-unlock-btn';
+            unlockBtn.innerHTML = '🔓';
+            unlockBtn.title = 'Master Access';
+            unlockBtn.style.cssText = `
+                position: fixed; bottom: 20px; right: 20px;
+                background: linear-gradient(135deg, #ffc107 0%, #ffca2c 100%);
+                border: 2px solid #e0a800; color: #1a1a1a;
+                width: 50px; height: 50px; border-radius: 50%;
+                cursor: pointer; font-size: 1.2rem;
+                box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+                transition: all 0.3s ease; z-index: 1000;
+            `;
+            unlockBtn.onclick = () => showPasswordPrompt();
+            document.body.appendChild(unlockBtn);
+        }
+
+        // Master Mode Indicator (nur wenn aktiv)
+        if (isMasterModeActive()) {
+            showMasterModeIndicator();
+        }
+    }
+
+    function showPasswordPrompt() {
+        const password = prompt('🔓 Master-Passwort eingeben:');
+        if (password === MASTER_PASSWORD) {
+            activateMasterMode();
+        } else if (password !== null) {
+            alert('❌ Falsches Passwort!');
+        }
+    }
+
+    function activateMasterMode() {
+        // Session-Storage setzen
+        sessionStorage.setItem('silas_master_mode', 'true');
+        sessionStorage.setItem('silas_master_timestamp', Date.now().toString());
+        
+        // Limits ändern
+        DEMO_LIMITS = { ...MASTER_LIMITS };
+        
+        // Rate Limits zurücksetzen
+        localStorage.removeItem('silas_daily');
+        localStorage.removeItem('silas_hourly');
+        localStorage.removeItem('silas_last_request');
+        
+        // UI Updates
+        showMasterModeIndicator();
+        hideUnlockButton();
+        showDemoStatus(); // Status neu laden
+        
+        // Erfolgs-Benachrichtigung
+        showNotification('🔓 Master Mode aktiviert! Alle Beschränkungen aufgehoben.', '#28a745');
+        
+        console.log('🔓 Silas Master Mode aktiviert');
+    }
+
+    function showMasterModeIndicator() {
+        const existing = document.getElementById('master-mode-indicator');
+        if (existing) existing.remove();
+        
+        const indicator = document.createElement('div');
+        indicator.id = 'master-mode-indicator';
+        indicator.style.cssText = `
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white; padding: 12px 20px; text-align: center;
+            font-weight: bold; border-radius: 8px; margin: 15px 0;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+            border: 2px solid #155724; position: relative;
+        `;
+        indicator.innerHTML = `
+            🔓 <strong>MASTER MODE AKTIV</strong> 🔓
+            <br><small style="opacity: 0.9;">Unlimited Keywords • No Rate Limits • Full Access</small>
+            <button onclick="deactivateMasterMode()" style="
+                position: absolute; top: 8px; right: 12px;
+                background: rgba(255,255,255,0.2); border: none;
+                color: white; border-radius: 50%; width: 24px; height: 24px;
+                cursor: pointer; font-size: 14px;" title="Master Mode deaktivieren">×</button>
+        `;
+        
+        silasForm.parentNode.insertBefore(indicator, silasForm);
+        
+        // Deaktivierungs-Funktion global verfügbar machen
+        window.deactivateMasterMode = () => {
+            if (confirm('Master Mode deaktivieren? Die Seite wird neu geladen.')) {
+                sessionStorage.removeItem('silas_master_mode');
+                sessionStorage.removeItem('silas_master_timestamp');
+                location.reload();
+            }
+        };
+    }
+
+    function hideUnlockButton() {
+        const btn = document.getElementById('master-unlock-btn');
+        if (btn) btn.style.display = 'none';
+    }
+
+    function showNotification(message, color = '#ffc107') {
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed; top: 20px; right: 20px;
+            background: ${color}; color: white; padding: 15px 25px;
+            border-radius: 8px; font-weight: bold; z-index: 9999;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            animation: slideIn 0.5s ease;
+        `;
+        notification.innerHTML = message;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.animation = 'slideOut 0.5s ease';
+            setTimeout(() => notification.remove(), 500);
+        }, 4000);
+        
+        // CSS für Animations
+        if (!document.getElementById('notification-styles')) {
+            const style = document.createElement('style');
+            style.id = 'notification-styles';
+            style.textContent = `
+                @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+                @keyframes slideOut { from { transform: translateX(0); } to { transform: translateX(100%); } }
+            `;
+            document.head.appendChild(style);
+        }
+    }
+
+    // === SCHUTZ-FUNKTIONEN ===
+    function initDemoTracking() {
+        const now = Date.now();
+        const today = new Date().toDateString();
+        
+        const dailyData = JSON.parse(localStorage.getItem('silas_daily') || '{}');
+        if (dailyData.date !== today) {
+            localStorage.setItem('silas_daily', JSON.stringify({ date: today, count: 0 }));
+        }
+        
+        const hourlyData = JSON.parse(localStorage.getItem('silas_hourly') || '{}');
+        const currentHour = Math.floor(now / (1000 * 60 * 60));
+        if (hourlyData.hour !== currentHour) {
+            localStorage.setItem('silas_hourly', JSON.stringify({ hour: currentHour, count: 0 }));
+        }
+    }
+
+    function checkRateLimit() {
+        const now = Date.now();
+        const dailyData = JSON.parse(localStorage.getItem('silas_daily') || '{}');
+        const hourlyData = JSON.parse(localStorage.getItem('silas_hourly') || '{}');
+        const lastRequest = parseInt(localStorage.getItem('silas_last_request') || '0');
+        
+        if (now - lastRequest < DEMO_LIMITS.cooldownBetweenRequests) {
+            const remainingSeconds = Math.ceil((DEMO_LIMITS.cooldownBetweenRequests - (now - lastRequest)) / 1000);
+            throw new Error(`⏱️ Bitte warte noch ${remainingSeconds} Sekunden vor der nächsten Anfrage.`);
+        }
+        
+        if (dailyData.count >= DEMO_LIMITS.maxGenerationsPerDay) {
+            throw new Error(`📅 Tägliches Demo-Limit erreicht (${DEMO_LIMITS.maxGenerationsPerDay} Generierungen). Versuche es morgen wieder.`);
+        }
+        
+        if (hourlyData.count >= DEMO_LIMITS.maxGenerationsPerHour) {
+            throw new Error(`⏰ Stündliches Demo-Limit erreicht (${DEMO_LIMITS.maxGenerationsPerHour} Generierungen). Versuche es in einer Stunde wieder.`);
+        }
+        
+        return true;
+    }
+
+    function updateUsageCounters() {
+        const now = Date.now();
+        const dailyData = JSON.parse(localStorage.getItem('silas_daily') || '{}');
+        dailyData.count = (dailyData.count || 0) + 1;
+        localStorage.setItem('silas_daily', JSON.stringify(dailyData));
+        
+        const hourlyData = JSON.parse(localStorage.getItem('silas_hourly') || '{}');
+        hourlyData.count = (hourlyData.count || 0) + 1;
+        localStorage.setItem('silas_hourly', JSON.stringify(hourlyData));
+        
+        localStorage.setItem('silas_last_request', now.toString());
+        showDemoStatus();
+    }
+
+    function validateKeyword(keyword) {
+        const forbidden = ['adult', 'porn', 'sex', 'drugs', 'illegal', 'hack', 'crack', 'bitcoin', 'crypto', 'gambling', 'casino', 'pharma'];
+        const lowerKeyword = keyword.toLowerCase();
+        
+        for (const word of forbidden) {
+            if (lowerKeyword.includes(word)) {
+                throw new Error(`🚫 Das Keyword "${keyword}" ist für die Demo nicht erlaubt.`);
+            }
+        }
+        
+        if (keyword.length > 50) {
+            throw new Error('📏 Keywords dürfen maximal 50 Zeichen lang sein.');
+        }
+        
+        if (!/^[a-zA-ZäöüÄÖÜß\s\-_0-9]+$/.test(keyword)) {
+            throw new Error('✏️ Keywords dürfen nur Buchstaben, Zahlen, Leerzeichen und Bindestriche enthalten.');
+        }
+        
+        return true;
+    }
+
+    function showDemoStatus() {
+        const dailyData = JSON.parse(localStorage.getItem('silas_daily') || '{}');
+        const hourlyData = JSON.parse(localStorage.getItem('silas_hourly') || '{}');
+        
+        const dailyRemaining = DEMO_LIMITS.maxGenerationsPerDay - (dailyData.count || 0);
+        const hourlyRemaining = DEMO_LIMITS.maxGenerationsPerHour - (hourlyData.count || 0);
+        
+        // Master Mode Status
+        if (isMasterModeActive()) {
+            demoStatusContainer.innerHTML = `
+                <div style="background: linear-gradient(135deg, rgba(40,167,69,0.1) 0%, rgba(32,201,151,0.1) 100%); border: 1px solid #28a745; border-radius: 8px; padding: 15px; margin: 15px 0; text-align: center; color: #28a745;">
+                    <strong>🔓 UNLIMITED MODE:</strong> 
+                    Keine Beschränkungen aktiv | 
+                    Keywords: <strong>Unlimited</strong> | 
+                    Generierungen: <strong>Unlimited</strong>
+                    <br><small style="color: #20c997; margin-top: 5px; display: block;">Master Access gewährt</small>
+                </div>
+            `;
+        } else {
+            // Standard Demo Status
+            demoStatusContainer.innerHTML = `
+                <div style="background: linear-gradient(135deg, rgba(255,193,7,0.1) 0%, rgba(255,193,7,0.05) 100%); border: 1px solid #ffc107; border-radius: 8px; padding: 15px; margin: 15px 0; text-align: center; color: #ffc107;">
+                    <strong>🎯 Demo-Modus:</strong> 
+                    Heute noch <strong>${dailyRemaining}</strong> Generierungen | 
+                    Diese Stunde noch <strong>${hourlyRemaining}</strong> Generierungen
+                    <br><small style="color: #ccc; margin-top: 5px; display: block;">Silas dient nur zu Demonstrationszwecken</small>
+                </div>
+            `;
+        }
+    }
+
     // --- LOGIK ZUM HINZUFÜGEN VON KEYWORDS ---
     function addKeywords() {
-        const newKeywords = keywordInput.value.split(',').map(kw => kw.trim()).filter(kw => kw.length > 0);
-        const currentIntent = textIntentSelect.value;
-        
-        newKeywords.forEach(keyword => {
-            // Prüfen ob Keyword bereits existiert (unabhängig vom Intent)
-            const existingIndex = keywordList.findIndex(item => item.keyword === keyword);
+        try {
+            const newKeywords = keywordInput.value.split(',').map(kw => kw.trim()).filter(kw => kw.length > 0);
+            const currentIntent = textIntentSelect.value;
             
-            if (existingIndex === -1) {
-                // Neues Keyword hinzufügen
-                keywordList.push({
-                    keyword: keyword,
-                    intent: currentIntent
-                });
-            } else {
-                // Existierendes Keyword aktualisieren
-                keywordList[existingIndex].intent = currentIntent;
+            // Keywords validieren
+            newKeywords.forEach(validateKeyword);
+            
+            // Session-Limit prüfen (außer im Master Mode)
+            if (!isMasterModeActive() && keywordList.length + newKeywords.length > DEMO_LIMITS.maxKeywordsPerSession) {
+                throw new Error(`🎯 Demo-Limit: Maximal ${DEMO_LIMITS.maxKeywordsPerSession} Keywords pro Session erlaubt.`);
             }
-        });
-        
-        if (newKeywords.length > 0) {
-            updateKeywordDisplay();
-            keywordInput.value = '';
+            
+            newKeywords.forEach(keyword => {
+                const existingIndex = keywordList.findIndex(item => item.keyword === keyword);
+                
+                if (existingIndex === -1) {
+                    keywordList.push({ keyword: keyword, intent: currentIntent });
+                } else {
+                    keywordList[existingIndex].intent = currentIntent;
+                }
+            });
+            
+            if (newKeywords.length > 0) {
+                updateKeywordDisplay();
+                keywordInput.value = '';
+                silasStatus.textContent = `✅ ${newKeywords.length} Keyword(s) hinzugefügt.`;
+                setTimeout(() => silasStatus.textContent = 'Bereit zur Generierung.', 2000);
+            }
+            
+        } catch (error) {
+            silasStatus.textContent = error.message;
+            silasStatus.style.color = '#ff6b6b';
+            setTimeout(() => {
+                silasStatus.textContent = 'Bereit zur Generierung.';
+                silasStatus.style.color = '#ffc107';
+            }, 4000);
         }
     }
 
