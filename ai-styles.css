@@ -246,25 +246,38 @@
 
 #keyword-display-list li {
     background-color: rgba(255, 255, 255, 0.05);
-    margin-bottom: 0.5rem;
-    padding: 0.8rem 1rem;
-    border-radius: 5px;
+    margin-bottom: 12px;
+    padding: 15px;
+    border-radius: 8px;
     display: flex;
+    align-items: flex-start;
     justify-content: space-between;
-    align-items: center;
     font-size: 0.95rem;
     color: #fff;
+    min-height: 50px;
+    gap: 10px;
+    transition: background-color 0.3s ease;
+}
+
+#keyword-display-list li:hover {
+    background-color: rgba(255, 255, 255, 0.08);
 }
 
 #keyword-display-list li button {
     background-color: #ff6b6b;
     color: white;
     border: none;
-    border-radius: 3px;
-    padding: 2px 8px;
+    border-radius: 6px;
+    min-width: 36px;
+    height: 36px;
     cursor: pointer;
-    font-size: 0.8rem;
+    font-size: 18px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     transition: background-color 0.3s ease;
+    flex-shrink: 0;
 }
 
 #keyword-display-list li button:hover {
@@ -515,53 +528,155 @@
     #silas-form {
         flex-direction: column;
         gap: 10px;
-        padding: 10px;
+        padding: 15px;
     }
     
     #silas-keyword-input {
         width: 100%;
         margin-bottom: 10px;
         border: 1px solid #444;
-        border-radius: 5px;
-        padding: 12px;
+        border-radius: 7px;
+        padding: 15px;
+        font-size: 16px; /* Verhindert Zoom auf iOS */
     }
     
     #add-keyword-btn {
         width: 100%;
         justify-content: center;
-        padding: 12px;
+        padding: 15px;
         border: 1px solid #ffc107;
-        border-radius: 5px;
+        border-radius: 7px;
+        font-size: 1.1rem;
+        min-height: 50px;
     }
 
     /* Input Group Mobile - Select-Box */
     .ai-container .input-group {
         flex-direction: column;
         align-items: stretch;
-        gap: 10px;
-        padding: 15px;
+        gap: 12px;
+        padding: 20px;
+        margin-top: 20px;
     }
     
     .ai-container .input-group label {
         text-align: center;
         min-width: auto;
         margin-right: 0;
-        margin-bottom: 5px;
+        margin-bottom: 0;
+        font-size: 1rem;
     }
     
     .ai-container .custom-select {
         width: 100%;
+        padding: 15px;
+        font-size: 16px; /* Verhindert Zoom auf iOS */
+        min-height: 50px;
+    }
+
+    /* Keyword List Mobile */
+    .keyword-list-container {
+        padding: 20px;
+        margin-top: 25px;
+    }
+    
+    .keyword-list-container h4 {
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+    }
+    
+    #keyword-display-list {
+        padding: 10px;
+        max-height: 300px;
+    }
+    
+    #keyword-display-list li {
+        padding: 20px 15px;
+        margin-bottom: 15px;
+        min-height: 70px;
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    /* Content Area auf Mobile - vertikal gestapelt */
+    #keyword-display-list li > div {
+        flex-direction: column !important;
+        gap: 8px !important;
+        align-items: flex-start !important;
+    }
+    
+    /* Badge auf Mobile größer und touch-friendly */
+    #keyword-display-list .intent-badge {
+        padding: 6px 12px !important;
+        font-size: 0.8rem !important;
+        border-radius: 15px !important;
+        margin-top: 8px !important;
+    }
+    
+    /* Remove Button auf Mobile größer */
+    #keyword-display-list li button {
+        min-width: 44px !important;
+        height: 44px !important;
+        font-size: 20px !important;
+        border-radius: 8px !important;
+        margin-left: 0 !important;
     }
 
     /* Button Controls Mobile */
     .keyword-list-controls {
         flex-direction: column;
-        gap: 10px;
+        gap: 15px;
+        margin-top: 25px;
     }
 
     .cta-button {
         width: 100%;
         justify-content: center;
+        padding: 18px 25px;
+        font-size: 1.1rem;
+        min-height: 55px;
+    }
+
+    /* Status Text Mobile */
+    #silas-status {
+        font-size: 1rem;
+        padding: 15px;
+        text-align: center;
+        line-height: 1.4;
+    }
+
+    /* Result Cards Mobile */
+    .result-card {
+        padding: 20px !important;
+        margin-bottom: 20px !important;
+    }
+    
+    .result-card h4 {
+        font-size: 1.1rem !important;
+        margin-bottom: 15px !important;
+    }
+    
+    .result-card .intent-badge {
+        padding: 6px 12px !important;
+        font-size: 0.8rem !important;
+        margin-bottom: 15px !important;
+    }
+    
+    .preview-btn {
+        width: 100% !important;
+        padding: 15px !important;
+        font-size: 1rem !important;
+        margin-top: 15px !important;
+        min-height: 50px !important;
+    }
+
+    /* Download Button Mobile */
+    #download-csv,
+    #download-csv-dynamic {
+        padding: 18px 20px !important;
+        font-size: 1.1rem !important;
+        min-height: 55px !important;
     }
 
     /* Preview Modal Mobile */
@@ -569,6 +684,13 @@
         width: 95vw;
         max-width: none;
         padding: 15px;
+        max-height: 95vh;
+        margin: 2.5vh auto;
+    }
+    
+    #preview-content-area {
+        max-height: 85vh;
+        padding-right: 10px;
     }
 
     /* Responsive Grid für Vorschau */
@@ -580,6 +702,19 @@
     /* SEO Section Mobile */
     .preview-landingpage section[style*="flex-direction: column"] div[style*="flex-direction: column"] {
         gap: 15px !important;
+    }
+    
+    /* Mobile Text Sizing in Preview */
+    .preview-landingpage h1 {
+        font-size: 1.8rem !important;
+    }
+    
+    .preview-landingpage h2 {
+        font-size: 1.4rem !important;
+    }
+    
+    .preview-landingpage h3 {
+        font-size: 1.2rem !important;
     }
 }
 
