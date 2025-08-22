@@ -469,24 +469,8 @@ export function initSilasForm() {
         }
     });
 
-    // Prompt erstellen
+    // Prompt erstellen - UMFANGREICHE VERSION
     function createSilasPrompt(keyword, intent) {
-        const jsonFormatInstructions = JSON.stringify({
-            "post_title": "SEO-optimierter Titel (50-60 Zeichen)",
-            "post_name": "seo-freundlicher-url-slug",
-            "meta_title": "Alternativer SEO-Titel (50-60 Zeichen)",
-            "meta_description": "Fesselnde Meta-Beschreibung (150-160 Zeichen) mit CTA.",
-            "h1": "Kraftvolle H1-Überschrift, die den Hauptnutzen kommuniziert.",
-            "h2_1": "Erste H2-Überschrift (Problemorientiert)",
-            "h2_2": "Zweite H2-Überschrift (Lösungsorientiert)",
-            "h2_3": "Dritte H2-Überschrift (Feature-/Nutzen-orientiert)",
-            "h2_4": "Vierte H2-Überschrift (Vertrauensbildend)",
-            "primary_cta": "Ein kurzer, starker Call-to-Action Text",
-            "secondary_cta": "Ein alternativer, sanfterer Call-to-Action",
-            "hero_text": "Ein fesselnder Einleitungstext für den Hero-Bereich",
-            "hero_subtext": "Eine unterstützende Unterüberschrift für den Hero-Bereich"
-        }, null, 2);
-
         let roleAndTask = '';
         if (intent === 'commercial') {
             roleAndTask = 'Du bist ein erstklassiger Marketing-Texter und SEO-Stratege. Dein Stil ist überzeugend, klar und auf Conversions ausgerichtet. Erstelle einen kommerziell ausgerichteten Text.';
@@ -494,7 +478,64 @@ export function initSilasForm() {
             roleAndTask = 'Du bist ein Fachexperte und SEO-Redakteur. Dein Stil ist informativ, klar und hilfreich. Erstelle einen informationsorientierten Text.';
         }
 
-        return 'Erstelle den gesamten Textinhalt für eine professionelle Landingpage zum Thema "' + keyword + '". ' + roleAndTask + ' Deine Antwort MUSS ein einziges, valides JSON-Objekt sein. Beginne direkt mit { und ende mit }. Das JSON-Objekt muss diese Struktur haben: ' + jsonFormatInstructions;
+        return `
+Du bist ein erstklassiger SEO-Content-Strategist. Erstelle vollständigen Landingpage-Content für das Thema "${keyword}".
+
+ROLLE: ${roleAndTask}
+
+WICHTIG: Deine Antwort MUSS ein einziges, valides JSON-Objekt sein. Beginne direkt mit { und ende mit }. Gib keine Markdown-Formatierung oder andere Texte aus.
+
+Das JSON-Objekt muss ALLE folgenden Felder enthalten und mit umfangreichem, hochwertigem Content füllen:
+
+{
+  "post_title": "SEO-optimierter Titel (50-60 Zeichen) für ${keyword}",
+  "post_name": "seo-freundlicher-url-slug-fuer-${keyword.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}",
+  "meta_title": "Alternativer SEO-Titel (50-60 Zeichen) für ${keyword}",
+  "meta_description": "Fesselnde Meta-Beschreibung (150-160 Zeichen) mit CTA für ${keyword}",
+  "h1": "Kraftvolle H1-Überschrift für ${keyword}, die den Hauptnutzen kommuniziert",
+  "h2_1": "Erste H2-Überschrift (Problemorientiert) für ${keyword}",
+  "h2_2": "Zweite H2-Überschrift (Lösungsorientiert) für ${keyword}",
+  "h2_3": "Dritte H2-Überschrift (Feature-/Nutzen-orientiert) für ${keyword}",
+  "h2_4": "Vierte H2-Überschrift (Vertrauensbildend) für ${keyword}",
+  "primary_cta": "Kurzer, starker Call-to-Action Text (z.B. 'Jetzt ${keyword} anfragen')",
+  "secondary_cta": "Alternativer, sanfterer Call-to-Action (z.B. 'Mehr über ${keyword} erfahren')",
+  "hero_text": "Fesselnder Einleitungstext für den Hero-Bereich (50-80 Wörter) über ${keyword}",
+  "hero_subtext": "Unterstützende Unterüberschrift für den Hero-Bereich (20-30 Wörter) zu ${keyword}",
+  "benefits_list": "HTML-Liste (<ul><li>...</li></ul>) mit 4-6 überzeugenden Vorteilen von ${keyword}",
+  "features_list": "HTML-Liste (<ul><li>...</li></ul>) mit 4-6 konkreten Merkmalen/Features von ${keyword}",
+  "social_proof": "Kurzer Satz über soziale Bewährtheit (z.B. 'Von über 1.000 zufriedenen ${keyword}-Kunden genutzt')",
+  "testimonial_1": "Glaubwürdiges, fiktives Kunden-Testimonial mit Name und Aussage zu ${keyword}",
+  "testimonial_2": "Zweites, andersartiges Kunden-Testimonial mit Name und Aussage zu ${keyword}",
+  "pricing_title": "Überschrift für den Preisbereich (z.B. 'Wählen Sie Ihren ${keyword}-Plan')",
+  "price_1": "Beschreibung für das erste ${keyword}-Preispaket (Starter/Basic)",
+  "price_2": "Beschreibung für das zweite ${keyword}-Preispaket (Professional)",
+  "price_3": "Beschreibung für das dritte ${keyword}-Preispaket (Enterprise/Premium)",
+  "faq_1": "Erste häufig gestellte Frage zu ${keyword}",
+  "faq_answer_1": "Ausführliche Antwort auf die erste ${keyword}-Frage (30-50 Wörter)",
+  "faq_2": "Zweite häufig gestellte Frage zu ${keyword}",
+  "faq_answer_2": "Ausführliche Antwort auf die zweite ${keyword}-Frage (30-50 Wörter)",
+  "faq_3": "Dritte häufig gestellte Frage zu ${keyword}",
+  "faq_answer_3": "Ausführliche Antwort auf die dritte ${keyword}-Frage (30-50 Wörter)",
+  "contact_info": "Kurze Kontaktinformation oder Hinweis für ${keyword} (z.B. 'Fragen zu ${keyword}? Rufen Sie uns an: ...')",
+  "footer_cta": "Letzter Call-to-Action für den Footer (z.B. 'Starten Sie noch heute Ihr ${keyword}-Projekt')",
+  "trust_signals": "Kurzer Text mit Vertrauenssignalen für ${keyword} (z.B. 'Zertifiziert • Sicher • ${keyword}-Experten')",
+  "guarantee_text": "Satz über Garantie für ${keyword} (z.B. '30-Tage-Geld-zurück-Garantie für alle ${keyword}-Services')"
+}
+
+QUALITÄTS-ANFORDERUNGEN:
+- Jedes Textfeld muss mindestens 10-15 Wörter enthalten (außer CTAs)
+- Hero-Text: 50-80 Wörter
+- FAQ-Antworten: 30-50 Wörter
+- Benefits/Features: Jeweils 4-6 Listenelemente mit ausführlichen Beschreibungen
+- Testimonials: Vollständige Zitate mit Namen und Firma
+- Alle Texte müssen spezifisch auf "${keyword}" bezogen sein
+- Professioneller, überzeugender Ton
+- SEO-optimiert aber natürlich lesbar
+- Verwende deutsche Sprache
+- Alle Listen müssen vollständige HTML-Markup enthalten
+
+Erstelle jetzt das vollständige JSON-Objekt mit umfangreichem Content für "${keyword}":
+        `;
     }
 
     // Ergebnis anzeigen
@@ -534,14 +575,152 @@ export function initSilasForm() {
         });
     }
 
-    // Vorschau Event Delegation
+    // Vorschau Event Delegation - VOLLSTÄNDIGE VORSCHAU
     silasResponseContainer.addEventListener('click', function(e) {
         if (e.target.classList.contains('preview-btn')) {
             const index = parseInt(e.target.getAttribute('data-index'));
             const data = allGeneratedData[index];
             
             if (data && !data.error && previewContentArea) {
-                let previewHtml = '<div style="color: #f0f0f0; line-height: 1.6;"><h1 style="color: #ffc107; margin-bottom: 20px;">' + (data.h1 || 'Keine H1 verfügbar') + '</h1><p style="margin-bottom: 20px;">' + (data.hero_text || 'Kein Hero-Text verfügbar') + '</p><h2 style="color: #eee; margin-top: 20px;">' + (data.h2_1 || 'Keine H2 verfügbar') + '</h2><h2 style="color: #eee; margin-top: 20px;">' + (data.h2_2 || 'Keine zweite H2 verfügbar') + '</h2></div>';
+                // Vollständige Landingpage-Vorschau mit allen Daten
+                let previewHtml = `
+                    <div class="preview-landingpage" style="color: #f0f0f0; line-height: 1.6; background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); padding: 20px; border-radius: 10px;">
+                        <!-- Header/Hero Section -->
+                        <header style="text-align: center; margin-bottom: 40px; padding: 30px 0; border-bottom: 2px solid #ffc107;">
+                            <h1 style="color: #ffc107; font-size: 2.5rem; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">${data.h1 || 'Keine H1 verfügbar'}</h1>
+                            <p style="font-size: 1.2rem; color: #ccc; margin-bottom: 15px; max-width: 800px; margin-left: auto; margin-right: auto;">${data.hero_text || 'Kein Hero-Text verfügbar'}</p>
+                            <p style="font-size: 1rem; color: #aaa; margin-bottom: 25px;">${data.hero_subtext || ''}</p>
+                            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                                <button style="background: #ffc107; color: #1a1a1a; border: none; padding: 12px 25px; border-radius: 5px; font-weight: bold; cursor: pointer;">${data.primary_cta || 'Jetzt anfragen'}</button>
+                                <button style="background: transparent; color: #ffc107; border: 2px solid #ffc107; padding: 12px 25px; border-radius: 5px; font-weight: bold; cursor: pointer;">${data.secondary_cta || 'Mehr erfahren'}</button>
+                            </div>
+                        </header>
+
+                        <!-- Content Sections -->
+                        <main style="max-width: 1000px; margin: 0 auto;">
+                            <!-- Problem Section -->
+                            <section style="margin-bottom: 40px; padding: 25px; background-color: rgba(255,255,255,0.05); border-radius: 8px; border-left: 4px solid #ff6b6b;">
+                                <h2 style="color: #ff6b6b; margin-bottom: 15px; font-size: 1.8rem;">${data.h2_1 || 'Problemstellung'}</h2>
+                                <p style="color: #ccc; margin-bottom: 20px;">Verstehen Sie die Herausforderungen in diesem Bereich und warum eine professionelle Lösung wichtig ist.</p>
+                            </section>
+
+                            <!-- Solution Section -->
+                            <section style="margin-bottom: 40px; padding: 25px; background-color: rgba(255,255,255,0.05); border-radius: 8px; border-left: 4px solid #28a745;">
+                                <h2 style="color: #28a745; margin-bottom: 15px; font-size: 1.8rem;">${data.h2_2 || 'Unsere Lösung'}</h2>
+                                <p style="color: #ccc; margin-bottom: 20px;">So bieten wir Ihnen die optimale Lösung für Ihre spezifischen Anforderungen.</p>
+                            </section>
+
+                            <!-- Features & Benefits -->
+                            <section style="margin-bottom: 40px;">
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;">
+                                    <div style="padding: 25px; background-color: rgba(255,255,255,0.05); border-radius: 8px;">
+                                        <h3 style="color: #ffc107; margin-bottom: 15px; font-size: 1.5rem;">${data.h2_3 || 'Features'}</h3>
+                                        <div style="color: #ccc;">${data.features_list || '<ul><li>Feature 1</li><li>Feature 2</li><li>Feature 3</li></ul>'}</div>
+                                    </div>
+                                    <div style="padding: 25px; background-color: rgba(255,255,255,0.05); border-radius: 8px;">
+                                        <h3 style="color: #ffc107; margin-bottom: 15px; font-size: 1.5rem;">Vorteile</h3>
+                                        <div style="color: #ccc;">${data.benefits_list || '<ul><li>Vorteil 1</li><li>Vorteil 2</li><li>Vorteil 3</li></ul>'}</div>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- Trust Section -->
+                            <section style="margin-bottom: 40px; padding: 25px; background-color: rgba(255,255,255,0.05); border-radius: 8px; border-left: 4px solid #17a2b8;">
+                                <h2 style="color: #17a2b8; margin-bottom: 15px; font-size: 1.8rem;">${data.h2_4 || 'Vertrauen & Qualität'}</h2>
+                                <p style="color: #ffc107; font-weight: bold; text-align: center; margin-bottom: 20px;">${data.social_proof || 'Vertrauenssignale'}</p>
+                                <p style="color: #aaa; text-align: center;">${data.trust_signals || 'Zertifiziert • Sicher • Garantiert'}</p>
+                            </section>
+
+                            <!-- Testimonials -->
+                            <section style="margin-bottom: 40px;">
+                                <h3 style="color: #ffc107; text-align: center; margin-bottom: 25px; font-size: 1.8rem;">Kundenstimmen</h3>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                                    <div style="padding: 20px; background-color: rgba(255,193,7,0.1); border-radius: 8px; border-left: 4px solid #ffc107;">
+                                        <p style="color: #ccc; font-style: italic; margin-bottom: 10px;">${data.testimonial_1 || 'Ausgezeichneter Service und professionelle Betreuung!'}</p>
+                                    </div>
+                                    <div style="padding: 20px; background-color: rgba(255,193,7,0.1); border-radius: 8px; border-left: 4px solid #ffc107;">
+                                        <p style="color: #ccc; font-style: italic; margin-bottom: 10px;">${data.testimonial_2 || 'Kann ich nur weiterempfehlen!'}</p>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- Pricing -->
+                            <section style="margin-bottom: 40px;">
+                                <h3 style="color: #ffc107; text-align: center; margin-bottom: 25px; font-size: 1.8rem;">${data.pricing_title || 'Unsere Pakete'}</h3>
+                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+                                    <div style="padding: 20px; background-color: rgba(255,255,255,0.05); border-radius: 8px; text-align: center;">
+                                        <h4 style="color: #ffc107; margin-bottom: 10px;">Starter</h4>
+                                        <p style="color: #ccc; font-size: 0.9rem;">${data.price_1 || 'Grundpaket für den Einstieg'}</p>
+                                    </div>
+                                    <div style="padding: 20px; background-color: rgba(255,193,7,0.1); border: 2px solid #ffc107; border-radius: 8px; text-align: center;">
+                                        <h4 style="color: #ffc107; margin-bottom: 10px;">Professional</h4>
+                                        <p style="color: #ccc; font-size: 0.9rem;">${data.price_2 || 'Erweiterte Funktionen'}</p>
+                                    </div>
+                                    <div style="padding: 20px; background-color: rgba(255,255,255,0.05); border-radius: 8px; text-align: center;">
+                                        <h4 style="color: #ffc107; margin-bottom: 10px;">Enterprise</h4>
+                                        <p style="color: #ccc; font-size: 0.9rem;">${data.price_3 || 'Vollständige Lösung'}</p>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- FAQ -->
+                            <section style="margin-bottom: 40px;">
+                                <h3 style="color: #ffc107; text-align: center; margin-bottom: 25px; font-size: 1.8rem;">Häufige Fragen</h3>
+                                <div style="space-y: 15px;">
+                                    <details style="background-color: rgba(255,255,255,0.05); border-radius: 8px; padding: 15px; margin-bottom: 15px;">
+                                        <summary style="color: #ffc107; font-weight: bold; cursor: pointer; margin-bottom: 10px;">${data.faq_1 || 'Wie funktioniert der Service?'}</summary>
+                                        <p style="color: #ccc; margin-top: 10px;">${data.faq_answer_1 || 'Detaillierte Antwort auf die erste Frage.'}</p>
+                                    </details>
+                                    <details style="background-color: rgba(255,255,255,0.05); border-radius: 8px; padding: 15px; margin-bottom: 15px;">
+                                        <summary style="color: #ffc107; font-weight: bold; cursor: pointer; margin-bottom: 10px;">${data.faq_2 || 'Was sind die Kosten?'}</summary>
+                                        <p style="color: #ccc; margin-top: 10px;">${data.faq_answer_2 || 'Detaillierte Antwort auf die zweite Frage.'}</p>
+                                    </details>
+                                    <details style="background-color: rgba(255,255,255,0.05); border-radius: 8px; padding: 15px; margin-bottom: 15px;">
+                                        <summary style="color: #ffc107; font-weight: bold; cursor: pointer; margin-bottom: 10px;">${data.faq_3 || 'Wie ist der Support?'}</summary>
+                                        <p style="color: #ccc; margin-top: 10px;">${data.faq_answer_3 || 'Detaillierte Antwort auf die dritte Frage.'}</p>
+                                    </details>
+                                </div>
+                            </section>
+
+                            <!-- Guarantee -->
+                            <section style="text-align: center; padding: 30px; background: linear-gradient(45deg, rgba(255,193,7,0.1), rgba(255,193,7,0.2)); border-radius: 10px; border: 2px solid #ffc107;">
+                                <h3 style="color: #ffc107; margin-bottom: 15px;">${data.guarantee_text || 'Unsere Garantie'}</h3>
+                                <p style="color: #ccc; margin-bottom: 25px;">${data.contact_info || 'Kontaktieren Sie uns für weitere Informationen.'}</p>
+                                <button style="background: #ffc107; color: #1a1a1a; border: none; padding: 15px 30px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 1.1rem;">${data.footer_cta || 'Jetzt starten'}</button>
+                            </section>
+                        </main>
+
+                        <!-- SEO Meta Info - KOMPLETT GETRENNT -->
+                        <div style="margin-top: 50px; padding: 0; clear: both;"></div>
+                        
+                        <section style="margin-top: 30px; padding: 25px; background: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(45,45,45,0.7) 100%); border-radius: 12px; border: 2px solid #444;">
+                            <h3 style="color: #ffc107; margin: 0 0 25px 0; text-align: center; font-size: 1.5rem; border-bottom: 2px solid #ffc107; padding-bottom: 10px;">📊 SEO & Meta-Informationen</h3>
+                            
+                            <div style="display: flex; flex-direction: column; gap: 20px; max-width: 100%;">
+                                <div style="padding: 15px; background: linear-gradient(90deg, rgba(40,167,69,0.1) 0%, rgba(40,167,69,0.05) 100%); border-radius: 8px; border-left: 4px solid #28a745;">
+                                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                                        <strong style="color: #28a745; font-size: 1rem;">🎯 SEO Titel:</strong>
+                                        <span style="color: #e9e9e9; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word;">${data.meta_title || data.post_title || 'N/A'}</span>
+                                    </div>
+                                </div>
+                                
+                                <div style="padding: 15px; background: linear-gradient(90deg, rgba(23,162,184,0.1) 0%, rgba(23,162,184,0.05) 100%); border-radius: 8px; border-left: 4px solid #17a2b8;">
+                                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                                        <strong style="color: #17a2b8; font-size: 1rem;">🔗 URL Slug:</strong>
+                                        <span style="color: #e9e9e9; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word; font-family: monospace; background-color: rgba(0,0,0,0.3); padding: 5px 8px; border-radius: 4px;">${data.post_name || 'n-a'}</span>
+                                    </div>
+                                </div>
+                                
+                                <div style="padding: 15px; background: linear-gradient(90deg, rgba(255,193,7,0.1) 0%, rgba(255,193,7,0.05) 100%); border-radius: 8px; border-left: 4px solid #ffc107;">
+                                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                                        <strong style="color: #ffc107; font-size: 1rem;">📝 Meta Description:</strong>
+                                        <span style="color: #e9e9e9; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word;">${data.meta_description || 'N/A'}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                `;
                 previewContentArea.innerHTML = previewHtml;
                 openPreviewModal();
             }
