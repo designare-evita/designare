@@ -14,64 +14,58 @@ export default async function handler(req, res) {
     // API-Schlüssel sicher aus den Vercel Environment Variables laden
     const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
 
-    // Daten aus der Anfrage des Frontends auslesen
-    const { history, prompt } = req.body;
+    // Daten aus der Anfrage von silas-form.js auslesen
+    const { prompt, keyword } = req.body;
 
-    // WICHTIG: Aktualisierte Modellnamen für 2025
-    // Probiere verschiedene verfügbare Modelle in der Reihenfolge ihrer Verfügbarkeit
+    if (!prompt) {
+        return res.status(400).json({ error: 'Ein Prompt wird benötigt.' });
+    }
+
+    // Modelle, die Vercel ausprobieren soll.
     const modelNames = [
-      "gemini-2.0-flash-exp",      // Neuestes experimentelles Modell
-      "gemini-1.5-flash",          // Falls noch verfügbar
-      "gemini-1.5-pro",            // Falls noch verfügbar
-      "gemini-pro"                 // Fallback (möglicherweise veraltet)
+      "gemini-1.5-pro-latest",
+      "gemini-1.5-flash",
+      "gemini-pro" 
     ];
 
     let model = null;
     let lastError = null;
 
-    // Versuche verschiedene Modelle, bis eines funktioniert
+    // Versuche verschiedene Modelle, bis eines funktioniert. Das macht die Funktion robust.
     for (const modelName of modelNames) {
       try {
         model = genAI.getGenerativeModel({ model: modelName });
-        console.log(`Erfolgreich Modell geladen: ${modelName}`);
-        break;
+        console.log(`Erfolgreich Modell geladen für Silas: ${modelName}`);
+        break; // Stoppe, sobald ein Modell erfolgreich geladen wurde
       } catch (error) {
         console.warn(`Modell ${modelName} nicht verfügbar:`, error.message);
         lastError = error;
-        continue;
+        continue; // Versuche das nächste Modell
       }
     }
 
     if (!model) {
-      throw new Error(`Kein verfügbares Modell gefunden. Letzter Fehler: ${lastError?.message}`);
+      throw new Error(`Kein verfügbares KI-Modell gefunden. Letzter Fehler: ${lastError?.message}`);
     }
 
-    const chat = model.startChat({
-      history: history || [], // Benutze den übergebenen Verlauf
-    });
-
-    const result = await chat.sendMessage(prompt);
+    // Führe den einzelnen Prompt aus (anders als bei Evitas Chat)
+    const result = await model.generateContent(prompt);
     const response = await result.response;
-    const text = response.text();
+    const responseText = response.text();
 
-    // Sende die Antwort der KI im JSON-Format zurück an das Frontend
-    res.status(200).json({ text });
+    // Bereinige die Antwort, um sicherzustellen, dass es valides JSON ist
+    const cleanJsonText = responseText.replace(/^```json\s*|```\s*$/g, '').trim();
+    const jsonData = JSON.parse(cleanJsonText);
+    
+    // Füge das Keyword wieder hinzu für die Anzeige im Frontend
+    jsonData.keyword = keyword;
+
+    // Sende das fertige JSON-Objekt zurück
+    res.status(200).json(jsonData);
 
   } catch (error) {
-    // Loggt den detaillierten Fehler auf dem Vercel-Server (sichtbar im Dashboard)
-    console.error("Error in /api/generate:", error); 
-    
-    // Detailliertere Fehlermeldung für Debugging
-    const errorMessage = error.message || 'Unbekannter Fehler';
-    console.error("Detaillierter Fehler:", {
-      message: errorMessage,
-      stack: error.stack,
-      name: error.name
-    });
-    
-    // Sendet eine spezifischere Fehlermeldung an den Benutzer
-    res.status(500).json({ 
-      error: `Fehler bei der Kommunikation mit der KI: ${errorMessage}` 
-    });
+    // Loggt den detaillierten Fehler auf dem Vercel-Server
+    console.error("Fehler in /api/generate (Silas):", error); 
+    res.status(500).json({ error: 'Fehler bei der Inhaltsgenerierung', details: error.message });
   }
 }
