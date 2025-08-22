@@ -1,3 +1,24 @@
+/* ==============
+   STYLES FÜR SILAS-FORMULAR-ERWEITERUNG
+   ============== */
+
+/* Stellt sicher, dass die Gruppe mit Label und Select-Box korrekt ausgerichtet ist */
+.tool-form .input-group label {
+    display: flex;
+    align-items: center; /* Zentriert den Text vertikal passend zur Box */
+    padding-right: 15px;  /* Fügt etwas Abstand zwischen Text und Box hinzu */
+    font-weight: 500;
+    white-space: nowrap;  /* Verhindert, dass der Text umbricht */
+    color: #f0f0f0;       /* Stellt die Textfarbe passend zum Rest ein */
+}
+
+/* Sorgt dafür, dass die Select-Box den verfügbaren Platz ausfüllt */
+.tool-form .input-group .custom-select {
+    flex-grow: 1;
+}
+
+
+
 #ai-response-content-area {
     max-height: 60vh;
     overflow-y: hidden !important; 
