@@ -1,27 +1,173 @@
 /* ==============
-   ERWEITERTE STYLES FÜR SELECT-BOX IN INPUT-GROUP
+   AI-STYLES.CSS - KOMPLETT NEU GESCHRIEBEN
+   Für Evita KI (Hauptseite) und Silas KI (CSV-Creator)
    ============== */
 
-/* Container für die Input-Group - sorgt für korrekte Ausrichtung */
+/* ======================================== */
+/* GLOBALE AI-CONTAINER STYLES             */
+/* ======================================== */
+
+/* Basis-Container für alle AI-Interfaces */
+.ai-container {
+    width: 100%;
+    margin: 0 auto;
+}
+
+.ai-container h3 {
+    color: #ffc107;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.ai-container p {
+    color: #ccc;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+/* ======================================== */
+/* EVITA KI - HAUPTSEITEN-FORMULAR         */
+/* ======================================== */
+
+/* Standard AI-Formular (für Evita auf der Hauptseite) */
+.ai-container form:not(#silas-form) {
+    display: flex;
+    flex-direction: row;
+    border-radius: 7px;
+    overflow: hidden;
+    border: 1px solid #444;
+    background-color: #2d2d2d;
+    transition: all 0.3s ease-in-out;
+    align-items: center;
+}
+
+.ai-container form:not(#silas-form):hover,
+.ai-container form:not(#silas-form):focus-within {
+    border-color: #ffc107;
+    box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
+}
+
+/* Input-Feld für Evita (ai-question) */
+#ai-question {
+    flex-grow: 1;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    background-color: transparent;
+    color: #fff;
+    outline: none;
+}
+
+#ai-question::placeholder {
+    color: #aaa;
+}
+
+#ai-question:focus {
+    outline: none;
+}
+
+/* Standard AI-Button für Evita */
+.ai-container form:not(#silas-form) button {
+    background: transparent;
+    border: none;
+    color: #ffc107;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: color 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.ai-container form:not(#silas-form) button:hover {
+    color: #fff;
+    background-color: rgba(255, 193, 7, 0.1);
+}
+
+/* ======================================== */
+/* SILAS KI - CSV-CREATOR FORMULAR         */
+/* ======================================== */
+
+/* Silas-spezifisches Hauptformular - Input und Button in einer Reihe */
+#silas-form {
+    display: flex !important;
+    flex-direction: row !important;
+    border-radius: 7px;
+    overflow: hidden;
+    border: 1px solid #444;
+    background-color: #2d2d2d;
+    transition: all 0.3s ease-in-out;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 1rem;
+}
+
+#silas-form:hover,
+#silas-form:focus-within {
+    border-color: #ffc107;
+    box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
+}
+
+/* Silas Keyword-Input */
+#silas-keyword-input {
+    flex-grow: 1;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    background-color: transparent;
+    color: #fff;
+    outline: none;
+}
+
+#silas-keyword-input::placeholder {
+    color: #aaa;
+}
+
+/* Silas Add-Button */
+#add-keyword-btn {
+    background: transparent;
+    border: none;
+    color: #ffc107;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+#add-keyword-btn:hover {
+    color: #fff;
+    background-color: rgba(255, 193, 7, 0.1);
+}
+
+/* ======================================== */
+/* SILAS SELECT-BOX (TEXT-INTENT)          */
+/* ======================================== */
+
+/* Input-Group für Select-Box */
 .ai-container .input-group {
     display: flex;
     align-items: center;
     margin-top: 1rem;
-    gap: 15px; /* Abstand zwischen Label und Select */
+    gap: 15px;
     width: 100%;
 }
 
-/* Label-Styling in der Input-Group */
 .ai-container .input-group label {
     display: flex;
     align-items: center;
     font-weight: 500;
     white-space: nowrap;
     color: #f0f0f0;
-    min-width: fit-content; /* Verhindert Überlappung */
+    min-width: fit-content;
 }
 
-/* Custom Select-Box Styling passend zur Website */
+/* Custom Select-Box */
 .ai-container .custom-select {
     flex-grow: 1;
     background-color: #2d2d2d;
@@ -34,7 +180,7 @@
     cursor: pointer;
     transition: all 0.3s ease-in-out;
     
-    /* Custom Arrow für Select */
+    /* Custom Arrow */
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -42,10 +188,9 @@
     background-repeat: no-repeat;
     background-position: right 12px center;
     background-size: 16px;
-    padding-right: 40px; /* Platz für den Custom Arrow */
+    padding-right: 40px;
 }
 
-/* Hover- und Focus-Effekte für die Select-Box */
 .ai-container .custom-select:hover,
 .ai-container .custom-select:focus {
     border-color: #ffc107;
@@ -53,191 +198,16 @@
     outline: none;
 }
 
-/* Option-Styling (funktioniert in den meisten modernen Browsern) */
 .ai-container .custom-select option {
     background-color: #2d2d2d;
     color: #fff;
     padding: 10px;
 }
 
-/* Responsive Anpassung für kleinere Bildschirme */
-@media (max-width: 768px) {
-    .ai-container .input-group {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-    }
-    
-    .ai-container .input-group label {
-        text-align: center;
-        min-width: auto;
-    }
-    
-    .ai-container .custom-select {
-        width: 100%;
-    }
-}
+/* ======================================== */
+/* SILAS KEYWORD-LISTE                     */
+/* ======================================== */
 
-/* Integration mit dem bestehenden Formular-Design */
-.ai-container form {
-    flex-direction: column; /* Ändert die Richtung für bessere Anordnung */
-    gap: 0; /* Entfernt Gap für präzisere Kontrolle */
-}
-
-/* Anpassung des Hauptformulars für bessere Integration */
-.ai-container form > div:first-child {
-    display: flex;
-    border-radius: 7px; 
-    overflow: hidden;
-    border: 1px solid #444;
-    background-color: #2d2d2d;
-    transition: all 0.3s ease-in-out;
-}
-
-/* Hover-Effekt für das gesamte Formular beibehalten */
-.ai-container form > div:first-child:hover,
-.ai-container form > div:first-child:focus-within {
-    border-color: #ffc107;
-    box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
-}
-
-/* Sicherstellen, dass das Input-Feld im Formular korrekt bleibt */
-.ai-container form input[type="text"] {
-    flex-grow: 1;
-    border: none;
-    padding: 10px 20px;
-    font-size: 1rem;
-    background-color: transparent;
-    color: #fff;
-}
-
-/* Button im Formular bleibt unverändert */
-.ai-container form button[type="submit"] {
-    background: transparent;
-    border: none;
-    color: #ffc107;
-    padding: 10px 20px;
-    cursor: pointer;
-    font-size: 1.2rem;
-    transition: color 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.ai-container form button[type="submit"]:hover {
-    color: #fff;
-}
-
-
-
-#ai-response-content-area {
-    max-height: 60vh;
-    overflow-y: hidden !important; 
-    padding-right: 15px;
-    text-align: left;
-    white-space: pre-wrap;  
-}
-
-/* Stile für den Lightbox-Footer */
-.modal-footer {
-    text-align: center;
-    margin-top: 2rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid #e0e0e0; /* Eine feine Trennlinie */
-}
-
-.modal-footer .button {
-    /* Beibehaltung des Hintergrunds und der Textfarbe */
-    background-color: var(--primary-color);
-    color: var(--button-text-color);
-    cursor: pointer; /* Stellt sicher, dass der Mauszeiger eine Hand ist */
-    padding: 0.75rem 1.5rem; /* Sorgt für angenehmen Innenabstand */
-    transition: all 0.3s ease; /* Allgemeine, sanfte Animation */
-    border: 2px solid rgb(211, 154, 0); 
-    font-size: 1rem;                      
-    border-radius: 5px;                    
-}
-
-/* Ein passender Hover-Effekt, der den goldenen Rahmen hervorhebt */
-.modal-footer .button:hover {
-    background-color: var(--primary-color-dark);
-    border-color: rgb(231, 174, 0); /* Lässt den Rahmen beim Hovern heller leuchten */
-}
-
-
-/* Globale Stile für alle AI-Formulare */
-.ai-container form {
-    display: flex;
-    border-radius: 7px; 
-    overflow: hidden;
-    border: 1px solid #444;
-    background-color: #2d2d2d;
-    transition: all 0.3s ease-in-out;
-}
-
-.ai-container form:hover,
-.ai-container form:focus-within {
-    border-color: #ffc107;
-    box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
-}
-
-.ai-container input[type="text"] {
-    flex-grow: 1;
-    border: none;
-    padding: 10px 20px;
-    font-size: 1rem;
-    background-color: transparent;
-    color: #fff;
-}
-
-.ai-container input[type="text"]:focus {
-    outline: none;
-}
-
-.ai-container button {
-    background: transparent;
-    border: none;
-    color: #ffc107;
-    padding: 10px 20px; /* Etwas mehr padding für bessere Optik */
-    cursor: pointer;
-    font-size: 1.2rem;
-    transition: color 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.ai-container button:hover {
-    color: #fff;
-}
-
-/* Stil für den Download-Button */
-#download-csv {
-    width: 100%;
-    text-align: center;
-    border: 2px solid #FCB500;
-    background-color: transparent;
-    color: #ffc107;
-    padding: 12px 20px;
-    border-radius: 7px; /* Passender Radius zum Formular */
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 1rem;
-    margin-top: 1rem;
-}
-
-#download-csv:hover {
-    background-color: #ffc107;
-    color: #2d2d2d;
-    box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
-}
-
-#download-csv .fas {
-    margin-right: 10px; /* Abstand zwischen Icon und Text */
-}
-
-/* Stile für die neue Keyword-Liste */
 .keyword-list-container {
     margin-top: 2rem;
     padding: 1.5rem;
@@ -272,161 +242,341 @@
     justify-content: space-between;
     align-items: center;
     font-size: 0.95rem;
+    color: #fff;
 }
+
+#keyword-display-list li button {
+    background-color: #ff6b6b;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    padding: 2px 8px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: background-color 0.3s ease;
+}
+
+#keyword-display-list li button:hover {
+    background-color: #ff5252;
+}
+
+/* ======================================== */
+/* SILAS BUTTON-CONTROLS                   */
+/* ======================================== */
 
 .keyword-list-controls {
     display: flex;
     justify-content: center;
     gap: 1rem;
     margin-top: 1.5rem;
+    flex-wrap: wrap;
 }
 
-/* Stil für den sekundären Button (Liste leeren) */
-.cta-button.secondary {
-    background-color: transparent;
-    border-color: #666;
-    color: #999;
-}
-
-.cta-button.secondary:hover {
-    background-color: #333;
-    color: #fff;
-}
-
-/* ============================================= */
-/* Verbessertes Button-Design für Silas-Steuerung */
-/* ============================================= */
-
-/* Container, der die Buttons zentriert und anordnet */
-.keyword-list-controls {
-    display: flex;
-    justify-content: center;
-    gap: 1rem; /* Abstand zwischen den Buttons */
-    margin-top: 1.5rem;
-    flex-wrap: wrap; /* Sorgt für Umbruch auf kleinen Bildschirmen */
-}
-
-/* Allgemeiner Stil für ALLE Call-to-Action-Buttons in diesem Bereich */
-.keyword-list-controls .cta-button,
-#silas-response-container .cta-button {
+/* CTA-Buttons */
+.cta-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     padding: 12px 25px;
     font-size: 1rem;
-    font-weight: 600; /* Etwas fetter für mehr Präsenz */
-    border-radius: 7px; /* Vollständig abgerundete Ecken */
+    font-weight: 600;
+    border-radius: 7px;
     cursor: pointer;
-    border: 2px solid; /* Vorbereitung für den Rahmen */
+    border: 2px solid;
     transition: all 0.3s ease;
-    text-decoration: none; /* Entfernt Unterstreichungen von a-Tags */
+    text-decoration: none;
 }
 
-.keyword-list-controls .cta-button .fas,
-#silas-response-container .cta-button .fas {
-    margin-right: 10px; /* Abstand zwischen Icon und Text */
+.cta-button .fas {
+    margin-right: 10px;
 }
 
-/* Primärer Button-Stil (Content erstellen & Download) */
-.keyword-list-controls .cta-button,
-#silas-response-container .cta-button {
-    background-color: #ffc107; /* Goldener Hintergrund */
-    border-color: #ffc107;
-    color: #1a1a1a; /* Dunkler Text für besseren Kontrast */
-}
-
-/* Hover-Effekt für primäre Buttons */
-.keyword-list-controls .cta-button:hover,
-#silas-response-container .cta-button:hover {
-    background-color: #ffca2c;
-    border-color: #ffca2c;
-    color: #000;
-    transform: translateY(-2px); /* Leichter Schwebe-Effekt */
-    box-shadow: 0 4px 15px rgba(255, 193, 7, 0.2);
-}
-
-/* Sekundärer Button-Stil (Liste leeren) */
-.keyword-list-controls .cta-button.secondary {
-    background-color: transparent;
-    border-color: #555; /* Dunkelgrauer Rahmen */
-    color: #aaa; /* Hellerer grauer Text */
-}
-
-/* Hover-Effekt für sekundären Button */
-.keyword-list-controls .cta-button.secondary:hover {
-    background-color: #333;
-    border-color: #777;
-    color: #fff;
-    box-shadow: none; /* Kein Leuchten für den sekundären Button */
-}
-
-/* ======================================== */
-/* Stile für die Silas Content-Vorschau   */
-/* ======================================== */
-
-.modal-content.preview-modal-content {
-    max-width: 800px; /* Breiteres Modal für bessere Lesbarkeit */
-    text-align: left;
-}
-
-#preview-content-area {
-    max-height: 70vh;
-    overflow-y: auto;
-    padding-right: 15px; /* Platz für die Scrollbar */
-}
-
-#preview-content-area h1 {
-    font-size: 2rem;
-    color: #ffc107;
-    margin-bottom: 1rem;
-    line-height: 1.2;
-}
-
-#preview-content-area h2 {
-    font-size: 1.5rem;
-    color: #eee;
-    margin-top: 2rem;
-    margin-bottom: 0.75rem;
-    border-bottom: 1px solid #444;
-    padding-bottom: 0.5rem;
-    text-align: left !important;
-}
-
-#preview-content-area p {
-    font-size: 1rem;
-    line-height: 1.6;
-    color: #ccc;
-    margin-bottom: 1rem;
-}
-
-#preview-content-area h3 {
-    font-size: 1.2rem;
-    color: #ffc107;
-    margin-top: 2.5rem;
-}
-
-/* Stil für den kleinen Vorschau-Button in der Liste */
-.preview-button {
-    background-color: transparent;
-    border: 1px solid #555;
-    color: #aaa;
-    padding: 5px 10px;
-    font-size: 0.8rem;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.preview-button:hover {
+/* Primärer CTA-Button */
+.cta-button:not(.secondary) {
     background-color: #ffc107;
     border-color: #ffc107;
     color: #1a1a1a;
 }
 
-/* Korrektur für die volle Breite des Silas-Interfaces */
-.performance-tip .ai-container,
-.performance-tip .keyword-list-container {
-    max-width: none !important; /* Hebt die Breitenbeschränkung auf */
-    width: 100% !important;    /* Nutzt die volle verfügbare Breite */
+.cta-button:not(.secondary):hover {
+    background-color: #ffca2c;
+    border-color: #ffca2c;
+    color: #000;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 193, 7, 0.2);
 }
 
+/* Sekundärer CTA-Button */
+.cta-button.secondary {
+    background-color: transparent;
+    border-color: #555;
+    color: #aaa;
+}
+
+.cta-button.secondary:hover {
+    background-color: #333;
+    border-color: #777;
+    color: #fff;
+    transform: none;
+    box-shadow: none;
+}
+
+/* ======================================== */
+/* SILAS ERGEBNIS-ANZEIGE                  */
+/* ======================================== */
+
+#silas-response-container {
+    margin-top: 1rem;
+    text-align: left;
+}
+
+#silas-response-container h3 {
+    color: #ffc107;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+#silas-response-content {
+    background-color: rgba(255,255,255,0.05);
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 1rem;
+}
+
+/* Result Cards */
+.result-card {
+    background-color: rgba(255,255,255,0.05);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-left: 4px solid #ffc107;
+}
+
+.result-card h4 {
+    color: #fff;
+    margin: 0 0 10px 0;
+}
+
+.result-card p {
+    margin: 5px 0;
+    color: #ccc;
+}
+
+.result-card .error {
+    color: #ff6b6b;
+}
+
+/* Vorschau-Button in Result Cards */
+.preview-btn {
+    background-color: #007cba;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.preview-btn:hover {
+    background-color: #005f8a;
+}
+
+/* Download-Button */
+#download-csv,
+#download-csv-dynamic {
+    width: 100%;
+    text-align: center;
+    border: 2px solid #ffc107;
+    background-color: transparent;
+    color: #ffc107;
+    padding: 12px 20px;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    margin-top: 1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#download-csv:hover,
+#download-csv-dynamic:hover {
+    background-color: #ffc107;
+    color: #2d2d2d;
+    box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
+}
+
+#download-csv .fas,
+#download-csv-dynamic .fas {
+    margin-right: 10px;
+}
+
+/* ======================================== */
+/* SILAS VORSCHAU-MODAL                    */
+/* ======================================== */
+
+.modal-content.preview-modal-content {
+    max-width: 90vw;
+    max-height: 90vh;
+    width: 1200px;
+    text-align: left;
+}
+
+#preview-content-area {
+    max-height: 80vh;
+    overflow-y: auto;
+    padding-right: 15px;
+}
+
+/* Vorschau-spezifische Styles */
+.preview-landingpage ul {
+    padding-left: 20px;
+    margin: 10px 0;
+}
+
+.preview-landingpage li {
+    margin-bottom: 8px;
+    color: #ccc;
+}
+
+.preview-landingpage details summary::-webkit-details-marker {
+    color: #ffc107;
+}
+
+.preview-landingpage details summary {
+    cursor: pointer;
+    outline: none;
+}
+
+.preview-landingpage details[open] summary {
+    margin-bottom: 10px;
+}
+
+/* ======================================== */
+/* EVITA RESPONSE-MODAL                    */
+/* ======================================== */
+
+#ai-response-content-area {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 15px;
+    text-align: left;
+    white-space: pre-wrap;
+    color: #ccc;
+    line-height: 1.6;
+}
+
+.modal-footer {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #444;
+}
+
+.modal-footer .button {
+    background-color: #ffc107;
+    color: #1a1a1a;
+    cursor: pointer;
+    padding: 0.75rem 1.5rem;
+    transition: all 0.3s ease;
+    border: 2px solid #ffc107;
+    font-size: 1rem;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+.modal-footer .button:hover {
+    background-color: #ffca2c;
+    border-color: #ffca2c;
+    transform: translateY(-1px);
+}
+
+/* ======================================== */
+/* RESPONSIVE DESIGN                       */
+/* ======================================== */
+
+@media (max-width: 768px) {
+    /* Silas Form Mobile */
+    #silas-form {
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px;
+    }
+    
+    #silas-keyword-input {
+        width: 100%;
+        margin-bottom: 10px;
+        border: 1px solid #444;
+        border-radius: 5px;
+        padding: 12px;
+    }
+    
+    #add-keyword-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 12px;
+        border: 1px solid #ffc107;
+        border-radius: 5px;
+    }
+
+    /* Input Group Mobile */
+    .ai-container .input-group {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+    
+    .ai-container .input-group label {
+        text-align: center;
+        min-width: auto;
+    }
+    
+    .ai-container .custom-select {
+        width: 100%;
+    }
+
+    /* Button Controls Mobile */
+    .keyword-list-controls {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .cta-button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* Preview Modal Mobile */
+    .modal-content.preview-modal-content {
+        width: 95vw;
+        max-width: none;
+    }
+
+    /* Responsive Grid für Vorschau */
+    .preview-landingpage div[style*="grid-template-columns"] {
+        grid-template-columns: 1fr !important;
+        gap: 15px !important;
+    }
+}
+
+/* ======================================== */
+/* UTILITY CLASSES                         */
+/* ======================================== */
+
+/* Vollbreite für Silas-Interface */
+.performance-tip .ai-container,
+.performance-tip .keyword-list-container {
+    max-width: none !important;
+    width: 100% !important;
+}
+
+/* Status-Text */
+#silas-status {
+    text-align: center;
+    width: 100%;
+    margin-top: 1rem;
+    color: #ffc107;
+    font-weight: 500;
+}
