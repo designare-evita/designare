@@ -2,6 +2,23 @@ a {
     text-decoration: none !important;
 }
 
+/* Header mit transparentem Hintergrund */
+.main-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    z-index: 1001;
+    box-sizing: border-box;
+    height: var(--header-height-desktop);
+    background-color: rgba(26, 26, 26, 0.95);
+    backdrop-filter: blur(10px);
+}
+
 .side-menu {
  padding-top: 80px;
 padding-bottom: 20px;
