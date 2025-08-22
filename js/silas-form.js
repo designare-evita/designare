@@ -377,20 +377,21 @@ ${jsonFormatInstructions}
                         </main>
 
                         <!-- SEO Meta Info -->
-                        <footer style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #444; font-size: 0.9rem; color: #666;">
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                                <div>
-                                    <strong style="color: #ffc107;">SEO Titel:</strong><br>
-                                    ${data.meta_title || data.post_title || 'N/A'}
+                        <footer style="margin-top: 40px; padding: 20px; border-top: 2px solid #444; font-size: 0.9rem; color: #666; background-color: rgba(0,0,0,0.3); border-radius: 8px;">
+                            <h3 style="color: #ffc107; margin-bottom: 20px; text-align: center;">SEO & Meta-Informationen</h3>
+                            <div style="display: grid; grid-template-columns: 1fr; gap: 15px; max-width: 800px; margin: 0 auto;">
+                                <div style="padding: 10px; background-color: rgba(255,255,255,0.05); border-radius: 5px; border-left: 3px solid #28a745;">
+                                    <strong style="color: #28a745; display: block; margin-bottom: 5px;">SEO Titel:</strong>
+                                    <span style="color: #ccc;">${data.meta_title || data.post_title || 'N/A'}</span>
                                 </div>
-                                <div>
-                                    <strong style="color: #ffc107;">URL Slug:</strong><br>
-                                    ${data.post_name || 'n-a'}
+                                <div style="padding: 10px; background-color: rgba(255,255,255,0.05); border-radius: 5px; border-left: 3px solid #17a2b8;">
+                                    <strong style="color: #17a2b8; display: block; margin-bottom: 5px;">URL Slug:</strong>
+                                    <span style="color: #ccc;">${data.post_name || 'n-a'}</span>
                                 </div>
-                            </div>
-                            <div style="margin-top: 15px;">
-                                <strong style="color: #ffc107;">Meta Description:</strong><br>
-                                ${data.meta_description || 'N/A'}
+                                <div style="padding: 10px; background-color: rgba(255,255,255,0.05); border-radius: 5px; border-left: 3px solid #ffc107;">
+                                    <strong style="color: #ffc107; display: block; margin-bottom: 5px;">Meta Description:</strong>
+                                    <span style="color: #ccc;">${data.meta_description || 'N/A'}</span>
+                                </div>
                             </div>
                         </footer>
                     </div>
