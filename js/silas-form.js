@@ -74,6 +74,7 @@ export function initSilasForm() {
         allGeneratedData = [];
         updateKeywordDisplay();
         silasResponseContainer.innerHTML = '';
+        silasResponseContainer.style.display = 'none'; // Container wieder verstecken
         silasStatus.textContent = 'Bereit zur Generierung.';
     });
 
@@ -86,7 +87,12 @@ export function initSilasForm() {
 
         startGenerationBtn.disabled = true;
         allGeneratedData = [];
-        silasResponseContainer.innerHTML = '';
+        
+        // Container leeren und für neue Ergebnisse vorbereiten
+        silasResponseContainer.innerHTML = '<h3>Erstellung läuft...</h3><div id="silas-response-content"></div>';
+        silasResponseContainer.style.display = 'block'; // Container sichtbar machen
+        
+        const responseContent = document.getElementById('silas-response-content');
         const textIntent = textIntentSelect.value;
 
         for (let i = 0; i < keywordList.length; i++) {
@@ -102,21 +108,36 @@ export function initSilasForm() {
                     body: JSON.stringify({ prompt: userPrompt, keyword: keyword })
                 });
 
-                if (!response.ok) { throw new Error(`Server-Fehler: ${await response.text()}`); }
+                if (!response.ok) { 
+                    throw new Error(`Server-Fehler: ${await response.text()}`); 
+                }
 
                 const data = await response.json();
                 allGeneratedData.push(data);
-                displayResult(data, i);
+                displayResult(data, i, responseContent);
 
             } catch (error) {
                 console.error('Fehler bei der Textgenerierung:', error);
                 const errorData = { keyword: keyword, error: error.message };
                 allGeneratedData.push(errorData);
-                displayResult(errorData, i);
+                displayResult(errorData, i, responseContent);
             }
         }
+
+        // Nach Abschluss: Status aktualisieren und Download-Button hinzufügen
         silasStatus.textContent = `Alle ${keywordList.length} Texte wurden generiert.`;
         startGenerationBtn.disabled = false;
+        
+        // Download-Button hinzufügen, wenn noch nicht vorhanden
+        if (!document.getElementById('download-csv-dynamic')) {
+            const downloadButton = document.createElement('button');
+            downloadButton.id = 'download-csv-dynamic';
+            downloadButton.className = 'cta-button';
+            downloadButton.innerHTML = '<i class="fas fa-download"></i> CSV Herunterladen';
+            downloadButton.style.marginTop = '1rem';
+            downloadButton.addEventListener('click', downloadCsv);
+            silasResponseContainer.appendChild(downloadButton);
+        }
     });
 
     // --- PROMPT ERSTELLUNG ---
@@ -181,35 +202,99 @@ ${jsonFormatInstructions}
     }
 
     // --- ANZEIGE & VORSCHAU ---
-    function displayResult(data, index) {
+    function displayResult(data, index, container) {
         const resultCard = document.createElement('div');
         resultCard.className = 'result-card';
+        resultCard.style.cssText = `
+            background-color: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #007cba;
+        `;
+        
         if (data.error) {
-            resultCard.innerHTML = `<h3>${data.keyword}</h3><p class="error">Fehler: ${data.error}</p>`;
+            resultCard.innerHTML = `
+                <h4 style="color: #ff6b6b; margin: 0 0 10px 0;">${data.keyword}</h4>
+                <p style="color: #ff6b6b; margin: 0;">Fehler: ${data.error}</p>
+            `;
         } else {
-            resultCard.innerHTML = `<h3>${data.keyword}</h3><p><strong>Titel:</strong> ${data.post_title || 'N/A'}</p><p><strong>Meta:</strong> ${data.meta_description || 'N/A'}</p><button class="preview-btn" data-index="${index}">Vorschau</button>`;
+            resultCard.innerHTML = `
+                <h4 style="color: #fff; margin: 0 0 10px 0;">${data.keyword}</h4>
+                <p style="margin: 5px 0; color: #ccc;"><strong>Titel:</strong> ${data.post_title || 'N/A'}</p>
+                <p style="margin: 5px 0; color: #ccc;"><strong>Meta:</strong> ${data.meta_description || 'N/A'}</p>
+                <button class="preview-btn" data-index="${index}" style="
+                    background-color: #007cba;
+                    color: white;
+                    border: none;
+                    padding: 8px 16px;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    margin-top: 10px;
+                ">Vorschau anzeigen</button>
+            `;
         }
-        silasResponseContainer.appendChild(resultCard);
+        container.appendChild(resultCard);
     }
     
-    const openPreviewModal = () => previewModal.classList.add('visible');
-    const closePreviewModal = () => previewModal.classList.remove('visible');
-    closePreviewModalBtn.addEventListener('click', closePreviewModal);
-    previewModal.addEventListener('click', (e) => { if (e.target === previewModal) closePreviewModal(); });
+    // --- MODAL FUNKTIONEN ---
+    const openPreviewModal = () => {
+        if (previewModal) {
+            previewModal.classList.add('visible');
+        }
+    };
+    
+    const closePreviewModal = () => {
+        if (previewModal) {
+            previewModal.classList.remove('visible');
+        }
+    };
 
+    // Event Listeners für Modal
+    if (closePreviewModalBtn) {
+        closePreviewModalBtn.addEventListener('click', closePreviewModal);
+    }
+    
+    if (previewModal) {
+        previewModal.addEventListener('click', (e) => { 
+            if (e.target === previewModal) closePreviewModal(); 
+        });
+    }
+
+    // Event Delegation für Vorschau-Buttons
     silasResponseContainer.addEventListener('click', (e) => {
         if (e.target.classList.contains('preview-btn')) {
-            const index = e.target.getAttribute('data-index');
+            const index = parseInt(e.target.getAttribute('data-index'));
             const data = allGeneratedData[index];
-            let previewHtml = `<h1>${data.h1 || ''}</h1><p>${data.hero_text || ''}</p><h2>${data.h2_1 || ''}</h2><h2>${data.h2_2 || ''}</h2>`;
-            previewContentArea.innerHTML = previewHtml;
-            openPreviewModal();
+            
+            if (data && !data.error && previewContentArea) {
+                let previewHtml = `
+                    <div style="color: #333; line-height: 1.6;">
+                        <h1 style="color: #007cba; margin-bottom: 20px;">${data.h1 || 'Keine H1 verfügbar'}</h1>
+                        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                            <p style="margin: 0; font-size: 16px;"><strong>Hero Text:</strong></p>
+                            <p style="margin: 10px 0 0 0;">${data.hero_text || 'Kein Hero-Text verfügbar'}</p>
+                        </div>
+                        <h2 style="color: #007cba; margin: 20px 0 10px 0;">${data.h2_1 || 'Keine H2 verfügbar'}</h2>
+                        <h2 style="color: #007cba; margin: 20px 0 10px 0;">${data.h2_2 || 'Keine zweite H2 verfügbar'}</h2>
+                        <div style="background-color: #e8f4f8; padding: 15px; border-radius: 8px; margin-top: 20px;">
+                            <p style="margin: 0; font-weight: bold;">Primary CTA:</p>
+                            <p style="margin: 5px 0 0 0; color: #007cba;">${data.primary_cta || 'Kein CTA verfügbar'}</p>
+                        </div>
+                    </div>
+                `;
+                previewContentArea.innerHTML = previewHtml;
+                openPreviewModal();
+            }
         }
     });
 
-    // --- CSV-DOWNLOAD ---
-    downloadCsvButton.addEventListener('click', () => {
-        if (allGeneratedData.length === 0) return;
+    // --- CSV-DOWNLOAD FUNKTION ---
+    function downloadCsv() {
+        if (allGeneratedData.length === 0) {
+            alert('Keine Daten zum Download verfügbar.');
+            return;
+        }
 
         const headers = [
             "keyword", "post_title", "post_name", "meta_title", "meta_description", "h1",
@@ -221,18 +306,33 @@ ${jsonFormatInstructions}
         ];
 
         let csvContent = headers.join(",") + "\n";
+        
         allGeneratedData.forEach(rowData => {
-            if (rowData.error) return;
-            const values = headers.map(header => `"${String(rowData[header] || '').replace(/"/g, '""')}"`);
+            if (rowData.error) return; // Fehlerhafte Datensätze überspringen
+            
+            const values = headers.map(header => {
+                const value = String(rowData[header] || '');
+                // CSV-Escaping: Anführungszeichen verdoppeln und Wert in Anführungszeichen setzen
+                return `"${value.replace(/"/g, '""')}"`;
+            });
             csvContent += values.join(",") + "\n";
         });
         
-        const encodedUri = encodeURI("data:text/csv;charset=utf-8," + csvContent);
+        // Download starten
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
         link.setAttribute("download", "silas_generated_content.csv");
+        link.style.visibility = 'hidden';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-    });
+        URL.revokeObjectURL(url);
+    }
+
+    // Bestehender Download-Button aus HTML (falls vorhanden)
+    if (downloadCsvButton) {
+        downloadCsvButton.addEventListener('click', downloadCsv);
+    }
 }
