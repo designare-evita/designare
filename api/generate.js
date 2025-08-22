@@ -100,7 +100,7 @@ module.exports = async (req, res) => {
             temperature: 0.7,
             topK: 40,
             topP: 0.95,
-            maxOutputTokens: 3000, // Reduziert für Stabilität
+            maxOutputTokens: 8000, // Erhöht für umfangreiche Inhalte
           }
         });
         usedModel = modelName;
@@ -120,36 +120,72 @@ module.exports = async (req, res) => {
       });
     }
 
-    // === SIMPLIFIED PROMPT ===
-    const simplifiedPrompt = `
-Erstelle JSON-Content für das Thema "${keyword}".
+    // === COMPREHENSIVE PROMPT ===
+    const comprehensivePrompt = `
+Du bist ein erstklassiger SEO-Content-Strategist. Erstelle vollständigen Landingpage-Content für das Thema "${keyword}".
 
-Antwort-Format (nur JSON, kein Markdown):
+WICHTIG: Deine Antwort MUSS ein einziges, valides JSON-Objekt sein. Beginne direkt mit { und ende mit }. Gib keine Markdown-Formatierung oder andere Texte aus.
+
+Das JSON-Objekt muss ALLE folgenden Felder enthalten und mit umfangreichem, hochwertigem Content füllen:
+
 {
-  "post_title": "SEO-Titel für ${keyword}",
-  "post_name": "${keyword.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}",
-  "meta_title": "Meta-Titel für ${keyword}",
-  "meta_description": "Meta-Beschreibung für ${keyword} (max 160 Zeichen)",
-  "h1": "Hauptüberschrift für ${keyword}",
-  "h2_1": "Erste Unterüberschrift",
-  "h2_2": "Zweite Unterüberschrift",
-  "primary_cta": "Hauptbutton-Text",
-  "hero_text": "Einleitungstext für ${keyword}"
+  "post_title": "SEO-optimierter Titel (50-60 Zeichen) für ${keyword}",
+  "post_name": "seo-freundlicher-url-slug-fuer-${keyword.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}",
+  "meta_title": "Alternativer SEO-Titel (50-60 Zeichen) für ${keyword}",
+  "meta_description": "Fesselnde Meta-Beschreibung (150-160 Zeichen) mit CTA für ${keyword}",
+  "h1": "Kraftvolle H1-Überschrift für ${keyword}, die den Hauptnutzen kommuniziert",
+  "h2_1": "Erste H2-Überschrift (Problemorientiert) für ${keyword}",
+  "h2_2": "Zweite H2-Überschrift (Lösungsorientiert) für ${keyword}",
+  "h2_3": "Dritte H2-Überschrift (Feature-/Nutzen-orientiert) für ${keyword}",
+  "h2_4": "Vierte H2-Überschrift (Vertrauensbildend) für ${keyword}",
+  "primary_cta": "Kurzer, starker Call-to-Action Text (z.B. 'Jetzt ${keyword} anfragen')",
+  "secondary_cta": "Alternativer, sanfterer Call-to-Action (z.B. 'Mehr über ${keyword} erfahren')",
+  "hero_text": "Fesselnder Einleitungstext für den Hero-Bereich (50-80 Wörter) über ${keyword}",
+  "hero_subtext": "Unterstützende Unterüberschrift für den Hero-Bereich (20-30 Wörter) zu ${keyword}",
+  "benefits_list": "HTML-Liste (<ul><li>...</li></ul>) mit 4-6 überzeugenden Vorteilen von ${keyword}",
+  "features_list": "HTML-Liste (<ul><li>...</li></ul>) mit 4-6 konkreten Merkmalen/Features von ${keyword}",
+  "social_proof": "Kurzer Satz über soziale Bewährtheit (z.B. 'Von über 1.000 zufriedenen ${keyword}-Kunden genutzt')",
+  "testimonial_1": "Glaubwürdiges, fiktives Kunden-Testimonial mit Name und Aussage zu ${keyword}",
+  "testimonial_2": "Zweites, andersartiges Kunden-Testimonial mit Name und Aussage zu ${keyword}",
+  "pricing_title": "Überschrift für den Preisbereich (z.B. 'Wählen Sie Ihren ${keyword}-Plan')",
+  "price_1": "Beschreibung für das erste ${keyword}-Preispaket (Starter/Basic)",
+  "price_2": "Beschreibung für das zweite ${keyword}-Preispaket (Professional)",
+  "price_3": "Beschreibung für das dritte ${keyword}-Preispaket (Enterprise/Premium)",
+  "faq_1": "Erste häufig gestellte Frage zu ${keyword}",
+  "faq_answer_1": "Ausführliche Antwort auf die erste ${keyword}-Frage (30-50 Wörter)",
+  "faq_2": "Zweite häufig gestellte Frage zu ${keyword}",
+  "faq_answer_2": "Ausführliche Antwort auf die zweite ${keyword}-Frage (30-50 Wörter)",
+  "faq_3": "Dritte häufig gestellte Frage zu ${keyword}",
+  "faq_answer_3": "Ausführliche Antwort auf die dritte ${keyword}-Frage (30-50 Wörter)",
+  "contact_info": "Kurze Kontaktinformation oder Hinweis für ${keyword} (z.B. 'Fragen zu ${keyword}? Rufen Sie uns an: ...')",
+  "footer_cta": "Letzter Call-to-Action für den Footer (z.B. 'Starten Sie noch heute Ihr ${keyword}-Projekt')",
+  "trust_signals": "Kurzer Text mit Vertrauenssignalen für ${keyword} (z.B. 'Zertifiziert • Sicher • ${keyword}-Experten')",
+  "guarantee_text": "Satz über Garantie für ${keyword} (z.B. '30-Tage-Geld-zurück-Garantie für alle ${keyword}-Services')"
 }
 
-Wichtig: Nur das JSON-Objekt zurückgeben, keine anderen Texte oder Formatierungen.
+QUALITÄTS-ANFORDERUNGEN:
+- Jedes Textfeld muss mindestens 10-15 Wörter enthalten (außer CTAs)
+- Hero-Text: 50-80 Wörter
+- FAQ-Antworten: 30-50 Wörter
+- Benefits/Features: Jeweils 4-6 Listenelemente
+- Testimonials: Vollständige Zitate mit Namen
+- Alle Texte müssen spezifisch auf "${keyword}" bezogen sein
+- Professioneller, überzeugender Ton
+- SEO-optimiert aber natürlich lesbar
+
+Erstelle jetzt das vollständige JSON-Objekt:
     `;
 
-    console.log('📤 Sende Anfrage an KI für:', keyword);
+    console.log('📤 Sende umfassende Anfrage an KI für:', keyword);
 
     // === CONTENT GENERATION ===
     let result;
     try {
       // Timeout für die Anfrage
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 25000);
+      const timeoutId = setTimeout(() => controller.abort(), 45000); // Längeres Timeout für umfangreiche Inhalte
       
-      result = await model.generateContent(simplifiedPrompt);
+      result = await model.generateContent(comprehensivePrompt);
       clearTimeout(timeoutId);
       
       console.log('✅ KI-Antwort erhalten');
@@ -204,17 +240,40 @@ Wichtig: Nur das JSON-Objekt zurückgeben, keine anderen Texte oder Formatierung
     } catch (parseError) {
       console.warn('⚠️ JSON-Parse-Fehler, verwende Fallback');
       
-      // Fallback-Content
+      // Umfangreicher Fallback-Content mit allen Spalten
       jsonData = {
-        post_title: keyword + " - Professionelle Lösung",
+        post_title: keyword + " - Professionelle Lösung & Beratung",
         post_name: keyword.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
-        meta_title: keyword + " | Ihre Experten",
-        meta_description: "Professionelle " + keyword + " Services. Kompetent und zuverlässig.",
-        h1: keyword + " - Ihre zuverlässige Lösung",
-        h2_1: "Warum " + keyword + " wichtig ist",
-        h2_2: "Unsere " + keyword + " Expertise",
-        primary_cta: "Jetzt anfragen",
-        hero_text: "Willkommen bei Ihrem " + keyword + " Experten. Professionelle Lösungen für Ihre Anforderungen.",
+        meta_title: keyword + " Experten | Ihre zuverlässige Lösung",
+        meta_description: "Professionelle " + keyword + " Services von Experten. Kompetent, zuverlässig und maßgeschneidert für Ihre Bedürfnisse. Jetzt informieren!",
+        h1: keyword + " - Ihre zuverlässige und professionelle Lösung",
+        h2_1: "Warum " + keyword + " für Ihr Unternehmen wichtig ist",
+        h2_2: "Unsere bewährte " + keyword + " Expertise und Lösungen",
+        h2_3: keyword + " Features und Vorteile im Detail",
+        h2_4: "Vertrauen Sie unserem erfahrenen " + keyword + " Team",
+        primary_cta: "Jetzt " + keyword + " anfragen",
+        secondary_cta: "Mehr über " + keyword + " erfahren",
+        hero_text: "Willkommen bei Ihrem " + keyword + " Experten. Wir bieten professionelle, maßgeschneiderte Lösungen, die Ihre Erwartungen übertreffen. Mit jahrelanger Erfahrung und bewährten Methoden sorgen wir für optimale Ergebnisse in allen " + keyword + " Bereichen.",
+        hero_subtext: "Vertrauen Sie auf unsere Erfahrung und Kompetenz im Bereich " + keyword,
+        benefits_list: "<ul><li>Professionelle " + keyword + " Beratung von Experten</li><li>Maßgeschneiderte Lösungen für Ihre Anforderungen</li><li>Erfahrenes und zertifiziertes Expertenteam</li><li>Zuverlässiger Support und Betreuung</li><li>Nachhaltige und langfristige Ergebnisse</li></ul>",
+        features_list: "<ul><li>Umfassende " + keyword + " Analyse und Bewertung</li><li>Individuelle Strategieentwicklung und Planung</li><li>Kontinuierliche Überwachung und Optimierung</li><li>Messbare Ergebnisse und Erfolgskontrolle</li><li>Flexible Anpassung an Ihre Bedürfnisse</li></ul>",
+        social_proof: "Von über 500 zufriedenen Kunden empfohlen und erfolgreich eingesetzt",
+        testimonial_1: "\"Exzellenter " + keyword + " Service! Das Team hat unsere Erwartungen in jeder Hinsicht übertroffen und professionelle Ergebnisse geliefert.\" - Maria Schmidt, Projektleiterin",
+        testimonial_2: "\"Professionell, zuverlässig und kompetent. Genau das, was wir für unsere " + keyword + " Anforderungen gesucht haben. Sehr empfehlenswert!\" - Thomas Weber, Geschäftsführer",
+        pricing_title: "Wählen Sie Ihr passendes " + keyword + " Paket",
+        price_1: keyword + " Starter - Ideal für den Einstieg mit grundlegenden Funktionen und Support",
+        price_2: keyword + " Professional - Für anspruchsvolle Projekte mit erweiterten Features und Priority Support",
+        price_3: keyword + " Enterprise - Maximale Leistung mit Premium Features, dediziertem Support und individuellen Anpassungen",
+        faq_1: "Was macht Ihren " + keyword + " Service besonders und unterscheidet Sie von der Konkurrenz?",
+        faq_answer_1: "Unser " + keyword + " Service zeichnet sich durch individuelle Beratung, jahrelange Erfahrung, bewährte Methoden und messbare Ergebnisse aus. Wir bieten maßgeschneiderte Lösungen statt Standard-Angebote.",
+        faq_2: "Wie lange dauert die Umsetzung eines typischen " + keyword + " Projekts?",
+        faq_answer_2: "Die Umsetzungsdauer hängt vom Projektumfang ab. Typischerweise zwischen 2-8 Wochen, je nach Komplexität und Ihren spezifischen " + keyword + " Anforderungen. Wir erstellen einen detaillierten Zeitplan.",
+        faq_3: "Gibt es eine Garantie oder Gewährleistung auf Ihre " + keyword + " Services?",
+        faq_answer_3: "Ja, wir bieten eine 30-Tage-Zufriedenheitsgarantie auf alle unsere " + keyword + " Services. Sollten Sie nicht zufrieden sein, finden wir gemeinsam eine Lösung oder erstatten den Betrag zurück.",
+        contact_info: "Fragen zu " + keyword + "? Rufen Sie uns an oder schreiben Sie uns eine E-Mail - wir beraten Sie gerne!",
+        footer_cta: "Starten Sie noch heute Ihr erfolgreiches " + keyword + " Projekt mit uns",
+        trust_signals: "Zertifiziert • Sicher • Garantiert • " + keyword + " Experten seit Jahren",
+        guarantee_text: "30-Tage-Geld-zurück-Garantie auf alle " + keyword + " Services und Dienstleistungen",
         _fallback_used: true,
         _parse_error: parseError.message
       };
