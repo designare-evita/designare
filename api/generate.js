@@ -1,10 +1,10 @@
 // api/generate.js
 
-// Importiert die Google AI Bibliothek
-import { GoogleGenerativeAI } from '@google/generative-ai';
+// Korrigiert: Node.js 'require' Syntax verwenden
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 // Handler-Funktion, die von Vercel aufgerufen wird
-export default async function handler(req, res) {
+module.exports = async (req, res) => {
   // Nur POST-Anfragen erlauben
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed' });
@@ -12,6 +12,7 @@ export default async function handler(req, res) {
 
   try {
     // API-Schlüssel sicher aus den Vercel Environment Variables laden
+    // Stelle sicher, dass der Schlüssel in Vercel 'GOOGLE_API_KEY' heißt
     const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
 
     // Daten aus der Anfrage von silas-form.js auslesen
@@ -21,34 +22,34 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Ein Prompt wird benötigt.' });
     }
 
-    // Modelle, die Vercel ausprobieren soll.
+    // Hinzugefügt: Robuste Modell-Auswahl wie bei Evita
     const modelNames = [
       "gemini-1.5-pro-latest",
       "gemini-1.5-flash",
-      "gemini-pro" 
+      "gemini-pro"
     ];
 
     let model = null;
     let lastError = null;
 
-    // Versuche verschiedene Modelle, bis eines funktioniert. Das macht die Funktion robust.
+    // Versuche verschiedene Modelle, bis eines funktioniert
     for (const modelName of modelNames) {
       try {
         model = genAI.getGenerativeModel({ model: modelName });
-        console.log(`Erfolgreich Modell geladen für Silas: ${modelName}`);
-        break; // Stoppe, sobald ein Modell erfolgreich geladen wurde
+        console.log(`Silas verwendet erfolgreich das Modell: ${modelName}`);
+        break; 
       } catch (error) {
-        console.warn(`Modell ${modelName} nicht verfügbar:`, error.message);
+        console.warn(`Modell ${modelName} für Silas nicht verfügbar:`, error.message);
         lastError = error;
-        continue; // Versuche das nächste Modell
+        continue;
       }
     }
 
     if (!model) {
-      throw new Error(`Kein verfügbares KI-Modell gefunden. Letzter Fehler: ${lastError?.message}`);
+      throw new Error(`Kein verfügbares KI-Modell für Silas gefunden. Letzter Fehler: ${lastError?.message}`);
     }
 
-    // Führe den einzelnen Prompt aus (anders als bei Evitas Chat)
+    // Führe den einzelnen Prompt aus
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const responseText = response.text();
@@ -68,4 +69,4 @@ export default async function handler(req, res) {
     console.error("Fehler in /api/generate (Silas):", error); 
     res.status(500).json({ error: 'Fehler bei der Inhaltsgenerierung', details: error.message });
   }
-}
+};
