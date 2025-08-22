@@ -13,7 +13,6 @@ export function initSilasForm() {
 
     // Ab hier wird der Code nur noch ausgeführt, wenn wir auf der CSV-Creator.html Seite sind.
     const keywordInput = document.getElementById('silas-keyword-input');
-    const addKeywordBtn = document.getElementById('add-keyword-btn');
     const keywordDisplayList = document.getElementById('keyword-display-list');
     const startGenerationBtn = document.getElementById('start-generation-btn');
     const clearListBtn = document.getElementById('clear-list-btn');
@@ -56,8 +55,20 @@ export function initSilasForm() {
     }
 
     // --- EVENT-LISTENER ---
-    addKeywordBtn.addEventListener('click', addKeywords);
-    keywordInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); addKeywords(); } });
+    // Handle form submission instead of button click
+    silasForm.addEventListener('submit', (e) => {
+        e.preventDefault(); // Prevent default form submission
+        addKeywords();
+    });
+    
+    // Keep the Enter key functionality on the input
+    keywordInput.addEventListener('keydown', (e) => { 
+        if (e.key === 'Enter') { 
+            e.preventDefault(); 
+            addKeywords(); 
+        } 
+    });
+    
     clearListBtn.addEventListener('click', () => {
         keywordList = [];
         allGeneratedData = [];
