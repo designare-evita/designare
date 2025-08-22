@@ -149,13 +149,17 @@
 /* SILAS SELECT-BOX (TEXT-INTENT)          */
 /* ======================================== */
 
-/* Input-Group für Select-Box */
+/* Input-Group für Select-Box - NEUE ZEILE unter dem Formular */
 .ai-container .input-group {
     display: flex;
     align-items: center;
     margin-top: 1rem;
     gap: 15px;
     width: 100%;
+    background-color: rgba(45, 45, 45, 0.3);
+    padding: 10px 15px;
+    border-radius: 7px;
+    border: 1px solid #444;
 }
 
 .ai-container .input-group label {
@@ -165,6 +169,7 @@
     white-space: nowrap;
     color: #f0f0f0;
     min-width: fit-content;
+    margin-right: 10px;
 }
 
 /* Custom Select-Box */
@@ -418,16 +423,18 @@
 /* ======================================== */
 
 .modal-content.preview-modal-content {
-    max-width: 90vw;
-    max-height: 90vh;
-    width: 1200px;
+    max-width: 95vw;
+    max-height: 95vh;
+    width: 1400px;
     text-align: left;
+    padding: 20px;
 }
 
 #preview-content-area {
-    max-height: 80vh;
+    max-height: 85vh;
     overflow-y: auto;
     padding-right: 15px;
+    padding-bottom: 20px;
 }
 
 /* Vorschau-spezifische Styles */
