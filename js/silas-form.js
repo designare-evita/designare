@@ -29,9 +29,26 @@ export function initSilasForm() {
 
     // --- LOGIK ZUM HINZUFÜGEN VON KEYWORDS ---
     function addKeywords() {
-        const newKeywords = keywordInput.value.split(',').map(kw => kw.trim()).filter(kw => kw.length > 0 && !keywordList.includes(kw));
+        const newKeywords = keywordInput.value.split(',').map(kw => kw.trim()).filter(kw => kw.length > 0);
+        const currentIntent = textIntentSelect.value;
+        
+        newKeywords.forEach(keyword => {
+            // Prüfen ob Keyword bereits existiert (unabhängig vom Intent)
+            const existingIndex = keywordList.findIndex(item => item.keyword === keyword);
+            
+            if (existingIndex === -1) {
+                // Neues Keyword hinzufügen
+                keywordList.push({
+                    keyword: keyword,
+                    intent: currentIntent
+                });
+            } else {
+                // Existierendes Keyword aktualisieren
+                keywordList[existingIndex].intent = currentIntent;
+            }
+        });
+        
         if (newKeywords.length > 0) {
-            keywordList.push(...newKeywords);
             updateKeywordDisplay();
             keywordInput.value = '';
         }
@@ -39,18 +56,81 @@ export function initSilasForm() {
 
     function updateKeywordDisplay() {
         keywordDisplayList.innerHTML = '';
-        keywordList.forEach((keyword, index) => {
+        keywordList.forEach((item, index) => {
             const listItem = document.createElement('li');
-            listItem.textContent = keyword;
+            
+            // Intent-Badge erstellen
+            const intentBadge = document.createElement('span');
+            intentBadge.className = 'intent-badge';
+            intentBadge.textContent = item.intent === 'commercial' ? 'Kommerziell' : 'Informativ';
+            intentBadge.style.cssText = `
+                background-color: ${item.intent === 'commercial' ? '#28a745' : '#17a2b8'};
+                color: white;
+                padding: 2px 8px;
+                border-radius: 12px;
+                font-size: 0.75rem;
+                font-weight: bold;
+                margin-left: 10px;
+                display: inline-block;
+            `;
+            
+            // Keyword-Text
+            const keywordSpan = document.createElement('span');
+            keywordSpan.textContent = item.keyword;
+            keywordSpan.style.fontWeight = '500';
+            
+            // Container für Keyword und Badge
+            const contentDiv = document.createElement('div');
+            contentDiv.style.display = 'flex';
+            contentDiv.style.alignItems = 'center';
+            contentDiv.style.flexGrow = '1';
+            contentDiv.appendChild(keywordSpan);
+            contentDiv.appendChild(intentBadge);
+            
+            // Remove-Button
             const removeBtn = document.createElement('button');
-            removeBtn.textContent = 'x';
+            removeBtn.textContent = '×';
+            removeBtn.style.cssText = `
+                background-color: #ff6b6b;
+                color: white;
+                border: none;
+                border-radius: 50%;
+                width: 24px;
+                height: 24px;
+                cursor: pointer;
+                font-size: 14px;
+                font-weight: bold;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: background-color 0.3s ease;
+            `;
             removeBtn.onclick = () => {
                 keywordList.splice(index, 1);
                 updateKeywordDisplay();
             };
+            removeBtn.onmouseover = () => removeBtn.style.backgroundColor = '#ff5252';
+            removeBtn.onmouseout = () => removeBtn.style.backgroundColor = '#ff6b6b';
+            
+            // List-Item zusammenbauen
+            listItem.style.cssText = `
+                background-color: rgba(255, 255, 255, 0.05);
+                margin-bottom: 8px;
+                padding: 12px 15px;
+                border-radius: 8px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                font-size: 0.95rem;
+                color: #fff;
+                border-left: 4px solid ${item.intent === 'commercial' ? '#28a745' : '#17a2b8'};
+            `;
+            
+            listItem.appendChild(contentDiv);
             listItem.appendChild(removeBtn);
             keywordDisplayList.appendChild(listItem);
         });
+        
         clearListBtn.style.display = keywordList.length > 0 ? 'inline-block' : 'none';
     }
 
@@ -96,10 +176,13 @@ export function initSilasForm() {
         const textIntent = textIntentSelect.value;
 
         for (let i = 0; i < keywordList.length; i++) {
-            const keyword = keywordList[i];
-            silasStatus.textContent = `Generiere Text für "${keyword}" (${i + 1}/${keywordList.length})...`;
+            const item = keywordList[i];
+            const keyword = item.keyword;
+            const intent = item.intent;
             
-            const userPrompt = createSilasPrompt(keyword, textIntent);
+            silasStatus.textContent = `Generiere Text für "${keyword}" (${intent === 'commercial' ? 'Kommerziell' : 'Informativ'}) (${i + 1}/${keywordList.length})...`;
+            
+            const userPrompt = createSilasPrompt(keyword, intent);
 
             try {
                 const response = await fetch('/api/generate', {
@@ -113,12 +196,18 @@ export function initSilasForm() {
                 }
 
                 const data = await response.json();
+                data.keyword = keyword; // Keyword für Anzeige
+                data.intent = intent;   // Intent für spätere Verwendung
                 allGeneratedData.push(data);
                 displayResult(data, i, responseContent);
 
             } catch (error) {
                 console.error('Fehler bei der Textgenerierung:', error);
-                const errorData = { keyword: keyword, error: error.message };
+                const errorData = { 
+                    keyword: keyword, 
+                    intent: intent,
+                    error: error.message 
+                };
                 allGeneratedData.push(errorData);
                 displayResult(errorData, i, responseContent);
             }
@@ -210,17 +299,21 @@ ${jsonFormatInstructions}
             border-radius: 8px;
             padding: 15px;
             margin-bottom: 15px;
-            border-left: 4px solid #007cba;
+            border-left: 4px solid ${data.intent === 'commercial' ? '#28a745' : '#17a2b8'};
         `;
         
         if (data.error) {
             resultCard.innerHTML = `
                 <h4 style="color: #ff6b6b; margin: 0 0 10px 0;">${data.keyword}</h4>
+                <span class="intent-badge" style="background-color: ${data.intent === 'commercial' ? '#28a745' : '#17a2b8'}; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; margin-bottom: 10px; display: inline-block;">${data.intent === 'commercial' ? 'Kommerziell' : 'Informativ'}</span>
                 <p style="color: #ff6b6b; margin: 0;">Fehler: ${data.error}</p>
             `;
         } else {
             resultCard.innerHTML = `
-                <h4 style="color: #fff; margin: 0 0 10px 0;">${data.keyword}</h4>
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                    <h4 style="color: #fff; margin: 0; flex-grow: 1;">${data.keyword}</h4>
+                    <span class="intent-badge" style="background-color: ${data.intent === 'commercial' ? '#28a745' : '#17a2b8'}; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold;">${data.intent === 'commercial' ? 'Kommerziell' : 'Informativ'}</span>
+                </div>
                 <p style="margin: 5px 0; color: #ccc;"><strong>Titel:</strong> ${data.post_title || 'N/A'}</p>
                 <p style="margin: 5px 0; color: #ccc;"><strong>Meta:</strong> ${data.meta_description || 'N/A'}</p>
                 <button class="preview-btn" data-index="${index}" style="
