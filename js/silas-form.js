@@ -66,44 +66,56 @@ export function initSilasForm() {
             intentBadge.style.cssText = `
                 background-color: ${item.intent === 'commercial' ? '#28a745' : '#17a2b8'};
                 color: white;
-                padding: 2px 8px;
+                padding: 4px 10px;
                 border-radius: 12px;
                 font-size: 0.75rem;
                 font-weight: bold;
-                margin-left: 10px;
+                margin-top: 8px;
                 display: inline-block;
+                white-space: nowrap;
             `;
             
             // Keyword-Text
             const keywordSpan = document.createElement('span');
             keywordSpan.textContent = item.keyword;
-            keywordSpan.style.fontWeight = '500';
+            keywordSpan.style.cssText = `
+                font-weight: 500;
+                color: #fff;
+                word-break: break-word;
+                line-height: 1.4;
+            `;
             
-            // Container für Keyword und Badge
+            // Container für Keyword und Badge (vertikales Layout auf Mobile)
             const contentDiv = document.createElement('div');
-            contentDiv.style.display = 'flex';
-            contentDiv.style.alignItems = 'center';
-            contentDiv.style.flexGrow = '1';
+            contentDiv.style.cssText = `
+                display: flex;
+                flex-direction: column;
+                flex-grow: 1;
+                gap: 5px;
+                min-width: 0;
+            `;
             contentDiv.appendChild(keywordSpan);
             contentDiv.appendChild(intentBadge);
             
-            // Remove-Button
+            // Remove-Button - größer für Touch
             const removeBtn = document.createElement('button');
             removeBtn.textContent = '×';
             removeBtn.style.cssText = `
                 background-color: #ff6b6b;
                 color: white;
                 border: none;
-                border-radius: 50%;
-                width: 24px;
-                height: 24px;
+                border-radius: 6px;
+                min-width: 36px;
+                height: 36px;
                 cursor: pointer;
-                font-size: 14px;
+                font-size: 18px;
                 font-weight: bold;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 transition: background-color 0.3s ease;
+                flex-shrink: 0;
+                margin-left: 10px;
             `;
             removeBtn.onclick = () => {
                 keywordList.splice(index, 1);
@@ -112,18 +124,20 @@ export function initSilasForm() {
             removeBtn.onmouseover = () => removeBtn.style.backgroundColor = '#ff5252';
             removeBtn.onmouseout = () => removeBtn.style.backgroundColor = '#ff6b6b';
             
-            // List-Item zusammenbauen
+            // List-Item zusammenbauen - responsive Layout
             listItem.style.cssText = `
                 background-color: rgba(255, 255, 255, 0.05);
-                margin-bottom: 8px;
-                padding: 12px 15px;
+                margin-bottom: 12px;
+                padding: 15px;
                 border-radius: 8px;
                 display: flex;
+                align-items: flex-start;
                 justify-content: space-between;
-                align-items: center;
                 font-size: 0.95rem;
                 color: #fff;
                 border-left: 4px solid ${item.intent === 'commercial' ? '#28a745' : '#17a2b8'};
+                min-height: 50px;
+                gap: 10px;
             `;
             
             listItem.appendChild(contentDiv);
