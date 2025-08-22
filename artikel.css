@@ -92,22 +92,6 @@ body {
     z-index: 1;
 }
 
-/* Header mit transparentem Hintergrund */
-.main-header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px;
-    z-index: 1001;
-    box-sizing: border-box;
-    height: var(--header-height-desktop);
-    background-color: rgba(26, 26, 26, 0.95);
-    backdrop-filter: blur(10px);
-}
 
 #top-left-logo-link {
     display: flex;
