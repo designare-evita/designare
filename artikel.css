@@ -1,7 +1,141 @@
-/*
- * artikel.css - KORRIGIERTE VERSION
- * Alle CSS-Syntax-Fehler behoben
- */
+a {
+    text-decoration: none !important;
+}
+
+.side-menu {
+ padding-top: 80px;
+padding-bottom: 20px;
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 600px; /* Breite des Menüs */
+    max-width: 85%; /* Maximalbreite auf kleinen Bildschirmen */
+    height: 100%;
+    background-color: #1a1a21; /* Dunkler Hintergrund, passt zum Stil */
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
+    z-index: 1002; /* Über allem anderen */
+    transform: translateX(100%); /* Standardmäßig außerhalb des Bildschirms */
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Weiche Animation */
+    display: flex;
+    flex-direction: column;
+    padding: 60px 20px 20px;
+}
+
+.side-menu.is-active {
+    transform: translateX(0); /* Sichtbar machen */
+}
+
+
+/* Der Schließen-Button (das "X") */
+.side-menu .close-button {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 2.5rem;
+    color: #fff;
+    background: none;
+    border: none;
+    cursor: pointer;
+    line-height: 1;
+}
+
+
+/* 1. Der Hauptcontainer (bleibt gleich) */
+.side-menu-content {
+    flex-grow: 1; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* 2. Die Liste selbst (bleibt gleich) */
+.side-menu-content ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* 3. Jeder einzelne Listenpunkt (vereinfacht) */
+.side-menu-content li {
+    display: flex;
+    align-items: baseline;
+}
+
+/* 4. Der statische Listenpunkt (bleibt gleich) */
+.side-menu-content li::before {
+    content: '';
+    color: #FCB500;
+    font-weight: 700;
+    padding-right: 15px;
+}
+
+/* 5. Der Link-Text bekommt jetzt den vertikalen Abstand */
+.side-menu-content li a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.3;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    width: 100%; /* Wichtig, damit der Link die ganze Breite einnimmt */
+    
+    /* NEU: Vertikaler Abstand als Padding */
+    padding: 30px 20px; /* <--- HIER steuerst du den vertikalen Abstand */
+}
+
+/* 6. Kleinere Zeilenhöhe NUR für den Zweizeiler */
+.side-menu-content li.multi-line a {
+    line-height: 1.2;
+}
+
+/* 7. Kombinierter Stil für den aktiven UND den Hover-Zustand */
+.side-menu-content li.active a,
+.side-menu-content li a:hover {
+    color: var(--accent-color);
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* --- FINALE & EINHEITLICHE KORREKTUR FÜR ALLE HEADER-ICONS --- */
+
+/* 1. Ein gemeinsamer Grundstil für ALLE Buttons rechts im Header */
+.header-right-controls button {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    color: var(--text-color);
+    cursor: pointer;
+    
+    /* Wichtig für die einheitliche Größe und Positionierung */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    width: 40px;
+    font-size: 1.2rem;
+    
+    opacity: 0.7;
+    transition: all 0.3s ease;
+}
+
+/* 2. Der Hover-Effekt für die drei originalen Icons (mit rundem Hintergrund) */
+#contact-button:hover, 
+#cookie-info-button:hover, 
+#about-me-button:hover {
+    background-color: var(--accent-color);
+    color: #fff;
+    opacity: 1;
+    transform: scale(1.1);
+    border-radius: 50%; /* Nur hier die runden Ecken! */
+}
+
+/* 3. Der separate, saubere Hover-Effekt NUR für den Menü-Button */
+#menu-toggle-button:hover {
+    opacity: 1;
+    transform: scale(1.1);
+    color: var(--accent-color); /* Nur die Farbe ändern */
+}
 
 /* NEU: Angepasste Fallback-Schriftart zur Vermeidung von Layout-Shifts */
 @font-face {
