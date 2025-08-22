@@ -1,8 +1,8 @@
 // js/silas-form.js
 
 export function initSilasForm() {
-    // Diese Prüfung ist die Lösung:
-    // Wir suchen das Hauptformular von Silas.
+    // DIES IST DIE LÖSUNG:
+    // Wir suchen nach dem Hauptformular von Silas.
     const silasForm = document.getElementById('silas-form');
     
     // Wenn das Formular nicht existiert, sind wir nicht auf der richtigen Seite.
@@ -11,7 +11,7 @@ export function initSilasForm() {
         return;
     }
 
-    // Ab hier läuft der Code nur noch, wenn wir auf der CSV-Creator.html Seite sind.
+    // Ab hier wird der Code nur noch ausgeführt, wenn wir auf der CSV-Creator.html Seite sind.
     const keywordInput = document.getElementById('silas-keyword-input');
     const addKeywordBtn = document.getElementById('add-keyword-btn');
     const keywordDisplayList = document.getElementById('keyword-display-list');
