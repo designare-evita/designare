@@ -376,24 +376,35 @@ ${jsonFormatInstructions}
                             </section>
                         </main>
 
-                        <!-- SEO Meta Info -->
-                        <footer style="margin-top: 40px; padding: 20px; border-top: 2px solid #444; font-size: 0.9rem; color: #666; background-color: rgba(0,0,0,0.3); border-radius: 8px;">
-                            <h3 style="color: #ffc107; margin-bottom: 20px; text-align: center;">SEO & Meta-Informationen</h3>
-                            <div style="display: grid; grid-template-columns: 1fr; gap: 15px; max-width: 800px; margin: 0 auto;">
-                                <div style="padding: 10px; background-color: rgba(255,255,255,0.05); border-radius: 5px; border-left: 3px solid #28a745;">
-                                    <strong style="color: #28a745; display: block; margin-bottom: 5px;">SEO Titel:</strong>
-                                    <span style="color: #ccc;">${data.meta_title || data.post_title || 'N/A'}</span>
+                        <!-- SEO Meta Info - KOMPLETT GETRENNT -->
+                        <div style="margin-top: 50px; padding: 0; clear: both;"></div> <!-- Spacer -->
+                        
+                        <section style="margin-top: 30px; padding: 25px; background: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(45,45,45,0.7) 100%); border-radius: 12px; border: 2px solid #444;">
+                            <h3 style="color: #ffc107; margin: 0 0 25px 0; text-align: center; font-size: 1.5rem; border-bottom: 2px solid #ffc107; padding-bottom: 10px;">📊 SEO & Meta-Informationen</h3>
+                            
+                            <div style="display: flex; flex-direction: column; gap: 20px; max-width: 100%;">
+                                <div style="padding: 15px; background: linear-gradient(90deg, rgba(40,167,69,0.1) 0%, rgba(40,167,69,0.05) 100%); border-radius: 8px; border-left: 4px solid #28a745;">
+                                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                                        <strong style="color: #28a745; font-size: 1rem;">🎯 SEO Titel:</strong>
+                                        <span style="color: #e9e9e9; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word;">${data.meta_title || data.post_title || 'N/A'}</span>
+                                    </div>
                                 </div>
-                                <div style="padding: 10px; background-color: rgba(255,255,255,0.05); border-radius: 5px; border-left: 3px solid #17a2b8;">
-                                    <strong style="color: #17a2b8; display: block; margin-bottom: 5px;">URL Slug:</strong>
-                                    <span style="color: #ccc;">${data.post_name || 'n-a'}</span>
+                                
+                                <div style="padding: 15px; background: linear-gradient(90deg, rgba(23,162,184,0.1) 0%, rgba(23,162,184,0.05) 100%); border-radius: 8px; border-left: 4px solid #17a2b8;">
+                                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                                        <strong style="color: #17a2b8; font-size: 1rem;">🔗 URL Slug:</strong>
+                                        <span style="color: #e9e9e9; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word; font-family: monospace; background-color: rgba(0,0,0,0.3); padding: 5px 8px; border-radius: 4px;">${data.post_name || 'n-a'}</span>
+                                    </div>
                                 </div>
-                                <div style="padding: 10px; background-color: rgba(255,255,255,0.05); border-radius: 5px; border-left: 3px solid #ffc107;">
-                                    <strong style="color: #ffc107; display: block; margin-bottom: 5px;">Meta Description:</strong>
-                                    <span style="color: #ccc;">${data.meta_description || 'N/A'}</span>
+                                
+                                <div style="padding: 15px; background: linear-gradient(90deg, rgba(255,193,7,0.1) 0%, rgba(255,193,7,0.05) 100%); border-radius: 8px; border-left: 4px solid #ffc107;">
+                                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                                        <strong style="color: #ffc107; font-size: 1rem;">📝 Meta Description:</strong>
+                                        <span style="color: #e9e9e9; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word;">${data.meta_description || 'N/A'}</span>
+                                    </div>
                                 </div>
                             </div>
-                        </footer>
+                        </section>
                     </div>
 
                     <style>
