@@ -90,13 +90,18 @@ document.addEventListener('DOMContentLoaded', function() {
     initAiForm();
     initSilasForm();
 
+    // Starte hier die Besucher-Erfassung
+    trackVisitor();
+
     console.log("Alle allgemeinen Module erfolgreich initialisiert.");
 });
 
 
-// Funktion, um den Besucher zu protokollieren
+/**
+ * Funktion, um den Besucher zu protokollieren.
+ * Ruft die serverseitige Funktion auf.
+ */
 function trackVisitor() {
-  // Ruft unsere serverseitige Funktion auf
   fetch('/api/track-visitor')
     .then(response => {
       if (response.ok) {
@@ -107,9 +112,3 @@ function trackVisitor() {
     })
     .catch(error => console.error('Netzwerkfehler:', error));
 }
-
-// Führe die Funktion aus, sobald das Fenster geladen ist
-window.onload = function() {
-  trackVisitor();
-  // Wenn du bereits eine window.onload-Funktion hast, füge trackVisitor() einfach dort hinzu.
-};
