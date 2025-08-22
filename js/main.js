@@ -92,3 +92,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
     console.log("Alle allgemeinen Module erfolgreich initialisiert.");
 });
+
+
+// Funktion, um den Besucher zu protokollieren
+function trackVisitor() {
+  // Ruft unsere serverseitige Funktion auf
+  fetch('/api/track-visitor')
+    .then(response => {
+      if (response.ok) {
+        console.log('Besucher erfasst.');
+      } else {
+        console.error('Fehler bei der Erfassung des Besuchers.');
+      }
+    })
+    .catch(error => console.error('Netzwerkfehler:', error));
+}
+
+// Führe die Funktion aus, sobald das Fenster geladen ist
+window.onload = function() {
+  trackVisitor();
+  // Wenn du bereits eine window.onload-Funktion hast, füge trackVisitor() einfach dort hinzu.
+};
