@@ -88,7 +88,28 @@
     transform: scale(1);
 }
 
-/* Der Schließen-Button wird vom bestehenden .close-button Stil übernommen */
+#close-preview-lightbox {
+    color: #000000 !important; /* Schwarze Farbe für das 'X' */
+    background-color: #ffffff; /* Weisser Hintergrund */
+    border-radius: 50%; /* Runder Button */
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    font-size: 20px;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+    /* Positionierung explizit setzen, um Konflikte zu vermeiden */
+    position: absolute;
+    top: 15px;
+    right: 15px;
+}
+
+#close-preview-lightbox:hover {
+    opacity: 1;
+}
 
 
 a {
