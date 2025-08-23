@@ -28,7 +28,7 @@ a {
     width: 600px;
     max-width: 85%;
     height: 100%;
-    background-color: #1a1a21;
+    background-color: transparent;
     box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
     z-index: 1002;
     transform: translateX(100%);
