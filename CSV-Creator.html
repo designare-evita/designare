@@ -80,21 +80,20 @@
 <div class="ai-container">
  <h2 style="text-align: center;">SEO-Texte <span style="color: #ffffff;">direkt in deine CSV</span></h2>
 <p>Ein paar knackige Keywords oder sogar spezifische Long-Tail-Keywords genügen! Silas zaubert dir passenden Content – direkt als CSV zum Download.</p>
-                        
-                        <!-- ERSTE ZEILE: Input + Button -->
-                        <form id="silas-form">
-                            <input type="text" id="silas-keyword-input" placeholder="Gib ein Keyword ein und drücke Enter..." autocomplete="off">
-                            <button type="submit" id="add-keyword-btn" aria-label="Keyword hinzufügen"><i class="fas fa-plus"></i></button>
-                        </form>
 
-                        <!-- ZWEITE ZEILE: Select-Box (AUSSERHALB des Formulars) -->
-                        <div class="input-group">
+	<div class="input-group">
                             <label for="text-intent-select">Text-Typ:</label>
                             <select id="text-intent-select" class="custom-select">
                                 <option value="informational">Informationsorientiert</option>
                                 <option value="commercial">Kommerziell</option>
                             </select>
                         </div>
+                 
+                        <form id="silas-form">
+                            <input type="text" id="silas-keyword-input" placeholder="Gib ein Keyword ein und drücke Enter..." autocomplete="off">
+                            <button type="submit" id="add-keyword-btn" aria-label="Keyword hinzufügen"><i class="fas fa-plus"></i></button>
+                        </form>
+
                     </div>
 
                     <div class="keyword-list-container">
