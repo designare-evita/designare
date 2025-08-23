@@ -204,12 +204,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Funktion zum Öffnen der Lightbox
     const openLightbox = (src) => {
         iframe.src = src;
-        lightbox.classList.add('visible');
+        lightbox.classList.add('is-visible'); // ÄNDERUNG: Fügt eine Klasse hinzu
     };
 
     // Funktion zum Schließen der Lightbox
     const closeLightbox = () => {
-        lightbox.classList.remove('visible');
+        lightbox.classList.remove('is-visible'); // ÄNDERUNG: Entfernt die Klasse
         // Kleine Verzögerung, damit der Inhalt nicht vor dem Ausblenden verschwindet
         setTimeout(() => {
             iframe.src = '';
@@ -219,7 +219,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Event-Listener für die Vorschau-Elemente
     previewItems.forEach(item => {
         item.addEventListener('click', function(e) {
-            e.preventDefault(); // Verhindert das Springen der Seite
+            e.preventDefault();
             const src = this.getAttribute('data-src');
             openLightbox(src);
         });
@@ -237,7 +237,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Schließen mit der Escape-Taste
     document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && lightbox.classList.contains('visible')) {
+        if (e.key === 'Escape' && lightbox.classList.contains('is-visible')) {
             closeLightbox();
         }
     });
