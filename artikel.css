@@ -601,40 +601,42 @@ footer a:hover {
     color: #fff;
 }
 
-/* Modal Styles */
+/*--------------------------------------------------------------
+# FINALE & KORREKTE MODAL/LIGHTBOX STILE
+--------------------------------------------------------------*/
+
+/* Allgemeiner Stil für ALLE Overlays */
 .modal-overlay {
-    align-items: center;
-    background-color: rgba(0, 0, 0, 0.7);
-    display: flex;
-    height: 100%;
-    justify-content: center;
-    left: 0;
-    opacity: 0;
-    pointer-events: none;
     position: fixed;
     top: 0;
-    transition: opacity 0.3s ease;
+    left: 0;
     width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items-center;
     z-index: 2000;
+    
+    /* Standardmäßig unsichtbar, aber bereit für Übergänge */
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
-.modal-overlay.visible {
+/* Der entscheidende Stil: Macht das Overlay sichtbar, wenn das JS die Klasse hinzufügt */
+.modal-overlay.is-visible {
+    visibility: visible;
     opacity: 1;
-    pointer-events: auto;
 }
 
-.modal-content {
-    background-color: var(--bg-color);
-    border-radius: 10px;
-    max-width: 700px;
-    padding: 2rem;
-    position: relative;
+/* Animation für den Inhalt beim Sichtbarwerden */
+.modal-overlay .modal-content {
     transform: scale(0.95);
     transition: transform 0.3s ease;
-    width: 90%;
 }
 
-.modal-overlay.visible .modal-content {
+.modal-overlay.is-visible .modal-content {
     transform: scale(1);
 }
 
@@ -1057,6 +1059,3 @@ footer a:hover {
     opacity: 1;
 }
 
-#preview-lightbox {
-    display: none;
-}
