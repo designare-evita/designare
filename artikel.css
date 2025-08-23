@@ -602,45 +602,55 @@ footer a:hover {
 }
 
 /*--------------------------------------------------------------
-# FINALE & KORREKTE MODAL/LIGHTBOX STILE
+# FINALE, SAUBERE MODAL & LIGHTBOX STILE
 --------------------------------------------------------------*/
 
-/* Allgemeiner Stil für ALLE Overlays */
+/* 1. Basis-Stil für ALLE Overlays */
 .modal-overlay {
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    height: 100%;
+    justify-content: center;
+    left: 0;
     position: fixed;
     top: 0;
-    left: 0;
     width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    display: flex;
-    justify-content: center;
-    align-items-center;
     z-index: 2000;
     
-    /* Standardmäßig unsichtbar, aber bereit für Übergänge */
-    visibility: hidden;
+    /* Standardmäßig unsichtbar, aber bereit für die Animation */
     opacity: 0;
+    visibility: hidden;
     transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
+/* 2. Sichtbarkeits-Klasse (wird per JavaScript gesteuert) */
+.modal-overlay.visible,
+.modal-overlay.is-visible { /* Unterstützt beide JS-Versionen */
+    opacity: 1;
+    visibility: visible;
+}
 
-/* Animation für den Inhalt beim Sichtbarwerden */
-.modal-overlay .modal-content {
+/* 3. Allgemeiner Inhalts-Container */
+.modal-content {
+    background-color: var(--bg-color);
+    border-radius: 10px;
+    max-width: 700px;
+    padding: 2rem;
+    position: relative;
+    width: 90%;
+    
+    /* Animation für das "Aufploppen" */
     transform: scale(0.95);
     transition: transform 0.3s ease;
 }
 
+.modal-overlay.visible .modal-content,
 .modal-overlay.is-visible .modal-content {
     transform: scale(1);
 }
 
-.modal-content h2 {
-    margin-bottom: 1.5rem;
-    margin-top: 0;
-    text-align: center;
-}
-
+/* 4. Allgemeiner Schließen-Button */
 .close-button {
     background: none;
     border: none;
@@ -657,6 +667,46 @@ footer a:hover {
 .close-button:hover {
     opacity: 1;
     transform: rotate(90deg);
+}
+
+/* 5. Spezifische Stile NUR für die Vorschau-Lightbox */
+.preview-lightbox-content {
+    background-color: #1a1a1a;
+    padding: 20px;
+    border: 2px solid #FCB500;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 1200px;
+}
+
+#close-preview-lightbox {
+    color: #000000 !important;
+    background-color: #ffffff;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    font-size: 20px;
+    opacity: 0.8;
+    transform: translateZ(0); /* Anti-Wackel-Fix */
+}
+
+#close-preview-lightbox:hover {
+    opacity: 1;
+    transform: rotate(0deg); /* Überschreibt den allgemeinen Dreheffekt */
+}
+
+
+/*--------------------------------------------------------------
+# Formular-Stile (unverändert)
+--------------------------------------------------------------*/
+.modal-content h2 {
+    margin-bottom: 1.5rem;
+    margin-top: 0;
+    text-align: center;
 }
 
 .modal-content form {
@@ -866,77 +916,6 @@ footer a:hover {
     list-style-type: square;
 }
 
-/*--------------------------------------------------------------
-# FINALE, ISOLIERTE & GARANTIERT FUNKTIONIERENDE LIGHTBOX-STILE
---------------------------------------------------------------*/
-
-/* 1. Das Overlay (der Hintergrund) */
-.preview-lightbox-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.85);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 2000;
-    
-    /* Standardmäßig unsichtbar & bereit für die Animation */
-    visibility: hidden;
-    opacity: 0;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
-}
-
-/* Wird sichtbar, wenn das JavaScript die Klasse ".is-visible" hinzufügt */
-.preview-lightbox-overlay.is-visible {
-    visibility: visible;
-    opacity: 1;
-}
-
-/* 2. Der Inhalts-Container mit goldenem Rahmen */
-.preview-lightbox-overlay .preview-lightbox-content {
-    background-color: #1a1a1a;
-    padding: 20px;
-    border: 2px solid #FCB500;
-    border-radius: 8px;
-    width: 90%;
-    max-width: 1200px;
-    
-    /* Animation für das "Aufploppen" */
-    transform: scale(0.95);
-    transition: transform 0.3s ease;
-}
-
-.preview-lightbox-overlay.is-visible .preview-lightbox-content {
-    transform: scale(1);
-}
-
-/* 3. Der Schließen-Button (X) - bleibt stabil */
-.preview-lightbox-overlay #close-preview-lightbox {
-    color: #000000 !important;
-    background-color: #ffffff;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1;
-    font-size: 20px;
-    opacity: 0.8;
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    transition: opacity 0.3s ease;
-    transform: translateZ(0); /* Anti-Wackel-Fix */
-    cursor: pointer;
-}
-
-.preview-lightbox-overlay #close-preview-lightbox:hover {
-    opacity: 1;
-}
 /* Responsive Design */
 @media (max-width: 768px) {
     .main-header {
@@ -1077,8 +1056,3 @@ footer a:hover {
         width: 100%;
     }
 }
-
-
-
-
-
