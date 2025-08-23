@@ -1,28 +1,31 @@
-// Korrigierte Version von matrix-effect.js
+// Matrix-Effekt mit verzögerter Initialisierung
 
-document.addEventListener('DOMContentLoaded', () => {
+function initMatrixEffect() {
+    console.log('Versuche Matrix-Effekt zu initialisieren...');
+    
     const canvas = document.getElementById('matrix-canvas');
-    if (!canvas) {
-        console.error('Matrix Canvas not found!');
+    const sideMenu = document.getElementById('side-menu-panel');
+    
+    if (!canvas || !sideMenu) {
+        console.log('Canvas oder Menu noch nicht verfügbar, versuche erneut in 100ms...');
+        setTimeout(initMatrixEffect, 100);
         return;
     }
+    
+    console.log('Canvas und Menu gefunden - initialisiere Matrix-Effekt');
+    
     const ctx = canvas.getContext('2d');
-    const sideMenu = document.getElementById('side-menu-panel');
-
-    // --- Konfiguration ---
     const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim() || '#FCB500';
     const alphabet = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッンABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     const fontSize = 16;
     let intervalId = null;
     let rainDrops = [];
 
-    // --- Canvas-Größe setzen ---
     const updateCanvasSize = () => {
         const rect = sideMenu.getBoundingClientRect();
         canvas.width = rect.width;
         canvas.height = rect.height;
         
-        // Neu berechnen der Spalten wenn sich die Größe ändert
         const columns = Math.ceil(canvas.width / fontSize);
         rainDrops = [];
         for (let x = 0; x < columns; x++) {
@@ -30,16 +33,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // --- Zeichenfunktion ---
     const draw = () => {
-        // Prüfen ob Canvas noch existiert und sichtbar ist
         if (!canvas.width || !canvas.height) return;
 
-        // Semi-transparenter Overlay für Fade-Effekt
         ctx.fillStyle = 'rgba(26, 26, 33, 0.08)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Matrix-Text zeichnen
         ctx.fillStyle = accentColor;
         ctx.font = `${fontSize}px monospace`;
 
@@ -50,7 +49,6 @@ document.addEventListener('DOMContentLoaded', () => {
             
             ctx.fillText(text, x, y);
 
-            // Reset der Tropfen wenn sie den Boden erreichen
             if (y > canvas.height && Math.random() > 0.975) {
                 rainDrops[i] = 0;
             }
@@ -58,60 +56,56 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // --- Animation starten ---
     const startAnimation = () => {
-        if (intervalId) return; // Bereits gestartet
+        if (intervalId) return;
         
         updateCanvasSize();
         
-        // Nur starten wenn Canvas eine gültige Größe hat
         if (canvas.width > 0 && canvas.height > 0) {
-            intervalId = setInterval(draw, 50); // 50ms = ~20 FPS
+            intervalId = setInterval(draw, 50);
+            console.log('Matrix-Animation gestartet');
         }
     };
 
-    // --- Animation stoppen ---
     const stopAnimation = () => {
         if (intervalId) {
             clearInterval(intervalId);
             intervalId = null;
+            console.log('Matrix-Animation gestoppt');
         }
-        // Canvas leeren
+        
         if (canvas.width && canvas.height) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
     };
 
-    // --- Event-Listener für Menü-Toggle ---
+    // Event-Listener für Menu-Buttons
     const menuToggleButton = document.getElementById('menu-toggle-button');
     const closeMenuButton = document.getElementById('close-menu-button');
 
-    // Menü öffnen
     if (menuToggleButton) {
         menuToggleButton.addEventListener('click', () => {
+            console.log('Menu öffnen');
             sideMenu.classList.add('is-active');
-            // Kurze Verzögerung für CSS-Transition
-            setTimeout(() => {
-                startAnimation();
-            }, 100);
+            setTimeout(startAnimation, 200);
         });
     }
 
-    // Menü schließen
     if (closeMenuButton) {
         closeMenuButton.addEventListener('click', () => {
+            console.log('Menu schließen');
             stopAnimation();
             sideMenu.classList.remove('is-active');
         });
     }
 
-    // --- MutationObserver als Fallback ---
+    // MutationObserver als Backup
     const observer = new MutationObserver((mutationsList) => {
         for (const mutation of mutationsList) {
             if (mutation.attributeName === 'class') {
                 const targetElement = mutation.target;
                 if (targetElement.classList.contains('is-active')) {
-                    setTimeout(startAnimation, 150);
+                    setTimeout(startAnimation, 200);
                 } else {
                     stopAnimation();
                 }
@@ -121,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     observer.observe(sideMenu, { attributes: true });
 
-    // --- Resize-Handler ---
+    // Resize-Handler
     window.addEventListener('resize', () => {
         if (sideMenu.classList.contains('is-active') && intervalId) {
             stopAnimation();
@@ -129,6 +123,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- Cleanup beim Seitenwechsel ---
     window.addEventListener('beforeunload', stopAnimation);
+    
+    console.log('Matrix-Effekt erfolgreich initialisiert');
+}
+
+// Starte die Initialisierung
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM geladen, starte Matrix-Initialisierung...');
+    initMatrixEffect();
 });
+
+// Fallback für den Fall dass DOMContentLoaded bereits ausgelöst wurde
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initMatrixEffect);
+} else {
+    initMatrixEffect();
+}
