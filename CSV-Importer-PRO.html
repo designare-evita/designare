@@ -49,6 +49,40 @@
     <div id="particles-js"></div>
 
 <div id="header-placeholder"></div>
+
+<script>
+// Debug: Prüfe Header-Loading
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🔍 DEBUG: DOM loaded');
+    
+    const headerPlaceholder = document.getElementById('header-placeholder');
+    console.log('🔍 DEBUG: Header placeholder found:', !!headerPlaceholder);
+    
+    if (headerPlaceholder) {
+        console.log('🔄 DEBUG: Starting header fetch...');
+        
+        fetch('/header.html')
+            .then(response => {
+                console.log('📥 DEBUG: Header response:', response.status, response.ok);
+                return response.text();
+            })
+            .then(data => {
+                console.log('✅ DEBUG: Header loaded, length:', data.length);
+                headerPlaceholder.innerHTML = data;
+                
+                // Prüfe ob Buttons jetzt da sind
+                setTimeout(() => {
+                    const aboutBtn = document.getElementById('about-me-button');
+                    console.log('🔍 DEBUG: About button after insert:', !!aboutBtn);
+                }, 100);
+            })
+            .catch(error => {
+                console.error('❌ DEBUG: Header fetch failed:', error);
+            });
+    }
+});
+</script>
+
     <div id="hero">
         <main class="article-container">
             <div class="article-content">
