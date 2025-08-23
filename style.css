@@ -6,6 +6,12 @@ a {
     text-decoration: none !important;
 }
 
+.side-menu-content,
+.side-menu .close-button {
+    position: relative; /* Hebt die Elemente in einen eigenen Positionierungs-Kontext */
+    z-index: 1;      /* Stellt sicher, dass sie ÜBER dem Canvas (mit z-index: -1) liegen */
+}
+
 #matrix-canvas {
     position: absolute;
     top: 0;
@@ -16,23 +22,21 @@ a {
 }
 
 .side-menu {
- padding-top: 80px;
-padding-bottom: 20px;
-    position: relative;
+    position: fixed; /* Geändert von 'relative' zu 'fixed' für korrekte Positionierung am Bildschirmrand */
     top: 0;
     right: 0;
-    width: 600px; /* Breite des Menüs */
-    max-width: 85%; /* Maximalbreite auf kleinen Bildschirmen */
+    width: 600px;
+    max-width: 85%;
     height: 100%;
-    background-color: #1a1a21; /* Dunkler Hintergrund, passt zum Stil */
+    background-color: #1a1a21;
     box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
-    z-index: 1002; /* Über allem anderen */
-    transform: translateX(100%); /* Standardmäßig außerhalb des Bildschirms */
-    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Weiche Animation */
+    z-index: 1002;
+    transform: translateX(100%);
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     display: flex;
     flex-direction: column;
     padding: 60px 20px 20px;
-overflow: hidden;
+    overflow: hidden; /* Behält das 'overflow' bei, um den Canvas zu begrenzen */
 }
 
 .side-menu.is-active {
