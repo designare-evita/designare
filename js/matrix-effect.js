@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
     const ctx = canvas.getContext('2d');
-    const sideMenu = document.getElementById('side-menu');
+    const sideMenu = document.getElementById('side-menu-panel');
 
     // Funktion, um die Canvas-Größe zu setzen
     const resizeCanvas = () => {
