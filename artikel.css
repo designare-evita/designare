@@ -624,11 +624,6 @@ footer a:hover {
     transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
-/* Der entscheidende Stil: Macht das Overlay sichtbar, wenn das JS die Klasse hinzufügt */
-.modal-overlay.is-visible {
-    visibility: visible;
-    opacity: 1;
-}
 
 /* Animation für den Inhalt beim Sichtbarwerden */
 .modal-overlay .modal-content {
@@ -1013,49 +1008,6 @@ footer a:hover {
 }
 
 
-/*--------------------------------------------------------------
-# Finale & Saubere Stile für die Vorschau-Lightbox
---------------------------------------------------------------*/
 
-/* Wichtig: Diese Regel ist für die Einblende-Animation der Lightbox */
-.preview-lightbox-overlay.visible .preview-lightbox-content {
-    transform: scale(1);
-}
 
-/* 1. Der Lightbox-Inhalt: Dunkler Hintergrund mit goldenem Rahmen */
-.preview-lightbox-content {
-    background-color: #1a1a1a;
-    padding: 20px;
-    border: 2px solid #FCB500;
-    border-radius: 8px;
-    position: relative;
-    width: 90%;
-    max-width: 1200px;
-    transform: scale(0.9);
-    transition: transform 0.3s ease;
-}
-
-/* 2. Der Schließen-Button (X): Eine einzige, stabile Regel */
-#close-preview-lightbox {
-    color: #000000 !important;
-    background-color: #ffffff;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1;
-    font-size: 20px;
-    opacity: 0.8;
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    transition: opacity 0.3s ease;
-    transform: translateZ(0);
-}
-
-#close-preview-lightbox:hover {
-    opacity: 1;
-}
 
