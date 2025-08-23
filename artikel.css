@@ -1056,3 +1056,7 @@ footer a:hover {
 #close-preview-lightbox:hover {
     opacity: 1;
 }
+
+#preview-lightbox {
+    display: none;
+}
