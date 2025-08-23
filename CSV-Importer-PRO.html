@@ -202,25 +202,44 @@ document.addEventListener('DOMContentLoaded', function() {
     const iframe = document.getElementById('preview-iframe');
     const closeButton = document.getElementById('close-preview-lightbox');
 
+    // Funktion zum Öffnen der Lightbox
+    const openLightbox = (src) => {
+        iframe.src = src;
+        lightbox.classList.add('visible');
+    };
+
+    // Funktion zum Schließen der Lightbox
+    const closeLightbox = () => {
+        lightbox.classList.remove('visible');
+        // Kleine Verzögerung, damit der Inhalt nicht vor dem Ausblenden verschwindet
+        setTimeout(() => {
+            iframe.src = '';
+        }, 300);
+    };
+
+    // Event-Listener für die Vorschau-Elemente
     previewItems.forEach(item => {
         item.addEventListener('click', function(e) {
-            e.preventDefault();
+            e.preventDefault(); // Verhindert das Springen der Seite
             const src = this.getAttribute('data-src');
-            iframe.src = src;
-            lightbox.style.display = 'flex';
+            openLightbox(src);
         });
     });
 
-    closeButton.addEventListener('click', function() {
-        lightbox.style.display = 'none';
-        iframe.src = '';
-    });
+    // Event-Listener für den Schließen-Button
+    closeButton.addEventListener('click', closeLightbox);
 
-    // Schließen bei Klick außerhalb des Inhalts
+    // Schließen bei Klick auf den Hintergrund
     lightbox.addEventListener('click', function(e) {
         if (e.target === lightbox) {
-            lightbox.style.display = 'none';
-            iframe.src = '';
+            closeLightbox();
+        }
+    });
+
+    // Schließen mit der Escape-Taste
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && lightbox.classList.contains('visible')) {
+            closeLightbox();
         }
     });
 });
