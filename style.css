@@ -6,10 +6,19 @@ a {
     text-decoration: none !important;
 }
 
+#matrix-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* Platziert den Canvas hinter den Menü-Links */
+}
+
 .side-menu {
  padding-top: 80px;
 padding-bottom: 20px;
-    position: fixed;
+    position: relative;
     top: 0;
     right: 0;
     width: 600px; /* Breite des Menüs */
@@ -23,6 +32,7 @@ padding-bottom: 20px;
     display: flex;
     flex-direction: column;
     padding: 60px 20px 20px;
+overflow: hidden;
 }
 
 .side-menu.is-active {
