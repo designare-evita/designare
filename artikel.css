@@ -75,8 +75,8 @@
 
 .preview-lightbox-content {
     background: #FCB500;
-    padding: 20px;
-    border-radius: 8px;
+    padding: 10px;
+    border-radius: 10px;
     position: relative;
     width: 90%;
     max-width: 1200px;
