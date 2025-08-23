@@ -445,6 +445,7 @@ export function initSilasForm() {
 
             silasStatus.textContent = '✅ Alle ' + keywordList.length + ' Texte wurden generiert.';
             startGenerationBtn.disabled = false;
+silasResponseContainer.querySelector('h3').textContent = 'Erstellung abgeschlossen!';
             
             // Download-Button hinzufügen
             if (!document.getElementById('download-csv-dynamic')) {
