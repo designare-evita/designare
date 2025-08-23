@@ -153,6 +153,26 @@ a {
     transform: translateX(0); /* Sichtbar machen */
 }
 
+/* Schließen-Button (X) für alle Lightboxen auf der Seite */
+.modal-content .close-button {
+    color: #000000; /* Farbe des 'X' auf Schwarz setzen */
+    background-color: #ffffff; /* Weissen Hintergrund hinzufügen, damit man es sieht */
+    border-radius: 50%; /* Macht den Button rund */
+    width: 30px; /* Feste Breite */
+    height: 30px; /* Feste Höhe */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1; /* Zentriert das 'X' vertikal besser */
+    font-size: 20px; /* Grösse des 'X' anpassen */
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+}
+
+.modal-content .close-button:hover {
+    opacity: 1; /* Volle Deckkraft beim Hover */
+}
+
 
 /* Der Schließen-Button (das "X") */
 .side-menu .close-button {
