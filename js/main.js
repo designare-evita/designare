@@ -50,8 +50,19 @@ function initializeHeaderScripts() {
         }
     });
 
-    // ✅ EINZIGE ÄNDERUNG: initModals() hierhin verschoben!
+    // ✅ initModals() hier initialisieren - NACH dem Header-Laden!
     initModals();
+    
+    // Debug: Prüfe ob die Buttons existieren
+    const contactBtn = document.getElementById('contact-button');
+    const cookieBtn = document.getElementById('cookie-info-button');
+    const aboutBtn = document.getElementById('about-me-button');
+    
+    console.log("Header-Buttons gefunden:", {
+        contact: !!contactBtn,
+        cookie: !!cookieBtn,
+        about: !!aboutBtn
+    });
     
     console.log("Header-spezifische Skripte (Menü, Modals) initialisiert.");
 }
@@ -64,11 +75,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Prüfen, ob der Platzhalter für den Header existiert
     if (headerPlaceholder) {
-        // Lade den Header aus der externen Datei
-        fetch('/header.html')
+        // Lade den Header aus der externen Datei (relativer Pfad)
+        fetch('header.html')
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Netzwerk-Antwort war nicht ok.');
+                }
+                return response.text();
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Header-Datei konnte nicht geladen werden.');
                 }
                 return response.text();
             })
@@ -94,7 +111,6 @@ document.addEventListener('DOMContentLoaded', function() {
     initTypewriters();
     initAiForm();
     initSilasForm();
-    // ❌ initModals() ENTFERNT - läuft jetzt in initializeHeaderScripts()
 
     // Starte hier die Besucher-Erfassung
     trackVisitor();
