@@ -156,18 +156,32 @@ function paginateAndShowModal(htmlContentString, pageName = '') {
         return;
     }
     
+    // Parse HTML String
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlContentString, 'text/html');
-    const legalContainer = doc.querySelector('.legal-container');
+    
+    // Suche nach .legal-container - falls nicht vorhanden, nimm body content
+    let legalContainer = doc.querySelector('.legal-container');
+    
+    // Falls kein .legal-container vorhanden, nimm alle Kinder des body
+    if (!legalContainer) {
+        legalContainer = doc.body;
+    }
 
-    if (legalContainer) {
+    if (legalContainer && legalContainer.children.length > 0) {
         legalModalContentArea.innerHTML = '';
         const children = Array.from(legalContainer.children);
         let allParts = [];
         let currentPage = 0;
 
-        // Spezielle Behandlung für Datenschutz-Seite
-        if (pageName === 'datenschutz') {
+        // Bestimme die Anzahl der benötigten Teile basierend auf der Inhaltslänge
+        const needsPagination = children.length > 10; // Nur paginieren wenn mehr als 10 Elemente
+
+        if (!needsPagination) {
+            // Kein Paging nötig - zeige alles auf einer Seite
+            allParts.push(children);
+        } else if (pageName === 'datenschutz') {
+            // Spezielle Behandlung für Datenschutz-Seite
             const findElementById = (id) => children.find(child => child.id === id);
             const getIndexOfElement = (element) => children.indexOf(element);
             const splitElements = [
@@ -184,40 +198,52 @@ function paginateAndShowModal(htmlContentString, pageName = '') {
                 const indices = splitElements.map(getIndexOfElement).sort((a, b) => a - b);
                 let lastIndex = 0;
                 indices.forEach(index => {
-                    allParts.push(children.slice(lastIndex, index));
-                    lastIndex = index;
+                    if (index > lastIndex) {
+                        allParts.push(children.slice(lastIndex, index));
+                        lastIndex = index;
+                    }
                 });
-                allParts.push(children.slice(lastIndex));
+                if (lastIndex < children.length) {
+                    allParts.push(children.slice(lastIndex));
+                }
             } else {
+                // Fallback: Teile in 2 Hälften
                 const splitIndex = Math.ceil(children.length / 2);
                 allParts.push(children.slice(0, splitIndex));
                 allParts.push(children.slice(splitIndex));
             }
         } else {
-            // Standard-Behandlung für andere Seiten
-            const targetSplitCount = Math.ceil(children.length * 0.5);
-            let h3SplitIndex = -1;
+            // Standard-Behandlung für andere Seiten (About, Impressum)
+            // Suche nach einem guten Teilungspunkt (vorzugsweise bei einem H2 oder H3)
+            const midPoint = Math.floor(children.length / 2);
+            let splitIndex = -1;
             
-            for (let i = 0; i < children.length; i++) {
-                if (children[i].tagName === 'H3' && i >= targetSplitCount * 0.8 && i <= targetSplitCount * 1.2) {
-                    h3SplitIndex = i;
+            // Suche nach einem H2 oder H3 in der Nähe der Mitte
+            for (let i = midPoint - 2; i <= midPoint + 2 && i < children.length; i++) {
+                if (i >= 0 && (children[i].tagName === 'H2' || children[i].tagName === 'H3')) {
+                    splitIndex = i;
                     break;
                 }
             }
             
-            if (h3SplitIndex !== -1) {
-                allParts.push(children.slice(0, h3SplitIndex));
-                allParts.push(children.slice(h3SplitIndex));
-            } else {
-                const splitIndex = Math.ceil(children.length / 2);
+            // Falls kein Header gefunden, teile einfach in der Mitte
+            if (splitIndex === -1) {
+                splitIndex = midPoint;
+            }
+            
+            if (splitIndex > 0 && splitIndex < children.length) {
                 allParts.push(children.slice(0, splitIndex));
                 allParts.push(children.slice(splitIndex));
+            } else {
+                // Fallback: zeige alles auf einer Seite
+                allParts.push(children);
             }
         }
 
         // Erstelle DIVs für jeden Teil
         const partDivs = allParts.map(part => {
             const div = document.createElement('div');
+            div.className = 'legal-modal-part';
             part.forEach(child => div.appendChild(child.cloneNode(true)));
             return div;
         });
@@ -236,10 +262,12 @@ function paginateAndShowModal(htmlContentString, pageName = '') {
             
             if (backButton) {
                 backButton.style.display = (currentPage > 0) ? 'inline-block' : 'none';
+                backButton.disabled = (currentPage === 0);
             }
             
             if (continueButton) {
                 continueButton.style.display = (currentPage < allParts.length - 1) ? 'inline-block' : 'none';
+                continueButton.disabled = (currentPage >= allParts.length - 1);
             }
         };
 
@@ -278,8 +306,10 @@ function paginateAndShowModal(htmlContentString, pageName = '') {
 
         renderCurrentPart();
         openLightbox(legalModal);
+        
+        console.log(`Modal geöffnet für ${pageName || 'Inhalt'} mit ${allParts.length} Teil(en)`);
     } else {
-        console.error('Legal Container nicht gefunden im HTML');
+        console.error('Kein Inhalt zum Anzeigen gefunden');
     }
 }
 
@@ -312,9 +342,10 @@ function setupLegalModals() {
             e.preventDefault();
             const aboutContentSource = document.getElementById('about-me-content');
             if (aboutContentSource) {
-                // Erstelle einen Container mit der about-me-content
-                const containerHTML = `<div class="legal-container">${aboutContentSource.innerHTML}</div>`;
-                paginateAndShowModal(containerHTML, 'about');
+                // Hole den inneren HTML-Inhalt direkt
+                const innerContent = aboutContentSource.innerHTML;
+                // Übergebe den kompletten HTML-String
+                paginateAndShowModal(innerContent, 'about');
             } else {
                 console.error('About Me Content nicht gefunden');
             }
