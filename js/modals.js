@@ -96,10 +96,9 @@ function setupContactModal() {
             }
             object['_honey'] = '';
             
-            const submitButton = e.submitter || contactForm.querySelector('button[type="submit"]');
-            const originalButtonText = submitButton.innerText;
-            submitButton.innerText = "Sende...";
-            submitButton.disabled = true;
+            const originalButtonText = e.submitter.innerText;
+            e.submitter.innerText = "Sende...";
+            e.submitter.disabled = true;
             
             try {
                 const response = await fetch('https://formsubmit.co/ajax/michael@designare.at', {
@@ -123,8 +122,8 @@ function setupContactModal() {
             } catch (error) {
                 alert('Ein unerwarteter Fehler ist aufgetreten.');
             } finally {
-                submitButton.innerText = originalButtonText;
-                submitButton.disabled = false;
+                e.submitter.innerText = originalButtonText;
+                e.submitter.disabled = false;
             }
         });
     }
@@ -227,7 +226,7 @@ function paginateAndShowModal(htmlContentString, pageName = '') {
             
             const backButton = document.createElement('button');
             backButton.id = 'legal-back-button';
-            backButton.textContent = 'Zurück';  // UTF-8 korrigiert
+            backButton.textContent = 'Zurück';
             backButton.addEventListener('click', () => {
                 currentPage--;
                 renderCurrentPart();

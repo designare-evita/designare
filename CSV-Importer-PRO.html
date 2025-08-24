@@ -49,7 +49,6 @@
     <div id="particles-js"></div>
 
 <div id="header-placeholder"></div>
-
     <div id="hero">
         <main class="article-container">
             <div class="article-content">
@@ -179,7 +178,7 @@ Der CSV Importer PRO übernimmt dann nahtlos und verwandelt die Daten im Handumd
         </div>
     </div>
 
-   <div id="preview-lightbox" class="preview-lightbox-overlay">
+    <div id="preview-lightbox" class="preview-lightbox-overlay">
     <div class="preview-lightbox-content">
         <button id="close-preview-lightbox" class="close-button">&times;</button>
         <iframe id="preview-iframe" src="" style="width: 100%; height: 80vh; border: none;"></iframe>
@@ -205,12 +204,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Funktion zum Öffnen der Lightbox
     const openLightbox = (src) => {
         iframe.src = src;
-        lightbox.classList.add('is-visible'); // ÄNDERUNG: Fügt eine Klasse hinzu
+        lightbox.classList.add('visible');
     };
 
     // Funktion zum Schließen der Lightbox
     const closeLightbox = () => {
-        lightbox.classList.remove('is-visible'); // ÄNDERUNG: Entfernt die Klasse
+        lightbox.classList.remove('visible');
         // Kleine Verzögerung, damit der Inhalt nicht vor dem Ausblenden verschwindet
         setTimeout(() => {
             iframe.src = '';
@@ -220,7 +219,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Event-Listener für die Vorschau-Elemente
     previewItems.forEach(item => {
         item.addEventListener('click', function(e) {
-            e.preventDefault();
+            e.preventDefault(); // Verhindert das Springen der Seite
             const src = this.getAttribute('data-src');
             openLightbox(src);
         });
@@ -238,12 +237,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Schließen mit der Escape-Taste
     document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && lightbox.classList.contains('is-visible')) {
+        if (e.key === 'Escape' && lightbox.classList.contains('visible')) {
             closeLightbox();
         }
     });
 });
 </script>
-
 </body>
 </html>
