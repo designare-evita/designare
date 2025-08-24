@@ -964,28 +964,13 @@ footer a:hover {
     z-index: 99998;
 }
 
-/* KORREKTUR FÜR HEADER & FOOTER AUF UNTERSEITEN */
 
-/* Stellt sicher, dass der Header über den Partikeln liegt */
 .main-header {
     z-index: 1001 !important;
 }
 
-/* Stellt sicher, dass der Footer über den Partikeln liegt */
-footer {
+.footer {
     z-index: 1001 !important;
-}
-
-.preview-lightbox-overlay {
-    border: 5px solid red !important;
-}
-
-.preview-lightbox-overlay .preview-lightbox-content {
-    border: 3px solid blue !important;
-}
-
-.preview-lightbox-overlay #close-preview-lightbox {
-    border: 2px solid green !important;
 }
 
 
