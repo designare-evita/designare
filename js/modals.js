@@ -22,6 +22,7 @@ function setupCookieModal() {
     const privacyPolicyLinkButton = document.getElementById('privacy-policy-link-button');
     const cookieInfoButton = document.getElementById('cookie-info-button');
 
+    // Zeige Cookie-Lightbox nur wenn noch nicht gesehen
     if (!localStorage.getItem('hasSeenCookieInfoLightbox')) {
         setTimeout(() => openLightbox(cookieInfoLightbox), 1000);
     }
@@ -96,9 +97,10 @@ function setupContactModal() {
             }
             object['_honey'] = '';
             
-            const originalButtonText = e.submitter.innerText;
-            e.submitter.innerText = "Sende...";
-            e.submitter.disabled = true;
+            const submitButton = e.submitter || contactForm.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton.innerText;
+            submitButton.innerText = "Sende...";
+            submitButton.disabled = true;
             
             try {
                 const response = await fetch('https://formsubmit.co/ajax/michael@designare.at', {
@@ -117,13 +119,14 @@ function setupContactModal() {
                     contactSuccessMessage.style.display = 'block';
                     contactForm.reset();
                 } else {
-                    alert('Fehler: ' + data.message);
+                    alert('Fehler: ' + (data.message || 'Unbekannter Fehler'));
                 }
             } catch (error) {
-                alert('Ein unerwarteter Fehler ist aufgetreten.');
+                console.error('Fehler beim Senden:', error);
+                alert('Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es später erneut.');
             } finally {
-                e.submitter.innerText = originalButtonText;
-                e.submitter.disabled = false;
+                submitButton.innerText = originalButtonText;
+                submitButton.disabled = false;
             }
         });
     }
@@ -132,14 +135,27 @@ function setupContactModal() {
         closeSuccessMessageBtn.addEventListener('click', (e) => {
             e.preventDefault();
             closeLightbox(contactModal);
+            // Reset für nächste Verwendung
+            setTimeout(() => {
+                if (contactForm && contactSuccessMessage) {
+                    contactForm.style.display = 'flex';
+                    contactSuccessMessage.style.display = 'none';
+                }
+            }, 300);
         });
     }
 }
 
-// Paginierungs- und Lade-Logik
+// Paginierungs- und Lade-Logik für Legal Modals
 function paginateAndShowModal(htmlContentString, pageName = '') {
     const legalModal = document.getElementById('legal-modal');
     const legalModalContentArea = document.getElementById('legal-modal-content-area');
+    
+    if (!legalModal || !legalModalContentArea) {
+        console.error('Legal Modal oder Content Area nicht gefunden');
+        return;
+    }
+    
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlContentString, 'text/html');
     const legalContainer = doc.querySelector('.legal-container');
@@ -150,12 +166,19 @@ function paginateAndShowModal(htmlContentString, pageName = '') {
         let allParts = [];
         let currentPage = 0;
 
+        // Spezielle Behandlung für Datenschutz-Seite
         if (pageName === 'datenschutz') {
             const findElementById = (id) => children.find(child => child.id === id);
             const getIndexOfElement = (element) => children.indexOf(element);
-            const splitElements = ['datenschutz-part-2-start', 'datenschutz-part-3-start', 'datenschutz-part-4-start', 'datenschutz-part-5-start', 'datenschutz-part-6-start']
-                .map(id => findElementById(id))
-                .filter(el => el);
+            const splitElements = [
+                'datenschutz-part-2-start', 
+                'datenschutz-part-3-start', 
+                'datenschutz-part-4-start', 
+                'datenschutz-part-5-start', 
+                'datenschutz-part-6-start'
+            ]
+            .map(id => findElementById(id))
+            .filter(el => el);
                 
             if (splitElements.length > 0) {
                 const indices = splitElements.map(getIndexOfElement).sort((a, b) => a - b);
@@ -171,6 +194,7 @@ function paginateAndShowModal(htmlContentString, pageName = '') {
                 allParts.push(children.slice(splitIndex));
             }
         } else {
+            // Standard-Behandlung für andere Seiten
             const targetSplitCount = Math.ceil(children.length * 0.5);
             let h3SplitIndex = -1;
             
@@ -191,6 +215,7 @@ function paginateAndShowModal(htmlContentString, pageName = '') {
             }
         }
 
+        // Erstelle DIVs für jeden Teil
         const partDivs = allParts.map(part => {
             const div = document.createElement('div');
             part.forEach(child => div.appendChild(child.cloneNode(true)));
@@ -206,8 +231,8 @@ function paginateAndShowModal(htmlContentString, pageName = '') {
         };
 
         const updatePaginationButtons = () => {
-            let backButton = legalModalContentArea.querySelector('#legal-back-button');
-            let continueButton = legalModalContentArea.querySelector('#legal-continue-button');
+            const backButton = legalModalContentArea.querySelector('#legal-back-button');
+            const continueButton = legalModalContentArea.querySelector('#legal-continue-button');
             
             if (backButton) {
                 backButton.style.display = (currentPage > 0) ? 'inline-block' : 'none';
@@ -218,8 +243,10 @@ function paginateAndShowModal(htmlContentString, pageName = '') {
             }
         };
 
+        // Füge alle Parts zum Modal hinzu
         partDivs.forEach(div => legalModalContentArea.appendChild(div));
 
+        // Füge Pagination-Buttons hinzu wenn mehr als 1 Teil
         if (allParts.length > 1) {
             const paginationButtonsDiv = document.createElement('div');
             paginationButtonsDiv.className = 'legal-modal-pagination-buttons';
@@ -228,16 +255,20 @@ function paginateAndShowModal(htmlContentString, pageName = '') {
             backButton.id = 'legal-back-button';
             backButton.textContent = 'Zurück';
             backButton.addEventListener('click', () => {
-                currentPage--;
-                renderCurrentPart();
+                if (currentPage > 0) {
+                    currentPage--;
+                    renderCurrentPart();
+                }
             });
             
             const continueButton = document.createElement('button');
             continueButton.id = 'legal-continue-button';
             continueButton.textContent = 'Weiter';
             continueButton.addEventListener('click', () => {
-                currentPage++;
-                renderCurrentPart();
+                if (currentPage < allParts.length - 1) {
+                    currentPage++;
+                    renderCurrentPart();
+                }
             });
             
             paginationButtonsDiv.appendChild(backButton);
@@ -247,23 +278,28 @@ function paginateAndShowModal(htmlContentString, pageName = '') {
 
         renderCurrentPart();
         openLightbox(legalModal);
+    } else {
+        console.error('Legal Container nicht gefunden im HTML');
     }
 }
 
+// Lade Legal-Seiten asynchron
 async function loadLegalPageInModal(pageName) {
     const url = `${pageName}.html`;
     try {
         const response = await fetch(url);
         if (!response.ok) {
-            throw new Error('Seite nicht gefunden');
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
         const htmlContent = await response.text();
         paginateAndShowModal(htmlContent, pageName);
     } catch (error) {
         console.error(`Fehler beim Laden von ${pageName}.html:`, error);
+        alert(`Die Seite ${pageName} konnte nicht geladen werden.`);
     }
 }
 
+// Setup für Legal Modals (About Me, Impressum, Datenschutz)
 function setupLegalModals() {
     const aboutMeButton = document.getElementById('about-me-button');
     const impressumLink = document.getElementById('impressum-link');
@@ -276,7 +312,11 @@ function setupLegalModals() {
             e.preventDefault();
             const aboutContentSource = document.getElementById('about-me-content');
             if (aboutContentSource) {
-                paginateAndShowModal(aboutContentSource.innerHTML, 'about');
+                // Erstelle einen Container mit der about-me-content
+                const containerHTML = `<div class="legal-container">${aboutContentSource.innerHTML}</div>`;
+                paginateAndShowModal(containerHTML, 'about');
+            } else {
+                console.error('About Me Content nicht gefunden');
             }
         });
     }
@@ -308,9 +348,29 @@ function setupLegalModals() {
     }
 }
 
+// ESC-Taste zum Schließen aller Modals
+function setupEscapeKey() {
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.modal-overlay.visible').forEach(modal => {
+                closeLightbox(modal);
+            });
+        }
+    });
+}
+
 // Hauptinitialisierungsfunktion - ES6 Export
 export function initModals() {
-    setupCookieModal();
-    setupContactModal();
-    setupLegalModals();
+    console.log('Initialisiere Modals...');
+    
+    try {
+        setupCookieModal();
+        setupContactModal();
+        setupLegalModals();
+        setupEscapeKey();
+        
+        console.log('✅ Modals erfolgreich initialisiert!');
+    } catch (error) {
+        console.error('❌ Fehler beim Initialisieren der Modals:', error);
+    }
 }
