@@ -263,17 +263,22 @@
     background-color: rgba(255, 255, 255, 0.08);
 }
 
-/* Badge für den Text-Typ (informativ/kommerziell) */
-#keyword-display-list .intent-badge {
+/* ======================================== */
+/* SILAS KEYWORD-LISTE (Korrektur)          */
+/* ======================================== */
+
+/* Korrektur für das Text-Typ-Badge auf Desktop */
+#keyword-display-list li .intent-badge {
+    font-size: 0.75rem !important; /* Kleinere Schriftgröße erzwingen */
+    font-weight: 600 !important;
     display: inline-block;
     background-color: rgba(255, 255, 255, 0.1);
     color: #ffc107;
     padding: 4px 10px;
-    font-size: 0.75rem; /* Kleinere Schriftgröße für das Badge */
-    font-weight: 600;
     border-radius: 12px;
     vertical-align: middle;
     margin-left: 10px;
+    text-transform: capitalize; /* Stellt sicher, dass der erste Buchstabe groß ist */
 }
 
 #keyword-display-list li button {
