@@ -195,54 +195,6 @@ Der CSV Importer PRO übernimmt dann nahtlos und verwandelt die Daten im Handumd
     <script type="module" src="js/main.js"></script>
 <script src="js/matrix-effect.js"></script>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const previewItems = document.querySelectorAll('.preview-item');
-    const lightbox = document.getElementById('preview-lightbox');
-    const iframe = document.getElementById('preview-iframe');
-    const closeButton = document.getElementById('close-preview-lightbox');
 
-    // Funktion zum Öffnen der Lightbox
-    const openLightbox = (src) => {
-        iframe.src = src;
-        lightbox.classList.add('is-visible'); // ÄNDERUNG: Fügt eine Klasse hinzu
-    };
-
-    // Funktion zum Schließen der Lightbox
-    const closeLightbox = () => {
-        lightbox.classList.remove('is-visible'); // ÄNDERUNG: Entfernt die Klasse
-        // Kleine Verzögerung, damit der Inhalt nicht vor dem Ausblenden verschwindet
-        setTimeout(() => {
-            iframe.src = '';
-        }, 300);
-    };
-
-    // Event-Listener für die Vorschau-Elemente
-    previewItems.forEach(item => {
-        item.addEventListener('click', function(e) {
-            e.preventDefault();
-            const src = this.getAttribute('data-src');
-            openLightbox(src);
-        });
-    });
-
-    // Event-Listener für den Schließen-Button
-    closeButton.addEventListener('click', closeLightbox);
-
-    // Schließen bei Klick auf den Hintergrund
-    lightbox.addEventListener('click', function(e) {
-        if (e.target === lightbox) {
-            closeLightbox();
-        }
-    });
-
-    // Schließen mit der Escape-Taste
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && lightbox.classList.contains('is-visible')) {
-            closeLightbox();
-        }
-    });
-});
-</script>
 </body>
 </html>
