@@ -259,26 +259,21 @@
     transition: background-color 0.3s ease;
 }
 
-#keyword-display-list li:hover {
-    background-color: rgba(255, 255, 255, 0.08);
-}
-
-/* ======================================== */
-/* SILAS KEYWORD-LISTE (Korrektur)          */
-/* ======================================== */
-
-/* Korrektur für das Text-Typ-Badge auf Desktop */
-#keyword-display-list li .intent-badge {
-    font-size: 0.75rem !important; /* Kleinere Schriftgröße erzwingen */
-    font-weight: 600 !important;
+body #keyword-display-list li .intent-badge {
     display: inline-block;
     background-color: rgba(255, 255, 255, 0.1);
     color: #ffc107;
     padding: 4px 10px;
+    font-size: 0.75rem; /* WICHTIG: Kleinere Schrift */
+    font-weight: 600;
     border-radius: 12px;
     vertical-align: middle;
-    margin-left: 10px;
-    text-transform: capitalize; /* Stellt sicher, dass der erste Buchstabe groß ist */
+    margin-left: auto; /* Schiebt das Badge nach rechts */
+    flex-shrink: 0; /* Verhindert, dass das Badge schrumpft */
+}
+
+#keyword-display-list li:hover {
+    background-color: rgba(255, 255, 255, 0.08);
 }
 
 #keyword-display-list li button {
