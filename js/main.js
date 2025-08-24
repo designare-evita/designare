@@ -53,17 +53,6 @@ function initializeHeaderScripts() {
     // ✅ initModals() hier initialisieren - NACH dem Header-Laden!
     initModals();
     
-    // Debug: Prüfe ob die Buttons existieren
-    const contactBtn = document.getElementById('contact-button');
-    const cookieBtn = document.getElementById('cookie-info-button');
-    const aboutBtn = document.getElementById('about-me-button');
-    
-    console.log("Header-Buttons gefunden:", {
-        contact: !!contactBtn,
-        cookie: !!cookieBtn,
-        about: !!aboutBtn
-    });
-    
     console.log("Header-spezifische Skripte (Menü, Modals) initialisiert.");
 }
 
@@ -71,11 +60,22 @@ function initializeHeaderScripts() {
  * Haupt-Initialisierungsfunktion, die nach dem Laden des DOMs ausgeführt wird.
  */
 document.addEventListener('DOMContentLoaded', function() {
+    // WICHTIG: Entferne no-scroll Klasse von allen Seiten außer index
+    const isIndexPage = window.location.pathname === '/' || 
+                       window.location.pathname === '/index.html' ||
+                       window.location.pathname.endsWith('/');
+    
+    if (!isIndexPage) {
+        // Auf Artikel-Seiten: Erlaube Scrollen
+        document.body.classList.remove('no-scroll');
+        document.body.style.overflow = '';
+    }
+    
     const headerPlaceholder = document.getElementById('header-placeholder');
 
     // Prüfen, ob der Platzhalter für den Header existiert
     if (headerPlaceholder) {
-        // Lade den Header aus der externen Datei (relativer Pfad)
+        // Lade den Header aus der externen Datei (KORRIGIERT - nur ein .then())
         fetch('header.html')
             .then(response => {
                 if (!response.ok) {
@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 headerPlaceholder.innerHTML = "<p style='color:red; text-align:center;'>Fehler: Der Header konnte nicht geladen werden.</p>";
             });
     } else {
-        // Falls kein Header-Placeholder vorhanden ist (wie auf der Index-Seite)
+        // Falls kein Header-Placeholder vorhanden ist (sollte nicht vorkommen)
         // initialisiere trotzdem die Header-Skripte
         initializeHeaderScripts();
     }
