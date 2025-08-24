@@ -60,16 +60,14 @@ function initializeHeaderScripts() {
  * Haupt-Initialisierungsfunktion, die nach dem Laden des DOMs ausgeführt wird.
  */
 document.addEventListener('DOMContentLoaded', function() {
-    // WICHTIG: Entferne no-scroll Klasse von allen Seiten außer index
-    const isIndexPage = window.location.pathname === '/' || 
-                       window.location.pathname === '/index.html' ||
-                       window.location.pathname.endsWith('/');
-    
-    if (!isIndexPage) {
-        // Auf Artikel-Seiten: Erlaube Scrollen
-        document.body.classList.remove('no-scroll');
-        document.body.style.overflow = '';
-    }
+    // SICHERHEITS-CHECK: Stelle sicher, dass overflow nicht blockiert ist
+    // Falls ein Modal-Bug auftritt, wird das Scrollen trotzdem funktionieren
+    setTimeout(() => {
+        if (document.body.style.overflow === 'hidden' && !document.querySelector('.modal-overlay.visible')) {
+            console.warn('Overflow war hidden ohne sichtbares Modal - korrigiere das');
+            document.body.style.overflow = '';
+        }
+    }, 2000);
     
     const headerPlaceholder = document.getElementById('header-placeholder');
 
@@ -93,10 +91,11 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(error => {
                 console.error('Fehler beim Laden des Headers:', error);
                 headerPlaceholder.innerHTML = "<p style='color:red; text-align:center;'>Fehler: Der Header konnte nicht geladen werden.</p>";
+                // Trotzdem versuchen, die Modals zu initialisieren
+                initializeHeaderScripts();
             });
     } else {
-        // Falls kein Header-Placeholder vorhanden ist (sollte nicht vorkommen)
-        // initialisiere trotzdem die Header-Skripte
+        // Falls kein Header-Placeholder vorhanden ist
         initializeHeaderScripts();
     }
 
