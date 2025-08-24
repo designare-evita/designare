@@ -268,7 +268,7 @@ body #keyword-display-list li .intent-badge {
     font-weight: 600;
     border-radius: 12px;
     vertical-align: middle;
-    margin-left: auto; /* Schiebt das Badge nach rechts */
+    width: auto; /* Automatische Breite basierend auf Inhalt */
     flex-shrink: 0; /* Verhindert, dass das Badge schrumpft */
 }
 
