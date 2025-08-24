@@ -1150,12 +1150,7 @@ body.lightbox-open {
     }
 }
 
-/*--------------------------------------------------------------
-# DEBUGGING STYLES (können nach dem Test entfernt werden)
---------------------------------------------------------------*/
 
-/* Temporäre Debug-Styles um zu sehen ob die Lightbox korrekt positioniert ist */
-/*
 .preview-lightbox-overlay {
     border: 5px solid red !important;
 }
@@ -1167,4 +1162,3 @@ body.lightbox-open {
 .preview-lightbox-overlay #close-preview-lightbox {
     border: 2px solid green !important;
 }
-*/
