@@ -79,13 +79,7 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch('header.html')
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('Netzwerk-Antwort war nicht ok.');
-                }
-                return response.text();
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Header-Datei konnte nicht geladen werden.');
+                    throw new Error('Netzwerk-Antwort war nicht ok. Status: ' + response.status);
                 }
                 return response.text();
             })
