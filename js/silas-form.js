@@ -316,27 +316,26 @@ export function initSilasForm() {
         }
     }
 
-   function updateKeywordDisplay() {
+function updateKeywordDisplay() {
     keywordDisplayList.innerHTML = '';
     
     keywordList.forEach(function(item, index) {
         const listItem = document.createElement('li');
         
-        // Intent Badge
+        // Intent Badge mit KLASSE statt inline CSS für konsistente Darstellung
         const intentBadge = document.createElement('span');
+        intentBadge.className = 'intent-badge';
         intentBadge.textContent = item.intent === 'commercial' ? 'Kommerziell' : 'Informativ';
-        
-        // KORREKTE STIL-DEFINITION FÜR DAS BADGE (inkl. kleiner Schriftgröße)
-        intentBadge.style.cssText = 'background-color: ' + (item.intent === 'commercial' ? '#28a745' : '#17a2b8') + '; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; margin-top: 8px; display: inline-block;';
+        intentBadge.style.cssText = 'background-color: ' + (item.intent === 'commercial' ? '#28a745' : '#17a2b8') + '; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; display: inline-block; width: auto; flex-shrink: 0;';
         
         // Keyword Text
         const keywordSpan = document.createElement('span');
         keywordSpan.textContent = item.keyword;
         keywordSpan.style.cssText = 'font-weight: 500; color: #fff; word-break: break-word; line-height: 1.4;';
         
-        // Content Container
+        // Content Container - mit align-items: flex-start für korrekte Badge-Positionierung
         const contentDiv = document.createElement('div');
-        contentDiv.style.cssText = 'display: flex; flex-direction: column; flex-grow: 1; gap: 5px; min-width: 0;';
+        contentDiv.style.cssText = 'display: flex; flex-direction: column; flex-grow: 1; gap: 5px; min-width: 0; align-items: flex-start;';
         contentDiv.appendChild(keywordSpan);
         contentDiv.appendChild(intentBadge);
         
@@ -359,6 +358,7 @@ export function initSilasForm() {
     
     clearListBtn.style.display = keywordList.length > 0 ? 'inline-block' : 'none';
 }
+
     // Event Listeners
     silasForm.addEventListener('submit', function(e) {
         e.preventDefault();
