@@ -270,6 +270,7 @@ export function initSilasForm() {
                 return kw.length > 0;
             });
             
+            // HIER WIRD DER WERT AUS DEM DROPDOWN GELESEN
             const currentIntent = textIntentSelect.value;
             
             // Keywords validieren
@@ -288,6 +289,7 @@ export function initSilasForm() {
                 });
                 
                 if (existingIndex === -1) {
+                    // KEYWORD WIRD MIT DEM GEWÄHLTEN "INTENT" GESPEICHERT
                     keywordList.push({
                         keyword: keyword,
                         intent: currentIntent
@@ -316,49 +318,42 @@ export function initSilasForm() {
         }
     }
 
-function updateKeywordDisplay() {
-    keywordDisplayList.innerHTML = '';
-    
-    keywordList.forEach(function(item, index) {
-        const listItem = document.createElement('li');
+    function updateKeywordDisplay() {
+        keywordDisplayList.innerHTML = '';
         
-        // Intent Badge
-        const intentBadge = document.createElement('span');
-        intentBadge.textContent = item.intent === 'commercial' ? 'Kommerziell' : 'Informativ';
-        // Stil für das Badge
-        intentBadge.style.cssText = 'background-color: ' + (item.intent === 'commercial' ? '#28a745' : '#17a2b8') + '; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; display: inline-block; white-space: nowrap;';
+        keywordList.forEach(function(item, index) {
+            const listItem = document.createElement('li');
+            
+            const intentBadge = document.createElement('span');
+            intentBadge.textContent = item.intent === 'commercial' ? 'Kommerziell' : 'Informativ';
+            intentBadge.style.cssText = 'background-color: ' + (item.intent === 'commercial' ? '#28a745' : '#17a2b8') + '; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; display: inline-block; white-space: nowrap;';
+            
+            const keywordSpan = document.createElement('span');
+            keywordSpan.textContent = item.keyword;
+            keywordSpan.style.cssText = 'font-weight: 500; color: #fff; word-break: break-word; line-height: 1.4;';
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.style.cssText = 'display: flex; flex-direction: row; align-items: center; flex-grow: 1; gap: 10px; min-width: 0;';
+            contentDiv.appendChild(keywordSpan);
+            contentDiv.appendChild(intentBadge);
+            
+            const removeBtn = document.createElement('button');
+            removeBtn.textContent = '×';
+            removeBtn.style.cssText = 'background-color: #ff6b6b; color: white; border: none; border-radius: 6px; min-width: 36px; height: 36px; cursor: pointer; font-size: 18px; font-weight: bold; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-left: 10px;';
+            removeBtn.onclick = function() {
+                keywordList.splice(index, 1);
+                updateKeywordDisplay();
+            };
+            
+            listItem.style.cssText = 'background-color: rgba(255, 255, 255, 0.05); margin-bottom: 12px; padding: 15px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; font-size: 0.95rem; color: #fff; border-left: 4px solid ' + (item.intent === 'commercial' ? '#28a745' : '#17a2b8') + '; min-height: 50px; gap: 10px;';
+            
+            listItem.appendChild(contentDiv);
+            listItem.appendChild(removeBtn);
+            keywordDisplayList.appendChild(listItem);
+        });
         
-        // Keyword Text
-        const keywordSpan = document.createElement('span');
-        keywordSpan.textContent = item.keyword;
-        keywordSpan.style.cssText = 'font-weight: 500; color: #fff; word-break: break-word; line-height: 1.4;';
-        
-        // Content Container - HIER IST DIE ÄNDERUNG!
-        const contentDiv = document.createElement('div');
-        // Wir ändern flex-direction auf 'row' und zentrieren die Elemente vertikal.
-        contentDiv.style.cssText = 'display: flex; flex-direction: row; align-items: center; flex-grow: 1; gap: 10px; min-width: 0;';
-        contentDiv.appendChild(keywordSpan);
-        contentDiv.appendChild(intentBadge);
-        
-        // Remove Button
-        const removeBtn = document.createElement('button');
-        removeBtn.textContent = '×';
-        removeBtn.style.cssText = 'background-color: #ff6b6b; color: white; border: none; border-radius: 6px; min-width: 36px; height: 36px; cursor: pointer; font-size: 18px; font-weight: bold; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-left: 10px;';
-        removeBtn.onclick = function() {
-            keywordList.splice(index, 1);
-            updateKeywordDisplay();
-        };
-        
-        // List Item
-        listItem.style.cssText = 'background-color: rgba(255, 255, 255, 0.05); margin-bottom: 12px; padding: 15px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; font-size: 0.95rem; color: #fff; border-left: 4px solid ' + (item.intent === 'commercial' ? '#28a745' : '#17a2b8') + '; min-height: 50px; gap: 10px;';
-        
-        listItem.appendChild(contentDiv);
-        listItem.appendChild(removeBtn);
-        keywordDisplayList.appendChild(listItem);
-    });
-    
-    clearListBtn.style.display = keywordList.length > 0 ? 'inline-block' : 'none';
-}
+        clearListBtn.style.display = keywordList.length > 0 ? 'inline-block' : 'none';
+    }
 
     // Event Listeners
     silasForm.addEventListener('submit', function(e) {
@@ -390,7 +385,6 @@ function updateKeywordDisplay() {
                 return;
             }
 
-            // Rate Limit prüfen
             checkRateLimit();
 
             startGenerationBtn.disabled = true;
@@ -404,10 +398,12 @@ function updateKeywordDisplay() {
             for (let i = 0; i < keywordList.length; i++) {
                 const item = keywordList[i];
                 const keyword = item.keyword;
+                // DER GESPEICHERTE "INTENT" WIRD HIER VERWENDET
                 const intent = item.intent;
                 
                 silasStatus.textContent = 'Generiere Text für "' + keyword + '" (' + (intent === 'commercial' ? 'Kommerziell' : 'Informativ') + ') (' + (i + 1) + '/' + keywordList.length + ')...';
                 
+                // DER "INTENT" WIRD AN DIE PROMPT-FUNKTION ÜBERGEBEN
                 const userPrompt = createSilasPrompt(keyword, intent);
 
                 try {
@@ -442,14 +438,12 @@ function updateKeywordDisplay() {
                 }
             }
 
-            // Usage Counter aktualisieren
             updateUsageCounters();
 
             silasStatus.textContent = '✅ Alle ' + keywordList.length + ' Texte wurden generiert.';
             startGenerationBtn.disabled = false;
-silasResponseContainer.querySelector('h3').textContent = 'Erstellung abgeschlossen!';
+            silasResponseContainer.querySelector('h3').textContent = 'Erstellung abgeschlossen!';
             
-            // Download-Button hinzufügen
             if (!document.getElementById('download-csv-dynamic')) {
                 const downloadButton = document.createElement('button');
                 downloadButton.id = 'download-csv-dynamic';
@@ -472,12 +466,12 @@ silasResponseContainer.querySelector('h3').textContent = 'Erstellung abgeschloss
         }
     });
 
-    // Prompt erstellen - UMFANGREICHE VERSION
+    // Prompt erstellen - Hier wird der "intent" genutzt, um die KI anzuweisen
     function createSilasPrompt(keyword, intent) {
         let roleAndTask = '';
         if (intent === 'commercial') {
             roleAndTask = 'Du bist ein erstklassiger Marketing-Texter und SEO-Stratege. Dein Stil ist überzeugend, klar und auf Conversions ausgerichtet. Erstelle einen kommerziell ausgerichteten Text.';
-        } else {
+        } else { // 'informational'
             roleAndTask = 'Du bist ein Fachexperte und SEO-Redakteur. Dein Stil ist informativ, klar und hilfreich. Erstelle einen informationsorientierten Text.';
         }
 
@@ -578,17 +572,15 @@ Erstelle jetzt das vollständige JSON-Objekt mit umfangreichem Content für "${k
         });
     }
 
-    // Vorschau Event Delegation - VOLLSTÄNDIGE VORSCHAU
+    // Vorschau Event Delegation
     silasResponseContainer.addEventListener('click', function(e) {
         if (e.target.classList.contains('preview-btn')) {
             const index = parseInt(e.target.getAttribute('data-index'));
             const data = allGeneratedData[index];
             
             if (data && !data.error && previewContentArea) {
-                // Vollständige Landingpage-Vorschau mit allen Daten
                 let previewHtml = `
                     <div class="preview-landingpage" style="color: #f0f0f0; line-height: 1.6; background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); padding: 20px; border-radius: 10px;">
-                        <!-- Header/Hero Section -->
                         <header style="text-align: center; margin-bottom: 40px; padding: 30px 0; border-bottom: 2px solid #ffc107;">
                             <h1 style="color: #ffc107; font-size: 2.5rem; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">${data.h1 || 'Keine H1 verfügbar'}</h1>
                             <p style="font-size: 1.2rem; color: #ccc; margin-bottom: 15px; max-width: 800px; margin-left: auto; margin-right: auto;">${data.hero_text || 'Kein Hero-Text verfügbar'}</p>
@@ -598,127 +590,45 @@ Erstelle jetzt das vollständige JSON-Objekt mit umfangreichem Content für "${k
                                 <button style="background: transparent; color: #ffc107; border: 2px solid #ffc107; padding: 12px 25px; border-radius: 5px; font-weight: bold; cursor: pointer;">${data.secondary_cta || 'Mehr erfahren'}</button>
                             </div>
                         </header>
-
-                        <!-- Content Sections -->
                         <main style="max-width: 1000px; margin: 0 auto;">
-                            <!-- Problem Section -->
                             <section style="margin-bottom: 40px; padding: 25px; background-color: rgba(255,255,255,0.05); border-radius: 8px; border-left: 4px solid #ff6b6b;">
                                 <h2 style="color: #ff6b6b; margin-bottom: 15px; font-size: 1.8rem;">${data.h2_1 || 'Problemstellung'}</h2>
-                                <p style="color: #ccc; margin-bottom: 20px;">Verstehen Sie die Herausforderungen in diesem Bereich und warum eine professionelle Lösung wichtig ist.</p>
                             </section>
-
-                            <!-- Solution Section -->
                             <section style="margin-bottom: 40px; padding: 25px; background-color: rgba(255,255,255,0.05); border-radius: 8px; border-left: 4px solid #28a745;">
                                 <h2 style="color: #28a745; margin-bottom: 15px; font-size: 1.8rem;">${data.h2_2 || 'Unsere Lösung'}</h2>
-                                <p style="color: #ccc; margin-bottom: 20px;">So bieten wir Ihnen die optimale Lösung für Ihre spezifischen Anforderungen.</p>
                             </section>
-
-                            <!-- Features & Benefits -->
                             <section style="margin-bottom: 40px;">
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;">
                                     <div style="padding: 25px; background-color: rgba(255,255,255,0.05); border-radius: 8px;">
                                         <h3 style="color: #ffc107; margin-bottom: 15px; font-size: 1.5rem;">${data.h2_3 || 'Features'}</h3>
-                                        <div style="color: #ccc;">${data.features_list || '<ul><li>Feature 1</li><li>Feature 2</li><li>Feature 3</li></ul>'}</div>
+                                        <div style="color: #ccc;">${data.features_list || '<ul><li>Feature 1</li></ul>'}</div>
                                     </div>
                                     <div style="padding: 25px; background-color: rgba(255,255,255,0.05); border-radius: 8px;">
                                         <h3 style="color: #ffc107; margin-bottom: 15px; font-size: 1.5rem;">Vorteile</h3>
-                                        <div style="color: #ccc;">${data.benefits_list || '<ul><li>Vorteil 1</li><li>Vorteil 2</li><li>Vorteil 3</li></ul>'}</div>
+                                        <div style="color: #ccc;">${data.benefits_list || '<ul><li>Vorteil 1</li></ul>'}</div>
                                     </div>
                                 </div>
                             </section>
-
-                            <!-- Trust Section -->
-                            <section style="margin-bottom: 40px; padding: 25px; background-color: rgba(255,255,255,0.05); border-radius: 8px; border-left: 4px solid #17a2b8;">
-                                <h2 style="color: #17a2b8; margin-bottom: 15px; font-size: 1.8rem;">${data.h2_4 || 'Vertrauen & Qualität'}</h2>
-                                <p style="color: #ffc107; font-weight: bold; text-align: center; margin-bottom: 20px;">${data.social_proof || 'Vertrauenssignale'}</p>
-                                <p style="color: #aaa; text-align: center;">${data.trust_signals || 'Zertifiziert • Sicher • Garantiert'}</p>
-                            </section>
-
-                            <!-- Testimonials -->
-                            <section style="margin-bottom: 40px;">
-                                <h3 style="color: #ffc107; text-align: center; margin-bottom: 25px; font-size: 1.8rem;">Kundenstimmen</h3>
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                                    <div style="padding: 20px; background-color: rgba(255,193,7,0.1); border-radius: 8px; border-left: 4px solid #ffc107;">
-                                        <p style="color: #ccc; font-style: italic; margin-bottom: 10px;">${data.testimonial_1 || 'Ausgezeichneter Service und professionelle Betreuung!'}</p>
-                                    </div>
-                                    <div style="padding: 20px; background-color: rgba(255,193,7,0.1); border-radius: 8px; border-left: 4px solid #ffc107;">
-                                        <p style="color: #ccc; font-style: italic; margin-bottom: 10px;">${data.testimonial_2 || 'Kann ich nur weiterempfehlen!'}</p>
-                                    </div>
-                                </div>
-                            </section>
-
-                            <!-- Pricing -->
-                            <section style="margin-bottom: 40px;">
-                                <h3 style="color: #ffc107; text-align: center; margin-bottom: 25px; font-size: 1.8rem;">${data.pricing_title || 'Unsere Pakete'}</h3>
-                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
-                                    <div style="padding: 20px; background-color: rgba(255,255,255,0.05); border-radius: 8px; text-align: center;">
-                                        <h4 style="color: #ffc107; margin-bottom: 10px;">Starter</h4>
-                                        <p style="color: #ccc; font-size: 0.9rem;">${data.price_1 || 'Grundpaket für den Einstieg'}</p>
-                                    </div>
-                                    <div style="padding: 20px; background-color: rgba(255,193,7,0.1); border: 2px solid #ffc107; border-radius: 8px; text-align: center;">
-                                        <h4 style="color: #ffc107; margin-bottom: 10px;">Professional</h4>
-                                        <p style="color: #ccc; font-size: 0.9rem;">${data.price_2 || 'Erweiterte Funktionen'}</p>
-                                    </div>
-                                    <div style="padding: 20px; background-color: rgba(255,255,255,0.05); border-radius: 8px; text-align: center;">
-                                        <h4 style="color: #ffc107; margin-bottom: 10px;">Enterprise</h4>
-                                        <p style="color: #ccc; font-size: 0.9rem;">${data.price_3 || 'Vollständige Lösung'}</p>
-                                    </div>
-                                </div>
-                            </section>
-
-                            <!-- FAQ -->
-                            <section style="margin-bottom: 40px;">
-                                <h3 style="color: #ffc107; text-align: center; margin-bottom: 25px; font-size: 1.8rem;">Häufige Fragen</h3>
-                                <div style="space-y: 15px;">
-                                    <details style="background-color: rgba(255,255,255,0.05); border-radius: 8px; padding: 15px; margin-bottom: 15px;">
-                                        <summary style="color: #ffc107; font-weight: bold; cursor: pointer; margin-bottom: 10px;">${data.faq_1 || 'Wie funktioniert der Service?'}</summary>
-                                        <p style="color: #ccc; margin-top: 10px;">${data.faq_answer_1 || 'Detaillierte Antwort auf die erste Frage.'}</p>
-                                    </details>
-                                    <details style="background-color: rgba(255,255,255,0.05); border-radius: 8px; padding: 15px; margin-bottom: 15px;">
-                                        <summary style="color: #ffc107; font-weight: bold; cursor: pointer; margin-bottom: 10px;">${data.faq_2 || 'Was sind die Kosten?'}</summary>
-                                        <p style="color: #ccc; margin-top: 10px;">${data.faq_answer_2 || 'Detaillierte Antwort auf die zweite Frage.'}</p>
-                                    </details>
-                                    <details style="background-color: rgba(255,255,255,0.05); border-radius: 8px; padding: 15px; margin-bottom: 15px;">
-                                        <summary style="color: #ffc107; font-weight: bold; cursor: pointer; margin-bottom: 10px;">${data.faq_3 || 'Wie ist der Support?'}</summary>
-                                        <p style="color: #ccc; margin-top: 10px;">${data.faq_answer_3 || 'Detaillierte Antwort auf die dritte Frage.'}</p>
-                                    </details>
-                                </div>
-                            </section>
-
-                            <!-- Guarantee -->
                             <section style="text-align: center; padding: 30px; background: linear-gradient(45deg, rgba(255,193,7,0.1), rgba(255,193,7,0.2)); border-radius: 10px; border: 2px solid #ffc107;">
                                 <h3 style="color: #ffc107; margin-bottom: 15px;">${data.guarantee_text || 'Unsere Garantie'}</h3>
-                                <p style="color: #ccc; margin-bottom: 25px;">${data.contact_info || 'Kontaktieren Sie uns für weitere Informationen.'}</p>
+                                <p style="color: #ccc; margin-bottom: 25px;">${data.contact_info || 'Kontaktieren Sie uns.'}</p>
                                 <button style="background: #ffc107; color: #1a1a1a; border: none; padding: 15px 30px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 1.1rem;">${data.footer_cta || 'Jetzt starten'}</button>
                             </section>
                         </main>
-
-                        <!-- SEO Meta Info - KOMPLETT GETRENNT -->
-                        <div style="margin-top: 50px; padding: 0; clear: both;"></div>
-                        
                         <section style="margin-top: 30px; padding: 25px; background: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(45,45,45,0.7) 100%); border-radius: 12px; border: 2px solid #444;">
                             <h3 style="color: #ffc107; margin: 0 0 25px 0; text-align: center; font-size: 1.5rem; border-bottom: 2px solid #ffc107; padding-bottom: 10px;">📊 SEO & Meta-Informationen</h3>
-                            
                             <div style="display: flex; flex-direction: column; gap: 20px; max-width: 100%;">
                                 <div style="padding: 15px; background: linear-gradient(90deg, rgba(40,167,69,0.1) 0%, rgba(40,167,69,0.05) 100%); border-radius: 8px; border-left: 4px solid #28a745;">
-                                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                                        <strong style="color: #28a745; font-size: 1rem;">🎯 SEO Titel:</strong>
-                                        <span style="color: #e9e9e9; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word;">${data.meta_title || data.post_title || 'N/A'}</span>
-                                    </div>
+                                    <strong style="color: #28a745; font-size: 1rem;">🎯 SEO Titel:</strong>
+                                    <span style="color: #e9e9e9; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word;">${data.meta_title || data.post_title || 'N/A'}</span>
                                 </div>
-                                
                                 <div style="padding: 15px; background: linear-gradient(90deg, rgba(23,162,184,0.1) 0%, rgba(23,162,184,0.05) 100%); border-radius: 8px; border-left: 4px solid #17a2b8;">
-                                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                                        <strong style="color: #17a2b8; font-size: 1rem;">🔗 URL Slug:</strong>
-                                        <span style="color: #e9e9e9; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word; font-family: monospace; background-color: rgba(0,0,0,0.3); padding: 5px 8px; border-radius: 4px;">${data.post_name || 'n-a'}</span>
-                                    </div>
+                                    <strong style="color: #17a2b8; font-size: 1rem;">🔗 URL Slug:</strong>
+                                    <span style="color: #e9e9e9; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word; font-family: monospace; background-color: rgba(0,0,0,0.3); padding: 5px 8px; border-radius: 4px;">${data.post_name || 'n-a'}</span>
                                 </div>
-                                
                                 <div style="padding: 15px; background: linear-gradient(90deg, rgba(255,193,7,0.1) 0%, rgba(255,193,7,0.05) 100%); border-radius: 8px; border-left: 4px solid #ffc107;">
-                                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                                        <strong style="color: #ffc107; font-size: 1rem;">📝 Meta Description:</strong>
-                                        <span style="color: #e9e9e9; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word;">${data.meta_description || 'N/A'}</span>
-                                    </div>
+                                    <strong style="color: #ffc107; font-size: 1rem;">📝 Meta Description:</strong>
+                                    <span style="color: #e9e9e9; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word;">${data.meta_description || 'N/A'}</span>
                                 </div>
                             </div>
                         </section>
