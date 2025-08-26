@@ -679,50 +679,192 @@ export function initSilasForm() {
         }
     }
 
-    // === MOCK CONTENT GENERATION (Ersetzt API Call) ===
+    // === INTELLIGENTE CONTENT GENERATION ===
     async function generateContent(item, index, responseContent) {
-        // Simuliere API-Aufruf mit Mock-Daten
+        // Simuliere API-Aufruf
         await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
         
         const context = item.context;
         const isCommercial = item.intent === 'commercial';
+        const keyword = item.keyword.toLowerCase().trim();
         
-        // Mock-Daten basierend auf Kontext und Intent
+        // Intelligente Content-Erstellung basierend auf Keywords und Kontext
+        function generateIntelligentContent(keyword, context, isCommercial) {
+            const templates = {
+                'kinder geburtstag': {
+                    commercial: {
+                        post_title: 'Unvergessliche Kindergeburtstage planen - Komplette Party-Pakete',
+                        meta_description: 'Planen Sie den perfekten Kindergeburtstag! Von Deko bis Kuchen - alles für eine unvergessliche Kinderparty. Jetzt Party-Paket buchen!',
+                        h1: 'Unvergessliche Kindergeburtstage - Einfach & Stressfrei',
+                        h2_1: 'Warum professionelle Kindergeburtstag-Planung?',
+                        h2_2: 'Unsere beliebten Party-Pakete',
+                        h2_3: 'Altersgerechte Themen & Aktivitäten',
+                        h2_4: 'Preise & Buchung',
+                        hero_text: 'Verwandeln Sie jeden Kindergeburtstag in ein magisches Erlebnis - ohne Stress für die Eltern',
+                        primary_cta: 'Party-Paket jetzt buchen',
+                        benefits_list: '<ul><li>Komplette Planung & Durchführung</li><li>Altersgerechte Aktivitäten & Spiele</li><li>Professionelle Animation</li><li>Komplette Ausstattung inklusive</li></ul>',
+                        features_list: '<ul><li>Thematische Dekoration</li><li>Interaktive Spiele & Shows</li><li>Kinder-DJ & Musik</li><li>Foto-Service inklusive</li></ul>'
+                    },
+                    informational: {
+                        post_title: 'Kindergeburtstag feiern: Der ultimative Planungs-Guide für Eltern',
+                        meta_description: 'Alles was Sie für den perfekten Kindergeburtstag wissen müssen: Spiele, Deko-Ideen, Kuchen-Rezepte und Budget-Tipps für jedes Alter.',
+                        h1: 'Kindergeburtstag planen: Ihr kompletter Leitfaden',
+                        h2_1: 'Die richtige Vorbereitung - Timeline & Checkliste',
+                        h2_2: 'Altersgerechte Spiele & Aktivitäten',
+                        h2_3: 'Budget-freundliche Deko & Kuchen-Ideen',
+                        h2_4: 'Häufige Pannen vermeiden',
+                        hero_text: 'Von der Planung bis zur Durchführung - so wird der Kindergeburtstag zum Erfolg für Kind und Eltern',
+                        primary_cta: 'Kostenlose Checkliste herunterladen',
+                        benefits_list: '<ul><li>Stress-freie Planung mit Schritt-für-Schritt Anleitung</li><li>Budget-schonende Ideen & DIY-Tipps</li><li>Altersgerechte Aktivitäten (3-12 Jahre)</li><li>Notfall-Plan für typische Probleme</li></ul>',
+                        features_list: '<ul><li>Detaillierte Checklisten</li><li>50+ Spiele-Ideen</li><li>Rezepte für Kinder-Kuchen</li><li>Budget-Rechner inklusive</li></ul>'
+                    }
+                },
+                'wordpress plugin': {
+                    commercial: {
+                        post_title: 'Premium WordPress Plugin - Erweiterte Funktionen für professionelle Websites',
+                        meta_description: 'Optimieren Sie Ihre WordPress-Website mit unserem Premium Plugin. SEO-Tools, Performance-Boost und erweiterte Funktionen. Jetzt kaufen!',
+                        h1: 'Das ultimative WordPress Plugin für Profis',
+                        h2_1: 'Warum unser WordPress Plugin wählen?',
+                        h2_2: 'Premium Features im Überblick',
+                        h2_3: 'Installation & Setup in 5 Minuten',
+                        h2_4: 'Lizenz-Optionen & Support',
+                        hero_text: 'Verwandeln Sie Ihre WordPress-Website in eine professionelle Powerhouse-Lösung',
+                        primary_cta: 'Plugin jetzt kaufen',
+                        benefits_list: '<ul><li>50% schnellere Ladezeiten</li><li>Automatische SEO-Optimierung</li><li>Premium Support & Updates</li><li>30-Tage Geld-zurück-Garantie</li></ul>',
+                        features_list: '<ul><li>Performance-Optimierung</li><li>SEO-Meta-Tags Manager</li><li>Backup & Security</li><li>Custom Post Types</li></ul>'
+                    },
+                    informational: {
+                        post_title: 'WordPress Plugins entwickeln: Kompletter Guide für Anfänger & Profis',
+                        meta_description: 'Lernen Sie WordPress Plugin-Entwicklung von Grund auf. Tutorial, Best Practices, Code-Beispiele und Tipps für erfolgreiche Plugins.',
+                        h1: 'WordPress Plugin Entwicklung: Der komplette Leitfaden',
+                        h2_1: 'Grundlagen der Plugin-Architektur',
+                        h2_2: 'Entwicklungsumgebung einrichten',
+                        h2_3: 'Best Practices & Code-Standards',
+                        h2_4: 'Plugin veröffentlichen & vermarkten',
+                        hero_text: 'Von der ersten Zeile Code bis zum erfolgreichen Plugin im WordPress Repository',
+                        primary_cta: 'Kostenloses Tutorial starten',
+                        benefits_list: '<ul><li>Schritt-für-Schritt Anleitungen</li><li>Praxis-erprobte Code-Beispiele</li><li>WordPress Coding Standards</li><li>Repository-Submission Guide</li></ul>',
+                        features_list: '<ul><li>Video-Tutorials</li><li>Downloadbare Code-Templates</li><li>Plugin-Boilerplate</li><li>Community-Support</li></ul>'
+                    }
+                }
+            };
+            
+            // Versuche zuerst spezifische Templates zu finden
+            const keywordKey = keyword.replace(/\s+/g, ' ').trim();
+            const intentKey = isCommercial ? 'commercial' : 'informational';
+            
+            if (templates[keywordKey] && templates[keywordKey][intentKey]) {
+                return templates[keywordKey][intentKey];
+            }
+            
+            // Fallback: Intelligente Generierung basierend auf Kontext und Keyword
+            return generateContextBasedContent(keyword, context, isCommercial);
+        }
+        
+        function generateContextBasedContent(keyword, context, isCommercial) {
+            // Bessere Kontextualisierung
+            const contextActions = {
+                'tech': {
+                    verbs: ['optimieren', 'automatisieren', 'integrieren', 'entwickeln'],
+                    benefits: ['Performance-Steigerung', 'Automatisierung', 'Benutzerfreundlichkeit', 'Skalierbarkeit'],
+                    features: ['Dashboard', 'API-Integration', 'Cloud-Sync', 'Analytics']
+                },
+                'business': {
+                    verbs: ['steigern', 'optimieren', 'maximieren', 'strategisch nutzen'],
+                    benefits: ['ROI-Steigerung', 'Effizienz-Gewinn', 'Marktvorsprung', 'Kostenersparnis'],
+                    features: ['Reporting', 'CRM-Integration', 'Automatisierung', 'KPI-Tracking']
+                },
+                'pets': {
+                    verbs: ['trainieren', 'pflegen', 'gesund halten', 'glücklich machen'],
+                    benefits: ['Gesunde Entwicklung', 'Stressreduktion', 'Bindungsaufbau', 'Verhaltensverbesserung'],
+                    features: ['Trainingsplan', 'Gesundheits-Monitoring', 'Ernährungsberatung', '24/7 Betreuung']
+                },
+                'gastro': {
+                    verbs: ['zubereiten', 'servieren', 'genießen', 'kreieren'],
+                    benefits: ['Geschmackserlebnis', 'Frische Qualität', 'Authentische Rezepte', 'Regionale Zutaten'],
+                    features: ['Saisonale Karte', 'Online-Bestellung', 'Catering-Service', 'Allergiker-freundlich']
+                },
+                'health': {
+                    verbs: ['verbessern', 'stärken', 'fördern', 'unterstützen'],
+                    benefits: ['Mehr Energie', 'Bessere Fitness', 'Stress-Reduktion', 'Langzeit-Gesundheit'],
+                    features: ['Personal Training', 'Ernährungsplan', 'Progress-Tracking', 'Experten-Betreuung']
+                }
+            };
+            
+            const actions = contextActions[context.name] || contextActions['business'];
+            const mainVerb = actions.verbs[Math.floor(Math.random() * actions.verbs.length)];
+            
+            // Bessere Keyword-Analyse
+            const isPlural = keyword.includes('en') || keyword.includes('er');
+            const articleDer = isPlural ? 'die' : 'der';
+            const articleEin = isPlural ? '' : isCommercial ? 'das perfekte' : 'Ihr Guide für';
+            
+            return {
+                post_title: isCommercial 
+                    ? `${keyword.charAt(0).toUpperCase() + keyword.slice(1)} ${mainVerb} - Premium ${context.label} Lösung`
+                    : `${keyword.charAt(0).toUpperCase() + keyword.slice(1)}: Kompletter ${context.label} Ratgeber 2025`,
+                    
+                meta_description: isCommercial
+                    ? `${mainVerb.charAt(0).toUpperCase() + mainVerb.slice(1)} Sie ${articleDer} ${keyword} mit unserer professionellen ${context.label}-Lösung. ${actions.benefits[0]} garantiert!`
+                    : `Alles über ${keyword}: ${actions.benefits.slice(0,2).join(', ')} und mehr. Ihr umfassender ${context.label}-Guide mit praktischen Tipps.`,
+                    
+                h1: isCommercial
+                    ? `${articleEin} ${keyword.charAt(0).toUpperCase() + keyword.slice(1)}-Lösung für ${context.audience.split(',')[0]}`
+                    : `${keyword.charAt(0).toUpperCase() + keyword.slice(1)}: ${context.label} Experten-Wissen`,
+                    
+                h2_1: isCommercial ? `Warum ${keyword} professionell ${mainVerb}?` : `Was macht ${articleDer} perfekte${isPlural ? 'n' : ''} ${keyword} aus?`,
+                h2_2: isCommercial ? `Unsere ${keyword}-Pakete im Überblick` : `${keyword} richtig ${mainVerb} - Schritt für Schritt`,
+                h2_3: `${context.label}-Tipps für ${keyword}`,
+                h2_4: isCommercial ? `Preise & Buchung` : `Häufige Fehler vermeiden`,
+                
+                hero_text: isCommercial
+                    ? `${mainVerb.charAt(0).toUpperCase() + mainVerb.slice(1)} Sie ${articleDer} ${keyword} mit unserer bewährten ${context.label}-Expertise - ${actions.benefits[0]} garantiert`
+                    : `${articleDer.charAt(0).toUpperCase() + articleDer.slice(1)} ${keyword} erfolgreich ${mainVerb}: Praktische Tipps, bewährte Strategien und Experten-Wissen`,
+                    
+                hero_subtext: `Speziell entwickelt für ${context.audience} - vertraut von über 1000+ zufriedenen Kunden`,
+                
+                primary_cta: isCommercial ? `${keyword.charAt(0).toUpperCase() + keyword.slice(1)} jetzt optimieren` : `Kostenlosen ${context.label}-Guide herunterladen`,
+                secondary_cta: isCommercial ? 'Kostenlose Beratung anfordern' : 'Experten-Tipps per E-Mail',
+                
+                benefits_list: `<ul>${actions.benefits.map(benefit => `<li>${benefit} durch professionelle ${keyword}-${context.label}</li>`).join('')}</ul>`,
+                features_list: `<ul>${actions.features.map(feature => `<li>${feature} für ${keyword}</li>`).join('')}</ul>`,
+                
+                social_proof: `Über 2.500 ${context.audience.split(',')[0]} nutzen bereits unsere ${keyword}-${context.label}`,
+                
+                testimonial_1: `"Durch diese ${keyword}-Lösung haben wir ${actions.benefits[0].toLowerCase()} erreicht - genau das was wir gebraucht haben!"`,
+                testimonial_2: `"Die beste ${keyword}-${context.label} die ich je verwendet habe. Kann ich nur empfehlen!"`,
+                
+                pricing_title: isCommercial ? `${keyword.charAt(0).toUpperCase() + keyword.slice(1)} Pakete` : `${keyword.charAt(0).toUpperCase() + keyword.slice(1)} Ressourcen`,
+                price_1: isCommercial ? '€39,90' : 'Kostenlos',
+                price_2: isCommercial ? '€79,90' : 'Premium €29',
+                price_3: isCommercial ? '€149,90' : 'Pro €59',
+                
+                faq_1: `Wie kann ich ${keyword} am besten ${mainVerb}?`,
+                faq_answer_1: `${keyword.charAt(0).toUpperCase() + keyword.slice(1)} lässt sich am besten ${mainVerb} durch eine systematische Herangehensweise und die richtigen ${context.label}-Tools.`,
+                faq_2: `Was kostet ${keyword} ${isCommercial ? 'Optimierung' : 'Planung'}?`,
+                faq_answer_2: isCommercial 
+                    ? `Unsere ${keyword}-Pakete starten bereits ab €39,90 und bieten ${actions.benefits[0].toLowerCase()}.`
+                    : `Die Kosten für ${keyword} variieren je nach Aufwand. Mit unseren Tipps können Sie jedoch deutlich sparen.`,
+                faq_3: `Wie lange dauert es bis ${keyword} Ergebnisse zeigt?`,
+                faq_answer_3: `Mit der richtigen ${context.label}-Strategie sehen Sie erste Verbesserungen bei ${keyword} bereits nach wenigen Tagen.`,
+                
+                trust_signals: 'SSL-verschlüsselt • DSGVO-konform • Über 5 Jahre Erfahrung',
+                guarantee_text: isCommercial ? '30 Tage Geld-zurück-Garantie' : '100% kostenlose Basis-Informationen'
+            };
+        }
+        
+        // Generiere intelligente Inhalte
+        const intelligentContent = generateIntelligentContent(keyword, context, isCommercial);
+        
+        // Vervollständige die Daten
         const mockData = {
             keyword: item.keyword,
             intent: item.intent,
-            post_title: `${isCommercial ? 'Kaufen Sie' : 'Alles über'} ${item.keyword} - ${context.label} Guide`,
-            post_name: item.keyword.toLowerCase().replace(/\s+/g, '-'),
-            meta_title: `${item.keyword} | ${context.label} ${isCommercial ? 'Shop' : 'Ratgeber'}`,
-            meta_description: `${isCommercial ? 'Entdecken Sie' : 'Erfahren Sie alles über'} ${item.keyword}. ${context.audience} vertrauen auf unsere ${context.label}-Expertise.`,
-            h1: `${isCommercial ? 'Premium' : 'Umfassender Guide:'} ${item.keyword}`,
-            h2_1: `Was ist ${item.keyword}?`,
-            h2_2: `${isCommercial ? 'Warum' : 'Wie'} ${item.keyword} ${isCommercial ? 'kaufen' : 'funktioniert'}`,
-            h2_3: `${context.label}-Tipps für ${item.keyword}`,
-            h2_4: isCommercial ? `${item.keyword} Preise & Angebote` : `${item.keyword} FAQ`,
-            primary_cta: isCommercial ? `${item.keyword} jetzt bestellen` : `Mehr über ${item.keyword} erfahren`,
-            secondary_cta: isCommercial ? 'Beratung anfordern' : 'Guide downloaden',
-            hero_text: `${isCommercial ? 'Die beste Lösung für' : 'Ihr Experten-Guide zu'} ${item.keyword} im ${context.label}-Bereich`,
-            hero_subtext: `${context.audience} vertrauen auf unsere ${context.label}-Expertise`,
-            benefits_list: `<ul><li>Professionelle ${context.label}-Lösung</li><li>Speziell für ${context.audience}</li><li>Bewährte Qualität</li></ul>`,
-            features_list: `<ul><li>${item.keyword} Features</li><li>${context.label} Integration</li><li>24/7 Support</li></ul>`,
-            social_proof: `Über 1000 zufriedene Kunden im ${context.label}-Bereich`,
-            testimonial_1: `"${item.keyword} hat unser ${context.label}-Business revolutioniert!"`,
-            testimonial_2: `"Beste ${item.keyword}-Lösung auf dem Markt."`,
-            pricing_title: isCommercial ? `${item.keyword} Preise` : `${item.keyword} Pakete`,
-            price_1: isCommercial ? '€29,99' : 'Kostenlos',
-            price_2: isCommercial ? '€59,99' : 'Premium €19',
-            price_3: isCommercial ? '€99,99' : 'Pro €49',
-            faq_1: `Was ist ${item.keyword}?`,
-            faq_answer_1: `${item.keyword} ist eine ${context.label}-Lösung für ${context.audience}.`,
-            faq_2: `Wie funktioniert ${item.keyword}?`,
-            faq_answer_2: `${item.keyword} arbeitet mit modernster ${context.label}-Technologie.`,
-            faq_3: isCommercial ? `Was kostet ${item.keyword}?` : `Ist ${item.keyword} kostenlos?`,
-            faq_answer_3: isCommercial ? `${item.keyword} ist ab €29,99 erhältlich.` : `${item.keyword} ist grundsätzlich kostenlos verfügbar.`,
-            contact_info: 'info@example.com | +43 1 234 5678',
-            footer_cta: isCommercial ? `Jetzt ${item.keyword} bestellen!` : `${item.keyword} Guide herunterladen`,
-            trust_signals: 'SSL-verschlüsselt | DSGVO-konform | 30 Tage Geld-zurück',
-            guarantee_text: isCommercial ? '30 Tage Geld-zurück-Garantie' : '100% kostenlose Informationen'
+            post_name: keyword.toLowerCase().replace(/\s+/g, '-'),
+            meta_title: intelligentContent.post_title,
+            contact_info: 'info@example.com • +43 1 234 5678 • Online-Chat verfügbar',
+            footer_cta: isCommercial ? intelligentContent.primary_cta : 'Newsletter abonnieren',
+            ...intelligentContent
         };
         
         return mockData;
