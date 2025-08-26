@@ -16,7 +16,144 @@ export function initSilasForm() {
         data: {},
         setItem(key, value) {
             this.data[key] = value;
-        },
+    // === SEPARATE GENERATION FUNCTION (Muss vor Event Listeners stehen) ===
+    async function startGeneration() {
+        console.log('Start Generation aufgerufen');
+        
+        try {
+            if (keywordList.length === 0) {
+                if (silasStatus) {
+                    silasStatus.textContent = 'Bitte füge zuerst Keywords hinzu.';
+                }
+                return;
+            }
+
+            checkRateLimit();
+
+            // Alle Buttons deaktivieren
+            const allStartBtns = [
+                document.getElementById('start-generation-btn'),
+                document.getElementById('start-generation-btn-new')
+            ];
+            allStartBtns.forEach(btn => {
+                if (btn) btn.disabled = true;
+            });
+            
+            allGeneratedData = [];
+            
+            if (silasResponseContainer) {
+                silasResponseContainer.innerHTML = '<h3>Erstellung läuft...</h3><div id="silas-response-content"></div>';
+                silasResponseContainer.style.display = 'block';
+            }
+            
+            const responseContent = document.getElementById('silas-response-content');
+
+            for (let i = 0; i < keywordList.length; i++) {
+                const item = keywordList[i];
+                
+                if (silasStatus) {
+                    silasStatus.innerHTML = `Generiere ${item.context.label}-Content für "${item.keyword}" <span style="color: ${item.context.color};">(${item.intent === 'commercial' ? 'Kommerziell' : 'Informativ'})</span> (${i + 1}/${keywordList.length})...`;
+                }
+
+                try {
+                    const data = await generateContent(item, i, responseContent);
+                    data.keyword = item.keyword;
+                    data.intent = item.intent;
+                    data._context = item.context;
+                    allGeneratedData.push(data);
+                    displayResult(data, i, responseContent);
+
+                    if (i < keywordList.length - 1) {
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                    }
+
+                } catch (error) {
+                    console.error(`Fehler bei "${item.keyword}":`, error);
+                    const errorData = {
+                        keyword: item.keyword,
+                        intent: item.intent,
+                        error: error.message,
+                        _context: item.context
+                    };
+                    allGeneratedData.push(errorData);
+                    displayResult(errorData, i, responseContent);
+                }
+            }
+
+            updateUsageCounters();
+
+            if (silasStatus) {
+                silasStatus.textContent = `Alle ${keywordList.length} Texte wurden generiert.`;
+            }
+            
+            // Buttons wieder aktivieren
+            allStartBtns.forEach(btn => {
+                if (btn) btn.disabled = false;
+            });
+            
+            const headerElement = silasResponseContainer?.querySelector('h3');
+            if (headerElement) {
+                headerElement.textContent = 'Erstellung abgeschlossen!';
+            }
+            
+            // Download Button hinzufügen
+            if (!document.getElementById('download-csv-dynamic') && silasResponseContainer) {
+                const downloadButton = document.createElement('button');
+                downloadButton.id = 'download-csv-dynamic';
+                downloadButton.innerHTML = '📥 CSV Herunterladen';
+                downloadButton.style.cssText = `
+                    background: linear-gradient(135deg, #007cba 0%, #0056b3 100%);
+                    color: white;
+                    border: none;
+                    padding: 15px 25px;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    font-size: 1rem;
+                    font-weight: bold;
+                    margin-top: 20px;
+                    width: 100%;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 4px 15px rgba(0, 124, 186, 0.3);
+                `;
+                downloadButton.addEventListener('click', downloadCsv);
+                
+                // Hover-Effekt
+                downloadButton.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px)';
+                    this.style.boxShadow = '0 6px 20px rgba(0, 124, 186, 0.4)';
+                });
+                downloadButton.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = '0 4px 15px rgba(0, 124, 186, 0.3)';
+                });
+                
+                silasResponseContainer.appendChild(downloadButton);
+            }
+
+        } catch (error) {
+            console.error('Generierungsfehler:', error);
+            if (silasStatus) {
+                silasStatus.textContent = error.message;
+                silasStatus.style.color = '#ff6b6b';
+            }
+            
+            // Buttons wieder aktivieren
+            const allStartBtns = [
+                document.getElementById('start-generation-btn'),
+                document.getElementById('start-generation-btn-new')
+            ];
+            allStartBtns.forEach(btn => {
+                if (btn) btn.disabled = false;
+            });
+            
+            setTimeout(function() {
+                if (silasStatus) {
+                    silasStatus.textContent = 'Bereit zur Generierung.';
+                    silasStatus.style.color = '#ffc107';
+                }
+            }, 5000);
+        }
+    },
         getItem(key) {
             return this.data[key] || null;
         },
@@ -646,15 +783,13 @@ export function initSilasForm() {
             const newClearBtn = document.getElementById('clear-list-btn-new');
             
             if (newStartBtn) {
-                newStartBtn.addEventListener('click', async function() {
-                    // Rufe die Hauptgenerierung auf
-                    if (startGenerationBtn && startGenerationBtn.click) {
-                        startGenerationBtn.click();
-                    } else {
-                        // Fallback: Direkt die Funktion aufrufen
-                        await startGeneration();
-                    }
-                });
+    // Originaler Button Event Listener
+    if (startGenerationBtn) {
+        startGenerationBtn.addEventListener('click', startGeneration);
+        console.log('Event Listener für Start Button wurde hinzugefügt');
+    } else {
+        console.error('FEHLER: start-generation-btn Element nicht gefunden!');
+    }
                 
                 // Hover-Effekte hinzufügen
                 newStartBtn.addEventListener('mouseenter', function() {
