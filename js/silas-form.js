@@ -1,154 +1,4 @@
-trust_signals: 'SSL-verschlüsselt • DSGVO-konform • Über 5 Jahre Erfahrung',
-                guarantee_text: isCommercial ? '30 Tage Geld-zurück-Garantie' : '100% kostenlose Basis-Informationen'
-            };
-        }
-        
-        // Generiere intelligente Inhalte
-        const intelligentContent = generateIntelligentContent(keyword, context, isCommercial);
-        
-        // Vervollständige die Daten
-        const mockData = {
-            keyword: item.keyword,
-            intent: item.intent,
-            post_name: keyword.toLowerCase().replace(/\s+/g, '-'),
-            meta_title: intelligentContent.post_title,
-            contact_info: 'info@example.com • +43 1 234 5678 • Online-Chat verfügbar',
-            footer_cta: isCommercial ? intelligentContent.primary_cta : 'Newsletter abonnieren',
-            ...intelligentContent
-        };
-        
-        return mockData;
-    }
-
-    // === KEYWORD MANAGEMENT ===
-    function addKeywords() {
-        try {
-            const newKeywords = keywordInput.value.split(',').map(kw => kw.trim()).filter(kw => kw.length > 0);
-            const currentIntent = textIntentSelect ? textIntentSelect.value : 'informational';
-            
-            if (newKeywords.length === 0) {
-                throw new Error('Bitte gib mindestens ein Keyword ein.');
-            }
-            
-            // Keywords validieren
-            newKeywords.forEach(validateKeyword);
-            
-            // Session-Limit prüfen
-            if (!isMasterModeActive() && keywordList.length + newKeywords.length > DEMO_LIMITS.maxKeywordsPerSession) {
-                throw new Error('Demo-Limit: Maximal ' + DEMO_LIMITS.maxKeywordsPerSession + ' Keywords pro Session.');
-            }
-            
-            newKeywords.forEach(function(keyword) {
-                const existingIndex = keywordList.findIndex(item => item.keyword === keyword);
-                
-                if (existingIndex === -1) {
-                    keywordList.push({
-                        keyword: keyword,
-                        intent: currentIntent,
-                        context: analyzeKeywordContext(keyword)
-                    });
-                } else {
-                    keywordList[existingIndex].intent = currentIntent;
-                    keywordList[existingIndex].context = analyzeKeywordContext(keyword);
-                }
-            });
-            
-            if (newKeywords.length > 0) {
-                updateKeywordDisplay();
-                showGenerationPreview();
-                keywordInput.value = '';
-                hideContextPreview();
-                
-                const lastKeyword = newKeywords[newKeywords.length - 1];
-                const context = analyzeKeywordContext(lastKeyword);
-                silasStatus.innerHTML = `Keyword "${lastKeyword}" hinzugefügt <span style="color: ${context.color};">(${context.label})</span>`;
-                setTimeout(() => {
-                    silasStatus.textContent = 'Bereit zur Generierung.';
-                }, 3000);
-            }
-            
-        } catch (error) {
-            silasStatus.textContent = error.message;
-            silasStatus.style.color = '#ff6b6b';
-            setTimeout(() => {
-                silasStatus.textContent = 'Bereit zur Generierung.';
-                silasStatus.style.color = '#ffc107';
-            }, 4000);
-        }
-    }
-
-    function updateKeywordDisplay() {
-        if (!keywordDisplayList) return;
-        
-        keywordDisplayList.innerHTML = '';
-        
-        keywordList.forEach(function(item, index) {
-            const listItem = document.createElement('li');
-            
-            const intentBadge = document.createElement('span');
-            intentBadge.textContent = item.intent === 'commercial' ? 'Kommerziell' : 'Informativ';
-            intentBadge.style.cssText = `
-                background-color: ${item.intent === 'commercial' ? '#28a745' : '#17a2b8'};
-                color: white;
-                padding: 4px 10px;
-                border-radius: 12px;
-                font-size: 0.75rem;
-                font-weight: bold;
-                margin-right: 8px;
-            `;
-            
-            const contextBadge = document.createElement('span');
-            contextBadge.innerHTML = `${item.context.icon} ${item.context.label}`;
-            contextBadge.style.cssText = `
-                background-color: ${item.context.color};
-                color: white;
-                padding: 4px 10px;
-                border-radius: 12px;
-                font-size: 0.75rem;
-                font-weight: bold;
-            `;
-            
-            const keywordSpan = document.createElement('span');
-            keywordSpan.textContent = item.keyword;
-            keywordSpan.style.cssText = `
-                font-weight: 500;
-                color: #fff;
-                display: block;
-                margin-bottom: 8px;
-            `;
-            
-            const contentDiv = document.createElement('div');
-            contentDiv.style.cssText = 'flex-grow: 1;';
-            
-            const badgeContainer = document.createElement('div');
-            badgeContainer.style.cssText = 'display: flex; gap: 8px;';
-            badgeContainer.appendChild(intentBadge);
-            badgeContainer.appendChild(contextBadge);
-            
-            contentDiv.appendChild(keywordSpan);
-            contentDiv.appendChild(badgeContainer);
-            
-            const removeBtn = document.createElement('button');
-            removeBtn.innerHTML = '×';
-            removeBtn.style.cssText = `
-                background-color: #ff6b6b;
-                color: white;
-                border: none;
-                border-radius: 6px;
-                min-width: 36px;
-                height: 36px;
-                cursor: pointer;
-                font-size: 18px;
-                font-weight: bold;
-                margin-left: 15px;
-            `;
-            removeBtn.onclick = function() {
-                keywordList.splice(index, 1);
-                updateKeywordDisplay();
-                showGenerationPreview();
-            };
-            
-            listItem.style.cssText = `
+listItem.style.cssText = `
                 background: linear-gradient(135deg, ${item.context.color}10 0%, ${item.context.color}05 100%);
                 margin-bottom: 12px;
                 padding: 15px;
@@ -755,9 +605,6 @@ trust_signals: 'SSL-verschlüsselt • DSGVO-konform • Über 5 Jahre Erfahrung
     // Preview Modal Content
     if (silasResponseContainer) {
         silasResponseContainer.addEventListener('click', function(e) {
-    // Preview Modal Content
-    if (silasResponseContainer) {
-        silasResponseContainer.addEventListener('click', function(e) {
             if (e.target.classList.contains('preview-btn')) {
                 const index = parseInt(e.target.getAttribute('data-index'));
                 const data = allGeneratedData[index];
@@ -822,48 +669,7 @@ trust_signals: 'SSL-verschlüsselt • DSGVO-konform • Über 5 Jahre Erfahrung
                                 </div>
                                 <div style="background: #1a1a1a; padding: 20px; border-radius: 10px;">
                                     <h3 style="color: #17a2b8; margin-bottom: 15px;">Features</h3>
-                                    <div style="color: #ccc;">${data.features_list || '<ul><li>Keine Daten</li></ul>'}</div>
-                                </div>
-                            </div>
-
-                            <!-- FAQ -->
-                            ${data.faq_1 ? `
-                            <div style="background: #1a1a1a; padding: 20px; border-radius: 10px;">
-                                <h3 style="color: #ffc107; margin-bottom: 15px;">Häufige Fragen</h3>
-                                <div style="margin-bottom: 15px;">
-                                    <strong style="color: #28a745;">${data.faq_1}</strong>
-                                    <p style="color: #ccc; margin: 5px 0 0 0;">${data.faq_answer_1 || 'Antwort nicht verfügbar'}</p>
-                                </div>
-                                ${data.faq_2 ? `
-                                <div style="margin-bottom: 15px;">
-                                    <strong style="color: #17a2b8;">${data.faq_2}</strong>
-                                    <p style="color: #ccc; margin: 5px 0 0 0;">${data.faq_answer_2 || 'Antwort nicht verfügbar'}</p>
-                                </div>
-                                ` : ''}
-                            </div>
-                            ` : ''}
-                        </div>
-                    `;
-                    
-                    openPreviewModal();
-                }
-            }
-        });
-    }
-
-    // === INITIALIZATION ===
-    initDemoTracking();
-    showDemoStatus();
-    createMasterPasswordUI();
-
-    console.log('Silas Form vollständig initialisiert');
-    console.log('Start Button gefunden:', !!startGenerationBtn);
-    console.log('Keyword Input gefunden:', !!keywordInput);
-    
-    if (silasStatus) {
-        silasStatus.textContent = 'Bereit für neue Keywords.';
-    }
-}// silas-form.js - VOLLSTÄNDIGE UND FUNKTIONSFÄHIGE VERSION
+                                    <div style="color: #ccc;">${data.features_list || '<ul><li>Keine Daten</li></ul>'}</div>// silas-form.js - REPARIERTE UND VOLLSTÄNDIGE VERSION
 
 export function initSilasForm() {
     const silasForm = document.getElementById('silas-form');
@@ -1018,7 +824,7 @@ export function initSilasForm() {
         if (!isMasterModeActive() && !document.getElementById('master-unlock-btn')) {
             const unlockBtn = document.createElement('button');
             unlockBtn.id = 'master-unlock-btn';
-            unlockBtn.innerHTML = '🔓';
+            unlockBtn.innerHTML = '🔒';
             unlockBtn.title = 'Master Access';
             unlockBtn.style.cssText = `
                 position: fixed; 
@@ -1269,81 +1075,18 @@ export function initSilasForm() {
         const isCommercial = item.intent === 'commercial';
         const keyword = item.keyword.toLowerCase().trim();
         
-        // Intelligente Content-Erstellung basierend auf Keywords und Kontext
-        function generateIntelligentContent(keyword, context, isCommercial) {
-            const templates = {
-                'kinder geburtstag': {
-                    commercial: {
-                        post_title: 'Unvergessliche Kindergeburtstage planen - Komplette Party-Pakete',
-                        meta_description: 'Planen Sie den perfekten Kindergeburtstag! Von Deko bis Kuchen - alles für eine unvergessliche Kinderparty. Jetzt Party-Paket buchen!',
-                        h1: 'Unvergessliche Kindergeburtstage - Einfach & Stressfrei',
-                        h2_1: 'Warum professionelle Kindergeburtstag-Planung?',
-                        h2_2: 'Unsere beliebten Party-Pakete',
-                        h2_3: 'Altersgerechte Themen & Aktivitäten',
-                        h2_4: 'Preise & Buchung',
-                        hero_text: 'Verwandeln Sie jeden Kindergeburtstag in ein magisches Erlebnis - ohne Stress für die Eltern',
-                        primary_cta: 'Party-Paket jetzt buchen',
-                        benefits_list: '<ul><li>Komplette Planung & Durchführung</li><li>Altersgerechte Aktivitäten & Spiele</li><li>Professionelle Animation</li><li>Komplette Ausstattung inklusive</li></ul>',
-                        features_list: '<ul><li>Thematische Dekoration</li><li>Interaktive Spiele & Shows</li><li>Kinder-DJ & Musik</li><li>Foto-Service inklusive</li></ul>'
-                    },
-                    informational: {
-                        post_title: 'Kindergeburtstag feiern: Der ultimative Planungs-Guide für Eltern',
-                        meta_description: 'Alles was Sie für den perfekten Kindergeburtstag wissen müssen: Spiele, Deko-Ideen, Kuchen-Rezepte und Budget-Tipps für jedes Alter.',
-                        h1: 'Kindergeburtstag planen: Ihr kompletter Leitfaden',
-                        h2_1: 'Die richtige Vorbereitung - Timeline & Checkliste',
-                        h2_2: 'Altersgerechte Spiele & Aktivitäten',
-                        h2_3: 'Budget-freundliche Deko & Kuchen-Ideen',
-                        h2_4: 'Häufige Pannen vermeiden',
-                        hero_text: 'Von der Planung bis zur Durchführung - so wird der Kindergeburtstag zum Erfolg für Kind und Eltern',
-                        primary_cta: 'Kostenlose Checkliste herunterladen',
-                        benefits_list: '<ul><li>Stress-freie Planung mit Schritt-für-Schritt Anleitung</li><li>Budget-schonende Ideen & DIY-Tipps</li><li>Altersgerechte Aktivitäten (3-12 Jahre)</li><li>Notfall-Plan für typische Probleme</li></ul>',
-                        features_list: '<ul><li>Detaillierte Checklisten</li><li>50+ Spiele-Ideen</li><li>Rezepte für Kinder-Kuchen</li><li>Budget-Rechner inklusive</li></ul>'
-                    }
-                },
-                'wordpress plugin': {
-                    commercial: {
-                        post_title: 'Premium WordPress Plugin - Erweiterte Funktionen für professionelle Websites',
-                        meta_description: 'Optimieren Sie Ihre WordPress-Website mit unserem Premium Plugin. SEO-Tools, Performance-Boost und erweiterte Funktionen. Jetzt kaufen!',
-                        h1: 'Das ultimative WordPress Plugin für Profis',
-                        h2_1: 'Warum unser WordPress Plugin wählen?',
-                        h2_2: 'Premium Features im Überblick',
-                        h2_3: 'Installation & Setup in 5 Minuten',
-                        h2_4: 'Lizenz-Optionen & Support',
-                        hero_text: 'Verwandeln Sie Ihre WordPress-Website in eine professionelle Powerhouse-Lösung',
-                        primary_cta: 'Plugin jetzt kaufen',
-                        benefits_list: '<ul><li>50% schnellere Ladezeiten</li><li>Automatische SEO-Optimierung</li><li>Premium Support & Updates</li><li>30-Tage Geld-zurück-Garantie</li></ul>',
-                        features_list: '<ul><li>Performance-Optimierung</li><li>SEO-Meta-Tags Manager</li><li>Backup & Security</li><li>Custom Post Types</li></ul>'
-                    },
-                    informational: {
-                        post_title: 'WordPress Plugins entwickeln: Kompletter Guide für Anfänger & Profis',
-                        meta_description: 'Lernen Sie WordPress Plugin-Entwicklung von Grund auf. Tutorial, Best Practices, Code-Beispiele und Tipps für erfolgreiche Plugins.',
-                        h1: 'WordPress Plugin Entwicklung: Der komplette Leitfaden',
-                        h2_1: 'Grundlagen der Plugin-Architektur',
-                        h2_2: 'Entwicklungsumgebung einrichten',
-                        h2_3: 'Best Practices & Code-Standards',
-                        h2_4: 'Plugin veröffentlichen & vermarkten',
-                        hero_text: 'Von der ersten Zeile Code bis zum erfolgreichen Plugin im WordPress Repository',
-                        primary_cta: 'Kostenloses Tutorial starten',
-                        benefits_list: '<ul><li>Schritt-für-Schritt Anleitungen</li><li>Praxis-erprobte Code-Beispiele</li><li>WordPress Coding Standards</li><li>Repository-Submission Guide</li></ul>',
-                        features_list: '<ul><li>Video-Tutorials</li><li>Downloadbare Code-Templates</li><li>Plugin-Boilerplate</li><li>Community-Support</li></ul>'
-                    }
-                }
-            };
-            
-            // Versuche zuerst spezifische Templates zu finden
-            const keywordKey = keyword.replace(/\s+/g, ' ').trim();
-            const intentKey = isCommercial ? 'commercial' : 'informational';
-            
-            if (templates[keywordKey] && templates[keywordKey][intentKey]) {
-                return templates[keywordKey][intentKey];
-            }
-            
-            // Fallback: Intelligente Generierung basierend auf Kontext und Keyword
-            return generateContextBasedContent(keyword, context, isCommercial);
-        }
+        // Mock-Daten generieren
+        const mockData = generateMockData(item);
+        return mockData;
+    }
+
+    function generateMockData(item) {
+        const keyword = item.keyword;
+        const context = item.context;
+        const isCommercial = item.intent === 'commercial';
         
-        function generateContextBasedContent(keyword, context, isCommercial) {
-            // Bessere Kontextualisierung
+        // Generiere intelligente Inhalte basierend auf Keyword und Kontext
+        function generateIntelligentContent(keyword, context, isCommercial) {
             const contextActions = {
                 'tech': {
                     verbs: ['optimieren', 'automatisieren', 'integrieren', 'entwickeln'],
@@ -1369,10 +1112,15 @@ export function initSilasForm() {
                     verbs: ['verbessern', 'stärken', 'fördern', 'unterstützen'],
                     benefits: ['Mehr Energie', 'Bessere Fitness', 'Stress-Reduktion', 'Langzeit-Gesundheit'],
                     features: ['Personal Training', 'Ernährungsplan', 'Progress-Tracking', 'Experten-Betreuung']
+                },
+                'general': {
+                    verbs: ['verbessern', 'optimieren', 'erweitern', 'entwickeln'],
+                    benefits: ['Qualitätssteigerung', 'Effizienz', 'Zufriedenheit', 'Erfolg'],
+                    features: ['Benutzerfreundlich', 'Professionell', 'Zuverlässig', 'Modern']
                 }
             };
             
-            const actions = contextActions[context.name] || contextActions['business'];
+            const actions = contextActions[context.name] || contextActions['general'];
             const mainVerb = actions.verbs[Math.floor(Math.random() * actions.verbs.length)];
             
             return {
@@ -1416,12 +1164,160 @@ export function initSilasForm() {
                 price_3: isCommercial ? '€149,90' : 'Pro €59',
                 
                 faq_1: `Wie kann ich ${keyword} am besten ${mainVerb}?`,
-                faq_answer_1: `${keyword.charAt(0).toUpperCase() + keyword.slice(1)} lässt sich am besten ${mainVerb} durch systematische Herangehensweise.`,
+                faq_answer_1: `${keyword.charAt(0).toUpperCase() + keyword.slice(1)} lässt sich am besten ${mainVerb} durch systematische Herangehensweise und die richtigen Tools.`,
                 faq_2: `Was kostet ${keyword} ${isCommercial ? 'Optimierung' : 'Planung'}?`,
                 faq_answer_2: isCommercial 
-                    ? `Unsere ${keyword}-Pakete starten bereits ab €39,90.`
-                    : `Die Kosten für ${keyword} variieren. Mit unseren Tipps können Sie jedoch sparen.`,
+                    ? `Unsere ${keyword}-Pakete starten bereits ab €39,90 monatlich.`
+                    : `Die Kosten für ${keyword} variieren je nach Umfang. Mit unseren Tipps können Sie jedoch erheblich sparen.`,
                 faq_3: `Wie lange dauert es bis ${keyword} Ergebnisse zeigt?`,
                 faq_answer_3: `Mit der richtigen Strategie sehen Sie erste Verbesserungen bereits nach wenigen Tagen.`,
                 
+                contact_info: 'info@example.com • +43 1 234 5678 • Online-Chat verfügbar',
+                footer_cta: isCommercial ? 'Jetzt Angebot anfordern' : 'Newsletter abonnieren',
                 trust_signals: 'SSL-verschlüsselt • DSGVO-konform • Über 5 Jahre Erfahrung',
+                guarantee_text: isCommercial ? '30 Tage Geld-zurück-Garantie' : '100% kostenlose Basis-Informationen'
+            };
+        }
+        
+        // Generiere intelligente Inhalte
+        const intelligentContent = generateIntelligentContent(keyword, context, isCommercial);
+        
+        // Vervollständige die Daten
+        const mockData = {
+            keyword: item.keyword,
+            intent: item.intent,
+            post_name: keyword.toLowerCase().replace(/\s+/g, '-'),
+            meta_title: intelligentContent.post_title,
+            ...intelligentContent
+        };
+        
+        return mockData;
+    }
+
+    // === KEYWORD MANAGEMENT ===
+    function addKeywords() {
+        try {
+            const newKeywords = keywordInput.value.split(',').map(kw => kw.trim()).filter(kw => kw.length > 0);
+            const currentIntent = textIntentSelect ? textIntentSelect.value : 'informational';
+            
+            if (newKeywords.length === 0) {
+                throw new Error('Bitte gib mindestens ein Keyword ein.');
+            }
+            
+            // Keywords validieren
+            newKeywords.forEach(validateKeyword);
+            
+            // Session-Limit prüfen
+            if (!isMasterModeActive() && keywordList.length + newKeywords.length > DEMO_LIMITS.maxKeywordsPerSession) {
+                throw new Error('Demo-Limit: Maximal ' + DEMO_LIMITS.maxKeywordsPerSession + ' Keywords pro Session.');
+            }
+            
+            newKeywords.forEach(function(keyword) {
+                const existingIndex = keywordList.findIndex(item => item.keyword === keyword);
+                
+                if (existingIndex === -1) {
+                    keywordList.push({
+                        keyword: keyword,
+                        intent: currentIntent,
+                        context: analyzeKeywordContext(keyword)
+                    });
+                } else {
+                    keywordList[existingIndex].intent = currentIntent;
+                    keywordList[existingIndex].context = analyzeKeywordContext(keyword);
+                }
+            });
+            
+            if (newKeywords.length > 0) {
+                updateKeywordDisplay();
+                showGenerationPreview();
+                keywordInput.value = '';
+                hideContextPreview();
+                
+                const lastKeyword = newKeywords[newKeywords.length - 1];
+                const context = analyzeKeywordContext(lastKeyword);
+                silasStatus.innerHTML = `Keyword "${lastKeyword}" hinzugefügt <span style="color: ${context.color};">(${context.label})</span>`;
+                setTimeout(() => {
+                    silasStatus.textContent = 'Bereit zur Generierung.';
+                }, 3000);
+            }
+            
+        } catch (error) {
+            silasStatus.textContent = error.message;
+            silasStatus.style.color = '#ff6b6b';
+            setTimeout(() => {
+                silasStatus.textContent = 'Bereit zur Generierung.';
+                silasStatus.style.color = '#ffc107';
+            }, 4000);
+        }
+    }
+
+    function updateKeywordDisplay() {
+        if (!keywordDisplayList) return;
+        
+        keywordDisplayList.innerHTML = '';
+        
+        keywordList.forEach(function(item, index) {
+            const listItem = document.createElement('li');
+            
+            const intentBadge = document.createElement('span');
+            intentBadge.textContent = item.intent === 'commercial' ? 'Kommerziell' : 'Informativ';
+            intentBadge.style.cssText = `
+                background-color: ${item.intent === 'commercial' ? '#28a745' : '#17a2b8'};
+                color: white;
+                padding: 4px 10px;
+                border-radius: 12px;
+                font-size: 0.75rem;
+                font-weight: bold;
+                margin-right: 8px;
+            `;
+            
+            const contextBadge = document.createElement('span');
+            contextBadge.innerHTML = `${item.context.icon} ${item.context.label}`;
+            contextBadge.style.cssText = `
+                background-color: ${item.context.color};
+                color: white;
+                padding: 4px 10px;
+                border-radius: 12px;
+                font-size: 0.75rem;
+                font-weight: bold;
+            `;
+            
+            const keywordSpan = document.createElement('span');
+            keywordSpan.textContent = item.keyword;
+            keywordSpan.style.cssText = `
+                font-weight: 500;
+                color: #fff;
+                display: block;
+                margin-bottom: 8px;
+            `;
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.style.cssText = 'flex-grow: 1;';
+            
+            const badgeContainer = document.createElement('div');
+            badgeContainer.style.cssText = 'display: flex; gap: 8px;';
+            badgeContainer.appendChild(intentBadge);
+            badgeContainer.appendChild(contextBadge);
+            
+            contentDiv.appendChild(keywordSpan);
+            contentDiv.appendChild(badgeContainer);
+            
+            const removeBtn = document.createElement('button');
+            removeBtn.innerHTML = '×';
+            removeBtn.style.cssText = `
+                background-color: #ff6b6b;
+                color: white;
+                border: none;
+                border-radius: 6px;
+                min-width: 36px;
+                height: 36px;
+                cursor: pointer;
+                font-size: 18px;
+                font-weight: bold;
+                margin-left: 15px;
+            `;
+            removeBtn.onclick = function() {
+                keywordList.splice(index, 1);
+                updateKeywordDisplay();
+                showGenerationPreview();
+            };
