@@ -1,8 +1,160 @@
-// api/generate.js - SICHERE VERSION BASIEREND AUF DEINEM ORIGINAL
+// api/generate.js - FINALE VERSION MIT DYNAMISCHEN PROMPTS
 
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-// Handler-Funktion, die von Vercel aufgerufen wird
+// KEYWORD-SPEZIFISCHE PROMPT-ERSTELLUNG
+function createSmartPrompt(keyword, intent) {
+    const lowerKeyword = keyword.toLowerCase();
+    
+    // AUTOMATISCHE KONTEXT-ERKENNUNG
+    let context = 'general';
+    let audience = 'Interessenten';
+    let problems = 'verschiedene Herausforderungen';
+    let solutions = 'passende Lösungen';
+    
+    if (lowerKeyword.includes('hund') || lowerKeyword.includes('tier') || lowerKeyword.includes('haustier')) {
+        context = 'pets';
+        audience = 'Hundebesitzer und Tierliebhaber';
+        problems = 'Sicherheit, Gesundheit und Wohlbefinden der Vierbeiner';
+        solutions = 'artgerechte Betreuung und Sicherheit';
+    } else if (lowerKeyword.includes('wordpress') || lowerKeyword.includes('plugin') || lowerKeyword.includes('web') || lowerKeyword.includes('software')) {
+        context = 'tech';
+        audience = 'Entwickler, Website-Betreiber und IT-Entscheider';
+        problems = 'technische Komplexität und Performance-Optimierung';
+        solutions = 'benutzerfreundliche Tools und Automatisierung';
+    } else if (lowerKeyword.includes('cafe') || lowerKeyword.includes('restaurant') || lowerKeyword.includes('gastronomie')) {
+        context = 'gastro';
+        audience = 'Gastronomiebetreiber und Genießer';
+        problems = 'Qualität, Service und Kundenzufriedenheit';
+        solutions = 'exzellente Kulinarik und Atmosphäre';
+    } else if (lowerKeyword.includes('marketing') || lowerKeyword.includes('seo') || lowerKeyword.includes('beratung')) {
+        context = 'business';
+        audience = 'Unternehmer, Marketing-Manager und Selbstständige';
+        problems = 'Sichtbarkeit, Konkurrenz und ROI-Optimierung';
+        solutions = 'strategisches Wachstum und Marktvorteile';
+    }
+    
+    // INTENT-SPEZIFISCHE ANPASSUNGEN
+    const isCommercial = intent === 'commercial';
+    const roleDefinition = isCommercial ? 
+        'verkaufsorientierter Marketing-Copywriter mit Fokus auf Conversion-Optimierung' :
+        'informativer Content-Experte mit Fokus auf Mehrwert und Problemlösung';
+    
+    const ctaStyle = isCommercial ? 'direkt und handlungsorientiert' : 'beratend und einladend';
+    
+    // KONTEXT-SPEZIFISCHE BEISPIELE
+    const contextExamples = {
+        'pets': {
+            titleExample: `"${keyword}: Sicherheitstipps für Hundebesitzer"`,
+            heroExample: `"Entspannte ${keyword}-Erlebnisse für Sie und Ihren Vierbeiner"`,
+            benefitExample: `"Sicherheits-Checkliste für ${keyword}-Ausflüge"`
+        },
+        'tech': {
+            titleExample: `"${keyword} - Entwickler-Guide & Best Practices"`,
+            heroExample: `"Optimieren Sie Ihre Workflow mit ${keyword}-Lösungen"`,
+            benefitExample: `"Performance-Boost durch ${keyword}-Integration"`
+        },
+        'gastro': {
+            titleExample: `"${keyword} - Kulinarische Highlights & Atmosphäre"`,
+            heroExample: `"Genießen Sie unvergessliche Momente in unserem ${keyword}"`,
+            benefitExample: `"Frische Zutaten und authentische ${keyword}-Spezialitäten"`
+        },
+        'business': {
+            titleExample: `"${keyword} - ROI-optimierte Strategien & Umsetzung"`,
+            heroExample: `"Steigern Sie Ihren Erfolg mit professionellem ${keyword}"`,
+            benefitExample: `"Messbare Ergebnisse durch ${keyword}-Expertise"`
+        }
+    };
+    
+    const examples = contextExamples[context] || contextExamples['business'];
+    
+    return `Du bist ein ${roleDefinition}.
+
+KEYWORD-ANALYSE:
+Hauptkeyword: "${keyword}"
+Kontext: ${context.toUpperCase()}
+Zielgruppe: ${audience}
+Hauptprobleme: ${problems}
+Lösungsansätze: ${solutions}
+
+CONTENT-AUSRICHTUNG:
+${isCommercial ? 
+`- Verkaufsorientiert mit klaren Nutzenversprechen
+- Vertrauensbildende Elemente und Social Proof
+- Starke, handlungsorientierte Call-to-Actions
+- ROI und konkrete Vorteile betonen` :
+`- Informativ und lösungsorientiert
+- Hilfreiche Tipps und praktische Anleitungen
+- Vertrauensaufbau durch Expertise
+- Beratende, einladende Call-to-Actions`}
+
+KREATIVITÄTS-RICHTLINIEN:
+- Verwende lebendige, bildhafte Sprache statt Fachkauderwelsch
+- Nutze konkrete Beispiele und spezifische Details für "${keyword}"
+- Schaffe emotionale Verbindung zur Zielgruppe
+- Jeder Text muss einzigartig und keyword-spezifisch sein
+
+BEISPIELE FÜR GUTEN ${keyword.toUpperCase()}-CONTENT:
+Titel-Stil: ${examples.titleExample}
+Hero-Stil: ${examples.heroExample}
+Benefit-Stil: ${examples.benefitExample}
+
+STRIKT VERMEIDEN (führt zur Ablehnung):
+❌ "jahrelange Erfahrung", "professionell und zuverlässig"
+❌ "Ihr vertrauensvoller Partner", "maßgeschneiderte Lösungen"
+❌ "höchste Qualität", "erstklassiger Service"
+❌ Wiederholungen zwischen verschiedenen Textfeldern
+❌ Oberflächliche Allgemeinplätze ohne ${keyword}-Bezug
+
+QUALITÄTS-KONTROLLE:
+✓ Keyword "${keyword}" mindestens 8x natürlich eingebaut
+✓ Jeder Text spezifisch für ${context}-Kontext
+✓ ${ctaStyle} Call-to-Actions verwenden
+✓ Emotionale Ansprache der Zielgruppe: ${audience}
+
+ANTWORT-FORMAT: 
+Antworte ausschließlich mit einem validen JSON-Objekt. Beginne direkt mit { und ende mit }. Keine Markdown-Formatierung!
+
+ALLE FELDER MÜSSEN VOLLSTÄNDIG AUSGEFÜLLT WERDEN:
+
+{
+  "post_title": "Einprägsamer SEO-Titel für ${keyword} mit emotionalem Hook (50-60 Zeichen)",
+  "post_name": "${keyword.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}",
+  "meta_title": "Alternative SEO-Variante mit anderem Blickwinkel auf ${keyword}",
+  "meta_description": "Überzeugende Meta-Beschreibung für ${keyword} mit starkem CTA (150-160 Zeichen)",
+  "h1": "Kraftvolle H1: ${keyword} + emotionaler Hauptnutzen für ${audience}",
+  "h2_1": "Problem-H2: Welche Herausforderungen gibt es bei ${keyword}?",
+  "h2_2": "Lösungs-H2: Wie wir ${keyword}-Probleme erfolgreich angehen",
+  "h2_3": "Nutzen-H2: Was ${keyword} für ${audience} ermöglicht",
+  "h2_4": "Vertrauens-H2: Warum Sie bei ${keyword} auf uns setzen sollten",
+  "primary_cta": "${isCommercial ? 'Starker Verkaufs-CTA' : 'Informativer CTA'} für ${keyword} (max. 30 Zeichen)",
+  "secondary_cta": "Alternative, sanftere Handlungsaufforderung für ${keyword}",
+  "hero_text": "Mitreißender Hero-Text (80-100 Wörter): Vermittle ${keyword}-Begeisterung und spreche ${audience} direkt an",
+  "hero_subtext": "Verstärkende Unterüberschrift für ${keyword} (30-40 Wörter) mit Credibility",
+  "benefits_list": "HTML-Liste mit 5-6 spezifischen ${keyword}-Vorteilen für ${audience} (je 12-18 Wörter pro Punkt)",
+  "features_list": "HTML-Liste mit 5-6 konkreten ${keyword}-Features oder Eigenschaften",
+  "social_proof": "Spezifische Sozialbeweise für ${keyword} mit echten Zahlen (nicht '1000 Kunden')",
+  "testimonial_1": "Ausführliches Testimonial: Name + Hintergrund + spezifische ${keyword}-Erfahrung (40-60 Wörter)",
+  "testimonial_2": "Zweites Testimonial mit anderer Perspektive auf ${keyword} (40-60 Wörter)",
+  "pricing_title": "Preis-Überschrift für ${keyword} (nicht 'Wählen Sie Ihren Plan')",
+  "price_1": "Starter-Paket: Was bei ${keyword} enthalten ist + Zielgruppe (30-40 Wörter)",
+  "price_2": "Professional-Paket: Erweiterte ${keyword}-Features + Service (35-45 Wörter)",
+  "price_3": "Premium-Paket: Alle ${keyword}-Features + exklusiver Service (40-50 Wörter)",
+  "faq_1": "Häufigste ECHTE ${keyword}-Frage von ${audience} (spezifisch, nicht generisch)",
+  "faq_answer_1": "Detaillierte, hilfreiche Antwort zur ersten ${keyword}-Frage (50-70 Wörter)",
+  "faq_2": "Zweithäufigste ${keyword}-Frage (Fokus: Umsetzung/Kosten/Prozess)",
+  "faq_answer_2": "Praktische Antwort mit konkreten ${keyword}-Informationen (50-70 Wörter)",
+  "faq_3": "Wichtige Detail-/Experten-Frage zu ${keyword}",
+  "faq_answer_3": "Fachlich fundierte ${keyword}-Antwort mit Mehrwert (50-70 Wörter)",
+  "contact_info": "Kontakt-Information mit spezifischem ${keyword}-Bezug und Kommunikationsweg",
+  "footer_cta": "Motivierender Schluss-CTA: ${keyword} + Zeitkomponente + Emotion",
+  "trust_signals": "Konkrete ${keyword}-Vertrauenselemente: Zertifikate, Erfahrung, Referenzen",
+  "guarantee_text": "Spezifische ${keyword}-Garantie mit klaren Bedingungen und Zeitrahmen"
+}
+
+Erstelle jetzt einzigartigen, hochwertigen Content für "${keyword}" im ${context}-Kontext:`;
+}
+
 module.exports = async (req, res) => {
   console.log('🚀 Silas API gestartet');
   
@@ -23,7 +175,6 @@ module.exports = async (req, res) => {
 
   try {
     console.log('📋 Request Body:', req.body);
-    console.log('📝 Headers:', req.headers);
 
     // === BASIC VALIDATION ===
     const { prompt, keyword, intent = 'informational' } = req.body;
@@ -36,7 +187,7 @@ module.exports = async (req, res) => {
       });
     }
 
-    console.log('✅ Validation passed für:', keyword);
+    console.log('✅ Validation passed für:', keyword, '(' + intent + ')');
 
     // === MASTER MODE CHECK ===
     const masterModeHeader = req.headers['x-silas-master'];
@@ -96,7 +247,7 @@ module.exports = async (req, res) => {
         model = genAI.getGenerativeModel({ 
           model: modelName,
           generationConfig: {
-            temperature: 0.7,
+            temperature: 0.85, // Höher für kreativeren Content
             topK: 40,
             topP: 0.95,
             maxOutputTokens: 8000,
@@ -119,73 +270,11 @@ module.exports = async (req, res) => {
       });
     }
 
-    // === IMPROVED PROMPT (nur bessere Formulierung, gleiche Struktur) ===
-    const isCommercial = intent === 'commercial';
+    // === SMART PROMPT CREATION ===
+    console.log('📝 Erstelle keyword-spezifischen Prompt...');
+    const smartPrompt = createSmartPrompt(keyword, intent);
     
-    const comprehensivePrompt = `
-Du bist ein erstklassiger SEO-Content-Strategist. Erstelle vollständigen Landingpage-Content für das Thema "${keyword}".
-
-${isCommercial ? 'FOKUS: Verkaufsorientierter Content mit starken CTAs und Nutzenversprechen.' : 'FOKUS: Informativer Content mit hilfreichen Details und beratenden CTAs.'}
-
-WICHTIG: Deine Antwort MUSS ein einziges, valides JSON-Objekt sein. Beginne direkt mit { und ende mit }. Gib keine Markdown-Formatierung oder andere Texte aus.
-
-VERMEIDE diese Standard-Floskeln:
-- "jahrelange Erfahrung", "professionell und zuverlässig" 
-- "Ihr vertrauensvoller Partner", "maßgeschneiderte Lösungen"
-
-Das JSON-Objekt muss ALLE folgenden Felder enthalten und mit umfangreichem, hochwertigem Content füllen:
-
-{
-  "post_title": "SEO-optimierter Titel (50-60 Zeichen) für ${keyword}",
-  "post_name": "seo-freundlicher-url-slug-fuer-${keyword.toLowerCase().replace(/\\s+/g, '-').replace(/[^a-z0-9-]/g, '')}",
-  "meta_title": "Alternativer SEO-Titel (50-60 Zeichen) für ${keyword}",
-  "meta_description": "Fesselnde Meta-Beschreibung (150-160 Zeichen) mit CTA für ${keyword}",
-  "h1": "Kraftvolle H1-Überschrift für ${keyword}, die den Hauptnutzen kommuniziert",
-  "h2_1": "Erste H2-Überschrift (Problemorientiert) für ${keyword}",
-  "h2_2": "Zweite H2-Überschrift (Lösungsorientiert) für ${keyword}",
-  "h2_3": "Dritte H2-Überschrift (Feature-/Nutzen-orientiert) für ${keyword}",
-  "h2_4": "Vierte H2-Überschrift (Vertrauensbildend) für ${keyword}",
-  "primary_cta": "Kurzer, starker Call-to-Action Text (z.B. '${isCommercial ? 'Jetzt ' + keyword + ' kaufen' : keyword + ' Guide herunterladen'}')",
-  "secondary_cta": "Alternativer, sanfterer Call-to-Action (z.B. 'Mehr über ${keyword} erfahren')",
-  "hero_text": "Fesselnder Einleitungstext für den Hero-Bereich (50-80 Wörter) über ${keyword}",
-  "hero_subtext": "Unterstützende Unterüberschrift für den Hero-Bereich (20-30 Wörter) zu ${keyword}",
-  "benefits_list": "HTML-Liste (<ul><li>...</li></ul>) mit 4-6 überzeugenden Vorteilen von ${keyword}",
-  "features_list": "HTML-Liste (<ul><li>...</li></ul>) mit 4-6 konkreten Merkmalen/Features von ${keyword}",
-  "social_proof": "Kurzer Satz über soziale Bewährtheit (z.B. 'Von über 500 zufriedenen ${keyword}-Kunden genutzt')",
-  "testimonial_1": "Glaubwürdiges, fiktives Kunden-Testimonial mit Name und Aussage zu ${keyword}",
-  "testimonial_2": "Zweites, andersartiges Kunden-Testimonial mit Name und Aussage zu ${keyword}",
-  "pricing_title": "Überschrift für den Preisbereich (z.B. 'Wählen Sie Ihren ${keyword}-Plan')",
-  "price_1": "Beschreibung für das erste ${keyword}-Preispaket (Starter/Basic)",
-  "price_2": "Beschreibung für das zweite ${keyword}-Preispaket (Professional)",
-  "price_3": "Beschreibung für das dritte ${keyword}-Preispaket (Enterprise/Premium)",
-  "faq_1": "Erste häufig gestellte Frage zu ${keyword}",
-  "faq_answer_1": "Ausführliche Antwort auf die erste ${keyword}-Frage (30-50 Wörter)",
-  "faq_2": "Zweite häufig gestellte Frage zu ${keyword}",
-  "faq_answer_2": "Ausführliche Antwort auf die zweite ${keyword}-Frage (30-50 Wörter)",
-  "faq_3": "Dritte häufig gestellte Frage zu ${keyword}",
-  "faq_answer_3": "Ausführliche Antwort auf die dritte ${keyword}-Frage (30-50 Wörter)",
-  "contact_info": "Kurze Kontaktinformation oder Hinweis für ${keyword} (z.B. 'Fragen zu ${keyword}? Rufen Sie uns an: ...')",
-  "footer_cta": "Letzter Call-to-Action für den Footer (z.B. 'Starten Sie noch heute Ihr ${keyword}-Projekt')",
-  "trust_signals": "Kurzer Text mit Vertrauenssignalen für ${keyword} (z.B. 'Zertifiziert • Sicher • ${keyword}-Experten')",
-  "guarantee_text": "Satz über Garantie für ${keyword} (z.B. '30-Tage-Geld-zurück-Garantie für alle ${keyword}-Services')"
-}
-
-QUALITÄTS-ANFORDERUNGEN:
-- Jedes Textfeld muss mindestens 10-15 Wörter enthalten (außer CTAs)
-- Hero-Text: 50-80 Wörter
-- FAQ-Antworten: 30-50 Wörter
-- Benefits/Features: Jeweils 4-6 Listenelemente mit ausführlichen Beschreibungen
-- Testimonials: Vollständige Zitate mit Namen und Firma
-- Alle Texte müssen spezifisch auf "${keyword}" bezogen sein
-- Professioneller, überzeugender Ton
-- SEO-optimiert aber natürlich lesbar
-- Verwende deutsche Sprache
-- Alle Listen müssen vollständige HTML-Markup enthalten
-
-Erstelle jetzt das vollständige JSON-Objekt mit umfangreichem Content für "${keyword}":
-    `;
-
-    console.log('📤 Sende umfassende Anfrage an KI für:', keyword);
+    console.log('📤 Sende Anfrage an KI für:', keyword);
 
     // === CONTENT GENERATION ===
     let result;
@@ -193,7 +282,7 @@ Erstelle jetzt das vollständige JSON-Objekt mit umfangreichem Content für "${k
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 45000);
       
-      result = await model.generateContent(comprehensivePrompt);
+      result = await model.generateContent(smartPrompt);
       clearTimeout(timeoutId);
       
       console.log('✅ KI-Antwort erhalten');
@@ -243,43 +332,83 @@ Erstelle jetzt das vollständige JSON-Objekt mit umfangreichem Content für "${k
       jsonData = JSON.parse(jsonString);
       console.log('✅ JSON erfolgreich geparst');
       
-    } catch (parseError) {
-      console.warn('⚠️ JSON-Parse-Fehler, verwende verbesserten Fallback');
+      // QUALITÄTS-CHECK
+      const filledFields = Object.keys(jsonData).filter(key => 
+        jsonData[key] && jsonData[key] !== null && jsonData[key] !== ''
+      ).length;
       
-      // VERBESSERTER FALLBACK MIT ALLEN FELDERN
+      console.log('📊 Gefüllte Felder:', filledFields, 'von erwartet 23+');
+      
+    } catch (parseError) {
+      console.warn('⚠️ JSON-Parse-Fehler, verwende intelligenten Fallback');
+      
+      // INTELLIGENTER, KEYWORD-SPEZIFISCHER FALLBACK
+      const lowerKeyword = keyword.toLowerCase();
+      let fallbackContent = {};
+      
+      if (lowerKeyword.includes('hund') || lowerKeyword.includes('tier')) {
+        fallbackContent = {
+          post_title: `${keyword} - Sicherheitstipps für entspannte Ausflüge`,
+          hero_text: `Entdecken Sie die schönsten ${keyword}-Erlebnisse! Wir zeigen Ihnen, wie Sie und Ihr Vierbeiner gemeinsam unvergessliche Momente erleben können. Mit unseren erprobten Sicherheitstipps und praktischen Ratschlägen wird jeder ${keyword}-Ausflug zum entspannten Erlebnis für die ganze Familie.`,
+          benefits_list: `<ul><li>Umfassende Sicherheits-Checkliste für ${keyword}-Ausflüge</li><li>Artgerechte Beschäftigung und Abkühlung für Ihren Hund</li><li>Erste-Hilfe-Tipps speziell für ${keyword}-Situationen</li><li>Wettergerechte Ausrüstung und Vorbereitung</li><li>Stressfreie Anreise und entspannte Rückkehr</li></ul>`,
+          faq_1: `Welche Hunderassen sind für ${keyword}-Aktivitäten besonders geeignet?`,
+          faq_answer_1: `Wasserliebende Rassen wie Golden Retriever, Labrador oder Neufundländer eignen sich besonders für ${keyword}-Ausflüge. Wichtig ist jedoch, jeden Hund individuell einzuschätzen.`,
+          primary_cta: intent === 'commercial' ? `${keyword} Guide kaufen` : `${keyword} Tipps erhalten`
+        };
+      } else if (lowerKeyword.includes('wordpress') || lowerKeyword.includes('plugin')) {
+        fallbackContent = {
+          post_title: `${keyword} - Entwickler-Guide für optimale Performance`,
+          hero_text: `Optimieren Sie Ihre WordPress-Website mit ${keyword}! Unsere bewährten Strategien und Code-Lösungen helfen Ihnen dabei, Performance, Sicherheit und Benutzerfreundlichkeit zu maximieren. Von der Installation bis zur Optimierung begleiten wir Sie durch alle Schritte.`,
+          benefits_list: `<ul><li>Schnelle ${keyword}-Integration ohne komplexe Konfiguration</li><li>Performance-Optimierung für bessere Ladezeiten</li><li>Sicherheits-Features zum Schutz vor Angriffen</li><li>SEO-freundliche Implementierung für bessere Rankings</li><li>Mobile-optimierte Darstellung auf allen Geräten</li></ul>`,
+          faq_1: `Wie installiere ich das ${keyword} richtig?`,
+          faq_answer_1: `Die ${keyword}-Installation erfolgt über das WordPress-Dashboard unter Plugins > Neu hinzufügen. Nach der Aktivierung führt Sie ein Setup-Assistent durch die Grundkonfiguration.`,
+          primary_cta: intent === 'commercial' ? `${keyword} jetzt kaufen` : `${keyword} testen`
+        };
+      } else {
+        fallbackContent = {
+          post_title: `${keyword} - Ihre Lösung für optimale Ergebnisse`,
+          hero_text: `Entdecken Sie die Möglichkeiten von ${keyword}! Wir bieten Ihnen umfassende Lösungen, die genau auf Ihre Bedürfnisse zugeschnitten sind. Mit bewährten Methoden und innovativen Ansätzen erreichen Sie Ihre Ziele schneller und effizienter.`,
+          benefits_list: `<ul><li>Individuelle ${keyword}-Lösungen für Ihre spezifischen Anforderungen</li><li>Bewährte Strategien mit nachweisbaren Erfolgen</li><li>Persönliche Betreuung durch erfahrene Experten</li><li>Flexible Anpassung an veränderte Bedingungen</li><li>Langfristige Partnerschaft für nachhaltigen Erfolg</li></ul>`,
+          faq_1: `Wie funktioniert ${keyword} in der Praxis?`,
+          faq_answer_1: `${keyword} wird individuell an Ihre Bedürfnisse angepasst. Nach einer ausführlichen Analyse entwickeln wir eine maßgeschneiderte Strategie für optimale Ergebnisse.`,
+          primary_cta: intent === 'commercial' ? `${keyword} jetzt starten` : `${keyword} Beratung`
+        };
+      }
+      
+      // VOLLSTÄNDIGER FALLBACK
       jsonData = {
-        post_title: keyword + " - Ihre kompetente Lösung für optimale Ergebnisse",
+        post_title: fallbackContent.post_title,
         post_name: keyword.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
-        meta_title: keyword + " Experten | Ihre zuverlässige Lösung",
-        meta_description: "Professionelle " + keyword + " Services von Experten. Kompetent, zuverlässig und maßgeschneidert für Ihre Bedürfnisse. Jetzt informieren und starten!",
-        h1: keyword + " - Ihre zuverlässige und professionelle Lösung",
-        h2_1: "Warum " + keyword + " für Ihr Unternehmen wichtig ist",
-        h2_2: "Unsere bewährte " + keyword + " Expertise und Lösungen",
-        h2_3: keyword + " Features und Vorteile im Detail",
-        h2_4: "Vertrauen Sie unserem erfahrenen " + keyword + " Team",
-        primary_cta: intent === 'commercial' ? "Jetzt " + keyword + " anfragen" : keyword + " Beratung erhalten",
-        secondary_cta: "Mehr über " + keyword + " erfahren",
-        hero_text: "Willkommen bei Ihrem " + keyword + " Experten. Wir bieten professionelle, maßgeschneiderte Lösungen, die Ihre Erwartungen übertreffen. Mit jahrelanger Erfahrung und bewährten Methoden sorgen wir für optimale Ergebnisse in allen " + keyword + " Bereichen. Vertrauen Sie auf unsere Kompetenz und lassen Sie sich von unserem Service überzeugen.",
-        hero_subtext: "Vertrauen Sie auf unsere Erfahrung und Kompetenz im Bereich " + keyword,
-        benefits_list: "<ul><li>Professionelle " + keyword + " Beratung von zertifizierten Experten</li><li>Maßgeschneiderte Lösungen für Ihre individuellen Anforderungen</li><li>Erfahrenes und hochqualifiziertes Expertenteam</li><li>Zuverlässiger Support und langfristige Betreuung</li><li>Nachhaltige und messbare Ergebnisse</li><li>Flexible Anpassung an veränderte Bedürfnisse</li></ul>",
-        features_list: "<ul><li>Umfassende " + keyword + " Analyse und detaillierte Bewertung</li><li>Individuelle Strategieentwicklung und präzise Planung</li><li>Kontinuierliche Überwachung und systematische Optimierung</li><li>Messbare Ergebnisse und regelmäßige Erfolgskontrolle</li><li>Flexible Anpassung an veränderte Marktbedingungen</li><li>Professionelle Dokumentation und transparente Berichterstattung</li></ul>",
-        social_proof: "Von über 500 zufriedenen Kunden empfohlen und erfolgreich eingesetzt",
-        testimonial_1: "\"Exzellenter " + keyword + " Service! Das Team hat unsere Erwartungen in jeder Hinsicht übertroffen und professionelle Ergebnisse geliefert. Die Zusammenarbeit war reibungslos und sehr effektiv.\" - Maria Schmidt, Projektleiterin bei TechSolutions GmbH",
-        testimonial_2: "\"Professionell, zuverlässig und kompetent. Genau das, was wir für unsere " + keyword + " Anforderungen gesucht haben. Die Ergebnisse sprechen für sich. Sehr empfehlenswert!\" - Thomas Weber, Geschäftsführer InnovateCorps",
-        pricing_title: "Wählen Sie Ihr passendes " + keyword + " Service-Paket",
-        price_1: keyword + " Starter - Ideal für den Einstieg mit grundlegenden Funktionen, E-Mail-Support und Basis-Features für kleinere Projekte",
-        price_2: keyword + " Professional - Für anspruchsvolle Projekte mit erweiterten Features, Priority Support und individueller Betreuung",
-        price_3: keyword + " Enterprise - Maximale Leistung mit Premium Features, dediziertem Support, individuellen Anpassungen und 24/7 Service",
-        faq_1: "Was macht Ihren " + keyword + " Service besonders und unterscheidet Sie von der Konkurrenz?",
-        faq_answer_1: "Unser " + keyword + " Service zeichnet sich durch individuelle Beratung, jahrelange Erfahrung, bewährte Methoden und messbare Ergebnisse aus. Wir bieten maßgeschneiderte Lösungen statt Standard-Angebote und stehen für Qualität.",
-        faq_2: "Wie lange dauert die Umsetzung eines typischen " + keyword + " Projekts normalerweise?",
-        faq_answer_2: "Die Umsetzungsdauer hängt vom Projektumfang ab. Typischerweise zwischen 2-8 Wochen, je nach Komplexität und Ihren spezifischen " + keyword + " Anforderungen. Wir erstellen einen detaillierten Zeitplan für Sie.",
-        faq_3: "Gibt es eine Garantie oder Gewährleistung auf Ihre " + keyword + " Services und Dienstleistungen?",
-        faq_answer_3: "Ja, wir bieten eine 30-Tage-Zufriedenheitsgarantie auf alle unsere " + keyword + " Services. Sollten Sie nicht zufrieden sein, finden wir gemeinsam eine Lösung oder erstatten den Betrag zurück.",
-        contact_info: "Fragen zu " + keyword + "? Rufen Sie uns an unter +43 1 234 5678 oder schreiben Sie uns eine E-Mail - wir beraten Sie gerne persönlich!",
-        footer_cta: "Starten Sie noch heute Ihr erfolgreiches " + keyword + " Projekt mit unserem Expertenteam",
-        trust_signals: "Zertifiziert • Sicher • Garantiert • " + keyword + " Experten seit über 10 Jahren",
-        guarantee_text: "30-Tage-Geld-zurück-Garantie auf alle " + keyword + " Services und Dienstleistungen",
+        meta_title: fallbackContent.post_title,
+        meta_description: fallbackContent.hero_text.substring(0, 140) + "... Jetzt informieren!",
+        h1: fallbackContent.post_title,
+        h2_1: `Warum ${keyword} für Sie wichtig ist`,
+        h2_2: `Unsere ${keyword} Expertise`,
+        h2_3: `${keyword} Vorteile und Features`,
+        h2_4: `Ihr ${keyword} Expertenteam`,
+        primary_cta: fallbackContent.primary_cta,
+        secondary_cta: `Mehr über ${keyword} erfahren`,
+        hero_text: fallbackContent.hero_text,
+        hero_subtext: `Vertrauen Sie auf unsere ${keyword} Kompetenz`,
+        benefits_list: fallbackContent.benefits_list,
+        features_list: `<ul><li>${keyword} Beratung und Support</li><li>Individuelle Lösungsentwicklung</li><li>Qualitätskontrolle und Testing</li><li>Dokumentation und Schulung</li><li>Langfristige Betreuung</li></ul>`,
+        social_proof: `Von zahlreichen zufriedenen ${keyword}-Kunden empfohlen`,
+        testimonial_1: `"Hervorragende ${keyword} Beratung! Genau das, was wir gesucht haben." - Sarah Mueller, Projektmanagerin`,
+        testimonial_2: `"Kompetent und zuverlässig. Unsere ${keyword}-Ziele wurden übertroffen." - Marcus Weber, Geschäftsführer`,
+        pricing_title: `${keyword} Service-Pakete`,
+        price_1: `${keyword} Basic - Grundlegende Features für den Einstieg`,
+        price_2: `${keyword} Professional - Erweiterte Funktionen für Fortgeschrittene`, 
+        price_3: `${keyword} Enterprise - Premium Service mit allen Features`,
+        faq_1: fallbackContent.faq_1,
+        faq_answer_1: fallbackContent.faq_answer_1,
+        faq_2: `Was kostet ${keyword}?`,
+        faq_answer_2: `Die ${keyword} Kosten richten sich nach Ihren spezifischen Anforderungen. Wir erstellen Ihnen gerne ein individuelles Angebot.`,
+        faq_3: `Wie lange dauert die ${keyword} Umsetzung?`,
+        faq_answer_3: `Die ${keyword} Umsetzungsdauer hängt vom Projektumfang ab. Typisch sind 1-4 Wochen für die vollständige Implementierung.`,
+        contact_info: `${keyword} Fragen? Kontaktieren Sie unsere Experten für eine kostenlose Erstberatung.`,
+        footer_cta: `Starten Sie jetzt Ihr ${keyword} Projekt`,
+        trust_signals: `${keyword} Experten • Zertifiziert • Garantiert`,
+        guarantee_text: `30-Tage-Zufriedenheitsgarantie auf alle ${keyword} Services`,
         _fallback_used: true,
         _parse_error: parseError.message
       };
