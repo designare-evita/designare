@@ -1,18 +1,39 @@
-// silas-form.js - VOLLSTÄNDIGE UND KORRIGIERTE VERSION
+// silas-form.js - KORRIGIERTE VERSION
 
 export function initSilasForm() {
     const silasForm = document.getElementById('silas-form');
     
     if (!silasForm) {
+        console.error('Silas Form nicht gefunden');
         return;
     }
 
     // === MASTER PASSWORD SYSTEM ===
     const MASTER_PASSWORD = "SilasUnlimited2024!";
     
+    // In-Memory Storage als Fallback für Browser Storage
+    const memoryStorage = {
+        data: {},
+        setItem(key, value) {
+            this.data[key] = value;
+        },
+        getItem(key) {
+            return this.data[key] || null;
+        },
+        removeItem(key) {
+            delete this.data[key];
+        }
+    };
+
+    // Storage-Wrapper mit Fallback
+    const storage = {
+        session: typeof sessionStorage !== 'undefined' ? sessionStorage : memoryStorage,
+        local: typeof localStorage !== 'undefined' ? localStorage : memoryStorage
+    };
+    
     function isMasterModeActive() {
-        const masterMode = sessionStorage.getItem('silas_master_mode');
-        const timestamp = parseInt(sessionStorage.getItem('silas_master_timestamp') || '0');
+        const masterMode = storage.session.getItem('silas_master_mode');
+        const timestamp = parseInt(storage.session.getItem('silas_master_timestamp') || '0');
         const now = Date.now();
         
         if (masterMode === 'true' && (now - timestamp) < (8 * 60 * 60 * 1000)) {
@@ -20,8 +41,8 @@ export function initSilasForm() {
         }
         
         if (masterMode === 'true') {
-            sessionStorage.removeItem('silas_master_mode');
-            sessionStorage.removeItem('silas_master_timestamp');
+            storage.session.removeItem('silas_master_mode');
+            storage.session.removeItem('silas_master_timestamp');
         }
         
         return false;
@@ -122,7 +143,9 @@ export function initSilasForm() {
         document.body.appendChild(notification);
         
         setTimeout(function() {
-            notification.remove();
+            if (notification.parentNode) {
+                notification.remove();
+            }
         }, 4000);
     }
 
@@ -164,14 +187,14 @@ export function initSilasForm() {
     }
 
     function activateMasterMode() {
-        sessionStorage.setItem('silas_master_mode', 'true');
-        sessionStorage.setItem('silas_master_timestamp', Date.now().toString());
+        storage.session.setItem('silas_master_mode', 'true');
+        storage.session.setItem('silas_master_timestamp', Date.now().toString());
         
         DEMO_LIMITS = Object.assign({}, MASTER_LIMITS);
         
-        localStorage.removeItem('silas_daily');
-        localStorage.removeItem('silas_hourly');
-        localStorage.removeItem('silas_last_request');
+        storage.local.removeItem('silas_daily');
+        storage.local.removeItem('silas_hourly');
+        storage.local.removeItem('silas_last_request');
         
         showMasterModeIndicator();
         hideUnlockButton();
@@ -199,7 +222,7 @@ export function initSilasForm() {
         indicator.innerHTML = `
             <strong>MASTER MODE AKTIV</strong><br>
             <small style="opacity: 0.9;">Unlimited Keywords • No Rate Limits</small>
-            <button onclick="deactivateMasterMode()" style="
+            <button onclick="window.deactivateMasterMode()" style="
                 position: absolute; 
                 top: 8px; 
                 right: 12px; 
@@ -217,8 +240,8 @@ export function initSilasForm() {
         
         window.deactivateMasterMode = function() {
             if (confirm('Master Mode deaktivieren?')) {
-                sessionStorage.removeItem('silas_master_mode');
-                sessionStorage.removeItem('silas_master_timestamp');
+                storage.session.removeItem('silas_master_mode');
+                storage.session.removeItem('silas_master_timestamp');
                 location.reload();
             }
         };
@@ -229,92 +252,20 @@ export function initSilasForm() {
         if (btn) btn.style.display = 'none';
     }
 
-    // === KONTEXT-PREVIEW ===
-    function createContextDisplay() {
-        let contextContainer = document.getElementById('context-preview-container');
-        
-        if (!contextContainer) {
-            contextContainer = document.createElement('div');
-            contextContainer.id = 'context-preview-container';
-            contextContainer.style.cssText = 'margin: 15px 0; transition: all 0.3s ease; display: none;';
-            
-            const inputGroup = document.querySelector('.input-group');
-            if (inputGroup && inputGroup.nextElementSibling) {
-                inputGroup.parentNode.insertBefore(contextContainer, inputGroup.nextElementSibling);
-            }
-        }
-        
-        return contextContainer;
-    }
-
-    function showContextPreview(keyword, intent) {
-        if (!keyword || keyword.trim().length < 3) {
-            hideContextPreview();
-            return;
-        }
-        
-        const context = analyzeKeywordContext(keyword.trim());
-        const container = createContextDisplay();
-        
-        container.innerHTML = `
-            <div style="
-                background: linear-gradient(135deg, ${context.color}15 0%, ${context.color}05 100%);
-                border: 1px solid ${context.color};
-                border-radius: 10px;
-                padding: 15px 20px;
-                display: flex;
-                align-items: center;
-                gap: 15px;
-            ">
-                <div style="font-size: 2rem;">${context.icon}</div>
-                
-                <div style="flex-grow: 1;">
-                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
-                        <strong style="color: ${context.color}; font-size: 1.1rem;">
-                            Kontext erkannt: ${context.label}
-                        </strong>
-                        
-                        <span style="
-                            background: ${intent === 'commercial' ? '#28a745' : '#17a2b8'};
-                            color: white;
-                            padding: 3px 8px;
-                            border-radius: 12px;
-                            font-size: 0.7rem;
-                            font-weight: bold;
-                        ">${intent === 'commercial' ? 'Kommerziell' : 'Informativ'}</span>
-                    </div>
-                    
-                    <p style="color: #ccc; margin: 0; font-size: 0.9rem;">
-                        Zielgruppe: ${context.audience}
-                    </p>
-                </div>
-            </div>
-        `;
-        
-        container.style.display = 'block';
-    }
-
-    function hideContextPreview() {
-        const container = document.getElementById('context-preview-container');
-        if (container) {
-            container.style.display = 'none';
-        }
-    }
-
     // === RATE LIMITING ===
     function initDemoTracking() {
         const now = Date.now();
         const today = new Date().toDateString();
         
-        const dailyData = JSON.parse(localStorage.getItem('silas_daily') || '{}');
+        const dailyData = JSON.parse(storage.local.getItem('silas_daily') || '{}');
         if (dailyData.date !== today) {
-            localStorage.setItem('silas_daily', JSON.stringify({ date: today, count: 0 }));
+            storage.local.setItem('silas_daily', JSON.stringify({ date: today, count: 0 }));
         }
         
-        const hourlyData = JSON.parse(localStorage.getItem('silas_hourly') || '{}');
+        const hourlyData = JSON.parse(storage.local.getItem('silas_hourly') || '{}');
         const currentHour = Math.floor(now / (1000 * 60 * 60));
         if (hourlyData.hour !== currentHour) {
-            localStorage.setItem('silas_hourly', JSON.stringify({ hour: currentHour, count: 0 }));
+            storage.local.setItem('silas_hourly', JSON.stringify({ hour: currentHour, count: 0 }));
         }
     }
 
@@ -324,9 +275,9 @@ export function initSilasForm() {
         }
         
         const now = Date.now();
-        const dailyData = JSON.parse(localStorage.getItem('silas_daily') || '{}');
-        const hourlyData = JSON.parse(localStorage.getItem('silas_hourly') || '{}');
-        const lastRequest = parseInt(localStorage.getItem('silas_last_request') || '0');
+        const dailyData = JSON.parse(storage.local.getItem('silas_daily') || '{}');
+        const hourlyData = JSON.parse(storage.local.getItem('silas_hourly') || '{}');
+        const lastRequest = parseInt(storage.local.getItem('silas_last_request') || '0');
         
         if (now - lastRequest < DEMO_LIMITS.cooldownBetweenRequests) {
             const remainingSeconds = Math.ceil((DEMO_LIMITS.cooldownBetweenRequests - (now - lastRequest)) / 1000);
@@ -346,15 +297,15 @@ export function initSilasForm() {
 
     function updateUsageCounters() {
         const now = Date.now();
-        const dailyData = JSON.parse(localStorage.getItem('silas_daily') || '{}');
+        const dailyData = JSON.parse(storage.local.getItem('silas_daily') || '{}');
         dailyData.count = (dailyData.count || 0) + 1;
-        localStorage.setItem('silas_daily', JSON.stringify(dailyData));
+        storage.local.setItem('silas_daily', JSON.stringify(dailyData));
         
-        const hourlyData = JSON.parse(localStorage.getItem('silas_hourly') || '{}');
+        const hourlyData = JSON.parse(storage.local.getItem('silas_hourly') || '{}');
         hourlyData.count = (hourlyData.count || 0) + 1;
-        localStorage.setItem('silas_hourly', JSON.stringify(hourlyData));
+        storage.local.setItem('silas_hourly', JSON.stringify(hourlyData));
         
-        localStorage.setItem('silas_last_request', now.toString());
+        storage.local.setItem('silas_last_request', now.toString());
         showDemoStatus();
     }
 
@@ -383,8 +334,8 @@ export function initSilasForm() {
     }
 
     function showDemoStatus() {
-        const dailyData = JSON.parse(localStorage.getItem('silas_daily') || '{}');
-        const hourlyData = JSON.parse(localStorage.getItem('silas_hourly') || '{}');
+        const dailyData = JSON.parse(storage.local.getItem('silas_daily') || '{}');
+        const hourlyData = JSON.parse(storage.local.getItem('silas_hourly') || '{}');
         
         const dailyRemaining = DEMO_LIMITS.maxGenerationsPerDay - (dailyData.count || 0);
         const hourlyRemaining = DEMO_LIMITS.maxGenerationsPerHour - (hourlyData.count || 0);
@@ -448,7 +399,11 @@ export function initSilasForm() {
     function addKeywords() {
         try {
             const newKeywords = keywordInput.value.split(',').map(kw => kw.trim()).filter(kw => kw.length > 0);
-            const currentIntent = textIntentSelect.value;
+            const currentIntent = textIntentSelect ? textIntentSelect.value : 'informational';
+            
+            if (newKeywords.length === 0) {
+                throw new Error('Bitte gib mindestens ein Keyword ein.');
+            }
             
             // Keywords validieren
             newKeywords.forEach(validateKeyword);
@@ -498,6 +453,8 @@ export function initSilasForm() {
     }
 
     function updateKeywordDisplay() {
+        if (!keywordDisplayList) return;
+        
         keywordDisplayList.innerHTML = '';
         
         keywordList.forEach(function(item, index) {
@@ -583,7 +540,9 @@ export function initSilasForm() {
             keywordDisplayList.appendChild(listItem);
         });
         
-        clearListBtn.style.display = keywordList.length > 0 ? 'inline-block' : 'none';
+        if (clearListBtn) {
+            clearListBtn.style.display = keywordList.length > 0 ? 'inline-block' : 'none';
+        }
     }
 
     function showGenerationPreview() {
@@ -648,32 +607,125 @@ export function initSilasForm() {
         }
     }
 
-    // === CONTENT GENERATION ===
-    async function generateContent(item, index, responseContent) {
-        try {
-            const response = await fetch('/api/generate', {
-                method: 'POST',
-                headers: Object.assign(
-                    { 'Content-Type': 'application/json' },
-                    isMasterModeActive() ? { 'X-Silas-Master': 'SilasUnlimited2024!' } : {}
-                ),
-                body: JSON.stringify({ 
-                    prompt: `Generate content for ${item.keyword}`, 
-                    keyword: item.keyword,
-                    intent: item.intent
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error('Server-Fehler: ' + response.status);
+    // === CONTEXT PREVIEW FUNCTIONS ===
+    function createContextDisplay() {
+        let contextContainer = document.getElementById('context-preview-container');
+        
+        if (!contextContainer) {
+            contextContainer = document.createElement('div');
+            contextContainer.id = 'context-preview-container';
+            contextContainer.style.cssText = 'margin: 15px 0; transition: all 0.3s ease; display: none;';
+            
+            const inputGroup = document.querySelector('.input-group');
+            if (inputGroup && inputGroup.nextElementSibling) {
+                inputGroup.parentNode.insertBefore(contextContainer, inputGroup.nextElementSibling);
             }
-
-            return await response.json();
-
-        } catch (error) {
-            console.error(`Fehler bei "${item.keyword}":`, error);
-            throw error;
         }
+        
+        return contextContainer;
+    }
+
+    function showContextPreview(keyword, intent) {
+        if (!keyword || keyword.trim().length < 3) {
+            hideContextPreview();
+            return;
+        }
+        
+        const context = analyzeKeywordContext(keyword.trim());
+        const container = createContextDisplay();
+        
+        container.innerHTML = `
+            <div style="
+                background: linear-gradient(135deg, ${context.color}15 0%, ${context.color}05 100%);
+                border: 1px solid ${context.color};
+                border-radius: 10px;
+                padding: 15px 20px;
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            ">
+                <div style="font-size: 2rem;">${context.icon}</div>
+                
+                <div style="flex-grow: 1;">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                        <strong style="color: ${context.color}; font-size: 1.1rem;">
+                            Kontext erkannt: ${context.label}
+                        </strong>
+                        
+                        <span style="
+                            background: ${intent === 'commercial' ? '#28a745' : '#17a2b8'};
+                            color: white;
+                            padding: 3px 8px;
+                            border-radius: 12px;
+                            font-size: 0.7rem;
+                            font-weight: bold;
+                        ">${intent === 'commercial' ? 'Kommerziell' : 'Informativ'}</span>
+                    </div>
+                    
+                    <p style="color: #ccc; margin: 0; font-size: 0.9rem;">
+                        Zielgruppe: ${context.audience}
+                    </p>
+                </div>
+            </div>
+        `;
+        
+        container.style.display = 'block';
+    }
+
+    function hideContextPreview() {
+        const container = document.getElementById('context-preview-container');
+        if (container) {
+            container.style.display = 'none';
+        }
+    }
+
+    // === MOCK CONTENT GENERATION (Ersetzt API Call) ===
+    async function generateContent(item, index, responseContent) {
+        // Simuliere API-Aufruf mit Mock-Daten
+        await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
+        
+        const context = item.context;
+        const isCommercial = item.intent === 'commercial';
+        
+        // Mock-Daten basierend auf Kontext und Intent
+        const mockData = {
+            keyword: item.keyword,
+            intent: item.intent,
+            post_title: `${isCommercial ? 'Kaufen Sie' : 'Alles über'} ${item.keyword} - ${context.label} Guide`,
+            post_name: item.keyword.toLowerCase().replace(/\s+/g, '-'),
+            meta_title: `${item.keyword} | ${context.label} ${isCommercial ? 'Shop' : 'Ratgeber'}`,
+            meta_description: `${isCommercial ? 'Entdecken Sie' : 'Erfahren Sie alles über'} ${item.keyword}. ${context.audience} vertrauen auf unsere ${context.label}-Expertise.`,
+            h1: `${isCommercial ? 'Premium' : 'Umfassender Guide:'} ${item.keyword}`,
+            h2_1: `Was ist ${item.keyword}?`,
+            h2_2: `${isCommercial ? 'Warum' : 'Wie'} ${item.keyword} ${isCommercial ? 'kaufen' : 'funktioniert'}`,
+            h2_3: `${context.label}-Tipps für ${item.keyword}`,
+            h2_4: isCommercial ? `${item.keyword} Preise & Angebote` : `${item.keyword} FAQ`,
+            primary_cta: isCommercial ? `${item.keyword} jetzt bestellen` : `Mehr über ${item.keyword} erfahren`,
+            secondary_cta: isCommercial ? 'Beratung anfordern' : 'Guide downloaden',
+            hero_text: `${isCommercial ? 'Die beste Lösung für' : 'Ihr Experten-Guide zu'} ${item.keyword} im ${context.label}-Bereich`,
+            hero_subtext: `${context.audience} vertrauen auf unsere ${context.label}-Expertise`,
+            benefits_list: `<ul><li>Professionelle ${context.label}-Lösung</li><li>Speziell für ${context.audience}</li><li>Bewährte Qualität</li></ul>`,
+            features_list: `<ul><li>${item.keyword} Features</li><li>${context.label} Integration</li><li>24/7 Support</li></ul>`,
+            social_proof: `Über 1000 zufriedene Kunden im ${context.label}-Bereich`,
+            testimonial_1: `"${item.keyword} hat unser ${context.label}-Business revolutioniert!"`,
+            testimonial_2: `"Beste ${item.keyword}-Lösung auf dem Markt."`,
+            pricing_title: isCommercial ? `${item.keyword} Preise` : `${item.keyword} Pakete`,
+            price_1: isCommercial ? '€29,99' : 'Kostenlos',
+            price_2: isCommercial ? '€59,99' : 'Premium €19',
+            price_3: isCommercial ? '€99,99' : 'Pro €49',
+            faq_1: `Was ist ${item.keyword}?`,
+            faq_answer_1: `${item.keyword} ist eine ${context.label}-Lösung für ${context.audience}.`,
+            faq_2: `Wie funktioniert ${item.keyword}?`,
+            faq_answer_2: `${item.keyword} arbeitet mit modernster ${context.label}-Technologie.`,
+            faq_3: isCommercial ? `Was kostet ${item.keyword}?` : `Ist ${item.keyword} kostenlos?`,
+            faq_answer_3: isCommercial ? `${item.keyword} ist ab €29,99 erhältlich.` : `${item.keyword} ist grundsätzlich kostenlos verfügbar.`,
+            contact_info: 'info@example.com | +43 1 234 5678',
+            footer_cta: isCommercial ? `Jetzt ${item.keyword} bestellen!` : `${item.keyword} Guide herunterladen`,
+            trust_signals: 'SSL-verschlüsselt | DSGVO-konform | 30 Tage Geld-zurück',
+            guarantee_text: isCommercial ? '30 Tage Geld-zurück-Garantie' : '100% kostenlose Informationen'
+        };
+        
+        return mockData;
     }
 
     function displayResult(data, index, container) {
@@ -720,148 +772,6 @@ export function initSilasForm() {
         
         container.appendChild(resultCard);
     }
-
-    // === EVENT LISTENERS ===
-    
-    // Live-Kontext-Erkennung
-    if (keywordInput) {
-        keywordInput.addEventListener('input', function() {
-            clearTimeout(window.contextUpdateTimeout);
-            window.contextUpdateTimeout = setTimeout(() => {
-                const keyword = this.value.trim();
-                const intent = textIntentSelect ? textIntentSelect.value : 'informational';
-                
-                if (keyword.length >= 3) {
-                    showContextPreview(keyword, intent);
-                } else {
-                    hideContextPreview();
-                }
-            }, 300);
-        });
-        
-        keywordInput.addEventListener('blur', function() {
-            setTimeout(hideContextPreview, 200);
-        });
-        
-        keywordInput.addEventListener('focus', function() {
-            const keyword = this.value.trim();
-            const intent = textIntentSelect ? textIntentSelect.value : 'informational';
-            if (keyword.length >= 3) {
-                showContextPreview(keyword, intent);
-            }
-        });
-    }
-
-    if (textIntentSelect) {
-        textIntentSelect.addEventListener('change', function() {
-            const keyword = keywordInput.value.trim();
-            if (keyword.length >= 3) {
-                showContextPreview(keyword, this.value);
-            }
-        });
-    }
-
-    // Form Submit
-    silasForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        addKeywords();
-    });
-    
-    keywordInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            addKeywords();
-        }
-    });
-    
-    // Clear List
-    clearListBtn.addEventListener('click', function() {
-        keywordList = [];
-        allGeneratedData = [];
-        updateKeywordDisplay();
-        hideContextPreview();
-        hideGenerationPreview();
-        
-        silasResponseContainer.innerHTML = '';
-        silasResponseContainer.style.display = 'none';
-        silasStatus.textContent = 'Liste geleert. Bereit für neue Keywords.';
-    });
-
-    // === HAUPTGENERIERUNG ===
-    startGenerationBtn.addEventListener('click', async function() {
-        try {
-            if (keywordList.length === 0) {
-                silasStatus.textContent = 'Bitte füge zuerst Keywords hinzu.';
-                return;
-            }
-
-            checkRateLimit();
-
-            startGenerationBtn.disabled = true;
-            allGeneratedData = [];
-            
-            silasResponseContainer.innerHTML = '<h3>Erstellung läuft...</h3><div id="silas-response-content"></div>';
-            silasResponseContainer.style.display = 'block';
-            
-            const responseContent = document.getElementById('silas-response-content');
-
-            for (let i = 0; i < keywordList.length; i++) {
-                const item = keywordList[i];
-                
-                silasStatus.innerHTML = `Generiere ${item.context.label}-Content für "${item.keyword}" <span style="color: ${item.context.color};">(${item.intent === 'commercial' ? 'Kommerziell' : 'Informativ'})</span> (${i + 1}/${keywordList.length})...`;
-
-                try {
-                    const data = await generateContent(item, i, responseContent);
-                    data.keyword = item.keyword;
-                    data.intent = item.intent;
-                    data._context = item.context;
-                    allGeneratedData.push(data);
-                    displayResult(data, i, responseContent);
-
-                    if (i < keywordList.length - 1) {
-                        await new Promise(resolve => setTimeout(resolve, 1000));
-                    }
-
-                } catch (error) {
-                    const errorData = {
-                        keyword: item.keyword,
-                        intent: item.intent,
-                        error: error.message,
-                        _context: item.context
-                    };
-                    allGeneratedData.push(errorData);
-                    displayResult(errorData, i, responseContent);
-                }
-            }
-
-            updateUsageCounters();
-
-            silasStatus.textContent = `Alle ${keywordList.length} Texte wurden generiert.`;
-            startGenerationBtn.disabled = false;
-            silasResponseContainer.querySelector('h3').textContent = 'Erstellung abgeschlossen!';
-            
-            // Download Button
-            if (!document.getElementById('download-csv-dynamic')) {
-                const downloadButton = document.createElement('button');
-                downloadButton.id = 'download-csv-dynamic';
-                downloadButton.className = 'cta-button';
-                downloadButton.innerHTML = '<i class="fas fa-download"></i> CSV Herunterladen';
-                downloadButton.style.marginTop = '1rem';
-                downloadButton.addEventListener('click', downloadCsv);
-                silasResponseContainer.appendChild(downloadButton);
-            }
-
-        } catch (error) {
-            silasStatus.textContent = error.message;
-            silasStatus.style.color = '#ff6b6b';
-            startGenerationBtn.disabled = false;
-            
-            setTimeout(function() {
-                silasStatus.textContent = 'Bereit zur Generierung.';
-                silasStatus.style.color = '#ffc107';
-            }, 5000);
-        }
-    });
 
     // === CSV DOWNLOAD ===
     function downloadCsv() {
@@ -923,6 +833,182 @@ export function initSilasForm() {
         showNotification(`CSV heruntergeladen: ${successfulData.length} Keywords`, '#28a745');
     }
 
+    // === EVENT LISTENERS ===
+    
+    // Live-Kontext-Erkennung
+    if (keywordInput) {
+        keywordInput.addEventListener('input', function() {
+            clearTimeout(window.contextUpdateTimeout);
+            window.contextUpdateTimeout = setTimeout(() => {
+                const keyword = this.value.trim();
+                const intent = textIntentSelect ? textIntentSelect.value : 'informational';
+                
+                if (keyword.length >= 3) {
+                    showContextPreview(keyword, intent);
+                } else {
+                    hideContextPreview();
+                }
+            }, 300);
+        });
+        
+        keywordInput.addEventListener('blur', function() {
+            setTimeout(hideContextPreview, 200);
+        });
+        
+        keywordInput.addEventListener('focus', function() {
+            const keyword = this.value.trim();
+            const intent = textIntentSelect ? textIntentSelect.value : 'informational';
+            if (keyword.length >= 3) {
+                showContextPreview(keyword, intent);
+            }
+        });
+    }
+
+    if (textIntentSelect) {
+        textIntentSelect.addEventListener('change', function() {
+            const keyword = keywordInput.value.trim();
+            if (keyword.length >= 3) {
+                showContextPreview(keyword, this.value);
+            }
+        });
+    }
+
+    // Form Submit
+    if (silasForm) {
+        silasForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            addKeywords();
+        });
+    }
+    
+    if (keywordInput) {
+        keywordInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addKeywords();
+            }
+        });
+    }
+    
+    // Clear List Button
+    if (clearListBtn) {
+        clearListBtn.addEventListener('click', function() {
+            keywordList = [];
+            allGeneratedData = [];
+            updateKeywordDisplay();
+            hideContextPreview();
+            hideGenerationPreview();
+            
+            if (silasResponseContainer) {
+                silasResponseContainer.innerHTML = '';
+                silasResponseContainer.style.display = 'none';
+            }
+            if (silasStatus) {
+                silasStatus.textContent = 'Liste geleert. Bereit für neue Keywords.';
+            }
+        });
+    }
+
+    // === HAUPTGENERIERUNG ===
+    if (startGenerationBtn) {
+        startGenerationBtn.addEventListener('click', async function() {
+            console.log('Start Generation Button geklickt');
+            
+            try {
+                if (keywordList.length === 0) {
+                    if (silasStatus) {
+                        silasStatus.textContent = 'Bitte füge zuerst Keywords hinzu.';
+                    }
+                    return;
+                }
+
+                checkRateLimit();
+
+                startGenerationBtn.disabled = true;
+                allGeneratedData = [];
+                
+                if (silasResponseContainer) {
+                    silasResponseContainer.innerHTML = '<h3>Erstellung läuft...</h3><div id="silas-response-content"></div>';
+                    silasResponseContainer.style.display = 'block';
+                }
+                
+                const responseContent = document.getElementById('silas-response-content');
+
+                for (let i = 0; i < keywordList.length; i++) {
+                    const item = keywordList[i];
+                    
+                    if (silasStatus) {
+                        silasStatus.innerHTML = `Generiere ${item.context.label}-Content für "${item.keyword}" <span style="color: ${item.context.color};">(${item.intent === 'commercial' ? 'Kommerziell' : 'Informativ'})</span> (${i + 1}/${keywordList.length})...`;
+                    }
+
+                    try {
+                        const data = await generateContent(item, i, responseContent);
+                        data.keyword = item.keyword;
+                        data.intent = item.intent;
+                        data._context = item.context;
+                        allGeneratedData.push(data);
+                        displayResult(data, i, responseContent);
+
+                        if (i < keywordList.length - 1) {
+                            await new Promise(resolve => setTimeout(resolve, 1000));
+                        }
+
+                    } catch (error) {
+                        console.error(`Fehler bei "${item.keyword}":`, error);
+                        const errorData = {
+                            keyword: item.keyword,
+                            intent: item.intent,
+                            error: error.message,
+                            _context: item.context
+                        };
+                        allGeneratedData.push(errorData);
+                        displayResult(errorData, i, responseContent);
+                    }
+                }
+
+                updateUsageCounters();
+
+                if (silasStatus) {
+                    silasStatus.textContent = `Alle ${keywordList.length} Texte wurden generiert.`;
+                }
+                startGenerationBtn.disabled = false;
+                
+                const headerElement = silasResponseContainer?.querySelector('h3');
+                if (headerElement) {
+                    headerElement.textContent = 'Erstellung abgeschlossen!';
+                }
+                
+                // Download Button hinzufügen
+                if (!document.getElementById('download-csv-dynamic') && silasResponseContainer) {
+                    const downloadButton = document.createElement('button');
+                    downloadButton.id = 'download-csv-dynamic';
+                    downloadButton.className = 'cta-button';
+                    downloadButton.innerHTML = '<i class="fas fa-download"></i> CSV Herunterladen';
+                    downloadButton.style.marginTop = '1rem';
+                    downloadButton.addEventListener('click', downloadCsv);
+                    silasResponseContainer.appendChild(downloadButton);
+                }
+
+            } catch (error) {
+                console.error('Generierungsfehler:', error);
+                if (silasStatus) {
+                    silasStatus.textContent = error.message;
+                    silasStatus.style.color = '#ff6b6b';
+                }
+                startGenerationBtn.disabled = false;
+                
+                setTimeout(function() {
+                    if (silasStatus) {
+                        silasStatus.textContent = 'Bereit zur Generierung.';
+                        silasStatus.style.color = '#ffc107';
+                    }
+                }, 5000);
+            }
+        });
+    } else {
+        console.error('Start Generation Button nicht gefunden!');
+    }
+
     // === MODAL FUNCTIONS ===
     const openPreviewModal = function() {
         if (previewModal) {
@@ -947,81 +1033,83 @@ export function initSilasForm() {
     }
 
     // Preview Modal Content
-    silasResponseContainer.addEventListener('click', function(e) {
-        if (e.target.classList.contains('preview-btn')) {
-            const index = parseInt(e.target.getAttribute('data-index'));
-            const data = allGeneratedData[index];
-            
-            if (data && !data.error && previewContentArea) {
-                const context = data._context || analyzeKeywordContext(data.keyword);
+    if (silasResponseContainer) {
+        silasResponseContainer.addEventListener('click', function(e) {
+            if (e.target.classList.contains('preview-btn')) {
+                const index = parseInt(e.target.getAttribute('data-index'));
+                const data = allGeneratedData[index];
                 
-                previewContentArea.innerHTML = `
-                    <div style="color: #f0f0f0; line-height: 1.6;">
-                        <div style="
-                            background: linear-gradient(135deg, ${context.color}20 0%, ${context.color}10 100%); 
-                            border: 1px solid ${context.color}; 
-                            border-radius: 12px; 
-                            padding: 20px; 
-                            margin-bottom: 30px; 
-                            text-align: center;
-                        ">
-                            <h2 style="color: ${context.color}; margin: 0; font-size: 1.5rem;">
-                                ${context.icon} ${context.label} Content
-                            </h2>
-                            <p style="color: #ccc; margin: 5px 0 0 0;">
-                                "${data.keyword}" | ${data.intent === 'commercial' ? 'Verkaufsorientiert' : 'Informativ'}
-                            </p>
-                        </div>
-                        
-                        <div style="background: #1a1a1a; padding: 30px; border-radius: 15px;">
-                            <h1 style="color: ${context.color}; font-size: 2rem; margin-bottom: 20px;">
-                                ${data.h1 || 'H1 nicht verfügbar'}
-                            </h1>
-                            
-                            <p style="font-size: 1.1rem; color: #e9e9e9; margin-bottom: 30px;">
-                                ${data.hero_text || 'Hero-Text nicht verfügbar'}
-                            </p>
-                            
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 30px;">
-                                <div style="padding: 20px; background: rgba(255,255,255,0.05); border-radius: 10px;">
-                                    <h3 style="color: #28a745; margin-bottom: 15px;">Vorteile</h3>
-                                    <div style="color: #ccc;">${data.benefits_list || '<ul><li>Keine Daten</li></ul>'}</div>
-                                </div>
-                                <div style="padding: 20px; background: rgba(255,255,255,0.05); border-radius: 10px;">
-                                    <h3 style="color: #17a2b8; margin-bottom: 15px;">Features</h3>
-                                    <div style="color: #ccc;">${data.features_list || '<ul><li>Keine Daten</li></ul>'}</div>
-                                </div>
+                if (data && !data.error && previewContentArea) {
+                    const context = data._context || analyzeKeywordContext(data.keyword);
+                    
+                    previewContentArea.innerHTML = `
+                        <div style="color: #f0f0f0; line-height: 1.6;">
+                            <div style="
+                                background: linear-gradient(135deg, ${context.color}20 0%, ${context.color}10 100%); 
+                                border: 1px solid ${context.color}; 
+                                border-radius: 12px; 
+                                padding: 20px; 
+                                margin-bottom: 30px; 
+                                text-align: center;
+                            ">
+                                <h2 style="color: ${context.color}; margin: 0; font-size: 1.5rem;">
+                                    ${context.icon} ${context.label} Content
+                                </h2>
+                                <p style="color: #ccc; margin: 5px 0 0 0;">
+                                    "${data.keyword}" | ${data.intent === 'commercial' ? 'Verkaufsorientiert' : 'Informativ'}
+                                </p>
                             </div>
                             
-                            ${data.faq_1 ? `
-                            <div style="margin-top: 30px;">
-                                <h3 style="color: #ffc107; margin-bottom: 20px;">Häufige Fragen</h3>
-                                <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; margin-bottom: 10px;">
-                                    <strong style="color: #28a745;">${data.faq_1}</strong>
-                                    <p style="color: #ccc; margin: 8px 0 0 0;">${data.faq_answer_1 || 'Antwort nicht verfügbar'}</p>
+                            <div style="background: #1a1a1a; padding: 30px; border-radius: 15px;">
+                                <h1 style="color: ${context.color}; font-size: 2rem; margin-bottom: 20px;">
+                                    ${data.h1 || 'H1 nicht verfügbar'}
+                                </h1>
+                                
+                                <p style="font-size: 1.1rem; color: #e9e9e9; margin-bottom: 30px;">
+                                    ${data.hero_text || 'Hero-Text nicht verfügbar'}
+                                </p>
+                                
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 30px;">
+                                    <div style="padding: 20px; background: rgba(255,255,255,0.05); border-radius: 10px;">
+                                        <h3 style="color: #28a745; margin-bottom: 15px;">Vorteile</h3>
+                                        <div style="color: #ccc;">${data.benefits_list || '<ul><li>Keine Daten</li></ul>'}</div>
+                                    </div>
+                                    <div style="padding: 20px; background: rgba(255,255,255,0.05); border-radius: 10px;">
+                                        <h3 style="color: #17a2b8; margin-bottom: 15px;">Features</h3>
+                                        <div style="color: #ccc;">${data.features_list || '<ul><li>Keine Daten</li></ul>'}</div>
+                                    </div>
                                 </div>
-                                ${data.faq_2 ? `
-                                <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; margin-bottom: 10px;">
-                                    <strong style="color: #17a2b8;">${data.faq_2}</strong>
-                                    <p style="color: #ccc; margin: 8px 0 0 0;">${data.faq_answer_2 || 'Antwort nicht verfügbar'}</p>
-                                </div>
-                                ` : ''}
-                                ${data.faq_3 ? `
-                                <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px;">
-                                    <strong style="color: #ffc107;">${data.faq_3}</strong>
-                                    <p style="color: #ccc; margin: 8px 0 0 0;">${data.faq_answer_3 || 'Antwort nicht verfügbar'}</p>
+                                
+                                ${data.faq_1 ? `
+                                <div style="margin-top: 30px;">
+                                    <h3 style="color: #ffc107; margin-bottom: 20px;">Häufige Fragen</h3>
+                                    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; margin-bottom: 10px;">
+                                        <strong style="color: #28a745;">${data.faq_1}</strong>
+                                        <p style="color: #ccc; margin: 8px 0 0 0;">${data.faq_answer_1 || 'Antwort nicht verfügbar'}</p>
+                                    </div>
+                                    ${data.faq_2 ? `
+                                    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; margin-bottom: 10px;">
+                                        <strong style="color: #17a2b8;">${data.faq_2}</strong>
+                                        <p style="color: #ccc; margin: 8px 0 0 0;">${data.faq_answer_2 || 'Antwort nicht verfügbar'}</p>
+                                    </div>
+                                    ` : ''}
+                                    ${data.faq_3 ? `
+                                    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px;">
+                                        <strong style="color: #ffc107;">${data.faq_3}</strong>
+                                        <p style="color: #ccc; margin: 8px 0 0 0;">${data.faq_answer_3 || 'Antwort nicht verfügbar'}</p>
+                                    </div>
+                                    ` : ''}
                                 </div>
                                 ` : ''}
                             </div>
-                            ` : ''}
                         </div>
-                    </div>
-                `;
-                
-                openPreviewModal();
+                    `;
+                    
+                    openPreviewModal();
+                }
             }
-        }
-    });
+        });
+    }
 
     // CSV Download Button (falls vorhanden)
     if (downloadCsvButton) {
@@ -1033,5 +1121,21 @@ export function initSilasForm() {
     showDemoStatus();
     createMasterPasswordUI();
 
-    console.log('Silas Form mit Kontext-System initialisiert');
+    // Debug-Ausgabe
+    console.log('Silas Form initialisiert');
+    console.log('Start Button gefunden:', !!startGenerationBtn);
+    console.log('Keyword Input gefunden:', !!keywordInput);
+    console.log('Keyword List Length:', keywordList.length);
+
+    // Teste Button-Funktionalität
+    if (startGenerationBtn) {
+        console.log('Event Listener für Start Button wurde hinzugefügt');
+    } else {
+        console.error('FEHLER: start-generation-btn Element nicht gefunden!');
+        // Alternative Button-Suche
+        const alternativeBtn = document.querySelector('[id*="start"]') || document.querySelector('[class*="start"]');
+        if (alternativeBtn) {
+            console.log('Alternativer Button gefunden:', alternativeBtn);
+        }
+    }
 }
