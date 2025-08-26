@@ -1,6 +1,7 @@
 // api/generate.js - STABILE VERSION OHNE CRASHS
 
 const { GoogleGenerativeAI } = require("@google/generative-ai");
+const { analyzeKeywordContext, buildBetterPrompt } = require('./utils');
 
 // Handler-Funktion, die von Vercel aufgerufen wird
 module.exports = async (req, res) => {
@@ -26,7 +27,7 @@ module.exports = async (req, res) => {
     console.log('🔑 Headers:', req.headers);
 
     // === BASIC VALIDATION ===
-    const { prompt, keyword } = req.body;
+const { prompt, keyword, intent = 'informational' } = req.body;
     
     if (!prompt || !keyword) {
       console.log('❌ Fehlende Daten');
@@ -120,6 +121,7 @@ module.exports = async (req, res) => {
       });
     }
 
+const USE_ENHANCED = process.env.SILAS_ENHANCED === 'true';
     // === COMPREHENSIVE PROMPT ===
     const comprehensivePrompt = `
 Du bist ein erstklassiger SEO-Content-Strategist. Erstelle vollständigen Landingpage-Content für das Thema "${keyword}".
