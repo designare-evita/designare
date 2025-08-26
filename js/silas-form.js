@@ -1042,15 +1042,27 @@ export function initSilasForm() {
                 if (data && !data.error && previewContentArea) {
                     const context = data._context || analyzeKeywordContext(data.keyword);
                     
+                    // Modal-Inhalt mit verbesserter Darstellung und Scroll-Funktionalität
                     previewContentArea.innerHTML = `
-                        <div style="color: #f0f0f0; line-height: 1.6;">
+                        <div style="
+                            color: #f0f0f0; 
+                            line-height: 1.6; 
+                            max-height: 80vh; 
+                            overflow-y: auto; 
+                            padding-right: 10px;
+                            scrollbar-width: thin;
+                            scrollbar-color: ${context.color} transparent;
+                        ">
                             <div style="
                                 background: linear-gradient(135deg, ${context.color}20 0%, ${context.color}10 100%); 
                                 border: 1px solid ${context.color}; 
                                 border-radius: 12px; 
                                 padding: 20px; 
-                                margin-bottom: 30px; 
+                                margin-bottom: 25px; 
                                 text-align: center;
+                                position: sticky;
+                                top: 0;
+                                z-index: 1;
                             ">
                                 <h2 style="color: ${context.color}; margin: 0; font-size: 1.5rem;">
                                     ${context.icon} ${context.label} Content
@@ -1060,47 +1072,200 @@ export function initSilasForm() {
                                 </p>
                             </div>
                             
-                            <div style="background: #1a1a1a; padding: 30px; border-radius: 15px;">
-                                <h1 style="color: ${context.color}; font-size: 2rem; margin-bottom: 20px;">
+                            <!-- SEO Grundlagen -->
+                            <div style="background: #1a1a1a; padding: 25px; border-radius: 12px; margin-bottom: 20px;">
+                                <h3 style="color: #ffc107; margin-bottom: 15px; border-bottom: 2px solid #ffc107; padding-bottom: 8px;">
+                                    SEO Grundlagen
+                                </h3>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                                    <div>
+                                        <strong style="color: #28a745;">Post Titel:</strong>
+                                        <p style="color: #e9e9e9; margin: 5px 0; font-size: 0.95rem;">${data.post_title || 'N/A'}</p>
+                                    </div>
+                                    <div>
+                                        <strong style="color: #28a745;">Meta Titel:</strong>
+                                        <p style="color: #e9e9e9; margin: 5px 0; font-size: 0.95rem;">${data.meta_title || 'N/A'}</p>
+                                    </div>
+                                </div>
+                                <div>
+                                    <strong style="color: #17a2b8;">Meta Beschreibung:</strong>
+                                    <p style="color: #e9e9e9; margin: 5px 0; font-size: 0.95rem;">${data.meta_description || 'N/A'}</p>
+                                </div>
+                            </div>
+
+                            <!-- Hauptcontent -->
+                            <div style="background: #1a1a1a; padding: 25px; border-radius: 12px; margin-bottom: 20px;">
+                                <h3 style="color: #ffc107; margin-bottom: 15px; border-bottom: 2px solid #ffc107; padding-bottom: 8px;">
+                                    Hauptcontent
+                                </h3>
+                                <h1 style="color: ${context.color}; font-size: 1.8rem; margin-bottom: 15px;">
                                     ${data.h1 || 'H1 nicht verfügbar'}
                                 </h1>
                                 
-                                <p style="font-size: 1.1rem; color: #e9e9e9; margin-bottom: 30px;">
-                                    ${data.hero_text || 'Hero-Text nicht verfügbar'}
-                                </p>
-                                
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 30px;">
-                                    <div style="padding: 20px; background: rgba(255,255,255,0.05); border-radius: 10px;">
-                                        <h3 style="color: #28a745; margin-bottom: 15px;">Vorteile</h3>
-                                        <div style="color: #ccc;">${data.benefits_list || '<ul><li>Keine Daten</li></ul>'}</div>
-                                    </div>
-                                    <div style="padding: 20px; background: rgba(255,255,255,0.05); border-radius: 10px;">
-                                        <h3 style="color: #17a2b8; margin-bottom: 15px;">Features</h3>
-                                        <div style="color: #ccc;">${data.features_list || '<ul><li>Keine Daten</li></ul>'}</div>
-                                    </div>
+                                <div style="margin-bottom: 20px;">
+                                    <strong style="color: #28a745;">Hero Text:</strong>
+                                    <p style="font-size: 1rem; color: #e9e9e9; margin: 8px 0;">${data.hero_text || 'N/A'}</p>
                                 </div>
                                 
-                                ${data.faq_1 ? `
-                                <div style="margin-top: 30px;">
-                                    <h3 style="color: #ffc107; margin-bottom: 20px;">Häufige Fragen</h3>
-                                    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; margin-bottom: 10px;">
-                                        <strong style="color: #28a745;">${data.faq_1}</strong>
-                                        <p style="color: #ccc; margin: 8px 0 0 0;">${data.faq_answer_1 || 'Antwort nicht verfügbar'}</p>
+                                <div style="margin-bottom: 20px;">
+                                    <strong style="color: #17a2b8;">Hero Subtext:</strong>
+                                    <p style="color: #ccc; margin: 8px 0;">${data.hero_subtext || 'N/A'}</p>
+                                </div>
+
+                                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; margin: 20px 0;">
+                                    <div style="background: rgba(40,167,69,0.1); padding: 10px; border-radius: 6px; text-align: center;">
+                                        <small style="color: #28a745;">H2-1</small>
+                                        <p style="color: #ccc; font-size: 0.8rem; margin: 5px 0 0 0;">${data.h2_1 || 'N/A'}</p>
                                     </div>
-                                    ${data.faq_2 ? `
-                                    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; margin-bottom: 10px;">
-                                        <strong style="color: #17a2b8;">${data.faq_2}</strong>
-                                        <p style="color: #ccc; margin: 8px 0 0 0;">${data.faq_answer_2 || 'Antwort nicht verfügbar'}</p>
+                                    <div style="background: rgba(23,162,184,0.1); padding: 10px; border-radius: 6px; text-align: center;">
+                                        <small style="color: #17a2b8;">H2-2</small>
+                                        <p style="color: #ccc; font-size: 0.8rem; margin: 5px 0 0 0;">${data.h2_2 || 'N/A'}</p>
                                     </div>
-                                    ` : ''}
-                                    ${data.faq_3 ? `
-                                    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px;">
-                                        <strong style="color: #ffc107;">${data.faq_3}</strong>
-                                        <p style="color: #ccc; margin: 8px 0 0 0;">${data.faq_answer_3 || 'Antwort nicht verfügbar'}</p>
+                                    <div style="background: rgba(255,193,7,0.1); padding: 10px; border-radius: 6px; text-align: center;">
+                                        <small style="color: #ffc107;">H2-3</small>
+                                        <p style="color: #ccc; font-size: 0.8rem; margin: 5px 0 0 0;">${data.h2_3 || 'N/A'}</p>
                                     </div>
-                                    ` : ''}
+                                    <div style="background: rgba(255,107,107,0.1); padding: 10px; border-radius: 6px; text-align: center;">
+                                        <small style="color: #ff6b6b;">H2-4</small>
+                                        <p style="color: #ccc; font-size: 0.8rem; margin: 5px 0 0 0;">${data.h2_4 || 'N/A'}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Vorteile & Features -->
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                                <div style="background: #1a1a1a; padding: 20px; border-radius: 10px;">
+                                    <h3 style="color: #28a745; margin-bottom: 15px; border-bottom: 2px solid #28a745; padding-bottom: 8px;">Vorteile</h3>
+                                    <div style="color: #ccc; font-size: 0.9rem;">${data.benefits_list || '<ul><li>Keine Daten</li></ul>'}</div>
+                                </div>
+                                <div style="background: #1a1a1a; padding: 20px; border-radius: 10px;">
+                                    <h3 style="color: #17a2b8; margin-bottom: 15px; border-bottom: 2px solid #17a2b8; padding-bottom: 8px;">Features</h3>
+                                    <div style="color: #ccc; font-size: 0.9rem;">${data.features_list || '<ul><li>Keine Daten</li></ul>'}</div>
+                                </div>
+                            </div>
+
+                            <!-- CTAs -->
+                            <div style="background: #1a1a1a; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                                <h3 style="color: #ffc107; margin-bottom: 15px; border-bottom: 2px solid #ffc107; padding-bottom: 8px;">
+                                    Call-to-Actions
+                                </h3>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                    <div>
+                                        <strong style="color: #28a745;">Primary CTA:</strong>
+                                        <p style="color: #e9e9e9; margin: 5px 0; font-size: 0.95rem;">${data.primary_cta || 'N/A'}</p>
+                                    </div>
+                                    <div>
+                                        <strong style="color: #17a2b8;">Secondary CTA:</strong>
+                                        <p style="color: #e9e9e9; margin: 5px 0; font-size: 0.95rem;">${data.secondary_cta || 'N/A'}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Social Proof & Testimonials -->
+                            <div style="background: #1a1a1a; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                                <h3 style="color: #ff6b6b; margin-bottom: 15px; border-bottom: 2px solid #ff6b6b; padding-bottom: 8px;">
+                                    Social Proof
+                                </h3>
+                                <p style="color: #e9e9e9; margin-bottom: 15px; font-style: italic;">${data.social_proof || 'N/A'}</p>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                    <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 8px;">
+                                        <strong style="color: #28a745;">Testimonial 1:</strong>
+                                        <p style="color: #ccc; margin: 8px 0 0 0; font-size: 0.9rem;">${data.testimonial_1 || 'N/A'}</p>
+                                    </div>
+                                    <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 8px;">
+                                        <strong style="color: #17a2b8;">Testimonial 2:</strong>
+                                        <p style="color: #ccc; margin: 8px 0 0 0; font-size: 0.9rem;">${data.testimonial_2 || 'N/A'}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Preise -->
+                            <div style="background: #1a1a1a; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                                <h3 style="color: #28a745; margin-bottom: 15px; border-bottom: 2px solid #28a745; padding-bottom: 8px;">
+                                    ${data.pricing_title || 'Preise'}
+                                </h3>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+                                    <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 8px; text-align: center;">
+                                        <strong style="color: #17a2b8;">Basic</strong>
+                                        <p style="color: #fff; font-size: 1.2rem; margin: 8px 0;">${data.price_1 || 'N/A'}</p>
+                                    </div>
+                                    <div style="background: rgba(255,193,7,0.1); padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #ffc107;">
+                                        <strong style="color: #ffc107;">Premium</strong>
+                                        <p style="color: #fff; font-size: 1.2rem; margin: 8px 0;">${data.price_2 || 'N/A'}</p>
+                                    </div>
+                                    <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 8px; text-align: center;">
+                                        <strong style="color: #ff6b6b;">Pro</strong>
+                                        <p style="color: #fff; font-size: 1.2rem; margin: 8px 0;">${data.price_3 || 'N/A'}</p>
+                                    </div>
+                                </div>
+                            </div>
+                                
+                            <!-- FAQ Sektion -->
+                            ${data.faq_1 ? `
+                            <div style="background: #1a1a1a; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                                <h3 style="color: #ffc107; margin-bottom: 20px; border-bottom: 2px solid #ffc107; padding-bottom: 8px;">
+                                    Häufige Fragen
+                                </h3>
+                                <div style="background: rgba(40,167,69,0.08); padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 3px solid #28a745;">
+                                    <strong style="color: #28a745; display: block; margin-bottom: 8px;">❓ ${data.faq_1}</strong>
+                                    <p style="color: #e9e9e9; margin: 0; font-size: 0.95rem;">${data.faq_answer_1 || 'Antwort nicht verfügbar'}</p>
+                                </div>
+                                ${data.faq_2 ? `
+                                <div style="background: rgba(23,162,184,0.08); padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 3px solid #17a2b8;">
+                                    <strong style="color: #17a2b8; display: block; margin-bottom: 8px;">❓ ${data.faq_2}</strong>
+                                    <p style="color: #e9e9e9; margin: 0; font-size: 0.95rem;">${data.faq_answer_2 || 'Antwort nicht verfügbar'}</p>
                                 </div>
                                 ` : ''}
+                                ${data.faq_3 ? `
+                                <div style="background: rgba(255,193,7,0.08); padding: 15px; border-radius: 8px; border-left: 3px solid #ffc107;">
+                                    <strong style="color: #ffc107; display: block; margin-bottom: 8px;">❓ ${data.faq_3}</strong>
+                                    <p style="color: #e9e9e9; margin: 0; font-size: 0.95rem;">${data.faq_answer_3 || 'Antwort nicht verfügbar'}</p>
+                                </div>
+                                ` : ''}
+                            </div>
+                            ` : ''}
+
+                            <!-- Footer Informationen -->
+                            <div style="background: #1a1a1a; padding: 20px; border-radius: 10px;">
+                                <h3 style="color: #6c757d; margin-bottom: 15px; border-bottom: 2px solid #6c757d; padding-bottom: 8px;">
+                                    Zusätzliche Informationen
+                                </h3>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                                    <div>
+                                        <strong style="color: #17a2b8;">Kontakt:</strong>
+                                        <p style="color: #ccc; margin: 5px 0; font-size: 0.9rem;">${data.contact_info || 'N/A'}</p>
+                                    </div>
+                                    <div>
+                                        <strong style="color: #28a745;">Footer CTA:</strong>
+                                        <p style="color: #ccc; margin: 5px 0; font-size: 0.9rem;">${data.footer_cta || 'N/A'}</p>
+                                    </div>
+                                </div>
+                                <div style="margin-bottom: 15px;">
+                                    <strong style="color: #ffc107;">Trust Signals:</strong>
+                                    <p style="color: #ccc; margin: 5px 0; font-size: 0.9rem;">${data.trust_signals || 'N/A'}</p>
+                                </div>
+                                <div>
+                                    <strong style="color: #ff6b6b;">Garantie:</strong>
+                                    <p style="color: #ccc; margin: 5px 0; font-size: 0.9rem;">${data.guarantee_text || 'N/A'}</p>
+                                </div>
+                            </div>
+
+                            <!-- Vollständige Datenansicht (Aufklappbar) -->
+                            <div style="margin-top: 25px;">
+                                <button onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none'; this.textContent = this.textContent === '📋 Alle Daten anzeigen' ? '📋 Alle Daten ausblenden' : '📋 Alle Daten anzeigen';" 
+                                        style="
+                                            background: #6c757d; 
+                                            color: white; 
+                                            border: none; 
+                                            padding: 10px 20px; 
+                                            border-radius: 6px; 
+                                            cursor: pointer; 
+                                            width: 100%;
+                                            font-size: 0.9rem;
+                                        ">📋 Alle Daten anzeigen</button>
+                                <div style="display: none; background: #0d1117; padding: 20px; border-radius: 8px; margin-top: 10px; max-height: 300px; overflow-y: auto;">
+                                    <pre style="color: #ccc; font-size: 0.8rem; white-space: pre-wrap; margin: 0;">${JSON.stringify(data, null, 2)}</pre>
+                                </div>
                             </div>
                         </div>
                     `;
