@@ -1013,12 +1013,62 @@ export function initSilasForm() {
     const openPreviewModal = function() {
         if (previewModal) {
             previewModal.classList.add('visible');
+            
+            // Stelle sicher, dass das Modal korrekt dimensioniert ist
+            previewModal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.85);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 3000;
+                visibility: visible;
+                opacity: 1;
+                transition: opacity 0.3s ease, visibility 0.3s ease;
+            `;
+            
+            // Modal-Content korrekt stylen
+            const modalContent = previewModal.querySelector('.modal-content') || 
+                               previewModal.querySelector('[class*="content"]') || 
+                               previewModal.firstElementChild;
+            
+            if (modalContent) {
+                modalContent.style.cssText = `
+                    background: var(--bg-color, #1a1a1a);
+                    border-radius: 12px;
+                    position: relative;
+                    width: 95%;
+                    max-width: 1400px;
+                    max-height: 95vh;
+                    overflow: hidden;
+                    transform: scale(1);
+                    transition: transform 0.3s ease;
+                    display: flex;
+                    flex-direction: column;
+                `;
+            }
+            
+            // Preview Content Area korrekt stylen
+            if (previewContentArea) {
+                previewContentArea.style.cssText = `
+                    padding: 20px;
+                    overflow-y: auto;
+                    max-height: calc(95vh - 100px);
+                    flex: 1;
+                `;
+            }
         }
     };
     
     const closePreviewModal = function() {
         if (previewModal) {
             previewModal.classList.remove('visible');
+            previewModal.style.visibility = 'hidden';
+            previewModal.style.opacity = '0';
         }
     };
 
