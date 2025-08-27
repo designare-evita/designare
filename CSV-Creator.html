@@ -79,7 +79,13 @@
     <div class="ai-container">
         <h2 style="text-align: center;">SEO-Texte <span style="color: #ffffff;">direkt in deine CSV</span></h2>
         <p>Gib deine Keywords vor und ergänze optional weitere Details, um die Textqualität zu maximieren. Silas zaubert dir passenden Content – direkt als CSV zum Download.</p>
-
+ <div class="input-group">
+            <label for="text-intent-select">Text-Typ:</label>
+            <select id="text-intent-select" class="custom-select">
+                <option value="informational">Informationsorientiert</option>
+                <option value="commercial">Kommerziell</option>
+            </select>
+        </div>
         <div class="silas-input-container">
             <input type="text" id="text-zielgruppe-input" class="silas-extra-input" placeholder="Zielgruppe (optional): z.B. Anfänger, Experten, Familien" autocomplete="off">
         </div>
@@ -90,14 +96,6 @@
 
         <div class="silas-input-container">
             <input type="text" id="text-usp-input" class="silas-extra-input" placeholder="Alleinstellungsmerkmal (USP) (optional): z.B. 24/7-Support" autocomplete="off">
-        </div>
-        
-        <div class="input-group">
-            <label for="text-intent-select">Text-Typ:</label>
-            <select id="text-intent-select" class="custom-select">
-                <option value="informational">Informationsorientiert</option>
-                <option value="commercial">Kommerziell</option>
-            </select>
         </div>
                  
         <form id="silas-form">
