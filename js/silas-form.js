@@ -226,15 +226,35 @@ export function initSilasForm() {
     }
 
     function updateKeywordDisplay() {
-        keywordDisplayList.innerHTML = '';
+      keywordDisplayList.innerHTML = '';
         keywordList.forEach((item, index) => {
             const listItem = document.createElement('li');
-            const intentBadge = `<span style="background-color: ${item.intent === 'commercial' ? '#28a745' : '#17a2b8'}; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; margin-top: 8px; display: inline-block;">${item.intent === 'commercial' ? 'Kommerziell' : 'Informativ'}</span>`;
-            const keywordSpan = `<span style="font-weight: 500; color: #fff; word-break: break-word; line-height: 1.4;">${item.keyword}</span>`;
-            const contentDiv = `<div style="display: flex; flex-direction: column; flex-grow: 1; gap: 5px; min-width: 0;">${keywordSpan}${intentBadge}</div>`;
-            const removeBtn = `<button data-index="${index}" class="remove-btn" style="background-color: #ff6b6b; color: white; border: none; border-radius: 6px; min-width: 36px; height: 36px; cursor: pointer; font-size: 18px; font-weight: bold; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-left: 10px;">×</button>`;
             listItem.style.cssText = `background-color: rgba(255, 255, 255, 0.05); margin-bottom: 12px; padding: 15px; border-radius: 8px; display: flex; align-items: flex-start; justify-content: space-between; font-size: 0.95rem; color: #fff; border-left: 4px solid ${item.intent === 'commercial' ? '#28a745' : '#17a2b8'}; min-height: 50px; gap: 10px;`;
-            listItem.innerHTML = contentDiv + removeBtn;
+            
+            // Dieser Container sorgt dafür, dass Keyword und Badge korrekt angeordnet sind
+            const contentDiv = document.createElement('div');
+            contentDiv.style.cssText = 'display: flex; flex-direction: column; flex-grow: 1; gap: 5px; min-width: 0;';
+
+            const keywordSpan = document.createElement('span');
+            keywordSpan.textContent = item.keyword;
+            keywordSpan.style.cssText = 'font-weight: 500; color: #fff; word-break: break-word; line-height: 1.4;';
+
+            const intentBadge = document.createElement('span');
+            intentBadge.textContent = item.intent === 'commercial' ? 'Kommerziell' : 'Informativ';
+            // Wichtig: display: inline-block, damit es nicht die ganze Breite einnimmt
+            intentBadge.style.cssText = `background-color: ${item.intent === 'commercial' ? '#28a745' : '#17a2b8'}; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; margin-top: 8px; display: inline-block;`;
+
+            contentDiv.appendChild(keywordSpan);
+            contentDiv.appendChild(intentBadge);
+
+            const removeBtn = document.createElement('button');
+            removeBtn.textContent = '×';
+            removeBtn.dataset.index = index;
+            removeBtn.className = 'remove-btn';
+            removeBtn.style.cssText = 'background-color: #ff6b6b; color: white; border: none; border-radius: 6px; min-width: 36px; height: 36px; cursor: pointer; font-size: 18px; font-weight: bold; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-left: 10px;';
+            
+            listItem.appendChild(contentDiv);
+            listItem.appendChild(removeBtn);
             keywordDisplayList.appendChild(listItem);
         });
         clearListBtn.style.display = keywordList.length > 0 ? 'inline-block' : 'none';
@@ -349,6 +369,7 @@ export function initSilasForm() {
         if (e.target.classList.contains('preview-btn')) {
             const index = parseInt(e.target.getAttribute('data-index'));
             const data = allGeneratedData[index];
+            
             if (data && !data.error && previewContentArea) {
                 // Dein vollständiger, detailreicher HTML-Code für die Vorschau
                 let previewHtml = `
@@ -362,7 +383,6 @@ export function initSilasForm() {
                                 <button style="background: transparent; color: #ffc107; border: 2px solid #ffc107; padding: 12px 25px; border-radius: 5px; font-weight: bold; cursor: pointer;">${data.secondary_cta || 'N/A'}</button>
                             </div>
                         </header>
-
                         <main style="max-width: 1000px; margin: 0 auto;">
                             <section style="margin-bottom: 40px; padding: 25px; background-color: rgba(255,255,255,0.05); border-radius: 8px; border-left: 4px solid #ff6b6b;"><h2 style="color: #ff6b6b; margin-bottom: 15px; font-size: 1.8rem;">${data.h2_1 || 'N/A'}</h2></section>
                             <section style="margin-bottom: 40px; padding: 25px; background-color: rgba(255,255,255,0.05); border-radius: 8px; border-left: 4px solid #28a745;"><h2 style="color: #28a745; margin-bottom: 15px; font-size: 1.8rem;">${data.h2_2 || 'N/A'}</h2></section>
@@ -370,10 +390,10 @@ export function initSilasForm() {
                             <section style="margin-bottom: 40px; padding: 25px; background-color: rgba(255,255,255,0.05); border-radius: 8px; border-left: 4px solid #17a2b8;"><h2 style="color: #17a2b8; margin-bottom: 15px; font-size: 1.8rem;">${data.h2_4 || 'Vertrauen & Qualität'}</h2><p style="color: #ffc107; font-weight: bold; text-align: center; margin-bottom: 20px;">${data.social_proof || ''}</p><p style="color: #aaa; text-align: center;">${data.trust_signals || ''}</p></section>
                             <section style="margin-bottom: 40px;"><h3 style="color: #ffc107; text-align: center; margin-bottom: 25px; font-size: 1.8rem;">Kundenstimmen</h3><div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;"><div style="padding: 20px; background-color: rgba(255,193,7,0.1); border-radius: 8px; border-left: 4px solid #ffc107;"><p style="color: #ccc; font-style: italic; margin-bottom: 10px;">${data.testimonial_1 || ''}</p></div><div style="padding: 20px; background-color: rgba(255,193,7,0.1); border-radius: 8px; border-left: 4px solid #ffc107;"><p style="color: #ccc; font-style: italic; margin-bottom: 10px;">${data.testimonial_2 || ''}</p></div></div></section>
                             <section style="margin-bottom: 40px;"><h3 style="color: #ffc107; text-align: center; margin-bottom: 25px; font-size: 1.8rem;">${data.pricing_title || 'Unsere Pakete'}</h3><div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;"><div style="padding: 20px; background-color: rgba(255,255,255,0.05); border-radius: 8px; text-align: center;"><h4 style="color: #ffc107; margin-bottom: 10px;">Starter</h4><p style="color: #ccc; font-size: 0.9rem;">${data.price_1 || ''}</p></div><div style="padding: 20px; background-color: rgba(255,193,7,0.1); border: 2px solid #ffc107; border-radius: 8px; text-align: center;"><h4 style="color: #ffc107; margin-bottom: 10px;">Professional</h4><p style="color: #ccc; font-size: 0.9rem;">${data.price_2 || ''}</p></div><div style="padding: 20px; background-color: rgba(255,255,255,0.05); border-radius: 8px; text-align: center;"><h4 style="color: #ffc107; margin-bottom: 10px;">Enterprise</h4><p style="color: #ccc; font-size: 0.9rem;">${data.price_3 || ''}</p></div></div></section>
-                            <section style="margin-bottom: 40px;"><h3 style="color: #ffc107; text-align: center; margin-bottom: 25px; font-size: 1.8rem;">Häufige Fragen</h3><div><details style="..."><summary style="...">${data.faq_1 || 'N/A'}</summary><p style="...">${data.faq_answer_1 || ''}</p></details><details style="..."><summary style="...">${data.faq_2 || 'N/A'}</summary><p style="...">${data.faq_answer_2 || ''}</p></details><details style="..."><summary style="...">${data.faq_3 || 'N/A'}</summary><p style="...">${data.faq_answer_3 || ''}</p></details></div></section>
+                            <section style="margin-bottom: 40px;"><h3 style="color: #ffc107; text-align: center; margin-bottom: 25px; font-size: 1.8rem;">Häufige Fragen</h3><div><details style="background-color: rgba(255,255,255,0.05); border-radius: 8px; padding: 15px; margin-bottom: 15px;"><summary style="color: #ffc107; font-weight: bold; cursor: pointer; margin-bottom: 10px;">${data.faq_1 || 'N/A'}</summary><p style="color: #ccc; margin-top: 10px;">${data.faq_answer_1 || ''}</p></details><details style="background-color: rgba(255,255,255,0.05); border-radius: 8px; padding: 15px; margin-bottom: 15px;"><summary style="color: #ffc107; font-weight: bold; cursor: pointer; margin-bottom: 10px;">${data.faq_2 || 'N/A'}</summary><p style="color: #ccc; margin-top: 10px;">${data.faq_answer_2 || ''}</p></details><details style="background-color: rgba(255,255,255,0.05); border-radius: 8px; padding: 15px; margin-bottom: 15px;"><summary style="color: #ffc107; font-weight: bold; cursor: pointer; margin-bottom: 10px;">${data.faq_3 || 'N/A'}</summary><p style="color: #ccc; margin-top: 10px;">${data.faq_answer_3 || ''}</p></details></div></section>
                             <section style="text-align: center; padding: 30px; background: linear-gradient(45deg, rgba(255,193,7,0.1), rgba(255,193,7,0.2)); border-radius: 10px; border: 2px solid #ffc107;"><h3 style="color: #ffc107; margin-bottom: 15px;">${data.guarantee_text || 'N/A'}</h3><p style="color: #ccc; margin-bottom: 25px;">${data.contact_info || ''}</p><button style="background: #ffc107; color: #1a1a1a; border: none; padding: 15px 30px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 1.1rem;">${data.footer_cta || 'N/A'}</button></section>
                         </main>
-                        <aside style="margin-top: 50px; padding: 25px; background: ...; border-radius: 12px; border: 2px solid #444;"><h3 style="color: #ffc107; ...">📊 SEO & Meta-Informationen</h3><div style="..."><div style="..."><strong style="...">🎯 SEO Titel:</strong><span style="...">${data.meta_title || data.post_title || 'N/A'}</span></div></div>...</aside>
+                        <aside style="margin-top: 50px; padding: 25px; background: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(45,45,45,0.7) 100%); border-radius: 12px; border: 2px solid #444;"><h3 style="color: #ffc107; margin: 0 0 25px 0; text-align: center; font-size: 1.5rem; border-bottom: 2px solid #ffc107; padding-bottom: 10px;">📊 SEO & Meta-Informationen</h3><div style="display: flex; flex-direction: column; gap: 20px; max-width: 100%;"><div style="padding: 15px; background: linear-gradient(90deg, rgba(40,167,69,0.1) 0%, rgba(40,167,69,0.05) 100%); border-radius: 8px; border-left: 4px solid #28a745;"><div style="display: flex; flex-direction: column; gap: 8px;"><strong style="color: #28a745; font-size: 1rem;">🎯 SEO Titel:</strong><span style="color: #e9e9e9; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word;">${data.meta_title || data.post_title || 'N/A'}</span></div></div><div style="padding: 15px; background: linear-gradient(90deg, rgba(23,162,184,0.1) 0%, rgba(23,162,184,0.05) 100%); border-radius: 8px; border-left: 4px solid #17a2b8;"><div style="display: flex; flex-direction: column; gap: 8px;"><strong style="color: #17a2b8; font-size: 1rem;">🔗 URL Slug:</strong><span style="color: #e9e9e9; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word; font-family: monospace; background-color: rgba(0,0,0,0.3); padding: 5px 8px; border-radius: 4px;">${data.post_name || 'n-a'}</span></div></div><div style="padding: 15px; background: linear-gradient(90deg, rgba(255,193,7,0.1) 0%, rgba(255,193,7,0.05) 100%); border-radius: 8px; border-left: 4px solid #ffc107;"><div style="display: flex; flex-direction: column; gap: 8px;"><strong style="color: #ffc107; font-size: 1rem;">📝 Meta Description:</strong><span style="color: #e9e9e9; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word;">${data.meta_description || 'N/A'}</span></div></div></div></aside>
                     </div>
                 `;
                 previewContentArea.innerHTML = previewHtml;
