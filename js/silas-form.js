@@ -256,7 +256,7 @@ export function initSilasForm() {
         keywordDisplayList.innerHTML = '';
         keywordList.forEach(function(item, index) {
             const listItem = document.createElement('li');
-            listItem.style.cssText = `background-color: rgba(255, 255, 255, 0.05); margin-bottom: 12px; padding: 15px; border-radius: 8px; display: flex; align-items: flex-start; justify-content: space-between; font-size: 0.95rem; color: #fff; border-left: 4px solid ${item.intent === 'commercial' ? '#28a745' : '#17a2b8'}; min-height: 50px; gap: 10px;`;
+            listItem.style.cssText = `background-color: rgba(255, 255, 255, 0.05); margin-bottom: 12px; padding: 15px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; font-size: 0.95rem; color: #fff; border-left: 4px solid ${item.intent === 'commercial' ? '#28a745' : '#17a2b8'}; min-height: 50px; gap: 10px;`;
             
             const contentDiv = document.createElement('div');
             contentDiv.style.cssText = 'display: flex; flex-direction: row; flex-grow: 1; gap: 8px; min-width: 0; align-items: flex-start;';
