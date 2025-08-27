@@ -389,139 +389,43 @@ export function initSilasForm() {
         container.appendChild(resultCard);
     }
 
-    function openPreviewModal() { 
-    if (previewModal) {
-        previewModal.classList.add('visible'); 
-        // Zusätzlicher Fix: Stelle sicher dass Body-Scroll gestoppt wird
-        document.body.style.overflow = 'hidden';
-    }
-}
+    function openPreviewModal() { if (previewModal) previewModal.classList.add('visible'); }
+    function closePreviewModal() { if (previewModal) previewModal.classList.remove('visible'); }
 
-function closePreviewModal() { 
-    if (previewModal) {
-        previewModal.classList.remove('visible');
-        // Body-Scroll wieder aktivieren
-        document.body.style.overflow = '';
-    }
-}
-
- silasResponseContainer.addEventListener('click', function(e) {
-    if (e.target.classList.contains('preview-btn')) {
-        const index = parseInt(e.target.getAttribute('data-index'));
-        const data = allGeneratedData[index];
-        
-        if (data && !data.error && previewContentArea) {
-            // Strukturiertere und besser formatierte Vorschau
-            let previewHtml = `
-                <div class="preview-container" style="padding: 20px;">
-                    <h2 style="color: #ffc107; margin-bottom: 30px; text-align: center; font-size: 1.8rem;">
-                        Vorschau: ${data.keyword}
-                    </h2>
-                    
-                    <!-- Hauptinhalt -->
-                    <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                        <h3 style="color: #ffc107; margin-bottom: 15px;">📝 Haupttitel & Hero-Bereich</h3>
-                        <div style="padding-left: 20px;">
-                            <p><strong>H1:</strong> ${data.h1 || 'N/A'}</p>
-                            <p><strong>Hero-Text:</strong> ${data.hero_text || 'N/A'}</p>
-                            <p><strong>Hero-Subtext:</strong> ${data.hero_subtext || 'N/A'}</p>
-                            <p><strong>Primärer CTA:</strong> ${data.primary_cta || 'N/A'}</p>
-                            <p><strong>Sekundärer CTA:</strong> ${data.secondary_cta || 'N/A'}</p>
-                        </div>
+    silasResponseContainer.addEventListener('click', function(e) {
+        if (e.target.classList.contains('preview-btn')) {
+            const index = parseInt(e.target.getAttribute('data-index'));
+            const data = allGeneratedData[index];
+            if (data && !data.error && previewContentArea) {
+                let previewHtml = `
+                    <div class="preview-landingpage" style="color: #f0f0f0; line-height: 1.6; background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); padding: 20px; border-radius: 10px;">
+                        <header style="text-align: center; margin-bottom: 40px; padding: 30px 0; border-bottom: 2px solid #ffc107;">
+                            <h1 style="color: #ffc107; font-size: 2.5rem; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">${data.h1 || 'N/A'}</h1>
+                            <p style="font-size: 1.2rem; color: #ccc; margin-bottom: 15px; max-width: 800px; margin-left: auto; margin-right: auto;">${data.hero_text || 'N/A'}</p>
+                            <p style="font-size: 1rem; color: #aaa; margin-bottom: 25px;">${data.hero_subtext || ''}</p>
+                            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                                <button style="background: #ffc107; color: #1a1a1a; border: none; padding: 12px 25px; border-radius: 5px; font-weight: bold; cursor: pointer;">${data.primary_cta || 'N/A'}</button>
+                                <button style="background: transparent; color: #ffc107; border: 2px solid #ffc107; padding: 12px 25px; border-radius: 5px; font-weight: bold; cursor: pointer;">${data.secondary_cta || 'N/A'}</button>
+                            </div>
+                        </header>
+                        <main style="max-width: 1000px; margin: 0 auto;">
+                            <section style="margin-bottom: 40px; padding: 25px; background-color: rgba(255,255,255,0.05); border-radius: 8px; border-left: 4px solid #ff6b6b;"><h2 style="color: #ff6b6b; margin-bottom: 15px; font-size: 1.8rem;">${data.h2_1 || 'N/A'}</h2></section>
+                            <section style="margin-bottom: 40px; padding: 25px; background-color: rgba(255,255,255,0.05); border-radius: 8px; border-left: 4px solid #28a745;"><h2 style="color: #28a745; margin-bottom: 15px; font-size: 1.8rem;">${data.h2_2 || 'N/A'}</h2></section>
+                            <section style="margin-bottom: 40px;"><div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;"><div style="padding: 25px; background-color: rgba(255,255,255,0.05); border-radius: 8px;"><h3 style="color: #ffc107; margin-bottom: 15px; font-size: 1.5rem;">${data.h2_3 || 'Features'}</h3><div style="color: #ccc;">${data.features_list || ''}</div></div><div style="padding: 25px; background-color: rgba(255,255,255,0.05); border-radius: 8px;"><h3 style="color: #ffc107; margin-bottom: 15px; font-size: 1.5rem;">Vorteile</h3><div style="color: #ccc;">${data.benefits_list || ''}</div></div></div></section>
+                            <section style="margin-bottom: 40px; padding: 25px; background-color: rgba(255,255,255,0.05); border-radius: 8px; border-left: 4px solid #17a2b8;"><h2 style="color: #17a2b8; margin-bottom: 15px; font-size: 1.8rem;">${data.h2_4 || 'Vertrauen & Qualität'}</h2><p style="color: #ffc107; font-weight: bold; text-align: center; margin-bottom: 20px;">${data.social_proof || ''}</p><p style="color: #aaa; text-align: center;">${data.trust_signals || ''}</p></section>
+                            <section style="margin-bottom: 40px;"><h3 style="color: #ffc107; text-align: center; margin-bottom: 25px; font-size: 1.8rem;">Kundenstimmen</h3><div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;"><div style="padding: 20px; background-color: rgba(255,193,7,0.1); border-radius: 8px; border-left: 4px solid #ffc107;"><p style="color: #ccc; font-style: italic; margin-bottom: 10px;">${data.testimonial_1 || ''}</p></div><div style="padding: 20px; background-color: rgba(255,193,7,0.1); border-radius: 8px; border-left: 4px solid #ffc107;"><p style="color: #ccc; font-style: italic; margin-bottom: 10px;">${data.testimonial_2 || ''}</p></div></div></section>
+                            <section style="margin-bottom: 40px;"><h3 style="color: #ffc107; text-align: center; margin-bottom: 25px; font-size: 1.8rem;">${data.pricing_title || 'Unsere Pakete'}</h3><div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;"><div style="padding: 20px; background-color: rgba(255,255,255,0.05); border-radius: 8px; text-align: center;"><h4 style="color: #ffc107; margin-bottom: 10px;">Starter</h4><p style="color: #ccc; font-size: 0.9rem;">${data.price_1 || ''}</p></div><div style="padding: 20px; background-color: rgba(255,193,7,0.1); border: 2px solid #ffc107; border-radius: 8px; text-align: center;"><h4 style="color: #ffc107; margin-bottom: 10px;">Professional</h4><p style="color: #ccc; font-size: 0.9rem;">${data.price_2 || ''}</p></div><div style="padding: 20px; background-color: rgba(255,255,255,0.05); border-radius: 8px; text-align: center;"><h4 style="color: #ffc107; margin-bottom: 10px;">Enterprise</h4><p style="color: #ccc; font-size: 0.9rem;">${data.price_3 || ''}</p></div></div></section>
+                            <section style="margin-bottom: 40px;"><h3 style="color: #ffc107; text-align: center; margin-bottom: 25px; font-size: 1.8rem;">Häufige Fragen</h3><div><details style="background-color: rgba(255,255,255,0.05); border-radius: 8px; padding: 15px; margin-bottom: 15px;"><summary style="color: #ffc107; font-weight: bold; cursor: pointer; margin-bottom: 10px;">${data.faq_1 || 'N/A'}</summary><p style="color: #ccc; margin-top: 10px;">${data.faq_answer_1 || ''}</p></details><details style="background-color: rgba(255,255,255,0.05); border-radius: 8px; padding: 15px; margin-bottom: 15px;"><summary style="color: #ffc107; font-weight: bold; cursor: pointer; margin-bottom: 10px;">${data.faq_2 || 'N/A'}</summary><p style="color: #ccc; margin-top: 10px;">${data.faq_answer_2 || ''}</p></details><details style="background-color: rgba(255,255,255,0.05); border-radius: 8px; padding: 15px; margin-bottom: 15px;"><summary style="color: #ffc107; font-weight: bold; cursor: pointer; margin-bottom: 10px;">${data.faq_3 || 'N/A'}</summary><p style="color: #ccc; margin-top: 10px;">${data.faq_answer_3 || ''}</p></details></div></section>
+                            <section style="text-align: center; padding: 30px; background: linear-gradient(45deg, rgba(255,193,7,0.1), rgba(255,193,7,0.2)); border-radius: 10px; border: 2px solid #ffc107;"><h3 style="color: #ffc107; margin-bottom: 15px;">${data.guarantee_text || 'N/A'}</h3><p style="color: #ccc; margin-bottom: 25px;">${data.contact_info || ''}</p><button style="background: #ffc107; color: #1a1a1a; border: none; padding: 15px 30px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 1.1rem;">${data.footer_cta || 'N/A'}</button></section>
+                        </main>
+                        <aside style="margin-top: 50px; padding: 25px; background: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(45,45,45,0.7) 100%); border-radius: 12px; border: 2px solid #444;"><h3 style="color: #ffc107; margin: 0 0 25px 0; text-align: center; font-size: 1.5rem; border-bottom: 2px solid #ffc107; padding-bottom: 10px;">📊 SEO & Meta-Informationen</h3><div style="display: flex; flex-direction: column; gap: 20px; max-width: 100%;"><div style="padding: 15px; background: linear-gradient(90deg, rgba(40,167,69,0.1) 0%, rgba(40,167,69,0.05) 100%); border-radius: 8px; border-left: 4px solid #28a745;"><div style="display: flex; flex-direction: column; gap: 8px;"><strong style="color: #28a745; font-size: 1rem;">🎯 SEO Titel:</strong><span style="color: #e9e9e9; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word;">${data.meta_title || data.post_title || 'N/A'}</span></div></div><div style="padding: 15px; background: linear-gradient(90deg, rgba(23,162,184,0.1) 0%, rgba(23,162,184,0.05) 100%); border-radius: 8px; border-left: 4px solid #17a2b8;"><div style="display: flex; flex-direction: column; gap: 8px;"><strong style="color: #17a2b8; font-size: 1rem;">🔗 URL Slug:</strong><span style="color: #e9e9e9; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word; font-family: monospace; background-color: rgba(0,0,0,0.3); padding: 5px 8px; border-radius: 4px;">${data.post_name || 'n-a'}</span></div></div><div style="padding: 15px; background: linear-gradient(90deg, rgba(255,193,7,0.1) 0%, rgba(255,193,7,0.05) 100%); border-radius: 8px; border-left: 4px solid #ffc107;"><div style="display: flex; flex-direction: column; gap: 8px;"><strong style="color: #ffc107; font-size: 1rem;">📝 Meta Description:</strong><span style="color: #e9e9e9; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word;">${data.meta_description || 'N/A'}</span></div></div></div></aside>
                     </div>
-                    
-                    <!-- Überschriften -->
-                    <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                        <h3 style="color: #ffc107; margin-bottom: 15px;">📌 Hauptüberschriften</h3>
-                        <div style="padding-left: 20px;">
-                            <p><strong>H2 #1:</strong> ${data.h2_1 || 'N/A'}</p>
-                            <p><strong>H2 #2:</strong> ${data.h2_2 || 'N/A'}</p>
-                            <p><strong>H2 #3:</strong> ${data.h2_3 || 'N/A'}</p>
-                            <p><strong>H2 #4:</strong> ${data.h2_4 || 'N/A'}</p>
-                        </div>
-                    </div>
-                    
-                    <!-- Features & Benefits -->
-                    <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                        <h3 style="color: #ffc107; margin-bottom: 15px;">✨ Features & Vorteile</h3>
-                        <div style="padding-left: 20px;">
-                            <p><strong>Features:</strong></p>
-                            <div style="padding-left: 20px; color: #ccc;">${data.features_list || 'N/A'}</div>
-                            <p><strong>Benefits:</strong></p>
-                            <div style="padding-left: 20px; color: #ccc;">${data.benefits_list || 'N/A'}</div>
-                        </div>
-                    </div>
-                    
-                    <!-- Social Proof -->
-                    <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                        <h3 style="color: #ffc107; margin-bottom: 15px;">⭐ Vertrauenselemente</h3>
-                        <div style="padding-left: 20px;">
-                            <p><strong>Social Proof:</strong> ${data.social_proof || 'N/A'}</p>
-                            <p><strong>Trust Signals:</strong> ${data.trust_signals || 'N/A'}</p>
-                            <p><strong>Garantie:</strong> ${data.guarantee_text || 'N/A'}</p>
-                        </div>
-                    </div>
-                    
-                    <!-- Testimonials -->
-                    <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                        <h3 style="color: #ffc107; margin-bottom: 15px;">💬 Kundenstimmen</h3>
-                        <div style="padding-left: 20px;">
-                            <p><strong>Testimonial 1:</strong><br><em>${data.testimonial_1 || 'N/A'}</em></p>
-                            <p><strong>Testimonial 2:</strong><br><em>${data.testimonial_2 || 'N/A'}</em></p>
-                        </div>
-                    </div>
-                    
-                    <!-- Pricing -->
-                    <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                        <h3 style="color: #ffc107; margin-bottom: 15px;">💰 Preise</h3>
-                        <div style="padding-left: 20px;">
-                            <p><strong>Titel:</strong> ${data.pricing_title || 'N/A'}</p>
-                            <p><strong>Preis 1:</strong> ${data.price_1 || 'N/A'}</p>
-                            <p><strong>Preis 2:</strong> ${data.price_2 || 'N/A'}</p>
-                            <p><strong>Preis 3:</strong> ${data.price_3 || 'N/A'}</p>
-                        </div>
-                    </div>
-                    
-                    <!-- FAQ -->
-                    <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                        <h3 style="color: #ffc107; margin-bottom: 15px;">❓ Häufige Fragen</h3>
-                        <div style="padding-left: 20px;">
-                            <p><strong>Frage 1:</strong> ${data.faq_1 || 'N/A'}<br>
-                            <em>Antwort:</em> ${data.faq_answer_1 || 'N/A'}</p>
-                            <p><strong>Frage 2:</strong> ${data.faq_2 || 'N/A'}<br>
-                            <em>Antwort:</em> ${data.faq_answer_2 || 'N/A'}</p>
-                            <p><strong>Frage 3:</strong> ${data.faq_3 || 'N/A'}<br>
-                            <em>Antwort:</em> ${data.faq_answer_3 || 'N/A'}</p>
-                        </div>
-                    </div>
-                    
-                    <!-- Footer & Contact -->
-                    <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                        <h3 style="color: #ffc107; margin-bottom: 15px;">📞 Kontakt & Abschluss</h3>
-                        <div style="padding-left: 20px;">
-                            <p><strong>Kontakt-Info:</strong> ${data.contact_info || 'N/A'}</p>
-                            <p><strong>Footer CTA:</strong> ${data.footer_cta || 'N/A'}</p>
-                        </div>
-                    </div>
-                    
-                    <!-- SEO Meta -->
-                    <div style="background: linear-gradient(135deg, rgba(40,167,69,0.1), rgba(40,167,69,0.2)); padding: 20px; border-radius: 8px; border: 2px solid #28a745;">
-                        <h3 style="color: #28a745; margin-bottom: 15px;">🔍 SEO-Metadaten</h3>
-                        <div style="padding-left: 20px;">
-                            <p><strong>Post Title:</strong> ${data.post_title || 'N/A'}</p>
-                            <p><strong>URL Slug:</strong> <code style="background: rgba(0,0,0,0.3); padding: 2px 5px; border-radius: 3px;">${data.post_name || 'N/A'}</code></p>
-                            <p><strong>Meta Title:</strong> ${data.meta_title || 'N/A'}</p>
-                            <p><strong>Meta Description:</strong> ${data.meta_description || 'N/A'}</p>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            previewContentArea.innerHTML = previewHtml;
-            openPreviewModal();
+                `;
+                previewContentArea.innerHTML = previewHtml;
+                openPreviewModal();
+            }
         }
-    }
-});
+    });
 
     function downloadCsv() {
         if (allGeneratedData.length === 0) {
