@@ -410,7 +410,7 @@ function closePreviewModal() {
     }
 }
 
- silasResponseContainer.addEventListener('click', function(e) {
+ document.addEventListener('click', function(e) { 
     if (e.target.classList.contains('preview-btn')) {
         const index = parseInt(e.target.getAttribute('data-index'));
         const data = allGeneratedData[index];
