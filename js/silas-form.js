@@ -389,8 +389,21 @@ export function initSilasForm() {
         container.appendChild(resultCard);
     }
 
-    function openPreviewModal() { if (previewModal) previewModal.classList.add('visible'); }
-    function closePreviewModal() { if (previewModal) previewModal.classList.remove('visible'); }
+    function openPreviewModal() { 
+    if (previewModal) {
+        previewModal.classList.add('visible'); 
+        // Zusätzlicher Fix: Stelle sicher dass Body-Scroll gestoppt wird
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closePreviewModal() { 
+    if (previewModal) {
+        previewModal.classList.remove('visible');
+        // Body-Scroll wieder aktivieren
+        document.body.style.overflow = '';
+    }
+}
 
  silasResponseContainer.addEventListener('click', function(e) {
     if (e.target.classList.contains('preview-btn')) {
