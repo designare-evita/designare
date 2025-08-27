@@ -103,6 +103,10 @@
     margin-bottom: 1.5rem; /* Abstand zwischen den Feldern */
 }
 
+#silas-form {
+    align-items: stretch; /* Stellt sicher, dass der Button die volle Höhe einnimmt */
+}
+
 /* 2. Hover- & Fokus-Effekt für alle Wrapper */
 #silas-form:hover,
 #silas-form:focus-within,
