@@ -80,17 +80,17 @@
         <h2 style="text-align: center;">SEO-Texte <span style="color: #ffffff;">direkt in deine CSV</span></h2>
         <p>Gib deine Keywords vor und ergänze optional weitere Details, um die Textqualität zu maximieren. Silas zaubert dir passenden Content – direkt als CSV zum Download.</p>
 
-        <form class="silas-form-clone" onsubmit="return false;">
-            <input type="text" id="text-zielgruppe-input" placeholder="Zielgruppe (optional): z.B. Anfänger, Experten, Familien" autocomplete="off">
-        </form>
+        <div class="silas-input-container">
+            <input type="text" id="text-zielgruppe-input" class="silas-extra-input" placeholder="Zielgruppe (optional): z.B. Anfänger, Experten, Familien" autocomplete="off">
+        </div>
 
-        <form class="silas-form-clone" onsubmit="return false;">
-            <input type="text" id="text-tonalitaet-input" placeholder="Tonalität (optional): z.B. humorvoll, professionell, seriös" autocomplete="off">
-        </form>
+        <div class="silas-input-container">
+            <input type="text" id="text-tonalitaet-input" class="silas-extra-input" placeholder="Tonalität (optional): z.B. humorvoll, professionell, seriös" autocomplete="off">
+        </div>
 
-        <form class="silas-form-clone" onsubmit="return false;">
-            <input type="text" id="text-usp-input" placeholder="Alleinstellungsmerkmal (USP) (optional): z.B. 24/7-Support" autocomplete="off">
-        </form>
+        <div class="silas-input-container">
+            <input type="text" id="text-usp-input" class="silas-extra-input" placeholder="Alleinstellungsmerkmal (USP) (optional): z.B. 24/7-Support" autocomplete="off">
+        </div>
         
         <div class="input-group">
             <label for="text-intent-select">Text-Typ:</label>
@@ -119,6 +119,11 @@
             </button>
         </div>
     </div>
+
+    <p id="silas-status" style="text-align: center; width: 100%; margin-top: 1rem;"></p>
+    <div id="silas-response-container" style="display: none; margin-top: 1rem; text-align: left;">
+        </div>
+</div>
 
     <p id="silas-status" style="text-align: center; width: 100%; margin-top: 1rem;"></p>
     <div id="silas-response-container" style="display: none; margin-top: 1rem; text-align: left;">
