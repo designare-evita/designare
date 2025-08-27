@@ -75,54 +75,64 @@
                     </ul>
                 </div>
     
+<div class="performance-tip">
+    <div class="ai-container">
+        <h2 style="text-align: center;">SEO-Texte <span style="color: #ffffff;">direkt in deine CSV</span></h2>
+        <p>Gib deine Keywords vor und ergänze optional weitere Details, um die Textqualität zu maximieren. Silas zaubert dir passenden Content – direkt als CSV zum Download.</p>
 
-	<div class="performance-tip">
-<div class="ai-container">
- <h2 style="text-align: center;">SEO-Texte <span style="color: #ffffff;">direkt in deine CSV</span></h2>
-<p>Ein paar knackige Keywords oder sogar spezifische Long-Tail-Keywords genügen! Silas zaubert dir passenden Content – direkt als CSV zum Download.</p>
+        <div class="input-group">
+            <label for="text-zielgruppe-input">Zielgruppe (optional):</label>
+            <input type="text" id="text-zielgruppe-input" placeholder="z.B. Anfänger, Experten, Familien" autocomplete="off">
+        </div>
 
-	<div class="input-group">
-                            <label for="text-intent-select">Text-Typ:</label>
-                            <select id="text-intent-select" class="custom-select">
-                                <option value="informational">Informationsorientiert</option>
-                                <option value="commercial">Kommerziell</option>
-                            </select>
-                        </div>
+        <div class="input-group">
+            <label for="text-tonalitaet-input">Tonalität (optional):</label>
+            <input type="text" id="text-tonalitaet-input" placeholder="z.B. humorvoll, professionell, seriös" autocomplete="off">
+        </div>
+
+        <div class="input-group">
+            <label for="text-usp-input">Alleinstellungsmerkmal (USP) (optional):</label>
+            <input type="text" id="text-usp-input" placeholder="z.B. Der einzige Anbieter mit 24/7-Support" autocomplete="off">
+        </div>
+        
+        <div class="input-group">
+            <label for="text-intent-select">Text-Typ:</label>
+            <select id="text-intent-select" class="custom-select">
+                <option value="informational">Informationsorientiert</option>
+                <option value="commercial">Kommerziell</option>
+            </select>
+        </div>
                  
-                        <form id="silas-form">
-
-                            <input type="text" id="silas-keyword-input" placeholder="Gib ein Keyword ein und drücke Enter..." autocomplete="off">
-                            <button type="submit" id="add-keyword-btn" aria-label="Keyword hinzufügen"><i class="fa-regular fa-square-plus"></i>
-
-                        </form>
-
-                    </div>
-
-                    <div class="keyword-list-container">
-                        <h4>Deine Content-Themen:</h4>
-                        <ul id="keyword-display-list">
-                        </ul>
-                        <div class="keyword-list-controls">
-                            <button id="start-generation-btn" class="cta-button">
-                                <i class="fas fa-cogs"></i> Content erstellen
-                            </button>
-                            <button id="clear-list-btn" class="cta-button secondary">
-                                <i class="fas fa-trash"></i> Liste leeren
-                            </button>
-                        </div>
-                    </div>
-
-                    <p id="silas-status" style="text-align: center; width: 100%; margin-top: 1rem;"></p>
-                    <div id="silas-response-container" style="display: none; margin-top: 1rem; text-align: left;">
-                        <h3>Erstellung abgeschlossen!</h3>
-                        <div id="silas-response-content" style="background-color: rgba(255,255,255,0.05); border-radius: 5px; padding: 10px; margin-bottom: 1rem;"></div>
-                        <button id="download-csv" class="cta-button">
-                            <i class="fas fa-download"></i> CSV Herunterladen
-                        </button>
-                    </div>
-                </div>
-        </main>
+        <form id="silas-form">
+            <input type="text" id="silas-keyword-input" placeholder="Gib ein oder mehrere Keywords ein (mit Komma trennen)..." autocomplete="off">
+            <button type="submit" id="add-keyword-btn" aria-label="Keyword hinzufügen"><i class="fa-regular fa-square-plus"></i></button>
+        </form>
     </div>
+
+    <div class="keyword-list-container">
+        <h4>Deine Content-Themen:</h4>
+        <ul id="keyword-display-list">
+        </ul>
+        <div class="keyword-list-controls">
+            <button id="start-generation-btn" class="cta-button">
+                <i class="fas fa-cogs"></i> Content erstellen
+            </button>
+            <button id="clear-list-btn" class="cta-button secondary">
+                <i class="fas fa-trash"></i> Liste leeren
+            </button>
+        </div>
+    </div>
+
+    <p id="silas-status" style="text-align: center; width: 100%; margin-top: 1rem;"></p>
+    <div id="silas-response-container" style="display: none; margin-top: 1rem; text-align: left;">
+        <h3>Erstellung abgeschlossen!</h3>
+        <div id="silas-response-content" style="background-color: rgba(255,255,255,0.05); border-radius: 5px; padding: 10px; margin-bottom: 1rem;"></div>
+        <button id="download-csv" class="cta-button">
+            <i class="fas fa-download"></i> CSV Herunterladen
+        </button>
+    </div>
+</div>
+
     
     <div id="contact-modal" class="modal-overlay">
         <div class="modal-content">
