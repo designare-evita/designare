@@ -400,7 +400,7 @@ export function initSilasForm() {
         if (data && !data.error && previewContentArea) {
             // Strukturiertere und besser formatierte Vorschau
             let previewHtml = `
-                <div class="preview-container" style="max-height: 80vh; overflow-y: auto; padding: 20px;">
+                <div class="preview-container" style="padding: 20px;">
                     <h2 style="color: #ffc107; margin-bottom: 30px; text-align: center; font-size: 1.8rem;">
                         Vorschau: ${data.keyword}
                     </h2>
