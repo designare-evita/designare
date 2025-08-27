@@ -121,10 +121,16 @@ module.exports = async (req, res) => {
 
     // NEU: Wir erstellen eine Liste von Aufgaben (Promises), eine für jedes Keyword,
     // und führen sie parallel mit Promise.all aus.
-    const generationPromises = keywords.map(async (item) => {
-      const { keyword, intent } = item;
-      try {
+   const generationPromises = keywords.map(async (item) => {
+    // KORREKTUR: Alle Felder werden jetzt aus dem "item"-Objekt ausgelesen
+    const { keyword, intent, zielgruppe, tonalitaet, usp } = item;
+    try {
         // --- START: DEINE VOLLSTÄNDIGE LOGIK FÜR EIN EINZELNES KEYWORD ---
+
+        // DEIN ORIGINAL: Keyword-Validierung für Demo-Modus
+        if (!isMasterRequest && keyword.length > 50) {
+          throw new Error('Keyword zu lang (max. 50 Zeichen).');
+        }
 
         // DEIN ORIGINAL: Keyword-Validierung für Demo-Modus
         if (!isMasterRequest && keyword.length > 50) {
