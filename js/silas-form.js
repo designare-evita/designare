@@ -389,9 +389,8 @@ export function initSilasForm() {
         container.appendChild(resultCard);
     }
 
-    function openPreviewModal() { 
+   function openPreviewModal() { 
     if (previewModal) {
-        // Body-Klasse hinzufügen um Scroll zu verhindern
         document.body.classList.add('modal-open');
         previewModal.classList.add('visible'); 
     }
@@ -399,7 +398,6 @@ export function initSilasForm() {
 
 function closePreviewModal() { 
     if (previewModal) {
-        // Body-Klasse entfernen
         document.body.classList.remove('modal-open');
         previewModal.classList.remove('visible');
     }
