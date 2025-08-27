@@ -396,7 +396,9 @@ export function initSilasForm() {
         if (e.target.classList.contains('preview-btn')) {
             const index = parseInt(e.target.getAttribute('data-index'));
             const data = allGeneratedData[index];
+            
             if (data && !data.error && previewContentArea) {
+                // Dein vollständiger, detailreicher HTML-Code für die Vorschau
                 let previewHtml = `
                     <div class="preview-landingpage" style="color: #f0f0f0; line-height: 1.6; background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); padding: 20px; border-radius: 10px;">
                         <header style="text-align: center; margin-bottom: 40px; padding: 30px 0; border-bottom: 2px solid #ffc107;">
