@@ -458,7 +458,7 @@
 /* SILAS KI - Preview Modal (KORRIGIERT)   */
 /* ======================================== */
 
-/* Preview Modal (Lightbox) Overlay */
+/* Preview Modal (Lightbox) Overlay - KORRIGIERT MIT !important */
 #silas-preview-modal {
     /* Positionierung & Sichtbarkeit */
     position: fixed;
@@ -469,16 +469,17 @@
     z-index: 9999;
     background-color: rgba(10, 10, 10, 0.9);
     
-    /* Perfekte Zentrierung mit Flexbox (wichtig!) */
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    /* Perfekte Zentrierung mit Flexbox (verstärkt!) */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 
     /* Übergänge für sanftes Ein-/Ausblenden */
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
     transition: opacity 0.3s ease, visibility 0.3s ease;
+    overflow-y: hidden; /* Verhindert Scrollen des Overlays */
 }
 
 /* Zustand, wenn das Modal sichtbar ist */
