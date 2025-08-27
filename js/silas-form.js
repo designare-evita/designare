@@ -226,39 +226,45 @@ export function initSilasForm() {
     }
 
     function updateKeywordDisplay() {
-      keywordDisplayList.innerHTML = '';
-        keywordList.forEach((item, index) => {
+    keywordDisplayList.innerHTML = '';
+        keywordList.forEach(function(item, index) {
             const listItem = document.createElement('li');
-            listItem.style.cssText = `background-color: rgba(255, 255, 255, 0.05); margin-bottom: 12px; padding: 15px; border-radius: 8px; display: flex; align-items: flex-start; justify-content: space-between; font-size: 0.95rem; color: #fff; border-left: 4px solid ${item.intent === 'commercial' ? '#28a745' : '#17a2b8'}; min-height: 50px; gap: 10px;`;
             
-            // Dieser Container sorgt dafür, dass Keyword und Badge korrekt angeordnet sind
+            // Container für Keyword und Badge
             const contentDiv = document.createElement('div');
             contentDiv.style.cssText = 'display: flex; flex-direction: column; flex-grow: 1; gap: 5px; min-width: 0;';
-
+            
+            // Keyword Text
             const keywordSpan = document.createElement('span');
             keywordSpan.textContent = item.keyword;
             keywordSpan.style.cssText = 'font-weight: 500; color: #fff; word-break: break-word; line-height: 1.4;';
-
+            
+            // Intent Badge
             const intentBadge = document.createElement('span');
             intentBadge.textContent = item.intent === 'commercial' ? 'Kommerziell' : 'Informativ';
-            // Wichtig: display: inline-block, damit es nicht die ganze Breite einnimmt
-            intentBadge.style.cssText = `background-color: ${item.intent === 'commercial' ? '#28a745' : '#17a2b8'}; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; margin-top: 8px; display: inline-block;`;
-
+            intentBadge.style.cssText = 'background-color: ' + (item.intent === 'commercial' ? '#28a745' : '#17a2b8') + '; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; margin-top: 8px; display: inline-block; align-self: flex-start;';
+            
             contentDiv.appendChild(keywordSpan);
             contentDiv.appendChild(intentBadge);
-
+            
+            // Entfernen-Button
             const removeBtn = document.createElement('button');
             removeBtn.textContent = '×';
-            removeBtn.dataset.index = index;
             removeBtn.className = 'remove-btn';
+            removeBtn.dataset.index = index;
             removeBtn.style.cssText = 'background-color: #ff6b6b; color: white; border: none; border-radius: 6px; min-width: 36px; height: 36px; cursor: pointer; font-size: 18px; font-weight: bold; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-left: 10px;';
+            
+            // List Item zusammenbauen
+            listItem.style.cssText = 'background-color: rgba(255, 255, 255, 0.05); margin-bottom: 12px; padding: 15px; border-radius: 8px; display: flex; align-items: flex-start; justify-content: space-between; font-size: 0.95rem; color: #fff; border-left: 4px solid ' + (item.intent === 'commercial' ? '#28a745' : '#17a2b8') + '; min-height: 50px; gap: 10px;';
             
             listItem.appendChild(contentDiv);
             listItem.appendChild(removeBtn);
             keywordDisplayList.appendChild(listItem);
         });
+        
         clearListBtn.style.display = keywordList.length > 0 ? 'inline-block' : 'none';
     }
+
 
 
     // =================================================================================
