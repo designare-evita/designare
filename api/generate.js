@@ -2,27 +2,30 @@
 
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-/**
- * HINWEIS: Diese Funktion erstellt den detaillierten Prompt. Sie muss aus dem Frontend (silas-form.js)
- * hierher verschoben werden, damit das Frontend nur die Keywords senden muss.
- * Der Inhalt ist identisch mit dem aus deiner `silas-form.js`.
- */
+// KORRIGIERTE PROMPT-FUNKTION
+
 function createSilasPrompt(keyword, intent, zielgruppe, tonalitaet, usp) {
     const roleAndTask = intent === 'commercial' 
-        ? 'Du bist ein erstklassiger Marketing-Texter und SEO-Stratege...'
-        : 'Du bist ein Fachexperte und SEO-Redakteur...';
+        ? 'Du bist ein erstklassiger Marketing-Texter und SEO-Stratege. Dein Stil ist überzeugend, klar und auf Conversions ausgerichtet.'
+        : 'Du bist ein Fachexperte und SEO-Redakteur. Dein Stil ist informativ, klar und hilfreich.';
 
+    // Ein dynamischer Kontext-Block wird erstellt
     let kontext = "";
     if (zielgruppe) kontext += `- ZIELGRUPPE: ${zielgruppe}\n`;
     if (tonalitaet) kontext += `- TONALITÄT: ${tonalitaet}\n`;
     if (usp) kontext += `- ALLEINSTELLUNGSMERKMAL (USP): ${usp}\n`;
 
-    // Dies ist dein vollständiger, umfangreicher Prompt-Text.
+    // Der Prompt-Text wird um den neuen Kontext-Block erweitert
     return `
         Du bist ein erstklassiger SEO-Content-Strategist. Erstelle vollständigen Landingpage-Content für das Thema "${keyword}".
+
+        ${kontext ? `ZUSÄTZLICHER KONTEXT, DER UNBEDINGT ZU BEACHTEN IST:\n${kontext}` : ''}
+
         ROLLE: ${roleAndTask}
+        
         WICHTIG: Deine Antwort MUSS ein einziges, valides JSON-Objekt sein. Beginne direkt mit { und ende mit }. Gib keine Markdown-Formatierung oder andere Texte aus.
-        Das JSON-Objekt muss ALLE folgenden Felder enthalten und mit umfangreichem, hochwertigem Content füllen:
+        
+        Das JSON-Objekt muss ALLE folgenden Felder enthalten und mit umfangreichem, hochwertigem Content füllen, der zum ZUSÄTZLICHEN KONTEXT passt:
         {
           "post_title": "SEO-optimierter Titel (50-60 Zeichen) für ${keyword}",
           "post_name": "seo-freundlicher-url-slug-fuer-${keyword.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}",
@@ -63,8 +66,8 @@ function createSilasPrompt(keyword, intent, zielgruppe, tonalitaet, usp) {
         - FAQ-Antworten: 30-50 Wörter
         - Benefits/Features: Jeweils 4-6 Listenelemente mit ausführlichen Beschreibungen
         - Testimonials: Vollständige Zitate mit Namen und Firma
-        - Alle Texte müssen spezifisch auf "${keyword}" bezogen sein
-        - Professioneller, überzeugender Ton
+        - Alle Texte müssen spezifisch auf "${keyword}" bezogen sein und den ZUSÄTZLICHEN KONTEXT berücksichtigen.
+        - Professioneller, überzeugender Ton, der zur angegebenen TONALITÄT passt.
         - SEO-optimiert aber natürlich lesbar
         - Verwende deutsche Sprache
         - Alle Listen müssen vollständige HTML-Markup enthalten
