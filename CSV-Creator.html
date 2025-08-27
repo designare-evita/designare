@@ -79,13 +79,15 @@
     <div class="ai-container">
         <h2 style="text-align: center;">SEO-Texte <span style="color: #ffffff;">direkt in deine CSV</span></h2>
         <p>Gib deine Keywords vor und ergänze optional weitere Details, um die Textqualität zu maximieren. Silas zaubert dir passenden Content – direkt als CSV zum Download.</p>
- <div class="input-group">
+        
+        <div class="input-group">
             <label for="text-intent-select">Text-Typ:</label>
             <select id="text-intent-select" class="custom-select">
                 <option value="informational">Informationsorientiert</option>
                 <option value="commercial">Kommerziell</option>
             </select>
         </div>
+        
         <div class="silas-input-container">
             <input type="text" id="text-zielgruppe-input" class="silas-extra-input" placeholder="Zielgruppe (optional): z.B. Anfänger, Experten, Familien" autocomplete="off">
         </div>
@@ -100,7 +102,9 @@
                  
         <form id="silas-form">
             <input type="text" id="silas-keyword-input" placeholder="Gib ein oder mehrere Keywords ein (mit Komma trennen)..." autocomplete="off">
-            <button type="submit" id="add-keyword-btn" aria-label="Keyword hinzufügen"><i class="fa-regular fa-square-plus"></i></button>
+            <button type="submit" id="add-keyword-btn" aria-label="Keyword hinzufügen">
+                <i class="fa-regular fa-square-plus"></i>
+            </button>
         </form>
     </div>
 
@@ -118,10 +122,10 @@
         </div>
     </div>
 
-    <p id="silas-status" style="text-align: center; width: 100%; margin-top: 1rem;"></p>
-    <div id="silas-response-container" style="display: none; margin-top: 1rem; text-align: left;">
-        </div>
-</div>  
+    <p id="silas-status"></p>
+    
+    <div id="silas-response-container" style="display: none;">
+    </div>
 </div>
     
     <div id="contact-modal" class="modal-overlay">
