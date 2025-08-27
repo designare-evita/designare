@@ -1,19 +1,12 @@
-// api/generate.js - DEINE STABILE VERSION, ERWEITERT FÜR BULK PROCESSING
+// api/generate.js - STABILE VERSION OHNE CRASHS
 
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-// DEIN PROMPT GEHÖRT INS BACKEND, UM DEN FRONTEND-CODE ZU VERKLEINERN
-function createSilasPrompt(keyword, intent) {
-    const roleAndTask = intent === 'commercial' ? 'Du bist ein erstklassiger Marketing-Texter...' : 'Du bist ein Fachexperte...';
-    // HIER KOMMT DEIN VOLLSTÄNDIGER, UMFANGREICHER PROMPT-TEXT HINEIN
-    return `Du bist ein erstklassiger SEO-Content-Strategist... für das Thema "${keyword}". ROLLE: ${roleAndTask} ... etc.`;
-}
-
 // Handler-Funktion, die von Vercel aufgerufen wird
 module.exports = async (req, res) => {
-  console.log('🚀 Silas API gestartet (Bulk Mode)');
+  console.log('🚀 Silas API gestartet');
   
-  // DEINE CORS-HEADER
+  // CORS Headers für alle Antworten
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -23,6 +16,7 @@ module.exports = async (req, res) => {
     res.status(200).end();
     return;
   }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
@@ -31,85 +25,100 @@ module.exports = async (req, res) => {
     console.log('📝 Request Body:', req.body);
     console.log('🔑 Headers:', req.headers);
 
-    // NEUE VALIDIERUNG: Erwartet ein Array
-    const { keywords } = req.body;
-    if (!keywords || !Array.isArray(keywords) || keywords.length === 0) {
-      return res.status(400).json({ error: 'Ein "keywords" Array ist erforderlich.' });
+    // === BASIC VALIDATION ===
+    const { prompt, keyword } = req.body;
+    
+    if (!prompt || !keyword) {
+      console.log('❌ Fehlende Daten');
+      return res.status(400).json({ 
+        error: 'Prompt und Keyword sind erforderlich.',
+        received: { prompt: !!prompt, keyword: !!keyword }
+      });
     }
 
-    // DEINE CHECKS BLEIBEN ERHALTEN
-    const isMasterRequest = req.headers['x-silas-master'] === 'SilasUnlimited2024!';
-    if (isMasterRequest) console.log('🔓 Master Mode Request erkannt');
+    console.log('✅ Validation passed für:', keyword);
 
+    // === MASTER MODE CHECK ===
+    const masterModeHeader = req.headers['x-silas-master'];
+    const isMasterRequest = masterModeHeader === 'SilasUnlimited2024!';
+    
+    if (isMasterRequest) {
+      console.log('🔓 Master Mode Request erkannt');
+    }
+
+    // === API KEY CHECK ===
     const apiKey = process.env.GEMINI_API_KEY;
+    
     if (!apiKey) {
       console.error('❌ GEMINI_API_KEY nicht gesetzt');
-      return res.status(500).json({ error: 'Server-Konfigurationsfehler' });
+      return res.status(500).json({ 
+        error: 'Server-Konfigurationsfehler',
+        details: 'API-Schlüssel nicht verfügbar'
+      });
     }
 
-    // DEINE GOOGLE AI INITIALISIERUNG BLEIBT ERHALTEN
-    const genAI = new GoogleGenerativeAI(apiKey);
-    
-    // NEU: PARALLELE VERARBEITUNG ALLER KEYWORDS
-    const generationPromises = keywords.map(async (item) => {
-      const { keyword, intent } = item;
-      try {
-        if (!keyword || !intent) throw new Error("Keyword und Intent sind für jeden Eintrag erforderlich.");
+    console.log('✅ API Key verfügbar');
 
-        // DEINE MODELLAUSWAHL UND GENERIERUNGS-LOGIK FÜR EIN KEYWORD
-        const modelNames = ["gemini-1.5-flash-latest", "gemini-1.5-flash", "gemini-pro"];
-        let model = null;
-        let usedModel = null;
-        for (const modelName of modelNames) {
-          try {
-            model = genAI.getGenerativeModel({ model: modelName, generationConfig: { temperature: 0.7, maxOutputTokens: 8000 } });
-            usedModel = modelName;
-            break;
-          } catch (modelError) { continue; }
-        }
-        if (!model) throw new Error("Kein KI-Modell verfügbar.");
-
-        const prompt = createSilasPrompt(keyword, intent);
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const rawText = await response.text();
-        
-        let jsonData;
-        let parseError = null;
-
-        try {
-            const cleanedText = rawText.replace(/^```json\s*|```\s*$/g, '').trim();
-            if (!cleanedText) throw new Error("API hat leeren Inhalt zurückgegeben.");
-            jsonData = JSON.parse(cleanedText);
-        } catch (e) {
-            parseError = e;
-            // DEIN UMFANGREICHER FALLBACK BLEIBT ERHALTEN
-            jsonData = { post_title: `Fehler bei der Generierung für: ${keyword}`, /* ... alle anderen Fallback-Felder ... */ _fallback_used: true, _parse_error: e.message };
-        }
-
-        // DEINE FINALE ANTWORT-STRUKTUR FÜR EIN KEYWORD
-        jsonData.keyword = keyword;
-        jsonData.intent = intent;
-        jsonData._meta = { model_used: usedModel, generation_time: new Date().toISOString(), master_mode: isMasterRequest, success: !parseError };
-        return jsonData;
-
-      } catch (error) {
-        // Fehlerbehandlung für ein einzelnes Keyword
-        return { keyword, intent, error: error.message, _meta: { success: false } };
+    // === SIMPLE RATE LIMITING ===
+    if (!isMasterRequest) {
+      const clientIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress || 'unknown';
+      console.log('🌐 Client IP:', clientIP.substring(0, 10) + '...');
+      
+      // Einfache Keyword-Validierung
+      if (keyword.length > 50) {
+        return res.status(400).json({ 
+          error: 'Keyword zu lang',
+          details: 'Keywords dürfen maximal 50 Zeichen lang sein.'
+        });
       }
-    });
+    }
 
-    // Auf alle Ergebnisse warten und als einzelne Antwort senden
-    const results = await Promise.all(generationPromises);
-    console.log('✅ Alle Antworten bereit, sende zum Client.');
-    return res.status(200).json(results);
+    // === GOOGLE AI INITIALIZATION ===
+    console.log('🤖 Initialisiere Google AI');
+    
+    let genAI;
+    try {
+      genAI = new GoogleGenerativeAI(apiKey);
+    } catch (initError) {
+      console.error('❌ Google AI Init Fehler:', initError);
+      return res.status(500).json({ 
+        error: 'KI-Service nicht verfügbar',
+        details: 'Fehler bei der Initialisierung'
+      });
+    }
 
-  } catch (error) {
-    // DEINE GLOBALE FEHLERBEHANDLUNG BLEIBT ERHALTEN
-    console.error('💥 Unerwarteter Fehler:', error);
-    res.status(500).json({ error: 'Interner Server-Fehler', details: 'Ein unerwarteter Fehler ist aufgetreten.' });
-  }
-};
+    // === MODEL SELECTION ===
+    const modelNames = ["gemini-1.5-flash-latest", "gemini-1.5-flash", "gemini-pro"];
+    let model = null;
+    let usedModel = null;
+    
+    for (const modelName of modelNames) {
+      try {
+        model = genAI.getGenerativeModel({ 
+          model: modelName,
+          generationConfig: {
+            temperature: 0.7,
+            topK: 40,
+            topP: 0.95,
+            maxOutputTokens: 8000, // Erhöht für umfangreiche Inhalte
+          }
+        });
+        usedModel = modelName;
+        console.log('✅ Modell geladen:', modelName);
+        break;
+      } catch (modelError) {
+        console.warn('⚠️ Modell nicht verfügbar:', modelName, modelError.message);
+        continue;
+      }
+    }
+
+    if (!model) {
+      console.error('❌ Kein Modell verfügbar');
+      return res.status(500).json({ 
+        error: 'KI-Modell nicht verfügbar',
+        details: 'Alle Modell-Varianten sind derzeit nicht erreichbar'
+      });
+    }
 
     // === COMPREHENSIVE PROMPT ===
     const comprehensivePrompt = `
