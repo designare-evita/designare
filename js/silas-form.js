@@ -391,8 +391,17 @@ export function initSilasForm() {
 
     function openPreviewModal() { 
     if (previewModal) {
+        // Debug: Entferne alle eventuell störenden Inline-Styles
+        previewModal.style.position = 'fixed';
+        previewModal.style.top = '0';
+        previewModal.style.left = '0';
+        previewModal.style.width = '100vw';
+        previewModal.style.height = '100vh';
+        previewModal.style.display = 'flex';
+        previewModal.style.alignItems = 'center';
+        previewModal.style.justifyContent = 'center';
+        
         previewModal.classList.add('visible'); 
-        // Zusätzlicher Fix: Stelle sicher dass Body-Scroll gestoppt wird
         document.body.style.overflow = 'hidden';
     }
 }
