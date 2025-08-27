@@ -259,7 +259,7 @@ export function initSilasForm() {
             listItem.style.cssText = `background-color: rgba(255, 255, 255, 0.05); margin-bottom: 12px; padding: 15px; border-radius: 8px; display: flex; align-items: flex-start; justify-content: space-between; font-size: 0.95rem; color: #fff; border-left: 4px solid ${item.intent === 'commercial' ? '#28a745' : '#17a2b8'}; min-height: 50px; gap: 10px;`;
             
             const contentDiv = document.createElement('div');
-            contentDiv.style.cssText = 'display: flex; flex-direction: column; flex-grow: 1; gap: 8px; min-width: 0; align-items: flex-start;';
+            contentDiv.style.cssText = 'display: flex; flex-direction: row; flex-grow: 1; gap: 8px; min-width: 0; align-items: flex-start;';
 
             const keywordSpan = document.createElement('span');
             keywordSpan.textContent = item.keyword;
