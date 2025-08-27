@@ -122,18 +122,12 @@ module.exports = async (req, res) => {
     console.log('🤖 Initialisiere Google AI');
     const genAI = new GoogleGenerativeAI(apiKey);
 
-    // NEU: Wir erstellen eine Liste von Aufgaben (Promises), eine für jedes Keyword,
-    // und führen sie parallel mit Promise.all aus.
-   const generationPromises = keywords.map(async (item) => {
-    // KORREKTUR: Alle Felder werden jetzt aus dem "item"-Objekt ausgelesen
+// KORRIGIERTER BLOCK FÜR DIE VERARBEITUNG
+const generationPromises = keywords.map(async (item) => {
+    // KORREKTUR 1: Alle Felder werden jetzt aus dem "item"-Objekt ausgelesen
     const { keyword, intent, zielgruppe, tonalitaet, usp } = item;
     try {
         // --- START: DEINE VOLLSTÄNDIGE LOGIK FÜR EIN EINZELNES KEYWORD ---
-
-        // DEIN ORIGINAL: Keyword-Validierung für Demo-Modus
-        if (!isMasterRequest && keyword.length > 50) {
-          throw new Error('Keyword zu lang (max. 50 Zeichen).');
-        }
 
         // DEIN ORIGINAL: Keyword-Validierung für Demo-Modus
         if (!isMasterRequest && keyword.length > 50) {
@@ -157,15 +151,16 @@ module.exports = async (req, res) => {
         }
         if (!model) throw new Error(`Kein KI-Modell für '${keyword}' verfügbar.`);
 
-        // DEIN ORIGINAL: Die eigentliche Generierung
-        const prompt = createSilasPrompt(keyword, intent);
+        // KORREKTUR 2: Alle ausgelesenen Felder werden jetzt korrekt an die Prompt-Funktion übergeben
+        const prompt = createSilasPrompt(keyword, intent, zielgruppe, tonalitaet, usp);
+        
         const result = await model.generateContent(prompt);
         const response = await result.response;
         const rawText = await response.text();
 
+        // Der Rest deiner Logik zur Verarbeitung der Antwort bleibt unverändert...
         let jsonData;
         let parseError = null;
-
         try {
             const cleanedText = rawText.replace(/^```json\s*|```\s*$/g, '').trim();
             if (!cleanedText) throw new Error("API hat leeren Inhalt zurückgegeben.");
@@ -173,7 +168,7 @@ module.exports = async (req, res) => {
         } catch (e) {
             parseError = e;
             console.error(`❌ JSON-Parse-Fehler für '${keyword}':`, e.message);
-            // DEIN ORIGINAL: UMFANGREICHER FALLBACK-CONTENT
+            // DEIN UMFANGREICHER FALLBACK-CONTENT
             jsonData = {
                 post_title: `Fehler bei der Generierung für: ${keyword}`,
                 post_name: `fehler-${keyword.toLowerCase().replace(/\s+/g, '-')}`,
@@ -208,7 +203,7 @@ module.exports = async (req, res) => {
         // --- ENDE: DEINE LOGIK FÜR EIN EINZELNES KEYWORD ---
 
       } catch (error) {
-        // Fehlerbehandlung für ein einzelnes Keyword, falls etwas in der Schleife schiefgeht
+        // Fehlerbehandlung für ein einzelnes Keyword
         console.error(`💥 Fehler bei der Verarbeitung von '${keyword}':`, error);
         return { keyword, intent, error: error.message, _meta: { success: false, master_mode: isMasterRequest } };
       }
