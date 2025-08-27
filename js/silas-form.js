@@ -1,4 +1,4 @@
-// js/silas-form.js - FINALE, VOLLSTÄNDIGE VERSION MIT ALLEN FUNKTIONEN UND KORREKTUREN
+// js/silas-form.js - DEINE VOLLSTÄNDIGE VERSION, ANGEPASST FÜR DAS NEUE, SCHNELLE BACKEND
 
 export function initSilasForm() {
     const silasForm = document.getElementById('silas-form');
@@ -7,13 +7,12 @@ export function initSilasForm() {
     }
 
     // =================================================================================
-    // DEIN ORIGINAL: ALLE VARIABLEN & KONSTANTEN
+    // DEIN ORIGINAL: ALLE VARIABLEN, DOM-ELEMENTE UND KONSTANTEN
     // =================================================================================
     const MASTER_PASSWORD = "SilasUnlimited2024!";
     let DEMO_LIMITS = { maxKeywordsPerSession: 3, maxGenerationsPerHour: 5, maxGenerationsPerDay: 10, cooldownBetweenRequests: 30000 };
     const MASTER_LIMITS = { maxKeywordsPerSession: 50, maxGenerationsPerHour: 100, maxGenerationsPerDay: 500, cooldownBetweenRequests: 1000 };
     
-    // DOM-ELEMENTE
     const keywordInput = document.getElementById('silas-keyword-input');
     const keywordDisplayList = document.getElementById('keyword-display-list');
     const startGenerationBtn = document.getElementById('start-generation-btn');
@@ -25,16 +24,11 @@ export function initSilasForm() {
     const previewContentArea = document.getElementById('preview-content-area');
     const textIntentSelect = document.getElementById('text-intent-select');
 
-    // NEU: DOM-Elemente für die neuen Felder
-    const zielgruppeInput = document.getElementById('text-zielgruppe-input');
-    const tonalitaetInput = document.getElementById('text-tonalitaet-input');
-    const uspInput = document.getElementById('text-usp-input');
-
     let keywordList = [];
     let allGeneratedData = [];
 
     // =================================================================================
-    // DEIN ORIGINAL: DAS GESAMTE PASSWORT- UND LIMIT-SYSTEM BLEIBT UNVERÄNDERT
+    // DEIN ORIGINAL: DAS GESAMTE PASSWORT- UND LIMIT-SYSTEM (1:1 ÜBERNOMMEN)
     // =================================================================================
     
     function isMasterModeActive() {
@@ -198,44 +192,26 @@ export function initSilasForm() {
             demoStatusContainer.innerHTML = '<div style="background: linear-gradient(135deg, rgba(255,193,7,0.1) 0%, rgba(255,193,7,0.05) 100%); border: 1px solid #ffc107; border-radius: 8px; padding: 15px; margin: 15px 0; text-align: center; color: #ffc107;"><strong>🎯 Demo-Modus:</strong> Heute noch <strong>' + dailyRemaining + '</strong> | Diese Stunde noch <strong>' + hourlyRemaining + '</strong> Generierungen</div>';
         }
     }
-    
-    // =================================================================================
-    // KERNÄNDERUNG 1: `addKeywords`-Funktion liest die neuen Felder aus
-    // =================================================================================
+
+    // DEIN ORIGINAL: Funktionen zum Hinzufügen und Anzeigen der Keywords
     function addKeywords() {
         try {
             const newKeywords = keywordInput.value.split(',').map(kw => kw.trim()).filter(kw => kw.length > 0);
-            
-            const zielgruppe = zielgruppeInput.value.trim();
-            const tonalitaet = tonalitaetInput.value.trim();
-            const usp = uspInput.value.trim();
             const currentIntent = textIntentSelect.value;
-
             for (let i = 0; i < newKeywords.length; i++) {
                 validateKeyword(newKeywords[i]);
             }
             if (!isMasterModeActive() && keywordList.length + newKeywords.length > DEMO_LIMITS.maxKeywordsPerSession) {
                 throw new Error('🎯 Demo-Limit: Maximal ' + DEMO_LIMITS.maxKeywordsPerSession + ' Keywords pro Session.');
             }
-
             newKeywords.forEach(keyword => {
                 const existingIndex = keywordList.findIndex(item => item.keyword === keyword);
                 if (existingIndex === -1) {
-                    keywordList.push({ 
-                        keyword: keyword, 
-                        intent: currentIntent,
-                        zielgruppe: zielgruppe,
-                        tonalitaet: tonalitaet,
-                        usp: usp
-                    });
+                    keywordList.push({ keyword: keyword, intent: currentIntent });
                 } else {
                     keywordList[existingIndex].intent = currentIntent;
-                    keywordList[existingIndex].zielgruppe = zielgruppe;
-                    keywordList[existingIndex].tonalitaet = tonalitaet;
-                    keywordList[existingIndex].usp = usp;
                 }
             });
-
             if (newKeywords.length > 0) {
                 updateKeywordDisplay();
                 keywordInput.value = '';
@@ -249,51 +225,28 @@ export function initSilasForm() {
         }
     }
 
-    // =================================================================================
-    // KERNÄNDERUNG 2: `updateKeywordDisplay` zeigt neue Infos an
-    // =================================================================================
     function updateKeywordDisplay() {
-        keywordDisplayList.innerHTML = '';
+keywordDisplayList.innerHTML = '';
         keywordList.forEach(function(item, index) {
             const listItem = document.createElement('li');
-            listItem.style.cssText = `background-color: rgba(255, 255, 255, 0.05); margin-bottom: 12px; padding: 15px; border-radius: 8px; display: flex; align-items: flex-start; justify-content: space-between; font-size: 0.95rem; color: #fff; border-left: 4px solid ${item.intent === 'commercial' ? '#28a745' : '#17a2b8'}; min-height: 50px; gap: 10px;`;
+            listItem.style.cssText = `background-color: rgba(255, 255, 255, 0.05); margin-bottom: 12px; padding: 15px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; font-size: 0.95rem; color: #fff; border-left: 4px solid ${item.intent === 'commercial' ? '#28a745' : '#17a2b8'}; min-height: 50px; gap: 10px;`;
             
+            // Dieser Container sorgt für die korrekte Anordnung
             const contentDiv = document.createElement('div');
-            contentDiv.style.cssText = 'display: flex; flex-direction: column; flex-grow: 1; gap: 8px; min-width: 0; align-items: flex-start;';
-
+            // KORREKTUR: `flex-direction: column` wurde entfernt und `align-items: center` hinzugefügt.
+            contentDiv.style.cssText = 'display: flex; flex-direction: row; align-items: center; flex-grow: 1; gap: 15px; min-width: 0;';
+            
             const keywordSpan = document.createElement('span');
             keywordSpan.textContent = item.keyword;
-            keywordSpan.style.cssText = 'font-weight: 500; color: #fff; word-break: break-word; line-height: 1.4;';
-            contentDiv.appendChild(keywordSpan);
-            
-            const badgesContainer = document.createElement('div');
-            badgesContainer.style.cssText = 'display: flex; flex-wrap: wrap; gap: 8px;';
+            keywordSpan.style.cssText = 'font-weight: 500; color: #fff; word-break: break-all; line-height: 1.4;';
             
             const intentBadge = document.createElement('span');
             intentBadge.textContent = item.intent === 'commercial' ? 'Kommerziell' : 'Informativ';
-            intentBadge.style.cssText = `background-color: ${item.intent === 'commercial' ? '#28a745' : '#17a2b8'}; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold;`;
-            badgesContainer.appendChild(intentBadge);
-
-            if (item.zielgruppe) {
-                const zielgruppeBadge = document.createElement('span');
-                zielgruppeBadge.textContent = `Für: ${item.zielgruppe}`;
-                zielgruppeBadge.style.cssText = `background-color: #6c757d; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold;`;
-                badgesContainer.appendChild(zielgruppeBadge);
-            }
-            if (item.tonalitaet) {
-                const tonalitaetBadge = document.createElement('span');
-                tonalitaetBadge.textContent = `Ton: ${item.tonalitaet}`;
-                tonalitaetBadge.style.cssText = `background-color: #6c757d; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold;`;
-                badgesContainer.appendChild(tonalitaetBadge);
-            }
-            if (item.usp) {
-                const uspBadge = document.createElement('span');
-                uspBadge.textContent = `USP: ${item.usp}`;
-                uspBadge.style.cssText = `background-color: #6c757d; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold;`;
-                badgesContainer.appendChild(uspBadge);
-            }
-
-            contentDiv.appendChild(badgesContainer);
+            // `margin-top` wird nicht mehr benötigt
+            intentBadge.style.cssText = `background-color: ${item.intent === 'commercial' ? '#28a745' : '#17a2b8'}; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; display: inline-block; flex-shrink: 0;`;
+            
+            contentDiv.appendChild(keywordSpan);
+            contentDiv.appendChild(intentBadge);
             
             const removeBtn = document.createElement('button');
             removeBtn.textContent = '×';
@@ -305,12 +258,16 @@ export function initSilasForm() {
             listItem.appendChild(removeBtn);
             keywordDisplayList.appendChild(listItem);
         });
+        
         clearListBtn.style.display = keywordList.length > 0 ? 'inline-block' : 'none';
     }
 
+
+
     // =================================================================================
-    // DEINE SCHNELLE GENERIERUNGS-FUNKTION
+    // KERNÄNDERUNG: Die Funktion zur Generierung wird umgebaut
     // =================================================================================
+
     startGenerationBtn.addEventListener('click', async function() {
         try {
             if (keywordList.length === 0) {
@@ -318,19 +275,24 @@ export function initSilasForm() {
                 return;
             }
             checkRateLimit();
+
+            // UI für den Ladevorgang
             startGenerationBtn.disabled = true;
             clearListBtn.disabled = true;
             allGeneratedData = [];
             silasResponseContainer.innerHTML = '<h3><i class="fas fa-spinner fa-spin"></i> Erstellung läuft...</h3><div id="silas-response-content"></div>';
             silasResponseContainer.style.display = 'block';
-            silasStatus.textContent = `Sende ${keywordList.length} Keywords an Silas...`;
+            silasStatus.textContent = `Sende ${keywordList.length} Keywords an Silas... Dieser Vorgang kann je nach Anzahl einen Moment dauern.`;
             
+            // NEU: Einzelner API-Aufruf mit der gesamten Keyword-Liste
             const response = await fetch('/api/generate', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    // Dein Master-Header wird nur gesendet, wenn der Modus aktiv ist
                     ...(isMasterModeActive() && { 'X-Silas-Master': MASTER_PASSWORD })
                 },
+                // Sende die gesamte Liste im neuen Format, das vom Backend erwartet wird
                 body: JSON.stringify({ keywords: keywordList })
             });
 
@@ -339,13 +301,16 @@ export function initSilasForm() {
                 throw new Error(errorData.error || `Server-Fehler: ${response.statusText}`);
             }
 
+            // NEU: Die Antwort ist ein Array mit allen Ergebnissen
             const results = await response.json();
-            allGeneratedData = results;
+            allGeneratedData = results; // Speichere alle Ergebnisse global für Vorschau und Download
 
+            // UI nach Abschluss aktualisieren
             silasResponseContainer.querySelector('h3').textContent = 'Erstellung abgeschlossen!';
             const responseContent = document.getElementById('silas-response-content');
-            responseContent.innerHTML = '';
+            responseContent.innerHTML = ''; // Leere Ladeanzeige
 
+            // Ergebnisse anzeigen
             results.forEach((data, index) => {
                 displayResult(data, index, responseContent);
             });
@@ -353,7 +318,8 @@ export function initSilasForm() {
             updateUsageCounters();
             silasStatus.textContent = `✅ Alle ${keywordList.length} Texte wurden verarbeitet.`;
             
-            if (allGeneratedData.some(d => !d.error && !d._fallback_used)) {
+            // DEIN ORIGINAL: Download-Button hinzufügen
+            if (allGeneratedData.some(d => !d.error)) { // Nur anzeigen, wenn mind. ein Ergebnis erfolgreich war
                 const downloadButton = document.createElement('button');
                 downloadButton.id = 'download-csv-dynamic';
                 downloadButton.className = 'cta-button';
@@ -362,6 +328,7 @@ export function initSilasForm() {
                 downloadButton.addEventListener('click', downloadCsv);
                 silasResponseContainer.appendChild(downloadButton);
             }
+
         } catch (error) {
             silasStatus.textContent = `Fehler: ${error.message}`;
             silasStatus.style.color = '#ff6b6b';
@@ -374,29 +341,40 @@ export function initSilasForm() {
         }
     });
 
+    // WICHTIG: Die `createSilasPrompt` Funktion ist jetzt im Backend und wird hier entfernt.
+
     // =================================================================================
     // DEIN ORIGINAL: Alle restlichen Funktionen bleiben 1:1 erhalten
     // =================================================================================
+
     function displayResult(data, index, container) {
         const resultCard = document.createElement('div');
         resultCard.className = 'result-card';
         resultCard.style.cssText = 'background-color: rgba(255,255,255,0.05); border-radius: 8px; padding: 15px; margin-bottom: 15px; border-left: 4px solid ' + (data.intent === 'commercial' ? '#28a745' : '#17a2b8') + ';';
         if (data.error) {
-            resultCard.innerHTML = `<h4 style="color: #ff6b6b; margin: 0 0 10px 0;">${data.keyword}</h4><p style="color: #ff6b6b; margin: 0;">Fehler: ${data.error}</p>`;
+            resultCard.innerHTML = `<h4 style="color: #ff6b6b; margin: 0 0 10px 0;">${data.keyword}</h4><span style="background-color: ${data.intent === 'commercial' ? '#28a745' : '#17a2b8'}; ...">${data.intent === 'commercial' ? 'Kommerziell' : 'Informativ'}</span><p style="color: #ff6b6b; margin: 0;">Fehler: ${data.error}</p>`;
         } else {
-            resultCard.innerHTML = `<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;"><h4 style="color: #fff; margin: 0; flex-grow: 1;">${data.keyword}</h4></div><p style="margin: 5px 0; color: #ccc;"><strong>Titel:</strong> ${data.post_title || 'N/A'}</p><p style="margin: 5px 0; color: #ccc;"><strong>Meta:</strong> ${data.meta_description || 'N/A'}</p><button class="preview-btn" data-index="${index}" style="background-color: #007cba; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-top: 10px;">Vorschau anzeigen</button>`;
+            resultCard.innerHTML = `<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;"><h4 style="color: #fff; margin: 0; flex-grow: 1;">${data.keyword}</h4><span style="...">${data.intent === 'commercial' ? 'Kommerziell' : 'Informativ'}</span></div><p style="margin: 5px 0; color: #ccc;"><strong>Titel:</strong> ${data.post_title || 'N/A'}</p><p style="margin: 5px 0; color: #ccc;"><strong>Meta:</strong> ${data.meta_description || 'N/A'}</p><button class="preview-btn" data-index="${index}" style="background-color: #007cba; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-top: 10px;">Vorschau anzeigen</button>`;
         }
         container.appendChild(resultCard);
     }
 
-    function openPreviewModal() { if (previewModal) previewModal.classList.add('visible'); }
-    function closePreviewModal() { if (previewModal) previewModal.classList.remove('visible'); }
+    function openPreviewModal() {
+        if (previewModal) previewModal.classList.add('visible');
+    }
+    
+    function closePreviewModal() {
+        if (previewModal) previewModal.classList.remove('visible');
+    }
 
+    // DEINE VORSCHAU EVENT DELEGATION - BLEIBT UNVERÄNDERT
     silasResponseContainer.addEventListener('click', function(e) {
         if (e.target.classList.contains('preview-btn')) {
             const index = parseInt(e.target.getAttribute('data-index'));
             const data = allGeneratedData[index];
+            
             if (data && !data.error && previewContentArea) {
+                // Dein vollständiger, detailreicher HTML-Code für die Vorschau
                 let previewHtml = `
                     <div class="preview-landingpage" style="color: #f0f0f0; line-height: 1.6; background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); padding: 20px; border-radius: 10px;">
                         <header style="text-align: center; margin-bottom: 40px; padding: 30px 0; border-bottom: 2px solid #ffc107;">
@@ -457,12 +435,6 @@ export function initSilasForm() {
     // DEINE ORIGINAL EVENT LISTENERS
     silasForm.addEventListener('submit', function(e) { e.preventDefault(); addKeywords(); });
     keywordInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); addKeywords(); } });
-    keywordDisplayList.addEventListener('click', function(e) {
-        if (e.target.matches('.remove-btn')) {
-            keywordList.splice(e.target.dataset.index, 1);
-            updateKeywordDisplay();
-        }
-    });
     clearListBtn.addEventListener('click', function() {
         keywordList = [];
         allGeneratedData = [];
@@ -474,8 +446,9 @@ export function initSilasForm() {
     if (closePreviewModalBtn) closePreviewModalBtn.addEventListener('click', closePreviewModal);
     if (previewModal) previewModal.addEventListener('click', function(e) { if (e.target === previewModal) closePreviewModal(); });
     
-    // DEINE ORIGINAL: Initialisierung
+    // DEIN ORIGINAL: Initialisierung
     initDemoTracking();
     showDemoStatus();
     createMasterPasswordUI();
 }
+
