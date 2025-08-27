@@ -391,26 +391,17 @@ export function initSilasForm() {
 
     function openPreviewModal() { 
     if (previewModal) {
-        // Debug: Entferne alle eventuell störenden Inline-Styles
-        previewModal.style.position = 'fixed';
-        previewModal.style.top = '0';
-        previewModal.style.left = '0';
-        previewModal.style.width = '100vw';
-        previewModal.style.height = '100vh';
-        previewModal.style.display = 'flex';
-        previewModal.style.alignItems = 'center';
-        previewModal.style.justifyContent = 'center';
-        
+        // Body-Klasse hinzufügen um Scroll zu verhindern
+        document.body.classList.add('modal-open');
         previewModal.classList.add('visible'); 
-        document.body.style.overflow = 'hidden';
     }
 }
 
 function closePreviewModal() { 
     if (previewModal) {
+        // Body-Klasse entfernen
+        document.body.classList.remove('modal-open');
         previewModal.classList.remove('visible');
-        // Body-Scroll wieder aktivieren
-        document.body.style.overflow = '';
     }
 }
 
