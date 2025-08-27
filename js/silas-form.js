@@ -206,11 +206,9 @@ export function initSilasForm() {
         try {
             const newKeywords = keywordInput.value.split(',').map(kw => kw.trim()).filter(kw => kw.length > 0);
             
-            // Werte aus den neuen, optionalen Feldern auslesen
             const zielgruppe = zielgruppeInput.value.trim();
             const tonalitaet = tonalitaetInput.value.trim();
             const usp = uspInput.value.trim();
-            
             const currentIntent = textIntentSelect.value;
 
             for (let i = 0; i < newKeywords.length; i++) {
@@ -223,7 +221,6 @@ export function initSilasForm() {
             newKeywords.forEach(keyword => {
                 const existingIndex = keywordList.findIndex(item => item.keyword === keyword);
                 if (existingIndex === -1) {
-                    // Das Objekt um die neuen Felder erweitern
                     keywordList.push({ 
                         keyword: keyword, 
                         intent: currentIntent,
@@ -232,7 +229,6 @@ export function initSilasForm() {
                         usp: usp
                     });
                 } else {
-                    // Auch bestehende Einträge aktualisieren
                     keywordList[existingIndex].intent = currentIntent;
                     keywordList[existingIndex].zielgruppe = zielgruppe;
                     keywordList[existingIndex].tonalitaet = tonalitaet;
@@ -242,7 +238,7 @@ export function initSilasForm() {
 
             if (newKeywords.length > 0) {
                 updateKeywordDisplay();
-                keywordInput.value = ''; // Nur das Keyword-Feld leeren
+                keywordInput.value = '';
                 silasStatus.textContent = '✅ ' + newKeywords.length + ' Keyword(s) hinzugefügt.';
                 setTimeout(() => { silasStatus.textContent = 'Bereit zur Generierung.'; }, 2000);
             }
@@ -254,7 +250,7 @@ export function initSilasForm() {
     }
 
     // =================================================================================
-    // KERNÄNDERUNG 2: `updateKeywordDisplay` mit korrektem Layout
+    // KERNÄNDERUNG 2: `updateKeywordDisplay` zeigt neue Infos an
     // =================================================================================
     function updateKeywordDisplay() {
         keywordDisplayList.innerHTML = '';
