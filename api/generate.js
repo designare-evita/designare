@@ -12,6 +12,11 @@ function createSilasPrompt(keyword, intent) {
         ? 'Du bist ein erstklassiger Marketing-Texter und SEO-Stratege. Dein Stil ist überzeugend, klar und auf Conversions ausgerichtet. Erstelle einen kommerziell ausgerichteten Text.'
         : 'Du bist ein Fachexperte und SEO-Redakteur. Dein Stil ist informativ, klar und hilfreich. Erstelle einen informationsorientierten Text.';
 
+let kontext = "";
+    if (zielgruppe) kontext += `- ZIELGRUPPE: ${zielgruppe}\n`;
+    if (tonalitaet) kontext += `- TONALITÄT: ${tonalitaet}\n`;
+    if (usp) kontext += `- ALLEINSTELLUNGSMERKMAL (USP): ${usp}\n`;
+
     // Dies ist dein vollständiger, umfangreicher Prompt-Text.
     return `
         Du bist ein erstklassiger SEO-Content-Strategist. Erstelle vollständigen Landingpage-Content für das Thema "${keyword}".
