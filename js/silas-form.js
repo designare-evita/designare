@@ -390,9 +390,16 @@ export function initSilasForm() {
     }
 
    function openPreviewModal() { 
+    console.log('openPreviewModal called');
+    console.log('previewModal element:', previewModal);
+    
     if (previewModal) {
+        console.log('Modal gefunden, füge visible-Klasse hinzu');
         document.body.classList.add('modal-open');
-        previewModal.classList.add('visible'); 
+        previewModal.classList.add('visible');
+        console.log('Modal classes after adding visible:', previewModal.classList.toString());
+    } else {
+        console.log('ERROR: Preview modal element not found!');
     }
 }
 
