@@ -154,8 +154,7 @@ const generationPromises = keywords.map(async (item) => {
         }
         if (!model) throw new Error(`Kein KI-Modell für '${keyword}' verfügbar.`);
 
-        // KORREKTUR 2: Alle ausgelesenen Felder werden jetzt korrekt an die Prompt-Funktion übergeben
-        createSilasPrompt(keyword, intent, zielgruppe, tonalitaet, usp, domain, email, phone);
+       const silasPrompt = createSilasPrompt(keyword, intent, zielgruppe, tonalitaet, usp, domain, email, phone);
         
         const result = await model.generateContent(prompt);
         const response = await result.response;
