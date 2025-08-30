@@ -1,33 +1,49 @@
 // api/track-visitor.js
 
-const fs = require('fs');
-const path = require('path');
+// Firebase-SDKs importieren
+const { initializeApp } = require('firebase/app');
+const { getFirestore, collection, addDoc } = require('firebase/firestore');
 
-module.exports = (req, res) => {
+// Deine Firebase-Konfiguration hier einfügen
+// Du findest diese in den Projekteinstellungen deiner Firebase-Konsole
+const firebaseConfig = {
+  apiKey: "AIzaSyC1KW-lxl33sKSspJ4uopEkl_SAmvuMHEk",
+  authDomain: "visitor-tracker-designare.firebaseapp.com",
+  projectId: "visitor-tracker-designare",
+  storageBucket: "visitor-tracker-designare.firebasestorage.app",
+  messagingSenderId: "544570726375",
+  appId: "1:544570726375:web:8488cb038a58003080cf42"
+};
+
+// Firebase initialisieren und Firestore-Instanz erhalten
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+module.exports = async (req, res) => {
   // Wichtige Besucherinformationen aus dem Request-Header extrahieren
   const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
   const userAgent = req.headers['user-agent'];
   const timestamp = new Date().toISOString();
   const page = req.headers.referer || 'Unbekannt'; // Welche Seite wurde besucht
 
-  // Die Zeile, die in die Log-Datei geschrieben wird
-  const logEntry = `${timestamp}, IP: ${ip}, User-Agent: ${userAgent}, Seite: ${page}\n`;
+  // Datenobjekt für die Datenbank erstellen
+  const visitorData = {
+    ip,
+    userAgent,
+    timestamp,
+    page
+  };
 
-  // Pfad zur Log-Datei. Wir speichern sie im Verzeichnis /tmp/, 
-  // das von Serverless-Plattformen wie Vercel für temporäre Dateien genutzt wird.
-  // WICHTIG: Auf Vercel werden diese Logs nach einiger Zeit gelöscht. 
-  // Für eine dauerhafte Speicherung wäre eine Datenbank die bessere Lösung.
-  const logFilePath = path.join('/tmp', 'visitor_log.txt');
+  try {
+    // Daten in die "visitors"-Collection in Firestore schreiben
+    const docRef = await addDoc(collection(db, "visitors"), visitorData);
+    console.log("Besucherdaten erfolgreich in Firestore gespeichert. Dokument-ID:", docRef.id);
 
-  // Log-Eintrag in die Datei schreiben
-  fs.appendFile(logFilePath, logEntry, (err) => {
-    if (err) {
-      console.error('Fehler beim Schreiben der Log-Datei:', err);
-      // Sende eine Fehlerantwort, falls das Schreiben fehlschlägt
-      return res.status(500).send('Fehler beim Protokollieren des Besuchs.');
-    }
-
-    // Sende eine erfolgreiche Antwort (200 OK) zurück
-    res.status(200).send('Besuch erfolgreich protokolliert.');
-  });
+    // Erfolgreiche Antwort zurücksenden
+    res.status(200).send('Besuch erfolgreich protokolliert und in Firestore gespeichert.');
+  } catch (e) {
+    console.error("Fehler beim Hinzufügen des Dokuments:", e);
+    // Fehlerantwort senden
+    res.status(500).send('Fehler beim Speichern der Besucherdaten.');
+  }
 };
