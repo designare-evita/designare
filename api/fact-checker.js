@@ -11,18 +11,18 @@ class FactChecker {
             /(garantiert|100%|immer|nie)/gi // Absolute Aussagen
         ];
 
-        this.problematicPhrases = {
-            'garantiert': { replacement: 'in der Regel', severity: 'high' },
-            '100%': { replacement: 'sehr hohe', severity: 'high' },
-            'immer': { replacement: 'üblicherweise', severity: 'medium' },
-            'nie': { replacement: 'selten', severity: 'medium' },
-            'nummer 1': { replacement: 'eine führende Position', severity: 'high' },
-            'marktführer': { replacement: 'ein etablierter Anbieter', severity: 'high' },
-            'revolutionär': { replacement: 'innovativ', severity: 'medium' },
-            'einzigartig': { replacement: 'besonders', severity: 'low' },
-            'beste': { replacement: 'sehr gute', severity: 'medium' },
-            'größte': { replacement: 'eine der größten', severity: 'medium' }
-        };
+this.problematicPhrases = {
+    'garantiert': { replacement: 'in der Regel', severity: 'high' },
+    '100%': { replacement: 'sehr hohe', severity: 'high' },
+    'immer': { replacement: 'üblicherweise', severity: 'medium' },
+    'nie': { replacement: 'selten', severity: 'medium' },
+    'nummer 1': { replacement: 'eine führende Position', severity: 'high' },
+    'marktführer': { replacement: 'ein etablierter Anbieter', severity: 'high' },
+    'revolutionär': { replacement: 'innovativ', severity: 'medium' },
+    'einzigartig': { replacement: 'besonders', severity: 'low' },
+    'beste': { replacement: 'sehr gute', severity: 'medium' },
+    'größte': { replacement: 'eine der größten', severity: 'medium' }
+};
     }
 
     /**
