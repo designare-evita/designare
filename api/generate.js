@@ -1,5 +1,5 @@
 // api/generate.js - DEINE STABILE VERSION, SORGFÄLTIG FÜR BULK PROCESSING UMGEBAUT
-
+const { FactChecker } = require("./fact-checker");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 // KORRIGIERTE PROMPT-FUNKTION
