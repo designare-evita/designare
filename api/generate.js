@@ -128,7 +128,7 @@ module.exports = async (req, res) => {
 // KORRIGIERTER BLOCK FÜR DIE VERARBEITUNG
 const generationPromises = keywords.map(async (item) => {
     // KORREKTUR 1: Alle Felder werden jetzt aus dem "item"-Objekt ausgelesen
-    const { keyword, intent, zielgruppe, tonalitaet, usp } = item;
+    const { keyword, intent, zielgruppe, tonalitaet, usp, domain, email, phone } = item;
     try {
         // --- START: DEINE VOLLSTÄNDIGE LOGIK FÜR EIN EINZELNES KEYWORD ---
 
@@ -155,7 +155,7 @@ const generationPromises = keywords.map(async (item) => {
         if (!model) throw new Error(`Kein KI-Modell für '${keyword}' verfügbar.`);
 
         // KORREKTUR 2: Alle ausgelesenen Felder werden jetzt korrekt an die Prompt-Funktion übergeben
-        const prompt = createSilasPrompt(keyword, intent, zielgruppe, tonalitaet, usp);
+        createSilasPrompt(keyword, intent, zielgruppe, tonalitaet, usp, domain, email, phone);
         
         const result = await model.generateContent(prompt);
         const response = await result.response;
