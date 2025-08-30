@@ -24,11 +24,12 @@ export function initSilasForm() {
     const closePreviewModalBtn = document.getElementById('close-preview-modal');
     const previewContentArea = document.getElementById('preview-content-area');
     const textIntentSelect = document.getElementById('text-intent-select');
-
-    // NEU: DOM-Elemente für die neuen Felder
     const zielgruppeInput = document.getElementById('text-zielgruppe-input');
     const tonalitaetInput = document.getElementById('text-tonalitaet-input');
     const uspInput = document.getElementById('text-usp-input');
+const domainInput = document.getElementById('text-domain-input');
+const emailInput = document.getElementById('text-email-input');
+const phoneInput = document.getElementById('text-phone-input');
 
     let keywordList = [];
     let allGeneratedData = [];
