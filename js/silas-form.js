@@ -417,38 +417,6 @@ if (item.phone) {
         container.appendChild(resultCard);
     }
 
-        // Fact-Check Anzeige hinzufügen
-    if (data._factCheck) {
-        const factCheckHtml = `
-            <div class="fact-check-indicator" style="
-                background: ${data._factCheck.confidenceScore >= 70 ? '#28a745' : '#ffc107'};
-                color: white;
-                padding: 8px 12px;
-                border-radius: 4px;
-                margin: 10px 0;
-                font-size: 0.9rem;
-            ">
-                Fact-Check Score: ${data._factCheck.confidenceScore}/100
-                ${data._factCheck.corrections.length > 0 ? 
-                  `<br><small>${data._factCheck.corrections.length} Korrekturen angewendet</small>` : 
-                  ''}
-            </div>
-            ${data._factCheck.corrections.length > 0 ? `
-                <details style="margin: 10px 0;">
-                    <summary style="cursor: pointer; color: #ffc107;">Korrekturen anzeigen</summary>
-                    <ul style="margin: 5px 0; padding-left: 20px;">
-                        ${data._factCheck.corrections.map(c => 
-                            `<li style="color: #ccc; font-size: 0.8rem;">
-                                "${c.from}" → "${c.to}"
-                            </li>`
-                        ).join('')}
-                    </ul>
-                </details>
-            ` : ''}
-        `;
-        resultCard.innerHTML += factCheckHtml;
-}
-}
     function openPreviewModal() { if (previewModal) previewModal.classList.add('visible'); }
     function closePreviewModal() { if (previewModal) previewModal.classList.remove('visible'); }
 
