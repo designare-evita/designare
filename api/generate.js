@@ -14,6 +14,9 @@ function createSilasPrompt(keyword, intent, zielgruppe, tonalitaet, usp) {
     if (zielgruppe) kontext += `- ZIELGRUPPE: ${zielgruppe}\n`;
     if (tonalitaet) kontext += `- TONALITÄT: ${tonalitaet}\n`;
     if (usp) kontext += `- ALLEINSTELLUNGSMERKMAL (USP): ${usp}\n`;
+    if (domain) kontext += `- WEBSEITE: ${domain}\n`;
+    if (email) kontext += `- E-MAIL: ${email}\n`;
+    if (phone) kontext += `- TELEFONNUMMER: ${phone}\n`;
 
     // Der Prompt-Text wird um den neuen Kontext-Block erweitert
     return `
