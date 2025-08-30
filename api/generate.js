@@ -5,6 +5,8 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 // KORRIGIERTE PROMPT-FUNKTION
 
 function createSilasPrompt(keyword, intent, zielgruppe, tonalitaet, usp, domain, email, phone) {
+    return FactChecker.createFactCheckAwarePrompt(keyword, intent, zielgruppe, tonalitaet, usp, domain, email, phone);
+}
     const roleAndTask = intent === 'commercial' 
         ? 'Du bist ein erstklassiger Marketing-Texter und SEO-Stratege. Dein Stil ist überzeugend, klar und auf Conversions ausgerichtet.'
         : 'Du bist ein Fachexperte und SEO-Redakteur. Dein Stil ist informativ, klar und hilfreich.';
