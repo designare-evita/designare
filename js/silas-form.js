@@ -284,6 +284,24 @@ const phoneInput = document.getElementById('text-phone-input');
             intentBadge.style.cssText = `background-color: ${item.intent === 'commercial' ? '#28a745' : '#17a2b8'}; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold;`;
             badgesContainer.appendChild(intentBadge);
 
+            if (item.domain) {
+    const domainBadge = document.createElement('span');
+    domainBadge.textContent = `Domain: ${item.domain}`;
+    domainBadge.style.cssText = `background-color: #4CAF50; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold;`;
+    badgesContainer.appendChild(domainBadge);
+}
+if (item.email) {
+    const emailBadge = document.createElement('span');
+    emailBadge.textContent = `E-Mail: ${item.email}`;
+    emailBadge.style.cssText = `background-color: #007bff; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold;`;
+    badgesContainer.appendChild(emailBadge);
+}
+if (item.phone) {
+    const phoneBadge = document.createElement('span');
+    phoneBadge.textContent = `Tel: ${item.phone}`;
+    phoneBadge.style.cssText = `background-color: #dc3545; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold;`;
+    badgesContainer.appendChild(phoneBadge);
+}
             if (item.zielgruppe) {
                 const zielgruppeBadge = document.createElement('span');
                 zielgruppeBadge.textContent = `Für: ${item.zielgruppe}`;
