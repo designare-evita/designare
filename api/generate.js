@@ -156,7 +156,7 @@ const generationPromises = keywords.map(async (item) => {
 
        const silasPrompt = createSilasPrompt(keyword, intent, zielgruppe, tonalitaet, usp, domain, email, phone);
         
-        const result = await model.generateContent(prompt);
+        const result = await model.generateContent(silasPrompt);
         const response = await result.response;
         const rawText = await response.text();
 
