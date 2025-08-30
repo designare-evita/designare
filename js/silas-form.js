@@ -211,6 +211,9 @@ const phoneInput = document.getElementById('text-phone-input');
             const tonalitaet = tonalitaetInput.value.trim();
             const usp = uspInput.value.trim();
             const currentIntent = textIntentSelect.value;
+        const domain = domainInput.value.trim();
+        const email = emailInput.value.trim();
+        const phone = phoneInput.value.trim();
 
             for (let i = 0; i < newKeywords.length; i++) {
                 validateKeyword(newKeywords[i]);
@@ -227,13 +230,19 @@ const phoneInput = document.getElementById('text-phone-input');
                         intent: currentIntent,
                         zielgruppe: zielgruppe,
                         tonalitaet: tonalitaet,
-                        usp: usp
+                        usp: usp,
+                    domain: domain,
+                    email: email,
+                    phone: phone
                     });
                 } else {
                     keywordList[existingIndex].intent = currentIntent;
                     keywordList[existingIndex].zielgruppe = zielgruppe;
                     keywordList[existingIndex].tonalitaet = tonalitaet;
                     keywordList[existingIndex].usp = usp;
+                 keywordList[existingIndex].domain = domain;
+                keywordList[existingIndex].email = email;
+                keywordList[existingIndex].phone = phone;
                 }
             });
 
