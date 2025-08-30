@@ -208,6 +208,20 @@ jsonData._meta = { model_used: usedModel, generation_time: new Date().toISOStrin
 console.log(`✅ Antwort für '${keyword}' bereit.`);
 return jsonData;
 
+// Fact-Checking nur bei erfolgreich generiertem Content
+if (!parseError) {
+    const factChecker = new FactChecker();
+    const factCheckResult = await factChecker.checkContent(jsonData, keyword);
+    jsonData = factCheckResult.correctedContent;
+    jsonData._factCheck = {
+        confidenceScore: factCheckResult.confidenceScore,
+        totalClaims: factCheckResult.totalClaims,
+        flaggedClaims: factCheckResult.flaggedClaims.length,
+        corrections: factCheckResult.corrections,
+        // ... weitere Metadaten
+    };
+}
+
         // --- ENDE: DEINE LOGIK FÜR EIN EINZELNES KEYWORD ---
 
       } catch (error) {
