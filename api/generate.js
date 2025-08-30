@@ -198,9 +198,13 @@ const generationPromises = keywords.map(async (item) => {
         // DEIN ORIGINAL: Finale Antwort-Struktur
         jsonData.keyword = keyword;
         jsonData.intent = intent;
-        jsonData._meta = { model_used: usedModel, generation_time: new Date().toISOString(), master_mode: isMasterRequest, success: !parseError };
-        console.log(`✅ Antwort für '${keyword}' bereit.`);
-        return jsonData;
+        jsonData.domain = domain;
+jsonData.email = email;
+jsonData.phone = phone;
+
+jsonData._meta = { model_used: usedModel, generation_time: new Date().toISOString(), master_mode: isMasterRequest, success: !parseError };
+console.log(`✅ Antwort für '${keyword}' bereit.`);
+return jsonData;
 
         // --- ENDE: DEINE LOGIK FÜR EIN EINZELNES KEYWORD ---
 
