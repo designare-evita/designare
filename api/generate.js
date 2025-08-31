@@ -11,6 +11,7 @@ function createSilasPrompt(keyword, intent, zielgruppe, tonalitaet, usp, domain,
 
     // Ein dynamischer Kontext-Block wird erstellt
     let kontext = "";
+if (brand) kontext += `- BRAND/ANSPRECHPARTNER: ${brand}\n`;
     if (zielgruppe) kontext += `- ZIELGRUPPE: ${zielgruppe}\n`;
     if (tonalitaet) kontext += `- TONALITÄT: ${tonalitaet}\n`;
     if (usp) kontext += `- ALLEINSTELLUNGSMERKMAL (USP): ${usp}\n`;
@@ -128,7 +129,7 @@ module.exports = async (req, res) => {
 // KORRIGIERTER BLOCK FÜR DIE VERARBEITUNG
 const generationPromises = keywords.map(async (item) => {
     // KORREKTUR 1: Alle Felder werden jetzt aus dem "item"-Objekt ausgelesen
-    const { keyword, intent, zielgruppe, tonalitaet, usp, domain, email, phone } = item;
+    const { keyword, intent, zielgruppe, tonalitaet, usp, domain, email, phone, brand } = item;
     try {
         // --- START: DEINE VOLLSTÄNDIGE LOGIK FÜR EIN EINZELNES KEYWORD ---
 
@@ -201,6 +202,7 @@ const generationPromises = keywords.map(async (item) => {
         jsonData.domain = domain;
 jsonData.email = email;
 jsonData.phone = phone;
+jsonData.brand = brand;
 
 jsonData._meta = { model_used: usedModel, generation_time: new Date().toISOString(), master_mode: isMasterRequest, success: !parseError };
 console.log(`✅ Antwort für '${keyword}' bereit.`);
@@ -211,7 +213,7 @@ return jsonData;
       } catch (error) {
         // Fehlerbehandlung für ein einzelnes Keyword
         console.error(`💥 Fehler bei der Verarbeitung von '${keyword}':`, error);
-        return { keyword, intent, error: error.message, _meta: { success: false, master_mode: isMasterRequest } };
+        return { keyword, intent, brand, error: error.message, _meta: { success: false, master_mode: isMasterRequest } };
       }
     });
 
