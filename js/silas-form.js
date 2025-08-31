@@ -1,19 +1,33 @@
-// js/silas-form.js - FINALE, VOLLSTÄNDIGE VERSION MIT ALLEN FUNKTIONEN UND KORREKTUREN
+// js/silas-form.js - KORRIGIERTE UND ROBUSTE VERSION
 
 export function initSilasForm() {
+    // Prüfe erst, ob wir auf der richtigen Seite sind
     const silasForm = document.getElementById('silas-form');
     if (!silasForm) {
-        return; // Stellt sicher, dass das Skript nur auf der richtigen Seite läuft
+        console.log('Silas Form nicht gefunden - überspringe Initialisierung');
+        return;
     }
 
+    console.log('🎯 Initialisiere Silas Form...');
+
     // =================================================================================
-    // DEIN ORIGINAL: ALLE VARIABLEN & KONSTANTEN
+    // KONSTANTEN & VARIABLEN
     // =================================================================================
     const MASTER_PASSWORD = "SilasUnlimited2024!";
-    let DEMO_LIMITS = { maxKeywordsPerSession: 3, maxGenerationsPerHour: 5, maxGenerationsPerDay: 10, cooldownBetweenRequests: 30000 };
-    const MASTER_LIMITS = { maxKeywordsPerSession: 50, maxGenerationsPerHour: 100, maxGenerationsPerDay: 500, cooldownBetweenRequests: 1000 };
+    let DEMO_LIMITS = { 
+        maxKeywordsPerSession: 3, 
+        maxGenerationsPerHour: 5, 
+        maxGenerationsPerDay: 10, 
+        cooldownBetweenRequests: 30000 
+    };
+    const MASTER_LIMITS = { 
+        maxKeywordsPerSession: 50, 
+        maxGenerationsPerHour: 100, 
+        maxGenerationsPerDay: 500, 
+        cooldownBetweenRequests: 1000 
+    };
     
-    // DOM-ELEMENTE
+    // DOM-ELEMENTE SICHER ABRUFEN
     const keywordInput = document.getElementById('silas-keyword-input');
     const keywordDisplayList = document.getElementById('keyword-display-list');
     const startGenerationBtn = document.getElementById('start-generation-btn');
@@ -24,16 +38,23 @@ export function initSilasForm() {
     const closePreviewModalBtn = document.getElementById('close-preview-modal');
     const previewContentArea = document.getElementById('preview-content-area');
 
+    // Prüfe kritische Elemente
+    if (!keywordInput || !keywordDisplayList || !startGenerationBtn || !silasStatus) {
+        console.error('❌ Kritische Silas-Elemente fehlen im DOM');
+        return;
+    }
+
     let keywordList = [];
-    // Speichert jetzt die vollständigen factCheckResult-Objekte
-    let allGeneratedData = []; 
+    let allGeneratedData = [];
     let isMasterMode = false;
 
     // =================================================================================
-    // DEINE ORIGINALE LOGIK: UI & LIMITIERUNGEN (MIT KORREKTUREN)
+    // HILFSFUNKTIONEN
     // =================================================================================
     
     function updateKeywordDisplay() {
+        if (!keywordDisplayList) return;
+        
         keywordDisplayList.innerHTML = '';
         if (keywordList.length === 0) {
             keywordDisplayList.innerHTML = '<li class="empty-list-info">Füge Keywords hinzu, um Content-Themen zu erstellen.</li>';
@@ -41,16 +62,32 @@ export function initSilasForm() {
             keywordList.forEach((keyword, index) => {
                 const li = document.createElement('li');
                 li.setAttribute('data-keyword', keyword);
-                li.innerHTML = `<span>${keyword}</span><div class="status">Bereit</div><button class="remove-btn" data-index="${index}">&times;</button>`;
+                li.innerHTML = `
+                    <span>${escapeHtml(keyword)}</span>
+                    <div class="status">Bereit</div>
+                    <button class="remove-btn" data-index="${index}">&times;</button>
+                `;
                 keywordDisplayList.appendChild(li);
             });
         }
-        startGenerationBtn.disabled = keywordList.length === 0;
-        clearListBtn.disabled = keywordList.length === 0;
+        
+        if (startGenerationBtn) startGenerationBtn.disabled = keywordList.length === 0;
+        if (clearListBtn) clearListBtn.disabled = keywordList.length === 0;
+    }
+
+    function escapeHtml(unsafe) {
+        if (typeof unsafe !== 'string') return '';
+        return unsafe
+             .replace(/&/g, "&amp;")
+             .replace(/</g, "&lt;")
+             .replace(/>/g, "&gt;")
+             .replace(/"/g, "&quot;")
+             .replace(/'/g, "&#039;");
     }
 
     function addKeywords() {
-        // KORREKTUR: Die 'limits'-Variable wurde hier hinzugefügt, um den Fehler zu beheben.
+        if (!keywordInput) return;
+        
         const limits = isMasterMode ? MASTER_LIMITS : DEMO_LIMITS;
         const keywords = keywordInput.value.split(',')
             .map(kw => kw.trim())
@@ -66,6 +103,10 @@ export function initSilasForm() {
         updateKeywordDisplay();
     }
     
+    // =================================================================================
+    // TRACKING & LIMITS
+    // =================================================================================
+    
     function getTrackingData() {
         try {
             const data = localStorage.getItem('silasDemoTracking');
@@ -76,10 +117,13 @@ export function initSilasForm() {
     }
 
     function setTrackingData(data) {
-        localStorage.setItem('silasDemoTracking', JSON.stringify(data));
+        try {
+            localStorage.setItem('silasDemoTracking', JSON.stringify(data));
+        } catch (e) {
+            console.error('Fehler beim Speichern der Tracking-Daten:', e);
+        }
     }
 
-    // KORRIGIERTE VERSION: Robuster gemacht, um Abstürze zu verhindern.
     function checkLimits() {
         try {
             if (isMasterMode) {
@@ -105,9 +149,6 @@ export function initSilasForm() {
             if (generationsLastHour >= DEMO_LIMITS.maxGenerationsPerHour) {
                 return { allowed: false, reason: "Stundenlimit erreicht." };
             }
-            if (keywordList.length > DEMO_LIMITS.maxKeywordsPerSession) {
-                return { allowed: false, reason: "Maximale Keywords pro Sitzung überschritten." };
-            }
             
             const lastGenerationTime = trackingData.generations[trackingData.generations.length - 1];
             if (lastGenerationTime && (now - lastGenerationTime < DEMO_LIMITS.cooldownBetweenRequests)) {
@@ -117,31 +158,26 @@ export function initSilasForm() {
             return { allowed: true };
         } catch (error) {
             console.error("Fehler in checkLimits:", error);
-            // Fallback, um einen Absturz der Anwendung zu verhindern
             return { allowed: false, reason: "Interner Fehler bei der Limit-Prüfung." };
         }
     }
     
-    function initDemoTracking() {
-        if (!localStorage.getItem('silasDemoTracking')) {
-            setTrackingData({ lastReset: Date.now(), generations: [] });
-        }
-    }
-    
     function showDemoStatus() {
+        const statusDiv = document.getElementById('demo-status');
+        if (!statusDiv) return;
+        
         if (isMasterMode) {
-            const statusDiv = document.getElementById('demo-status');
-            if(statusDiv) statusDiv.innerHTML = '<p class="master-mode-active">⚡ Master-Modus Aktiv</p>';
+            statusDiv.innerHTML = '<p class="master-mode-active">⚡ Master-Modus Aktiv</p>';
             return;
         }
-        let trackingData = getTrackingData();
-        const now = Date.now();
-        const oneHour = 60 * 60 * 1000;
-        const generationsLastHour = trackingData.generations.filter(ts => now - ts < oneHour).length;
-        const generationsLastDay = trackingData.generations.length;
+        
+        try {
+            let trackingData = getTrackingData();
+            const now = Date.now();
+            const oneHour = 60 * 60 * 1000;
+            const generationsLastHour = trackingData.generations.filter(ts => now - ts < oneHour).length;
+            const generationsLastDay = trackingData.generations.length;
 
-        const statusDiv = document.getElementById('demo-status');
-        if (statusDiv) {
             statusDiv.innerHTML = `
                 <p><strong>Demo-Status:</strong></p>
                 <ul>
@@ -149,12 +185,17 @@ export function initSilasForm() {
                     <li>Tag: ${generationsLastDay}/${DEMO_LIMITS.maxGenerationsPerDay}</li>
                 </ul>
             `;
+        } catch (error) {
+            console.error('Fehler beim Anzeigen des Demo-Status:', error);
         }
     }
 
     function createMasterPasswordUI() {
         const container = document.querySelector('.ai-container');
         if (!container) return;
+
+        // Prüfe, ob das Passwort-Input bereits existiert
+        if (document.getElementById('master-password-input')) return;
 
         const passwordInput = document.createElement('input');
         passwordInput.type = 'password';
@@ -167,13 +208,18 @@ export function initSilasForm() {
             if (e.target.value === MASTER_PASSWORD) {
                 isMasterMode = true;
                 DEMO_LIMITS = MASTER_LIMITS;
-                console.log("Master-Modus aktiviert!");
+                console.log("🚀 Master-Modus aktiviert!");
                 passwordInput.style.borderColor = 'lime';
                 showDemoStatus();
             } else {
-                if(isMasterMode) { // Nur zurücksetzen, wenn es aktiv war
+                if(isMasterMode) {
                     isMasterMode = false;
-                    DEMO_LIMITS = { maxKeywordsPerSession: 3, maxGenerationsPerHour: 5, maxGenerationsPerDay: 10, cooldownBetweenRequests: 30000 };
+                    DEMO_LIMITS = { 
+                        maxKeywordsPerSession: 3, 
+                        maxGenerationsPerHour: 5, 
+                        maxGenerationsPerDay: 10, 
+                        cooldownBetweenRequests: 30000 
+                    };
                     passwordInput.style.borderColor = '';
                     console.log("Master-Modus deaktiviert.");
                     showDemoStatus();
@@ -181,281 +227,19 @@ export function initSilasForm() {
             }
         });
         
-        container.insertBefore(passwordInput, container.querySelector('#silas-form'));
+        const formElement = container.querySelector('#silas-form');
+        if (formElement) {
+            container.insertBefore(passwordInput, formElement);
+        } else {
+            container.appendChild(passwordInput);
+        }
     }
 
     // =================================================================================
-    // KERNFUNKTION: CONTENT-GENERIERUNG (JETZT MIT FACTCHECKER-INTEGRATION)
+    // CONTENT-GENERIERUNG
     // =================================================================================
 
     async function handleKeywordGeneration() {
-        const startButton = document.getElementById('start-generation-btn');
-        const clearButton = document.getElementById('clear-list-btn');
-        const statusElement = document.getElementById('silas-status');
-        const responseContainer = document.getElementById('silas-response-container');
-
-        // KORREKTUR: Der Limit-Check ist jetzt absturzsicher.
-        const limitCheck = checkLimits();
-        console.log('Limit Check Result:', limitCheck); // Debugging-Hilfe
-        if (!limitCheck || !limitCheck.allowed) {
-            statusElement.textContent = `❌ Limit erreicht: ${limitCheck.reason || 'Unbekannter Grund'}`;
+        if (!startGenerationBtn || !silasStatus || !silasResponseContainer) {
+            console.error('Kritische UI-Elemente für Generierung fehlen');
             return;
-        }
-
-        startButton.disabled = true;
-        clearButton.disabled = true;
-        statusElement.textContent = '🔮 Silas zaubert... bitte warten.';
-        
-        const keywords = [...keywordList];
-        const options = {
-            intent: document.getElementById('text-intent-select').value,
-            zielgruppe: document.getElementById('text-zielgruppe-input').value,
-            tonalitaet: document.getElementById('text-tonalitaet-input').value,
-            usp: document.getElementById('text-usp-input').value,
-            domain: document.getElementById('text-domain-input').value,
-            email: document.getElementById('text-email-input').value,
-            phone: document.getElementById('text-phone-input').value,
-            brand: document.getElementById('text-brand-input').value,
-            isMasterRequest: isMasterMode
-        };
-
-        responseContainer.style.display = 'block';
-        responseContainer.innerHTML = '';
-        allGeneratedData = [];
-
-        try {
-            const response = await fetch('/api/generate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ keywords, ...options })
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(`Serverfehler: ${errorData.message || response.statusText}`);
-            }
-
-            const results = await response.json();
-            
-            results.forEach(result => {
-                allGeneratedData.push(result);
-                displaySingleResult(result.keyword, result);
-            });
-
-            statusElement.textContent = `✅ ${keywords.length} Content-Themen erfolgreich erstellt.`;
-            createDownloadButton();
-
-            const trackingData = getTrackingData();
-            keywords.forEach(() => trackingData.generations.push(Date.now()));
-            setTrackingData(trackingData);
-            showDemoStatus();
-
-        } catch (error) {
-            console.error('Fehler bei der Content-Generierung:', error);
-            statusElement.textContent = `💥 Fehler: ${error.message}`;
-        } finally {
-            startButton.disabled = keywordList.length === 0;
-            clearButton.disabled = keywordList.length === 0;
-        }
-    }
-
-    // =================================================================================
-    // UI-DARSTELLUNG DER ERGEBNISSE
-    // =================================================================================
-    
-    function displaySingleResult(keyword, result) {
-        const container = document.getElementById('silas-response-container');
-        const keywordStatusElement = document.querySelector(`li[data-keyword="${keyword}"] .status`);
-
-        if (result.error || (result.correctedContent && result.correctedContent._parse_error)) {
-            if (keywordStatusElement) {
-                keywordStatusElement.textContent = '❌ Fehler';
-                keywordStatusElement.className = 'status error';
-            }
-            const errorElement = document.createElement('div');
-            errorElement.className = 'result-item';
-            errorElement.innerHTML = `<h4>Fehler bei: "${keyword}"</h4><p class="error-message">${result.error || (result.correctedContent ? result.correctedContent.meta_description : 'Unbekannter Fehler')}</p>`;
-            container.appendChild(errorElement);
-            return;
-        }
-
-        if (keywordStatusElement) {
-            keywordStatusElement.textContent = '✅ Fertig';
-            keywordStatusElement.className = 'status success';
-        }
-
-        const resultElement = document.createElement('div');
-        resultElement.className = 'result-item';
-        resultElement.innerHTML = `
-            <h4>Ergebnis für: "${keyword}"</h4>
-            <div class="fact-check-summary">
-                <span class="confidence-score score-${getScoreColor(result.confidenceScore)}">
-                    Vertrauens-Score: ${result.confidenceScore}/100
-                </span>
-                <span class="corrections-count">
-                    Korrekturen: ${result.corrections.length}
-                </span>
-            </div>
-            ${result.corrections.length > 0 ? createCorrectionsList(result.corrections) : '<p class="no-corrections">Keine automatischen Korrekturen notwendig.</p>'}
-            <button class="cta-button preview-button" data-keyword="${keyword}">Vorschau anzeigen</button>
-        `;
-        container.appendChild(resultElement);
-    }
-    
-    function getScoreColor(score) {
-        if (score >= 80) return 'high';
-        if (score >= 60) return 'medium';
-        return 'low';
-    }
-
-    function createCorrectionsList(corrections) {
-        let listHtml = '<ul class="corrections-list">';
-        const correctionsToShow = corrections.slice(0, 3);
-        correctionsToShow.forEach(corr => {
-            listHtml += `<li><strong>[${corr.field}]</strong> "${escapeHtml(corr.from)}" wurde zu "${escapeHtml(corr.to)}" geändert.</li>`;
-        });
-        if (corrections.length > 3) {
-            listHtml += `<li>... und ${corrections.length - 3} weitere.</li>`;
-        }
-        listHtml += '</ul>';
-        return listHtml;
-    }
-
-    function escapeHtml(unsafe) {
-        if (typeof unsafe !== 'string') return '';
-        return unsafe
-             .replace(/&/g, "&amp;")
-             .replace(/</g, "&lt;")
-             .replace(/>/g, "&gt;")
-             .replace(/"/g, "&quot;")
-             .replace(/'/g, "&#039;");
-    }
-
-    // =================================================================================
-    // VORSCHAU & CSV-EXPORT
-    // =================================================================================
-
-    function showPreviewModal(data) {
-        if (!data) return;
-        let contentHtml = '<h2>Vorschau: ' + escapeHtml(data.post_title) + '</h2>';
-        for (const [key, value] of Object.entries(data)) {
-            if (key !== 'keyword' && !key.startsWith('_')) {
-                let displayValue = escapeHtml(value);
-                if (typeof value === 'string' && value.trim().startsWith('<ul>')) {
-                    displayValue = value;
-                }
-                contentHtml += `
-                    <div class="preview-field">
-                        <strong>${escapeHtml(key)}:</strong>
-                        <div>${displayValue}</div>
-                    </div>
-                `;
-            }
-        }
-        previewContentArea.innerHTML = contentHtml;
-        previewModal.style.display = 'flex';
-    }
-
-    function closePreviewModal() {
-        previewModal.style.display = 'none';
-    }
-
-    function createDownloadButton() {
-        const container = document.getElementById('silas-response-container');
-        const oldButton = document.getElementById('download-csv-btn');
-        if (oldButton) oldButton.remove();
-        
-        const downloadButton = document.createElement('button');
-        downloadButton.id = 'download-csv-btn';
-        downloadButton.className = 'cta-button';
-        downloadButton.innerHTML = '<i class="fas fa-download"></i> Alle als CSV herunterladen';
-        downloadButton.onclick = downloadCSV;
-        container.appendChild(downloadButton);
-    }
-    
-    function convertToCSV(dataArray) {
-        if (!dataArray || dataArray.length === 0) return '';
-        const firstValidItem = dataArray.find(item => item && item.correctedContent);
-        if (!firstValidItem) return '';
-
-        const headers = Object.keys(firstValidItem.correctedContent);
-        const csvRows = [headers.join(';')];
-        
-        for (const item of dataArray) {
-            // Nur gültige Ergebnisse in die CSV aufnehmen
-            if(!item || !item.correctedContent || item.error) continue;
-
-            const row = item.correctedContent;
-            const values = headers.map(header => {
-                const escaped = ('' + (row[header] || '')).replace(/"/g, '""');
-                return `"${escaped}"`;
-            });
-            csvRows.push(values.join(';'));
-        }
-        return csvRows.join('\n');
-    }
-
-    function downloadCSV() {
-        const csvContent = convertToCSV(allGeneratedData);
-        if(!csvContent) {
-            alert("Keine gültigen Daten zum Herunterladen vorhanden.");
-            return;
-        }
-        const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement("a");
-        const url = URL.createObjectURL(blob);
-        link.setAttribute("href", url);
-        link.setAttribute("download", "silas_generated_content.csv");
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-    }
-    
-    // =================================================================================
-    // EVENT LISTENERS
-    // =================================================================================
-    
-    silasForm.addEventListener('submit', function(e) { e.preventDefault(); addKeywords(); });
-    keywordInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); addKeywords(); } });
-    
-    keywordDisplayList.addEventListener('click', function(e) {
-        if (e.target.matches('.remove-btn')) {
-            const index = parseInt(e.target.dataset.index, 10);
-            keywordList.splice(index, 1);
-            updateKeywordDisplay();
-        }
-    });
-
-    clearListBtn.addEventListener('click', function() {
-        keywordList = [];
-        allGeneratedData = [];
-        updateKeywordDisplay();
-        silasResponseContainer.innerHTML = '';
-        silasResponseContainer.style.display = 'none';
-        silasStatus.textContent = 'Bereit zur Generierung.';
-    });
-
-    startGenerationBtn.addEventListener('click', handleKeywordGeneration);
-
-    silasResponseContainer.addEventListener('click', function(event) {
-        if (event.target.classList.contains('preview-button')) {
-            const keyword = event.target.getAttribute('data-keyword');
-            const dataToShow = allGeneratedData.find(d => d.keyword === keyword);
-            if (dataToShow) {
-                showPreviewModal(dataToShow.correctedContent);
-            }
-        }
-    });
-
-    if (closePreviewModalBtn) closePreviewModalBtn.addEventListener('click', closePreviewModal);
-    if (previewModal) previewModal.addEventListener('click', function(e) { if (e.target === previewModal) closePreviewModal(); });
-    
-    // INITIALISIERUNG
-    updateKeywordDisplay();
-    initDemoTracking();
-    showDemoStatus();
-    createMasterPasswordUI();
-}
-
