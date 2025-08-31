@@ -464,7 +464,7 @@ if (item.phone) {
             alert('Keine Daten zum Download verfügbar.');
             return;
         }
-        const headers = ["keyword", "domain", "email", "phone", "post_title", "post_name", "meta_title", "meta_description", "h1", "h2_1", "h2_2", "h2_3", "h2_4", "primary_cta", "secondary_cta", "hero_text", "hero_subtext", "benefits_list", "features_list", "social_proof", "testimonial_1", "testimonial_2", "pricing_title", "price_1", "price_2", "price_3", "faq_1", "faq_answer_1", "faq_2", "faq_answer_2", "faq_3", "faq_answer_3", "contact_info", "footer_cta", "trust_signals", "guarantee_text"];
+        const headers = ["keyword", "brand", "domain", "email", "phone", "post_title", "post_name", "meta_title", "meta_description", "h1", "h2_1", "h2_2", "h2_3", "h2_4", "primary_cta", "secondary_cta", "hero_text", "hero_subtext", "benefits_list", "features_list", "social_proof", "testimonial_1", "testimonial_2", "pricing_title", "price_1", "price_2", "price_3", "faq_1", "faq_answer_1", "faq_2", "faq_answer_2", "faq_3", "faq_answer_3", "contact_info", "footer_cta", "trust_signals", "guarantee_text"];
         let csvContent = headers.join(",") + "\n";
         allGeneratedData.forEach(function(rowData) {
             if (rowData.error) return;
