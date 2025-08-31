@@ -732,5 +732,112 @@
     width: 100% !important;
 }
 
+/* ... existing code ... */
+
+/* ==========================================================================
+   NEU: Stile für Fact-Checker-Ergebnisse
+   ========================================================================== */
+
+.result-item {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+}
+
+.result-item:hover {
+    border-color: #FCB500;
+}
+
+.result-item h4 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #FCB500;
+    font-size: 1.1em;
+}
+
+.fact-check-summary {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    margin-bottom: 15px;
+    font-size: 0.9em;
+    flex-wrap: wrap;
+}
+
+.confidence-score {
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-weight: bold;
+    color: #000;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.confidence-score.score-high { background-color: #28a745; color: #fff; }
+.confidence-score.score-medium { background-color: #fd7e14; color: #fff; }
+.confidence-score.score-low { background-color: #dc3545; color: #fff; }
+
+.corrections-count {
+    font-weight: 500;
+    color: #ccc;
+}
+
+.corrections-list {
+    list-style-type: '⚠️';
+    padding-left: 25px;
+    font-size: 0.85em;
+    background-color: rgba(0,0,0,0.15);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    padding: 12px 15px 12px 35px;
+    margin: 15px 0;
+}
+
+.corrections-list li {
+    margin-bottom: 8px;
+    line-height: 1.5;
+    color: #ddd;
+}
+
+.corrections-list li strong {
+    color: #FCB500;
+}
+
+.no-corrections {
+    font-style: italic;
+    color: #999;
+    font-size: 0.9em;
+    margin: 15px 0;
+}
+
+.error-message {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.preview-field {
+    margin-bottom: 15px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 15px;
+}
+
+.preview-field strong {
+    display: block;
+    margin-bottom: 5px;
+    color: #FCB500;
+}
+
+.preview-field div {
+    background-color: rgba(0,0,0,0.2);
+    padding: 10px;
+    border-radius: 4px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
 
 
