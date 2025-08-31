@@ -30,72 +30,87 @@ async function askGemini(prompt, modelName = "gemini-1.5-flash-latest") {
         return response.text();
     } catch (error) {
         console.error(`Fehler bei der Anfrage an das Modell ${modelName}:`, error);
-        throw new Error(`Konnte keine Antwort vom Modell ${modelName} erhalten.`);
+        // Wirft den Fehler weiter, damit das Fallback-System greifen kann.
+        throw new Error(`API-Anfrage an ${modelName} fehlgeschlagen.`);
     }
 }
 
 /**
- * DEIN ORIGINALER HAUPT-HANDLER: Verarbeitet die Massen-Anfragen zur Content-Generierung,
- * jetzt erweitert um den FactChecker-Workflow.
+ * DEINE ORIGINALE HILFSFUNKTION: Bereinigt den JSON-String, den die KI zurückgibt.
+ * @param {string} text - Der rohe Text von der KI.
+ * @returns {string} Ein bereinigter, JSON-kompatibler String.
+ */
+function cleanJsonString(text) {
+    // Entfernt "```json" und "```" sowie führende/nachfolgende Leerzeichen
+    let cleanedText = text.replace(/```json/g, '').replace(/```/g, '').trim();
+    return cleanedText;
+}
+
+/**
+ * DEINE ORIGINALE HAUPTFUNKTION: Der Vercel Serverless Handler
  */
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
-        return res.status(405).json({ message: 'Nur POST-Anfragen sind erlaubt' });
+        return res.status(405).json({ error: 'Method Not Allowed' });
     }
 
     try {
         const { keywords, intent, zielgruppe, tonalitaet, usp, domain, email, phone, brand, isMasterRequest } = req.body;
 
         if (!keywords || !Array.isArray(keywords) || keywords.length === 0) {
-            return res.status(400).json({ error: 'Keywords müssen als Array bereitgestellt werden.' });
+            return res.status(400).json({ error: 'Keywords-Array fehlt oder ist leer.' });
         }
 
-        console.log(`Starte Bulk-Generierung für ${keywords.length} Keywords...`);
+        console.log(`Starte Verarbeitung für ${keywords.length} Keywords...`);
 
-        // DEINE ORIGINALE LOGIK: Alle Keyword-Anfragen werden parallel verarbeitet.
+        // DEINE ORIGINALE LOGIK: Parallele Verarbeitung aller Keywords
         const generationPromises = keywords.map(async (keyword, index) => {
             try {
-                if (index > 0) await sleep(500);
+                // Kurze Pause zwischen den Anfragen, um Rate-Limits zu schonen
+                if (index > 0) {
+                    const delay = isMasterRequest ? 500 : 2000;
+                    await sleep(delay);
+                }
+                
+                console.log(`[${index + 1}/${keywords.length}] Verarbeite Keyword: '${keyword}'`);
 
                 // --- START DER FACTCHECKER-INTEGRATION ---
 
-                // 1. PROMPT ERSTELLEN (PROAKTIV)
-                // Die alte `createSilasPrompt` Funktion wird durch die Methode des FactCheckers ersetzt.
-                // Diese enthält bereits alle Anweisungen für qualitativ hochwertigen, FAKTENBASIERTEN Content.
+                // 1. Erstelle den optimierten Prompt mit den Fact-Checking Regeln
                 const factCheckAwarePrompt = FactChecker.createFactCheckAwarePrompt(
                     keyword, intent, zielgruppe, tonalitaet, usp, domain, email, phone, brand
                 );
-                
-                // 2. INHALT GENERIEREN (DEINE FALLBACK-LOGIK BLEIBT ERHALTEN)
-                let aiResponseJson;
-                let usedModel = isMasterRequest ? "gemini-1.5-pro-latest" : "gemini-1.5-flash-latest";
+
+                // 2. Rufe die KI auf, mit Fallback-System
+                let textResponse;
+                let usedModel = "gemini-1.5-flash-latest";
                 try {
-                    aiResponseJson = await askGemini(factCheckAwarePrompt, usedModel);
+                    textResponse = await askGemini(factCheckAwarePrompt, usedModel);
                 } catch (e) {
-                    console.warn(`Modell ${usedModel} fehlgeschlagen für '${keyword}', versuche Fallback...`);
-                    usedModel = "gemini-1.5-flash-latest";
-                    aiResponseJson = await askGemini(factCheckAwarePrompt, usedModel);
+                    console.warn(`Modell ${usedModel} fehlgeschlagen, versuche Fallback gemini-1.0-pro...`);
+                    usedModel = "gemini-1.0-pro";
+                    textResponse = await askGemini(factCheckAwarePrompt, usedModel);
                 }
 
-                // DEINE ORIGINALE JSON-PARSE-LOGIK BLEIBT ERHALTEN
+                // 3. Verarbeite die KI-Antwort
                 let initialContent;
                 try {
-                     initialContent = JSON.parse(aiResponseJson);
+                    initialContent = JSON.parse(cleanJsonString(textResponse));
                 } catch (e) {
-                    console.error(`JSON-Parse-Fehler für '${keyword}':`, e.message);
-                    initialContent = { 
-                        "post_title": `Fehler bei der Generierung für ${keyword}`, 
-                        "meta_description": "Die KI-Antwort war kein valides JSON.", 
-                        "_parse_error": true 
+                    // Wenn das Parsen fehlschlägt, wird ein Fehlerobjekt für die UI erstellt
+                    console.error(`Fehler beim Parsen des JSON für '${keyword}':`, e);
+                    initialContent = {
+                        _parse_error: true,
+                        meta_description: `Fehler beim Verarbeiten der KI-Antwort. Bitte erneut versuchen. Details: ${e.message}`
                     };
                 }
 
-                // 3. INHALT PRÜFEN & KORRIGIEREN (REAKTIV)
-                // Der von der KI gelieferte Inhalt wird nun analysiert, automatisch korrigiert und bewertet.
+                // 4. Führe den reaktiven Faktencheck durch
                 const factChecker = new FactChecker();
                 const factCheckResult = await factChecker.checkContent(initialContent, keyword);
-
-                // 4. METADATEN HINZUFÜGEN (DEINE LOGIK BLEIBT ERHALTEN)
+                
+                // 5. Füge die Metadaten deiner Original-Logik zum Ergebnis hinzu
+                factCheckResult.keyword = keyword;
                 factCheckResult._meta = {
                     model_used: usedModel,
                     generation_time: new Date().toISOString(),
