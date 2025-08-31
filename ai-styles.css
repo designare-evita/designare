@@ -839,5 +839,164 @@
     word-wrap: break-word;
 }
 
+/* SILAS KEYWORD-LISTE - KORRIGIERTE BADGE-STYLES */
+/* Füge diese Styles zu deiner ai-styles.css hinzu */
+
+#keyword-display-list li {
+    background-color: rgba(255, 255, 255, 0.05);
+    margin-bottom: 12px;
+    padding: 15px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.95rem;
+    color: #fff;
+    min-height: 50px;
+    gap: 10px;
+    transition: background-color 0.3s ease;
+}
+
+#keyword-display-list li:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Das Keyword selbst */
+#keyword-display-list li > span {
+    flex-grow: 1;
+    font-weight: 500;
+}
+
+/* Status Badge */
+#keyword-display-list li .status {
+    background-color: rgba(252, 181, 0, 0.2);
+    color: #FCB500;
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    min-width: 60px;
+    text-align: center;
+    border: 1px solid rgba(252, 181, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+/* Status Badge Varianten */
+#keyword-display-list li .status.success {
+    background-color: rgba(40, 167, 69, 0.2);
+    color: #28a745;
+    border-color: rgba(40, 167, 69, 0.3);
+}
+
+#keyword-display-list li .status.error {
+    background-color: rgba(220, 53, 69, 0.2);
+    color: #dc3545;
+    border-color: rgba(220, 53, 69, 0.3);
+}
+
+#keyword-display-list li .status.processing {
+    background-color: rgba(0, 123, 255, 0.2);
+    color: #007bff;
+    border-color: rgba(0, 123, 255, 0.3);
+    animation: pulse 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes pulse {
+    from { opacity: 0.6; }
+    to { opacity: 1; }
+}
+
+/* Remove Button */
+#keyword-display-list li .remove-btn {
+    background-color: #ff6b6b;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    min-width: 36px;
+    height: 36px;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+    margin-left: 10px;
+}
+
+#keyword-display-list li .remove-btn:hover {
+    background-color: #ff5252;
+    transform: scale(1.1);
+}
+
+/* Download Button 100% Breite */
+#download-csv-btn,
+#download-csv-dynamic {
+    width: 100% !important;
+    text-align: center !important;
+    border: 2px solid #ffc107 !important;
+    background-color: transparent !important;
+    color: #ffc107 !important;
+    padding: 15px 20px !important;
+    border-radius: 7px !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    font-size: 1.1rem !important;
+    font-weight: 600 !important;
+    margin-top: 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px !important;
+}
+
+#download-csv-btn:hover,
+#download-csv-dynamic:hover {
+    background-color: #ffc107 !important;
+    color: #2d2d2d !important;
+    box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3) !important;
+    transform: translateY(-2px) !important;
+}
+
+#download-csv-btn .fas,
+#download-csv-dynamic .fas {
+    font-size: 1.2rem !important;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    #keyword-display-list li {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        padding: 20px 15px;
+    }
+
+    #keyword-display-list li > span {
+        text-align: center;
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    #keyword-display-list li .status {
+        align-self: center;
+        min-width: 80px;
+    }
+
+    #keyword-display-list li .remove-btn {
+        align-self: center;
+        min-width: 44px;
+        height: 44px;
+        margin-left: 0;
+    }
+
+    #download-csv-btn,
+    #download-csv-dynamic {
+        padding: 18px 20px !important;
+        font-size: 1rem !important;
+    }
+}
+
 
 
