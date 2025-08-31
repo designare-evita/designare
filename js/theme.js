@@ -1,9 +1,8 @@
-// js/theme.js
+// js/theme.js - KORRIGIERTE VERSION
 
 import { updateParticleColors } from './effects.js';
 
 const body = document.body;
-const themeToggle = document.getElementById('theme-toggle');
 
 function applyTheme(theme) {
     if (theme === 'dark') {
@@ -12,7 +11,9 @@ function applyTheme(theme) {
         body.classList.remove('dark-mode');
     }
     // Nach jeder Theme-Änderung die Partikelfarben aktualisieren
-    updateParticleColors();
+    if (typeof updateParticleColors === 'function') {
+        updateParticleColors();
+    }
 }
 
 function handleThemeToggle() {
@@ -21,11 +22,27 @@ function handleThemeToggle() {
     applyTheme(newTheme);
 }
 
-// Exportiert eine Haupt-Initialisierungsfunktion für das Theme
+// KORRIGIERT: Funktion heißt jetzt 'initTheme' statt 'initThemeToggle'
 export function initTheme() {
-    if (themeToggle) {
-        const savedTheme = localStorage.getItem('theme') || 'dark';
-        applyTheme(savedTheme);
-        themeToggle.addEventListener('click', handleThemeToggle);
-    }
+    // Warte kurz, bis der Header geladen ist
+    const checkForThemeToggle = () => {
+        const themeToggle = document.getElementById('theme-toggle');
+        if (themeToggle) {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            applyTheme(savedTheme);
+            themeToggle.addEventListener('click', handleThemeToggle);
+            console.log('✅ Theme-Toggle initialisiert');
+        } else {
+            // Versuche es nochmal in 100ms, falls Header noch nicht geladen
+            setTimeout(checkForThemeToggle, 100);
+        }
+    };
+    
+    checkForThemeToggle();
+}
+
+// ZUSÄTZLICH: Export der alten Funktion für Rückwärtskompatibilität
+export function initThemeToggle() {
+    console.warn('initThemeToggle ist deprecated, verwende initTheme');
+    initTheme();
 }
