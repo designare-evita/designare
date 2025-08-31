@@ -53,14 +53,21 @@ export function initSilasForm() {
         // Prüfe ob Modal bereits existiert
         let existingModal = document.getElementById('silas-preview-modal');
         if (existingModal) {
+            // Stelle sicher, dass Event-Listener existieren
+            setupModalEventListeners(existingModal);
             return existingModal;
         }
 
         // Erstelle das Modal dynamisch
         const modalHTML = `
-            <div id="silas-preview-modal" class="modal-overlay" style="display: none;">
+            <div id="silas-preview-modal" class="modal-overlay" style="display: none; visibility: hidden; opacity: 0;">
                 <div class="modal-content preview-modal-content">
-                    <button id="close-preview-modal" class="close-button">&times;</button>
+                    <button id="close-preview-modal" class="close-button" type="button" 
+                            onclick="window.closeSilasPreview()" 
+                            onmousedown="window.closeSilasPreview()" 
+                            ontouchstart="window.closeSilasPreview()">
+                        &times;
+                    </button>
                     <div id="preview-content-area">
                         <!-- Content wird hier eingefügt -->
                     </div>
@@ -72,24 +79,62 @@ export function initSilasForm() {
         document.body.insertAdjacentHTML('beforeend', modalHTML);
         
         const modal = document.getElementById('silas-preview-modal');
-        const closeBtn = document.getElementById('close-preview-modal');
-        
-        // Event-Listener für Schließen
-        if (closeBtn) {
-            closeBtn.addEventListener('click', closePreviewModal);
-        }
-        
-        // Event-Listener für Klick außerhalb des Modals
-        if (modal) {
-            modal.addEventListener('click', function(e) {
-                if (e.target === modal) {
-                    closePreviewModal();
-                }
-            });
-        }
+        setupModalEventListeners(modal);
 
         console.log('✅ Vorschau-Modal dynamisch erstellt');
         return modal;
+    }
+
+    function setupModalEventListeners(modal) {
+        if (!modal) return;
+
+        const closeBtn = document.getElementById('close-preview-modal');
+        
+        // Entferne alte Event-Listener (falls vorhanden)
+        if (closeBtn) {
+            closeBtn.replaceWith(closeBtn.cloneNode(true));
+            const newCloseBtn = document.getElementById('close-preview-modal');
+            
+            // Event-Listener für Close-Button
+            newCloseBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('🔴 Close-Button geklickt');
+                closePreviewModal();
+            });
+
+            // Zusätzlich: Double-Click als Fallback
+            newCloseBtn.addEventListener('dblclick', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('🔴 Close-Button doppelt geklickt');
+                closePreviewModal();
+            });
+        }
+        
+        // Event-Listener für Klick außerhalb des Modals (neu erstellen)
+        modal.replaceWith(modal.cloneNode(true));
+        const newModal = document.getElementById('silas-preview-modal');
+        
+        newModal.addEventListener('click', function(e) {
+            if (e.target === newModal) {
+                console.log('🔴 Außerhalb des Modals geklickt');
+                closePreviewModal();
+            }
+        });
+
+        // Escape-Taste zum Schließen
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('silas-preview-modal');
+                if (modal && (modal.style.display === 'flex' || modal.classList.contains('visible'))) {
+                    console.log('🔴 Escape gedrückt');
+                    closePreviewModal();
+                }
+            }
+        });
+
+        console.log('✅ Modal Event-Listener eingerichtet');
     }
 
     function showPreviewModal(data) {
@@ -174,12 +219,21 @@ export function initSilasForm() {
     }
 
     function closePreviewModal() {
+        console.log('🔴 closePreviewModal() aufgerufen');
+        
         const modal = document.getElementById('silas-preview-modal');
         if (modal) {
+            // Mehrere Methoden zum Verstecken - als Fallback
             modal.style.display = 'none';
             modal.style.visibility = 'hidden';
             modal.style.opacity = '0';
             modal.classList.remove('visible');
+            
+            console.log('✅ Modal versteckt');
+            console.log('Modal display:', modal.style.display);
+            console.log('Modal visibility:', modal.style.visibility);
+        } else {
+            console.error('❌ Modal nicht gefunden beim Schließen');
         }
         
         // Scrollen wieder aktivieren
@@ -610,7 +664,7 @@ export function initSilasForm() {
     }
     
     // =================================================================================
-    // GLOBALE FUNKTION FÜR VORSCHAU-BUTTONS
+    // GLOBALE FUNKTION FÜR VORSCHAU-BUTTONS & VERBESSERTE SCHLIESS-LOGIK
     // =================================================================================
     
     // Mache die Vorschau-Funktion global verfügbar
@@ -623,6 +677,12 @@ export function initSilasForm() {
             console.error('Keine Daten für Keyword gefunden:', keyword);
             alert('Keine Vorschau-Daten verfügbar für: ' + keyword);
         }
+    };
+
+    // Globale Funktion zum Schließen des Modals
+    window.closeSilasPreview = function() {
+        console.log('🔴 Globale Close-Funktion aufgerufen');
+        closePreviewModal();
     };
 
     // =================================================================================
