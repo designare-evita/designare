@@ -11,20 +11,20 @@ export function initSilasForm() {
     console.log('🎯 Initialisiere Silas Form...');
 
     // =================================================================================
-    // KONSTANTEN & VARIABLEN
+    // KONSTANTEN & VARIABLEN - KORRIGIERTE LIMITS
     // =================================================================================
     const MASTER_PASSWORD = "SilasUnlimited2024!";
     let DEMO_LIMITS = { 
-        maxKeywordsPerSession: 3, 
-        maxGenerationsPerHour: 5, 
-        maxGenerationsPerDay: 10, 
-        cooldownBetweenRequests: 30000 
+        maxKeywordsPerSession: 50,  // KORRIGIERT: zurück auf 50
+        maxGenerationsPerHour: 10,  // KORRIGIERT: erhöht auf 10
+        maxGenerationsPerDay: 25,   // KORRIGIERT: erhöht auf 25
+        cooldownBetweenRequests: 2000  // KORRIGIERT: reduziert auf 2 Sekunden
     };
     const MASTER_LIMITS = { 
-        maxKeywordsPerSession: 50, 
+        maxKeywordsPerSession: 100, // KORRIGIERT: noch höher für Master
         maxGenerationsPerHour: 100, 
         maxGenerationsPerDay: 500, 
-        cooldownBetweenRequests: 1000 
+        cooldownBetweenRequests: 500  // KORRIGIERT: noch schneller für Master
     };
     
     // DOM-ELEMENTE SICHER ABRUFEN
@@ -187,13 +187,9 @@ export function initSilasForm() {
                 const li = document.createElement('li');
                 li.setAttribute('data-keyword', keyword);
                 li.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                        <span>${escapeHtml(keyword)}</span>
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <div class="status">Bereit</div>
-                            <button class="remove-btn" data-index="${index}">&times;</button>
-                        </div>
-                    </div>
+                    <span>${escapeHtml(keyword)}</span>
+                    <div class="status">Bereit</div>
+                    <button class="remove-btn" data-index="${index}">&times;</button>
                 `;
                 keywordDisplayList.appendChild(li);
             });
@@ -357,10 +353,10 @@ export function initSilasForm() {
                 if(isMasterMode) {
                     isMasterMode = false;
                     DEMO_LIMITS = { 
-                        maxKeywordsPerSession: 3, 
-                        maxGenerationsPerHour: 5, 
-                        maxGenerationsPerDay: 10, 
-                        cooldownBetweenRequests: 30000 
+                        maxKeywordsPerSession: 50,  // KORRIGIERT: zurück auf 50
+                        maxGenerationsPerHour: 10,  // KORRIGIERT: erhöht
+                        maxGenerationsPerDay: 25,   // KORRIGIERT: erhöht
+                        cooldownBetweenRequests: 2000  // KORRIGIERT: reduziert
                     };
                     passwordInput.style.borderColor = '#444';
                     console.log("Master-Modus deaktiviert.");
@@ -540,6 +536,10 @@ export function initSilasForm() {
         downloadButton.className = 'cta-button';
         downloadButton.innerHTML = '<i class="fas fa-download"></i> Alle als CSV herunterladen';
         downloadButton.onclick = downloadCSV;
+        
+        // KORRIGIERT: 100% Breite für Download-Button
+        downloadButton.style.cssText = 'width: 100%; margin-top: 20px; justify-content: center;';
+        
         silasResponseContainer.appendChild(downloadButton);
     }
     
