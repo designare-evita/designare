@@ -213,6 +213,7 @@ const phoneInput = document.getElementById('text-phone-input');
             const usp = uspInput.value.trim();
             const currentIntent = textIntentSelect.value;
         const domain = domainInput.value.trim();
+const brand = brandInput.value.trim();
         const email = emailInput.value.trim();
         const phone = phoneInput.value.trim();
 
@@ -232,6 +233,7 @@ const phoneInput = document.getElementById('text-phone-input');
                         zielgruppe: zielgruppe,
                         tonalitaet: tonalitaet,
                         usp: usp,
+                   brand: brand,
                     domain: domain,
                     email: email,
                     phone: phone
@@ -242,6 +244,7 @@ const phoneInput = document.getElementById('text-phone-input');
                     keywordList[existingIndex].tonalitaet = tonalitaet;
                     keywordList[existingIndex].usp = usp;
                  keywordList[existingIndex].domain = domain;
+keywordList[existingIndex].brand = brand;
                 keywordList[existingIndex].email = email;
                 keywordList[existingIndex].phone = phone;
                 }
@@ -429,7 +432,7 @@ if (item.phone) {
                 let previewHtml = `
                     <div class="preview-landingpage" style="color: #f0f0f0; line-height: 1.6; background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); padding: 20px; border-radius: 10px;">
                         <header style="text-align: center; margin-bottom: 40px; padding: 30px 0; border-bottom: 2px solid #ffc107;">
-                            <h1 style="color: #ffc107; font-size: 2.5rem; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">${data.h1 || 'N/A'}</h1>
+                            <h1 style="color: #ffc107; font-size: 2.3rem; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">${data.h1 || 'N/A'}</h1>
                             <p style="font-size: 1.2rem; color: #ccc; margin-bottom: 15px; max-width: 800px; margin-left: auto; margin-right: auto;">${data.hero_text || 'N/A'}</p>
                             <p style="font-size: 1rem; color: #aaa; margin-bottom: 25px;">${data.hero_subtext || ''}</p>
                             <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
