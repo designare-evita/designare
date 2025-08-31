@@ -1,4 +1,4 @@
-// js/silas-form.js - KORRIGIERTE VORSCHAU-FUNKTIONALITÄT
+// js/silas-form.js - FINALE KORREKTUR
 
 export function initSilasForm() {
     // Prüfe erst, ob wir auf der richtigen Seite sind
@@ -34,6 +34,11 @@ export function initSilasForm() {
     const clearListBtn = document.getElementById('clear-list-btn');
     const silasStatus = document.getElementById('silas-status');
     const silasResponseContainer = document.getElementById('silas-response-container');
+    
+    // Verwende das existierende Modal aus dem HTML
+    const previewModal = document.getElementById('silas-preview-modal');
+    const closePreviewModalBtn = document.getElementById('close-preview-modal');
+    const previewContentArea = document.getElementById('preview-content-area');
 
     // Prüfe kritische Elemente
     if (!keywordInput || !keywordDisplayList || !startGenerationBtn || !silasStatus) {
@@ -46,111 +51,14 @@ export function initSilasForm() {
     let isMasterMode = false;
 
     // =================================================================================
-    // VERBESSERTE MODAL-FUNKTIONALITÄT
+    // MODAL-FUNKTIONALITÄT (VEREINFACHT)
     // =================================================================================
     
-    function createPreviewModal() {
-        // Prüfe ob Modal bereits existiert
-        let existingModal = document.getElementById('silas-preview-modal');
-        if (existingModal) {
-            // Stelle sicher, dass Event-Listener existieren
-            setupModalEventListeners(existingModal);
-            return existingModal;
-        }
-
-        // Erstelle das Modal dynamisch
-        const modalHTML = `
-            <div id="silas-preview-modal" class="modal-overlay" style="display: none; visibility: hidden; opacity: 0;">
-                <div class="modal-content preview-modal-content">
-                    <button id="close-preview-modal" class="close-button" type="button" 
-                            onclick="window.closeSilasPreview()" 
-                            onmousedown="window.closeSilasPreview()" 
-                            ontouchstart="window.closeSilasPreview()">
-                        &times;
-                    </button>
-                    <div id="preview-content-area">
-                        <!-- Content wird hier eingefügt -->
-                    </div>
-                </div>
-            </div>
-        `;
-
-        // Füge Modal zum Body hinzu
-        document.body.insertAdjacentHTML('beforeend', modalHTML);
-        
-        const modal = document.getElementById('silas-preview-modal');
-        setupModalEventListeners(modal);
-
-        console.log('✅ Vorschau-Modal dynamisch erstellt');
-        return modal;
-    }
-
-    function setupModalEventListeners(modal) {
-        if (!modal) return;
-
-        const closeBtn = document.getElementById('close-preview-modal');
-        
-        // Entferne alte Event-Listener (falls vorhanden)
-        if (closeBtn) {
-            closeBtn.replaceWith(closeBtn.cloneNode(true));
-            const newCloseBtn = document.getElementById('close-preview-modal');
-            
-            // Event-Listener für Close-Button
-            newCloseBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('🔴 Close-Button geklickt');
-                closePreviewModal();
-            });
-
-            // Zusätzlich: Double-Click als Fallback
-            newCloseBtn.addEventListener('dblclick', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('🔴 Close-Button doppelt geklickt');
-                closePreviewModal();
-            });
-        }
-        
-        // Event-Listener für Klick außerhalb des Modals (neu erstellen)
-        modal.replaceWith(modal.cloneNode(true));
-        const newModal = document.getElementById('silas-preview-modal');
-        
-        newModal.addEventListener('click', function(e) {
-            if (e.target === newModal) {
-                console.log('🔴 Außerhalb des Modals geklickt');
-                closePreviewModal();
-            }
-        });
-
-        // Escape-Taste zum Schließen
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                const modal = document.getElementById('silas-preview-modal');
-                if (modal && (modal.style.display === 'flex' || modal.classList.contains('visible'))) {
-                    console.log('🔴 Escape gedrückt');
-                    closePreviewModal();
-                }
-            }
-        });
-
-        console.log('✅ Modal Event-Listener eingerichtet');
-    }
-
     function showPreviewModal(data) {
         console.log('🔍 Zeige Vorschau für:', data);
         
-        if (!data) {
-            console.error('Keine Daten für Vorschau verfügbar');
-            return;
-        }
-
-        // Stelle sicher, dass Modal existiert
-        const modal = createPreviewModal();
-        const previewContentArea = document.getElementById('preview-content-area');
-        
-        if (!previewContentArea) {
-            console.error('Vorschau-Content-Bereich nicht gefunden');
+        if (!data || !previewModal || !previewContentArea) {
+            console.error('Keine Daten oder Modal-Elemente für Vorschau verfügbar');
             return;
         }
         
@@ -206,13 +114,8 @@ export function initSilasForm() {
 
         previewContentArea.innerHTML = contentHtml;
         
-        // Zeige Modal mit verschiedenen Fallbacks
-        modal.style.display = 'flex';
-        modal.style.visibility = 'visible';
-        modal.style.opacity = '1';
-        modal.classList.add('visible');
-        
-        // Verhindere Scrollen im Hintergrund
+        // Zeige Modal
+        previewModal.classList.add('visible');
         document.body.style.overflow = 'hidden';
         
         console.log('✅ Vorschau-Modal angezeigt');
@@ -221,24 +124,15 @@ export function initSilasForm() {
     function closePreviewModal() {
         console.log('🔴 closePreviewModal() aufgerufen');
         
-        const modal = document.getElementById('silas-preview-modal');
-        if (modal) {
-            // Mehrere Methoden zum Verstecken - als Fallback
-            modal.style.display = 'none';
-            modal.style.visibility = 'hidden';
-            modal.style.opacity = '0';
-            modal.classList.remove('visible');
-            
+        if (previewModal) {
+            previewModal.classList.remove('visible');
             console.log('✅ Modal versteckt');
-            console.log('Modal display:', modal.style.display);
-            console.log('Modal visibility:', modal.style.visibility);
         } else {
             console.error('❌ Modal nicht gefunden beim Schließen');
         }
         
         // Scrollen wieder aktivieren
         document.body.style.overflow = '';
-        
         console.log('✅ Vorschau-Modal geschlossen');
     }
 
@@ -269,7 +163,7 @@ export function initSilasForm() {
     }
 
     // =================================================================================
-    // HILFSFUNKTIONEN (wie zuvor)
+    // HILFSFUNKTIONEN
     // =================================================================================
     
     function escapeHtml(unsafe) {
@@ -293,9 +187,13 @@ export function initSilasForm() {
                 const li = document.createElement('li');
                 li.setAttribute('data-keyword', keyword);
                 li.innerHTML = `
-                    <span>${escapeHtml(keyword)}</span>
-                    <div class="status">Bereit</div>
-                    <button class="remove-btn" data-index="${index}">&times;</button>
+                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                        <span>${escapeHtml(keyword)}</span>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="status">Bereit</div>
+                            <button class="remove-btn" data-index="${index}">&times;</button>
+                        </div>
+                    </div>
                 `;
                 keywordDisplayList.appendChild(li);
             });
@@ -324,7 +222,7 @@ export function initSilasForm() {
     }
 
     // =================================================================================
-    // WEITERE FUNKTIONEN (Tracking, Limits, etc. wie zuvor)
+    // TRACKING & LIMITS
     // =================================================================================
     
     function getTrackingData() {
@@ -383,11 +281,22 @@ export function initSilasForm() {
     }
 
     function showDemoStatus() {
-        const statusDiv = document.getElementById('demo-status');
-        if (!statusDiv) return;
+        // Status wird als separates Element angezeigt
+        let statusDiv = document.getElementById('demo-status');
+        if (!statusDiv) {
+            statusDiv = document.createElement('div');
+            statusDiv.id = 'demo-status';
+            statusDiv.style.cssText = 'text-align: center; margin: 10px 0; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 5px; font-size: 0.9rem;';
+            
+            // Füge nach dem Keyword-Container hinzu
+            const keywordContainer = document.querySelector('.keyword-list-container');
+            if (keywordContainer) {
+                keywordContainer.appendChild(statusDiv);
+            }
+        }
         
         if (isMasterMode) {
-            statusDiv.innerHTML = '<p class="master-mode-active">⚡ Master-Modus Aktiv</p>';
+            statusDiv.innerHTML = '<p class="master-mode-active" style="color: lime; font-weight: bold;">⚡ Master-Modus Aktiv</p>';
             return;
         }
         
@@ -400,7 +309,7 @@ export function initSilasForm() {
 
             statusDiv.innerHTML = `
                 <p><strong>Demo-Status:</strong></p>
-                <ul>
+                <ul style="list-style: none; padding: 0; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
                     <li>Stunde: ${generationsLastHour}/${DEMO_LIMITS.maxGenerationsPerHour}</li>
                     <li>Tag: ${generationsLastDay}/${DEMO_LIMITS.maxGenerationsPerDay}</li>
                 </ul>
@@ -411,17 +320,31 @@ export function initSilasForm() {
     }
 
     function createMasterPasswordUI() {
-        const container = document.querySelector('.ai-container');
-        if (!container) return;
-
+        // Prüfe, ob das Passwort-Input bereits existiert
         if (document.getElementById('master-password-input')) return;
 
+        // Erstelle separaten Container für Master-Passwort
+        const passwordContainer = document.createElement('div');
+        passwordContainer.style.cssText = 'text-align: center; margin: 20px 0; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px; border: 1px solid #444;';
+        
+        const passwordLabel = document.createElement('label');
+        passwordLabel.textContent = 'Master-Zugang (optional):';
+        passwordLabel.style.cssText = 'display: block; margin-bottom: 8px; color: #ccc; font-size: 0.9rem;';
+        
         const passwordInput = document.createElement('input');
         passwordInput.type = 'password';
         passwordInput.id = 'master-password-input';
-        passwordInput.placeholder = 'Master-Passwort (optional)';
-        passwordInput.style.marginTop = '10px';
-        passwordInput.classList.add('silas-extra-input');
+        passwordInput.placeholder = 'Master-Passwort eingeben...';
+        passwordInput.style.cssText = `
+            background: #2d2d2d; 
+            border: 1px solid #444; 
+            border-radius: 5px; 
+            color: #fff; 
+            padding: 8px 12px; 
+            font-size: 0.9rem; 
+            text-align: center;
+            transition: border-color 0.3s ease;
+        `;
         
         passwordInput.addEventListener('input', (e) => {
             if (e.target.value === MASTER_PASSWORD) {
@@ -439,18 +362,20 @@ export function initSilasForm() {
                         maxGenerationsPerDay: 10, 
                         cooldownBetweenRequests: 30000 
                     };
-                    passwordInput.style.borderColor = '';
+                    passwordInput.style.borderColor = '#444';
                     console.log("Master-Modus deaktiviert.");
                     showDemoStatus();
                 }
             }
         });
         
-        const formElement = container.querySelector('#silas-form');
-        if (formElement) {
-            container.insertBefore(passwordInput, formElement);
-        } else {
-            container.appendChild(passwordInput);
+        passwordContainer.appendChild(passwordLabel);
+        passwordContainer.appendChild(passwordInput);
+        
+        // Füge den Container nach dem Keywords-Liste hinzu
+        const keywordContainer = document.querySelector('.keyword-list-container');
+        if (keywordContainer) {
+            keywordContainer.appendChild(passwordContainer);
         }
     }
 
@@ -574,7 +499,7 @@ export function initSilasForm() {
                 </span>
             </div>
             ${result.corrections && result.corrections.length > 0 ? createCorrectionsList(result.corrections) : '<p class="no-corrections">Keine automatischen Korrekturen notwendig.</p>'}
-            <button class="cta-button preview-button" data-keyword="${keyword}" onclick="window.showSilasPreview('${keyword}')">
+            <button class="cta-button preview-button" data-keyword="${keyword}">
                 🔍 Vorschau anzeigen
             </button>
         `;
@@ -662,28 +587,6 @@ export function initSilasForm() {
             alert('Fehler beim Herunterladen der CSV-Datei.');
         }
     }
-    
-    // =================================================================================
-    // GLOBALE FUNKTION FÜR VORSCHAU-BUTTONS & VERBESSERTE SCHLIESS-LOGIK
-    // =================================================================================
-    
-    // Mache die Vorschau-Funktion global verfügbar
-    window.showSilasPreview = function(keyword) {
-        console.log('🔍 Vorschau angefordert für:', keyword);
-        const dataToShow = allGeneratedData.find(d => d.keyword === keyword);
-        if (dataToShow && dataToShow.correctedContent) {
-            showPreviewModal(dataToShow.correctedContent);
-        } else {
-            console.error('Keine Daten für Keyword gefunden:', keyword);
-            alert('Keine Vorschau-Daten verfügbar für: ' + keyword);
-        }
-    };
-
-    // Globale Funktion zum Schließen des Modals
-    window.closeSilasPreview = function() {
-        console.log('🔴 Globale Close-Funktion aufgerufen');
-        closePreviewModal();
-    };
 
     // =================================================================================
     // EVENT LISTENERS
@@ -739,6 +642,37 @@ export function initSilasForm() {
         startGenerationBtn.addEventListener('click', handleKeywordGeneration);
     }
 
+    // Vorschau-Buttons
+    if (silasResponseContainer) {
+        silasResponseContainer.addEventListener('click', function(event) {
+            if (event.target.classList.contains('preview-button')) {
+                const keyword = event.target.getAttribute('data-keyword');
+                const dataToShow = allGeneratedData.find(d => d.keyword === keyword);
+                if (dataToShow && dataToShow.correctedContent) {
+                    showPreviewModal(dataToShow.correctedContent);
+                }
+            }
+        });
+    }
+
+    // Vorschau-Modal schließen
+    if (closePreviewModalBtn) {
+        closePreviewModalBtn.addEventListener('click', closePreviewModal);
+    }
+    
+    if (previewModal) {
+        previewModal.addEventListener('click', function(e) { 
+            if (e.target === previewModal) closePreviewModal(); 
+        });
+    }
+
+    // Escape-Taste für Modal
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && previewModal && previewModal.classList.contains('visible')) {
+            closePreviewModal();
+        }
+    });
+    
     // =================================================================================
     // INITIALISIERUNG
     // =================================================================================
