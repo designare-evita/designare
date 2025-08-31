@@ -25,12 +25,12 @@ export function initSilasForm() {
     const previewContentArea = document.getElementById('preview-content-area');
 
     let keywordList = [];
-    // GEÄNDERT: Speichert jetzt die vollständigen factCheckResult-Objekte
+    // Speichert jetzt die vollständigen factCheckResult-Objekte
     let allGeneratedData = []; 
     let isMasterMode = false;
 
     // =================================================================================
-    // DEINE ORIGINALE LOGIK: UI & LIMITIERUNGEN
+    // DEINE ORIGINALE LOGIK: UI & LIMITIERUNGEN (MIT KORREKTUREN)
     // =================================================================================
     
     function updateKeywordDisplay() {
@@ -50,6 +50,7 @@ export function initSilasForm() {
     }
 
     function addKeywords() {
+        // KORREKTUR: Die 'limits'-Variable wurde hier hinzugefügt, um den Fehler zu beheben.
         const limits = isMasterMode ? MASTER_LIMITS : DEMO_LIMITS;
         const keywords = keywordInput.value.split(',')
             .map(kw => kw.trim())
@@ -65,14 +66,124 @@ export function initSilasForm() {
         updateKeywordDisplay();
     }
     
-    // Deine Logik für Demo-Tracking, Master-Passwort etc. bleibt unverändert
-    function getTrackingData() { /* ... unverändert ... */ }
-    function setTrackingData(data) { /* ... unverändert ... */ }
-    function checkLimits() { /* ... unverändert ... */ }
-    function initDemoTracking() { /* ... unverändert ... */ }
-    function showDemoStatus() { /* ... unverändert ... */ }
-    function createMasterPasswordUI() { /* ... unverändert ... */ }
+    function getTrackingData() {
+        try {
+            const data = localStorage.getItem('silasDemoTracking');
+            return data ? JSON.parse(data) : { lastReset: Date.now(), generations: [] };
+        } catch (e) {
+            return { lastReset: Date.now(), generations: [] };
+        }
+    }
+
+    function setTrackingData(data) {
+        localStorage.setItem('silasDemoTracking', JSON.stringify(data));
+    }
+
+    // KORRIGIERTE VERSION: Robuster gemacht, um Abstürze zu verhindern.
+    function checkLimits() {
+        try {
+            if (isMasterMode) {
+                return { allowed: true };
+            }
+
+            let trackingData = getTrackingData();
+            const now = Date.now();
+            const oneHour = 60 * 60 * 1000;
+            const oneDay = 24 * oneHour;
+
+            if (now - trackingData.lastReset > oneDay) {
+                trackingData = { lastReset: now, generations: [] };
+                setTrackingData(trackingData);
+            }
+
+            const generationsLastHour = trackingData.generations.filter(ts => now - ts < oneHour).length;
+            const generationsLastDay = trackingData.generations.length;
+
+            if (generationsLastDay >= DEMO_LIMITS.maxGenerationsPerDay) {
+                return { allowed: false, reason: "Tageslimit erreicht." };
+            }
+            if (generationsLastHour >= DEMO_LIMITS.maxGenerationsPerHour) {
+                return { allowed: false, reason: "Stundenlimit erreicht." };
+            }
+            if (keywordList.length > DEMO_LIMITS.maxKeywordsPerSession) {
+                return { allowed: false, reason: "Maximale Keywords pro Sitzung überschritten." };
+            }
+            
+            const lastGenerationTime = trackingData.generations[trackingData.generations.length - 1];
+            if (lastGenerationTime && (now - lastGenerationTime < DEMO_LIMITS.cooldownBetweenRequests)) {
+                 return { allowed: false, reason: `Bitte warte einen Moment vor der nächsten Anfrage.` };
+            }
+
+            return { allowed: true };
+        } catch (error) {
+            console.error("Fehler in checkLimits:", error);
+            // Fallback, um einen Absturz der Anwendung zu verhindern
+            return { allowed: false, reason: "Interner Fehler bei der Limit-Prüfung." };
+        }
+    }
     
+    function initDemoTracking() {
+        if (!localStorage.getItem('silasDemoTracking')) {
+            setTrackingData({ lastReset: Date.now(), generations: [] });
+        }
+    }
+    
+    function showDemoStatus() {
+        if (isMasterMode) {
+            const statusDiv = document.getElementById('demo-status');
+            if(statusDiv) statusDiv.innerHTML = '<p class="master-mode-active">⚡ Master-Modus Aktiv</p>';
+            return;
+        }
+        let trackingData = getTrackingData();
+        const now = Date.now();
+        const oneHour = 60 * 60 * 1000;
+        const generationsLastHour = trackingData.generations.filter(ts => now - ts < oneHour).length;
+        const generationsLastDay = trackingData.generations.length;
+
+        const statusDiv = document.getElementById('demo-status');
+        if (statusDiv) {
+            statusDiv.innerHTML = `
+                <p><strong>Demo-Status:</strong></p>
+                <ul>
+                    <li>Stunde: ${generationsLastHour}/${DEMO_LIMITS.maxGenerationsPerHour}</li>
+                    <li>Tag: ${generationsLastDay}/${DEMO_LIMITS.maxGenerationsPerDay}</li>
+                </ul>
+            `;
+        }
+    }
+
+    function createMasterPasswordUI() {
+        const container = document.querySelector('.ai-container');
+        if (!container) return;
+
+        const passwordInput = document.createElement('input');
+        passwordInput.type = 'password';
+        passwordInput.id = 'master-password-input';
+        passwordInput.placeholder = 'Master-Passwort (optional)';
+        passwordInput.style.marginTop = '10px';
+        passwordInput.classList.add('silas-extra-input');
+        
+        passwordInput.addEventListener('input', (e) => {
+            if (e.target.value === MASTER_PASSWORD) {
+                isMasterMode = true;
+                DEMO_LIMITS = MASTER_LIMITS;
+                console.log("Master-Modus aktiviert!");
+                passwordInput.style.borderColor = 'lime';
+                showDemoStatus();
+            } else {
+                if(isMasterMode) { // Nur zurücksetzen, wenn es aktiv war
+                    isMasterMode = false;
+                    DEMO_LIMITS = { maxKeywordsPerSession: 3, maxGenerationsPerHour: 5, maxGenerationsPerDay: 10, cooldownBetweenRequests: 30000 };
+                    passwordInput.style.borderColor = '';
+                    console.log("Master-Modus deaktiviert.");
+                    showDemoStatus();
+                }
+            }
+        });
+        
+        container.insertBefore(passwordInput, container.querySelector('#silas-form'));
+    }
+
     // =================================================================================
     // KERNFUNKTION: CONTENT-GENERIERUNG (JETZT MIT FACTCHECKER-INTEGRATION)
     // =================================================================================
@@ -83,9 +194,11 @@ export function initSilasForm() {
         const statusElement = document.getElementById('silas-status');
         const responseContainer = document.getElementById('silas-response-container');
 
+        // KORREKTUR: Der Limit-Check ist jetzt absturzsicher.
         const limitCheck = checkLimits();
-        if (!limitCheck.allowed) {
-            statusElement.textContent = `❌ Limit erreicht: ${limitCheck.reason}`;
+        console.log('Limit Check Result:', limitCheck); // Debugging-Hilfe
+        if (!limitCheck || !limitCheck.allowed) {
+            statusElement.textContent = `❌ Limit erreicht: ${limitCheck.reason || 'Unbekannter Grund'}`;
             return;
         }
 
@@ -93,7 +206,7 @@ export function initSilasForm() {
         clearButton.disabled = true;
         statusElement.textContent = '🔮 Silas zaubert... bitte warten.';
         
-        const keywords = [...keywordList]; // Kopie der Liste für die Verarbeitung
+        const keywords = [...keywordList];
         const options = {
             intent: document.getElementById('text-intent-select').value,
             zielgruppe: document.getElementById('text-zielgruppe-input').value,
@@ -111,7 +224,6 @@ export function initSilasForm() {
         allGeneratedData = [];
 
         try {
-            // DEINE ORIGINALE LOGIK: Bulk-Anfrage an das Backend senden
             const response = await fetch('/api/generate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -123,7 +235,6 @@ export function initSilasForm() {
                 throw new Error(`Serverfehler: ${errorData.message || response.statusText}`);
             }
 
-            // GEÄNDERT: Verarbeitet jetzt ein Array von factCheckResult-Objekten
             const results = await response.json();
             
             results.forEach(result => {
@@ -134,12 +245,10 @@ export function initSilasForm() {
             statusElement.textContent = `✅ ${keywords.length} Content-Themen erfolgreich erstellt.`;
             createDownloadButton();
 
-            // Demo-Tracking aktualisieren
             const trackingData = getTrackingData();
-            trackingData.generations.push(Date.now());
+            keywords.forEach(() => trackingData.generations.push(Date.now()));
             setTrackingData(trackingData);
             showDemoStatus();
-
 
         } catch (error) {
             console.error('Fehler bei der Content-Generierung:', error);
@@ -151,14 +260,9 @@ export function initSilasForm() {
     }
 
     // =================================================================================
-    // NEU & VERBESSERT: UI-DARSTELLUNG DER ERGEBNISSE
+    // UI-DARSTELLUNG DER ERGEBNISSE
     // =================================================================================
-
-    /**
-     * Zeigt das detaillierte Ergebnis für ein einzelnes Keyword an.
-     * @param {string} keyword Das verarbeitete Keyword.
-     * @param {object} result Das vollständige factCheckResult-Objekt vom Server.
-     */
+    
     function displaySingleResult(keyword, result) {
         const container = document.getElementById('silas-response-container');
         const keywordStatusElement = document.querySelector(`li[data-keyword="${keyword}"] .status`);
@@ -228,7 +332,7 @@ export function initSilasForm() {
     }
 
     // =================================================================================
-    // DEINE ORIGINALEN FUNKTIONEN: VORSCHAU & CSV-EXPORT
+    // VORSCHAU & CSV-EXPORT
     // =================================================================================
 
     function showPreviewModal(data) {
@@ -236,10 +340,14 @@ export function initSilasForm() {
         let contentHtml = '<h2>Vorschau: ' + escapeHtml(data.post_title) + '</h2>';
         for (const [key, value] of Object.entries(data)) {
             if (key !== 'keyword' && !key.startsWith('_')) {
+                let displayValue = escapeHtml(value);
+                if (typeof value === 'string' && value.trim().startsWith('<ul>')) {
+                    displayValue = value;
+                }
                 contentHtml += `
                     <div class="preview-field">
-                        <strong>${key}:</strong>
-                        <div>${value}</div>
+                        <strong>${escapeHtml(key)}:</strong>
+                        <div>${displayValue}</div>
                     </div>
                 `;
             }
@@ -254,7 +362,6 @@ export function initSilasForm() {
 
     function createDownloadButton() {
         const container = document.getElementById('silas-response-container');
-        // Entferne alten Button, falls vorhanden
         const oldButton = document.getElementById('download-csv-btn');
         if (oldButton) oldButton.remove();
         
@@ -268,11 +375,19 @@ export function initSilasForm() {
     
     function convertToCSV(dataArray) {
         if (!dataArray || dataArray.length === 0) return '';
-        const headers = Object.keys(dataArray[0]);
+        const firstValidItem = dataArray.find(item => item && item.correctedContent);
+        if (!firstValidItem) return '';
+
+        const headers = Object.keys(firstValidItem.correctedContent);
         const csvRows = [headers.join(';')];
-        for (const row of dataArray) {
+        
+        for (const item of dataArray) {
+            // Nur gültige Ergebnisse in die CSV aufnehmen
+            if(!item || !item.correctedContent || item.error) continue;
+
+            const row = item.correctedContent;
             const values = headers.map(header => {
-                const escaped = ('' + row[header]).replace(/"/g, '""');
+                const escaped = ('' + (row[header] || '')).replace(/"/g, '""');
                 return `"${escaped}"`;
             });
             csvRows.push(values.join(';'));
@@ -281,8 +396,11 @@ export function initSilasForm() {
     }
 
     function downloadCSV() {
-        // GEÄNDERT: Verwendet jetzt den korrigierten Inhalt aus den Ergebnissen
-        const csvContent = convertToCSV(allGeneratedData.map(result => result.correctedContent));
+        const csvContent = convertToCSV(allGeneratedData);
+        if(!csvContent) {
+            alert("Keine gültigen Daten zum Herunterladen vorhanden.");
+            return;
+        }
         const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a");
         const url = URL.createObjectURL(blob);
@@ -296,7 +414,7 @@ export function initSilasForm() {
     }
     
     // =================================================================================
-    // DEINE ORIGINALEN EVENT LISTENERS (jetzt mit neuer Logik für Vorschau)
+    // EVENT LISTENERS
     // =================================================================================
     
     silasForm.addEventListener('submit', function(e) { e.preventDefault(); addKeywords(); });
@@ -304,7 +422,8 @@ export function initSilasForm() {
     
     keywordDisplayList.addEventListener('click', function(e) {
         if (e.target.matches('.remove-btn')) {
-            keywordList.splice(e.target.dataset.index, 1);
+            const index = parseInt(e.target.dataset.index, 10);
+            keywordList.splice(index, 1);
             updateKeywordDisplay();
         }
     });
@@ -320,13 +439,11 @@ export function initSilasForm() {
 
     startGenerationBtn.addEventListener('click', handleKeywordGeneration);
 
-    // GEÄNDERT: Event Delegation für die dynamisch erstellten Vorschau-Buttons
     silasResponseContainer.addEventListener('click', function(event) {
         if (event.target.classList.contains('preview-button')) {
             const keyword = event.target.getAttribute('data-keyword');
             const dataToShow = allGeneratedData.find(d => d.keyword === keyword);
             if (dataToShow) {
-                // Verwende den korrigierten Inhalt für die Vorschau
                 showPreviewModal(dataToShow.correctedContent);
             }
         }
@@ -335,8 +452,8 @@ export function initSilasForm() {
     if (closePreviewModalBtn) closePreviewModalBtn.addEventListener('click', closePreviewModal);
     if (previewModal) previewModal.addEventListener('click', function(e) { if (e.target === previewModal) closePreviewModal(); });
     
-    // DEINE ORIGINALE INITIALISIERUNG
-    updateKeywordDisplay(); // Initial display
+    // INITIALISIERUNG
+    updateKeywordDisplay();
     initDemoTracking();
     showDemoStatus();
     createMasterPasswordUI();
