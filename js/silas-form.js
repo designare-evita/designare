@@ -1,4 +1,4 @@
-// js/silas-form.js - FINALE KORREKTUR
+// js/silas-form.js - KORRIGIERTE VERSION - Badges & Vertrauensscore Fix
 
 export function initSilasForm() {
     // Prüfe erst, ob wir auf der richtigen Seite sind
@@ -11,20 +11,20 @@ export function initSilasForm() {
     console.log('🎯 Initialisiere Silas Form...');
 
     // =================================================================================
-    // KONSTANTEN & VARIABLEN - KORRIGIERTE LIMITS
+    // KONSTANTEN & VARIABLEN
     // =================================================================================
     const MASTER_PASSWORD = "SilasUnlimited2024!";
     let DEMO_LIMITS = { 
-        maxKeywordsPerSession: 50,  // KORRIGIERT: zurück auf 50
-        maxGenerationsPerHour: 10,  // KORRIGIERT: erhöht auf 10
-        maxGenerationsPerDay: 25,   // KORRIGIERT: erhöht auf 25
-        cooldownBetweenRequests: 2000  // KORRIGIERT: reduziert auf 2 Sekunden
+        maxKeywordsPerSession: 50,
+        maxGenerationsPerHour: 10,
+        maxGenerationsPerDay: 25,
+        cooldownBetweenRequests: 2000
     };
     const MASTER_LIMITS = { 
-        maxKeywordsPerSession: 100, // KORRIGIERT: noch höher für Master
+        maxKeywordsPerSession: 100,
         maxGenerationsPerHour: 100, 
         maxGenerationsPerDay: 500, 
-        cooldownBetweenRequests: 500  // KORRIGIERT: noch schneller für Master
+        cooldownBetweenRequests: 500
     };
     
     // DOM-ELEMENTE SICHER ABRUFEN
@@ -35,12 +35,10 @@ export function initSilasForm() {
     const silasStatus = document.getElementById('silas-status');
     const silasResponseContainer = document.getElementById('silas-response-container');
     
-    // Verwende das existierende Modal aus dem HTML
     const previewModal = document.getElementById('silas-preview-modal');
     const closePreviewModalBtn = document.getElementById('close-preview-modal');
     const previewContentArea = document.getElementById('preview-content-area');
 
-    // Prüfe kritische Elemente
     if (!keywordInput || !keywordDisplayList || !startGenerationBtn || !silasStatus) {
         console.error('❌ Kritische Silas-Elemente fehlen im DOM');
         return;
@@ -49,9 +47,10 @@ export function initSilasForm() {
     let keywordList = [];
     let allGeneratedData = [];
     let isMasterMode = false;
+    let keywordStatuses = new Map(); // Tracking für Keyword-Status
 
     // =================================================================================
-    // MODAL-FUNKTIONALITÄT (VEREINFACHT)
+    // MODAL-FUNKTIONALITÄT
     // =================================================================================
     
     function showPreviewModal(data) {
@@ -62,7 +61,6 @@ export function initSilasForm() {
             return;
         }
         
-        // Erstelle HTML-Content
         let contentHtml = `<h2>Vorschau: ${escapeHtml(data.post_title || 'Unbekannt')}</h2>`;
         
         const fieldsOrder = [
@@ -75,15 +73,13 @@ export function initSilasForm() {
             'social_proof', 'trust_signals'
         ];
 
-        // Zeige Felder in sinnvoller Reihenfolge
         fieldsOrder.forEach(key => {
             if (data[key] && data[key].toString().trim()) {
                 const value = data[key];
                 let displayValue;
                 
-                // Behandle HTML-Listen anders
                 if (typeof value === 'string' && (value.includes('<ul>') || value.includes('<ol>'))) {
-                    displayValue = value; // HTML-Listen direkt anzeigen
+                    displayValue = value;
                 } else {
                     displayValue = escapeHtml(String(value));
                 }
@@ -97,7 +93,6 @@ export function initSilasForm() {
             }
         });
 
-        // Zeige restliche Felder
         Object.keys(data).forEach(key => {
             if (!fieldsOrder.includes(key) && !key.startsWith('_') && data[key] && data[key].toString().trim()) {
                 const value = data[key];
@@ -113,31 +108,18 @@ export function initSilasForm() {
         });
 
         previewContentArea.innerHTML = contentHtml;
-        
-        // Zeige Modal
         previewModal.classList.add('visible');
         document.body.style.overflow = 'hidden';
-        
-        console.log('✅ Vorschau-Modal angezeigt');
     }
 
     function closePreviewModal() {
-        console.log('🔴 closePreviewModal() aufgerufen');
-        
         if (previewModal) {
             previewModal.classList.remove('visible');
-            console.log('✅ Modal versteckt');
-        } else {
-            console.error('❌ Modal nicht gefunden beim Schließen');
         }
-        
-        // Scrollen wieder aktivieren
         document.body.style.overflow = '';
-        console.log('✅ Vorschau-Modal geschlossen');
     }
 
     function formatFieldName(fieldName) {
-        // Mache Feldnamen benutzerfreundlicher
         const fieldNameMap = {
             'post_title': 'Seitentitel',
             'meta_title': 'SEO-Titel',
@@ -184,19 +166,35 @@ export function initSilasForm() {
             keywordDisplayList.innerHTML = '<li class="empty-list-info">Füge Keywords hinzu, um Content-Themen zu erstellen.</li>';
         } else {
             keywordList.forEach((keyword, index) => {
+                const status = keywordStatuses.get(keyword) || { state: 'ready', text: 'Bereit' };
+                
                 const li = document.createElement('li');
                 li.setAttribute('data-keyword', keyword);
+                
+                // KORRIGIERT: Vereinfachte HTML-Struktur ohne Badge-Klassen
                 li.innerHTML = `
-                    <span>${escapeHtml(keyword)}</span>
-                    <div class="status">Bereit</div>
+                    <span class="keyword-text">${escapeHtml(keyword)}</span>
+                    <span class="keyword-status keyword-status-${status.state}">${status.text}</span>
                     <button class="remove-btn" data-index="${index}">&times;</button>
                 `;
+                
                 keywordDisplayList.appendChild(li);
             });
         }
         
         if (startGenerationBtn) startGenerationBtn.disabled = keywordList.length === 0;
         if (clearListBtn) clearListBtn.disabled = keywordList.length === 0;
+    }
+
+    // KORRIGIERT: Neue Funktion für Keyword-Status-Update
+    function updateKeywordStatus(keyword, state, text) {
+        keywordStatuses.set(keyword, { state, text });
+        
+        const keywordElement = document.querySelector(`li[data-keyword="${keyword}"] .keyword-status`);
+        if (keywordElement) {
+            keywordElement.textContent = text;
+            keywordElement.className = `keyword-status keyword-status-${state}`;
+        }
     }
 
     function addKeywords() {
@@ -212,7 +210,11 @@ export function initSilasForm() {
             return;
         }
 
-        keywordList.push(...keywords);
+        keywords.forEach(keyword => {
+            keywordList.push(keyword);
+            keywordStatuses.set(keyword, { state: 'ready', text: 'Bereit' });
+        });
+        
         keywordInput.value = '';
         updateKeywordDisplay();
     }
@@ -277,14 +279,12 @@ export function initSilasForm() {
     }
 
     function showDemoStatus() {
-        // Status wird als separates Element angezeigt
         let statusDiv = document.getElementById('demo-status');
         if (!statusDiv) {
             statusDiv = document.createElement('div');
             statusDiv.id = 'demo-status';
             statusDiv.style.cssText = 'text-align: center; margin: 10px 0; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 5px; font-size: 0.9rem;';
             
-            // Füge nach dem Keyword-Container hinzu
             const keywordContainer = document.querySelector('.keyword-list-container');
             if (keywordContainer) {
                 keywordContainer.appendChild(statusDiv);
@@ -316,10 +316,8 @@ export function initSilasForm() {
     }
 
     function createMasterPasswordUI() {
-        // Prüfe, ob das Passwort-Input bereits existiert
         if (document.getElementById('master-password-input')) return;
 
-        // Erstelle separaten Container für Master-Passwort
         const passwordContainer = document.createElement('div');
         passwordContainer.style.cssText = 'text-align: center; margin: 20px 0; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px; border: 1px solid #444;';
         
@@ -353,10 +351,10 @@ export function initSilasForm() {
                 if(isMasterMode) {
                     isMasterMode = false;
                     DEMO_LIMITS = { 
-                        maxKeywordsPerSession: 50,  // KORRIGIERT: zurück auf 50
-                        maxGenerationsPerHour: 10,  // KORRIGIERT: erhöht
-                        maxGenerationsPerDay: 25,   // KORRIGIERT: erhöht
-                        cooldownBetweenRequests: 2000  // KORRIGIERT: reduziert
+                        maxKeywordsPerSession: 50,
+                        maxGenerationsPerHour: 10,
+                        maxGenerationsPerDay: 25,
+                        cooldownBetweenRequests: 2000
                     };
                     passwordInput.style.borderColor = '#444';
                     console.log("Master-Modus deaktiviert.");
@@ -368,7 +366,6 @@ export function initSilasForm() {
         passwordContainer.appendChild(passwordLabel);
         passwordContainer.appendChild(passwordInput);
         
-        // Füge den Container nach dem Keywords-Liste hinzu
         const keywordContainer = document.querySelector('.keyword-list-container');
         if (keywordContainer) {
             keywordContainer.appendChild(passwordContainer);
@@ -408,6 +405,11 @@ export function initSilasForm() {
             isMasterRequest: isMasterMode
         };
 
+        // KORRIGIERT: Setze alle Keywords auf "Verarbeitung läuft..."
+        keywords.forEach(keyword => {
+            updateKeywordStatus(keyword, 'processing', 'Verarbeitung läuft...');
+        });
+
         silasResponseContainer.style.display = 'block';
         silasResponseContainer.innerHTML = '';
         allGeneratedData = [];
@@ -426,9 +428,17 @@ export function initSilasForm() {
 
             const results = await response.json();
             
+            // KORRIGIERT: Verarbeite jedes Ergebnis und aktualisiere den Status
             results.forEach(result => {
                 allGeneratedData.push(result);
                 displaySingleResult(result.keyword, result);
+                
+                // Update Status basierend auf Erfolg/Fehler
+                if (result.error || (result.correctedContent && result.correctedContent._parse_error)) {
+                    updateKeywordStatus(result.keyword, 'error', '❌ Fehler');
+                } else {
+                    updateKeywordStatus(result.keyword, 'success', '✅ Fertig');
+                }
             });
 
             silasStatus.textContent = `✅ ${keywords.length} Content-Themen erfolgreich erstellt.`;
@@ -442,6 +452,11 @@ export function initSilasForm() {
         } catch (error) {
             console.error('Fehler bei der Content-Generierung:', error);
             silasStatus.textContent = `💥 Fehler: ${error.message}`;
+            
+            // KORRIGIERT: Bei globalem Fehler alle Keywords auf Fehler setzen
+            keywords.forEach(keyword => {
+                updateKeywordStatus(keyword, 'error', '❌ Fehler');
+            });
         } finally {
             startGenerationBtn.disabled = keywordList.length === 0;
             if (clearListBtn) clearListBtn.disabled = keywordList.length === 0;
@@ -460,13 +475,7 @@ export function initSilasForm() {
     function displaySingleResult(keyword, result) {
         if (!silasResponseContainer) return;
 
-        const keywordStatusElement = document.querySelector(`li[data-keyword="${keyword}"] .status`);
-
         if (result.error || (result.correctedContent && result.correctedContent._parse_error)) {
-            if (keywordStatusElement) {
-                keywordStatusElement.textContent = '❌ Fehler';
-                keywordStatusElement.className = 'status error';
-            }
             const errorElement = document.createElement('div');
             errorElement.className = 'result-item';
             errorElement.innerHTML = `
@@ -477,24 +486,28 @@ export function initSilasForm() {
             return;
         }
 
-        if (keywordStatusElement) {
-            keywordStatusElement.textContent = '✅ Fertig';
-            keywordStatusElement.className = 'status success';
-        }
+        // KORRIGIERT: Überprüfe ob confidenceScore existiert und ist gültig
+        const confidenceScore = (result && typeof result.confidenceScore === 'number') 
+            ? Math.max(0, Math.min(100, result.confidenceScore))  // Wert zwischen 0-100 forcieren
+            : 85;  // Fallback-Wert
+
+        const corrections = (result && Array.isArray(result.corrections)) ? result.corrections : [];
+
+        console.log(`Keyword: ${keyword}, Confidence Score: ${confidenceScore}, Corrections: ${corrections.length}`);
 
         const resultElement = document.createElement('div');
         resultElement.className = 'result-item';
         resultElement.innerHTML = `
             <h4>Ergebnis für: "${escapeHtml(keyword)}"</h4>
             <div class="fact-check-summary">
-                <span class="confidence-score score-${getScoreColor(result.confidenceScore || 85)}">
-                    Vertrauens-Score: ${result.confidenceScore || 85}/100
+                <span class="confidence-score confidence-score-${getScoreColor(confidenceScore)}">
+                    Vertrauens-Score: ${confidenceScore}/100
                 </span>
                 <span class="corrections-count">
-                    Korrekturen: ${result.corrections ? result.corrections.length : 0}
+                    Korrekturen: ${corrections.length}
                 </span>
             </div>
-            ${result.corrections && result.corrections.length > 0 ? createCorrectionsList(result.corrections) : '<p class="no-corrections">Keine automatischen Korrekturen notwendig.</p>'}
+            ${corrections.length > 0 ? createCorrectionsList(corrections) : '<p class="no-corrections">Keine automatischen Korrekturen notwendig.</p>'}
             <button class="cta-button preview-button" data-keyword="${keyword}">
                 🔍 Vorschau anzeigen
             </button>
@@ -502,17 +515,27 @@ export function initSilasForm() {
         silasResponseContainer.appendChild(resultElement);
     }
     
+    // KORRIGIERT: Überarbeite Score-Color-Logik
     function getScoreColor(score) {
-        if (score >= 80) return 'high';
-        if (score >= 60) return 'medium';
+        const numScore = Number(score);
+        if (isNaN(numScore)) return 'medium';
+        
+        if (numScore >= 80) return 'high';
+        if (numScore >= 60) return 'medium';
         return 'low';
     }
 
     function createCorrectionsList(corrections) {
+        if (!Array.isArray(corrections) || corrections.length === 0) {
+            return '<p class="no-corrections">Keine Korrekturen verfügbar.</p>';
+        }
+
         let listHtml = '<ul class="corrections-list">';
         const correctionsToShow = corrections.slice(0, 3);
         correctionsToShow.forEach(corr => {
-            listHtml += `<li><strong>[${escapeHtml(corr.field)}]</strong> "${escapeHtml(corr.from)}" wurde zu "${escapeHtml(corr.to)}" geändert.</li>`;
+            if (corr && corr.field && corr.from && corr.to) {
+                listHtml += `<li><strong>[${escapeHtml(corr.field)}]</strong> "${escapeHtml(corr.from)}" wurde zu "${escapeHtml(corr.to)}" geändert.</li>`;
+            }
         });
         if (corrections.length > 3) {
             listHtml += `<li>... und ${corrections.length - 3} weitere.</li>`;
@@ -536,8 +559,6 @@ export function initSilasForm() {
         downloadButton.className = 'cta-button';
         downloadButton.innerHTML = '<i class="fas fa-download"></i> Alle als CSV herunterladen';
         downloadButton.onclick = downloadCSV;
-        
-        // KORRIGIERT: 100% Breite für Download-Button
         downloadButton.style.cssText = 'width: 100%; margin-top: 20px; justify-content: center;';
         
         silasResponseContainer.appendChild(downloadButton);
@@ -592,7 +613,6 @@ export function initSilasForm() {
     // EVENT LISTENERS
     // =================================================================================
     
-    // Formular-Submit
     if (silasForm) {
         silasForm.addEventListener('submit', function(e) { 
             e.preventDefault(); 
@@ -600,7 +620,6 @@ export function initSilasForm() {
         });
     }
 
-    // Enter-Taste im Input
     if (keywordInput) {
         keywordInput.addEventListener('keydown', function(e) { 
             if (e.key === 'Enter') { 
@@ -610,24 +629,25 @@ export function initSilasForm() {
         });
     }
     
-    // Keywords entfernen
     if (keywordDisplayList) {
         keywordDisplayList.addEventListener('click', function(e) {
             if (e.target.matches('.remove-btn')) {
                 const index = parseInt(e.target.dataset.index, 10);
                 if (!isNaN(index) && index >= 0 && index < keywordList.length) {
+                    const removedKeyword = keywordList[index];
                     keywordList.splice(index, 1);
+                    keywordStatuses.delete(removedKeyword); // Status auch entfernen
                     updateKeywordDisplay();
                 }
             }
         });
     }
 
-    // Liste leeren
     if (clearListBtn) {
         clearListBtn.addEventListener('click', function() {
             keywordList = [];
             allGeneratedData = [];
+            keywordStatuses.clear(); // Status-Map leeren
             updateKeywordDisplay();
             if (silasResponseContainer) {
                 silasResponseContainer.innerHTML = '';
@@ -637,12 +657,10 @@ export function initSilasForm() {
         });
     }
 
-    // Generierung starten
     if (startGenerationBtn) {
         startGenerationBtn.addEventListener('click', handleKeywordGeneration);
     }
 
-    // Vorschau-Buttons
     if (silasResponseContainer) {
         silasResponseContainer.addEventListener('click', function(event) {
             if (event.target.classList.contains('preview-button')) {
@@ -655,7 +673,6 @@ export function initSilasForm() {
         });
     }
 
-    // Vorschau-Modal schließen
     if (closePreviewModalBtn) {
         closePreviewModalBtn.addEventListener('click', closePreviewModal);
     }
@@ -666,7 +683,6 @@ export function initSilasForm() {
         });
     }
 
-    // Escape-Taste für Modal
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape' && previewModal && previewModal.classList.contains('visible')) {
             closePreviewModal();
@@ -687,7 +703,6 @@ export function initSilasForm() {
         }
     }
 
-    // Alles initialisieren
     updateKeywordDisplay();
     initializeTracking();
     showDemoStatus();
