@@ -152,14 +152,12 @@ export function initSilasForm() {
         const container = document.querySelector('.ai-container');
         if (!container) return;
 
-        // Verhindert, dass das Passwortfeld mehrfach hinzugefügt wird
         if (document.getElementById('master-password-input')) return;
 
         const passwordInput = document.createElement('input');
         passwordInput.type = 'password';
         passwordInput.id = 'master-password-input';
         passwordInput.placeholder = 'Master-Passwort (optional)';
-        passwordInput.style.marginTop = '10px';
         passwordInput.classList.add('silas-extra-input');
         
         passwordInput.addEventListener('input', (e) => {
@@ -180,10 +178,11 @@ export function initSilasForm() {
             }
         });
         
+        // Fügt das Passwortfeld vor dem Haupt-Formular ein
         container.insertBefore(passwordInput, container.querySelector('#silas-form'));
     }
 
-    // WIEDER HINZUGEFÜGT: Die Funktion zur Erstellung der Badges
+    // KORREKTUR: Fehlende Funktion wieder hinzugefügt
     function createInputBadges() {
         const inputsWithBadges = [
             { id: 'text-domain-input', label: 'Domain' },
@@ -485,7 +484,7 @@ export function initSilasForm() {
     initDemoTracking();
     showDemoStatus();
     createMasterPasswordUI();
-    // WIEDER HINZUGEFÜGT: Der Aufruf, um die Badges zu erstellen
+    // KORREKTUR: Der Aufruf, um die Badges zu erstellen, ist jetzt wieder da.
     createInputBadges();
 }
 
