@@ -1,205 +1,54 @@
-// js/silas-form.js - KORRIGIERTE VERSION - Badges & Vertrauensscore Fix
+// js/silas-form.js - FINALE, VOLLSTÄNDIGE VERSION MIT ALLEN FUNKTIONEN UND KORREKTUREN
 
 export function initSilasForm() {
-    // Prüfe erst, ob wir auf der richtigen Seite sind
     const silasForm = document.getElementById('silas-form');
     if (!silasForm) {
-        console.log('Silas Form nicht gefunden - überspringe Initialisierung');
-        return;
+        return; // Stellt sicher, dass das Skript nur auf der richtigen Seite läuft
     }
 
-    console.log('🎯 Initialisiere Silas Form...');
-
     // =================================================================================
-    // KONSTANTEN & VARIABLEN
+    // VARIABLEN & KONSTANTEN
     // =================================================================================
     const MASTER_PASSWORD = "SilasUnlimited2024!";
-    let DEMO_LIMITS = { 
-        maxKeywordsPerSession: 50,
-        maxGenerationsPerHour: 10,
-        maxGenerationsPerDay: 25,
-        cooldownBetweenRequests: 2000
-    };
-    const MASTER_LIMITS = { 
-        maxKeywordsPerSession: 100,
-        maxGenerationsPerHour: 100, 
-        maxGenerationsPerDay: 500, 
-        cooldownBetweenRequests: 500
-    };
+    let DEMO_LIMITS = { maxKeywordsPerSession: 3, maxGenerationsPerHour: 5, maxGenerationsPerDay: 10, cooldownBetweenRequests: 30000 };
+    const MASTER_LIMITS = { maxKeywordsPerSession: 50, maxGenerationsPerHour: 100, maxGenerationsPerDay: 500, cooldownBetweenRequests: 1000 };
     
-    // DOM-ELEMENTE SICHER ABRUFEN
+    // DOM-ELEMENTE
     const keywordInput = document.getElementById('silas-keyword-input');
     const keywordDisplayList = document.getElementById('keyword-display-list');
     const startGenerationBtn = document.getElementById('start-generation-btn');
     const clearListBtn = document.getElementById('clear-list-btn');
     const silasStatus = document.getElementById('silas-status');
     const silasResponseContainer = document.getElementById('silas-response-container');
-    
     const previewModal = document.getElementById('silas-preview-modal');
     const closePreviewModalBtn = document.getElementById('close-preview-modal');
     const previewContentArea = document.getElementById('preview-content-area');
 
-    if (!keywordInput || !keywordDisplayList || !startGenerationBtn || !silasStatus) {
-        console.error('❌ Kritische Silas-Elemente fehlen im DOM');
-        return;
-    }
-
     let keywordList = [];
-    let allGeneratedData = [];
+    let allGeneratedData = []; 
     let isMasterMode = false;
-    let keywordStatuses = new Map(); // Tracking für Keyword-Status
 
     // =================================================================================
-    // MODAL-FUNKTIONALITÄT
-    // =================================================================================
-    
-    function showPreviewModal(data) {
-        console.log('🔍 Zeige Vorschau für:', data);
-        
-        if (!data || !previewModal || !previewContentArea) {
-            console.error('Keine Daten oder Modal-Elemente für Vorschau verfügbar');
-            return;
-        }
-        
-        let contentHtml = `<h2>Vorschau: ${escapeHtml(data.post_title || 'Unbekannt')}</h2>`;
-        
-        const fieldsOrder = [
-            'post_title', 'meta_title', 'meta_description', 'h1', 
-            'h2_1', 'h2_2', 'h2_3', 'h2_4',
-            'hero_text', 'hero_subtext', 
-            'benefits_list', 'features_list',
-            'primary_cta', 'secondary_cta',
-            'testimonial_1', 'testimonial_2',
-            'social_proof', 'trust_signals'
-        ];
-
-        fieldsOrder.forEach(key => {
-            if (data[key] && data[key].toString().trim()) {
-                const value = data[key];
-                let displayValue;
-                
-                if (typeof value === 'string' && (value.includes('<ul>') || value.includes('<ol>'))) {
-                    displayValue = value;
-                } else {
-                    displayValue = escapeHtml(String(value));
-                }
-                
-                contentHtml += `
-                    <div class="preview-field">
-                        <strong>${formatFieldName(key)}:</strong>
-                        <div class="preview-field-content">${displayValue}</div>
-                    </div>
-                `;
-            }
-        });
-
-        Object.keys(data).forEach(key => {
-            if (!fieldsOrder.includes(key) && !key.startsWith('_') && data[key] && data[key].toString().trim()) {
-                const value = data[key];
-                let displayValue = typeof value === 'string' && value.includes('<') ? value : escapeHtml(String(value));
-                
-                contentHtml += `
-                    <div class="preview-field">
-                        <strong>${formatFieldName(key)}:</strong>
-                        <div class="preview-field-content">${displayValue}</div>
-                    </div>
-                `;
-            }
-        });
-
-        previewContentArea.innerHTML = contentHtml;
-        previewModal.classList.add('visible');
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closePreviewModal() {
-        if (previewModal) {
-            previewModal.classList.remove('visible');
-        }
-        document.body.style.overflow = '';
-    }
-
-    function formatFieldName(fieldName) {
-        const fieldNameMap = {
-            'post_title': 'Seitentitel',
-            'meta_title': 'SEO-Titel',
-            'meta_description': 'Meta-Beschreibung',
-            'h1': 'Hauptüberschrift (H1)',
-            'h2_1': 'Überschrift 1 (H2)',
-            'h2_2': 'Überschrift 2 (H2)',
-            'h2_3': 'Überschrift 3 (H2)',
-            'h2_4': 'Überschrift 4 (H2)',
-            'hero_text': 'Hero-Text',
-            'hero_subtext': 'Hero-Untertext',
-            'benefits_list': 'Vorteile',
-            'features_list': 'Features',
-            'primary_cta': 'Haupt-Call-to-Action',
-            'secondary_cta': 'Zweiter Call-to-Action',
-            'testimonial_1': 'Testimonial 1',
-            'testimonial_2': 'Testimonial 2',
-            'social_proof': 'Soziale Bewährtheit',
-            'trust_signals': 'Vertrauenssignale'
-        };
-        
-        return fieldNameMap[fieldName] || fieldName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-    }
-
-    // =================================================================================
-    // HILFSFUNKTIONEN
+    // UI, LIMITIERUNGEN & BADGES
     // =================================================================================
     
-    function escapeHtml(unsafe) {
-        if (typeof unsafe !== 'string') return '';
-        return unsafe
-             .replace(/&/g, "&amp;")
-             .replace(/</g, "&lt;")
-             .replace(/>/g, "&gt;")
-             .replace(/"/g, "&quot;")
-             .replace(/'/g, "&#039;");
-    }
-
     function updateKeywordDisplay() {
-        if (!keywordDisplayList) return;
-        
         keywordDisplayList.innerHTML = '';
         if (keywordList.length === 0) {
             keywordDisplayList.innerHTML = '<li class="empty-list-info">Füge Keywords hinzu, um Content-Themen zu erstellen.</li>';
         } else {
             keywordList.forEach((keyword, index) => {
-                const status = keywordStatuses.get(keyword) || { state: 'ready', text: 'Bereit' };
-                
                 const li = document.createElement('li');
                 li.setAttribute('data-keyword', keyword);
-                
-                // KORRIGIERT: Vereinfachte HTML-Struktur ohne Badge-Klassen
-                li.innerHTML = `
-                    <span class="keyword-text">${escapeHtml(keyword)}</span>
-                    <span class="keyword-status keyword-status-${status.state}">${status.text}</span>
-                    <button class="remove-btn" data-index="${index}">&times;</button>
-                `;
-                
+                li.innerHTML = `<span>${keyword}</span><div class="status">Bereit</div><button class="remove-btn" data-index="${index}">&times;</button>`;
                 keywordDisplayList.appendChild(li);
             });
         }
-        
-        if (startGenerationBtn) startGenerationBtn.disabled = keywordList.length === 0;
-        if (clearListBtn) clearListBtn.disabled = keywordList.length === 0;
-    }
-
-    // KORRIGIERT: Neue Funktion für Keyword-Status-Update
-    function updateKeywordStatus(keyword, state, text) {
-        keywordStatuses.set(keyword, { state, text });
-        
-        const keywordElement = document.querySelector(`li[data-keyword="${keyword}"] .keyword-status`);
-        if (keywordElement) {
-            keywordElement.textContent = text;
-            keywordElement.className = `keyword-status keyword-status-${state}`;
-        }
+        startGenerationBtn.disabled = keywordList.length === 0;
+        clearListBtn.disabled = keywordList.length === 0;
     }
 
     function addKeywords() {
-        if (!keywordInput) return;
-        
         const limits = isMasterMode ? MASTER_LIMITS : DEMO_LIMITS;
         const keywords = keywordInput.value.split(',')
             .map(kw => kw.trim())
@@ -210,18 +59,10 @@ export function initSilasForm() {
             return;
         }
 
-        keywords.forEach(keyword => {
-            keywordList.push(keyword);
-            keywordStatuses.set(keyword, { state: 'ready', text: 'Bereit' });
-        });
-        
+        keywordList.push(...keywords);
         keywordInput.value = '';
         updateKeywordDisplay();
     }
-
-    // =================================================================================
-    // TRACKING & LIMITS
-    // =================================================================================
     
     function getTrackingData() {
         try {
@@ -233,11 +74,7 @@ export function initSilasForm() {
     }
 
     function setTrackingData(data) {
-        try {
-            localStorage.setItem('silasDemoTracking', JSON.stringify(data));
-        } catch (e) {
-            console.error('Fehler beim Speichern der Tracking-Daten:', e);
-        }
+        localStorage.setItem('silasDemoTracking', JSON.stringify(data));
     }
 
     function checkLimits() {
@@ -265,6 +102,9 @@ export function initSilasForm() {
             if (generationsLastHour >= DEMO_LIMITS.maxGenerationsPerHour) {
                 return { allowed: false, reason: "Stundenlimit erreicht." };
             }
+            if (keywordList.length > DEMO_LIMITS.maxKeywordsPerSession) {
+                return { allowed: false, reason: "Maximale Keywords pro Sitzung überschritten." };
+            }
             
             const lastGenerationTime = trackingData.generations[trackingData.generations.length - 1];
             if (lastGenerationTime && (now - lastGenerationTime < DEMO_LIMITS.cooldownBetweenRequests)) {
@@ -277,138 +117,136 @@ export function initSilasForm() {
             return { allowed: false, reason: "Interner Fehler bei der Limit-Prüfung." };
         }
     }
-
-    function showDemoStatus() {
-        let statusDiv = document.getElementById('demo-status');
-        if (!statusDiv) {
-            statusDiv = document.createElement('div');
-            statusDiv.id = 'demo-status';
-            statusDiv.style.cssText = 'text-align: center; margin: 10px 0; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 5px; font-size: 0.9rem;';
-            
-            const keywordContainer = document.querySelector('.keyword-list-container');
-            if (keywordContainer) {
-                keywordContainer.appendChild(statusDiv);
-            }
+    
+    function initDemoTracking() {
+        if (!localStorage.getItem('silasDemoTracking')) {
+            setTrackingData({ lastReset: Date.now(), generations: [] });
         }
-        
+    }
+    
+    function showDemoStatus() {
         if (isMasterMode) {
-            statusDiv.innerHTML = '<p class="master-mode-active" style="color: lime; font-weight: bold;">⚡ Master-Modus Aktiv</p>';
+            const statusDiv = document.getElementById('demo-status');
+            if(statusDiv) statusDiv.innerHTML = '<p class="master-mode-active">⚡ Master-Modus Aktiv</p>';
             return;
         }
-        
-        try {
-            let trackingData = getTrackingData();
-            const now = Date.now();
-            const oneHour = 60 * 60 * 1000;
-            const generationsLastHour = trackingData.generations.filter(ts => now - ts < oneHour).length;
-            const generationsLastDay = trackingData.generations.length;
+        let trackingData = getTrackingData();
+        const now = Date.now();
+        const oneHour = 60 * 60 * 1000;
+        const generationsLastHour = trackingData.generations.filter(ts => now - ts < oneHour).length;
+        const generationsLastDay = trackingData.generations.length;
 
+        const statusDiv = document.getElementById('demo-status');
+        if (statusDiv) {
             statusDiv.innerHTML = `
                 <p><strong>Demo-Status:</strong></p>
-                <ul style="list-style: none; padding: 0; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+                <ul>
                     <li>Stunde: ${generationsLastHour}/${DEMO_LIMITS.maxGenerationsPerHour}</li>
                     <li>Tag: ${generationsLastDay}/${DEMO_LIMITS.maxGenerationsPerDay}</li>
                 </ul>
             `;
-        } catch (error) {
-            console.error('Fehler beim Anzeigen des Demo-Status:', error);
         }
     }
 
     function createMasterPasswordUI() {
+        const container = document.querySelector('.ai-container');
+        if (!container) return;
+
+        // Verhindert, dass das Passwortfeld mehrfach hinzugefügt wird
         if (document.getElementById('master-password-input')) return;
 
-        const passwordContainer = document.createElement('div');
-        passwordContainer.style.cssText = 'text-align: center; margin: 20px 0; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px; border: 1px solid #444;';
-        
-        const passwordLabel = document.createElement('label');
-        passwordLabel.textContent = 'Master-Zugang (optional):';
-        passwordLabel.style.cssText = 'display: block; margin-bottom: 8px; color: #ccc; font-size: 0.9rem;';
-        
         const passwordInput = document.createElement('input');
         passwordInput.type = 'password';
         passwordInput.id = 'master-password-input';
-        passwordInput.placeholder = 'Master-Passwort eingeben...';
-        passwordInput.style.cssText = `
-            background: #2d2d2d; 
-            border: 1px solid #444; 
-            border-radius: 5px; 
-            color: #fff; 
-            padding: 8px 12px; 
-            font-size: 0.9rem; 
-            text-align: center;
-            transition: border-color 0.3s ease;
-        `;
+        passwordInput.placeholder = 'Master-Passwort (optional)';
+        passwordInput.style.marginTop = '10px';
+        passwordInput.classList.add('silas-extra-input');
         
         passwordInput.addEventListener('input', (e) => {
             if (e.target.value === MASTER_PASSWORD) {
                 isMasterMode = true;
                 DEMO_LIMITS = MASTER_LIMITS;
-                console.log("🚀 Master-Modus aktiviert!");
+                console.log("Master-Modus aktiviert!");
                 passwordInput.style.borderColor = 'lime';
                 showDemoStatus();
             } else {
                 if(isMasterMode) {
                     isMasterMode = false;
-                    DEMO_LIMITS = { 
-                        maxKeywordsPerSession: 50,
-                        maxGenerationsPerHour: 10,
-                        maxGenerationsPerDay: 25,
-                        cooldownBetweenRequests: 2000
-                    };
-                    passwordInput.style.borderColor = '#444';
+                    DEMO_LIMITS = { maxKeywordsPerSession: 3, maxGenerationsPerHour: 5, maxGenerationsPerDay: 10, cooldownBetweenRequests: 30000 };
+                    passwordInput.style.borderColor = '';
                     console.log("Master-Modus deaktiviert.");
                     showDemoStatus();
                 }
             }
         });
         
-        passwordContainer.appendChild(passwordLabel);
-        passwordContainer.appendChild(passwordInput);
-        
-        const keywordContainer = document.querySelector('.keyword-list-container');
-        if (keywordContainer) {
-            keywordContainer.appendChild(passwordContainer);
-        }
+        container.insertBefore(passwordInput, container.querySelector('#silas-form'));
+    }
+
+    // WIEDER HINZUGEFÜGT: Die Funktion zur Erstellung der Badges
+    function createInputBadges() {
+        const inputsWithBadges = [
+            { id: 'text-domain-input', label: 'Domain' },
+            { id: 'text-brand-input', label: 'Brand' },
+            { id: 'text-email-input', label: 'E-Mail' },
+            { id: 'text-phone-input', label: 'Telefon' },
+            { id: 'text-zielgruppe-input', label: 'Zielgruppe' },
+            { id: 'text-tonalitaet-input', label: 'Tonalität' },
+            { id: 'text-usp-input', label: 'USP' }
+        ];
+
+        inputsWithBadges.forEach(config => {
+            const inputElement = document.getElementById(config.id);
+            if (inputElement) {
+                const container = inputElement.parentElement;
+                
+                let badgeContainer = container.querySelector('.badge-container');
+                if (!badgeContainer) {
+                    badgeContainer = document.createElement('div');
+                    badgeContainer.className = 'badge-container';
+                    inputElement.insertAdjacentElement('afterend', badgeContainer);
+                }
+
+                inputElement.addEventListener('input', () => {
+                    badgeContainer.innerHTML = ''; 
+                    if (inputElement.value.trim() !== '') {
+                        const badge = document.createElement('span');
+                        badge.className = 'input-badge';
+                        badge.textContent = config.label;
+                        badgeContainer.appendChild(badge);
+                    }
+                });
+            }
+        });
     }
 
     // =================================================================================
-    // CONTENT-GENERIERUNG
+    // KERNFUNKTION: CONTENT-GENERIERUNG
     // =================================================================================
 
     async function handleKeywordGeneration() {
-        if (!startGenerationBtn || !silasStatus || !silasResponseContainer) {
-            console.error('Kritische UI-Elemente für Generierung fehlen');
-            return;
-        }
-
         const limitCheck = checkLimits();
-        if (!limitCheck || !limitCheck.allowed) {
-            silasStatus.textContent = `❌ Limit erreicht: ${limitCheck.reason || 'Unbekannter Grund'}`;
+        if (!limitCheck.allowed) {
+            silasStatus.textContent = `❌ Limit erreicht: ${limitCheck.reason}`;
             return;
         }
 
         startGenerationBtn.disabled = true;
-        if (clearListBtn) clearListBtn.disabled = true;
+        clearListBtn.disabled = true;
         silasStatus.textContent = '🔮 Silas zaubert... bitte warten.';
         
         const keywords = [...keywordList];
         const options = {
-            intent: getInputValue('text-intent-select') || 'informational',
-            zielgruppe: getInputValue('text-zielgruppe-input'),
-            tonalitaet: getInputValue('text-tonalitaet-input'),
-            usp: getInputValue('text-usp-input'),
-            domain: getInputValue('text-domain-input'),
-            email: getInputValue('text-email-input'),
-            phone: getInputValue('text-phone-input'),
-            brand: getInputValue('text-brand-input'),
+            intent: document.getElementById('text-intent-select').value,
+            zielgruppe: document.getElementById('text-zielgruppe-input').value,
+            tonalitaet: document.getElementById('text-tonalitaet-input').value,
+            usp: document.getElementById('text-usp-input').value,
+            domain: document.getElementById('text-domain-input').value,
+            email: document.getElementById('text-email-input').value,
+            phone: document.getElementById('text-phone-input').value,
+            brand: document.getElementById('text-brand-input').value,
             isMasterRequest: isMasterMode
         };
-
-        // KORRIGIERT: Setze alle Keywords auf "Verarbeitung läuft..."
-        keywords.forEach(keyword => {
-            updateKeywordStatus(keyword, 'processing', 'Verarbeitung läuft...');
-        });
 
         silasResponseContainer.style.display = 'block';
         silasResponseContainer.innerHTML = '';
@@ -422,50 +260,34 @@ export function initSilasForm() {
             });
 
             if (!response.ok) {
-                const errorData = await response.json().catch(() => ({ message: response.statusText }));
+                const errorData = await response.json();
                 throw new Error(`Serverfehler: ${errorData.message || response.statusText}`);
             }
 
             const results = await response.json();
             
-            // KORRIGIERT: Verarbeite jedes Ergebnis und aktualisiere den Status
             results.forEach(result => {
                 allGeneratedData.push(result);
                 displaySingleResult(result.keyword, result);
-                
-                // Update Status basierend auf Erfolg/Fehler
-                if (result.error || (result.correctedContent && result.correctedContent._parse_error)) {
-                    updateKeywordStatus(result.keyword, 'error', '❌ Fehler');
-                } else {
-                    updateKeywordStatus(result.keyword, 'success', '✅ Fertig');
-                }
             });
 
             silasStatus.textContent = `✅ ${keywords.length} Content-Themen erfolgreich erstellt.`;
             createDownloadButton();
 
-            const trackingData = getTrackingData();
-            keywords.forEach(() => trackingData.generations.push(Date.now()));
-            setTrackingData(trackingData);
-            showDemoStatus();
+            if (!isMasterMode) {
+                const trackingData = getTrackingData();
+                keywords.forEach(() => trackingData.generations.push(Date.now()));
+                setTrackingData(trackingData);
+                showDemoStatus();
+            }
 
         } catch (error) {
             console.error('Fehler bei der Content-Generierung:', error);
             silasStatus.textContent = `💥 Fehler: ${error.message}`;
-            
-            // KORRIGIERT: Bei globalem Fehler alle Keywords auf Fehler setzen
-            keywords.forEach(keyword => {
-                updateKeywordStatus(keyword, 'error', '❌ Fehler');
-            });
         } finally {
             startGenerationBtn.disabled = keywordList.length === 0;
-            if (clearListBtn) clearListBtn.disabled = keywordList.length === 0;
+            clearListBtn.disabled = keywordList.length === 0;
         }
-    }
-
-    function getInputValue(elementId) {
-        const element = document.getElementById(elementId);
-        return element ? element.value.trim() : '';
     }
 
     // =================================================================================
@@ -473,69 +295,54 @@ export function initSilasForm() {
     // =================================================================================
     
     function displaySingleResult(keyword, result) {
-        if (!silasResponseContainer) return;
+        const keywordStatusElement = document.querySelector(`li[data-keyword="${keyword}"] .status`);
 
         if (result.error || (result.correctedContent && result.correctedContent._parse_error)) {
+            if (keywordStatusElement) {
+                keywordStatusElement.textContent = '❌ Fehler';
+                keywordStatusElement.className = 'status error';
+            }
             const errorElement = document.createElement('div');
             errorElement.className = 'result-item';
-            errorElement.innerHTML = `
-                <h4>Fehler bei: "${escapeHtml(keyword)}"</h4>
-                <p class="error-message">${escapeHtml(result.error || 'Unbekannter Fehler')}</p>
-            `;
+            errorElement.innerHTML = `<h4>Fehler bei: "${keyword}"</h4><p class="error-message">${result.error || (result.correctedContent ? result.correctedContent.meta_description : 'Unbekannter Fehler')}</p>`;
             silasResponseContainer.appendChild(errorElement);
             return;
         }
 
-        // KORRIGIERT: Überprüfe ob confidenceScore existiert und ist gültig
-        const confidenceScore = (result && typeof result.confidenceScore === 'number') 
-            ? Math.max(0, Math.min(100, result.confidenceScore))  // Wert zwischen 0-100 forcieren
-            : 85;  // Fallback-Wert
-
-        const corrections = (result && Array.isArray(result.corrections)) ? result.corrections : [];
-
-        console.log(`Keyword: ${keyword}, Confidence Score: ${confidenceScore}, Corrections: ${corrections.length}`);
+        if (keywordStatusElement) {
+            keywordStatusElement.textContent = '✅ Fertig';
+            keywordStatusElement.className = 'status success';
+        }
 
         const resultElement = document.createElement('div');
         resultElement.className = 'result-item';
         resultElement.innerHTML = `
-            <h4>Ergebnis für: "${escapeHtml(keyword)}"</h4>
+            <h4>Ergebnis für: "${keyword}"</h4>
             <div class="fact-check-summary">
-                <span class="confidence-score confidence-score-${getScoreColor(confidenceScore)}">
-                    Vertrauens-Score: ${confidenceScore}/100
+                <span class="confidence-score score-${getScoreColor(result.confidenceScore)}">
+                    Vertrauens-Score: ${result.confidenceScore}/100
                 </span>
                 <span class="corrections-count">
-                    Korrekturen: ${corrections.length}
+                    Korrekturen: ${result.corrections.length}
                 </span>
             </div>
-            ${corrections.length > 0 ? createCorrectionsList(corrections) : '<p class="no-corrections">Keine automatischen Korrekturen notwendig.</p>'}
-            <button class="cta-button preview-button" data-keyword="${keyword}">
-                🔍 Vorschau anzeigen
-            </button>
+            ${result.corrections.length > 0 ? createCorrectionsList(result.corrections) : '<p class="no-corrections">Keine automatischen Korrekturen notwendig.</p>'}
+            <button class="cta-button preview-button" data-keyword="${keyword}">Vorschau anzeigen</button>
         `;
         silasResponseContainer.appendChild(resultElement);
     }
     
-    // KORRIGIERT: Überarbeite Score-Color-Logik
     function getScoreColor(score) {
-        const numScore = Number(score);
-        if (isNaN(numScore)) return 'medium';
-        
-        if (numScore >= 80) return 'high';
-        if (numScore >= 60) return 'medium';
+        if (score >= 80) return 'high';
+        if (score >= 60) return 'medium';
         return 'low';
     }
 
     function createCorrectionsList(corrections) {
-        if (!Array.isArray(corrections) || corrections.length === 0) {
-            return '<p class="no-corrections">Keine Korrekturen verfügbar.</p>';
-        }
-
         let listHtml = '<ul class="corrections-list">';
         const correctionsToShow = corrections.slice(0, 3);
         correctionsToShow.forEach(corr => {
-            if (corr && corr.field && corr.from && corr.to) {
-                listHtml += `<li><strong>[${escapeHtml(corr.field)}]</strong> "${escapeHtml(corr.from)}" wurde zu "${escapeHtml(corr.to)}" geändert.</li>`;
-            }
+            listHtml += `<li><strong>[${corr.field}]</strong> "${escapeHtml(corr.from)}" wurde zu "${escapeHtml(corr.to)}" geändert.</li>`;
         });
         if (corrections.length > 3) {
             listHtml += `<li>... und ${corrections.length - 3} weitere.</li>`;
@@ -544,13 +351,46 @@ export function initSilasForm() {
         return listHtml;
     }
 
+    function escapeHtml(unsafe) {
+        if (typeof unsafe !== 'string') return '';
+        return unsafe
+             .replace(/&/g, "&amp;")
+             .replace(/</g, "&lt;")
+             .replace(/>/g, "&gt;")
+             .replace(/"/g, "&quot;")
+             .replace(/'/g, "&#039;");
+    }
+
     // =================================================================================
-    // CSV-EXPORT
+    // VORSCHAU & CSV-EXPORT
     // =================================================================================
 
+    function showPreviewModal(data) {
+        if (!data) return;
+        let contentHtml = '<h2>Vorschau: ' + escapeHtml(data.post_title) + '</h2>';
+        for (const [key, value] of Object.entries(data)) {
+            if (key !== 'keyword' && !key.startsWith('_')) {
+                let displayValue = escapeHtml(value);
+                if (typeof value === 'string' && value.trim().startsWith('<ul>')) {
+                    displayValue = value;
+                }
+                contentHtml += `
+                    <div class="preview-field">
+                        <strong>${escapeHtml(key)}:</strong>
+                        <div>${displayValue}</div>
+                    </div>
+                `;
+            }
+        }
+        previewContentArea.innerHTML = contentHtml;
+        previewModal.style.display = 'flex';
+    }
+
+    function closePreviewModal() {
+        previewModal.style.display = 'none';
+    }
+
     function createDownloadButton() {
-        if (!silasResponseContainer) return;
-        
         const oldButton = document.getElementById('download-csv-btn');
         if (oldButton) oldButton.remove();
         
@@ -559,8 +399,6 @@ export function initSilasForm() {
         downloadButton.className = 'cta-button';
         downloadButton.innerHTML = '<i class="fas fa-download"></i> Alle als CSV herunterladen';
         downloadButton.onclick = downloadCSV;
-        downloadButton.style.cssText = 'width: 100%; margin-top: 20px; justify-content: center;';
-        
         silasResponseContainer.appendChild(downloadButton);
     }
     
@@ -591,122 +429,63 @@ export function initSilasForm() {
             alert("Keine gültigen Daten zum Herunterladen vorhanden.");
             return;
         }
-        
-        try {
-            const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
-            const url = URL.createObjectURL(blob);
-            link.setAttribute("href", url);
-            link.setAttribute("download", "silas_generated_content.csv");
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-        } catch (error) {
-            console.error('Fehler beim CSV-Download:', error);
-            alert('Fehler beim Herunterladen der CSV-Datei.');
-        }
+        const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", "silas_generated_content.csv");
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
     }
-
+    
     // =================================================================================
     // EVENT LISTENERS
     // =================================================================================
     
-    if (silasForm) {
-        silasForm.addEventListener('submit', function(e) { 
-            e.preventDefault(); 
-            addKeywords(); 
-        });
-    }
-
-    if (keywordInput) {
-        keywordInput.addEventListener('keydown', function(e) { 
-            if (e.key === 'Enter') { 
-                e.preventDefault(); 
-                addKeywords(); 
-            } 
-        });
-    }
+    silasForm.addEventListener('submit', function(e) { e.preventDefault(); addKeywords(); });
+    keywordInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); addKeywords(); } });
     
-    if (keywordDisplayList) {
-        keywordDisplayList.addEventListener('click', function(e) {
-            if (e.target.matches('.remove-btn')) {
-                const index = parseInt(e.target.dataset.index, 10);
-                if (!isNaN(index) && index >= 0 && index < keywordList.length) {
-                    const removedKeyword = keywordList[index];
-                    keywordList.splice(index, 1);
-                    keywordStatuses.delete(removedKeyword); // Status auch entfernen
-                    updateKeywordDisplay();
-                }
-            }
-        });
-    }
-
-    if (clearListBtn) {
-        clearListBtn.addEventListener('click', function() {
-            keywordList = [];
-            allGeneratedData = [];
-            keywordStatuses.clear(); // Status-Map leeren
+    keywordDisplayList.addEventListener('click', function(e) {
+        if (e.target.matches('.remove-btn')) {
+            const index = parseInt(e.target.dataset.index, 10);
+            keywordList.splice(index, 1);
             updateKeywordDisplay();
-            if (silasResponseContainer) {
-                silasResponseContainer.innerHTML = '';
-                silasResponseContainer.style.display = 'none';
-            }
-            if (silasStatus) silasStatus.textContent = 'Bereit zur Generierung.';
-        });
-    }
-
-    if (startGenerationBtn) {
-        startGenerationBtn.addEventListener('click', handleKeywordGeneration);
-    }
-
-    if (silasResponseContainer) {
-        silasResponseContainer.addEventListener('click', function(event) {
-            if (event.target.classList.contains('preview-button')) {
-                const keyword = event.target.getAttribute('data-keyword');
-                const dataToShow = allGeneratedData.find(d => d.keyword === keyword);
-                if (dataToShow && dataToShow.correctedContent) {
-                    showPreviewModal(dataToShow.correctedContent);
-                }
-            }
-        });
-    }
-
-    if (closePreviewModalBtn) {
-        closePreviewModalBtn.addEventListener('click', closePreviewModal);
-    }
-    
-    if (previewModal) {
-        previewModal.addEventListener('click', function(e) { 
-            if (e.target === previewModal) closePreviewModal(); 
-        });
-    }
-
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && previewModal && previewModal.classList.contains('visible')) {
-            closePreviewModal();
         }
     });
-    
-    // =================================================================================
-    // INITIALISIERUNG
-    // =================================================================================
-    
-    function initializeTracking() {
-        try {
-            if (!localStorage.getItem('silasDemoTracking')) {
-                setTrackingData({ lastReset: Date.now(), generations: [] });
-            }
-        } catch (error) {
-            console.error('Fehler bei der Tracking-Initialisierung:', error);
-        }
-    }
 
+    clearListBtn.addEventListener('click', function() {
+        keywordList = [];
+        allGeneratedData = [];
+        updateKeywordDisplay();
+        silasResponseContainer.innerHTML = '';
+        silasResponseContainer.style.display = 'none';
+        silasStatus.textContent = 'Bereit zur Generierung.';
+    });
+
+    startGenerationBtn.addEventListener('click', handleKeywordGeneration);
+
+    silasResponseContainer.addEventListener('click', function(event) {
+        if (event.target.classList.contains('preview-button')) {
+            const keyword = event.target.getAttribute('data-keyword');
+            const dataToShow = allGeneratedData.find(d => d.keyword === keyword);
+            if (dataToShow) {
+                showPreviewModal(dataToShow.correctedContent);
+            }
+        }
+    });
+
+    if (closePreviewModalBtn) closePreviewModalBtn.addEventListener('click', closePreviewModal);
+    if (previewModal) previewModal.addEventListener('click', function(e) { if (e.target === previewModal) closePreviewModal(); });
+    
+    // INITIALISIERUNG
     updateKeywordDisplay();
-    initializeTracking();
+    initDemoTracking();
     showDemoStatus();
     createMasterPasswordUI();
-    
-    console.log('✅ Silas Form erfolgreich initialisiert');
+    // WIEDER HINZUGEFÜGT: Der Aufruf, um die Badges zu erstellen
+    createInputBadges();
 }
+
