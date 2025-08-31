@@ -285,7 +285,7 @@ keywordList[existingIndex].brand = brand;
             
             const intentBadge = document.createElement('span');
             intentBadge.textContent = item.intent === 'commercial' ? 'Kommerziell' : 'Informativ';
-            intentBadge.style.cssText = `background-color: ${item.intent === 'commercial' ? '#28a745' : '#17a2b8'}; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold;`;
+            intentBadge.style.cssText = `background-color: ${item.intent === 'commercial' ? '#28a745' : '#17a2b8'}; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: normal;`;
             badgesContainer.appendChild(intentBadge);
 
             if (item.domain) {
@@ -294,6 +294,15 @@ keywordList[existingIndex].brand = brand;
     domainBadge.style.cssText = `background-color: #4CAF50; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold;`;
     badgesContainer.appendChild(domainBadge);
 }
+
+ if (item.brand) {
+                const brandBadge = document.createElement('span');
+                brandBadge.textContent = `Brand: ${item.brand}`;
+                // Wir verwenden eine auffälligere Farbe, um die Brand hervorzuheben
+                brandBadge.style.cssText = `background-color: #fd7e14; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold;`;
+                badgesContainer.appendChild(brandBadge);
+            }
+
 if (item.email) {
     const emailBadge = document.createElement('span');
     emailBadge.textContent = `E-Mail: ${item.email}`;
