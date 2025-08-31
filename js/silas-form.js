@@ -243,3 +243,329 @@ export function initSilasForm() {
         if (!startGenerationBtn || !silasStatus || !silasResponseContainer) {
             console.error('Kritische UI-Elemente für Generierung fehlen');
             return;
+        }
+
+        const limitCheck = checkLimits();
+        if (!limitCheck || !limitCheck.allowed) {
+            silasStatus.textContent = `❌ Limit erreicht: ${limitCheck.reason || 'Unbekannter Grund'}`;
+            return;
+        }
+
+        startGenerationBtn.disabled = true;
+        if (clearListBtn) clearListBtn.disabled = true;
+        silasStatus.textContent = '🔮 Silas zaubert... bitte warten.';
+        
+        const keywords = [...keywordList];
+        const options = {
+            intent: getInputValue('text-intent-select') || 'informational',
+            zielgruppe: getInputValue('text-zielgruppe-input'),
+            tonalitaet: getInputValue('text-tonalitaet-input'),
+            usp: getInputValue('text-usp-input'),
+            domain: getInputValue('text-domain-input'),
+            email: getInputValue('text-email-input'),
+            phone: getInputValue('text-phone-input'),
+            brand: getInputValue('text-brand-input'),
+            isMasterRequest: isMasterMode
+        };
+
+        silasResponseContainer.style.display = 'block';
+        silasResponseContainer.innerHTML = '';
+        allGeneratedData = [];
+
+        try {
+            const response = await fetch('/api/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ keywords, ...options })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ message: response.statusText }));
+                throw new Error(`Serverfehler: ${errorData.message || response.statusText}`);
+            }
+
+            const results = await response.json();
+            
+            results.forEach(result => {
+                allGeneratedData.push(result);
+                displaySingleResult(result.keyword, result);
+            });
+
+            silasStatus.textContent = `✅ ${keywords.length} Content-Themen erfolgreich erstellt.`;
+            createDownloadButton();
+
+            // Tracking updaten
+            const trackingData = getTrackingData();
+            keywords.forEach(() => trackingData.generations.push(Date.now()));
+            setTrackingData(trackingData);
+            showDemoStatus();
+
+        } catch (error) {
+            console.error('Fehler bei der Content-Generierung:', error);
+            silasStatus.textContent = `💥 Fehler: ${error.message}`;
+        } finally {
+            startGenerationBtn.disabled = keywordList.length === 0;
+            if (clearListBtn) clearListBtn.disabled = keywordList.length === 0;
+        }
+    }
+
+    function getInputValue(elementId) {
+        const element = document.getElementById(elementId);
+        return element ? element.value.trim() : '';
+    }
+
+    // =================================================================================
+    // UI-DARSTELLUNG DER ERGEBNISSE
+    // =================================================================================
+    
+    function displaySingleResult(keyword, result) {
+        if (!silasResponseContainer) return;
+
+        const keywordStatusElement = document.querySelector(`li[data-keyword="${keyword}"] .status`);
+
+        if (result.error || (result.correctedContent && result.correctedContent._parse_error)) {
+            if (keywordStatusElement) {
+                keywordStatusElement.textContent = '❌ Fehler';
+                keywordStatusElement.className = 'status error';
+            }
+            const errorElement = document.createElement('div');
+            errorElement.className = 'result-item';
+            errorElement.innerHTML = `
+                <h4>Fehler bei: "${escapeHtml(keyword)}"</h4>
+                <p class="error-message">${escapeHtml(result.error || 'Unbekannter Fehler')}</p>
+            `;
+            silasResponseContainer.appendChild(errorElement);
+            return;
+        }
+
+        if (keywordStatusElement) {
+            keywordStatusElement.textContent = '✅ Fertig';
+            keywordStatusElement.className = 'status success';
+        }
+
+        const resultElement = document.createElement('div');
+        resultElement.className = 'result-item';
+        resultElement.innerHTML = `
+            <h4>Ergebnis für: "${escapeHtml(keyword)}"</h4>
+            <div class="fact-check-summary">
+                <span class="confidence-score score-${getScoreColor(result.confidenceScore || 85)}">
+                    Vertrauens-Score: ${result.confidenceScore || 85}/100
+                </span>
+                <span class="corrections-count">
+                    Korrekturen: ${result.corrections ? result.corrections.length : 0}
+                </span>
+            </div>
+            ${result.corrections && result.corrections.length > 0 ? createCorrectionsList(result.corrections) : '<p class="no-corrections">Keine automatischen Korrekturen notwendig.</p>'}
+            <button class="cta-button preview-button" data-keyword="${keyword}">Vorschau anzeigen</button>
+        `;
+        silasResponseContainer.appendChild(resultElement);
+    }
+    
+    function getScoreColor(score) {
+        if (score >= 80) return 'high';
+        if (score >= 60) return 'medium';
+        return 'low';
+    }
+
+    function createCorrectionsList(corrections) {
+        let listHtml = '<ul class="corrections-list">';
+        const correctionsToShow = corrections.slice(0, 3);
+        correctionsToShow.forEach(corr => {
+            listHtml += `<li><strong>[${escapeHtml(corr.field)}]</strong> "${escapeHtml(corr.from)}" wurde zu "${escapeHtml(corr.to)}" geändert.</li>`;
+        });
+        if (corrections.length > 3) {
+            listHtml += `<li>... und ${corrections.length - 3} weitere.</li>`;
+        }
+        listHtml += '</ul>';
+        return listHtml;
+    }
+
+    // =================================================================================
+    // VORSCHAU & CSV-EXPORT
+    // =================================================================================
+
+    function showPreviewModal(data) {
+        if (!data || !previewModal || !previewContentArea) return;
+        
+        let contentHtml = `<h2>Vorschau: ${escapeHtml(data.post_title || 'Unbekannt')}</h2>`;
+        for (const [key, value] of Object.entries(data)) {
+            if (key !== 'keyword' && !key.startsWith('_') && value) {
+                let displayValue = escapeHtml(String(value));
+                if (typeof value === 'string' && value.trim().startsWith('<ul>')) {
+                    displayValue = value; // HTML-Listen nicht escapen
+                }
+                contentHtml += `
+                    <div class="preview-field">
+                        <strong>${escapeHtml(key)}:</strong>
+                        <div>${displayValue}</div>
+                    </div>
+                `;
+            }
+        }
+        previewContentArea.innerHTML = contentHtml;
+        previewModal.style.display = 'flex';
+    }
+
+    function closePreviewModal() {
+        if (previewModal) previewModal.style.display = 'none';
+    }
+
+    function createDownloadButton() {
+        if (!silasResponseContainer) return;
+        
+        const oldButton = document.getElementById('download-csv-btn');
+        if (oldButton) oldButton.remove();
+        
+        const downloadButton = document.createElement('button');
+        downloadButton.id = 'download-csv-btn';
+        downloadButton.className = 'cta-button';
+        downloadButton.innerHTML = '<i class="fas fa-download"></i> Alle als CSV herunterladen';
+        downloadButton.onclick = downloadCSV;
+        silasResponseContainer.appendChild(downloadButton);
+    }
+    
+    function convertToCSV(dataArray) {
+        if (!dataArray || dataArray.length === 0) return '';
+        const firstValidItem = dataArray.find(item => item && item.correctedContent);
+        if (!firstValidItem) return '';
+
+        const headers = Object.keys(firstValidItem.correctedContent);
+        const csvRows = [headers.join(';')];
+        
+        for (const item of dataArray) {
+            if(!item || !item.correctedContent || item.error) continue;
+
+            const row = item.correctedContent;
+            const values = headers.map(header => {
+                const escaped = ('' + (row[header] || '')).replace(/"/g, '""');
+                return `"${escaped}"`;
+            });
+            csvRows.push(values.join(';'));
+        }
+        return csvRows.join('\n');
+    }
+
+    function downloadCSV() {
+        const csvContent = convertToCSV(allGeneratedData);
+        if(!csvContent) {
+            alert("Keine gültigen Daten zum Herunterladen vorhanden.");
+            return;
+        }
+        
+        try {
+            const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", "silas_generated_content.csv");
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error('Fehler beim CSV-Download:', error);
+            alert('Fehler beim Herunterladen der CSV-Datei.');
+        }
+    }
+    
+    // =================================================================================
+    // EVENT LISTENERS
+    // =================================================================================
+    
+    // Formular-Submit
+    if (silasForm) {
+        silasForm.addEventListener('submit', function(e) { 
+            e.preventDefault(); 
+            addKeywords(); 
+        });
+    }
+
+    // Enter-Taste im Input
+    if (keywordInput) {
+        keywordInput.addEventListener('keydown', function(e) { 
+            if (e.key === 'Enter') { 
+                e.preventDefault(); 
+                addKeywords(); 
+            } 
+        });
+    }
+    
+    // Keywords entfernen
+    if (keywordDisplayList) {
+        keywordDisplayList.addEventListener('click', function(e) {
+            if (e.target.matches('.remove-btn')) {
+                const index = parseInt(e.target.dataset.index, 10);
+                if (!isNaN(index) && index >= 0 && index < keywordList.length) {
+                    keywordList.splice(index, 1);
+                    updateKeywordDisplay();
+                }
+            }
+        });
+    }
+
+    // Liste leeren
+    if (clearListBtn) {
+        clearListBtn.addEventListener('click', function() {
+            keywordList = [];
+            allGeneratedData = [];
+            updateKeywordDisplay();
+            if (silasResponseContainer) {
+                silasResponseContainer.innerHTML = '';
+                silasResponseContainer.style.display = 'none';
+            }
+            if (silasStatus) silasStatus.textContent = 'Bereit zur Generierung.';
+        });
+    }
+
+    // Generierung starten
+    if (startGenerationBtn) {
+        startGenerationBtn.addEventListener('click', handleKeywordGeneration);
+    }
+
+    // Vorschau-Buttons
+    if (silasResponseContainer) {
+        silasResponseContainer.addEventListener('click', function(event) {
+            if (event.target.classList.contains('preview-button')) {
+                const keyword = event.target.getAttribute('data-keyword');
+                const dataToShow = allGeneratedData.find(d => d.keyword === keyword);
+                if (dataToShow && dataToShow.correctedContent) {
+                    showPreviewModal(dataToShow.correctedContent);
+                }
+            }
+        });
+    }
+
+    // Vorschau-Modal schließen
+    if (closePreviewModalBtn) {
+        closePreviewModalBtn.addEventListener('click', closePreviewModal);
+    }
+    
+    if (previewModal) {
+        previewModal.addEventListener('click', function(e) { 
+            if (e.target === previewModal) closePreviewModal(); 
+        });
+    }
+    
+    // =================================================================================
+    // INITIALISIERUNG
+    // =================================================================================
+    
+    function initializeTracking() {
+        try {
+            if (!localStorage.getItem('silasDemoTracking')) {
+                setTrackingData({ lastReset: Date.now(), generations: [] });
+            }
+        } catch (error) {
+            console.error('Fehler bei der Tracking-Initialisierung:', error);
+        }
+    }
+
+    // Alles initialisieren
+    updateKeywordDisplay();
+    initializeTracking();
+    showDemoStatus();
+    createMasterPasswordUI();
+    
+    console.log('✅ Silas Form erfolgreich initialisiert');
+}
