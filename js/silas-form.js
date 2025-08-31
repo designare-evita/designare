@@ -299,38 +299,38 @@ keywordList[existingIndex].brand = brand;
                 const brandBadge = document.createElement('span');
                 brandBadge.textContent = `Brand: ${item.brand}`;
                 // Wir verwenden eine auffälligere Farbe, um die Brand hervorzuheben
-                brandBadge.style.cssText = `background-color: #fd7e14; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold;`;
+                brandBadge.style.cssText = `background-color: #fd7e14; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: normal;`;
                 badgesContainer.appendChild(brandBadge);
             }
 
 if (item.email) {
     const emailBadge = document.createElement('span');
     emailBadge.textContent = `E-Mail: ${item.email}`;
-    emailBadge.style.cssText = `background-color: #007bff; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold;`;
+    emailBadge.style.cssText = `background-color: #007bff; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: normal;`;
     badgesContainer.appendChild(emailBadge);
 }
 if (item.phone) {
     const phoneBadge = document.createElement('span');
     phoneBadge.textContent = `Tel: ${item.phone}`;
-    phoneBadge.style.cssText = `background-color: #dc3545; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold;`;
+    phoneBadge.style.cssText = `background-color: #dc3545; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: normal;`;
     badgesContainer.appendChild(phoneBadge);
 }
             if (item.zielgruppe) {
                 const zielgruppeBadge = document.createElement('span');
                 zielgruppeBadge.textContent = `Für: ${item.zielgruppe}`;
-                zielgruppeBadge.style.cssText = `background-color: #6c757d; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold;`;
+                zielgruppeBadge.style.cssText = `background-color: #6c757d; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: normal;`;
                 badgesContainer.appendChild(zielgruppeBadge);
             }
             if (item.tonalitaet) {
                 const tonalitaetBadge = document.createElement('span');
                 tonalitaetBadge.textContent = `Ton: ${item.tonalitaet}`;
-                tonalitaetBadge.style.cssText = `background-color: #6c757d; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold;`;
+                tonalitaetBadge.style.cssText = `background-color: #6c757d; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: normal;`;
                 badgesContainer.appendChild(tonalitaetBadge);
             }
             if (item.usp) {
                 const uspBadge = document.createElement('span');
                 uspBadge.textContent = `USP: ${item.usp}`;
-                uspBadge.style.cssText = `background-color: #6c757d; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold;`;
+                uspBadge.style.cssText = `background-color: #6c757d; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: normal;`;
                 badgesContainer.appendChild(uspBadge);
             }
 
