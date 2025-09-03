@@ -291,7 +291,7 @@ export function initSilasForm() {
             if (item.domain) {
                 const domainBadge = document.createElement('span');
                 domainBadge.textContent = `Domain: ${item.domain}`;
-                domainBadge.style.cssText = `background-color: #4CAF50; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold;`;
+                domainBadge.style.cssText = `background-color: #4CAF50; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: normal;`;
                 badgesContainer.appendChild(domainBadge);
             }
 
@@ -409,7 +409,7 @@ export function initSilasForm() {
                 downloadTxtButton.id = 'download-txt-dynamic';
                 downloadTxtButton.className = 'cta-button';
                 downloadTxtButton.innerHTML = '<i class="fas fa-file-alt"></i> TXT Herunterladen';
-                downloadTxtButton.style.marginLeft = '10px'; // Abstand zwischen den Buttons
+                downloadTxtButton.style.marginLeft = '10px'; // Abstand bleibt
                 downloadTxtButton.addEventListener('click', downloadTxt);
                 downloadContainer.appendChild(downloadTxtButton);
                 
