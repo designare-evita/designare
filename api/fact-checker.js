@@ -73,6 +73,12 @@ class FactChecker {
         if (email) kontext += `- E-MAIL FÜR CTA: ${email}\n`;
         if (phone) kontext += `- TELEFONNUMMER FÜR CTA: ${phone}\n`;
 
+        const grammaticalPersonInstruction = `
+            🚨 WICHTIGE GRAMMATIK-REGEL:
+            - Die Brand ist "${brand}". Wenn dies wie ein Einzelname (z.B. 'Sandra', 'Michael') klingt, schreibe den gesamten Text in der Singular-Form (z.B. "Mein Angebot", "Ich biete an", "Bei mir erhalten Sie").
+            - Wenn die Brand wie ein Firmenname klingt (z.B. 'Relaxo GmbH', 'Wellness Oase'), verwende die Plural-Form ("Unsere Angebote", "Wir bieten an").
+        `;
+
         return `
             Hier ist ein Beispiel für einen perfekten, faktenbasierten JSON-Output zum Thema "nachhaltige Kaffeebohnen":
             {
