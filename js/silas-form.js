@@ -423,29 +423,54 @@ export function initSilasForm() {
     // =================================================================================
     // NEU 1/3: `displayResult` wird angepasst, um den HTML-Download-Button hinzuzufügen
     // =================================================================================
-    function displayResult(data, index, container) {
-        const resultCard = document.createElement('div');
-        resultCard.className = 'result-card';
-        resultCard.style.cssText = 'background-color: rgba(255,255,255,0.05); border-radius: 8px; padding: 15px; margin-bottom: 15px; border-left: 4px solid ' + (data.intent === 'commercial' ? '#28a745' : '#17a2b8') + ';';
-        if (data.error) {
-            resultCard.innerHTML = `<h4 style="color: #ff6b6b; margin: 0 0 10px 0;">${data.keyword}</h4><p style="color: #ff6b6b; margin: 0;">Fehler: ${data.error}</p>`;
-        } else {
-            resultCard.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                    <h4 style="color: #fff; margin: 0; flex-grow: 1;">${data.keyword}</h4>
-                </div>
-                <p style="margin: 5px 0; color: #ccc;"><strong>Titel:</strong> ${data.post_title || 'N/A'}</p>
-                <p style="margin: 5px 0; color: #ccc;"><strong>Meta:</strong> ${data.meta_description || 'N/A'}</p>
-                <div class="result-card-actions" style="margin-top: 10px;">
-                    <button class="preview-btn" data-index="${index}" style="background-color: #007cba; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">Vorschau anzeigen</button>
-                    <button class="download-html-btn" data-index="${index}" style="background-color: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-left: 10px;">
-                        <i class="fas fa-file-code"></i> HTML herunterladen
-                    </button>
+function displayResult(data, index, container) {
+    const resultCard = document.createElement('div');
+    resultCard.className = 'result-card';
+    resultCard.style.cssText = 'background-color: rgba(255,255,255,0.05); border-radius: 8px; padding: 15px; margin-bottom: 15px; border-left: 4px solid ' + (data.intent === 'commercial' ? '#28a745' : '#17a2b8') + ';';
+    
+    if (data.error) {
+        resultCard.innerHTML = `<h4 style="color: #ff6b6b; margin: 0 0 10px 0;">${data.keyword}</h4><p style="color: #ff6b6b; margin: 0;">Fehler: ${data.error}</p>`;
+    } else {
+        // =================================================================
+        // NEU: HTML-BLOCK FÜR DIE QUALITÄTSANZEIGE ERSTELLEN
+        // =================================================================
+        let factCheckHtml = '';
+        // Wir prüfen, ob die Fact-Check-Daten vorhanden sind.
+        if (data._factCheck && typeof data._factCheck.confidenceScore !== 'undefined') {
+            const score = data._factCheck.confidenceScore;
+            // Die Farbe ändert sich je nach Score
+            const color = score >= 80 ? '#28a745' : (score >= 60 ? '#ffc107' : '#ff6b6b');
+            const icon = score >= 80 ? 'fa-check-circle' : 'fa-exclamation-triangle';
+
+            factCheckHtml = `
+                <div class="fact-check-score" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #444; text-align: left;">
+                    <strong style="color: ${color}; font-size: 0.9rem;">
+                        <i class="fas ${icon}"></i> E-E-A-T Qualitäts-Check: 
+                        <span style="background-color: ${color}; color: #1a1a1a; padding: 2px 6px; border-radius: 4px; font-size: 0.85rem;">${score}% Vertrauen</span>
+                    </strong>
+                    ${data._factCheck.flaggedClaims.length > 0 ? `<br><small style="color: #ccc; font-size: 0.8rem;">(${data._factCheck.flaggedClaims.length} übertriebene Aussage(n) automatisch korrigiert)</small>` : ''}
                 </div>
             `;
         }
-        container.appendChild(resultCard);
+        // =================================================================
+
+        resultCard.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                <h4 style="color: #fff; margin: 0; flex-grow: 1;">${data.keyword}</h4>
+            </div>
+            <p style="margin: 5px 0; color: #ccc;"><strong>Titel:</strong> ${data.post_title || 'N/A'}</p>
+            <p style="margin: 5px 0; color: #ccc;"><strong>Meta:</strong> ${data.meta_description || 'N/A'}</p>
+            <div class="result-card-actions" style="margin-top: 10px;">
+                <button class="preview-btn" data-index="${index}" style="background-color: #007cba; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">Vorschau anzeigen</button>
+                <button class="download-html-btn" data-index="${index}" style="background-color: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-left: 10px;">
+                    <i class="fas fa-file-code"></i> HTML herunterladen
+                </button>
+            </div>
+            ${factCheckHtml} 
+        `; // Der neue HTML-Block wird hier am Ende eingefügt
     }
+    container.appendChild(resultCard);
+}
 
     function openPreviewModal() { if (previewModal) previewModal.classList.add('visible'); }
     function closePreviewModal() { if (previewModal) previewModal.classList.remove('visible'); }
