@@ -27,10 +27,10 @@ export function initSilasForm() {
     const zielgruppeInput = document.getElementById('text-zielgruppe-input');
     const tonalitaetInput = document.getElementById('text-tonalitaet-input');
     const uspInput = document.getElementById('text-usp-input');
-const domainInput = document.getElementById('text-domain-input');
-const brandInput = document.getElementById('text-brand-input');
-const emailInput = document.getElementById('text-email-input');
-const phoneInput = document.getElementById('text-phone-input');
+    const domainInput = document.getElementById('text-domain-input');
+    const brandInput = document.getElementById('text-brand-input');
+    const emailInput = document.getElementById('text-email-input');
+    const phoneInput = document.getElementById('text-phone-input');
 
     let keywordList = [];
     let allGeneratedData = [];
@@ -202,7 +202,7 @@ const phoneInput = document.getElementById('text-phone-input');
     }
     
     // =================================================================================
-    // KERNÄNDERUNG 1: `addKeywords`-Funktion liest die neuen Felder aus
+    // DEIN ORIGINAL: addKeywords
     // =================================================================================
     function addKeywords() {
         try {
@@ -212,10 +212,10 @@ const phoneInput = document.getElementById('text-phone-input');
             const tonalitaet = tonalitaetInput.value.trim();
             const usp = uspInput.value.trim();
             const currentIntent = textIntentSelect.value;
-        const domain = domainInput.value.trim();
-const brand = brandInput.value.trim();
-        const email = emailInput.value.trim();
-        const phone = phoneInput.value.trim();
+            const domain = domainInput.value.trim();
+            const brand = brandInput.value.trim();
+            const email = emailInput.value.trim();
+            const phone = phoneInput.value.trim();
 
             for (let i = 0; i < newKeywords.length; i++) {
                 validateKeyword(newKeywords[i]);
@@ -233,20 +233,20 @@ const brand = brandInput.value.trim();
                         zielgruppe: zielgruppe,
                         tonalitaet: tonalitaet,
                         usp: usp,
-                   brand: brand,
-                    domain: domain,
-                    email: email,
-                    phone: phone
+                        brand: brand,
+                        domain: domain,
+                        email: email,
+                        phone: phone
                     });
                 } else {
                     keywordList[existingIndex].intent = currentIntent;
                     keywordList[existingIndex].zielgruppe = zielgruppe;
                     keywordList[existingIndex].tonalitaet = tonalitaet;
                     keywordList[existingIndex].usp = usp;
-                 keywordList[existingIndex].domain = domain;
-keywordList[existingIndex].brand = brand;
-                keywordList[existingIndex].email = email;
-                keywordList[existingIndex].phone = phone;
+                    keywordList[existingIndex].domain = domain;
+                    keywordList[existingIndex].brand = brand;
+                    keywordList[existingIndex].email = email;
+                    keywordList[existingIndex].phone = phone;
                 }
             });
 
@@ -264,7 +264,7 @@ keywordList[existingIndex].brand = brand;
     }
 
     // =================================================================================
-    // KERNÄNDERUNG 2: `updateKeywordDisplay` zeigt neue Infos an
+    // DEIN ORIGINAL: updateKeywordDisplay
     // =================================================================================
     function updateKeywordDisplay() {
         keywordDisplayList.innerHTML = '';
@@ -289,32 +289,31 @@ keywordList[existingIndex].brand = brand;
             badgesContainer.appendChild(intentBadge);
 
             if (item.domain) {
-    const domainBadge = document.createElement('span');
-    domainBadge.textContent = `Domain: ${item.domain}`;
-    domainBadge.style.cssText = `background-color: #4CAF50; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold;`;
-    badgesContainer.appendChild(domainBadge);
-}
+                const domainBadge = document.createElement('span');
+                domainBadge.textContent = `Domain: ${item.domain}`;
+                domainBadge.style.cssText = `background-color: #4CAF50; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold;`;
+                badgesContainer.appendChild(domainBadge);
+            }
 
- if (item.brand) {
+            if (item.brand) {
                 const brandBadge = document.createElement('span');
                 brandBadge.textContent = `Brand: ${item.brand}`;
-                // Wir verwenden eine auffälligere Farbe, um die Brand hervorzuheben
                 brandBadge.style.cssText = `background-color: #fd7e14; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: normal;`;
                 badgesContainer.appendChild(brandBadge);
             }
 
-if (item.email) {
-    const emailBadge = document.createElement('span');
-    emailBadge.textContent = `E-Mail: ${item.email}`;
-    emailBadge.style.cssText = `background-color: #007bff; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: normal;`;
-    badgesContainer.appendChild(emailBadge);
-}
-if (item.phone) {
-    const phoneBadge = document.createElement('span');
-    phoneBadge.textContent = `Tel: ${item.phone}`;
-    phoneBadge.style.cssText = `background-color: #dc3545; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: normal;`;
-    badgesContainer.appendChild(phoneBadge);
-}
+            if (item.email) {
+                const emailBadge = document.createElement('span');
+                emailBadge.textContent = `E-Mail: ${item.email}`;
+                emailBadge.style.cssText = `background-color: #007bff; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: normal;`;
+                badgesContainer.appendChild(emailBadge);
+            }
+            if (item.phone) {
+                const phoneBadge = document.createElement('span');
+                phoneBadge.textContent = `Tel: ${item.phone}`;
+                phoneBadge.style.cssText = `background-color: #dc3545; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: normal;`;
+                badgesContainer.appendChild(phoneBadge);
+            }
             if (item.zielgruppe) {
                 const zielgruppeBadge = document.createElement('span');
                 zielgruppeBadge.textContent = `Für: ${item.zielgruppe}`;
@@ -350,7 +349,7 @@ if (item.phone) {
     }
 
     // =================================================================================
-    // DEINE SCHNELLE GENERIERUNGS-FUNKTION
+    // ANGEPASST: `startGenerationBtn` Event Listener
     // =================================================================================
     startGenerationBtn.addEventListener('click', async function() {
         try {
@@ -395,13 +394,26 @@ if (item.phone) {
             silasStatus.textContent = `✅ Alle ${keywordList.length} Texte wurden verarbeitet.`;
             
             if (allGeneratedData.some(d => !d.error && !d._fallback_used)) {
-                const downloadButton = document.createElement('button');
-                downloadButton.id = 'download-csv-dynamic';
-                downloadButton.className = 'cta-button';
-                downloadButton.innerHTML = '<i class="fas fa-download"></i> CSV Herunterladen';
-                downloadButton.style.marginTop = '1rem';
-                downloadButton.addEventListener('click', downloadCsv);
-                silasResponseContainer.appendChild(downloadButton);
+                const downloadContainer = document.createElement('div');
+                downloadContainer.style.marginTop = '1rem';
+
+                const downloadCsvButton = document.createElement('button');
+                downloadCsvButton.id = 'download-csv-dynamic';
+                downloadCsvButton.className = 'cta-button';
+                downloadCsvButton.innerHTML = '<i class="fas fa-download"></i> CSV Herunterladen';
+                downloadCsvButton.addEventListener('click', downloadCsv);
+                downloadContainer.appendChild(downloadCsvButton);
+
+                // NEU: TXT-Download-Button wird hier erstellt
+                const downloadTxtButton = document.createElement('button');
+                downloadTxtButton.id = 'download-txt-dynamic';
+                downloadTxtButton.className = 'cta-button';
+                downloadTxtButton.innerHTML = '<i class="fas fa-file-alt"></i> TXT Herunterladen';
+                downloadTxtButton.style.marginLeft = '10px'; // Abstand zwischen den Buttons
+                downloadTxtButton.addEventListener('click', downloadTxt);
+                downloadContainer.appendChild(downloadTxtButton);
+                
+                silasResponseContainer.appendChild(downloadContainer);
             }
         } catch (error) {
             silasStatus.textContent = `Fehler: ${error.message}`;
@@ -416,7 +428,7 @@ if (item.phone) {
     });
 
     // =================================================================================
-    // DEIN ORIGINAL: Alle restlichen Funktionen bleiben 1:1 erhalten
+    // DEIN ORIGINAL: displayResult und Modal-Funktionen
     // =================================================================================
     function displayResult(data, index, container) {
         const resultCard = document.createElement('div');
@@ -468,6 +480,58 @@ if (item.phone) {
         }
     });
 
+    // =================================================================================
+    // NEU: `downloadTxt` Funktion
+    // =================================================================================
+    function downloadTxt() {
+        if (allGeneratedData.length === 0) {
+            alert('Keine Daten zum Download verfügbar.');
+            return;
+        }
+
+        const headers = ["keyword", "brand", "domain", "email", "phone", "post_title", "post_name", "meta_title", "meta_description", "h1", "h2_1", "h2_2", "h2_3", "h2_4", "primary_cta", "secondary_cta", "hero_text", "hero_subtext", "benefits_list", "features_list", "social_proof", "testimonial_1", "testimonial_2", "pricing_title", "price_1", "price_2", "price_3", "faq_1", "faq_answer_1", "faq_2", "faq_answer_2", "faq_3", "faq_answer_3", "contact_info", "footer_cta", "trust_signals", "guarantee_text"];
+        
+        let txtContent = '';
+
+        allGeneratedData.forEach(function(rowData, index) {
+            if (rowData.error) return;
+
+            txtContent += `==================================================\n`;
+            txtContent += `            INHALT FÜR: ${rowData.keyword}\n`;
+            txtContent += `==================================================\n\n`;
+
+            headers.forEach(function(header) {
+                const value = String(rowData[header] || '');
+                // Bereinigt den Wert von HTML-Tags für eine saubere Textdarstellung
+                const cleanedValue = value.replace(/<[^>]*>/g, ''); 
+                if (cleanedValue) {
+                    // Formatiert den Header für bessere Lesbarkeit (z.B. "post_title" -> "Post Title")
+                    const formattedHeader = header.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                    txtContent += `${formattedHeader}:\n${cleanedValue}\n\n`;
+                }
+            });
+
+            // Fügt einen Trenner zwischen den einzelnen Keyword-Inhalten hinzu
+            if (index < allGeneratedData.length - 1) {
+                txtContent += `\n\n---\n\n\n`;
+            }
+        });
+
+        const blob = new Blob([txtContent], { type: 'text/plain;charset=utf-8;' });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", "silas_generated_content.txt");
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
+
+    // =================================================================================
+    // DEIN ORIGINAL: `downloadCsv` Funktion
+    // =================================================================================
     function downloadCsv() {
         if (allGeneratedData.length === 0) {
             alert('Keine Daten zum Download verfügbar.');
@@ -520,5 +584,3 @@ if (item.phone) {
     showDemoStatus();
     createMasterPasswordUI();
 }
-
-
