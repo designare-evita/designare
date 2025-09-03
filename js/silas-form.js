@@ -401,7 +401,7 @@ export function initSilasForm() {
                 // Nun überschreiben wir nur die nötigen Attribute und fügen den Event-Listener hinzu.
                 downloadTxtButton.id = 'download-txt-dynamic';
                 downloadTxtButton.innerHTML = '<i class="fas fa-file-alt"></i> TXT Herunterladen';
-                downloadTxtButton.style.marginLeft = '10px';
+                downloadTxtButton.style.marginLeft = '0px';
                 downloadTxtButton.addEventListener('click', downloadTxt);
                 downloadContainer.appendChild(downloadTxtButton);
                 
