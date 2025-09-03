@@ -266,6 +266,7 @@ this.problematicPhrases = {
             : 'Du bist ein Fachexperte und SEO-Redakteur. Dein Stil ist informativ, klar und hilfreich.';
 
         let kontext = "";
+if (brand) kontext += `- BRAND/ANSPRECHPARTNER: ${brand}\\n`;
         if (zielgruppe) kontext += `- ZIELGRUPPE: ${zielgruppe}\n`;
         if (tonalitaet) kontext += `- TONALITÄT: ${tonalitaet}\n`;
         if (usp) kontext += `- ALLEINSTELLUNGSMERKMAL (USP): ${usp}\n`;
