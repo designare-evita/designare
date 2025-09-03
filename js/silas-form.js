@@ -395,9 +395,11 @@ export function initSilasForm() {
                 downloadCsvButton.addEventListener('click', downloadCsv);
                 downloadContainer.appendChild(downloadCsvButton);
 
-                const downloadTxtButton = document.createElement('button');
+                // Wir klonen den CSV-Button, um ein 100% identisches Aussehen zu garantieren.
+                const downloadTxtButton = downloadCsvButton.cloneNode(false); // Klonen des Buttons ohne Inhalt
+                
+                // Nun überschreiben wir nur die nötigen Attribute und fügen den Event-Listener hinzu.
                 downloadTxtButton.id = 'download-txt-dynamic';
-                downloadTxtButton.className = downloadCsvButton.className; 
                 downloadTxtButton.innerHTML = '<i class="fas fa-file-alt"></i> TXT Herunterladen';
                 downloadTxtButton.style.marginLeft = '10px';
                 downloadTxtButton.addEventListener('click', downloadTxt);
@@ -405,6 +407,7 @@ export function initSilasForm() {
                 
                 silasResponseContainer.appendChild(downloadContainer);
             }
+
         } catch (error) {
             silasStatus.textContent = `Fehler: ${error.message}`;
             silasStatus.style.color = '#ff6b6b';
