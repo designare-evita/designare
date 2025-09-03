@@ -58,7 +58,7 @@ class FactChecker {
      * @returns {string} Der fertige Prompt für die Gemini API.
      */
     generateResponsiblePrompt(keywordData) {
-        const { keyword, intent, zielgruppe, tonalitaet, usp, domain, email, phone, brand } = keywordData;
+        const { keyword, intent, zielgruppe, tonalitaet, usp, domain, email, phone, brand, grammaticalPerson } = keywordData;
 
         const roleAndTask = intent === 'commercial' 
             ? 'Du bist ein erstklassiger Marketing-Texter und SEO-Stratege. Dein Stil ist überzeugend, klar und auf Conversions ausgerichtet.'
@@ -75,8 +75,9 @@ class FactChecker {
 
         const grammaticalPersonInstruction = `
             🚨 WICHTIGE GRAMMATIK-REGEL:
-            - Die Brand ist "${brand}". Wenn dies wie ein Einzelname (z.B. 'Sandra', 'Michael') klingt, schreibe den gesamten Text in der Singular-Form (z.B. "Mein Angebot", "Ich biete an", "Bei mir erhalten Sie").
-            - Wenn die Brand wie ein Firmenname klingt (z.B. 'Relaxo GmbH', 'Wellness Oase'), verwende die Plural-Form ("Unsere Angebote", "Wir bieten an").
+            - Der Nutzer hat die Form "${grammaticalPerson}" gewählt.
+            - Wenn die Form 'singular' ist, schreibe den gesamten Text in der Ich-Form (z.B. "Mein Angebot", "Ich biete an", "Bei mir erhalten Sie").
+            - Wenn die Form 'plural' ist, verwende die Wir-Form (z.B. "Unsere Angebote", "Wir bieten an").
         `;
 
         return `
