@@ -80,6 +80,12 @@ class FactChecker {
             - Wenn die Form 'plural' ist, verwende die Wir-Form (z.B. "Unsere Angebote", "Wir bieten an").
         `;
 
+        const faqSchemaInstruction = `
+            - Erstelle ZUSÄTZLICH zu den FAQ-Texten ein valides "FAQPage" Schema.org Script im JSON-LD Format.
+            - Das Script muss die exakt gleichen Fragen und Antworten enthalten, die du in den Feldern faq_1, faq_answer_1 etc. generierst.
+            - Gib dieses komplette Script als einen einzigen, escaped JSON-String in das Feld "faq_schema_script" aus.
+        `;
+
         return `
             Hier ist ein Beispiel für einen perfekten, faktenbasierten JSON-Output zum Thema "nachhaltige Kaffeebohnen":
             {
