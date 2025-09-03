@@ -1,6 +1,7 @@
 // api/generate.js - DEINE STABILE VERSION, SORGFÄLTIG FÜR BULK PROCESSING UMGEBAUT
 
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+const { FactChecker } = require('./fact-checker.js');
+const factChecker = new FactChecker(); 
 
 
 function createSilasPrompt(keyword, intent, zielgruppe, tonalitaet, usp, domain, email, phone, brand) {
