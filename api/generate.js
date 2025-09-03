@@ -1,19 +1,11 @@
-// api/generate.js - Deine Original-Datei, jetzt KORREKT mit Fact-Checker-Integration
+// api/generate.js - Aktualisierte Version mit nachträglicher Qualitätskontrolle
 
 const { GoogleGenerativeAI } = require("@google/generative-ai");
-// NEU: Wir importieren den FactChecker, der jetzt die gesamte Prompt-Logik enthält.
 const { FactChecker } = require('./fact-checker.js');
 
-// Initialisierung der Google AI und des FactCheckers
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const factChecker = new FactChecker();
 
-// -------------------------------------------------------------------------
-// HINWEIS: Die alte Funktion `createSilasPrompt` wird hier bewusst entfernt.
-// Ihre Aufgabe wird vollständig von `factChecker.generateResponsiblePrompt` übernommen.
-// -------------------------------------------------------------------------
-
-// Diese Hilfsfunktion bleibt unverändert
 function cleanJsonString(str) {
     return str.replace(/```json/g, '').replace(/```/g, '').trim();
 }
@@ -37,9 +29,6 @@ export default async function handler(req, res) {
         const usedModel = isMasterRequest ? "gemini-1.5-pro-latest" : "gemini-1.5-flash";
         const model = genAI.getGenerativeModel({ model: usedModel });
 
-        // === HIER IST DIE MAGIE ===
-        // Diese EINE Zeile ersetzt die gesamte, alte `createSilasPrompt`-Funktion.
-        // Der komplette Prompt kommt jetzt aus der `fact-checker.js`-Datei.
         const prompt = factChecker.generateResponsiblePrompt(keywordData);
         
         const result = await model.generateContent(prompt);
@@ -62,6 +51,17 @@ export default async function handler(req, res) {
                 _parse_error: e.message
             };
         }
+
+        // =================================================================
+        // NEU: NACHTRÄGLICHE QUALITÄTSKONTROLLE WIRD HIER DURCHGEFÜHRT
+        // =================================================================
+        if (!parseError) {
+            // Wir rufen die checkContent-Funktion auf, die den Inhalt analysiert.
+            const factCheckResult = await factChecker.checkContent(jsonData, keyword);
+            // Wir hängen das komplette Prüfergebnis an unsere JSON-Antwort an.
+            jsonData._factCheck = factCheckResult;
+        }
+        // =================================================================
 
         // Deine originale Logik zur Anreicherung der Daten bleibt erhalten
         jsonData.keyword = keyword;
