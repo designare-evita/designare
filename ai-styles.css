@@ -420,6 +420,10 @@
     background-color: #005f8a;
 }
 
+/* ======================================== */
+/* SILAS PREVIEW MODAL - download buttons */
+/* ======================================== */
+
 #download-csv,
 #download-csv-dynamic {
     width: 100%;
@@ -450,12 +454,38 @@
     margin-right: 10px;
 }
 
-/* ======================================== */
-/* SILAS PREVIEW MODAL - VEREINFACHTE LÖSUNG */
-/* ======================================== */
+#download-txt,
+#download-txt-dynamic {
+    width: 100%;
+    text-align: center;
+    border: 2px solid #ffc107;
+    background-color: transparent;
+    color: #ffc107;
+    padding: 12px 20px;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    margin-top: 1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#download-txt:hover,
+#download-txt-dynamic:hover {
+    background-color: #ffc107;
+    color: #2d2d2d;
+    box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
+}
+
+#download-txt .fas,
+#download-txt-dynamic .fas {
+    margin-right: 10px;
+}
 
 /* ======================================== */
-/* SILAS KI - Preview Modal (KORRIGIERT)   */
+/* SILAS PREVIEW MODAL - VEREINFACHTE LÖSUNG */
 /* ======================================== */
 
 /* Preview Modal (Lightbox) Overlay - KORRIGIERT MIT !important */
