@@ -31,6 +31,7 @@ export function initSilasForm() {
     const brandInput = document.getElementById('text-brand-input');
     const emailInput = document.getElementById('text-email-input');
     const phoneInput = document.getElementById('text-phone-input');
+    const grammaticalPersonSelect = document.getElementById('grammatical-person-select');
 
     let keywordList = [];
     let allGeneratedData = [];
