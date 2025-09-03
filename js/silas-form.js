@@ -205,7 +205,6 @@ export function initSilasForm() {
     function addKeywords() {
         try {
             const newKeywords = keywordInput.value.split(',').map(kw => kw.trim()).filter(kw => kw.length > 0);
-            
             const zielgruppe = zielgruppeInput.value.trim();
             const tonalitaet = tonalitaetInput.value.trim();
             const usp = uspInput.value.trim();
@@ -214,6 +213,7 @@ export function initSilasForm() {
             const brand = brandInput.value.trim();
             const email = emailInput.value.trim();
             const phone = phoneInput.value.trim();
+            const grammaticalPerson = grammaticalPersonSelect.value;
 
             for (let i = 0; i < newKeywords.length; i++) {
                 validateKeyword(newKeywords[i]);
@@ -234,7 +234,8 @@ export function initSilasForm() {
                         brand: brand,
                         domain: domain,
                         email: email,
-                        phone: phone
+                        phone: phone,
+                        grammaticalPerson: grammaticalPerson
                     });
                 } else {
                     keywordList[existingIndex].intent = currentIntent;
@@ -245,6 +246,7 @@ export function initSilasForm() {
                     keywordList[existingIndex].brand = brand;
                     keywordList[existingIndex].email = email;
                     keywordList[existingIndex].phone = phone;
+                    keywordList[existingIndex].grammaticalPerson = grammaticalPerson;
                 }
             });
 
