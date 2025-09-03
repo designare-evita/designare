@@ -201,9 +201,6 @@ export function initSilasForm() {
         }
     }
     
-    // =================================================================================
-    // DEIN ORIGINAL: addKeywords
-    // =================================================================================
     function addKeywords() {
         try {
             const newKeywords = keywordInput.value.split(',').map(kw => kw.trim()).filter(kw => kw.length > 0);
@@ -263,9 +260,6 @@ export function initSilasForm() {
         }
     }
 
-    // =================================================================================
-    // DEIN ORIGINAL: updateKeywordDisplay
-    // =================================================================================
     function updateKeywordDisplay() {
         keywordDisplayList.innerHTML = '';
         keywordList.forEach(function(item, index) {
@@ -291,7 +285,7 @@ export function initSilasForm() {
             if (item.domain) {
                 const domainBadge = document.createElement('span');
                 domainBadge.textContent = `Domain: ${item.domain}`;
-                domainBadge.style.cssText = `background-color: #4CAF50; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: normal;`;
+                domainBadge.style.cssText = `background-color: #4CAF50; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold;`;
                 badgesContainer.appendChild(domainBadge);
             }
 
@@ -348,9 +342,6 @@ export function initSilasForm() {
         clearListBtn.style.display = keywordList.length > 0 ? 'inline-block' : 'none';
     }
 
-    // =================================================================================
-    // ANGEPASST: `startGenerationBtn` Event Listener
-    // =================================================================================
     startGenerationBtn.addEventListener('click', async function() {
         try {
             if (keywordList.length === 0) {
@@ -404,12 +395,11 @@ export function initSilasForm() {
                 downloadCsvButton.addEventListener('click', downloadCsv);
                 downloadContainer.appendChild(downloadCsvButton);
 
-                // NEU: TXT-Download-Button wird hier erstellt
                 const downloadTxtButton = document.createElement('button');
                 downloadTxtButton.id = 'download-txt-dynamic';
-                downloadTxtButton.className = 'cta-button';
+                downloadTxtButton.className = downloadCsvButton.className; 
                 downloadTxtButton.innerHTML = '<i class="fas fa-file-alt"></i> TXT Herunterladen';
-                downloadTxtButton.style.marginLeft = '10px'; // Abstand bleibt
+                downloadTxtButton.style.marginLeft = '10px';
                 downloadTxtButton.addEventListener('click', downloadTxt);
                 downloadContainer.appendChild(downloadTxtButton);
                 
@@ -428,7 +418,7 @@ export function initSilasForm() {
     });
 
     // =================================================================================
-    // DEIN ORIGINAL: displayResult und Modal-Funktionen
+    // NEU 1/3: `displayResult` wird angepasst, um den HTML-Download-Button hinzuzufügen
     // =================================================================================
     function displayResult(data, index, container) {
         const resultCard = document.createElement('div');
@@ -437,7 +427,19 @@ export function initSilasForm() {
         if (data.error) {
             resultCard.innerHTML = `<h4 style="color: #ff6b6b; margin: 0 0 10px 0;">${data.keyword}</h4><p style="color: #ff6b6b; margin: 0;">Fehler: ${data.error}</p>`;
         } else {
-            resultCard.innerHTML = `<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;"><h4 style="color: #fff; margin: 0; flex-grow: 1;">${data.keyword}</h4></div><p style="margin: 5px 0; color: #ccc;"><strong>Titel:</strong> ${data.post_title || 'N/A'}</p><p style="margin: 5px 0; color: #ccc;"><strong>Meta:</strong> ${data.meta_description || 'N/A'}</p><button class="preview-btn" data-index="${index}" style="background-color: #007cba; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-top: 10px;">Vorschau anzeigen</button>`;
+            resultCard.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                    <h4 style="color: #fff; margin: 0; flex-grow: 1;">${data.keyword}</h4>
+                </div>
+                <p style="margin: 5px 0; color: #ccc;"><strong>Titel:</strong> ${data.post_title || 'N/A'}</p>
+                <p style="margin: 5px 0; color: #ccc;"><strong>Meta:</strong> ${data.meta_description || 'N/A'}</p>
+                <div class="result-card-actions" style="margin-top: 10px;">
+                    <button class="preview-btn" data-index="${index}" style="background-color: #007cba; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">Vorschau anzeigen</button>
+                    <button class="download-html-btn" data-index="${index}" style="background-color: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-left: 10px;">
+                        <i class="fas fa-file-code"></i> HTML herunterladen
+                    </button>
+                </div>
+            `;
         }
         container.appendChild(resultCard);
     }
@@ -445,44 +447,110 @@ export function initSilasForm() {
     function openPreviewModal() { if (previewModal) previewModal.classList.add('visible'); }
     function closePreviewModal() { if (previewModal) previewModal.classList.remove('visible'); }
 
+    // =================================================================================
+    // NEU 2/3: Event Listener für Preview UND HTML-Download
+    // =================================================================================
     silasResponseContainer.addEventListener('click', function(e) {
-        if (e.target.classList.contains('preview-btn')) {
-            const index = parseInt(e.target.getAttribute('data-index'));
+        const previewButton = e.target.closest('.preview-btn');
+        const downloadButton = e.target.closest('.download-html-btn');
+
+        if (previewButton) {
+            const index = parseInt(previewButton.getAttribute('data-index'));
             const data = allGeneratedData[index];
             if (data && !data.error && previewContentArea) {
-                let previewHtml = `
-                    <div class="preview-landingpage" style="color: #f0f0f0; line-height: 1.6; background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); padding: 20px; border-radius: 10px;">
-                        <header style="text-align: center; margin-bottom: 40px; padding: 30px 0; border-bottom: 2px solid #ffc107;">
-                            <h1 style="color: #ffc107; font-size: 2.3rem; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">${data.h1 || 'N/A'}</h1>
-                            <p style="font-size: 1.2rem; color: #ccc; margin-bottom: 15px; max-width: 800px; margin-left: auto; margin-right: auto;">${data.hero_text || 'N/A'}</p>
-                            <p style="font-size: 1rem; color: #aaa; margin-bottom: 25px;">${data.hero_subtext || ''}</p>
-                            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                                <button style="background: #ffc107; color: #1a1a1a; border: none; padding: 12px 25px; border-radius: 5px; font-weight: bold; cursor: pointer;">${data.primary_cta || 'N/A'}</button>
-                                <button style="background: transparent; color: #ffc107; border: 2px solid #ffc107; padding: 12px 25px; border-radius: 5px; font-weight: bold; cursor: pointer;">${data.secondary_cta || 'N/A'}</button>
-                            </div>
-                        </header>
-                        <main style="max-width: 1000px; margin: 0 auto;">
-                            <section style="margin-bottom: 40px; padding: 25px; background-color: rgba(255,255,255,0.05); border-radius: 8px; border-left: 4px solid #ff6b6b;"><h2 style="color: #ff6b6b; margin-bottom: 15px; font-size: 1.8rem;">${data.h2_1 || 'N/A'}</h2></section>
-                            <section style="margin-bottom: 40px; padding: 25px; background-color: rgba(255,255,255,0.05); border-radius: 8px; border-left: 4px solid #28a745;"><h2 style="color: #28a745; margin-bottom: 15px; font-size: 1.8rem;">${data.h2_2 || 'N/A'}</h2></section>
-                            <section style="margin-bottom: 40px;"><div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;"><div style="padding: 25px; background-color: rgba(255,255,255,0.05); border-radius: 8px;"><h3 style="color: #ffc107; margin-bottom: 15px; font-size: 1.5rem;">${data.h2_3 || 'Features'}</h3><div style="color: #ccc;">${data.features_list || ''}</div></div><div style="padding: 25px; background-color: rgba(255,255,255,0.05); border-radius: 8px;"><h3 style="color: #ffc107; margin-bottom: 15px; font-size: 1.5rem;">Vorteile</h3><div style="color: #ccc;">${data.benefits_list || ''}</div></div></div></section>
-                            <section style="margin-bottom: 40px; padding: 25px; background-color: rgba(255,255,255,0.05); border-radius: 8px; border-left: 4px solid #17a2b8;"><h2 style="color: #17a2b8; margin-bottom: 15px; font-size: 1.8rem;">${data.h2_4 || 'Vertrauen & Qualität'}</h2><p style="color: #ffc107; font-weight: bold; text-align: center; margin-bottom: 20px;">${data.social_proof || ''}</p><p style="color: #aaa; text-align: center;">${data.trust_signals || ''}</p></section>
-                            <section style="margin-bottom: 40px;"><h3 style="color: #ffc107; text-align: center; margin-bottom: 25px; font-size: 1.8rem;">Kundenstimmen</h3><div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;"><div style="padding: 20px; background-color: rgba(255,193,7,0.1); border-radius: 8px; border-left: 4px solid #ffc107;"><p style="color: #ccc; font-style: italic; margin-bottom: 10px;">${data.testimonial_1 || ''}</p></div><div style="padding: 20px; background-color: rgba(255,193,7,0.1); border-radius: 8px; border-left: 4px solid #ffc107;"><p style="color: #ccc; font-style: italic; margin-bottom: 10px;">${data.testimonial_2 || ''}</p></div></div></section>
-                            <section style="margin-bottom: 40px;"><h3 style="color: #ffc107; text-align: center; margin-bottom: 25px; font-size: 1.8rem;">${data.pricing_title || 'Unsere Pakete'}</h3><div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;"><div style="padding: 20px; background-color: rgba(255,255,255,0.05); border-radius: 8px; text-align: center;"><h4 style="color: #ffc107; margin-bottom: 10px;">Starter</h4><p style="color: #ccc; font-size: 0.9rem;">${data.price_1 || ''}</p></div><div style="padding: 20px; background-color: rgba(255,193,7,0.1); border: 2px solid #ffc107; border-radius: 8px; text-align: center;"><h4 style="color: #ffc107; margin-bottom: 10px;">Professional</h4><p style="color: #ccc; font-size: 0.9rem;">${data.price_2 || ''}</p></div><div style="padding: 20px; background-color: rgba(255,255,255,0.05); border-radius: 8px; text-align: center;"><h4 style="color: #ffc107; margin-bottom: 10px;">Enterprise</h4><p style="color: #ccc; font-size: 0.9rem;">${data.price_3 || ''}</p></div></div></section>
-                            <section style="margin-bottom: 40px;"><h3 style="color: #ffc107; text-align: center; margin-bottom: 25px; font-size: 1.8rem;">Häufige Fragen</h3><div><details style="background-color: rgba(255,255,255,0.05); border-radius: 8px; padding: 15px; margin-bottom: 15px;"><summary style="color: #ffc107; font-weight: bold; cursor: pointer; margin-bottom: 10px;">${data.faq_1 || 'N/A'}</summary><p style="color: #ccc; margin-top: 10px;">${data.faq_answer_1 || ''}</p></details><details style="background-color: rgba(255,255,255,0.05); border-radius: 8px; padding: 15px; margin-bottom: 15px;"><summary style="color: #ffc107; font-weight: bold; cursor: pointer; margin-bottom: 10px;">${data.faq_2 || 'N/A'}</summary><p style="color: #ccc; margin-top: 10px;">${data.faq_answer_2 || ''}</p></details><details style="background-color: rgba(255,255,255,0.05); border-radius: 8px; padding: 15px; margin-bottom: 15px;"><summary style="color: #ffc107; font-weight: bold; cursor: pointer; margin-bottom: 10px;">${data.faq_3 || 'N/A'}</summary><p style="color: #ccc; margin-top: 10px;">${data.faq_answer_3 || ''}</p></details></div></section>
-                            <section style="text-align: center; padding: 30px; background: linear-gradient(45deg, rgba(255,193,7,0.1), rgba(255,193,7,0.2)); border-radius: 10px; border: 2px solid #ffc107;"><h3 style="color: #ffc107; margin-bottom: 15px;">${data.guarantee_text || 'N/A'}</h3><p style="color: #ccc; margin-bottom: 25px;">${data.contact_info || ''}</p><button style="background: #ffc107; color: #1a1a1a; border: none; padding: 15px 30px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 1.1rem;">${data.footer_cta || 'N/A'}</button></section>
-                        </main>
-                        <aside style="margin-top: 50px; padding: 25px; background: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(45,45,45,0.7) 100%); border-radius: 12px; border: 2px solid #444;"><h3 style="color: #ffc107; margin: 0 0 25px 0; text-align: center; font-size: 1.5rem; border-bottom: 2px solid #ffc107; padding-bottom: 10px;">📊 SEO & Meta-Informationen</h3><div style="display: flex; flex-direction: column; gap: 20px; max-width: 100%;"><div style="padding: 15px; background: linear-gradient(90deg, rgba(40,167,69,0.1) 0%, rgba(40,167,69,0.05) 100%); border-radius: 8px; border-left: 4px solid #28a745;"><div style="display: flex; flex-direction: column; gap: 8px;"><strong style="color: #28a745; font-size: 1rem;">🎯 SEO Titel:</strong><span style="color: #e9e9e9; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word;">${data.meta_title || data.post_title || 'N/A'}</span></div></div><div style="padding: 15px; background: linear-gradient(90deg, rgba(23,162,184,0.1) 0%, rgba(23,162,184,0.05) 100%); border-radius: 8px; border-left: 4px solid #17a2b8;"><div style="display: flex; flex-direction: column; gap: 8px;"><strong style="color: #17a2b8; font-size: 1rem;">🔗 URL Slug:</strong><span style="color: #e9e9e9; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word; font-family: monospace; background-color: rgba(0,0,0,0.3); padding: 5px 8px; border-radius: 4px;">${data.post_name || 'n-a'}</span></div></div><div style="padding: 15px; background: linear-gradient(90deg, rgba(255,193,7,0.1) 0%, rgba(255,193,7,0.05) 100%); border-radius: 8px; border-left: 4px solid #ffc107;"><div style="display: flex; flex-direction: column; gap: 8px;"><strong style="color: #ffc107; font-size: 1rem;">📝 Meta Description:</strong><span style="color: #e9e9e9; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word;">${data.meta_description || 'N/A'}</span></div></div></div></aside>
-                    </div>
-                `;
-                previewContentArea.innerHTML = previewHtml;
+                // Generiere den HTML-Inhalt für die Vorschau
+                previewContentArea.innerHTML = generateLandingpageHtml(data);
                 openPreviewModal();
             }
         }
+
+        if (downloadButton) {
+            const index = parseInt(downloadButton.getAttribute('data-index'));
+            downloadHtml(index);
+        }
     });
 
+    // Diese Funktion wird ausgelagert, um Code-Dopplung zu vermeiden
+    function generateLandingpageHtml(data) {
+        return `
+            <div class="preview-landingpage" style="color: #f0f0f0; line-height: 1.6; background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); padding: 20px; border-radius: 10px;">
+                <header style="text-align: center; margin-bottom: 40px; padding: 30px 0; border-bottom: 2px solid #ffc107;">
+                    <h1 style="color: #ffc107; font-size: 2.3rem; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">${data.h1 || 'N/A'}</h1>
+                    <p style="font-size: 1.2rem; color: #ccc; margin-bottom: 15px; max-width: 800px; margin-left: auto; margin-right: auto;">${data.hero_text || 'N/A'}</p>
+                    <p style="font-size: 1rem; color: #aaa; margin-bottom: 25px;">${data.hero_subtext || ''}</p>
+                    <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                        <button style="background: #ffc107; color: #1a1a1a; border: none; padding: 12px 25px; border-radius: 5px; font-weight: bold; cursor: pointer;">${data.primary_cta || 'N/A'}</button>
+                        <button style="background: transparent; color: #ffc107; border: 2px solid #ffc107; padding: 12px 25px; border-radius: 5px; font-weight: bold; cursor: pointer;">${data.secondary_cta || 'N/A'}</button>
+                    </div>
+                </header>
+                <main style="max-width: 1000px; margin: 0 auto;">
+                    <section style="margin-bottom: 40px; padding: 25px; background-color: rgba(255,255,255,0.05); border-radius: 8px; border-left: 4px solid #ff6b6b;"><h2 style="color: #ff6b6b; margin-bottom: 15px; font-size: 1.8rem;">${data.h2_1 || 'N/A'}</h2></section>
+                    <section style="margin-bottom: 40px; padding: 25px; background-color: rgba(255,255,255,0.05); border-radius: 8px; border-left: 4px solid #28a745;"><h2 style="color: #28a745; margin-bottom: 15px; font-size: 1.8rem;">${data.h2_2 || 'N/A'}</h2></section>
+                    <section style="margin-bottom: 40px;"><div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;"><div style="padding: 25px; background-color: rgba(255,255,255,0.05); border-radius: 8px;"><h3 style="color: #ffc107; margin-bottom: 15px; font-size: 1.5rem;">${data.h2_3 || 'Features'}</h3><div style="color: #ccc;">${data.features_list || ''}</div></div><div style="padding: 25px; background-color: rgba(255,255,255,0.05); border-radius: 8px;"><h3 style="color: #ffc107; margin-bottom: 15px; font-size: 1.5rem;">Vorteile</h3><div style="color: #ccc;">${data.benefits_list || ''}</div></div></div></section>
+                    <section style="margin-bottom: 40px; padding: 25px; background-color: rgba(255,255,255,0.05); border-radius: 8px; border-left: 4px solid #17a2b8;"><h2 style="color: #17a2b8; margin-bottom: 15px; font-size: 1.8rem;">${data.h2_4 || 'Vertrauen & Qualität'}</h2><p style="color: #ffc107; font-weight: bold; text-align: center; margin-bottom: 20px;">${data.social_proof || ''}</p><p style="color: #aaa; text-align: center;">${data.trust_signals || ''}</p></section>
+                    <section style="margin-bottom: 40px;"><h3 style="color: #ffc107; text-align: center; margin-bottom: 25px; font-size: 1.8rem;">Kundenstimmen</h3><div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;"><div style="padding: 20px; background-color: rgba(255,193,7,0.1); border-radius: 8px; border-left: 4px solid #ffc107;"><p style="color: #ccc; font-style: italic; margin-bottom: 10px;">${data.testimonial_1 || ''}</p></div><div style="padding: 20px; background-color: rgba(255,193,7,0.1); border-radius: 8px; border-left: 4px solid #ffc107;"><p style="color: #ccc; font-style: italic; margin-bottom: 10px;">${data.testimonial_2 || ''}</p></div></div></section>
+                    <section style="margin-bottom: 40px;"><h3 style="color: #ffc107; text-align: center; margin-bottom: 25px; font-size: 1.8rem;">${data.pricing_title || 'Unsere Pakete'}</h3><div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;"><div style="padding: 20px; background-color: rgba(255,255,255,0.05); border-radius: 8px; text-align: center;"><h4 style="color: #ffc107; margin-bottom: 10px;">Starter</h4><p style="color: #ccc; font-size: 0.9rem;">${data.price_1 || ''}</p></div><div style="padding: 20px; background-color: rgba(255,193,7,0.1); border: 2px solid #ffc107; border-radius: 8px; text-align: center;"><h4 style="color: #ffc107; margin-bottom: 10px;">Professional</h4><p style="color: #ccc; font-size: 0.9rem;">${data.price_2 || ''}</p></div><div style="padding: 20px; background-color: rgba(255,255,255,0.05); border-radius: 8px; text-align: center;"><h4 style="color: #ffc107; margin-bottom: 10px;">Enterprise</h4><p style="color: #ccc; font-size: 0.9rem;">${data.price_3 || ''}</p></div></div></section>
+                    <section style="margin-bottom: 40px;"><h3 style="color: #ffc107; text-align: center; margin-bottom: 25px; font-size: 1.8rem;">Häufige Fragen</h3><div><details style="background-color: rgba(255,255,255,0.05); border-radius: 8px; padding: 15px; margin-bottom: 15px;"><summary style="color: #ffc107; font-weight: bold; cursor: pointer; margin-bottom: 10px;">${data.faq_1 || 'N/A'}</summary><p style="color: #ccc; margin-top: 10px;">${data.faq_answer_1 || ''}</p></details><details style="background-color: rgba(255,255,255,0.05); border-radius: 8px; padding: 15px; margin-bottom: 15px;"><summary style="color: #ffc107; font-weight: bold; cursor: pointer; margin-bottom: 10px;">${data.faq_2 || 'N/A'}</summary><p style="color: #ccc; margin-top: 10px;">${data.faq_answer_2 || ''}</p></details><details style="background-color: rgba(255,255,255,0.05); border-radius: 8px; padding: 15px; margin-bottom: 15px;"><summary style="color: #ffc107; font-weight: bold; cursor: pointer; margin-bottom: 10px;">${data.faq_3 || 'N/A'}</summary><p style="color: #ccc; margin-top: 10px;">${data.faq_answer_3 || ''}</p></details></div></section>
+                    <section style="text-align: center; padding: 30px; background: linear-gradient(45deg, rgba(255,193,7,0.1), rgba(255,193,7,0.2)); border-radius: 10px; border: 2px solid #ffc107;"><h3 style="color: #ffc107; margin-bottom: 15px;">${data.guarantee_text || 'N/A'}</h3><p style="color: #ccc; margin-bottom: 25px;">${data.contact_info || ''}</p><button style="background: #ffc107; color: #1a1a1a; border: none; padding: 15px 30px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 1.1rem;">${data.footer_cta || 'N/A'}</button></section>
+                </main>
+                <aside style="margin-top: 50px; padding: 25px; background: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(45,45,45,0.7) 100%); border-radius: 12px; border: 2px solid #444;"><h3 style="color: #ffc107; margin: 0 0 25px 0; text-align: center; font-size: 1.5rem; border-bottom: 2px solid #ffc107; padding-bottom: 10px;">📊 SEO & Meta-Informationen</h3><div style="display: flex; flex-direction: column; gap: 20px; max-width: 100%;"><div style="padding: 15px; background: linear-gradient(90deg, rgba(40,167,69,0.1) 0%, rgba(40,167,69,0.05) 100%); border-radius: 8px; border-left: 4px solid #28a745;"><div style="display: flex; flex-direction: column; gap: 8px;"><strong style="color: #28a745; font-size: 1rem;">🎯 SEO Titel:</strong><span style="color: #e9e9e9; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word;">${data.meta_title || data.post_title || 'N/A'}</span></div></div><div style="padding: 15px; background: linear-gradient(90deg, rgba(23,162,184,0.1) 0%, rgba(23,162,184,0.05) 100%); border-radius: 8px; border-left: 4px solid #17a2b8;"><div style="display: flex; flex-direction: column; gap: 8px;"><strong style="color: #17a2b8; font-size: 1rem;">🔗 URL Slug:</strong><span style="color: #e9e9e9; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word; font-family: monospace; background-color: rgba(0,0,0,0.3); padding: 5px 8px; border-radius: 4px;">${data.post_name || 'n-a'}</span></div></div><div style="padding: 15px; background: linear-gradient(90deg, rgba(255,193,7,0.1) 0%, rgba(255,193,7,0.05) 100%); border-radius: 8px; border-left: 4px solid #ffc107;"><div style="display: flex; flex-direction: column; gap: 8px;"><strong style="color: #ffc107; font-size: 1rem;">📝 Meta Description:</strong><span style="color: #e9e9e9; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word;">${data.meta_description || 'N/A'}</span></div></div></div></aside>
+            </div>
+        `;
+    }
+
     // =================================================================================
-    // NEU: `downloadTxt` Funktion
+    // NEU 3/3: Die `downloadHtml` Funktion
     // =================================================================================
+    function downloadHtml(index) {
+        const data = allGeneratedData[index];
+        if (!data || data.error) {
+            alert('Fehler: Daten für den HTML-Download nicht verfügbar.');
+            return;
+        }
+
+        const landingpageContent = generateLandingpageHtml(data);
+
+        // Den Inhalt in eine vollständige HTML-Struktur einbetten
+        const fullHtml = `
+            <!DOCTYPE html>
+            <html lang="de">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>${data.meta_title || data.post_title || 'Landingpage'}</title>
+                <style>
+                    body { 
+                        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+                        background-color: #121212; 
+                        color: #e0e0e0; 
+                        line-height: 1.6; 
+                        margin: 0; 
+                        padding: 20px; 
+                    }
+                </style>
+            </head>
+            <body>
+                ${landingpageContent}
+            </body>
+            </html>
+        `;
+
+        const blob = new Blob([fullHtml], { type: 'text/html;charset=utf-8;' });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        
+        // Einen sauberen Dateinamen aus dem post_name oder Keyword generieren
+        const filename = (data.post_name || data.keyword.trim().replace(/\s+/g, '-').toLowerCase()) + '.html';
+        link.setAttribute("download", filename);
+        
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
+
     function downloadTxt() {
         if (allGeneratedData.length === 0) {
             alert('Keine Daten zum Download verfügbar.');
@@ -502,16 +570,13 @@ export function initSilasForm() {
 
             headers.forEach(function(header) {
                 const value = String(rowData[header] || '');
-                // Bereinigt den Wert von HTML-Tags für eine saubere Textdarstellung
                 const cleanedValue = value.replace(/<[^>]*>/g, ''); 
                 if (cleanedValue) {
-                    // Formatiert den Header für bessere Lesbarkeit (z.B. "post_title" -> "Post Title")
                     const formattedHeader = header.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
                     txtContent += `${formattedHeader}:\n${cleanedValue}\n\n`;
                 }
             });
 
-            // Fügt einen Trenner zwischen den einzelnen Keyword-Inhalten hinzu
             if (index < allGeneratedData.length - 1) {
                 txtContent += `\n\n---\n\n\n`;
             }
@@ -529,9 +594,6 @@ export function initSilasForm() {
         URL.revokeObjectURL(url);
     }
 
-    // =================================================================================
-    // DEIN ORIGINAL: `downloadCsv` Funktion
-    // =================================================================================
     function downloadCsv() {
         if (allGeneratedData.length === 0) {
             alert('Keine Daten zum Download verfügbar.');
