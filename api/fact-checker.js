@@ -260,7 +260,8 @@ this.problematicPhrases = {
     /**
      * Erstellt erweiterten Prompt mit Fact-Check Anweisungen
      */
-    static createFactCheckAwarePrompt(keyword, intent, zielgruppe, tonalitaet, usp, domain, email, phone) {
+ generateResponsiblePrompt(keywordData) {
+        const { keyword, intent, zielgruppe, tonalitaet, usp, domain, email, phone, brand } = keywordData;
         const roleAndTask = intent === 'commercial' 
             ? 'Du bist ein erstklassiger Marketing-Texter und SEO-Stratege. Dein Stil ist überzeugend, klar und auf Conversions ausgerichtet.'
             : 'Du bist ein Fachexperte und SEO-Redakteur. Dein Stil ist informativ, klar und hilfreich.';
