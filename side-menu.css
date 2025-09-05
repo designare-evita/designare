@@ -109,3 +109,10 @@ a {
     color: var(--accent-color);
     background-color: rgba(255, 255, 255, 0.05);
 }
+
+@media (max-width: 768px) {
+.side-menu-content li a {
+  font-size: 1.5rem;
+ padding: 20px 10px; 
+}
+} 
