@@ -10,6 +10,28 @@ a {
     display: none;
 }
 
+/* style.css */
+
+/* --- Finale Korrektur für das Kontakt-Formular-Layout --- */
+
+/* Erzwingt die volle Breite für Input-Felder und die Textarea NUR im Kontakt-Modal. */
+#contact-modal #contact-form-inner input[type="text"],
+#contact-modal #contact-form-inner input[type="email"],
+#contact-modal #contact-form-inner textarea {
+    width: 100%;
+    box-sizing: border-box; /* Stellt sicher, dass Padding die Breite nicht beeinflusst */
+}
+
+/* Stellt den korrekten Abstand für alle Elemente im Formular wieder her. */
+#contact-modal #contact-form-inner > * {
+    margin-bottom: 15px; /* Oder der gewünschte Abstand */
+}
+
+/* Entfernt den unteren Abstand vom letzten Element (dem Button), um es sauber abzuschließen. */
+#contact-modal #contact-form-inner > *:last-child {
+    margin-bottom: 0;
+}
+
 
 /* Stellt sicher, dass das Formular beim Öffnen immer sichtbar ist. */
 #contact-form-inner {
