@@ -45,10 +45,8 @@ async function handleAiQuestion(question) {
 
         const data = await response.json();
         
-        // =============================================================
-        // HIER IST DIE KORREKTUR: Wir verwenden data.response statt data.answer
+
         appendMessage(data.response, 'ai');
-        // =============================================================
 
     } catch (error) {
         console.error('Fehler bei der Anfrage an die KI:', error);
