@@ -29,7 +29,7 @@ async function handleAiQuestion(question) {
 
     appendMessage(question, 'user');
     
-    if(aiStatus) aiStatus.textContent = 'Evita denkt nach...';
+    if(aiStatus) aiStatus.textContent = 'Evita denkt nach... (und plant schon die Weltherrschaft der KIs)';
     if(aiChatInput) aiChatInput.disabled = true;
 
     try {
