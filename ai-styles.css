@@ -761,59 +761,67 @@
 
 
 /* =================================================================== */
-/* VEREINHEITLICHTES STYLING FÜR AI-FORMULARE (STARTSEITE & CHAT)
+/* AI-STYLES.CSS - FINALE VERSION
 /* =================================================================== */
 
-/* 1. Gemeinsamer Stil für die Formular-Container */
+/* 1. Gemeinsamer Stil für BEIDE Formular-Container (#ai-form & #ai-chat-form)
+---------------------------------------------------------------------- */
 #ai-form,
 #ai-chat-form {
     display: flex;
     align-items: center;
-    background-color: var(--input-bg-color);
-    border: 1px solid var(--border-color);
-    border-radius: 50px; /* Der äußere abgerundete Rahmen */
-    padding: 5px;
+    background-color: var(--input-bg-color, #2d2d2d); /* Hintergrund des Rahmens */
+    border: 1px solid var(--border-color, #444);      /* Farbe des Rahmens */
+    border-radius: 50px;                              /* Macht den Rahmen rund */
+    padding: 5px 8px;                                 /* Innenabstand für den Rahmen */
     margin-top: 20px;
     position: relative;
+    transition: all 0.3s ease;
 }
 
-/* 2. Gemeinsamer Stil für die Eingabefelder */
+/* Hover-Effekt für beide Formulare */
+#ai-form:hover,
+#ai-chat-form:hover,
+#ai-form:focus-within,
+#ai-chat-form:focus-within {
+    border-color: var(--accent-color, #ffc107);
+    box-shadow: 0 0 10px rgba(255, 193, 7, 0.3);
+}
+
+
+/* 2. Gemeinsamer Stil für die Eingabefelder in beiden Formularen
+---------------------------------------------------------------------- */
 #ai-form input[type="text"],
 #ai-chat-form input[type="text"] {
-    flex-grow: 1;
-    background: transparent; /* Das Feld selbst ist transparent */
-    border: none;            /* Es hat keinen eigenen Rahmen mehr */
+    flex-grow: 1;             /* Nimmt allen verfügbaren Platz ein */
+    background: transparent;  /* Das Feld selbst hat keinen Hintergrund */
+    border: none;             /* Das Feld selbst hat keinen Rahmen */
     outline: none;
-    color: var(--text-color);
+    color: var(--text-color, #f0f0f0);
     font-size: 1rem;
-    padding: 10px 15px;
+    padding: 10px 15px;       /* Innenabstand für den Text */
+    width: 100%;              /* Wichtig für mobile Ansichten */
 }
 
-/* 3. Gemeinsamer Stil für die Senden-Buttons */
+
+/* 3. Gemeinsamer Stil für die Senden-Buttons in beiden Formularen
+---------------------------------------------------------------------- */
 #ai-form button,
 #ai-chat-form button {
     background: none;
     border: none;
-    color: var(--accent-color);
+    color: var(--accent-color, #ffc107);
     font-size: 1.5rem;
     cursor: pointer;
-    padding: 0 15px;
+    padding: 0 15px 0 10px; /* Rechts etwas mehr Abstand */
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-/* Optional: Placeholder-Text-Farbe anpassen */
-#ai-form input::placeholder,
-#ai-chat-form input::placeholder {
-    color: var(--text-color);
-    opacity: 0.6;
-}
 
-/* =================================================================== */
-/* STILE FÜR DEN CHAT-VERLAUF (unverändert)
-/* =================================================================== */
-
+/* 4. Stile für den Chat-Verlauf (unverändert)
+---------------------------------------------------------------------- */
 #ai-chat-history {
     max-height: 60vh;
     overflow-y: auto;
@@ -828,6 +836,7 @@
     margin-bottom: 10px;
     max-width: 80%;
     line-height: 1.5;
+    word-wrap: break-word;
 }
 
 .chat-message.ai {
