@@ -761,7 +761,7 @@
 
 
 /* =================================================================== */
-/* AI-STYLES.CSS - FINALE, SAUBERE VERSION
+/* AI-STYLES.CSS - BEIDE FORMULARE IDENTISCH
 /* =================================================================== */
 
 /* 1. Gemeinsamer Stil für BEIDE Formular-Container (#ai-form & #ai-chat-form)
@@ -775,7 +775,7 @@
     border-radius: 50px;
     padding: 5px 8px;
     margin-top: 20px;
-    box-sizing: border-box; /* Wichtig: Padding wird in die Gesamtbreite einberechnet */
+    box-sizing: border-box;
     transition: all 0.3s ease;
 }
 
@@ -813,6 +813,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+#ai-form button:hover,
+#ai-chat-form button:hover {
+    background-color: rgba(255, 193, 7, 0.1);
+    color: #fff;
 }
 
 /* 4. Stile für den Chat-Verlauf (unverändert)
