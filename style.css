@@ -10,7 +10,10 @@ a {
     display: none;
 }
 
-/* style.css */
+#legal-modal .about-image-wrapper,
+#legal-modal .about-image-wrapper-bottom {
+    text-align: center;
+}
 
 /* --- Finale Korrektur für das Kontakt-Formular-Layout --- */
 
