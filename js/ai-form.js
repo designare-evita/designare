@@ -13,7 +13,6 @@ function appendMessage(text, sender) {
 
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('chat-message', sender);
-    // Wir prüfen, ob der Text 'undefined' ist und geben eine bessere Meldung aus.
     messageDiv.innerHTML = text === undefined ? "<em>(Leere Antwort erhalten)</em>" : text;
     aiChatHistory.appendChild(messageDiv);
     aiChatHistory.scrollTop = aiChatHistory.scrollHeight;
@@ -47,15 +46,11 @@ async function handleAiQuestion(question) {
         const data = await response.json();
         
         // =============================================================
-        // FINALE PRÜFUNG: Wir checken, ob die Antwort korrekt formatiert ist.
+        // DIE ENDGÜLTIGE LÖSUNG: Wir verwenden data.answer, weil der Server das schickt!
         // =============================================================
-        console.log('Antwort vom Server erhalten:', data); // Dieser Log bleibt zur Sicherheit.
-
-        if (data && data.response) {
-            // Alles gut, wir haben eine Antwort.
-            appendMessage(data.response, 'ai');
+        if (data && data.answer) {
+            appendMessage(data.answer, 'ai');
         } else {
-            // Das Datenpaket hat nicht das, was wir erwarten.
             appendMessage('Fehler: Die Antwort vom Server hatte ein unerwartetes Format.', 'ai');
             console.error('Unerwartetes Server-Antwortformat. Erhaltenes Objekt:', data);
         }
