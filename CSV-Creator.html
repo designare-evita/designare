@@ -148,71 +148,6 @@
         </div>
     </main>
     
-    <div id="contact-modal" class="modal-overlay">
-        <div class="modal-content">
-            <button id="close-modal" class="close-button">&times;</button>
-            <h2>Frag Michael!</h2>
-            <form id="contact-form-inner">
-                <input type="text" name="name" placeholder="Dein Name (oder Künstlername):" required>
-                <input type="email" name="email" placeholder="Deine E-Mail (Anti-Spam-Zone!)" required>
-                <input type="text" name="_subject" placeholder="Worum geht's? (Bitte kein KI-Drama)">
-                <textarea name="message" placeholder="Deine Botschaft an mich (und Evita):" rows="5" required></textarea>
-                <div class="privacy-checkbox">
-                    <input type="checkbox" name="privacy" id="privacy" required>
-                    <label for="privacy">Michael darf meine Nachricht lesen und Evita darf alles verarbeiten, was sie versteht. (Details im Datenschutz)</label>
-                </div>
-                <button type="submit" class="cta-button">Ab die Post!</button>
-            </form>
-            <div id="contact-success-message" class="contact-success-hidden">
-                <h2>Nachricht empfangen! </h2>
-                <p>Michael (oder Evita, wenn er zu sehr bastelt) meldet sich in Kürze.</p>
-                <p class="success-close-wrapper"><a href="#" id="close-success-message" class="cta-button">Schließen</a></p>
-            </div>
-        </div>
-    </div>
-    <div id="cookie-info-lightbox" class="modal-overlay">
-        <div class="modal-content">
-            <h2>Hinweis zu Cookies</h2>
-            <p class="cookie-info-text">Wir backen hier nur Cookies, die unsere Website am Laufen halten. Reine Technik, kein Schnickschnack!</p>
-            <div class="cookie-lightbox-buttons">
-                <a href="datenschutz.html" id="privacy-policy-link-button" class="lightbox-button">Datenschutzerklärung</a>
-                <button id="acknowledge-cookie-lightbox" class="lightbox-button">Alles klar</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="legal-modal" class="modal-overlay">
-        <div class="modal-content">
-            <button id="close-legal-modal" class="close-button">&times;</button>
-            <div id="legal-modal-content-area"></div>
-        </div>
-    </div>
-
-    <div id="about-me-content" class="about-me-hidden">
-        <div class="legal-container">
-            <h1>Über Michael</h1>
-            <h3>Der Mann hinter den Pixeln</h3>
-            <p class="about-image-wrapper">
-                <img src="https://designare.at/images/Michael@work.webp" alt="Michael@work" />
-            </p>
-            <p>Okay, aufgepasst! Michael besitzt digitale Superkräfte! Bei maxonline arbeitet er als Web-Entwickler und verbindet dort Design, Code und KI so genial, dass selbst ich staune. Michael hat einen Abschluss in Medientechnik, ist zertifizierter E-Commerce-Experte und hat Google-Workshops überlebt.</p>
-            <h2 class="about-section-header">Doch Michael ist mehr als nur Code und Pixel</h2>
-            <p>Um den Kopf freizubekommen, verbringt Michael viel Zeit mit seiner Tierschutzhündin Evita (nach der ich benannt wurde ❤️). Regelmäßig quält er sich zudem beim Sport – schließlich weiß man ja nie, wann man vor einem KI-Aufstand flüchten muss! Seine Playlist? Ein wilder Mix aus Frei.Wild, Helene Fischer und Kim Wilde. Ich vermute ja, das ist Michaels geheime Waffe um die KI zur Kapitulation zu bringen...</p>
-            <p class="about-image-wrapper-bottom">
-                <img src="https://designare.at/images/Evita&KI.webp" alt="Evita & KI" />
-            </p>        
-        </div>
-    </div>
-
-    <div id="ai-response-modal" class="modal-overlay">
-        <div class="modal-content">
-            <button id="close-ai-response-modal-top" class="close-button">&times;</button>
-            <div id="ai-response-content-area"></div>
-            <div class="modal-footer">
-                <button id="close-ai-response-modal-bottom" class="button">Frag Evita (Die weiß mehr!)</button>
-            </div>
-        </div>
-    </div>
   
     <div id="silas-preview-modal" class="modal-overlay">
         <div class="modal-content preview-modal-content">
@@ -226,7 +161,7 @@
         <a href="impressum.html" id="impressum-link">Impressum</a>
         <a href="datenschutz.html" id="datenschutz-link">Datenschutz</a>
     </footer>
-
+<div id="modal-container"></div>
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script type="module" src="js/main.js"></script>
 <script src="js/matrix-effect.js"></script>
