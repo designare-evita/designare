@@ -760,4 +760,65 @@
 }
 
 
+/* ai-styles.css */
+
+/* --- Stile für das neue AI-Chat-Fenster --- */
+
+/* Container für den Chatverlauf */
+#ai-chat-history {
+    max-height: 60vh; /* Maximale Höhe, z.B. 60% der Bildschirmhöhe */
+    overflow-y: auto; /* Scrollbalken hinzufügen, wenn der Inhalt zu lang wird */
+    padding: 10px;
+    border-bottom: 1px solid #333; /* Trennlinie zum Eingabefeld */
+    margin-bottom: 15px;
+}
+
+/* Allgemeine Stil-Regel für jede Nachricht im Chat */
+.chat-message {
+    padding: 10px 15px;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    max-width: 80%;
+    line-height: 1.5;
+}
+
+/* Nachricht von Evita (linksbündig) */
+.chat-message.ai {
+    background-color: #2a2a2a;
+    border-top-left-radius: 0;
+    align-self: flex-start;
+    text-align: left;
+}
+
+/* Nachricht vom Benutzer (rechtsbündig) */
+.chat-message.user {
+    background-color: #0044cc; /* Akzentfarbe für den User */
+    color: white;
+    border-top-right-radius: 0;
+    align-self: flex-end; /* Wichtig für die rechtsbündige Ausrichtung */
+    text-align: right;
+    margin-left: auto; /* Schiebt die Box nach rechts */
+}
+
+/* Das Formular im Footer des Modals */
+#ai-chat-form {
+    display: flex;
+    gap: 10px;
+}
+
+#ai-chat-form input {
+    flex-grow: 1; /* Nimmt den maximal verfügbaren Platz ein */
+    border-radius: 20px;
+}
+
+#ai-chat-form button {
+    background: none;
+    border: none;
+    color: var(--accent-color);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0 10px;
+}
+
+
 
