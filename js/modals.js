@@ -136,20 +136,30 @@ function setupContactModal() {
     }
 }
 
-// Paginierungs- und Lade-Logik
+// =================================================================
+// HIER BEGINNEN DIE WICHTIGEN ÄNDERUNGEN
+// =================================================================
+
+/**
+ * Nimmt HTML-Inhalt entgegen und stellt ihn paginiert in einem Modal dar.
+ * AKZEPTIERT JETZT legalModal und legalModalContentArea ALS PARAMETER.
+ * @param {string} htmlContentString - Der darzustellende HTML-Code.
+ * @param {string} pageName - Der Name der Seite (für Paginierungslogik).
+ * @param {HTMLElement} legalModal - Das Haupt-Modal-Element.
+ * @param {HTMLElement} legalModalContentArea - Der Bereich für den Inhalt.
+ */
 function paginateAndShowModal(htmlContentString, pageName, legalModal, legalModalContentArea) {
-    const legalModal = document.getElementById('legal-modal');
-    const legalModalContentArea = document.getElementById('legal-modal-content-area');
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlContentString, 'text/html');
     const legalContainer = doc.querySelector('.legal-container');
 
     if (legalContainer) {
-        legalModalContentArea.innerHTML = '';
+        legalModalContentArea.innerHTML = ''; // Jetzt ist es sicher
         const children = Array.from(legalContainer.children);
         let allParts = [];
         let currentPage = 0;
 
+        // Deine Paginierungslogik (unverändert)
         if (pageName === 'datenschutz') {
             const findElementById = (id) => children.find(child => child.id === id);
             const getIndexOfElement = (element) => children.indexOf(element);
@@ -170,17 +180,15 @@ function paginateAndShowModal(htmlContentString, pageName, legalModal, legalModa
                 allParts.push(children.slice(0, splitIndex));
                 allParts.push(children.slice(splitIndex));
             }
-        } else {
+        } else { // Paginierung für Impressum & Über Mich
             const targetSplitCount = Math.ceil(children.length * 0.5);
             let h3SplitIndex = -1;
-            
             for (let i = 0; i < children.length; i++) {
                 if (children[i].tagName === 'H3' && i >= targetSplitCount * 0.8 && i <= targetSplitCount * 1.2) {
                     h3SplitIndex = i;
                     break;
                 }
             }
-            
             if (h3SplitIndex !== -1) {
                 allParts.push(children.slice(0, h3SplitIndex));
                 allParts.push(children.slice(h3SplitIndex));
@@ -208,14 +216,8 @@ function paginateAndShowModal(htmlContentString, pageName, legalModal, legalModa
         const updatePaginationButtons = () => {
             let backButton = legalModalContentArea.querySelector('#legal-back-button');
             let continueButton = legalModalContentArea.querySelector('#legal-continue-button');
-            
-            if (backButton) {
-                backButton.style.display = (currentPage > 0) ? 'inline-block' : 'none';
-            }
-            
-            if (continueButton) {
-                continueButton.style.display = (currentPage < allParts.length - 1) ? 'inline-block' : 'none';
-            }
+            if (backButton) backButton.style.display = (currentPage > 0) ? 'inline-block' : 'none';
+            if (continueButton) continueButton.style.display = (currentPage < allParts.length - 1) ? 'inline-block' : 'none';
         };
 
         partDivs.forEach(div => legalModalContentArea.appendChild(div));
@@ -223,7 +225,6 @@ function paginateAndShowModal(htmlContentString, pageName, legalModal, legalModa
         if (allParts.length > 1) {
             const paginationButtonsDiv = document.createElement('div');
             paginationButtonsDiv.className = 'legal-modal-pagination-buttons';
-            
             const backButton = document.createElement('button');
             backButton.id = 'legal-back-button';
             backButton.textContent = 'Zurück';
@@ -231,7 +232,6 @@ function paginateAndShowModal(htmlContentString, pageName, legalModal, legalModa
                 currentPage--;
                 renderCurrentPart();
             });
-            
             const continueButton = document.createElement('button');
             continueButton.id = 'legal-continue-button';
             continueButton.textContent = 'Weiter';
@@ -239,7 +239,6 @@ function paginateAndShowModal(htmlContentString, pageName, legalModal, legalModa
                 currentPage++;
                 renderCurrentPart();
             });
-            
             paginationButtonsDiv.appendChild(backButton);
             paginationButtonsDiv.appendChild(continueButton);
             legalModalContentArea.appendChild(paginationButtonsDiv);
@@ -250,15 +249,31 @@ function paginateAndShowModal(htmlContentString, pageName, legalModal, legalModa
     }
 }
 
+/**
+ * Lädt den Inhalt von Impressum/Datenschutz und zeigt ihn im Modal an.
+ * SUCHT DIE ELEMENTE JETZT SELBST UND PRÜFT, OB SIE EXISTIEREN.
+ * @param {string} pageName - Der Name der HTML-Datei ohne ".html".
+ */
 async function loadLegalPageInModal(pageName) {
     const url = `${pageName}.html`;
     try {
         const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error('Seite nicht gefunden');
-        }
+        if (!response.ok) throw new Error('Seite nicht gefunden');
         const htmlContent = await response.text();
-        paginateAndShowModal(htmlContent, pageName);
+        
+        // WICHTIGER TEIL: Elemente erst hier suchen, direkt bevor sie gebraucht werden.
+        const legalModal = document.getElementById('legal-modal');
+        const legalModalContentArea = document.getElementById('legal-modal-content-area');
+
+        // Sicherheitsprüfung, ob die Elemente geladen wurden
+        if (!legalModal || !legalModalContentArea) {
+            console.error('Das Legal-Modal oder sein Inhaltsbereich konnte nicht gefunden werden.');
+            return;
+        }
+
+        // Elemente an die Paginierungsfunktion übergeben
+        paginateAndShowModal(htmlContent, pageName, legalModal, legalModalContentArea);
+
     } catch (error) {
         console.error(`Fehler beim Laden von ${pageName}.html:`, error);
     }
@@ -275,8 +290,11 @@ function setupLegalModals() {
         aboutMeButton.addEventListener('click', (e) => {
             e.preventDefault();
             const aboutContentSource = document.getElementById('about-me-content');
-            if (aboutContentSource) {
-                paginateAndShowModal(aboutContentSource.innerHTML, 'about');
+            const legalModalTarget = document.getElementById('legal-modal');
+            const legalModalContentAreaTarget = document.getElementById('legal-modal-content-area');
+            
+            if (aboutContentSource && legalModalTarget && legalModalContentAreaTarget) {
+                 paginateAndShowModal(aboutContentSource.innerHTML, 'about', legalModalTarget, legalModalContentAreaTarget);
             }
         });
     }
