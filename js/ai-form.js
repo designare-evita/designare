@@ -13,7 +13,8 @@ function appendMessage(text, sender) {
 
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('chat-message', sender);
-    messageDiv.innerHTML = text;
+    // Wir prüfen, ob der Text 'undefined' ist und geben eine bessere Meldung aus.
+    messageDiv.innerHTML = text === undefined ? "<em>(Leere Antwort erhalten)</em>" : text;
     aiChatHistory.appendChild(messageDiv);
     aiChatHistory.scrollTop = aiChatHistory.scrollHeight;
 }
@@ -40,24 +41,29 @@ async function handleAiQuestion(question) {
         });
 
         if (!response.ok) {
-            throw new Error(`Netzwerkfehler: ${response.status}`);
+            throw new Error(`Netzwerkfehler: Server antwortete mit Status ${response.status}`);
         }
 
         const data = await response.json();
         
         // =============================================================
-        // NEUER "SPION": Wir lassen uns die komplette Antwort anzeigen
-        console.log('Antwort vom Server:', data); 
+        // FINALE PRÜFUNG: Wir checken, ob die Antwort korrekt formatiert ist.
         // =============================================================
+        console.log('Antwort vom Server erhalten:', data); // Dieser Log bleibt zur Sicherheit.
 
-        // Wir greifen weiterhin auf data.response zu
-        appendMessage(data.response, 'ai');
+        if (data && data.response) {
+            // Alles gut, wir haben eine Antwort.
+            appendMessage(data.response, 'ai');
+        } else {
+            // Das Datenpaket hat nicht das, was wir erwarten.
+            appendMessage('Fehler: Die Antwort vom Server hatte ein unerwartetes Format.', 'ai');
+            console.error('Unerwartetes Server-Antwortformat. Erhaltenes Objekt:', data);
+        }
 
     } catch (error) {
         console.error('Fehler bei der Anfrage an die KI:', error);
-        appendMessage('Entschuldigung, da ist etwas schiefgelaufen. Bitte versuche es später noch einmal.', 'ai');
+        appendMessage(`Entschuldigung, ein technischer Fehler ist aufgetreten: "${error.message}"`, 'ai');
     } finally {
-        // ... der finally-Block bleibt unverändert ...
         if(aiStatus) aiStatus.textContent = '';
         if(aiChatInput) {
             aiChatInput.disabled = false;
@@ -69,6 +75,7 @@ async function handleAiQuestion(question) {
         }
     }
 }
+
 /**
  * Initialisiert die Formulare für die KI-Interaktion.
  */
