@@ -6,8 +6,10 @@ a {
     text-decoration: none !important;
 }
 
+.about-me-hidden {
+    display: none;
+}
 
-/* --- FINALE & EINHEITLICHE KORREKTUR FÜR ALLE HEADER-ICONS --- */
 
 /* 1. Ein gemeinsamer Grundstil für ALLE Buttons rechts im Header */
 .header-right-controls button {
