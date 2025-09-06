@@ -331,4 +331,5 @@ export function initModals() {
     setupCookieModal();
     setupContactModal();
     setupLegalModals();
+setupAiModal();
 }
