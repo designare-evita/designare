@@ -87,11 +87,8 @@
     line-height: 1 !important;
 }
 
-#ai-response-modal #ai-chat-form button:hover {
+#ai-chat-form button:hover {
     background: #d39a00 !important;
-    background-color: #d39a00 !important;
-    border-color: #d39a00 !important;
-    color: #fff !important;
 }
 
 /* ======================================== */
