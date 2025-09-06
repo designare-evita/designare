@@ -770,16 +770,15 @@
 #ai-chat-form {
     display: flex;
     align-items: center;
-    background-color: var(--input-bg-color, #2d2d2d); /* Hintergrund des Rahmens */
-    border: 1px solid var(--border-color, #444);      /* Farbe des Rahmens */
-    border-radius: 50px;                              /* Macht den Rahmen rund */
-    padding: 5px 8px;                                 /* Innenabstand für den Rahmen */
+    background-color: var(--input-bg-color, #2d2d2d);
+    border: 1px solid var(--border-color, #444);
+    border-radius: 50px;
+    padding: 5px 8px;
     margin-top: 20px;
     position: relative;
     transition: all 0.3s ease;
 }
 
-/* Hover-Effekt für beide Formulare */
 #ai-form:hover,
 #ai-chat-form:hover,
 #ai-form:focus-within,
@@ -793,14 +792,14 @@
 ---------------------------------------------------------------------- */
 #ai-form input[type="text"],
 #ai-chat-form input[type="text"] {
-    flex-grow: 1;             /* Nimmt allen verfügbaren Platz ein */
-    background: transparent;  /* Das Feld selbst hat keinen Hintergrund */
-    border: none;             /* Das Feld selbst hat keinen Rahmen */
+    flex-grow: 1;
+    background: transparent;
+    border: none;
     outline: none;
     color: var(--text-color, #f0f0f0);
     font-size: 1rem;
-    padding: 10px 15px;       /* Innenabstand für den Text */
-    width: 100%;              /* Wichtig für mobile Ansichten */
+    padding: 10px 15px;
+    /* width: 100%; */ /* <-- DIESE ZEILE WURDE ENTFERNT. DAS IST DIE KORREKTUR! */
 }
 
 
@@ -813,7 +812,7 @@
     color: var(--accent-color, #ffc107);
     font-size: 1.5rem;
     cursor: pointer;
-    padding: 0 15px 0 10px; /* Rechts etwas mehr Abstand */
+    padding: 0 15px 0 10px;
     display: flex;
     align-items: center;
     justify-content: center;
