@@ -37,7 +37,10 @@
 /* AI-CHAT-FORM - MODAL FORMULAR           */
 /* ======================================== */
 
-/* Das Chat-Formular im Modal soll EXAKT wie ai-form aussehen */
+/* ======================================== */
+/* AI-CHAT-FORM - MODAL FORMULAR           */
+/* ======================================== */
+
 #ai-chat-form {
     background-color: var(--bg-color) !important;
     border: 1px solid var(--border-color) !important;
@@ -46,7 +49,7 @@
     flex-direction: row !important;
     overflow: hidden !important;
     transition: border-color 0.3s ease !important;
-    align-items: center !important;
+    align-items: stretch !important; /* wichtig für Button gleiche Höhe */
 }
 
 #ai-chat-form:focus-within {
@@ -72,6 +75,27 @@
 #ai-chat-form input[type="text"].placeholder-fade::placeholder {
     opacity: 0 !important;
 }
+
+#ai-chat-form button {
+    background: var(--accent-color) !important;
+    border: 1px solid var(--accent-color) !important;
+    color: #fff !important;
+    cursor: pointer !important;
+    font-size: 1rem !important;
+    padding: 0 18px !important;     /* nur links/rechts Padding */
+    margin: 0 !important;
+    line-height: 1 !important;
+    flex-shrink: 0 !important;
+    height: 100% !important;        /* volle Höhe */
+    align-self: stretch !important; /* bündig oben/unten */
+    border-radius: 0 8px 8px 0 !important; /* nur rechte Seite rund */
+    transition: background-color 0.3s ease !important;
+}
+
+#ai-chat-form button:hover {
+    background: #d39a00 !important;
+}
+
 
 #ai-response-modal #ai-chat-form button {
     background: var(--accent-color) !important;
