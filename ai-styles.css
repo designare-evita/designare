@@ -71,8 +71,6 @@
 
 #ai-chat-form button {
     background: none !important;
-    border: 1px !important;
-border-color: var(--accent-color) !important;
     color: var(--accent-color) !important;
     cursor: pointer !important;
     font-size: 1rem !important;
