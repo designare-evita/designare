@@ -1,13 +1,165 @@
 /* ==============
-   AI-STYLES.CSS - KOMPLETT KORRIGIERTE VERSION
+   AI-STYLES.CSS - KOMPLETT NEU UND KORRIGIERT
    Für Evita KI (Hauptseite) und Silas KI (CSV-Creator)
    ============== */
 
 /* ======================================== */
-/* GLOBALE AI-CONTAINER STYLES             */
+/* EVITA KI - HAUPTSEITEN-FORMULAR         */
 /* ======================================== */
 
-/* Basis-Container für alle AI-Interfaces */
+/* Das Haupt-AI-Formular auf der Startseite verwendet die Stile aus style.css */
+/* Hier nur spezielle Ergänzungen falls nötig */
+
+#ai-question::placeholder {
+    color: var(--text-color);
+    opacity: 0.5;
+    transition: opacity 0.6s ease-in-out;
+}
+
+#ai-question.placeholder-fade::placeholder {
+    opacity: 0;
+}
+
+#ai-status {
+    background-color: rgba(255,255,255,0.03);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    margin-top: 10px;
+    min-height: 40px;
+    opacity: 0.9;
+    padding: 10px;
+    text-align: left;
+    transition: opacity 0.3s ease, border-color 0.3s ease;
+}
+
+/* ======================================== */
+/* AI-CHAT-FORM - MODAL FORMULAR           */
+/* ======================================== */
+
+/* Das Chat-Formular im Modal soll EXAKT wie ai-form aussehen */
+#ai-chat-form {
+    background-color: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    display: flex;
+    overflow: hidden;
+    transition: border-color 0.3s ease;
+}
+
+#ai-chat-form:focus-within {
+    border-color: var(--accent-color);
+}
+
+#ai-chat-form input[type="text"] {
+    background: none;
+    border: none;
+    color: var(--text-color);
+    flex-grow: 1;
+    font-size: 1rem;
+    outline: none;
+    padding: 12px 15px;
+}
+
+#ai-chat-form input[type="text"]::placeholder {
+    color: var(--text-color);
+    opacity: 0.5;
+    transition: opacity 0.6s ease-in-out;
+}
+
+#ai-chat-form button {
+    background: var(--accent-color);
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0 18px;
+    transition: background-color 0.3s ease;
+}
+
+#ai-chat-form button:hover {
+    background: #d39a00;
+}
+
+/* ======================================== */
+/* AI-CHAT-HISTORY - CHAT-VERLAUF          */
+/* ======================================== */
+
+#ai-chat-history {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding: 10px;
+    border-bottom: 1px solid #333;
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-message {
+    padding: 10px 15px;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    max-width: 80%;
+    line-height: 1.5;
+    word-wrap: break-word;
+}
+
+.chat-message.ai {
+    background-color: #2a2a2a;
+    border-top-left-radius: 0;
+    align-self: flex-start;
+}
+
+.chat-message.user {
+    background-color: #0044cc;
+    color: white;
+    border-top-right-radius: 0;
+    align-self: flex-end;
+}
+
+/* ======================================== */
+/* AI-RESPONSE-MODAL                       */
+/* ======================================== */
+
+#ai-response-content-area {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 15px;
+    text-align: left;
+    white-space: pre-wrap;
+    color: #ccc;
+    line-height: 1.6;
+}
+
+.modal-footer {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #444;
+}
+
+.modal-footer .button {
+    background-color: #ffc107;
+    color: #1a1a1a;
+    cursor: pointer;
+    padding: 0.75rem 1.5rem;
+    transition: all 0.3s ease;
+    border: 2px solid #ffc107;
+    font-size: 1rem;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+.modal-footer .button:hover {
+    background-color: #ffca2c;
+    border-color: #ffca2c;
+    transform: translateY(-1px);
+}
+
+/* ======================================== */
+/* SILAS KI - CSV-CREATOR FORMULAR         */
+/* ======================================== */
+
 .ai-container {
     width: 100%;
     margin: 0 auto;
@@ -24,71 +176,6 @@
     text-align: center;
     margin-bottom: 1.5rem;
 }
-
-/* ======================================== */
-/* EVITA KI - HAUPTSEITEN-FORMULAR         */
-/* ======================================== */
-
-/* Standard AI-Formular (für Evita auf der Hauptseite) */
-.ai-container form:not(#silas-form) {
-    display: flex;
-    flex-direction: row;
-    border-radius: 7px;
-    overflow: hidden;
-    border: 1px solid #444;
-    background-color: #2d2d2d;
-    transition: all 0.3s ease-in-out;
-    align-items: center;
-}
-
-.ai-container form:not(#silas-form):hover,
-.ai-container form:not(#silas-form):focus-within {
-    border-color: #ffc107;
-    box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
-}
-
-/* Input-Feld für Evita (ai-question) */
-#ai-question {
-    flex-grow: 1;
-    border: none;
-    padding: 10px 20px;
-    font-size: 1rem;
-    background-color: transparent;
-    color: #fff;
-    outline: none;
-}
-
-#ai-question::placeholder {
-    color: #aaa;
-}
-
-#ai-question:focus {
-    outline: none;
-}
-
-/* Standard AI-Button für Evita */
-.ai-container form:not(#silas-form) button {
-    background: transparent;
-    border: none;
-    color: #ffc107;
-    padding: 10px 20px;
-    cursor: pointer;
-    font-size: 1.2rem;
-    transition: color 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.ai-container form:not(#silas-form) button:hover {
-    color: #fff;
-    background-color: rgba(255, 193, 7, 0.1);
-}
-
-/* ======================================== */
-/* SILAS KI - CSV-CREATOR FORMULAR         */
-/* ======================================== */
 
 #silas-form,
 .silas-input-container {
@@ -421,73 +508,10 @@
 }
 
 /* ======================================== */
-/* SILAS PREVIEW MODAL - download buttons */
+/* SILAS PREVIEW MODAL                     */
 /* ======================================== */
 
-#download-csv,
-#download-csv-dynamic {
-    width: 100%;
-    text-align: center;
-    border: 2px solid #ffc107;
-    background-color: transparent;
-    color: #ffc107;
-    padding: 12px 20px;
-    border-radius: 7px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 1rem;
-    margin-top: 1rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-
-#download-csv:hover,
-#download-csv-dynamic:hover {
-    background-color: #ffc107;
-    color: #2d2d2d;
-    box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
-}
-
-#download-csv .fas,
-#download-csv-dynamic .fas {
-    margin-right: 10px;
-}
-
-#download-txt,
-#download-txt-dynamic {
-    width: 100%;
-    text-align: center;
-    border: 2px solid #ffc107;
-    background-color: transparent;
-    color: #ffc107;
-    padding: 12px 20px;
-    border-radius: 7px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 1rem;
-    margin-top: 1rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-
-#download-txt:hover,
-#download-txt-dynamic:hover {
-    background-color: #ffc107;
-    color: #2d2d2d;
-    box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
-}
-
-
-
-/* ======================================== */
-/* SILAS PREVIEW MODAL - VEREINFACHTE LÖSUNG */
-/* ======================================== */
-
-/* Preview Modal (Lightbox) Overlay - KORRIGIERT MIT !important */
 #silas-preview-modal {
-    /* Positionierung & Sichtbarkeit */
     position: fixed;
     top: 0;
     left: 0;
@@ -496,27 +520,23 @@
     z-index: 9999;
     background-color: rgba(10, 10, 10, 0.9);
     
-    /* Perfekte Zentrierung mit Flexbox (verstärkt!) */
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
 
-    /* Übergänge für sanftes Ein-/Ausblenden */
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
     transition: opacity 0.3s ease, visibility 0.3s ease;
-    overflow-y: hidden; /* Verhindert Scrollen des Overlays */
+    overflow-y: hidden;
 }
 
-/* Zustand, wenn das Modal sichtbar ist */
 #silas-preview-modal.visible {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
 }
 
-/* Der Inhalts-Container des Modals */
 #silas-preview-modal .modal-content {
     background-color: #1e1e1e;
     color: #e0e0e0;
@@ -536,7 +556,6 @@
     transform: scale(1);
 }
 
-/* Der scrollbare Bereich innerhalb des Modals */
 #preview-content-area {
     overflow-y: auto;
     padding: 20px;
@@ -545,43 +564,40 @@
     border-radius: 5px;
 }
 
-/* ======================================== */
-/* EVITA RESPONSE-MODAL                    */
-/* ======================================== */
-
-#ai-response-content-area {
-    max-height: 60vh;
-    overflow-y: auto;
-    padding-right: 15px;
-    text-align: left;
-    white-space: pre-wrap;
-    color: #ccc;
-    line-height: 1.6;
-}
-
-.modal-footer {
+#download-csv,
+#download-csv-dynamic,
+#download-txt,
+#download-txt-dynamic {
+    width: 100%;
     text-align: center;
-    margin-top: 2rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid #444;
-}
-
-.modal-footer .button {
-    background-color: #ffc107;
-    color: #1a1a1a;
-    cursor: pointer;
-    padding: 0.75rem 1.5rem;
-    transition: all 0.3s ease;
     border: 2px solid #ffc107;
+    background-color: transparent;
+    color: #ffc107;
+    padding: 12px 20px;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all 0.3s ease;
     font-size: 1rem;
-    border-radius: 5px;
-    text-decoration: none;
+    margin-top: 1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.modal-footer .button:hover {
-    background-color: #ffca2c;
-    border-color: #ffca2c;
-    transform: translateY(-1px);
+#download-csv:hover,
+#download-csv-dynamic:hover,
+#download-txt:hover,
+#download-txt-dynamic:hover {
+    background-color: #ffc107;
+    color: #2d2d2d;
+    box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
+}
+
+#download-csv .fas,
+#download-csv-dynamic .fas,
+#download-txt .fas,
+#download-txt-dynamic .fas {
+    margin-right: 10px;
 }
 
 /* Status-Text */
@@ -598,7 +614,6 @@
 /* ======================================== */
 
 @media (max-width: 768px) {
-    /* Silas Form Mobile */
     #silas-form {
         flex-direction: column;
         gap: 10px;
@@ -624,7 +639,6 @@
         min-height: 50px;
     }
 
-    /* Input Group Mobile */
     .ai-container .input-group {
         flex-direction: column;
         align-items: stretch;
@@ -648,7 +662,6 @@
         min-height: 50px;
     }
 
-    /* Keyword List Mobile */
     .keyword-list-container {
         padding: 20px;
         margin-top: 25px;
@@ -687,7 +700,6 @@
         margin-left: 0 !important;
     }
 
-    /* Button Controls Mobile */
     .keyword-list-controls {
         flex-direction: column;
         gap: 15px;
@@ -702,7 +714,6 @@
         min-height: 55px;
     }
 
-    /* Result Cards Mobile */
     .result-card {
         padding: 20px !important;
         margin-bottom: 20px !important;
@@ -721,15 +732,15 @@
         min-height: 50px !important;
     }
 
-    /* Download Button Mobile */
     #download-csv,
-    #download-csv-dynamic {
+    #download-csv-dynamic,
+    #download-txt,
+    #download-txt-dynamic {
         padding: 18px 20px !important;
         font-size: 1.1rem !important;
         min-height: 55px !important;
     }
 
-    /* Preview Modal Mobile */
     body #silas-preview-modal .modal-content {
         width: 95vw !important;
         height: 95vh !important;
@@ -757,91 +768,4 @@
 .performance-tip .keyword-list-container {
     max-width: none !important;
     width: 100% !important;
-}
-
-/* AI-STYLES.CSS - KORREKTE VERSION BASIEREND AUF STYLE.CSS */
-
-/* Beide Formulare bekommen die GLEICHEN Stile wie in style.css definiert */
-#ai-form,
-#ai-chat-form {
-    background-color: var(--bg-color);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    display: flex;
-    overflow: hidden;
-    transition: border-color 0.3s ease;
-}
-
-#ai-form:focus-within,
-#ai-chat-form:focus-within {
-    border-color: var(--accent-color);
-}
-
-/* Input-Felder für beide Formulare - GLEICH wie in style.css */
-#ai-form input[type="text"],
-#ai-chat-form input[type="text"] {
-    background: none;
-    border: none;
-    color: var(--text-color);
-    flex-grow: 1;
-    font-size: 1rem;
-    outline: none;
-    padding: 12px 15px;
-}
-
-#ai-form input[type="text"]::placeholder,
-#ai-chat-form input[type="text"]::placeholder {
-    color: var(--text-color);
-    opacity: 0.5;
-    transition: opacity 0.6s ease-in-out;
-}
-
-/* Buttons für beide Formulare - GLEICH wie in style.css */
-#ai-form button,
-#ai-chat-form button {
-    background: var(--accent-color);
-    border: none;
-    color: #fff;
-    cursor: pointer;
-    font-size: 1rem;
-    padding: 0 18px;
-    transition: background-color 0.3s ease;
-}
-
-#ai-form button:hover,
-#ai-chat-form button:hover {
-    background: #d39a00;
-}
-
-/* Rest der AI-Styles bleibt unverändert... */
-#ai-chat-history {
-    max-height: 60vh;
-    overflow-y: auto;
-    padding: 10px;
-    border-bottom: 1px solid #333;
-    margin-bottom: 15px;
-    display: flex;
-    flex-direction: column;
-}
-
-.chat-message {
-    padding: 10px 15px;
-    border-radius: 15px;
-    margin-bottom: 10px;
-    max-width: 80%;
-    line-height: 1.5;
-    word-wrap: break-word;
-}
-
-.chat-message.ai {
-    background-color: #2a2a2a;
-    border-top-left-radius: 0;
-    align-self: flex-start;
-}
-
-.chat-message.user {
-    background-color: #0044cc;
-    color: white;
-    border-top-right-radius: 0;
-    align-self: flex-end;
 }
