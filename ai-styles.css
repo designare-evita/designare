@@ -37,10 +37,6 @@
 /* AI-CHAT-FORM - MODAL FORMULAR           */
 /* ======================================== */
 
-/* ======================================== */
-/* AI-CHAT-FORM - MODAL FORMULAR           */
-/* ======================================== */
-
 #ai-chat-form {
     background-color: var(--bg-color) !important;
     border: 1px solid var(--border-color) !important;
@@ -76,7 +72,9 @@
     opacity: 0 !important;
 }
 
-#ai-chat-form button {
+/* Einheitliche Button-Regel – gilt überall, auch im Modal */
+#ai-chat-form button,
+#ai-response-modal #ai-chat-form button {
     background: var(--accent-color) !important;
     border: 1px solid var(--accent-color) !important;
     color: #fff !important;
@@ -92,26 +90,8 @@
     transition: background-color 0.3s ease !important;
 }
 
-#ai-chat-form button:hover {
-    background: #d39a00 !important;
-}
-
-
-#ai-response-modal #ai-chat-form button {
-    background: var(--accent-color) !important;
-    background-color: var(--accent-color) !important;
-    border: 1px solid var(--accent-color) !important;
-    color: #fff !important;
-    cursor: pointer !important;
-    font-size: 1rem !important;
-    padding: 0 18px !important;
-    transition: background-color 0.3s ease !important;
-    flex-shrink: 0 !important;
-    margin: 0 !important;
-    line-height: 1 !important;
-}
-
-#ai-chat-form button:hover {
+#ai-chat-form button:hover,
+#ai-response-modal #ai-chat-form button:hover {
     background: #d39a00 !important;
 }
 
