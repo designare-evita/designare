@@ -121,18 +121,3 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-/**
- * Funktion, um den Besucher zu protokollieren.
- * Ruft die serverseitige Funktion auf.
- */
-function trackVisitor() {
-  fetch('/api/track-visitor')
-    .then(response => {
-      if (response.ok) {
-        console.log('Besucher erfasst.');
-      } else {
-        console.error('Fehler bei der Erfassung des Besuchers.');
-      }
-    })
-    .catch(error => console.error('Netzwerkfehler:', error));
-}
