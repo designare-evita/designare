@@ -73,8 +73,9 @@
     opacity: 0 !important;
 }
 
-#ai-chat-form button {
+#ai-response-modal #ai-chat-form button {
     background: none !important;
+    background-color: transparent !important;
     border: none !important;
     color: var(--accent-color) !important;
     cursor: pointer !important;
@@ -83,10 +84,12 @@
     transition: background-color 0.3s ease !important;
     flex-shrink: 0 !important;
     margin: 0 !important;
+    line-height: 1 !important;
 }
 
-#ai-chat-form button:hover {
+#ai-response-modal #ai-chat-form button:hover {
     background: #d39a00 !important;
+    background-color: #d39a00 !important;
     color: #fff !important;
 }
 
