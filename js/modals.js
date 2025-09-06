@@ -137,7 +137,7 @@ function setupContactModal() {
 }
 
 // Paginierungs- und Lade-Logik
-function paginateAndShowModal(htmlContentString, pageName = '') {
+function paginateAndShowModal(htmlContentString, pageName, legalModal, legalModalContentArea) {
     const legalModal = document.getElementById('legal-modal');
     const legalModalContentArea = document.getElementById('legal-modal-content-area');
     const parser = new DOMParser();
