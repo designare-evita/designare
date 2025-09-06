@@ -6,113 +6,6 @@ a {
     text-decoration: none !important;
 }
 
-.side-menu-content,
-.side-menu .close-button {
-    position: relative; /* Hebt die Elemente in einen eigenen Positionierungs-Kontext */
-    z-index: 1;      /* Stellt sicher, dass sie ÜBER dem Canvas (mit z-index: -1) liegen */
-}
-
-#matrix-canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1; /* Platziert den Canvas hinter den Menü-Links */
-}
-
-.side-menu {
-    position: fixed; /* Geändert von 'relative' zu 'fixed' für korrekte Positionierung am Bildschirmrand */
-    top: 0;
-    right: 0;
-    width: 600px;
-    max-width: 90%;
-    height: 100%;
-    background-color: transparent;
-    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
-    z-index: 1002;
-    transform: translateX(100%);
-    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    display: flex;
-    flex-direction: column;
-    padding: 60px 20px 20px;
-    overflow: hidden; /* Behält das 'overflow' bei, um den Canvas zu begrenzen */
-}
-
-.side-menu.is-active {
-    transform: translateX(0); /* Sichtbar machen */
-}
-
-
-/* Der Schließen-Button (das "X") */
-.side-menu .close-button {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    font-size: 2.5rem;
-    color: #fff;
-    background: none;
-    border: none;
-    cursor: pointer;
-    line-height: 1;
-}
-
-
-/* 1. Der Hauptcontainer (bleibt gleich) */
-.side-menu-content {
-    flex-grow: 1; 
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-/* 2. Die Liste selbst (bleibt gleich) */
-.side-menu-content ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-/* 3. Jeder einzelne Listenpunkt (vereinfacht) */
-.side-menu-content li {
-    display: flex;
-    align-items: baseline;
-}
-
-/* 4. Der statische Listenpunkt (bleibt gleich) */
-.side-menu-content li::before {
-    content: '';
-    color: #FCB500;
-    font-weight: 700;
-    padding-right: 15px;
-}
-
-/* 5. Der Link-Text bekommt jetzt den vertikalen Abstand */
-.side-menu-content li a {
-    color: #fff;
-    text-decoration: none;
-    font-size: 1.9rem;
-    font-weight: 700;
-    line-height: 1.3;
-    transition: all 0.3s ease;
-    border-radius: 8px;
-    width: 100%; /* Wichtig, damit der Link die ganze Breite einnimmt */
-    
-    /* NEU: Vertikaler Abstand als Padding */
-    padding: 30px 20px; /* <--- HIER steuerst du den vertikalen Abstand */
-}
-
-/* 6. Kleinere Zeilenhöhe NUR für den Zweizeiler */
-.side-menu-content li.multi-line a {
-    line-height: 1.2;
-}
-
-/* 7. Kombinierter Stil für den aktiven UND den Hover-Zustand */
-.side-menu-content li.active a,
-.side-menu-content li a:hover {
-    color: var(--accent-color);
-    background-color: rgba(255, 255, 255, 0.05);
-}
 
 /* --- FINALE & EINHEITLICHE KORREKTUR FÜR ALLE HEADER-ICONS --- */
 
@@ -789,9 +682,5 @@ footer a:hover {
         height: 160px;
         margin-bottom: 1rem;
     }
-.side-menu-content li a {
-      font-size: 1.5rem;
- padding: 20px 10px; 
-}
 
 }
