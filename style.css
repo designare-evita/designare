@@ -11,6 +11,17 @@ a {
 }
 
 
+/* Stellt sicher, dass das Formular beim Öffnen immer sichtbar ist. */
+#contact-form-inner {
+    display: block;
+}
+
+/* Stellt sicher, dass die Erfolgsmeldung anfangs immer versteckt ist. */
+#contact-success-message {
+    display: none;
+}
+
+
 /* 1. Ein gemeinsamer Grundstil für ALLE Buttons rechts im Header */
 .header-right-controls button {
     background: none;
