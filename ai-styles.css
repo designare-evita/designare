@@ -760,20 +760,68 @@
 }
 
 
-/* ai-styles.css */
+/* =================================================================== */
+/* VEREINHEITLICHTES STYLING FÜR AI-FORMULARE (STARTSEITE & CHAT)
+/* =================================================================== */
 
-/* --- Stile für das neue AI-Chat-Fenster --- */
+/* 1. Gemeinsamer Stil für die Formular-Container */
+#ai-form,
+#ai-chat-form {
+    display: flex;
+    align-items: center;
+    background-color: var(--input-bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 50px; /* Der äußere abgerundete Rahmen */
+    padding: 5px;
+    margin-top: 20px;
+    position: relative;
+}
 
-/* Container für den Chatverlauf */
+/* 2. Gemeinsamer Stil für die Eingabefelder */
+#ai-form input[type="text"],
+#ai-chat-form input[type="text"] {
+    flex-grow: 1;
+    background: transparent; /* Das Feld selbst ist transparent */
+    border: none;            /* Es hat keinen eigenen Rahmen mehr */
+    outline: none;
+    color: var(--text-color);
+    font-size: 1rem;
+    padding: 10px 15px;
+}
+
+/* 3. Gemeinsamer Stil für die Senden-Buttons */
+#ai-form button,
+#ai-chat-form button {
+    background: none;
+    border: none;
+    color: var(--accent-color);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Optional: Placeholder-Text-Farbe anpassen */
+#ai-form input::placeholder,
+#ai-chat-form input::placeholder {
+    color: var(--text-color);
+    opacity: 0.6;
+}
+
+/* =================================================================== */
+/* STILE FÜR DEN CHAT-VERLAUF (unverändert)
+/* =================================================================== */
+
 #ai-chat-history {
-    max-height: 60vh; /* Maximale Höhe, z.B. 60% der Bildschirmhöhe */
-    overflow-y: auto; /* Scrollbalken hinzufügen, wenn der Inhalt zu lang wird */
+    max-height: 60vh;
+    overflow-y: auto;
     padding: 10px;
-    border-bottom: 1px solid #333; /* Trennlinie zum Eingabefeld */
+    border-bottom: 1px solid #333;
     margin-bottom: 15px;
 }
 
-/* Allgemeine Stil-Regel für jede Nachricht im Chat */
 .chat-message {
     padding: 10px 15px;
     border-radius: 15px;
@@ -782,7 +830,6 @@
     line-height: 1.5;
 }
 
-/* Nachricht von Evita (linksbündig) */
 .chat-message.ai {
     background-color: #2a2a2a;
     border-top-left-radius: 0;
@@ -790,35 +837,11 @@
     text-align: left;
 }
 
-/* Nachricht vom Benutzer (rechtsbündig) */
 .chat-message.user {
-    background-color: #0044cc; /* Akzentfarbe für den User */
+    background-color: #0044cc;
     color: white;
     border-top-right-radius: 0;
-    align-self: flex-end; /* Wichtig für die rechtsbündige Ausrichtung */
+    align-self: flex-end;
+    margin-left: auto;
     text-align: right;
-    margin-left: auto; /* Schiebt die Box nach rechts */
 }
-
-/* Das Formular im Footer des Modals */
-#ai-chat-form {
-    display: flex;
-    gap: 10px;
-}
-
-#ai-chat-form input {
-    flex-grow: 1; /* Nimmt den maximal verfügbaren Platz ein */
-    border-radius: 20px;
-}
-
-#ai-chat-form button {
-    background: none;
-    border: none;
-    color: var(--accent-color);
-    font-size: 1.5rem;
-    cursor: pointer;
-    padding: 0 10px;
-}
-
-
-
