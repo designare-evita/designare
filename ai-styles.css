@@ -74,10 +74,10 @@
 }
 
 #ai-response-modal #ai-chat-form button {
-    background: none !important;
-    background-color: transparent !important;
-    border: none !important;
-    color: var(--accent-color) !important;
+    background: var(--accent-color) !important;
+    background-color: var(--accent-color) !important;
+    border: 1px solid var(--accent-color) !important;
+    color: #fff !important;
     cursor: pointer !important;
     font-size: 1rem !important;
     padding: 0 18px !important;
@@ -90,6 +90,7 @@
 #ai-response-modal #ai-chat-form button:hover {
     background: #d39a00 !important;
     background-color: #d39a00 !important;
+    border-color: #d39a00 !important;
     color: #fff !important;
 }
 
