@@ -39,14 +39,12 @@
 
 #ai-chat-form {
   background-color: var(--bg-color) !important;
-  border: 1px solid var(--border-color) !important;
-  border-right: none !important;            /* rechts keine Linie */
-  border-radius: 10px 0 0 10px !important;  /* nur links rund */
+  border: none !important;                  /* kein schwarzer Rahmen */
+  border-radius: 10px !important;
   display: flex !important;
   flex-direction: row !important;
   align-items: stretch !important;
-  overflow: hidden !important;
-  transition: border-color 0.3s ease !important;
+  overflow: hidden !important;              /* Kanten sauber clippen */
 }
 
 #ai-chat-form:focus-within {
@@ -56,7 +54,9 @@
 #ai-chat-form input[type="text"] {
   flex: 1 1 auto !important;
   background: none !important;
-  border: none !important;
+  border: 1px solid var(--border-color) !important;
+  border-right: none !important;            /* rechts offen zum Button */
+  border-radius: 10px 0 0 10px !important;  /* nur links rund */
   color: var(--text-color) !important;
   font-size: 1rem !important;
   outline: none !important;
@@ -83,23 +83,21 @@
   background: var(--accent-color) !important;
   color: #fff !important;
 
-  border: none !important;                   /* keine schwarze Linie */
+  border: 1px solid var(--accent-color) !important;
+  border-radius: 0 10px 10px 0 !important;  /* nur rechts rund */
   padding: 12px 18px !important;
   margin: 0 !important;
   line-height: 1 !important;
   box-sizing: border-box !important;
 
   flex: 0 0 auto !important;
-  border-radius: 0 10px 10px 0 !important;   /* nur rechts rund */
   transition: background-color 0.3s ease !important;
 }
-
 
 #ai-chat-form button:hover,
 #ai-response-modal #ai-chat-form button:hover {
   background: #d39a00 !important;
 }
-
 /* ======================================== */
 /* AI-CHAT-HISTORY - CHAT-VERLAUF          */
 /* ======================================== */
