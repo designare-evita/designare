@@ -1,5 +1,14 @@
 // js/main.js
 
+document.addEventListener("DOMContentLoaded", function() {
+    // Lädt den Inhalt der Modals in den Container
+    fetch('modals.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('modal-container').innerHTML = data;
+        })
+        .catch(error => console.error('Fehler beim Laden der Modals:', error));
+
 // Importiere alle deine externen Module
 import { initEffects } from './effects.js';
 import { initTypewriters } from './typewriter.js';
