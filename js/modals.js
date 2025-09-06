@@ -1,14 +1,14 @@
 // js/modals.js
 
 // Allgemeine Lightbox-Funktionen
-const openLightbox = (lightboxElement) => {
+export const openLightbox = (lightboxElement) => {
     if (lightboxElement) {
         lightboxElement.classList.add('visible');
         document.body.style.overflow = 'hidden';
     }
 };
 
-const closeLightbox = (lightboxElement) => {
+export const closeLightbox = (lightboxElement) => {
     if (lightboxElement) {
         lightboxElement.classList.remove('visible');
         document.body.style.overflow = '';
