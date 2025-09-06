@@ -45,13 +45,19 @@ async function handleAiQuestion(question) {
 
         const data = await response.json();
         
+        // =============================================================
+        // NEUER "SPION": Wir lassen uns die komplette Antwort anzeigen
+        console.log('Antwort vom Server:', data); 
+        // =============================================================
 
+        // Wir greifen weiterhin auf data.response zu
         appendMessage(data.response, 'ai');
 
     } catch (error) {
         console.error('Fehler bei der Anfrage an die KI:', error);
         appendMessage('Entschuldigung, da ist etwas schiefgelaufen. Bitte versuche es später noch einmal.', 'ai');
     } finally {
+        // ... der finally-Block bleibt unverändert ...
         if(aiStatus) aiStatus.textContent = '';
         if(aiChatInput) {
             aiChatInput.disabled = false;
@@ -63,7 +69,6 @@ async function handleAiQuestion(question) {
         }
     }
 }
-
 /**
  * Initialisiert die Formulare für die KI-Interaktion.
  */
