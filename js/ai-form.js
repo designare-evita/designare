@@ -1,7 +1,5 @@
 // js/ai-form.js
 
-// Wir importieren die Funktion zum Öffnen der Lightbox aus modals.js,
-// anstatt sie hier neu zu definieren.
 import { openLightbox } from './modals.js';
 
 /**
@@ -15,10 +13,8 @@ function appendMessage(text, sender) {
 
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('chat-message', sender);
-    messageDiv.innerHTML = text; // innerHTML, damit z.B. <strong> etc. funktioniert
+    messageDiv.innerHTML = text;
     aiChatHistory.appendChild(messageDiv);
-
-    // Automatisch zum Ende des Chats scrollen
     aiChatHistory.scrollTop = aiChatHistory.scrollHeight;
 }
 
@@ -31,10 +27,8 @@ async function handleAiQuestion(question) {
     const aiChatInput = document.getElementById('ai-chat-input');
     const aiStatus = document.getElementById('ai-status');
 
-    // Zeige die Frage des Benutzers sofort im Chat an
     appendMessage(question, 'user');
     
-    // Visuelles Feedback für den Benutzer
     if(aiStatus) aiStatus.textContent = 'Evita denkt nach...';
     if(aiChatInput) aiChatInput.disabled = true;
 
@@ -50,21 +44,22 @@ async function handleAiQuestion(question) {
         }
 
         const data = await response.json();
-        // Füge Evitas Antwort dem Chat hinzu. Wir nutzen "response" statt "answer".
+        
+        // =============================================================
+        // HIER IST DIE KORREKTUR: Wir verwenden data.response statt data.answer
         appendMessage(data.response, 'ai');
+        // =============================================================
 
     } catch (error) {
         console.error('Fehler bei der Anfrage an die KI:', error);
         appendMessage('Entschuldigung, da ist etwas schiefgelaufen. Bitte versuche es später noch einmal.', 'ai');
     } finally {
-        // Aufräumen und Eingabefelder wieder bereit machen
         if(aiStatus) aiStatus.textContent = '';
         if(aiChatInput) {
             aiChatInput.disabled = false;
-            aiChatInput.focus(); // Setzt den Cursor direkt ins Feld für die nächste Frage
+            aiChatInput.focus();
         }
         
-        // Öffne das Modal, falls es noch nicht sichtbar ist (wichtig für die erste Frage)
         if (aiResponseModal && !aiResponseModal.classList.contains('visible')) {
             openLightbox(aiResponseModal);
         }
@@ -80,7 +75,6 @@ export function initAiForm() {
     const aiChatForm = document.getElementById('ai-chat-form');
     const aiChatInput = document.getElementById('ai-chat-input');
     
-    // Handler für das Hauptformular auf der Startseite
     if (mainAiForm && mainAiQuestionInput) {
         mainAiForm.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -88,14 +82,13 @@ export function initAiForm() {
             if (!question) return;
 
             const aiChatHistory = document.getElementById('ai-chat-history');
-            if (aiChatHistory) aiChatHistory.innerHTML = ''; // Leert den alten Chat-Verlauf
+            if (aiChatHistory) aiChatHistory.innerHTML = '';
             
             handleAiQuestion(question);
-            mainAiQuestionInput.value = ''; // Leert das Haupt-Eingabefeld
+            mainAiQuestionInput.value = '';
         });
     }
 
-    // Handler für das Chat-Formular im Modal
     if (aiChatForm && aiChatInput) {
         aiChatForm.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -103,7 +96,7 @@ export function initAiForm() {
             if (!question) return;
             
             handleAiQuestion(question);
-            aiChatInput.value = ''; // Leert das Chat-Eingabefeld
+            aiChatInput.value = '';
         });
     }
 }
