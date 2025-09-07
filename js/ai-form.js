@@ -1,20 +1,44 @@
-// js/ai-form.js (FINALE VERSION)
+// js/ai-form.js (FINALE VERSION FÜR DEN KALENDER-CHAT)
 import { showAIResponse, showLoadingState, hideLoadingState } from './modals.js';
 
-const aiForm = document.getElementById('ai-form');
-const aiQuestionInput = document.getElementById('ai-question');
+// Formular auf der Hauptseite
+const mainAiForm = document.getElementById('ai-form');
+const mainAiInput = document.getElementById('ai-question');
 
-// Der Gesprächs-Manager bleibt gleich
+// Formular IN der Evita-Lightbox
+const chatModalForm = document.getElementById('ai-chat-form');
+const chatModalInput = document.getElementById('ai-chat-input');
+const chatModalHistory = document.getElementById('ai-chat-history');
+
+// Der Gesprächs-Manager, der sich den Fortschritt merkt
 let conversationState = {
-  step: 'idle',
-  data: {}
+  step: 'idle', // idle | awaiting_slot | awaiting_name | awaiting_email
+  data: {}      // Hier sammeln wir die Infos (slot, name, email)
 };
 
-// Diese Funktion wird jetzt die Hauptlogik enthalten
-async function processUserInput(userInput) {
+// Diese Funktion wird von den Termin-Buttons geklickt
+window.selectSlot = function(slot) {
+  if (chatModalInput) {
+    chatModalInput.value = slot;
+    chatModalInput.focus();
+    // Simuliert einen Klick auf den Senden-Button des Modal-Formulars
+    const submitButton = chatModalForm.querySelector('button[type="submit"]');
+    if (submitButton) {
+      submitButton.click();
+    }
+  }
+}
+
+// Die zentrale Logik, die die Eingaben verarbeitet
+async function handleConversation(userInput) {
+  showLoadingState();
+  if (chatModalInput) chatModalInput.disabled = true;
+
   try {
+    // Je nach Schritt im Gespräch, passiert etwas anderes
     switch (conversationState.step) {
-      case 'idle':
+      
+      case 'idle': // Die allererste Frage
         const response = await fetch('/api/ask-gemini', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -24,35 +48,38 @@ async function processUserInput(userInput) {
 
         if (data.action === 'start_booking') {
           conversationState.step = 'awaiting_slot';
-          showAIResponse(data.message, false); // Modal anzeigen
+          // Zeige die "Ich prüfe..." Nachricht und dann die Termine
           const availabilityRes = await fetch('/api/get-availability');
           const availabilityData = await availabilityRes.json();
-          
-          // HTML für die Buttons vorbereiten
-          let html = `<p>Hier sind die nächsten freien Termine. Bitte wählen Sie einen passenden aus:</p><div class="booking-options">`;
-          availabilityData.slots.forEach(slot => {
-            html += `<button class="slot-button" onclick="window.selectSlot('${slot}')">${slot}</button>`;
-          });
-          html += `</div>`;
-          showAIResponse(html, true); // Modal mit Buttons aktualisieren
+          let html = `<p>${data.message}</p>`;
+          if (availabilityData.slots && availabilityData.slots.length > 0) {
+            html += `<p>Hier sind die nächsten freien Termine. Bitte wählen Sie einen passenden aus:</p><div class="booking-options">`;
+            availabilityData.slots.forEach(slot => {
+              html += `<button class="slot-button" onclick="window.selectSlot('${slot}')">${slot}</button>`;
+            });
+            html += `</div>`;
+          } else {
+            html += `<p>Momentan sind leider keine freien Termine verfügbar. Versuchen Sie es bitte später erneut.</p>`;
+          }
+          showAIResponse(html, true);
         } else {
-          showAIResponse(data.answer, false); // Modal mit normaler Antwort anzeigen
+          showAIResponse(data.answer, false);
         }
         break;
 
-      case 'awaiting_slot':
+      case 'awaiting_slot': // Nutzer hat einen Termin-Slot ausgewählt/eingegeben
         conversationState.data.slot = userInput;
         conversationState.step = 'awaiting_name';
         showAIResponse(`Super, der Termin ist für Sie vorgemerkt. Wie lautet Ihr voller Name?`, false);
         break;
 
-      case 'awaiting_name':
+      case 'awaiting_name': // Nutzer hat seinen Namen eingegeben
         conversationState.data.name = userInput;
         conversationState.step = 'awaiting_email';
         showAIResponse(`Danke, ${userInput}. Und wie lautet Ihre E-Mail-Adresse für die Bestätigung?`, false);
         break;
       
-      case 'awaiting_email':
+      case 'awaiting_email': // Nutzer hat seine E-Mail eingegeben -> FINALE
         conversationState.data.email = userInput;
         const bookingResponse = await fetch('/api/create-appointment', {
           method: 'POST',
@@ -61,44 +88,48 @@ async function processUserInput(userInput) {
         });
         const bookingData = await bookingResponse.json();
         showAIResponse(bookingData.message, false);
-        conversationState = { step: 'idle', data: {} }; // Reset
+        // Gespräch zurücksetzen für die nächste Anfrage
+        conversationState = { step: 'idle', data: {} };
         break;
     }
   } catch (error) {
     console.error('Fehler im Dialog-Manager:', error);
     showAIResponse('Oh, da ist ein technischer Fehler aufgetreten. Bitte versuchen Sie es später noch einmal.', false);
     conversationState = { step: 'idle', data: {} }; // Reset bei Fehler
-  }
-}
-
-// Diese Funktion muss global sein
-window.selectSlot = function(slot) {
-  if (aiQuestionInput) {
-    aiQuestionInput.value = slot;
-    aiQuestionInput.focus();
-  }
-  const modal = document.getElementById('ai-response-modal');
-  if (modal) {
-    modal.classList.remove('active');
-    document.body.classList.remove('no-scroll');
-  }
-}
-
-// Event Listener nur hinzufügen, wenn das Formular existiert
-if (aiForm && aiQuestionInput) {
-  aiForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const userInput = aiQuestionInput.value.trim();
-    if (!userInput) return;
-
-    showLoadingState();
-    aiQuestionInput.value = '';
-
-    // Ruft die neue Hauptfunktion auf und wartet, bis sie fertig ist
-    await processUserInput(userInput);
-    
-    // finally wird hier nicht mehr benötigt, da hideLoadingState
-    // erst nach dem Anzeigen der Antwort aufgerufen werden soll
+  } finally {
     hideLoadingState();
+    if (chatModalInput) chatModalInput.disabled = false;
+    if (chatModalInput) chatModalInput.focus();
+  }
+}
+
+// --- Event Listener ---
+// Nur hinzufügen, wenn die Elemente auf der Seite existieren.
+
+// 1. Für das Formular auf der Startseite
+if (mainAiForm) {
+  mainAiForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const userInput = mainAiInput.value.trim();
+    if (!userInput) return;
+    
+    // Gesprächszustand und Chatverlauf für eine saubere neue Anfrage zurücksetzen
+    conversationState = { step: 'idle', data: {} };
+    if (chatModalHistory) chatModalHistory.innerHTML = ''; 
+    
+    handleConversation(userInput);
+    mainAiInput.value = '';
+  });
+}
+
+// 2. Für das Formular IN der Lightbox
+if (chatModalForm) {
+  chatModalForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const userInput = chatModalInput.value.trim();
+    if (!userInput) return;
+    
+    handleConversation(userInput);
+    chatModalInput.value = '';
   });
 }
