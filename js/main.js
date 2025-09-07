@@ -45,11 +45,6 @@ const initializeDynamicScripts = () => {
     // Modal-Logik initialisieren
     initModals();
     
-    // =================================================================
-    // KORREKTUR: initAiForm() wird jetzt hier aufgerufen, NACHDEM
-    // das Modal-HTML geladen wurde.
-    // =================================================================
-    initAiForm();
 };
 
 /**
