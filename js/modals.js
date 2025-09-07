@@ -1,62 +1,60 @@
-// js/modals.js (REPARATUR-VERSION BASIEREND AUF IHREM ORIGINAL)
+// js/modals.js - KORRIGIERTE VERSION mit einheitlichem Modal-System
 
 // ===================================================================
-// 1. IHR ORIGINALCODE: HELFERFUNKTIONEN
-// DIESER TEIL IST 1:1 AUS IHRER FUNKTIONIERENDEN DATEI ÜBERNOMMEN
+// EINHEITLICHE MODAL-FUNKTIONEN
 // ===================================================================
-export const openLightbox = (lightboxElement) => {
-    if (lightboxElement) {
-        lightboxElement.classList.add('visible');
+
+export const openModal = (modalElement) => {
+    if (modalElement) {
+        modalElement.classList.add('visible');
         document.body.style.overflow = 'hidden';
+        document.body.classList.add('no-scroll');
     }
 };
 
-export const closeLightbox = (lightboxElement) => {
-    if (lightboxElement) {
-        lightboxElement.classList.remove('visible');
+export const closeModal = (modalElement) => {
+    if (modalElement) {
+        modalElement.classList.remove('visible');
         document.body.style.overflow = '';
+        document.body.classList.remove('no-scroll');
     }
 };
 
 // ===================================================================
-// 2. MINIMALE ERWEITERUNG FÜR EVITA
-// Diese 3 Funktionen werden sauber hinzugefügt und nutzen Ihre originalen Helfer.
+// AI-SPEZIFISCHE FUNKTIONEN
 // ===================================================================
 
 export function showAIResponse(content, isHTML = false) {
-  const modal = document.getElementById('ai-response-modal');
-  const contentArea = document.getElementById('ai-chat-history');
-  if (modal && contentArea) {
-    if (isHTML) {
-      contentArea.innerHTML = content;
-    } else {
-      contentArea.textContent = content;
+    const modal = document.getElementById('ai-response-modal');
+    const contentArea = document.getElementById('ai-chat-history');
+    if (modal && contentArea) {
+        if (isHTML) {
+            contentArea.innerHTML = content;
+        } else {
+            contentArea.textContent = content;
+        }
+        openModal(modal);
     }
-    // WICHTIG: Nutzt jetzt wieder IHRE funktionierende 'openLightbox' Funktion!
-    openLightbox(modal);
-  }
 }
 
 export function showLoadingState() {
-  const aiStatus = document.getElementById('ai-status');
-  if (aiStatus) {
-    aiStatus.textContent = 'Evita denkt nach...';
-    aiStatus.style.display = 'block';
-  }
+    const aiStatus = document.getElementById('ai-status');
+    if (aiStatus) {
+        aiStatus.textContent = 'Evita denkt nach...';
+        aiStatus.style.display = 'block';
+    }
 }
 
 export function hideLoadingState() {
-  const aiStatus = document.getElementById('ai-status');
-  if (aiStatus) {
-    aiStatus.textContent = '';
-    aiStatus.style.display = 'none';
-  }
+    const aiStatus = document.getElementById('ai-status');
+    if (aiStatus) {
+        aiStatus.textContent = '';
+        aiStatus.style.display = 'none';
+    }
 }
 
-
 // ===================================================================
-// 3. IHR ORIGINALCODE: SETUP-FUNKTIONEN
-// DIESER TEIL IST 1:1 AUS IHRER FUNKTIONIERENDEN DATEI ÜBERNOMMEN
+// MODAL SETUP FUNKTIONEN
 // ===================================================================
 
 function setupCookieModal() {
@@ -65,58 +63,157 @@ function setupCookieModal() {
     const privacyPolicyLinkButton = document.getElementById('privacy-policy-link-button');
     const cookieInfoButton = document.getElementById('cookie-info-button');
 
+    // Cookie Modal automatisch anzeigen
     if (cookieInfoLightbox && !localStorage.getItem('hasSeenCookieInfoLightbox')) {
-        setTimeout(() => openLightbox(cookieInfoLightbox), 2000);
+        setTimeout(() => openModal(cookieInfoLightbox), 2000);
     }
+
+    // Cookie akzeptieren
     if (acknowledgeCookieLightboxBtn) {
         acknowledgeCookieLightboxBtn.addEventListener('click', () => {
             localStorage.setItem('hasSeenCookieInfoLightbox', 'true');
-            closeLightbox(cookieInfoLightbox);
+            closeModal(cookieInfoLightbox);
         });
     }
+
+    // Datenschutz-Link
     if (privacyPolicyLinkButton) {
         privacyPolicyLinkButton.addEventListener('click', (e) => {
             e.preventDefault();
-            if (cookieInfoLightbox) closeLightbox(cookieInfoLightbox);
-            const datenschutzModal = document.getElementById('datenschutz-modal');
-            if (datenschutzModal) openLightbox(datenschutzModal);
+            if (cookieInfoLightbox) closeModal(cookieInfoLightbox);
+            // Lade Datenschutz-Inhalt und öffne Legal-Modal
+            loadLegalContent('datenschutz.html');
         });
     }
+
+    // Cookie-Info Button im Header
     if (cookieInfoButton) {
         cookieInfoButton.addEventListener('click', (e) => {
             e.preventDefault();
-            if (cookieInfoLightbox) openLightbox(cookieInfoLightbox);
+            if (cookieInfoLightbox) openModal(cookieInfoLightbox);
         });
     }
 }
 
 function setupContactModal() {
     const contactModal = document.getElementById('contact-modal');
-    const openContactModalBtn = document.getElementById('open-contact-modal');
+    const contactButton = document.getElementById('contact-button');
     const closeContactModalBtn = document.getElementById('close-modal');
+    const contactForm = document.getElementById('contact-form-inner');
+    const successMessage = document.getElementById('contact-success-message');
+    const closeSuccessBtn = document.getElementById('close-success-message');
 
-    if (openContactModalBtn) {
-        openContactModalBtn.addEventListener('click', () => openLightbox(contactModal));
+    // Kontakt-Modal öffnen
+    if (contactButton) {
+        contactButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            // Formular anzeigen, Erfolgsmeldung verstecken
+            if (contactForm) contactForm.style.display = 'block';
+            if (successMessage) successMessage.style.display = 'none';
+            openModal(contactModal);
+        });
     }
+
+    // Kontakt-Modal schließen
     if (closeContactModalBtn) {
-        closeContactModalBtn.addEventListener('click', () => closeLightbox(contactModal));
+        closeContactModalBtn.addEventListener('click', () => closeModal(contactModal));
+    }
+
+    // Erfolgs-Modal schließen
+    if (closeSuccessBtn) {
+        closeSuccessBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            closeModal(contactModal);
+        });
+    }
+
+    // Formular-Submit (vereinfacht - hier würdest du deine Formlogik einfügen)
+    if (contactForm) {
+        contactForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            // Hier würde normalerweise das Formular verarbeitet
+            // Für Demo zeigen wir einfach die Erfolgsmeldung
+            contactForm.style.display = 'none';
+            successMessage.style.display = 'block';
+        });
+    }
+}
+
+function setupAboutModal() {
+    const aboutButton = document.getElementById('about-me-button');
+    const legalModal = document.getElementById('legal-modal');
+    const aboutContent = document.getElementById('about-me-content');
+    const legalContentArea = document.getElementById('legal-modal-content-area');
+
+    if (aboutButton) {
+        aboutButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            // About-Me Inhalt in das Legal-Modal laden
+            if (aboutContent && legalContentArea) {
+                legalContentArea.innerHTML = aboutContent.innerHTML;
+                openModal(legalModal);
+            }
+        });
     }
 }
 
 function setupLegalModals() {
-    ['impressum-link', 'datenschutz-link'].forEach(linkId => {
-        const link = document.getElementById(linkId);
-        if (link) {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const modalId = linkId.replace('-link', '-modal');
-                const modal = document.getElementById(modalId);
-                if (modal) {
-                    openLightbox(modal);
-                }
-            });
-        }
-    });
+    const impressumLink = document.getElementById('impressum-link');
+    const datenschutzLink = document.getElementById('datenschutz-link');
+    const legalModal = document.getElementById('legal-modal');
+    const closeLegalModalBtn = document.getElementById('close-legal-modal');
+
+    // Impressum Link
+    if (impressumLink) {
+        impressumLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            loadLegalContent('impressum.html');
+        });
+    }
+
+    // Datenschutz Link
+    if (datenschutzLink) {
+        datenschutzLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            loadLegalContent('datenschutz.html');
+        });
+    }
+
+    // Legal Modal schließen
+    if (closeLegalModalBtn) {
+        closeLegalModalBtn.addEventListener('click', () => closeModal(legalModal));
+    }
+}
+
+function loadLegalContent(page) {
+    const legalModal = document.getElementById('legal-modal');
+    const legalContentArea = document.getElementById('legal-modal-content-area');
+    
+    if (!legalContentArea) return;
+
+    // Lade den Inhalt der entsprechenden Seite
+    fetch(page)
+        .then(response => response.text())
+        .then(html => {
+            // Extrahiere nur den Inhalt zwischen den main-Tags oder den body-Inhalt
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const legalContainer = doc.querySelector('.legal-container');
+            
+            if (legalContainer) {
+                legalContentArea.innerHTML = legalContainer.innerHTML;
+            } else {
+                legalContentArea.innerHTML = '<p>Inhalt konnte nicht geladen werden.</p>';
+            }
+            
+            openModal(legalModal);
+        })
+        .catch(error => {
+            console.error('Fehler beim Laden des Inhalts:', error);
+            legalContentArea.innerHTML = '<p>Fehler beim Laden des Inhalts.</p>';
+            openModal(legalModal);
+        });
 }
 
 function setupAiModal() {
@@ -125,24 +222,55 @@ function setupAiModal() {
         document.getElementById('close-ai-response-modal-top'),
         document.getElementById('close-ai-response-modal-bottom')
     ];
+    
     closeButtons.forEach(btn => {
         if (btn) {
-            btn.addEventListener('click', () => closeLightbox(aiResponseModal));
+            btn.addEventListener('click', () => closeModal(aiResponseModal));
         }
     });
+
+    // Chat-Form Submit
     const aiChatForm = document.getElementById('ai-chat-form');
     if (aiChatForm) {
-        aiChatForm.addEventListener('submit', (e) => e.preventDefault());
+        aiChatForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            // Hier würde die Chat-Logik stehen
+        });
     }
 }
 
+function setupModalBackgroundClose() {
+    // Schließe Modals beim Klick auf den Hintergrund
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('modal-overlay')) {
+            closeModal(e.target);
+        }
+    });
+
+    // Schließe Modals mit ESC-Taste
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            const openModal = document.querySelector('.modal-overlay.visible');
+            if (openModal) {
+                closeModal(openModal);
+            }
+        }
+    });
+}
+
 // ===================================================================
-// 4. IHR ORIGINALCODE: HAUPT-INITIALISIERUNG
+// HAUPT-INITIALISIERUNG
 // ===================================================================
 
 export function initModals() {
+    console.log('Initialisiere Modals...');
+    
     setupCookieModal();
     setupContactModal();
+    setupAboutModal();
     setupLegalModals();
     setupAiModal();
+    setupModalBackgroundClose();
+    
+    console.log('Modals erfolgreich initialisiert');
 }
