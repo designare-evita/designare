@@ -1,4 +1,4 @@
-// js/ai-form.js (KORRIGIERTE VERSION - TERMIN-BUTTONS FUNKTIONAL)
+// js/ai-form.js (KORRIGIERTE VERSION - CONVERSATION STATE & BOOKING FLOW)
 import { showAIResponse, showLoadingState, hideLoadingState } from './modals.js';
 
 // Formular auf der Hauptseite
@@ -28,6 +28,63 @@ function selectSlot(slot) {
 // Mache die Funktion global verfügbar
 window.selectSlot = selectSlot;
 
+// ===================================================================
+// NEUE FUNKTION: Prüft ob eine Eingabe im Booking-Kontext steht
+// ===================================================================
+function isInBookingProcess() {
+  return conversationState.step !== 'idle';
+}
+
+// ===================================================================
+// NEUE FUNKTION: Verarbeitet Booking-spezifische Eingaben
+// ===================================================================
+async function handleBookingInput(userInput) {
+  console.log('Handle Booking Input:', conversationState.step, userInput);
+  
+  switch (conversationState.step) {
+    case 'awaiting_name':
+      conversationState.data.name = userInput;
+      conversationState.step = 'awaiting_email';
+      showAIResponse(`Danke, ${userInput}! Und wie lautet Ihre E-Mail-Adresse für die Terminbestätigung?`, false);
+      return true; // Indicates this was handled
+
+    case 'awaiting_email':
+      conversationState.data.email = userInput;
+      
+      // Email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(userInput)) {
+        showAIResponse(`Bitte geben Sie eine gültige E-Mail-Adresse ein (z.B. max@example.com):`, false);
+        return true;
+      }
+      
+      try {
+        const bookingResponse = await fetch('/api/create-appointment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(conversationState.data)
+        });
+        const bookingData = await bookingResponse.json();
+        
+        if (bookingData.success) {
+          showAIResponse(`✅ ${bookingData.message}`, false);
+        } else {
+          showAIResponse(`❌ Es gab ein Problem: ${bookingData.message}`, false);
+        }
+      } catch (error) {
+        console.error('Fehler bei der Terminbuchung:', error);
+        showAIResponse('❌ Es gab einen technischen Fehler bei der Terminbuchung. Bitte versuchen Sie es später erneut.', false);
+      }
+      
+      // Gespräch zurücksetzen
+      conversationState = { step: 'idle', data: {} };
+      return true; // Indicates this was handled
+
+    default:
+      return false; // Not handled
+  }
+}
+
 // Die zentrale Logik, die die Eingaben verarbeitet
 async function handleConversation(userInput) {
   showLoadingState();
@@ -37,92 +94,65 @@ async function handleConversation(userInput) {
   if (currentChatInput) currentChatInput.disabled = true;
 
   try {
-    // Je nach Schritt im Gespräch, passiert etwas anderes
-    switch (conversationState.step) {
-      
-      case 'idle': // Die allererste Frage
-        const response = await fetch('/api/ask-gemini', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt: userInput, source: 'evita' })
-        });
-        const data = await response.json();
+    // ===================================================================
+    // NEUE PRIORITÄT: Prüfe zuerst, ob wir im Booking-Prozess sind
+    // ===================================================================
+    if (isInBookingProcess()) {
+      const wasHandled = await handleBookingInput(userInput);
+      if (wasHandled) {
+        return; // Exit früh, da Booking-Input verarbeitet wurde
+      }
+    }
 
-        if (data.action === 'start_booking') {
-          conversationState.step = 'awaiting_slot';
-          let html = `<p>${data.message}</p>`;
-          
-          try {
-            const availabilityRes = await fetch('/api/get-availability');
-            const availabilityData = await availabilityRes.json();
-            
-            if (availabilityData.slots && availabilityData.slots.length > 0) {
-              html += `<p>Hier sind die nächsten freien Termine. Bitte wählen Sie einen passenden aus:</p>
-                       <div class="booking-options" style="display: flex; flex-direction: column; gap: 10px; margin: 15px 0;">`;
-              
-              availabilityData.slots.forEach(slot => {
-                html += `<button class="slot-button" 
-                          onclick="window.selectSlot('${slot}')" 
-                          style="background: #ffc107; color: #1a1a1a; border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: background 0.3s;"
-                          onmouseover="this.style.background='#e0a800'" 
-                          onmouseout="this.style.background='#ffc107'">${slot}</button>`;
-              });
-              html += `</div>`;
-            } else {
-              html += `<p>Momentan sind leider keine freien Termine verfügbar. Versuchen Sie es bitte später erneut.</p>`;
-            }
-          } catch (error) {
-            console.error('Fehler beim Laden der Verfügbarkeiten:', error);
-            html += `<p>Es gab ein Problem beim Laden der Termine. Bitte versuchen Sie es später erneut.</p>`;
-          }
-          
-          showAIResponse(html, true);
-        } else {
-          showAIResponse(data.answer, false);
-        }
-        break;
+    // ===================================================================
+    // URSPRÜNGLICHE LOGIK: Nur für neue Gespräche
+    // ===================================================================
+    if (conversationState.step === 'idle') {
+      const response = await fetch('/api/ask-gemini', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: userInput, source: 'evita' })
+      });
+      const data = await response.json();
 
-      case 'awaiting_slot': // Nutzer hat einen Termin-Slot manuell eingegeben
-        conversationState.data.slot = userInput;
-        conversationState.step = 'awaiting_name';
-        showAIResponse(`Super! Ich habe den Termin "${userInput}" für Sie vorgemerkt. Wie lautet Ihr vollständiger Name?`, false);
-        break;
-
-      case 'awaiting_name': // Nutzer hat seinen Namen eingegeben
-        conversationState.data.name = userInput;
-        conversationState.step = 'awaiting_email';
-        showAIResponse(`Danke, ${userInput}! Und wie lautet Ihre E-Mail-Adresse für die Terminbestätigung?`, false);
-        break;
-      
-      case 'awaiting_email': // Nutzer hat seine E-Mail eingegeben -> FINALE
-        conversationState.data.email = userInput;
+      if (data.action === 'start_booking') {
+        conversationState.step = 'awaiting_slot';
+        let html = `<p>${data.message}</p>`;
         
         try {
-          const bookingResponse = await fetch('/api/create-appointment', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(conversationState.data)
-          });
-          const bookingData = await bookingResponse.json();
+          const availabilityRes = await fetch('/api/get-availability');
+          const availabilityData = await availabilityRes.json();
           
-          if (bookingData.success) {
-            showAIResponse(`✅ ${bookingData.message}`, false);
+          if (availabilityData.slots && availabilityData.slots.length > 0) {
+            html += `<p>Hier sind die nächsten freien Termine. Bitte wählen Sie einen passenden aus:</p>
+                     <div class="booking-options" style="display: flex; flex-direction: column; gap: 10px; margin: 15px 0;">`;
+            
+            availabilityData.slots.forEach(slot => {
+              html += `<button class="slot-button" 
+                        onclick="window.selectSlot('${slot}')" 
+                        style="background: #ffc107; color: #1a1a1a; border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: background 0.3s;"
+                        onmouseover="this.style.background='#e0a800'" 
+                        onmouseout="this.style.background='#ffc107'">${slot}</button>`;
+            });
+            html += `</div>`;
           } else {
-            showAIResponse(`❌ Es gab ein Problem: ${bookingData.message}`, false);
+            html += `<p>Momentan sind leider keine freien Termine verfügbar. Versuchen Sie es bitte später erneut.</p>`;
           }
         } catch (error) {
-          console.error('Fehler bei der Terminbuchung:', error);
-          showAIResponse('❌ Es gab einen technischen Fehler bei der Terminbuchung. Bitte versuchen Sie es später erneut.', false);
+          console.error('Fehler beim Laden der Verfügbarkeiten:', error);
+          html += `<p>Es gab ein Problem beim Laden der Termine. Bitte versuchen Sie es später erneut.</p>`;
         }
         
-        // Gespräch zurücksetzen
-        conversationState = { step: 'idle', data: {} };
-        break;
-        
-      default:
-        showAIResponse('Es gab einen unerwarteten Fehler im Gesprächsablauf. Bitte starten Sie erneut.', false);
-        conversationState = { step: 'idle', data: {} };
+        showAIResponse(html, true);
+      } else {
+        showAIResponse(data.answer, false);
+      }
+    } else {
+      // Fallback für unerwartete Zustände
+      showAIResponse('Es gab einen unerwarteten Fehler im Gesprächsablauf. Bitte starten Sie erneut.', false);
+      conversationState = { step: 'idle', data: {} };
     }
+
   } catch (error) {
     console.error('Fehler im Dialog-Manager:', error);
     showAIResponse('Oh, da ist ein technischer Fehler aufgetreten. Bitte versuchen Sie es später noch einmal.', false);
