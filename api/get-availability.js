@@ -22,7 +22,7 @@ export default async function handler(req, res) {
         // ===================================================================
         const CONFIG = {
             workingHours: { start: 9, end: 17 },
-            appointmentDuration: 30, // Dauer in Minuten
+            appointmentDuration: 60, // Dauer in Minuten
             workingDays: ['sonntag', 'montag', 'dienstag', 'mittwoch', 'donnerstag', 'freitag', 'samstag'],
             dayMapping: { 'sonntag': 0, 'montag': 1, 'dienstag': 2, 'mittwoch': 3, 'donnerstag': 4, 'freitag': 5, 'samstag': 6 }
         };
