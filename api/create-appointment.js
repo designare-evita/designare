@@ -210,7 +210,7 @@ export default async function handler(req, res) {
     if (error.message && error.message.includes('Domain-Wide Delegation')) {
       errorMessage = 'Kalender-Konfigurationsproblem. Bitte kontaktieren Sie Michael direkt.';
     } else if (error.message && error.message.includes('parse')) {
-      errorMessage = 'Das Datumsformat konnte nicht verarbeitet werden. Bitte versuchen Sie es erneut.';
+      errorMessage = 'Das Datumsformat konnte nicht verarbeitet werden. Bitte versuche es erneut.';
     }
     
     res.status(500).json({ 
