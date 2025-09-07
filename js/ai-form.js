@@ -57,7 +57,7 @@ function selectSlot(slot) {
   
   // Chat-History updaten
   addMessageToHistory(`Termin gewählt: ${slot}`, 'user');
-  addMessageToHistory(`Super! Ich habe den Termin "${slot}" für Sie vorgemerkt. Wie lautet Dein vollständiger Name?`, 'ai');
+  addMessageToHistory(`Super! Ich habe den Termin "${slot}" für Dich vorgemerkt. Wie lautet Dein vollständiger Name?`, 'ai');
   
   // Fokus auf Input setzen
   setTimeout(() => {
@@ -100,7 +100,7 @@ async function handleBookingInput(userInput) {
       // Email validation
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(userInput)) {
-        addMessageToHistory(`Bitte geben Sie eine gültige E-Mail-Adresse ein (z.B. max@example.com):`, 'ai');
+        addMessageToHistory(`Bitte gebe eine gültige E-Mail-Adresse ein (z.B. max@example.com):`, 'ai');
         return true;
       }
       
