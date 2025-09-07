@@ -1,4 +1,4 @@
-// js/ai-form.js (KORRIGIERTE VERSION - Chat-Funktionalität repariert)
+// js/ai-form.js (VERBESSERTE VERSION mit direkter Modal-Steuerung)
 
 import { initBookingModal, showStep } from './booking.js';
 
@@ -15,11 +15,55 @@ export const initAiForm = () => {
     const aiQuestion = document.getElementById('ai-question');
     const aiStatus = document.getElementById('ai-status');
     const modalOverlay = document.getElementById('ai-response-modal');
-    const responseArea = document.getElementById('ai-chat-history'); // KORREKTUR: Verwende chat-history statt content-area
+    const responseArea = document.getElementById('ai-chat-history');
     const closeButtons = document.querySelectorAll('#close-ai-response-modal-top, #close-ai-response-modal-bottom');
 
     console.log("🔧 Modal-Overlay gefunden?", !!modalOverlay);
     console.log("🔧 Response-Area gefunden?", !!responseArea);
+
+    // NEUE FUNKTION: Modal direkt anzeigen (mehrere Methoden)
+    const showModal = () => {
+        if (!modalOverlay) return;
+        
+        console.log("🎯 Zeige Modal mit mehreren Methoden");
+        
+        // Methode 1: CSS-Klasse
+        modalOverlay.classList.add('visible');
+        
+        // Methode 2: Direkter Style
+        modalOverlay.style.display = 'flex';
+        modalOverlay.style.opacity = '1';
+        modalOverlay.style.visibility = 'visible';
+        modalOverlay.style.pointerEvents = 'auto';
+        
+        // Methode 3: Data-Attribut für Debugging
+        modalOverlay.setAttribute('data-debug', 'true');
+        
+        // Body-Scroll deaktivieren
+        document.body.style.overflow = 'hidden';
+        document.body.classList.add('no-scroll');
+        
+        console.log("✅ Modal sollte jetzt sichtbar sein");
+        console.log("Modal classList:", modalOverlay.classList.toString());
+        console.log("Modal style.display:", modalOverlay.style.display);
+    };
+
+    // NEUE FUNKTION: Modal verstecken
+    const hideModal = () => {
+        if (!modalOverlay) return;
+        
+        console.log("❎ Verstecke Modal");
+        
+        modalOverlay.classList.remove('visible');
+        modalOverlay.style.display = 'none';
+        modalOverlay.style.opacity = '0';
+        modalOverlay.style.visibility = 'hidden';
+        modalOverlay.style.pointerEvents = 'none';
+        modalOverlay.removeAttribute('data-debug');
+        
+        document.body.style.overflow = '';
+        document.body.classList.remove('no-scroll');
+    };
 
     const launchBookingModal = async () => {
         console.log("📅 launchBookingModal gestartet");
@@ -34,33 +78,53 @@ export const initAiForm = () => {
             } catch (error) {
                 console.error("❌ Fehler beim Laden des Booking-Modals:", error);
                 addMessageToHistory("Entschuldigung, beim Öffnen des Buchungsfensters ist ein Fehler aufgetreten.", 'ai');
-                modalOverlay.style.display = 'flex';
+                showModal();
                 return;
             }
         }
-        modalOverlay.style.display = 'none';
+        hideModal();
         const bookingModal = document.getElementById('booking-modal');
-        bookingModal.style.display = 'flex';
-        showStep('step-day-selection');
+        if (bookingModal) {
+            bookingModal.style.display = 'flex';
+            showStep('step-day-selection');
+        }
     };
 
-    // NEUE FUNKTION: Nachrichten zur Chat-History hinzufügen
+    // VERBESSERTE FUNKTION: Nachrichten zur Chat-History hinzufügen
     const addMessageToHistory = (message, sender) => {
-        if (!responseArea) return;
+        if (!responseArea) {
+            console.warn("⚠️ responseArea nicht gefunden für Message:", message);
+            return;
+        }
+
+        console.log(`💬 Füge ${sender}-Nachricht hinzu:`, message.substring(0, 50) + "...");
 
         const messageDiv = document.createElement('div');
         messageDiv.className = `chat-message ${sender}`;
-        messageDiv.textContent = message;
+        
+        // HTML-Inhalt oder Text, je nach Nachrichtentyp
+        if (message.includes('<') && message.includes('>')) {
+            messageDiv.innerHTML = message;
+        } else {
+            messageDiv.textContent = message;
+        }
         
         responseArea.appendChild(messageDiv);
         
         // Scroll zum Ende
         responseArea.scrollTop = responseArea.scrollHeight;
+        
+        console.log("✅ Nachricht hinzugefügt, responseArea children:", responseArea.children.length);
     };
 
-    // NEUE FUNKTION: Chat-History leeren und erste Nachricht hinzufügen
+    // VERBESSERTE FUNKTION: Chat-History leeren und erste Nachricht hinzufügen
     const initializeChat = (initialMessage) => {
-        if (!responseArea) return;
+        if (!responseArea) {
+            console.warn("⚠️ responseArea nicht gefunden für initializeChat");
+            return;
+        }
+        
+        console.log("🆕 Initialisiere Chat mit Nachricht:", initialMessage.substring(0, 50) + "...");
         
         responseArea.innerHTML = ''; // Leere die History
         addMessageToHistory(initialMessage, 'ai');
@@ -75,6 +139,8 @@ export const initAiForm = () => {
             console.warn("⚠️ Keine Frage eingegeben.");
             return;
         }
+
+        console.log("❓ Frage:", question);
 
         aiStatus.textContent = 'Evita denkt nach...';
         aiStatus.style.display = 'block';
@@ -96,11 +162,11 @@ export const initAiForm = () => {
             const data = await response.json();
             console.log("📨 API Response:", data);
 
-            // KORREKTUR: Prüfe auf die richtige Aktion
+            // Prüfe auf die richtige Aktion
             if (data.action === 'start_booking') {
-                // Zeige die Buchungs-Nachricht im Chat
+                console.log("📅 Buchung erkannt");
                 initializeChat(data.message);
-                modalOverlay.style.display = 'flex';
+                showModal();
                 
                 // Warte kurz und starte dann die Buchung
                 setTimeout(() => {
@@ -109,21 +175,22 @@ export const initAiForm = () => {
                 return;
             }
 
-            // KORREKTUR: Normale Antwort verarbeiten
+            // Normale Antwort verarbeiten
             if (data.answer) {
+                console.log("💬 Normale Antwort erhalten");
                 initializeChat(data.answer);
             } else {
+                console.warn("⚠️ Keine Antwort in API Response");
                 initializeChat("Entschuldigung, ich konnte keine Antwort generieren.");
             }
             
-            modalOverlay.style.display = 'flex';
-            console.log("💡 Modal sichtbar gemacht (display:flex)");
+            showModal();
 
         } catch (error) {
             console.error('❌ Fehler bei der Anfrage an Evita:', error);
             aiStatus.textContent = 'Ein Fehler ist aufgetreten.';
             initializeChat("Entschuldigung, ich habe gerade technische Schwierigkeiten. Bitte versuche es später noch einmal.");
-            modalOverlay.style.display = 'flex';
+            showModal();
         } 
         finally {
             aiQuestion.value = '';
@@ -134,7 +201,7 @@ export const initAiForm = () => {
         }
     };
 
-    // NEUE FUNKTION: Chat-Formular-Handler
+    // VERBESSERTE FUNKTION: Chat-Formular-Handler
     const handleChatSubmit = async (event) => {
         console.log("💬 handleChatSubmit ausgelöst");
         event.preventDefault();
@@ -150,6 +217,8 @@ export const initAiForm = () => {
         const userInput = chatInput.value.trim();
         if (!userInput) return;
 
+        console.log("💬 User Chat Input:", userInput);
+
         // User-Nachricht zur History hinzufügen
         addMessageToHistory(userInput, 'user');
         chatInput.value = '';
@@ -162,6 +231,7 @@ export const initAiForm = () => {
             });
 
             const data = await response.json();
+            console.log("📨 Chat API Response:", data);
             
             // Prüfe wieder auf Buchungs-Aktion
             if (data.action === 'start_booking') {
@@ -191,19 +261,34 @@ export const initAiForm = () => {
     aiForm.addEventListener('submit', handleFormSubmit);
     console.log("✅ Submit-Listener registriert");
 
-    // KORREKTUR: Chat-Form Event Listener hinzufügen (mit Delegation)
+    // Chat-Form Event Listener hinzufügen (mit Delegation)
     document.addEventListener('submit', (e) => {
         if (e.target.id === 'ai-chat-form') {
+            console.log("📝 Chat-Form Submit erkannt");
             handleChatSubmit(e);
         }
     });
     console.log("✅ Chat-Submit-Listener registriert");
 
+    // Close-Button Event Listeners
     closeButtons.forEach(button => {
         button.addEventListener('click', () => {
-            modalOverlay.style.display = 'none';
-            console.log("❎ Modal geschlossen");
+            console.log("❎ Close-Button geklickt");
+            hideModal();
         });
     });
     console.log("✅ Close-Buttons registriert");
+
+    // DEBUGGING: Teste Modal-Funktionalität
+    console.log("🔧 Debug: Teste Modal nach 3 Sekunden...");
+    setTimeout(() => {
+        console.log("🔧 Debug: Teste Modal-Anzeige");
+        initializeChat("Debug: Dies ist eine Test-Nachricht um zu prüfen, ob das Modal funktioniert.");
+        showModal();
+        
+        setTimeout(() => {
+            console.log("🔧 Debug: Verstecke Modal wieder");
+            hideModal();
+        }, 3000);
+    }, 3000);
 };
