@@ -1,5 +1,7 @@
-// js/ai-form.js
+// js/ai-form.js (DEBUG-VERSION)
 import { showAIResponse, showLoadingState, hideLoadingState } from './modals.js';
+
+console.log('✅ DEBUG: ai-form.js wurde geladen und wird jetzt ausgeführt.');
 
 const aiForm = document.getElementById('ai-form');
 const aiQuestionInput = document.getElementById('ai-question');
@@ -39,27 +41,32 @@ window.selectSlot = function(slot) {
   }
 }
 
-// Hier ist die if-Bedingung, die in der Fehlermeldung erwähnt wurde (Zeile 63)
 if (aiForm && aiQuestionInput) {
+  console.log('✅ DEBUG: Formular (#ai-form) wurde gefunden. Event Listener wird jetzt hinzugefügt.');
   
   aiForm.addEventListener('submit', async (e) => {
+    console.log('✅ DEBUG: Formular wurde abgesendet! Die submit-Funktion startet.');
     e.preventDefault();
     const userInput = aiQuestionInput.value.trim();
     if (!userInput) return;
 
+    console.log('✅ DEBUG: Benutzereingabe:', userInput);
     showLoadingState();
     aiQuestionInput.value = '';
 
     try {
+      console.log('✅ DEBUG: Aktueller Gesprächsschritt:', conversationState.step);
       switch (conversationState.step) {
         
         case 'idle':
+          console.log('✅ DEBUG: Rufe /api/ask-gemini auf...');
           const response = await fetch('/api/ask-gemini', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ prompt: userInput, source: 'evita' })
           });
           const data = await response.json();
+          console.log('✅ DEBUG: Antwort von ask-gemini erhalten:', data);
 
           if (data.action === 'start_booking') {
             conversationState.step = 'awaiting_slot';
@@ -72,6 +79,7 @@ if (aiForm && aiQuestionInput) {
           }
           break;
 
+        // ... (die anderen cases bleiben gleich) ...
         case 'awaiting_slot':
           conversationState.data.slot = userInput;
           conversationState.step = 'awaiting_name';
@@ -86,22 +94,19 @@ if (aiForm && aiQuestionInput) {
         
         case 'awaiting_email':
           conversationState.data.email = userInput;
-          
           const bookingResponse = await fetch('/api/create-appointment', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(conversationState.data)
           });
           const bookingData = await bookingResponse.json();
-
           displayMessage(bookingData.message);
-          
           conversationState.step = 'idle';
           conversationState.data = {};
           break;
       }
     } catch (error) {
-      console.error('Fehler im Dialog-Manager:', error);
+      console.error('❌ DEBUG: Ein Fehler ist im Dialog-Manager aufgetreten:', error);
       displayMessage('Oh, da ist ein technischer Fehler aufgetreten. Bitte versuchen Sie es später noch einmal.');
       conversationState.step = 'idle';
       conversationState.data = {};
@@ -110,4 +115,6 @@ if (aiForm && aiQuestionInput) {
     }
   });
 
-} // <--- HIER IST DIE FEHLENDE KLAMMER, die jetzt hinzugefügt wurde.
+} else {
+    console.warn('⚠️ DEBUG: Formular (#ai-form) wurde auf dieser Seite NICHT gefunden. Das ist auf Unterseiten normal.');
+}
