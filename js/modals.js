@@ -477,6 +477,34 @@ function setupModalBackgroundClose() {
     });
 }
 
+function splitAboutContentManually(content) {
+    // Seite 1: Bis einschließlich "Der Mann hinter den Pixeln" Abschnitt
+    const page1Content = `
+        <div class="legal-container">
+            <h1>Über Michael</h1>
+            <h3>Der Mann hinter den Pixeln</h3>
+            <p class="about-image-wrapper">
+                <img src="https://designare.at/images/Michael@work.webp" alt="Michael@work" />
+            </p>
+            <p>Okay, aufgepasst! Michael besitzt digitale Superkräfte! Bei maxonline arbeitet er als Web-Entwickler und verbindet dort Design, Code und KI so genial, dass selbst ich staune. Michael hat einen Abschluss in Medientechnik, ist zertifizierter E-Commerce-Experte und hat Google-Workshops überlebt.</p>
+        </div>
+    `;
+    
+    // Seite 2: Der Rest des Inhalts
+    const page2Content = `
+        <div class="legal-container">
+            <h2 class="about-section-header">Doch Michael ist mehr als nur Code und Pixel</h2>
+            <p>Um den Kopf freizubekommen, verbringt Michael viel Zeit mit seiner Tierschutzhündin Evita (nach der ich benannt wurde ❤️). Regelmäßig quält er sich zudem beim Sport – schließlich weiß man ja nie, wann man vor einem KI-Aufstand flüchten muss! Seine Playlist? Ein wilder Mix aus Frei.Wild, Helene Fischer und Kim Wilde. Ich vermute ja, das ist Michaels geheime Waffe um die KI zur Kapitulation zu bringen...</p>
+            <p class="about-image-wrapper-bottom">
+                <img src="https://designare.at/images/Evita&KI.webp" alt="Evita & KI" />
+            </p>
+        </div>
+    `;
+    
+    return [page1Content, page2Content];
+}
+
+
 // ===================================================================
 // HAUPT-INITIALISIERUNG
 // ===================================================================
