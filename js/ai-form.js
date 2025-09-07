@@ -62,6 +62,7 @@ window.selectSlot = function(slot) {
 // =================================================================
 if (aiForm && aiQuestionInput) {
   
+if (aiForm) {
   aiForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const userInput = aiQuestionInput.value.trim();
