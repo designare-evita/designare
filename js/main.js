@@ -1,16 +1,15 @@
-// js/main.js
+// js/main.js (KORRIGIERT FÜR AI-FORM INIT)
 
 // === 1. IMPORTE ===
 import { initEffects } from './effects.js';
 import { initTypewriters } from './typewriter.js';
 import { initModals } from './modals.js';
-import './ai-form.js'; 
+import { initAiForm } from './ai-form.js'; // <-- GEÄNDERTER IMPORT
 import { initSilasForm } from './silas-form.js';
 
-
 // === 2. HELFERFUNKTIONEN ===
-
 const loadContent = (url, elementId) => {
+    // ... (Diese Funktion bleibt unverändert)
     const placeholder = document.getElementById(elementId);
     if (!placeholder) {
         return Promise.reject(`Platzhalter-Element '${elementId}' nicht gefunden.`);
@@ -26,6 +25,7 @@ const loadContent = (url, elementId) => {
 };
 
 const trackVisitor = () => {
+    // ... (Diese Funktion bleibt unverändert)
     fetch('/api/track-visitor')
         .then(response => response.ok ? console.log('Besucher erfasst.') : console.error('Fehler bei der Erfassung des Besuchers.'))
         .catch(error => console.error('Netzwerkfehler beim Tracking:', error));
@@ -33,26 +33,16 @@ const trackVisitor = () => {
 
 
 // === 3. INITIALISIERUNGS-FUNKTIONEN ===
-
-/**
- * Initialisiert alle Skripte, die von den geladenen HTML-Inhalten (Header, Modals) abhängen.
- */
 const initializeDynamicScripts = () => {
     console.log("Starte Initialisierung der dynamischen Skripte (Menü, Modals)...");
-    
-
     initModals();
-    
 };
 
-/**
- * Initialisiert alle Skripte, die NICHT von externen Inhalten abhängen.
- */
 const initializeStaticScripts = () => {
     console.log("Starte Initialisierung der statischen Skripte...");
     initEffects();
     initTypewriters();
-    // initAiForm(); // <-- WURDE VON HIER ENTFERNT
+    initAiForm(); // <-- AUFRUF HIER HINZUGEFÜGT
     initSilasForm();
 };
 
@@ -61,6 +51,7 @@ const initializeStaticScripts = () => {
 document.addEventListener('DOMContentLoaded', () => {
     console.log("DOM geladen. Start der Anwendung.");
 
+    // Ruft die Skripte auf, die auf das initiale HTML angewiesen sind.
     initializeStaticScripts();
 
     const headerPromise = loadContent('/header.html', 'header-placeholder');
@@ -69,6 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
     Promise.all([headerPromise, modalsPromise])
         .then(() => {
             console.log("✅ Header und Modals erfolgreich geladen.");
+            // Ruft die Skripte auf, die auf das nachgeladene HTML angewiesen sind.
             initializeDynamicScripts();
         })
         .catch(error => {
