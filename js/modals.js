@@ -1,4 +1,4 @@
-// js/modals.js - VOLLSTÄNDIG KORRIGIERTE VERSION
+// js/modals.js - MIT PAGINATION FÜR DATENSCHUTZ/IMPRESSUM/ÜBER MICH
 
 // ===================================================================
 // EINHEITLICHE MODAL-FUNKTIONEN
@@ -149,7 +149,7 @@ function setupCookieModal() {
         privacyPolicyLinkButton.addEventListener('click', (e) => {
             e.preventDefault();
             if (cookieInfoLightbox) closeModal(cookieInfoLightbox);
-            loadLegalContent('datenschutz.html');
+            loadLegalContentWithPagination('datenschutz.html');
         });
     }
 
@@ -226,19 +226,41 @@ function setupAboutModal() {
     if (aboutButton) {
         aboutButton.addEventListener('click', (e) => {
             e.preventDefault();
-            loadAboutContent();
+            loadAboutContentWithPagination();
         });
     }
 }
 
-function loadAboutContent() {
+function loadAboutContentWithPagination() {
     const legalModal = document.getElementById('legal-modal');
     const legalContentArea = document.getElementById('legal-modal-content-area');
     const aboutContent = document.getElementById('about-me-content');
     
     if (aboutContent && legalContentArea) {
         // About-Content direkt kopieren (es ist bereits im DOM verfügbar)
-        legalContentArea.innerHTML = aboutContent.innerHTML;
+        const content = aboutContent.innerHTML;
+        
+        // Teile den Content in 2 Seiten auf (50% Teilung)
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = content;
+        
+        const allElements = Array.from(tempDiv.children);
+        const midpoint = Math.ceil(allElements.length / 2);
+        
+        const page1 = allElements.slice(0, midpoint);
+        const page2 = allElements.slice(midpoint);
+        
+        // Pagination-State initialisieren
+        window.modalPaginationState = {
+            pages: [
+                page1.map(el => el.outerHTML).join(''),
+                page2.map(el => el.outerHTML).join('')
+            ],
+            currentPage: 0,
+            totalPages: 2
+        };
+        
+        showModalPage(0);
         openModal(legalModal);
     }
 }
@@ -252,7 +274,7 @@ function setupLegalModals() {
     if (impressumLink) {
         impressumLink.addEventListener('click', (e) => {
             e.preventDefault();
-            loadLegalContent('impressum.html');
+            loadLegalContentWithPagination('impressum.html');
         });
     }
 
@@ -260,7 +282,7 @@ function setupLegalModals() {
     if (datenschutzLink) {
         datenschutzLink.addEventListener('click', (e) => {
             e.preventDefault();
-            loadLegalContent('datenschutz.html');
+            loadLegalContentWithPagination('datenschutz.html');
         });
     }
 
@@ -273,7 +295,11 @@ function setupLegalModals() {
     }
 }
 
-function loadLegalContent(page) {
+// ===================================================================
+// PAGINATION FUNKTIONALITÄT
+// ===================================================================
+
+function loadLegalContentWithPagination(page) {
     const legalModal = document.getElementById('legal-modal');
     const legalContentArea = document.getElementById('legal-modal-content-area');
     
@@ -299,18 +325,8 @@ function loadLegalContent(page) {
             // Suche nach dem legal-container
             let legalContainer = doc.querySelector('.legal-container');
             
-            // Fallback: Suche nach main-content
-            if (!legalContainer) {
-                legalContainer = doc.querySelector('main');
-            }
-            
-            // Fallback: Nimm den body-Inhalt
-            if (!legalContainer) {
-                legalContainer = doc.querySelector('body');
-            }
-            
             if (legalContainer) {
-                legalContentArea.innerHTML = legalContainer.innerHTML;
+                setupPaginationForContent(legalContainer.innerHTML, page);
             } else {
                 legalContentArea.innerHTML = '<div class="legal-container"><h1>Fehler</h1><p>Der Inhalt konnte nicht geladen werden.</p></div>';
             }
@@ -319,6 +335,110 @@ function loadLegalContent(page) {
             console.error('Fehler beim Laden des Inhalts:', error);
             legalContentArea.innerHTML = `<div class="legal-container"><h1>Fehler</h1><p>Inhalt konnte nicht geladen werden: ${error.message}</p></div>`;
         });
+}
+
+function setupPaginationForContent(content, pageType) {
+    let pages = [];
+    
+    if (pageType === 'datenschutz.html') {
+        // Datenschutz: Teilung bei jedem H3
+        pages = splitContentByH3(content);
+    } else {
+        // Impressum: 50% Teilung
+        pages = splitContentByHalf(content);
+    }
+    
+    // Pagination-State initialisieren
+    window.modalPaginationState = {
+        pages: pages,
+        currentPage: 0,
+        totalPages: pages.length
+    };
+    
+    showModalPage(0);
+}
+
+function splitContentByH3(content) {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = content;
+    
+    const pages = [];
+    let currentPageContent = [];
+    
+    Array.from(tempDiv.children).forEach(element => {
+        if (element.tagName === 'H3' && currentPageContent.length > 0) {
+            // Neue Seite beginnen bei H3
+            pages.push(`<div class="legal-container">${currentPageContent.map(el => el.outerHTML).join('')}</div>`);
+            currentPageContent = [element];
+        } else {
+            currentPageContent.push(element);
+        }
+    });
+    
+    // Letzte Seite hinzufügen
+    if (currentPageContent.length > 0) {
+        pages.push(`<div class="legal-container">${currentPageContent.map(el => el.outerHTML).join('')}</div>`);
+    }
+    
+    return pages;
+}
+
+function splitContentByHalf(content) {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = content;
+    
+    const allElements = Array.from(tempDiv.children);
+    const midpoint = Math.ceil(allElements.length / 2);
+    
+    const page1 = allElements.slice(0, midpoint);
+    const page2 = allElements.slice(midpoint);
+    
+    return [
+        `<div class="legal-container">${page1.map(el => el.outerHTML).join('')}</div>`,
+        `<div class="legal-container">${page2.map(el => el.outerHTML).join('')}</div>`
+    ];
+}
+
+function showModalPage(pageIndex) {
+    const legalContentArea = document.getElementById('legal-modal-content-area');
+    const state = window.modalPaginationState;
+    
+    if (!state || !legalContentArea) return;
+    
+    // Seiteninhalt anzeigen
+    legalContentArea.innerHTML = state.pages[pageIndex];
+    
+    // Pagination-Buttons hinzufügen (wenn mehr als 1 Seite)
+    if (state.totalPages > 1) {
+        const paginationDiv = document.createElement('div');
+        paginationDiv.className = 'legal-modal-pagination-buttons';
+        
+        // Zurück-Button
+        const prevButton = document.createElement('button');
+        prevButton.textContent = '← Zurück';
+        prevButton.disabled = pageIndex === 0;
+        prevButton.addEventListener('click', () => {
+            if (pageIndex > 0) {
+                showModalPage(pageIndex - 1);
+                window.modalPaginationState.currentPage = pageIndex - 1;
+            }
+        });
+        
+        // Weiter-Button
+        const nextButton = document.createElement('button');
+        nextButton.textContent = 'Weiter →';
+        nextButton.disabled = pageIndex === state.totalPages - 1;
+        nextButton.addEventListener('click', () => {
+            if (pageIndex < state.totalPages - 1) {
+                showModalPage(pageIndex + 1);
+                window.modalPaginationState.currentPage = pageIndex + 1;
+            }
+        });
+        
+        paginationDiv.appendChild(prevButton);
+        paginationDiv.appendChild(nextButton);
+        legalContentArea.appendChild(paginationDiv);
+    }
 }
 
 function setupAiModal() {
