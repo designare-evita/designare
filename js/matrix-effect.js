@@ -1,4 +1,4 @@
-// Matrix-Effekt mit verzögerter Initialisierung
+// Matrix-Effekt mit intelligenter Initialisierung
 
 function initMatrixEffect() {
     console.log('Versuche Matrix-Effekt zu initialisieren...');
@@ -6,9 +6,19 @@ function initMatrixEffect() {
     const canvas = document.getElementById('matrix-canvas');
     const sideMenu = document.getElementById('side-menu-panel');
     
+    // KORREKTUR: Maximal 10 Versuche, dann aufgeben
     if (!canvas || !sideMenu) {
-        console.log('Canvas oder Menu noch nicht verfügbar, versuche erneut in 100ms...');
-        setTimeout(initMatrixEffect, 100);
+        // Prüfe, ob wir schon zu oft versucht haben
+        if (!window.matrixRetryCount) window.matrixRetryCount = 0;
+        window.matrixRetryCount++;
+        
+        if (window.matrixRetryCount > 10) {
+            console.log('Matrix-Effekt: Maximale Anzahl Versuche erreicht. Beende Initialisierung.');
+            return;
+        }
+        
+        console.log(`Canvas oder Menu noch nicht verfügbar, versuche erneut in 200ms... (Versuch ${window.matrixRetryCount}/10)`);
+        setTimeout(initMatrixEffect, 200);
         return;
     }
     
@@ -126,17 +136,25 @@ function initMatrixEffect() {
     window.addEventListener('beforeunload', stopAnimation);
     
     console.log('Matrix-Effekt erfolgreich initialisiert');
+    
+    // WICHTIG: Retry-Counter zurücksetzen, da Initialisierung erfolgreich war
+    window.matrixRetryCount = 0;
 }
 
-// Starte die Initialisierung
-document.addEventListener('DOMContentLoaded', () => {
+// Starte die Initialisierung nur einmal
+let matrixInitialized = false;
+
+function safeInitMatrix() {
+    if (matrixInitialized) return;
+    matrixInitialized = true;
+    
     console.log('DOM geladen, starte Matrix-Initialisierung...');
     initMatrixEffect();
-});
+}
 
-// Fallback für den Fall dass DOMContentLoaded bereits ausgelöst wurde
+// Event-Listener nur einmal registrieren
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initMatrixEffect);
+    document.addEventListener('DOMContentLoaded', safeInitMatrix);
 } else {
-    initMatrixEffect();
+    safeInitMatrix();
 }
