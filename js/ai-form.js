@@ -1,60 +1,60 @@
-// js/ai-form.js (FINALE DIAGNOSE-VERSION)
-console.log("🟢 Modul: ai-form.js wird geladen...");
+// js/ai-form.js (FINALE VERSION)
 
 import { initBookingModal, showStep } from './booking.js';
-console.log("✅ Import von booking.js in ai-form.js erfolgreich.");
 
 export const initAiForm = () => {
-    console.log("➡️ Funktion: initAiForm() wird ausgeführt.");
-    
     const aiForm = document.getElementById('ai-form');
+    if (!aiForm) return; // Bricht ab, wenn das Formular nicht existiert
+
     const aiQuestion = document.getElementById('ai-question');
     const aiStatus = document.getElementById('ai-status');
     const modalOverlay = document.getElementById('ai-response-modal');
     const responseArea = document.getElementById('ai-response-content-area');
     const closeButtons = document.querySelectorAll('#close-ai-response-modal-top, #close-ai-response-modal-bottom');
 
-    if (!aiForm) {
-        console.warn("🔴 AI-Formular nicht gefunden. Initialisierung übersprungen.");
-        return;
-    }
-    console.log("✅ AI-Formular gefunden, initialisiere Event-Listener.");
-
-    const launchBookingModal = async () => { /* ... bleibt unverändert ... */ };
+    const launchBookingModal = async () => {
+        const modalContainer = document.getElementById('modal-container');
+        if (!document.getElementById('booking-modal')) {
+            try {
+                const response = await fetch('/booking-modal.html');
+                if (!response.ok) throw new Error('booking-modal.html konnte nicht geladen werden.');
+                const html = await response.text();
+                modalContainer.insertAdjacentHTML('beforeend', html);
+                initBookingModal();
+            } catch (error) {
+                console.error("Fehler beim Laden des Booking-Modals:", error);
+                responseArea.innerHTML = "<p>Entschuldigung, beim Öffnen des Buchungsfensters ist ein Fehler aufgetreten.</p>";
+                modalOverlay.style.display = 'flex';
+                return;
+            }
+        }
+        modalOverlay.style.display = 'none';
+        const bookingModal = document.getElementById('booking-modal');
+        bookingModal.style.display = 'flex';
+        showStep('step-day-selection');
+    };
 
     const handleFormSubmit = async (event) => {
-        console.log("➡️ handleFormSubmit: Formular abgeschickt!");
         event.preventDefault();
-        
         const question = aiQuestion.value.trim();
-        console.log(`➡️ handleFormSubmit: Frage lautet "${question}"`);
-        if (!question) {
-            console.log("🔴 handleFormSubmit: Frage ist leer. Abbruch.");
-            return;
-        }
+        if (!question) return;
 
-        console.log("➡️ handleFormSubmit: Setze Status auf 'Evita denkt nach...'");
         aiStatus.textContent = 'Evita denkt nach...';
         aiStatus.style.display = 'block';
-
-        console.log("➡️ handleFormSubmit: Deaktiviere Formular.");
         aiQuestion.disabled = true;
         aiForm.querySelector('button').disabled = true;
 
         try {
-            console.log("➡️ handleFormSubmit: Starte fetch-Anfrage an /api/ask-gemini...");
             const response = await fetch('/api/ask-gemini', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ prompt: question }),
             });
-            console.log("✅ handleFormSubmit: Fetch-Antwort erhalten.");
 
             if (!response.ok) {
                 throw new Error(`HTTP-Fehler: ${response.status}`);
             }
 
-            console.log("➡️ handleFormSubmit: Öffne Antwort-Modal.");
             responseArea.innerHTML = '';
             modalOverlay.style.display = 'flex';
 
@@ -62,16 +62,11 @@ export const initAiForm = () => {
             const decoder = new TextDecoder();
             let accumulatedContent = '';
 
-            console.log("➡️ handleFormSubmit: Starte Stream-Verarbeitung...");
             while (true) {
                 const { done, value } = await reader.read();
-                if (done) {
-                    console.log("✅ handleFormSubmit: Stream beendet.");
-                    break;
-                }
+                if (done) break;
                 
                 accumulatedContent += decoder.decode(value, { stream: true });
-                // (Der Rest der Stream-Logik bleibt gleich)
                 let processedContent = accumulatedContent.replace(/\\n/g, '<br>');
 
                 if (processedContent.includes('[BUCHUNG STARTEN]')) {
@@ -83,13 +78,14 @@ export const initAiForm = () => {
                 responseArea.innerHTML = processedContent;
             }
 
-        } catch (error) {
-            console.error("❌ handleFormSubmit: Fehler im try-Block:", error);
+        } catch (error)
+        {
+            console.error('Fehler bei der Anfrage an Evita:', error);
             aiStatus.textContent = 'Ein Fehler ist aufgetreten.';
-            responseArea.innerHTML = `<p>Entschuldigung, ich habe gerade technische Schwierigkeiten.</p>`;
+            responseArea.innerHTML = `<p>Entschuldigung, ich habe gerade technische Schwierigkeiten. Bitte versuche es später noch einmal.</p>`;
             modalOverlay.style.display = 'flex';
-        } finally {
-            console.log("➡️ handleFormSubmit: Führe 'finally'-Block aus (Formular reaktivieren).");
+        } 
+        finally {
             aiQuestion.value = '';
             aiStatus.style.display = 'none';
             aiQuestion.disabled = false;
