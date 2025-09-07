@@ -240,24 +240,14 @@ function loadAboutContentWithPagination() {
         // About-Content direkt kopieren (es ist bereits im DOM verfügbar)
         const content = aboutContent.innerHTML;
         
-        // Teile den Content in 2 Seiten auf (50% Teilung)
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = content;
-        
-        const allElements = Array.from(tempDiv.children);
-        const midpoint = Math.ceil(allElements.length / 2);
-        
-        const page1 = allElements.slice(0, midpoint);
-        const page2 = allElements.slice(midpoint);
+        // Erstelle manuell sinnvolle Seitenaufteilungen basierend auf dem Inhalt
+        const pages = splitAboutContentManually(content);
         
         // Pagination-State initialisieren
         window.modalPaginationState = {
-            pages: [
-                page1.map(el => el.outerHTML).join(''),
-                page2.map(el => el.outerHTML).join('')
-            ],
+            pages: pages,
             currentPage: 0,
-            totalPages: 2
+            totalPages: pages.length
         };
         
         showModalPage(0);
