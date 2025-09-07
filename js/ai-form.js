@@ -1,11 +1,12 @@
 // js/ai-form.js
 import { showAIResponse, showLoadingState, hideLoadingState } from './modals.js';
 
+// Holt sich die HTML-Elemente. Diese können null sein, wenn man auf einer Unterseite ist.
 const aiForm = document.getElementById('ai-form');
 const aiQuestionInput = document.getElementById('ai-question');
 
 // =================================================================
-// NEU START: Der "Gesprächs-Manager"
+// Der "Gesprächs-Manager"
 // =================================================================
 
 // Dieses Objekt merkt sich, wo im Gespräch wir uns befinden.
@@ -18,12 +19,18 @@ let conversationState = {
 
 // Zeigt einfachen Text von Evita an
 function displayMessage(text) {
-  showAIResponse(text); // Nutzt Ihre bestehende Funktion aus modals.js
+  showAIResponse(text, false); // Nutzt Ihre bestehende Funktion aus modals.js
 }
 
 // Zeigt die buchbaren Termine als klickbare Buttons an
 function displayBookingOptions(slots) {
   const contentArea = document.getElementById('ai-response-content-area');
+  
+  // Überprüft, ob Slots gefunden wurden
+  if (!slots || slots.length === 0) {
+    showAIResponse("Momentan sind leider keine freien Termine verfügbar. Bitte versuchen Sie es später erneut.", false);
+    return;
+  }
   
   let html = `<p>Hier sind die nächsten freien Termine. Bitte wählen Sie einen passenden aus:</p><div class="booking-options">`;
   slots.forEach(slot => {
@@ -32,97 +39,98 @@ function displayBookingOptions(slots) {
   });
   html += `</div>`;
   
-  // Wir verwenden Ihre showAIResponse-Funktion, aber geben ihr direkt HTML-Inhalt
-  showAIResponse(html, true); // Der zweite Parameter 'isHTML' muss ggf. in modals.js hinzugefügt werden
+  showAIResponse(html, true); // Der zweite Parameter 'true' sagt der Funktion, dass es sich um HTML handelt
 }
 
-// Diese Funktion wird von den Termin-Buttons aufgerufen
+// Diese Funktion wird von den Termin-Buttons aufgerufen und muss global verfügbar sein.
 window.selectSlot = function(slot) {
-  aiQuestionInput.value = slot; // Füllt das Input-Feld
-  aiQuestionInput.focus();
-  // Optional: Schliesst das Modal, damit der Nutzer nur noch "Senden" drücken muss
+  if (aiQuestionInput) {
+    aiQuestionInput.value = slot; // Füllt das Input-Feld
+    aiQuestionInput.focus();
+  }
+  // Schliesst das Modal, damit der Nutzer nur noch "Senden" drücken muss
   const modal = document.getElementById('ai-response-modal');
-  if (modal) modal.classList.remove('active');
+  if (modal) {
+    modal.classList.remove('active');
+    document.body.classList.remove('no-scroll');
+  }
 }
 
-// --- Der Haupt-Event-Handler ---
+// =================================================================
+// FINALE KORREKTUR: Der Code wird nur ausgeführt, wenn das Formular
+// auf der aktuellen Seite auch wirklich existiert.
+// =================================================================
+if (aiForm && aiQuestionInput) {
+  
+  aiForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const userInput = aiQuestionInput.value.trim();
+    if (!userInput) return;
 
-aiForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const userInput = aiQuestionInput.value.trim();
-  if (!userInput) return;
+    showLoadingState();
+    aiQuestionInput.value = '';
 
-  showLoadingState(); // Zeigt "Evita denkt nach..."
-  aiQuestionInput.value = ''; // Leert das Feld nach dem Senden
-
-  try {
-    // Die Logik entscheidet basierend auf dem aktuellen Gesprächsschritt
-    switch (conversationState.step) {
-      
-      case 'idle':
-        // Standard-Anfrage an das "Gehirn"
-        const response = await fetch('/api/ask-gemini', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt: userInput })
-        });
-        const data = await response.json();
-
-        if (data.action === 'start_booking') {
-          // Buchungsprozess wurde gestartet
-          conversationState.step = 'awaiting_slot';
-          displayMessage(data.message); // Zeigt "Gerne, ich prüfe..."
-          // Ruft sofort die Verfügbarkeiten ab
-          const availabilityRes = await fetch('/api/get-availability');
-          const availabilityData = await availabilityRes.json();
-          displayBookingOptions(availabilityData.slots);
-        } else {
-          // Normale Antwort
-          displayMessage(data.answer);
-        }
-        break;
-
-      case 'awaiting_slot':
-        // Nutzer hat einen Termin-Slot gesendet
-        conversationState.data.slot = userInput;
-        conversationState.step = 'awaiting_name';
-        displayMessage(`Super, Termin "${userInput}" ist vorgemerkt. Wie lautet Ihr voller Name?`);
-        break;
-
-      case 'awaiting_name':
-        // Nutzer hat seinen Namen gesendet
-        conversationState.data.name = userInput;
-        conversationState.step = 'awaiting_email';
-        displayMessage(`Danke, ${userInput}. Und wie lautet Ihre E-Mail-Adresse, damit ich Ihnen die Bestätigung senden kann?`);
-        break;
-      
-      case 'awaiting_email':
-        // Nutzer hat seine E-Mail gesendet -> FINALE
-        conversationState.data.email = userInput;
+    try {
+      // Die Logik entscheidet basierend auf dem aktuellen Gesprächsschritt
+      switch (conversationState.step) {
         
-        // Sende alle gesammelten Daten an die "Hände" zum Buchen
-        const bookingResponse = await fetch('/api/create-appointment', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(conversationState.data)
-        });
-        const bookingData = await bookingResponse.json();
+        case 'idle':
+          // Standard-Anfrage an das "Gehirn"
+          const response = await fetch('/api/ask-gemini', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt: userInput, source: 'evita' })
+          });
+          const data = await response.json();
 
-        displayMessage(bookingData.message);
+          if (data.action === 'start_booking') {
+            conversationState.step = 'awaiting_slot';
+            displayMessage(data.message);
+            const availabilityRes = await fetch('/api/get-availability');
+            const availabilityData = await availabilityRes.json();
+            displayBookingOptions(availabilityData.slots);
+          } else {
+            displayMessage(data.answer);
+          }
+          break;
+
+        case 'awaiting_slot':
+          conversationState.data.slot = userInput;
+          conversationState.step = 'awaiting_name';
+          displayMessage(`Super, der Termin ist für Sie vorgemerkt. Wie lautet Ihr voller Name?`);
+          break;
+
+        case 'awaiting_name':
+          conversationState.data.name = userInput;
+          conversationState.step = 'awaiting_email';
+          displayMessage(`Danke, ${userInput}. Und wie lautet Ihre E-Mail-Adresse für die Bestätigung?`);
+          break;
         
-        // Gespräch zurücksetzen
-        conversationState.step = 'idle';
-        conversationState.data = {};
-        break;
+        case 'awaiting_email':
+          conversationState.data.email = userInput;
+          
+          const bookingResponse = await fetch('/api/create-appointment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(conversationState.data)
+          });
+          const bookingData = await bookingResponse.json();
+
+          displayMessage(bookingData.message);
+          
+          // Gespräch zurücksetzen
+          conversationState.step = 'idle';
+          conversationState.data = {};
+          break;
+      }
+    } catch (error) {
+      console.error('Fehler im Dialog-Manager:', error);
+      displayMessage('Oh, da ist ein technischer Fehler aufgetreten. Bitte versuchen Sie es später noch einmal.');
+      // Bei Fehlern das Gespräch immer zurücksetzen
+      conversationState.step = 'idle';
+      conversationState.data = {};
+    } finally {
+      hideLoadingState();
     }
-  } catch (error) {
-    console.error('Fehler im Dialog-Manager:', error);
-    displayMessage('Oh, da ist ein technischer Fehler aufgetreten. Bitte versuchen Sie es später noch einmal.');
-  } finally {
-    hideLoadingState();
-  }
-});
-
-// =================================================================
-// NEU ENDE: Der "Gesprächs-Manager"
-// =================================================================
+  });
+}
