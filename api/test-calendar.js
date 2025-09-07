@@ -3,7 +3,6 @@ const { google } = require('googleapis');
 
 export default async function handler(req, res) {
     try {
-        // Schritt 1: Authentifizierung (genau wie später in der echten Funktion)
         const auth = new google.auth.GoogleAuth({
             credentials: JSON.parse(process.env.GOOGLE_CREDENTIALS),
             scopes: ['https://www.googleapis.com/auth/calendar.readonly'],
@@ -11,30 +10,41 @@ export default async function handler(req, res) {
 
         const calendar = google.calendar({ version: 'v3', auth });
 
-        // Schritt 2: API-Anfrage -> "Liste mir alle meine Kalender auf"
-        const response = await calendar.calendarList.list();
-        
-        const calendars = response.data.items;
+        // NEUE STRATEGIE: Wir fragen nicht mehr die Liste aller Kalender ab,
+        // sondern versuchen direkt, Termine aus dem primären Kalender zu lesen.
+        console.log("Versuche, Termine vom primären Kalender abzurufen...");
 
-        if (calendars && calendars.length > 0) {
-            // Schritt 3: Erfolgreiche Antwort senden
-            const calendarNames = calendars.map(cal => cal.summary);
-            res.status(200).json({ 
-                success: true, 
-                message: "Verbindung erfolgreich! Gefundene Kalender:",
-                calendars: calendarNames 
+        const response = await calendar.events.list({
+            calendarId: 'primary', // 'primary' ist ein spezielles Kürzel für den Hauptkalender
+            timeMin: (new Date()).toISOString(),
+            maxResults: 5,
+            singleEvents: true,
+            orderBy: 'startTime',
+        });
+
+        const events = response.data.items;
+        if (events && events.length > 0) {
+            const eventSummaries = events.map(event => event.summary);
+            res.status(200).json({
+                success: true,
+                message: "Verbindung und Lesezugriff auf den Hauptkalender erfolgreich!",
+                next_events: eventSummaries
             });
         } else {
-            res.status(404).json({ success: false, message: "Verbindung erfolgreich, aber keine Kalender gefunden." });
+            // Dies ist jetzt der erwartete Erfolg, wenn Sie keine Termine in der Zukunft haben!
+            res.status(200).json({
+                success: true,
+                message: "Verbindung erfolgreich, aber keine bevorstehenden Termine im Hauptkalender gefunden."
+            });
         }
 
     } catch (error) {
-        // Schritt 3 (Alternativ): Fehlermeldung senden
-        console.error("Fehler bei der Verbindung zur Google Calendar API:", error);
-        res.status(500).json({ 
-            success: false, 
-            message: "Verbindung fehlgeschlagen.",
-            error: error.message 
+        console.error("Fehler beim direkten Zugriff auf den primären Kalender:", error);
+        res.status(500).json({
+            success: false,
+            message: "Der direkte Zugriff auf den Kalender ist fehlgeschlagen.",
+            // Wir geben jetzt mehr Details zum Fehler aus
+            error_details: error.response ? error.response.data : error.message
         });
     }
 }
