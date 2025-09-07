@@ -8,7 +8,7 @@ const bookingState = {
 };
 
 // Funktion zum Anzeigen eines bestimmten Schritts und Ausblenden der anderen
-const showStep = (stepId) => {
+export const showStep = (stepId) => {
     document.querySelectorAll('.booking-step').forEach(step => {
         step.classList.remove('active');
     });
