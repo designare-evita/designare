@@ -1,0 +1,57 @@
+<div id="booking-modal" class="modal-overlay">
+    <div class="modal-content">
+        <button id="close-booking-modal" class="close-button">&times;</button>
+        <div id="booking-flow-container">
+
+            <div id="step-day-selection" class="booking-step active">
+                <h2>Wähle einen Tag für dein Gespräch</h2>
+                <p>An welchen Tagen passt es dir am besten?</p>
+                <div class="day-selection-container">
+                    <button class="day-button" data-day="montag">Montag</button>
+                    <button class="day-button" data-day="dienstag">Dienstag</button>
+                    <button class="day-button" data-day="mittwoch">Mittwoch</button>
+                    <button class="day-button" data-day="donnerstag">Donnerstag</button>
+                    <button class="day-button" data-day="freitag">Freitag</button>
+                </div>
+                <div id="day-loader" class="loader" style="display: none;"></div>
+            </div>
+
+            <div id="step-time-selection" class="booking-step">
+                <button class="back-button" data-target="step-day-selection">&larr; Zurück zur Tagauswahl</button>
+                <h2>Verfügbare Termine für <span id="selected-day-display"></span></h2>
+                <p>Am <span id="selected-date-display"></span></p>
+                <div id="slots-container">
+                    </div>
+                <div id="slots-loader" class="loader" style="display: none;"></div>
+                <p id="no-slots-message" style="display: none;">Für diesen Tag sind leider keine Termine mehr verfügbar.</p>
+            </div>
+
+            <div id="step-details" class="booking-step">
+                <button class="back-button" data-target="step-time-selection">&larr; Zurück zur Uhrzeit</button>
+                <h2>Fast geschafft!</h2>
+                <p>Dein Termin: <strong id="selected-slot-display"></strong></p>
+                <form id="booking-form">
+                    <input type="hidden" id="selected-slot-input" name="slot">
+                    <div class="form-group">
+                        <label for="name">Dein Name</label>
+                        <input type="text" id="name" name="name" placeholder="Max Mustermann" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Deine E-Mail</label>
+                        <input type="email" id="email" name="email" placeholder="max.mustermann@mail.com" required>
+                    </div>
+                    <button type="submit" class="button" id="submit-booking-button">Termin buchen</button>
+                    <div id="booking-loader" class="loader" style="display: none;"></div>
+                </form>
+            </div>
+            
+            <div id="step-confirmation" class="booking-step">
+                 <h2>Vielen Dank!</h2>
+                 <p id="confirmation-message">Dein Termin wurde erfolgreich gebucht.</p>
+                 <button class="button" id="close-confirmation-button">Fenster schließen</button>
+            </div>
+
+        </div>
+         <p id="booking-error-message" class="error-message" style="display: none;"></p>
+    </div>
+</div>
