@@ -825,6 +825,74 @@ footer a:hover {
     list-style-type: square;
 }
 
+/* --- Kontaktformular Layout Korrektur --- */
+
+/* Erzwingt die volle Breite für Input-Felder und die Textarea im Kontakt-Modal. */
+#contact-modal #contact-form-inner input[type="text"],
+#contact-modal #contact-form-inner input[type="email"],
+#contact-modal #contact-form-inner textarea {
+    width: 100%;
+    box-sizing: border-box; /* Stellt sicher, dass Padding die Breite nicht beeinflusst */
+}
+
+/* Stellt den korrekten Abstand für alle Elemente im Formular wieder her. */
+#contact-modal #contact-form-inner > * {
+    margin-bottom: 15px; /* Oder der gewünschte Abstand */
+}
+
+/* Entfernt den unteren Abstand vom letzten Element (dem Button). */
+#contact-modal #contact-form-inner > *:last-child {
+    margin-bottom: 0;
+}
+
+/* Stellt sicher, dass das Formular beim Öffnen immer sichtbar ist. */
+#contact-form-inner {
+    display: block;
+}
+
+/* Stellt sicher, dass die Erfolgsmeldung anfangs immer versteckt ist. */
+#contact-success-message {
+    display: none;
+}
+
+/* --- Allgemeine Modal-Styles --- */
+
+.modal-content form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.modal-content input[type="text"],
+.modal-content input[type="email"],
+.modal-content textarea {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+    padding: 12px;
+    border-radius: 5px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: border-color 0.3s ease;
+}
+
+.modal-content input:focus,
+.modal-content textarea:focus {
+    border-color: var(--accent-color);
+    outline: none;
+}
+
+.privacy-checkbox {
+    align-items: center;
+    display: flex;
+    font-size: 0.8rem;
+    gap: 10px;
+}
+
+.privacy-checkbox input {
+    width: auto;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .main-header {
