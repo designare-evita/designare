@@ -1,4 +1,4 @@
-// js/ai-form.js (KORRIGIERTE VERSION - CONVERSATION STATE & BOOKING FLOW)
+// js/ai-form.js (FINALE REPARATUR-VERSION - CONVERSATION STATE & BOOKING FLOW)
 import { showAIResponse, showLoadingState, hideLoadingState } from './modals.js';
 
 // Formular auf der Hauptseite
@@ -21,12 +21,42 @@ function selectSlot(slot) {
   conversationState.data.slot = slot;
   conversationState.step = 'awaiting_name';
   
-  // Zeige die nächste Nachricht
-  showAIResponse(`Super! Ich habe den Termin "${slot}" für Sie vorgemerkt. Wie lautet Ihr vollständiger Name?`, false);
+  // Chat-History updaten
+  addMessageToHistory(`Termin gewählt: ${slot}`, 'user');
+  addMessageToHistory(`Super! Ich habe den Termin "${slot}" für Sie vorgemerkt. Wie lautet Ihr vollständiger Name?`, 'ai');
+  
+  // Fokus auf Input setzen
+  setTimeout(() => {
+    const chatInput = document.getElementById('ai-chat-input');
+    if (chatInput) {
+      chatInput.focus();
+    }
+  }, 100);
 }
 
 // Mache die Funktion global verfügbar
 window.selectSlot = selectSlot;
+
+// ===================================================================
+// NEUE FUNKTION: Fügt Nachrichten zur Chat-History hinzu
+// ===================================================================
+function addMessageToHistory(message, sender) {
+  const chatHistory = document.getElementById('ai-chat-history');
+  if (!chatHistory) return;
+
+  const messageDiv = document.createElement('div');
+  messageDiv.className = `chat-message ${sender}`;
+  if (sender === 'ai' && typeof message === 'string' && message.includes('<')) {
+    messageDiv.innerHTML = message;
+  } else {
+    messageDiv.textContent = message;
+  }
+  
+  chatHistory.appendChild(messageDiv);
+  
+  // Scroll zum Ende
+  chatHistory.scrollTop = chatHistory.scrollHeight;
+}
 
 // ===================================================================
 // NEUE FUNKTION: Prüft ob eine Eingabe im Booking-Kontext steht
@@ -41,11 +71,14 @@ function isInBookingProcess() {
 async function handleBookingInput(userInput) {
   console.log('Handle Booking Input:', conversationState.step, userInput);
   
+  // Füge die User-Nachricht zur History hinzu
+  addMessageToHistory(userInput, 'user');
+  
   switch (conversationState.step) {
     case 'awaiting_name':
       conversationState.data.name = userInput;
       conversationState.step = 'awaiting_email';
-      showAIResponse(`Danke, ${userInput}! Und wie lautet Ihre E-Mail-Adresse für die Terminbestätigung?`, false);
+      addMessageToHistory(`Danke, ${userInput}! Und wie lautet Ihre E-Mail-Adresse für die Terminbestätigung?`, 'ai');
       return true; // Indicates this was handled
 
     case 'awaiting_email':
@@ -54,26 +87,33 @@ async function handleBookingInput(userInput) {
       // Email validation
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(userInput)) {
-        showAIResponse(`Bitte geben Sie eine gültige E-Mail-Adresse ein (z.B. max@example.com):`, false);
+        addMessageToHistory(`Bitte geben Sie eine gültige E-Mail-Adresse ein (z.B. max@example.com):`, 'ai');
         return true;
       }
       
+      // Loading-Nachricht
+      addMessageToHistory('Einen Moment bitte, ich erstelle Ihren Termin...', 'ai');
+      
       try {
+        console.log('Sending booking data:', conversationState.data);
+        
         const bookingResponse = await fetch('/api/create-appointment', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(conversationState.data)
         });
+        
         const bookingData = await bookingResponse.json();
+        console.log('Booking response:', bookingData);
         
         if (bookingData.success) {
-          showAIResponse(`✅ ${bookingData.message}`, false);
+          addMessageToHistory(`✅ ${bookingData.message}`, 'ai');
         } else {
-          showAIResponse(`❌ Es gab ein Problem: ${bookingData.message}`, false);
+          addMessageToHistory(`❌ Es gab ein Problem: ${bookingData.message}`, 'ai');
         }
       } catch (error) {
         console.error('Fehler bei der Terminbuchung:', error);
-        showAIResponse('❌ Es gab einen technischen Fehler bei der Terminbuchung. Bitte versuchen Sie es später erneut.', false);
+        addMessageToHistory('❌ Es gab einen technischen Fehler bei der Terminbuchung. Bitte versuchen Sie es später erneut.', 'ai');
       }
       
       // Gespräch zurücksetzen
@@ -108,6 +148,9 @@ async function handleConversation(userInput) {
     // URSPRÜNGLICHE LOGIK: Nur für neue Gespräche
     // ===================================================================
     if (conversationState.step === 'idle') {
+      // Für neue Gespräche, füge User-Input zur History hinzu
+      addMessageToHistory(userInput, 'user');
+      
       const response = await fetch('/api/ask-gemini', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -117,15 +160,17 @@ async function handleConversation(userInput) {
 
       if (data.action === 'start_booking') {
         conversationState.step = 'awaiting_slot';
-        let html = `<p>${data.message}</p>`;
+        
+        // Erste AI-Antwort
+        addMessageToHistory(data.message, 'ai');
         
         try {
           const availabilityRes = await fetch('/api/get-availability');
           const availabilityData = await availabilityRes.json();
           
           if (availabilityData.slots && availabilityData.slots.length > 0) {
-            html += `<p>Hier sind die nächsten freien Termine. Bitte wählen Sie einen passenden aus:</p>
-                     <div class="booking-options" style="display: flex; flex-direction: column; gap: 10px; margin: 15px 0;">`;
+            let html = `<p>Hier sind die nächsten freien Termine. Bitte wählen Sie einen passenden aus:</p>
+                       <div class="booking-options" style="display: flex; flex-direction: column; gap: 10px; margin: 15px 0;">`;
             
             availabilityData.slots.forEach(slot => {
               html += `<button class="slot-button" 
@@ -135,27 +180,27 @@ async function handleConversation(userInput) {
                         onmouseout="this.style.background='#ffc107'">${slot}</button>`;
             });
             html += `</div>`;
+            
+            addMessageToHistory(html, 'ai');
           } else {
-            html += `<p>Momentan sind leider keine freien Termine verfügbar. Versuchen Sie es bitte später erneut.</p>`;
+            addMessageToHistory(`Momentan sind leider keine freien Termine verfügbar. Versuchen Sie es bitte später erneut.`, 'ai');
           }
         } catch (error) {
           console.error('Fehler beim Laden der Verfügbarkeiten:', error);
-          html += `<p>Es gab ein Problem beim Laden der Termine. Bitte versuchen Sie es später erneut.</p>`;
+          addMessageToHistory(`Es gab ein Problem beim Laden der Termine. Bitte versuchen Sie es später erneut.`, 'ai');
         }
-        
-        showAIResponse(html, true);
       } else {
-        showAIResponse(data.answer, false);
+        addMessageToHistory(data.answer, 'ai');
       }
     } else {
       // Fallback für unerwartete Zustände
-      showAIResponse('Es gab einen unerwarteten Fehler im Gesprächsablauf. Bitte starten Sie erneut.', false);
+      addMessageToHistory('Es gab einen unerwarteten Fehler im Gesprächsablauf. Bitte starten Sie erneut.', 'ai');
       conversationState = { step: 'idle', data: {} };
     }
 
   } catch (error) {
     console.error('Fehler im Dialog-Manager:', error);
-    showAIResponse('Oh, da ist ein technischer Fehler aufgetreten. Bitte versuchen Sie es später noch einmal.', false);
+    addMessageToHistory('Oh, da ist ein technischer Fehler aufgetreten. Bitte versuchen Sie es später noch einmal.', 'ai');
     conversationState = { step: 'idle', data: {} };
   } finally {
     hideLoadingState();
@@ -180,9 +225,17 @@ if (mainAiForm) {
     // Conversation state zurücksetzen für neue Gespräche
     conversationState = { step: 'idle', data: {} };
     
-    // Chat-History leeren
+    // Chat-History leeren und Modal öffnen
     const chatHistory = document.getElementById('ai-chat-history');
     if (chatHistory) chatHistory.innerHTML = ''; 
+    
+    // Modal öffnen
+    const modal = document.getElementById('ai-response-modal');
+    if (modal) {
+      modal.classList.add('visible');
+      document.body.style.overflow = 'hidden';
+      document.body.classList.add('no-scroll');
+    }
     
     handleConversation(userInput);
     mainAiInput.value = '';
