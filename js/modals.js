@@ -1,5 +1,20 @@
 // js/modals.js
 
+export function showLoadingState() {
+  const aiStatus = document.getElementById('ai-status');
+  if (aiStatus) {
+    aiStatus.textContent = 'Evita denkt nach... (und plant schon die Weltherrschaft der KIs)';
+    aiStatus.style.display = 'block';
+  }
+}
+
+export function hideLoadingState() {
+  const aiStatus = document.getElementById('ai-status');
+  if (aiStatus) {
+    aiStatus.textContent = '';
+    aiStatus.style.display = 'none';
+  }
+}
 
 // ===================================================================
 // 1. ALLGEMEINE HELFERFUNKTIONEN (EXPORTIERT)
