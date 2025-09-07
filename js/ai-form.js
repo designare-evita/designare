@@ -57,7 +57,7 @@ function selectSlot(slot) {
   
   // Chat-History updaten
   addMessageToHistory(`Termin gewählt: ${slot}`, 'user');
-  addMessageToHistory(`Super! Ich habe den Termin "${slot}" für Sie vorgemerkt. Wie lautet Ihr vollständiger Name?`, 'ai');
+  addMessageToHistory(`Super! Ich habe den Termin "${slot}" für Sie vorgemerkt. Wie lautet Dein vollständiger Name?`, 'ai');
   
   // Fokus auf Input setzen
   setTimeout(() => {
@@ -91,7 +91,7 @@ async function handleBookingInput(userInput) {
     case 'awaiting_name':
       conversationState.data.name = userInput;
       conversationState.step = 'awaiting_email';
-      addMessageToHistory(`Danke, ${userInput}! Und wie lautet Ihre E-Mail-Adresse für die Terminbestätigung?`, 'ai');
+      addMessageToHistory(`Danke, ${userInput}! Und wie lautet Deine E-Mail-Adresse für die Terminbestätigung?`, 'ai');
       return true; // Indicates this was handled
 
     case 'awaiting_email':
@@ -105,7 +105,7 @@ async function handleBookingInput(userInput) {
       }
       
       // Loading-Nachricht
-      addMessageToHistory('Einen Moment bitte, ich erstelle Ihren Termin...', 'ai');
+      addMessageToHistory('Einen Moment bitte, ich erstelle Deinen Termin...', 'ai');
       
       try {
         console.log('Sending booking data:', conversationState.data);
@@ -126,7 +126,7 @@ async function handleBookingInput(userInput) {
         }
       } catch (error) {
         console.error('Fehler bei der Terminbuchung:', error);
-        addMessageToHistory('❌ Es gab einen technischen Fehler bei der Terminbuchung. Bitte versuchen Sie es später erneut.', 'ai');
+        addMessageToHistory('❌ Es gab einen technischen Fehler bei der Terminbuchung. Bitte versuche es später erneut.', 'ai');
       }
       
       // Gespräch zurücksetzen
@@ -182,7 +182,7 @@ async function handleConversation(userInput) {
           const availabilityData = await availabilityRes.json();
           
           if (availabilityData.slots && availabilityData.slots.length > 0) {
-            let html = `<p>Hier sind die nächsten freien Termine. Bitte wählen Sie einen passenden aus:</p>
+            let html = `<p>Hier sind die nächsten freien Termine. Bitte wähle einen passenden aus:</p>
                        <div class="booking-options" style="display: flex; flex-direction: column; gap: 10px; margin: 15px 0;">`;
             
             availabilityData.slots.forEach(slot => {
@@ -196,24 +196,24 @@ async function handleConversation(userInput) {
             
             addMessageToHistory(html, 'ai');
           } else {
-            addMessageToHistory(`Momentan sind leider keine freien Termine verfügbar. Versuchen Sie es bitte später erneut.`, 'ai');
+            addMessageToHistory(`Momentan sind leider keine freien Termine verfügbar. Versuche es bitte später erneut.`, 'ai');
           }
         } catch (error) {
           console.error('Fehler beim Laden der Verfügbarkeiten:', error);
-          addMessageToHistory(`Es gab ein Problem beim Laden der Termine. Bitte versuchen Sie es später erneut.`, 'ai');
+          addMessageToHistory(`Es gab ein Problem beim Laden der Termine. Bitte versuche es später erneut.`, 'ai');
         }
       } else {
         addMessageToHistory(data.answer, 'ai');
       }
     } else {
       // Fallback für unerwartete Zustände
-      addMessageToHistory('Es gab einen unerwarteten Fehler im Gesprächsablauf. Bitte starten Sie erneut.', 'ai');
+      addMessageToHistory('Es gab einen unerwarteten Fehler im Gesprächsablauf. Bitte starte erneut.', 'ai');
       conversationState = { step: 'idle', data: {} };
     }
 
   } catch (error) {
     console.error('Fehler im Dialog-Manager:', error);
-    addMessageToHistory('Oh, da ist ein technischer Fehler aufgetreten. Bitte versuchen Sie es später noch einmal.', 'ai');
+    addMessageToHistory('Oh, da ist ein technischer Fehler aufgetreten. Bitte versuche es später noch einmal.', 'ai');
     conversationState = { step: 'idle', data: {} };
   } finally {
     hideLoadingState();
