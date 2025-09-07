@@ -1,4 +1,4 @@
-// js/main.js (VERSION MIT ERWEITERTEM LOGGING)
+// js/main.js (FINALE VERSION)
 
 // === 1. IMPORTE ===
 import { initEffects } from './effects.js';
@@ -29,36 +29,14 @@ const trackVisitor = () => {
 
 // === 3. INITIALISIERUNGS-FUNKTIONEN ===
 const initializeDynamicScripts = () => {
-    console.log("Starte Initialisierung der dynamischen Skripte (Menü, Modals)...");
-    try {
-        initModals();
-        console.log("✅ Erfolgreich: initModals()");
-    } catch (error) {
-        console.error("❌ Fehler in initializeDynamicScripts:", error);
-    }
+    initModals();
 };
 
 const initializeStaticScripts = () => {
-    console.log("Starte Initialisierung der statischen Skripte...");
-    try {
-        console.log("➡️ Aufruf: initEffects()");
-        initEffects();
-        console.log("✅ Erfolgreich: initEffects()");
-
-        console.log("➡️ Aufruf: initTypewriters()");
-        initTypewriters();
-        console.log("✅ Erfolgreich: initTypewriters()");
-
-        console.log("➡️ Aufruf: initAiForm()");
-        initAiForm();
-        console.log("✅ Erfolgreich: initAiForm()");
-
-        console.log("➡️ Aufruf: initSilasForm()");
-        initSilasForm();
-        console.log("✅ Erfolgreich: initSilasForm()");
-    } catch (error) {
-        console.error("❌ Kritischer Fehler in initializeStaticScripts:", error);
-    }
+    initEffects();
+    initTypewriters();
+    initAiForm();
+    initSilasForm();
 };
 
 // === 4. HAUPTEINSTIEGSPUNKT ===
