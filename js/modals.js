@@ -1,4 +1,4 @@
-// js/modals.js - KORRIGIERTE VERSION mit einheitlichem Modal-System
+// js/modals.js - VOLLSTÄNDIG KORRIGIERTE VERSION
 
 // ===================================================================
 // EINHEITLICHE MODAL-FUNKTIONEN
@@ -21,12 +21,13 @@ export const closeModal = (modalElement) => {
 };
 
 // ===================================================================
-// AI-SPEZIFISCHE FUNKTIONEN
+// AI-SPEZIFISCHE FUNKTIONEN MIT CHAT-UNTERSTÜTZUNG
 // ===================================================================
 
 export function showAIResponse(content, isHTML = false) {
     const modal = document.getElementById('ai-response-modal');
     const contentArea = document.getElementById('ai-chat-history');
+    
     if (modal && contentArea) {
         if (isHTML) {
             contentArea.innerHTML = content;
@@ -34,6 +35,14 @@ export function showAIResponse(content, isHTML = false) {
             contentArea.textContent = content;
         }
         openModal(modal);
+        
+        // Fokus auf Chat-Input setzen für Weiterführung der Unterhaltung
+        setTimeout(() => {
+            const chatInput = document.getElementById('ai-chat-input');
+            if (chatInput) {
+                chatInput.focus();
+            }
+        }, 100);
     }
 }
 
@@ -51,6 +60,65 @@ export function hideLoadingState() {
         aiStatus.textContent = '';
         aiStatus.style.display = 'none';
     }
+}
+
+// ===================================================================
+// CHAT-FUNKTIONALITÄT FÜR AI-MODAL
+// ===================================================================
+
+function setupAiChatFunctionality() {
+    const aiChatForm = document.getElementById('ai-chat-form');
+    const aiChatInput = document.getElementById('ai-chat-input');
+    const aiChatHistory = document.getElementById('ai-chat-history');
+
+    if (aiChatForm && aiChatInput) {
+        aiChatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const userInput = aiChatInput.value.trim();
+            if (!userInput) return;
+
+            // User-Nachricht zur History hinzufügen
+            addMessageToHistory(userInput, 'user');
+            aiChatInput.value = '';
+
+            try {
+                // API-Anfrage an Evita
+                const response = await fetch('/api/ask-gemini', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: userInput, source: 'evita' })
+                });
+
+                const data = await response.json();
+                
+                // AI-Antwort zur History hinzufügen
+                if (data.answer) {
+                    addMessageToHistory(data.answer, 'ai');
+                } else if (data.message) {
+                    addMessageToHistory(data.message, 'ai');
+                }
+
+            } catch (error) {
+                console.error('Fehler bei AI-Chat:', error);
+                addMessageToHistory('Entschuldigung, da ist ein technischer Fehler aufgetreten.', 'ai');
+            }
+        });
+    }
+}
+
+function addMessageToHistory(message, sender) {
+    const chatHistory = document.getElementById('ai-chat-history');
+    if (!chatHistory) return;
+
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `chat-message ${sender}`;
+    messageDiv.textContent = message;
+    
+    chatHistory.appendChild(messageDiv);
+    
+    // Scroll zum Ende
+    chatHistory.scrollTop = chatHistory.scrollHeight;
 }
 
 // ===================================================================
@@ -81,7 +149,6 @@ function setupCookieModal() {
         privacyPolicyLinkButton.addEventListener('click', (e) => {
             e.preventDefault();
             if (cookieInfoLightbox) closeModal(cookieInfoLightbox);
-            // Lade Datenschutz-Inhalt und öffne Legal-Modal
             loadLegalContent('datenschutz.html');
         });
     }
@@ -107,9 +174,7 @@ function setupContactModal() {
     if (contactButton) {
         contactButton.addEventListener('click', (e) => {
             e.preventDefault();
-            // Formular anzeigen, Erfolgsmeldung verstecken
-            if (contactForm) contactForm.style.display = 'block';
-            if (successMessage) successMessage.style.display = 'none';
+            resetContactModal();
             openModal(contactModal);
         });
     }
@@ -127,41 +192,60 @@ function setupContactModal() {
         });
     }
 
-    // Formular-Submit (vereinfacht - hier würdest du deine Formlogik einfügen)
+    // Formular-Submit
     if (contactForm) {
-        contactForm.addEventListener('submit', (e) => {
+        contactForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            // Hier würde normalerweise das Formular verarbeitet
-            // Für Demo zeigen wir einfach die Erfolgsmeldung
-            contactForm.style.display = 'none';
-            successMessage.style.display = 'block';
+            
+            // Hier könntest du echte Formular-Verarbeitung einfügen
+            // Für jetzt zeigen wir die Erfolgsmeldung
+            showContactSuccess();
         });
     }
 }
 
+function resetContactModal() {
+    const contactForm = document.getElementById('contact-form-inner');
+    const successMessage = document.getElementById('contact-success-message');
+    
+    if (contactForm) contactForm.style.display = 'block';
+    if (successMessage) successMessage.style.display = 'none';
+}
+
+function showContactSuccess() {
+    const contactForm = document.getElementById('contact-form-inner');
+    const successMessage = document.getElementById('contact-success-message');
+    
+    if (contactForm) contactForm.style.display = 'none';
+    if (successMessage) successMessage.style.display = 'block';
+}
+
 function setupAboutModal() {
     const aboutButton = document.getElementById('about-me-button');
-    const legalModal = document.getElementById('legal-modal');
-    const aboutContent = document.getElementById('about-me-content');
-    const legalContentArea = document.getElementById('legal-modal-content-area');
 
     if (aboutButton) {
         aboutButton.addEventListener('click', (e) => {
             e.preventDefault();
-            
-            // About-Me Inhalt in das Legal-Modal laden
-            if (aboutContent && legalContentArea) {
-                legalContentArea.innerHTML = aboutContent.innerHTML;
-                openModal(legalModal);
-            }
+            loadAboutContent();
         });
+    }
+}
+
+function loadAboutContent() {
+    const legalModal = document.getElementById('legal-modal');
+    const legalContentArea = document.getElementById('legal-modal-content-area');
+    const aboutContent = document.getElementById('about-me-content');
+    
+    if (aboutContent && legalContentArea) {
+        // About-Content direkt kopieren (es ist bereits im DOM verfügbar)
+        legalContentArea.innerHTML = aboutContent.innerHTML;
+        openModal(legalModal);
     }
 }
 
 function setupLegalModals() {
     const impressumLink = document.getElementById('impressum-link');
     const datenschutzLink = document.getElementById('datenschutz-link');
-    const legalModal = document.getElementById('legal-modal');
     const closeLegalModalBtn = document.getElementById('close-legal-modal');
 
     // Impressum Link
@@ -182,7 +266,10 @@ function setupLegalModals() {
 
     // Legal Modal schließen
     if (closeLegalModalBtn) {
-        closeLegalModalBtn.addEventListener('click', () => closeModal(legalModal));
+        closeLegalModalBtn.addEventListener('click', () => {
+            const legalModal = document.getElementById('legal-modal');
+            closeModal(legalModal);
+        });
     }
 }
 
@@ -192,27 +279,45 @@ function loadLegalContent(page) {
     
     if (!legalContentArea) return;
 
+    // Loading-Anzeige
+    legalContentArea.innerHTML = '<div style="text-align: center; padding: 2rem;"><i class="fas fa-spinner fa-spin"></i> Lade Inhalt...</div>';
+    openModal(legalModal);
+
     // Lade den Inhalt der entsprechenden Seite
     fetch(page)
-        .then(response => response.text())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            return response.text();
+        })
         .then(html => {
-            // Extrahiere nur den Inhalt zwischen den main-Tags oder den body-Inhalt
+            // Extrahiere den Inhalt
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
-            const legalContainer = doc.querySelector('.legal-container');
+            
+            // Suche nach dem legal-container
+            let legalContainer = doc.querySelector('.legal-container');
+            
+            // Fallback: Suche nach main-content
+            if (!legalContainer) {
+                legalContainer = doc.querySelector('main');
+            }
+            
+            // Fallback: Nimm den body-Inhalt
+            if (!legalContainer) {
+                legalContainer = doc.querySelector('body');
+            }
             
             if (legalContainer) {
                 legalContentArea.innerHTML = legalContainer.innerHTML;
             } else {
-                legalContentArea.innerHTML = '<p>Inhalt konnte nicht geladen werden.</p>';
+                legalContentArea.innerHTML = '<div class="legal-container"><h1>Fehler</h1><p>Der Inhalt konnte nicht geladen werden.</p></div>';
             }
-            
-            openModal(legalModal);
         })
         .catch(error => {
             console.error('Fehler beim Laden des Inhalts:', error);
-            legalContentArea.innerHTML = '<p>Fehler beim Laden des Inhalts.</p>';
-            openModal(legalModal);
+            legalContentArea.innerHTML = `<div class="legal-container"><h1>Fehler</h1><p>Inhalt konnte nicht geladen werden: ${error.message}</p></div>`;
         });
 }
 
@@ -229,14 +334,8 @@ function setupAiModal() {
         }
     });
 
-    // Chat-Form Submit
-    const aiChatForm = document.getElementById('ai-chat-form');
-    if (aiChatForm) {
-        aiChatForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            // Hier würde die Chat-Logik stehen
-        });
-    }
+    // Setup Chat-Funktionalität
+    setupAiChatFunctionality();
 }
 
 function setupModalBackgroundClose() {
