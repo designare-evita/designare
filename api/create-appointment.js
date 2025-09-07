@@ -1,4 +1,4 @@
-// api/create-appointment.js (KORRIGIERTE VERSION mit deutschem Datum-Parsing)
+// api/create-appointment.js (KORRIGIERTE VERSION ohne attendees)
 import { google } from 'googleapis';
 
 export default async function handler(req, res) {
@@ -31,7 +31,7 @@ export default async function handler(req, res) {
     const calendar = google.calendar({ version: 'v3', auth });
 
     // ===================================================================
-    // NEUE FUNKTION: Parst deutsche Datum-Strings
+    // DEUTSCHE DATUM-PARSING FUNKTION
     // ===================================================================
     function parseGermanDate(slotString) {
       console.log('Parsing German date:', slotString);
@@ -166,9 +166,10 @@ export default async function handler(req, res) {
     });
 
     // Das ist das Termin-Objekt, das an Google gesendet wird
+    // WICHTIG: Keine attendees mehr, da das Domain-Wide Delegation erfordern würde
     const event = {
       summary: `Beratungsgespräch: ${name}`,
-      description: `Termin gebucht über Evita auf designare.at.\nKontakt: ${email}\nUrsprünglicher Slot: ${slot}`,
+      description: `Termin gebucht über Evita auf designare.at.\n\nKontaktdaten:\nName: ${name}\nE-Mail: ${email}\n\nUrsprünglicher Slot: ${slot}\n\nHinweis: Bitte kontaktiere den Kunden per E-Mail für weitere Details.`,
       start: {
         dateTime: startTime.toISOString(),
         timeZone: 'Europe/Vienna',
@@ -177,9 +178,8 @@ export default async function handler(req, res) {
         dateTime: endTime.toISOString(),
         timeZone: 'Europe/Vienna',
       },
-      // Fügt den Kunden als Gast zum Termin hinzu (er bekommt eine Einladung)
-      attendees: [{ email: email }],
-      // Nutzt die Standard-Benachrichtigungen des Kalenders (z.B. 10 Min vorher)
+      // ENTFERNT: attendees - verursachte den "Domain-Wide Delegation" Fehler
+      // Nutzt die Standard-Benachrichtigungen des Kalenders
       reminders: { 'useDefault': true },
     };
 
@@ -189,22 +189,33 @@ export default async function handler(req, res) {
     const result = await calendar.events.insert({
       calendarId: 'primary',
       resource: event,
-      sendNotifications: true, // Wichtig, damit der Gast eine E-Mail bekommt
+      sendNotifications: false, // Auf false gesetzt, da keine attendees
     });
 
     console.log('Calendar event created successfully:', result.data.id);
 
     res.status(200).json({ 
       success: true, 
-      message: 'Ihr Termin wurde erfolgreich gebucht! Sie erhalten in Kürze eine Bestätigung per E-Mail.',
-      eventId: result.data.id
+      message: `Dein Termin wurde erfolgreich gebucht! Der Termin für ${name} (${email}) am ${slot} wurde in den Kalender eingetragen. Michael wird sich in Kürze per E-Mail bei Dir melden.`,
+      eventId: result.data.id,
+      customerInfo: { name, email, slot }
     });
 
   } catch (error) {
     console.error("Fehler in create-appointment:", error);
+    
+    // Spezifische Fehlerbehandlung für bekannte Google API Fehler
+    let errorMessage = 'Ups, da ist etwas schiefgelaufen. Die Terminbuchung konnte nicht abgeschlossen werden.';
+    
+    if (error.message && error.message.includes('Domain-Wide Delegation')) {
+      errorMessage = 'Kalender-Konfigurationsproblem. Bitte kontaktieren Sie Michael direkt.';
+    } else if (error.message && error.message.includes('parse')) {
+      errorMessage = 'Das Datumsformat konnte nicht verarbeitet werden. Bitte versuchen Sie es erneut.';
+    }
+    
     res.status(500).json({ 
       success: false, 
-      message: 'Ups, da ist etwas schiefgelaufen. Die Terminbuchung konnte nicht abgeschlossen werden.',
+      message: errorMessage,
       error: error.message
     });
   }
