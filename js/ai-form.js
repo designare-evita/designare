@@ -4,7 +4,10 @@ import { initBookingModal, showStep } from './booking.js';
 
 export const initAiForm = () => {
     const aiForm = document.getElementById('ai-form');
-    if (!aiForm) return; // Bricht ab, wenn das Formular nicht existiert
+    if (!aiForm) {
+    console.warn("⚠️ Kein ai-form im DOM gefunden, initAiForm abgebrochen.");
+    return;
+}
 
     const aiQuestion = document.getElementById('ai-question');
     const aiStatus = document.getElementById('ai-status');
