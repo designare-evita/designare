@@ -1,22 +1,5 @@
 // js/modals.js
 
-export function showAIResponse(content, isHTML = false) {
-  const modal = document.getElementById('ai-response-modal');
-  const contentArea = document.getElementById('ai-response-content-area');
-  
-  if (modal && contentArea) {
-    if (isHTML) {
-      // Setzt HTML-Inhalt direkt (für die Termin-Buttons)
-      contentArea.innerHTML = content;
-    } else {
-      // Setzt normalen Text und verhindert, dass HTML-Tags ausgeführt werden
-      contentArea.textContent = content;
-    }
-    
-    modal.classList.add('active'); // Öffnet das Modal
-    document.body.classList.add('no-scroll'); // Verhindert das Scrollen der Seite
-  }
-}
 
 // ===================================================================
 // 1. ALLGEMEINE HELFERFUNKTIONEN (EXPORTIERT)
