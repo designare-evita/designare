@@ -20,6 +20,44 @@ module.exports = async function handler(req, res) {
     }
 
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
+
+    // =================================================================
+    // NEUER TEIL START: INTENT-ERKENNUNG (Der "Verteiler")
+    // =================================================================
+
+    const intentDetectionPrompt = `
+      Analysiere die folgende Nutzereingabe. Deine einzige Aufgabe ist es, die Absicht (intent) zu klassifizieren.
+      Antworte NUR mit einem einzigen Wort: "booking" oder "question".
+      
+      "booking" ist für alles, was mit Terminen, Kalendern, Verfügbarkeit oder Buchungen zu tun hat.
+      "question" ist für alle anderen allgemeinen Fragen.
+
+      Beispiele:
+      - Nutzer fragt: "Hast du nächste Woche Zeit?" -> Deine Antwort: booking
+      - Nutzer fragt: "Ich brauche einen Termin." -> Deine Antwort: booking
+      - Nutzer fragt: "Was ist JavaScript?" -> Deine Antwort: question
+      - Nutzer fragt: "Wer bist du?" -> Deine Antwort: question
+
+      Hier ist die Nutzereingabe: "${prompt}"
+    `;
+
+    const intentResult = await model.generateContent(intentDetectionPrompt);
+    const intentResponse = await intentResult.response;
+    const intent = intentResponse.text().trim();
+
+    // =================================================================
+    // NEUER TEIL ENDE: INTENT-ERKENNUNG
+    // =================================================================
+
+    // Wenn die Absicht "booking" ist, starten wir den Buchungsprozess im Frontend
+    if (intent === 'booking') {
+      res.status(200).json({
+        action: 'start_booking',
+        message: 'Gerne, ich prüfe kurz meine Verfügbarkeiten für Sie. Einen Moment bitte...'
+      });
+      return; // Wichtig: Die Funktion hier beenden
+    }
+    
     let finalPrompt = '';
 
     // --- ANFRAGE-VERTEILER ---
