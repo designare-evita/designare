@@ -2,7 +2,7 @@
 
 // ===================================================================
 // 1. IHR ORIGINALCODE: HELFERFUNKTIONEN
-// DIESER TEIL WIRD 1:1 AUS IHRER FUNKTIONIERENDEN DATEI ÜBERNOMMEN
+// DIESER TEIL IST 1:1 AUS IHRER FUNKTIONIERENDEN DATEI ÜBERNOMMEN
 // ===================================================================
 export const openLightbox = (lightboxElement) => {
     if (lightboxElement) {
@@ -20,7 +20,7 @@ export const closeLightbox = (lightboxElement) => {
 
 // ===================================================================
 // 2. MINIMALE ERWEITERUNG FÜR EVITA
-// Diese 3 Funktionen werden sauber hinzugefügt, ohne etwas zu verändern.
+// Diese 3 Funktionen werden sauber hinzugefügt und nutzen Ihre originalen Helfer.
 // ===================================================================
 
 export function showAIResponse(content, isHTML = false) {
@@ -32,6 +32,7 @@ export function showAIResponse(content, isHTML = false) {
     } else {
       contentArea.textContent = content;
     }
+    // WICHTIG: Nutzt jetzt wieder IHRE funktionierende 'openLightbox' Funktion!
     openLightbox(modal);
   }
 }
@@ -55,7 +56,7 @@ export function hideLoadingState() {
 
 // ===================================================================
 // 3. IHR ORIGINALCODE: SETUP-FUNKTIONEN
-// DIESER TEIL WIRD 1:1 AUS IHRER FUNKTIONIERENDEN DATEI ÜBERNOMMEN
+// DIESER TEIL IST 1:1 AUS IHRER FUNKTIONIERENDEN DATEI ÜBERNOMMEN
 // ===================================================================
 
 function setupCookieModal() {
