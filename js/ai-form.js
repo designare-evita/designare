@@ -1,18 +1,18 @@
-// js/ai-form.js (FINALE FUNKTIONIERENDE VERSION)
+// js/ai-form.js (ENCODING-SICHERE VERSION)
 import { showLoadingState, hideLoadingState } from './modals.js';
 
 // Formular auf der Hauptseite
 const mainAiForm = document.getElementById('ai-form');
 const mainAiInput = document.getElementById('ai-question');
 
-// Der Gesprächs-Manager, der sich den Fortschritt merkt
+// Der Gespraechs-Manager, der sich den Fortschritt merkt
 let conversationState = {
   step: 'idle', // idle | awaiting_slot | awaiting_name | awaiting_email
   data: {}      // Hier sammeln wir die Infos (slot, name, email)
 };
 
 // ===================================================================
-// NEUE FUNKTION: Öffnet das AI-Modal und zeigt Inhalt an
+// NEUE FUNKTION: Oeffnet das AI-Modal und zeigt Inhalt an
 // ===================================================================
 function openAIModal() {
   const modal = document.getElementById('ai-response-modal');
@@ -24,7 +24,7 @@ function openAIModal() {
 }
 
 // ===================================================================
-// NEUE FUNKTION: Fügt Nachrichten zur Chat-History hinzu
+// NEUE FUNKTION: Fuegt Nachrichten zur Chat-History hinzu
 // ===================================================================
 function addMessageToHistory(message, sender) {
   const chatHistory = document.getElementById('ai-chat-history');
@@ -46,7 +46,7 @@ function addMessageToHistory(message, sender) {
 }
 
 // ===================================================================
-// KORRIGIERTE FUNKTION: Diese wird global verfügbar gemacht
+// KORRIGIERTE FUNKTION: Diese wird global verfuegbar gemacht
 // ===================================================================
 function selectSlot(slot) {
   console.log('selectSlot aufgerufen mit:', slot);
@@ -55,9 +55,11 @@ function selectSlot(slot) {
   conversationState.data.slot = slot;
   conversationState.step = 'awaiting_name';
   
+  console.log('conversationState nach selectSlot:', conversationState);
+  
   // Chat-History updaten
-  addMessageToHistory(`Termin gewählt: ${slot}`, 'user');
-  addMessageToHistory(`Super! Ich habe den Termin "${slot}" für Dich vorgemerkt. Wie lautet Dein vollständiger Name?`, 'ai');
+  addMessageToHistory(`Termin gewaehlt: ${slot}`, 'user');
+  addMessageToHistory(`Super! Ich habe den Termin "${slot}" fuer Dich vorgemerkt. Wie lautet Dein vollstaendiger Name?`, 'ai');
   
   // Fokus auf Input setzen
   setTimeout(() => {
@@ -68,14 +70,16 @@ function selectSlot(slot) {
   }, 100);
 }
 
-// Mache die Funktion global verfügbar
+// Mache die Funktion global verfuegbar
 window.selectSlot = selectSlot;
 
 // ===================================================================
-// NEUE FUNKTION: Prüft ob eine Eingabe im Booking-Kontext steht
+// NEUE FUNKTION: Prueft ob eine Eingabe im Booking-Kontext steht
 // ===================================================================
 function isInBookingProcess() {
-  return conversationState.step !== 'idle';
+  const result = conversationState.step !== 'idle';
+  console.log('isInBookingProcess:', result, 'current step:', conversationState.step);
+  return result;
 }
 
 // ===================================================================
@@ -84,14 +88,15 @@ function isInBookingProcess() {
 async function handleBookingInput(userInput) {
   console.log('Handle Booking Input:', conversationState.step, userInput);
   
-  // Füge die User-Nachricht zur History hinzu
+  // Fuege die User-Nachricht zur History hinzu
   addMessageToHistory(userInput, 'user');
   
   switch (conversationState.step) {
     case 'awaiting_name':
       conversationState.data.name = userInput;
       conversationState.step = 'awaiting_email';
-      addMessageToHistory(`Danke, ${userInput}! Und wie lautet Deine E-Mail-Adresse für die Terminbestätigung?`, 'ai');
+      console.log('Name gespeichert, wechsle zu awaiting_email:', conversationState);
+      addMessageToHistory(`Danke, ${userInput}! Und wie lautet Deine E-Mail-Adresse fuer die Terminbestaetigung?`, 'ai');
       return true; // Indicates this was handled
 
     case 'awaiting_email':
@@ -100,7 +105,7 @@ async function handleBookingInput(userInput) {
       // Email validation
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(userInput)) {
-        addMessageToHistory(`Bitte gebe eine gültige E-Mail-Adresse ein (z.B. max@example.com):`, 'ai');
+        addMessageToHistory(`Bitte gebe eine gueltige E-Mail-Adresse ein (z.B. max@example.com):`, 'ai');
         return true;
       }
       
@@ -126,14 +131,15 @@ async function handleBookingInput(userInput) {
         }
       } catch (error) {
         console.error('Fehler bei der Terminbuchung:', error);
-        addMessageToHistory('❌ Es gab einen technischen Fehler bei der Terminbuchung. Bitte versuche es später erneut.', 'ai');
+        addMessageToHistory('❌ Es gab einen technischen Fehler bei der Terminbuchung. Bitte versuche es spaeter erneut.', 'ai');
       }
       
-      // Gespräch zurücksetzen
+      // Gespraech zuruecksetzen
       conversationState = { step: 'idle', data: {} };
       return true; // Indicates this was handled
 
     default:
+      console.log('Unbekannter booking step:', conversationState.step);
       return false; // Not handled
   }
 }
@@ -142,26 +148,31 @@ async function handleBookingInput(userInput) {
 async function handleConversation(userInput) {
   showLoadingState();
   
-  // Disable input während der Verarbeitung
+  // Disable input waehrend der Verarbeitung
   const currentChatInput = document.getElementById('ai-chat-input');
   if (currentChatInput) currentChatInput.disabled = true;
 
   try {
+    console.log('handleConversation called with:', userInput, 'current state:', conversationState);
+    
     // ===================================================================
-    // NEUE PRIORITÄT: Prüfe zuerst, ob wir im Booking-Prozess sind
+    // NEUE PRIORITAET: Pruefe zuerst, ob wir im Booking-Prozess sind
     // ===================================================================
     if (isInBookingProcess()) {
+      console.log('Im Booking-Prozess, rufe handleBookingInput auf');
       const wasHandled = await handleBookingInput(userInput);
       if (wasHandled) {
-        return; // Exit früh, da Booking-Input verarbeitet wurde
+        console.log('Booking input wurde verarbeitet');
+        return; // Exit frueh, da Booking-Input verarbeitet wurde
       }
     }
 
     // ===================================================================
-    // URSPRÜNGLICHE LOGIK: Nur für neue Gespräche
+    // URSPRUENGLICHE LOGIK: Nur fuer neue Gespraeche
     // ===================================================================
     if (conversationState.step === 'idle') {
-      // Für neue Gespräche, füge User-Input zur History hinzu
+      console.log('Im idle state, normale Gemini-Anfrage');
+      // Fuer neue Gespraeche, fuege User-Input zur History hinzu
       addMessageToHistory(userInput, 'user');
       
       const response = await fetch('/api/ask-gemini', {
@@ -173,6 +184,7 @@ async function handleConversation(userInput) {
 
       if (data.action === 'start_booking') {
         conversationState.step = 'awaiting_slot';
+        console.log('Booking gestartet, state:', conversationState);
         
         // Erste AI-Antwort
         addMessageToHistory(data.message, 'ai');
@@ -182,7 +194,7 @@ async function handleConversation(userInput) {
           const availabilityData = await availabilityRes.json();
           
           if (availabilityData.slots && availabilityData.slots.length > 0) {
-            let html = `<p>Hier sind die nächsten freien Termine. Bitte wähle einen passenden aus:</p>
+            let html = `<p>Hier sind die naechsten freien Termine. Bitte waehle einen passenden aus:</p>
                        <div class="booking-options" style="display: flex; flex-direction: column; gap: 10px; margin: 15px 0;">`;
             
             availabilityData.slots.forEach(slot => {
@@ -196,24 +208,25 @@ async function handleConversation(userInput) {
             
             addMessageToHistory(html, 'ai');
           } else {
-            addMessageToHistory(`Momentan sind leider keine freien Termine verfügbar. Versuche es bitte später erneut.`, 'ai');
+            addMessageToHistory(`Momentan sind leider keine freien Termine verfuegbar. Versuche es bitte spaeter erneut.`, 'ai');
           }
         } catch (error) {
-          console.error('Fehler beim Laden der Verfügbarkeiten:', error);
-          addMessageToHistory(`Es gab ein Problem beim Laden der Termine. Bitte versuche es später erneut.`, 'ai');
+          console.error('Fehler beim Laden der Verfuegbarkeiten:', error);
+          addMessageToHistory(`Es gab ein Problem beim Laden der Termine. Bitte versuche es spaeter erneut.`, 'ai');
         }
       } else {
         addMessageToHistory(data.answer, 'ai');
       }
     } else {
-      // Fallback für unerwartete Zustände
-      addMessageToHistory('Es gab einen unerwarteten Fehler im Gesprächsablauf. Bitte starte erneut.', 'ai');
+      // Fallback fuer unerwartete Zustaende
+      console.log('Unerwarteter Zustand:', conversationState.step);
+      addMessageToHistory('Es gab einen unerwarteten Fehler im Gespraechsablauf. Bitte starte erneut.', 'ai');
       conversationState = { step: 'idle', data: {} };
     }
 
   } catch (error) {
     console.error('Fehler im Dialog-Manager:', error);
-    addMessageToHistory('Oh, da ist ein technischer Fehler aufgetreten. Bitte versuche es später noch einmal.', 'ai');
+    addMessageToHistory('Oh, da ist ein technischer Fehler aufgetreten. Bitte versuche es spaeter noch einmal.', 'ai');
     conversationState = { step: 'idle', data: {} };
   } finally {
     hideLoadingState();
@@ -228,21 +241,21 @@ async function handleConversation(userInput) {
 // EVENT LISTENER SETUP
 // ===================================================================
 
-// 1. Für das Formular auf der Startseite
+// 1. Fuer das Formular auf der Startseite
 if (mainAiForm) {
   mainAiForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const userInput = mainAiInput.value.trim();
     if (!userInput) return;
     
-    // Conversation state zurücksetzen für neue Gespräche
+    // Conversation state zuruecksetzen fuer neue Gespraeche
     conversationState = { step: 'idle', data: {} };
     
-    // Chat-History leeren und Modal öffnen
+    // Chat-History leeren und Modal oeffnen
     const chatHistory = document.getElementById('ai-chat-history');
     if (chatHistory) chatHistory.innerHTML = ''; 
     
-    // Modal öffnen
+    // Modal oeffnen
     openAIModal();
     
     handleConversation(userInput);
@@ -250,7 +263,7 @@ if (mainAiForm) {
   });
 }
 
-// 2. Event Delegation für das Chat-Modal (da es dynamisch geladen wird)
+// 2. Event Delegation fuer das Chat-Modal (da es dynamisch geladen wird)
 document.addEventListener('submit', (e) => {
   if (e.target && e.target.id === 'ai-chat-form') {
     e.preventDefault();
@@ -265,9 +278,9 @@ document.addEventListener('submit', (e) => {
   }
 });
 
-// 3. Modal schließen Buttons
+// 3. Modal schliessen Buttons
 document.addEventListener('click', (e) => {
-  // Schließen Buttons
+  // Schliessen Buttons
   if (e.target && (e.target.id === 'close-ai-response-modal-top' || e.target.id === 'close-ai-response-modal-bottom')) {
     const modal = document.getElementById('ai-response-modal');
     if (modal) {
@@ -277,13 +290,13 @@ document.addEventListener('click', (e) => {
     }
   }
   
-  // Debug-Info für Termin-Buttons
+  // Debug-Info fuer Termin-Buttons
   if (e.target && e.target.classList.contains('slot-button')) {
     console.log('Slot-Button geklickt:', e.target);
   }
 });
 
-// 4. Modal schließen bei Hintergrund-Klick
+// 4. Modal schliessen bei Hintergrund-Klick
 document.addEventListener('click', (e) => {
   if (e.target && e.target.id === 'ai-response-modal') {
     const modal = document.getElementById('ai-response-modal');
@@ -295,4 +308,4 @@ document.addEventListener('click', (e) => {
   }
 });
 
-console.log('AI-Form Modul geladen. selectSlot-Funktion verfügbar:', typeof window.selectSlot);
+console.log('AI-Form Modul geladen. selectSlot-Funktion verfuegbar:', typeof window.selectSlot);
