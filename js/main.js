@@ -40,11 +40,9 @@ const trackVisitor = () => {
 const initializeDynamicScripts = () => {
     console.log("Starte Initialisierung der dynamischen Skripte (Menü, Modals)...");
     
-    // Menü-Logik & Aktiven Menüpunkt setzen
-    // ... (dein bestehender Code hier) ...
 
-    // Modal-Logik initialisieren
     initModals();
+initBookingModal();
     
 };
 
