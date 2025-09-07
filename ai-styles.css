@@ -1,14 +1,11 @@
 /* ==============
-   AI-STYLES.CSS - KOMPLETT NEU UND KORRIGIERT
+   AI-STYLES.CSS - FINALE VERSION
    Für Evita KI (Hauptseite) und Silas KI (CSV-Creator)
    ============== */
 
 /* ======================================== */
 /* EVITA KI - HAUPTSEITEN-FORMULAR         */
 /* ======================================== */
-
-/* Das Haupt-AI-Formular auf der Startseite verwendet die Stile aus style.css */
-/* Hier nur spezielle Ergänzungen falls nötig */
 
 #ai-question::placeholder {
     color: var(--text-color);
@@ -37,7 +34,6 @@
 /* MODAL GRUNDLAGEN - EVITA CHAT           */
 /* ======================================== */
 
-/* GRUND-MODAL OVERLAY */
 .modal-overlay {
     position: fixed !important;
     top: 0 !important;
@@ -47,7 +43,7 @@
     z-index: 9999 !important;
     background-color: rgba(10, 10, 10, 0.9) !important;
     
-    display: none !important; /* Standardmäßig versteckt */
+    display: none !important;
     align-items: center !important;
     justify-content: center !important;
     
@@ -57,7 +53,6 @@
     transition: opacity 0.3s ease, visibility 0.3s ease !important;
 }
 
-/* MODAL SICHTBAR MACHEN */
 .modal-overlay.visible {
     display: flex !important;
     opacity: 1 !important;
@@ -65,7 +60,6 @@
     pointer-events: auto !important;
 }
 
-/* ALTERNATIVE: Direkte Display-Steuerung */
 .modal-overlay[style*="display: flex"] {
     display: flex !important;
     opacity: 1 !important;
@@ -73,26 +67,8 @@
     pointer-events: auto !important;
 }
 
-/* FALLBACK: Falls .visible nicht funktioniert */
-.modal-overlay.show,
-.modal-overlay.open {
-    display: flex !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
-}
-
-/* DEBUG: Zum Testen sichtbar machen */
-.modal-overlay[data-debug="true"] {
-    display: flex !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
-    background-color: rgba(255, 0, 0, 0.3) !important; /* Rote Farbe zum Debuggen */
-}
-
 /* ======================================== */
-/* AI-RESPONSE-MODAL SPEZIFISCH            */
+/* AI-RESPONSE-MODAL                       */
 /* ======================================== */
 
 #ai-response-modal .modal-content {
@@ -112,12 +88,11 @@
     overflow: hidden !important;
 }
 
-.modal-overlay.visible #ai-response-modal .modal-content,
-.modal-overlay[style*="display: flex"] #ai-response-modal .modal-content {
+.modal-overlay.visible .modal-content,
+.modal-overlay[style*="display: flex"] .modal-content {
     transform: scale(1) !important;
 }
 
-/* CLOSE BUTTON */
 .close-button {
     position: absolute !important;
     top: 15px !important;
@@ -142,21 +117,19 @@
 }
 
 /* ======================================== */
-/* AI-CHAT-HISTORY - CHAT-VERLAUF          */
+/* AI-CHAT-HISTORY                         */
 /* ======================================== */
 
 #ai-chat-history {
     flex: 1 !important;
     overflow-y: auto !important;
-    padding: 60px 20px 20px 20px !important; /* Top-Padding für Close-Button */
+    padding: 60px 20px 20px 20px !important;
     background-color: rgba(0, 0, 0, 0.1) !important;
     border-radius: 8px !important;
     margin-bottom: 15px !important;
     min-height: 200px !important;
-    max-height: 400px !important;
 }
 
-/* CHAT-NACHRICHTEN */
 .chat-message {
     padding: 12px 16px !important;
     border-radius: 12px !important;
@@ -193,7 +166,7 @@
 }
 
 /* ======================================== */
-/* AI-CHAT-FORM - MODAL FORMULAR           */
+/* AI-CHAT-FORM                            */
 /* ======================================== */
 
 #ai-chat-form {
@@ -205,7 +178,7 @@
     flex-direction: row !important;
     align-items: stretch !important;
     overflow: hidden !important;
-    margin-bottom: 15px !important;
+    margin: 0 20px 15px 20px !important;
 }
 
 #ai-chat-form:focus-within {
@@ -226,15 +199,9 @@
 #ai-chat-form input[type="text"]::placeholder {
     color: var(--text-color, #e0e0e0) !important;
     opacity: 0.5 !important;
-    transition: opacity 0.6s ease-in-out !important;
 }
 
-#ai-chat-form input[type="text"].placeholder-fade::placeholder {
-    opacity: 0 !important;
-}
-
-#ai-chat-form button,
-#ai-response-modal #ai-chat-form button {
+#ai-chat-form button {
     background: var(--accent-color, #ffc107) !important;
     color: #1a1a1a !important;
     border: none !important;
@@ -244,14 +211,10 @@
     justify-content: center !important;
     cursor: pointer !important;
     transition: background-color 0.3s ease !important;
-    margin: 0 !important;
-    line-height: 1 !important;
-    box-sizing: border-box !important;
     flex: 0 0 auto !important;
 }
 
-#ai-chat-form button:hover,
-#ai-response-modal #ai-chat-form button:hover {
+#ai-chat-form button:hover {
     background: #d39a00 !important;
 }
 
@@ -293,8 +256,8 @@
 .ai-container {
     width: 100%;
     margin: 0 auto;
-    position: relative; /* Notwendig, damit z-index funktioniert */
-    z-index: 10;      /* Ein hoher Wert stellt sicher, dass es über anderen Elementen liegt */
+    position: relative;
+    z-index: 10;
 }
 
 .ai-container h3 {
@@ -387,7 +350,7 @@
 }
 
 /* ======================================== */
-/* SILAS SELECT-BOX (TEXT-INTENT)          */
+/* SILAS SELECT-BOX                        */
 /* ======================================== */
 
 .ai-container .input-group {
@@ -732,7 +695,6 @@
     margin-right: 10px;
 }
 
-/* Status-Text */
 #silas-status {
     text-align: center;
     width: 100%;
@@ -771,6 +733,10 @@
         width: 32px !important;
         height: 32px !important;
         font-size: 1.1rem !important;
+    }
+
+    #ai-chat-form {
+        margin: 0 15px 15px 15px !important;
     }
 
     /* Silas Responsive */
@@ -918,139 +884,4 @@
         height: 38px !important;
         font-size: 1.3rem !important;
     }
-}
-
-/* ======================================== */
-/* UTILITY CLASSES                         */
-/* ======================================== */
-
-.performance-tip .ai-container,
-.performance-tip .keyword-list-container {
-    max-width: none !important;
-    width: 100% !important;
-}
-
-/* MODAL SICHTBARKEIT FORCIEREN - TEMPORÄRER CSS-OVERRIDE */
-/* Füge diesen Code am ENDE deiner ai-styles.css hinzu */
-
-/* NUCLEAR OPTION: Modal-Sichtbarkeit erzwingen */
-#ai-response-modal {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100vw !important;
-    height: 100vh !important;
-    z-index: 99999 !important;
-    background: rgba(0, 0, 0, 0.8) !important;
-}
-
-#ai-response-modal.visible,
-#ai-response-modal[style*="display: flex"],
-#ai-response-modal[data-debug="true"] {
-    display: flex !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
-}
-
-/* Modal Content forcieren */
-#ai-response-modal .modal-content {
-    background: #1e1e1e !important;
-    border-radius: 10px !important;
-    width: 90vw !important;
-    max-width: 800px !important;
-    height: 80vh !important;
-    max-height: 600px !important;
-    margin: auto !important;
-    display: flex !important;
-    flex-direction: column !important;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8) !important;
-}
-
-/* Chat History forcieren */
-#ai-chat-history {
-    background: #2a2a2a !important;
-    color: #fff !important;
-    padding: 20px !important;
-    flex: 1 !important;
-    overflow-y: auto !important;
-    border-radius: 8px !important;
-    margin: 20px !important;
-}
-
-/* Chat Messages forcieren */
-.chat-message {
-    background: #444 !important;
-    color: #fff !important;
-    padding: 12px 16px !important;
-    border-radius: 12px !important;
-    margin-bottom: 12px !important;
-    max-width: 85% !important;
-    display: block !important;
-}
-
-.chat-message.ai {
-    background: #2a2a2a !important;
-    border: 1px solid #666 !important;
-}
-
-.chat-message.user {
-    background: #ffc107 !important;
-    color: #000 !important;
-    margin-left: auto !important;
-}
-
-/* Chat Form forcieren */
-#ai-chat-form {
-    background: #333 !important;
-    border: 1px solid #666 !important;
-    border-radius: 8px !important;
-    display: flex !important;
-    margin: 20px !important;
-    overflow: hidden !important;
-}
-
-#ai-chat-form input {
-    background: #444 !important;
-    color: #fff !important;
-    border: none !important;
-    padding: 12px 15px !important;
-    flex: 1 !important;
-}
-
-#ai-chat-form button {
-    background: #ffc107 !important;
-    color: #000 !important;
-    border: none !important;
-    padding: 12px 18px !important;
-    cursor: pointer !important;
-}
-
-/* Close Button forcieren */
-.close-button {
-    position: absolute !important;
-    top: 15px !important;
-    right: 20px !important;
-    background: #f44336 !important;
-    color: #fff !important;
-    border: none !important;
-    width: 35px !important;
-    height: 35px !important;
-    border-radius: 50% !important;
-    cursor: pointer !important;
-    z-index: 100000 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    font-size: 18px !important;
-    font-weight: bold !important;
-}
-
-/* DEBUG: Sichtbarer Test-Modus */
-#ai-response-modal[data-debug="true"] {
-    background: rgba(255, 0, 0, 0.5) !important; /* Rot für Debug */
-}
-
-#ai-response-modal[data-debug="true"] .modal-content {
-    border: 5px solid #ff0000 !important; /* Roter Rahmen für Debug */
 }
