@@ -299,7 +299,12 @@ function setupChatFormListener() {
       e.preventDefault();
       
       const userInput = aiChatInput.value.trim();
-      if (!userInput) return;
+      console.log('Debug - userInput value:', userInput, 'length:', userInput.length);
+      
+      if (!userInput) {
+        console.log('Debug - userInput ist leer, breche ab');
+        return;
+      }
       
       console.log('Chat-Form Input:', userInput);
       logCurrentState('CHAT FORM SUBMIT');
