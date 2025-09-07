@@ -1,4 +1,4 @@
-// js/ai-form.js (FINALE FUNKTIONIERENDE VERSION)
+// js/ai-form.js (FINALE REPARIERTE VERSION - Chat funktioniert)
 
 import { initBookingModal, showStep } from './booking.js';
 
@@ -215,25 +215,24 @@ export const initAiForm = () => {
         event.preventDefault();
         console.log("💬 Chat-Submit Handler aufgerufen");
 
-        // WICHTIG: Warte kurz, damit das Element verfügbar ist
-        await new Promise(resolve => setTimeout(resolve, 50));
+        // WICHTIG: Stoppe die weitere Event-Propagation
+        event.stopImmediatePropagation();
 
         const chatInput = document.getElementById('ai-chat-input');
-        console.log("🔍 Chat-Input Element:", chatInput);
-        console.log("🔍 Chat-Input Wert:", chatInput ? chatInput.value : 'NICHT GEFUNDEN');
-
         if (!chatInput) {
             console.warn("⚠️ Chat-Input nicht gefunden");
             return;
         }
 
         const userInput = chatInput.value.trim();
+        console.log("🔍 Chat-Input Wert direkt gelesen:", `"${userInput}"`);
+
         if (!userInput) {
-            console.warn("⚠️ Leere Chat-Eingabe, Wert:", `"${chatInput.value}"`);
+            console.warn("⚠️ Leere Chat-Eingabe");
             return;
         }
 
-        console.log("💬 Chat-Eingabe:", userInput);
+        console.log("💬 Chat-Eingabe verarbeitet:", userInput);
 
         // Füge User-Nachricht sofort hinzu
         addMessageToHistory(userInput, 'user');
@@ -243,42 +242,31 @@ export const initAiForm = () => {
         await sendToEvita(userInput, true);
     };
 
-    // Event Listener registrieren
+    // REPARIERTE Event Listener Setup
+    let chatFormHandled = false;
+
+    // Event Listener für Hauptformular
     aiForm.addEventListener('submit', handleFormSubmit);
     console.log("✅ AI-Form Submit-Listener registriert");
 
-    // VERBESSERTER Chat-Form Event Listener
-    const setupChatFormListener = () => {
-        // Event-Delegation für dynamisch geladene Elemente
-        document.addEventListener('submit', (e) => {
-            if (e.target.id === 'ai-chat-form') {
-                console.log("🎯 Chat-Form Submit (Event-Delegation)");
-                handleChatSubmit(e);
+    // VEREINFACHTER Chat-Form Event Listener (nur Event-Delegation)
+    document.addEventListener('submit', (e) => {
+        if (e.target.id === 'ai-chat-form') {
+            console.log("🎯 Chat-Form Submit erkannt - Event-Delegation");
+            
+            // Verhindere doppelte Behandlung
+            if (chatFormHandled) {
+                console.log("⚠️ Chat bereits behandelt, überspringe");
+                return;
             }
-        });
-
-        // Direkter Listener mit Polling
-        const pollForChatForm = () => {
-            const chatForm = document.getElementById('ai-chat-form');
-            if (chatForm && !chatForm.dataset.listenerAdded) {
-                console.log("🔧 Direkter Chat-Form Listener hinzugefügt");
-                chatForm.dataset.listenerAdded = 'true';
-                chatForm.addEventListener('submit', (e) => {
-                    console.log("🎯 Chat-Form Submit (Direkt)");
-                    handleChatSubmit(e);
-                });
-            } else {
-                // Versuche es in 500ms erneut
-                setTimeout(pollForChatForm, 500);
-            }
-        };
-        
-        // Starte Polling nach kurzer Verzögerung
-        setTimeout(pollForChatForm, 100);
-    };
-
-    setupChatFormListener();
-    console.log("✅ Chat-Submit-Listener Setup gestartet");
+            
+            chatFormHandled = true;
+            setTimeout(() => { chatFormHandled = false; }, 100); // Reset nach 100ms
+            
+            handleChatSubmit(e);
+        }
+    });
+    console.log("✅ Chat-Submit-Listener (Event-Delegation) registriert");
 
     // Close-Button Event Listeners
     closeButtons.forEach(button => {
