@@ -1,8 +1,8 @@
-// js/modals.js (FINALE, KORRIGIERTE VERSION)
+// js/modals.js (FINALE REPARATUR-VERSION)
 
 // ===================================================================
-// 1. ALLGEMEINE HELFERFUNKTIONEN (IHR ORIGINALCODE)
-// Diese werden von allen anderen Funktionen genutzt.
+// 1. IHR ORIGINALCODE: ALLGEMEINE HELFERFUNKTIONEN
+// Diese bleiben exakt so, wie sie bei Ihnen funktioniert haben.
 // ===================================================================
 
 export const openLightbox = (lightboxElement) => {
@@ -20,13 +20,13 @@ export const closeLightbox = (lightboxElement) => {
 };
 
 // ===================================================================
-// 2. NEUE EXPORTIERTE FUNKTIONEN FÜR EVITA
-// Diese nutzen jetzt Ihre originalen open/close Funktionen.
+// 2. NEUE FUNKTIONEN FÜR EVITA
+// WICHTIG: Diese nutzen jetzt Ihre originalen open/close Funktionen.
 // ===================================================================
 
 export function showAIResponse(content, isHTML = false) {
   const modal = document.getElementById('ai-response-modal');
-  const contentArea = document.getElementById('ai-response-content-area');
+  const contentArea = document.getElementById('ai-chat-history'); 
   
   if (modal && contentArea) {
     if (isHTML) {
@@ -34,7 +34,7 @@ export function showAIResponse(content, isHTML = false) {
     } else {
       contentArea.textContent = content;
     }
-    // WICHTIGE KORREKTUR: Nutzt jetzt Ihre bewährte Funktion!
+    // REPARATUR: Nutzt jetzt wieder Ihre funktionierende 'openLightbox' Funktion!
     openLightbox(modal); 
   }
 }
@@ -56,8 +56,8 @@ export function hideLoadingState() {
 }
 
 // ===================================================================
-// 3. SETUP-FUNKTIONEN FÜR JEDES MODAL (IHR ORIGINALCODE)
-// Dieser Teil bleibt exakt so, wie er bei Ihnen war.
+// 3. IHR ORIGINALCODE: SETUP-FUNKTIONEN FÜR JEDES MODAL
+// Dieser Code wird wieder exakt so hergestellt, wie er war.
 // ===================================================================
 
 function setupCookieModal() {
@@ -94,7 +94,6 @@ function setupCookieModal() {
 function setupContactModal() {
     const contactModal = document.getElementById('contact-modal');
     const openContactModalBtn = document.getElementById('open-contact-modal');
-    // Korrektur: Der Schliessen-Button hat eine andere ID in Ihrem HTML
     const closeContactModalBtn = document.getElementById('close-modal');
 
     if (openContactModalBtn) {
@@ -132,10 +131,14 @@ function setupAiModal() {
             btn.addEventListener('click', () => closeLightbox(aiResponseModal));
         }
     });
+    const aiChatForm = document.getElementById('ai-chat-form');
+    if (aiChatForm) {
+        aiChatForm.addEventListener('submit', (e) => e.preventDefault());
+    }
 }
 
 // ===================================================================
-// 4. HAUPT-INITIALISIERUNG (Wird von main.js aufgerufen)
+// 4. IHRE ORIGINALE HAUPT-INITIALISIERUNG
 // ===================================================================
 
 export function initModals() {
