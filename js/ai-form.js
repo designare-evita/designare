@@ -20,10 +20,9 @@ let conversationState = {
 // KORRIGIERTE FUNKTION: Diese Funktion wird von den Termin-Buttons geklickt
 // ===================================================================
 window.selectSlot = function(slot) {
-  if (chatModalInput) {
+  if (chatModalInput && chatModalForm) {
     // 1. Füllt das richtige Eingabefeld (das im Modal)
     chatModalInput.value = slot;
-    chatModalInput.focus();
     
     // 2. Simuliert einen Klick auf den Senden-Button des Modal-Formulars
     // Dies ist der entscheidende Teil, der den Chat vorantreibt.
