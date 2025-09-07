@@ -23,7 +23,7 @@ export default async function handler(req, res) {
             },
             
             // Arbeitstage (0 = Sonntag, 1 = Montag, ..., 6 = Samstag)
-            workingDays: [1, 3, 4, 5], // Montag bis Freitag
+            workingDays: [1, 2, 3, 4, 5], // Montag bis Freitag
             
             // Maximale Tage in die Zukunft
             maxDaysAhead: 14,
