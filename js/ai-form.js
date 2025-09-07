@@ -1,4 +1,4 @@
-// js/ai-form.js (FINALE VERSION ohne Debug-Code)
+// js/ai-form.js (VERBESSERTE VERSION mit funktionierendem Booking)
 
 import { initBookingModal, showStep } from './booking.js';
 
@@ -44,28 +44,58 @@ export const initAiForm = () => {
         document.body.classList.remove('no-scroll');
     };
 
+    // VERBESSERTE Booking-Modal-Funktion
     const launchBookingModal = async () => {
         console.log("📅 launchBookingModal gestartet");
-        const modalContainer = document.getElementById('modal-container');
-        if (!document.getElementById('booking-modal')) {
-            try {
+        
+        try {
+            // Verstecke zunächst das AI-Modal
+            hideModal();
+            
+            // Prüfe, ob booking-modal.html bereits geladen ist
+            let bookingModal = document.getElementById('booking-modal');
+            
+            if (!bookingModal) {
+                console.log("📄 Lade booking-modal.html...");
+                
+                const modalContainer = document.getElementById('modal-container');
+                if (!modalContainer) {
+                    throw new Error('Modal-Container nicht gefunden');
+                }
+                
                 const response = await fetch('/booking-modal.html');
-                if (!response.ok) throw new Error('booking-modal.html konnte nicht geladen werden.');
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: Booking-Modal konnte nicht geladen werden`);
+                }
+                
                 const html = await response.text();
                 modalContainer.insertAdjacentHTML('beforeend', html);
+                
+                // Suche das Modal erneut
+                bookingModal = document.getElementById('booking-modal');
+                if (!bookingModal) {
+                    throw new Error('Booking-Modal nach dem Laden nicht gefunden');
+                }
+                
+                console.log("✅ Booking-Modal HTML geladen");
+                
+                // Initialisiere das Booking-System
                 initBookingModal();
-            } catch (error) {
-                console.error("❌ Fehler beim Laden des Booking-Modals:", error);
-                addMessageToHistory("Entschuldigung, beim Öffnen des Buchungsfensters ist ein Fehler aufgetreten.", 'ai');
-                showModal();
-                return;
             }
-        }
-        hideModal();
-        const bookingModal = document.getElementById('booking-modal');
-        if (bookingModal) {
+            
+            // Zeige das Booking-Modal
             bookingModal.style.display = 'flex';
+            console.log("✅ Booking-Modal angezeigt");
+            
+            // Starte mit dem ersten Schritt
             showStep('step-day-selection');
+            
+        } catch (error) {
+            console.error("❌ Fehler beim Laden des Booking-Modals:", error);
+            
+            // Zeige Fehler im AI-Chat und bringe das AI-Modal zurück
+            addMessageToHistory(`Entschuldigung, beim Öffnen des Buchungsfensters ist ein Fehler aufgetreten: ${error.message}`, 'ai');
+            showModal();
         }
     };
 
@@ -92,6 +122,7 @@ export const initAiForm = () => {
         addMessageToHistory(initialMessage, 'ai');
     };
 
+    // VERBESSERTE API-Kommunikation mit besserer Booking-Erkennung
     const handleFormSubmit = async (event) => {
         event.preventDefault();
 
@@ -104,6 +135,8 @@ export const initAiForm = () => {
         aiForm.querySelector('button').disabled = true;
 
         try {
+            console.log("🌐 Sende Anfrage an Evita:", question);
+            
             const response = await fetch('/api/ask-gemini', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -115,27 +148,32 @@ export const initAiForm = () => {
             }
 
             const data = await response.json();
+            console.log("📨 Evita Response:", data);
 
+            // Prüfe auf Booking-Aktion
             if (data.action === 'start_booking') {
+                console.log("📅 Booking-Aktion erkannt");
                 initializeChat(data.message);
                 showModal();
                 
+                // Warte 2 Sekunden und starte Booking
                 setTimeout(() => {
                     launchBookingModal();
                 }, 2000);
                 return;
             }
 
+            // Normale Antwort
             if (data.answer) {
                 initializeChat(data.answer);
+                showModal();
             } else {
                 initializeChat("Entschuldigung, ich konnte keine Antwort generieren.");
+                showModal();
             }
-            
-            showModal();
 
         } catch (error) {
-            console.error('❌ Fehler bei der Anfrage an Evita:', error);
+            console.error('❌ Fehler bei Evita-Anfrage:', error);
             aiStatus.textContent = 'Ein Fehler ist aufgetreten.';
             initializeChat("Entschuldigung, ich habe gerade technische Schwierigkeiten. Bitte versuche es später noch einmal.");
             showModal();
@@ -148,16 +186,17 @@ export const initAiForm = () => {
         }
     };
 
+    // VERBESSERTE Chat-Funktion
     const handleChatSubmit = async (event) => {
         event.preventDefault();
 
-        const chatForm = document.getElementById('ai-chat-form');
         const chatInput = document.getElementById('ai-chat-input');
-        
-        if (!chatInput || !chatForm) return;
+        if (!chatInput) return;
 
         const userInput = chatInput.value.trim();
         if (!userInput) return;
+
+        console.log("💬 Chat-Eingabe:", userInput);
 
         addMessageToHistory(userInput, 'user');
         chatInput.value = '';
@@ -170,15 +209,20 @@ export const initAiForm = () => {
             });
 
             const data = await response.json();
+            console.log("📨 Chat Response:", data);
             
+            // Prüfe auf Booking-Aktion
             if (data.action === 'start_booking') {
+                console.log("📅 Booking aus Chat erkannt");
                 addMessageToHistory(data.message, 'ai');
+                
                 setTimeout(() => {
                     launchBookingModal();
                 }, 2000);
                 return;
             }
 
+            // Normale Chat-Antwort
             if (data.answer) {
                 addMessageToHistory(data.answer, 'ai');
             } else if (data.message) {
@@ -188,27 +232,32 @@ export const initAiForm = () => {
             }
 
         } catch (error) {
-            console.error('❌ Fehler bei AI-Chat:', error);
+            console.error('❌ Fehler bei Chat-Anfrage:', error);
             addMessageToHistory('Entschuldigung, da ist ein technischer Fehler aufgetreten.', 'ai');
         }
     };
 
     // Event Listener registrieren
     aiForm.addEventListener('submit', handleFormSubmit);
+    console.log("✅ AI-Form Submit-Listener registriert");
 
     // Chat-Form Event Listener (mit Delegation für dynamisch geladene Elemente)
     document.addEventListener('submit', (e) => {
         if (e.target.id === 'ai-chat-form') {
+            console.log("📝 Chat-Form Submit erkannt");
             handleChatSubmit(e);
         }
     });
+    console.log("✅ Chat-Submit-Listener registriert");
 
     // Close-Button Event Listeners
     closeButtons.forEach(button => {
         button.addEventListener('click', () => {
+            console.log("❎ AI-Modal schließen");
             hideModal();
         });
     });
+    console.log("✅ Close-Button-Listener registriert");
 
     console.log("✅ Evita AI-Form vollständig initialisiert");
 };
