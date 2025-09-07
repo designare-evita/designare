@@ -1,8 +1,15 @@
-// /api/get-availability.js (ERWEITERTE VERSION)
+// /api/get-availability.js (STARK VERBESSERTE VERSION FÜR TAGESAUSWAHL)
 import { google } from 'googleapis';
 
 export default async function handler(req, res) {
     try {
+        // Der gewünschte Wochentag aus der URL (z.B. /api/get-availability?day=mittwoch)
+        const { day: targetDay } = req.query;
+
+        if (!targetDay) {
+            return res.status(400).json({ success: false, message: "Ein Wochentag ist erforderlich (z.B. ?day=montag)." });
+        }
+
         const auth = new google.auth.GoogleAuth({
             credentials: JSON.parse(process.env.GOOGLE_CREDENTIALS),
             scopes: ['https://www.googleapis.com/auth/calendar.readonly'],
@@ -11,189 +18,106 @@ export default async function handler(req, res) {
         const calendar = google.calendar({ version: 'v3', auth });
 
         // ===================================================================
-        // KONFIGURATION: Hier kannst du deine Verfügbarkeiten anpassen
+        // KONFIGURATION
         // ===================================================================
-        
-        const AVAILABILITY_CONFIG = {
-            // Arbeitszeiten
-            workingHours: {
-                start: 9,    // 9:00 Uhr
-                end: 17,     // 17:00 Uhr
-                interval: 60 // Termine alle 60 Minuten
-            },
-            
-            // Arbeitstage (0 = Sonntag, 1 = Montag, ..., 6 = Samstag)
-            workingDays: [1, 2, 3, 4, 5], // Montag bis Freitag
-            
-            // Maximale Tage in die Zukunft
-            maxDaysAhead: 14,
-            
-            // Maximale Anzahl angezeigter Termine
-            maxSlots: 6,
-            
-            // Spezielle Verfügbarkeiten (überschreibt Standard-Arbeitszeiten)
-            customSlots: [
-                // Beispiele für spezielle Termine:
-                // { date: '2025-09-10', time: '18:00', duration: 30, note: 'Abendtermin' },
-                // { date: '2025-09-14', time: '08:00', duration: 60, note: 'Früher Termin' }
-            ],
-            
-            // Gesperrte Zeiten (zusätzlich zu Kalenderterminen)
-            blockedSlots: [
-                // Beispiele:
-                // { date: '2025-09-09', timeStart: '12:00', timeEnd: '13:00', reason: 'Mittagspause' },
-                // { date: '2025-09-11', timeStart: '15:00', timeEnd: '16:00', reason: 'Interner Termin' }
-            ],
-            
-            // Termin-Infos die dem Kunden angezeigt werden
-            appointmentInfo: {
-                duration: 30, // Standard-Dauer in Minuten
-                type: 'Beratungsgespräch',
-                location: 'Online (Link wird zugesendet)',
-                preparation: 'Bitte bereiten Sie Ihre Fragen vor',
-                notes: 'Bei Fragen kontaktieren Sie michael@designare.at'
-            }
+        const CONFIG = {
+            workingHours: { start: 9, end: 17 },
+            appointmentDuration: 30, // Dauer in Minuten
+            workingDays: ['sonntag', 'montag', 'dienstag', 'mittwoch', 'donnerstag', 'freitag', 'samstag'],
+            dayMapping: { 'sonntag': 0, 'montag': 1, 'dienstag': 2, 'mittwoch': 3, 'donnerstag': 4, 'freitag': 5, 'samstag': 6 }
         };
 
         // ===================================================================
-        // TERMINE AUS GOOGLE CALENDAR ABRUFEN
+        // DATUM DES NÄCHSTEN GEWÜNSCHTEN WOCHENTAGS FINDEN
         // ===================================================================
-        
-        const now = new Date();
-        const maxDate = new Date();
-        maxDate.setDate(now.getDate() + AVAILABILITY_CONFIG.maxDaysAhead);
+        const targetDayNumber = CONFIG.dayMapping[targetDay.toLowerCase()];
+        if (targetDayNumber === undefined) {
+            return res.status(400).json({ success: false, message: `Ungültiger Wochentag: ${targetDay}` });
+        }
+
+        const nextTargetDate = new Date();
+        nextTargetDate.setHours(0, 0, 0, 0); // Auf Mitternacht setzen für saubere Vergleiche
+        const todayNumber = nextTargetDate.getDay();
+        let dayDifference = targetDayNumber - todayNumber;
+        if (dayDifference < 0) { // Wenn Tag in dieser Woche schon vorbei war -> nächste Woche
+            dayDifference += 7;
+        }
+        nextTargetDate.setDate(nextTargetDate.getDate() + dayDifference);
+
+        // ===================================================================
+        // TERMINE FÜR DIESEN TAG AUS GOOGLE CALENDAR ABRUFEN
+        // ===================================================================
+        const timeMin = new Date(nextTargetDate);
+        timeMin.setHours(0, 0, 1, 0); // Start des Tages
+
+        const timeMax = new Date(nextTargetDate);
+        timeMax.setHours(23, 59, 59, 0); // Ende des Tages
 
         const result = await calendar.events.list({
-            calendarId: 'designare.design@gmail.com', // Deine Kalender-ID
-            timeMin: now.toISOString(),
-            timeMax: maxDate.toISOString(),
+            calendarId: 'designare.design@gmail.com',
+            timeMin: timeMin.toISOString(),
+            timeMax: timeMax.toISOString(),
             singleEvents: true,
             orderBy: 'startTime',
         });
 
         const busySlots = result.data.items.map(event => ({
-            start: new Date(event.start.dateTime || event.start.date),
-            end: new Date(event.end.dateTime || event.end.date),
+            start: new Date(event.start.dateTime),
+            end: new Date(event.end.dateTime),
         }));
 
         // ===================================================================
-        // VERFÜGBARE TERMINE GENERIEREN
+        // VERFÜGBARE SLOTS FÜR DIESEN TAG GENERIEREN UND PRÜFEN
         // ===================================================================
-        
         const availableSlots = [];
-        let currentDate = new Date(now);
+        const now = new Date();
 
-        for (let i = 0; i < AVAILABILITY_CONFIG.maxDaysAhead; i++) {
-            // Nur Arbeitstage prüfen
-            const dayOfWeek = currentDate.getDay();
-            if (AVAILABILITY_CONFIG.workingDays.includes(dayOfWeek)) {
-                
-                // Standard-Arbeitszeiten durchgehen
-                for (let hour = AVAILABILITY_CONFIG.workingHours.start; 
-                     hour < AVAILABILITY_CONFIG.workingHours.end; 
-                     hour += AVAILABILITY_CONFIG.workingHours.interval / 60) {
-                    
-                    const potentialSlot = new Date(currentDate);
-                    potentialSlot.setHours(Math.floor(hour), (hour % 1) * 60, 0, 0);
-                    
-                    // Ist der Slot in der Zukunft?
-                    if (potentialSlot > now) {
-                        // Prüfe ob der Slot frei ist
-                        if (isSlotAvailable(potentialSlot, busySlots, AVAILABILITY_CONFIG)) {
-                            const formattedSlot = formatSlotForDisplay(potentialSlot);
-                            availableSlots.push(formattedSlot);
-                        }
+        for (let hour = CONFIG.workingHours.start; hour < CONFIG.workingHours.end; hour++) {
+            for (let minute = 0; minute < 60; minute += CONFIG.appointmentDuration) {
+                const potentialSlotStart = new Date(nextTargetDate);
+                potentialSlotStart.setHours(hour, minute, 0, 0);
+
+                const potentialSlotEnd = new Date(potentialSlotStart.getTime() + CONFIG.appointmentDuration * 60000);
+
+                // Slot muss in der Zukunft liegen
+                if (potentialSlotStart <= now) {
+                    continue; // Diesen Slot überspringen
+                }
+
+                // Prüfen, ob der Slot mit einem gebuchten Termin kollidiert
+                let isBooked = false;
+                for (const busy of busySlots) {
+                    if (potentialSlotStart < busy.end && potentialSlotEnd > busy.start) {
+                        isBooked = true;
+                        break;
                     }
                 }
-            }
 
-            // Nächster Tag
-            currentDate.setDate(currentDate.getDate() + 1);
-            
-            // Stoppe wenn genug Termine gefunden
-            if (availableSlots.length >= AVAILABILITY_CONFIG.maxSlots) break;
+                if (!isBooked) {
+                    availableSlots.push(formatSlotForDisplay(potentialSlotStart));
+                }
+            }
         }
 
-        // Füge custom Slots hinzu
-        AVAILABILITY_CONFIG.customSlots.forEach(customSlot => {
-            const slotDate = new Date(`${customSlot.date}T${customSlot.time}:00`);
-            if (slotDate > now && isSlotAvailable(slotDate, busySlots, AVAILABILITY_CONFIG)) {
-                const formattedSlot = formatSlotForDisplay(slotDate, customSlot.note);
-                availableSlots.push(formattedSlot);
-            }
-        });
-
-        // Sortiere chronologisch
-        availableSlots.sort();
-
-        res.status(200).json({ 
-            success: true, 
-            slots: availableSlots.slice(0, AVAILABILITY_CONFIG.maxSlots),
-            appointmentInfo: AVAILABILITY_CONFIG.appointmentInfo 
+        res.status(200).json({
+            success: true,
+            day: targetDay,
+            date: nextTargetDate.toLocaleDateString('de-DE', { year: 'numeric', month: 'long', day: 'numeric' }),
+            slots: availableSlots,
         });
 
     } catch (error) {
         console.error("Fehler in get-availability:", error);
-        res.status(500).json({ 
-            success: false, 
-            message: "Fehler beim Abrufen der Verfügbarkeit.",
-            error: error.message 
-        });
+        res.status(500).json({ success: false, message: "Fehler beim Abrufen der Verfügbarkeit." });
     }
 }
 
-// ===================================================================
-// HILFSFUNKTIONEN
-// ===================================================================
-
-function isSlotAvailable(potentialSlot, busySlots, config) {
-    const slotEnd = new Date(potentialSlot.getTime() + (config.appointmentInfo.duration * 60000));
-    
-    // Prüfe gegen bestehende Termine
-    for (const busySlot of busySlots) {
-        if (potentialSlot < busySlot.end && slotEnd > busySlot.start) {
-            return false;
-        }
-    }
-    
-    // Prüfe gegen gesperrte Zeiten
-    for (const blocked of config.blockedSlots) {
-        const blockedDate = blocked.date;
-        const slotDate = potentialSlot.toISOString().split('T')[0];
-        
-        if (slotDate === blockedDate) {
-            const blockedStart = new Date(`${blockedDate}T${blocked.timeStart}:00`);
-            const blockedEnd = new Date(`${blockedDate}T${blocked.timeEnd}:00`);
-            
-            if (potentialSlot < blockedEnd && slotEnd > blockedStart) {
-                return false;
-            }
-        }
-    }
-    
-    return true;
-}
-
-function formatSlotForDisplay(slotDate, note = '') {
-    const options = { 
-        weekday: 'long', 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric',
-        timeZone: 'Europe/Vienna'
+function formatSlotForDisplay(slotDate) {
+    const optionsDate = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    const dateStr = slotDate.toLocaleDateString('de-DE', optionsDate);
+    const timeStr = slotDate.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+    return {
+        fullString: `${dateStr} um ${timeStr}`,
+        time: timeStr
     };
-    
-    const dateStr = slotDate.toLocaleDateString('de-DE', options);
-    const timeStr = slotDate.toLocaleTimeString('de-DE', { 
-        hour: '2-digit', 
-        minute: '2-digit',
-        timeZone: 'Europe/Vienna'
-    });
-    
-    let formatted = `${dateStr} um ${timeStr}`;
-    if (note) {
-        formatted += ` (${note})`;
-    }
-    
-    return formatted;
 }
