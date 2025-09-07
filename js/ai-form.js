@@ -1,4 +1,4 @@
-// js/ai-form.js (FINALE VERSION FÜR DEN KALENDER-CHAT)
+// js/ai-form.js (FINALE REPARATUR-VERSION)
 import { showAIResponse, showLoadingState, hideLoadingState } from './modals.js';
 
 // Formular auf der Hauptseite
@@ -16,12 +16,17 @@ let conversationState = {
   data: {}      // Hier sammeln wir die Infos (slot, name, email)
 };
 
-// Diese Funktion wird von den Termin-Buttons geklickt
+// ===================================================================
+// KORRIGIERTE FUNKTION: Diese Funktion wird von den Termin-Buttons geklickt
+// ===================================================================
 window.selectSlot = function(slot) {
   if (chatModalInput) {
+    // 1. Füllt das richtige Eingabefeld (das im Modal)
     chatModalInput.value = slot;
     chatModalInput.focus();
-    // Simuliert einen Klick auf den Senden-Button des Modal-Formulars
+    
+    // 2. Simuliert einen Klick auf den Senden-Button des Modal-Formulars
+    // Dies ist der entscheidende Teil, der den Chat vorantreibt.
     const submitButton = chatModalForm.querySelector('button[type="submit"]');
     if (submitButton) {
       submitButton.click();
@@ -48,10 +53,9 @@ async function handleConversation(userInput) {
 
         if (data.action === 'start_booking') {
           conversationState.step = 'awaiting_slot';
-          // Zeige die "Ich prüfe..." Nachricht und dann die Termine
+          let html = `<p>${data.message}</p>`;
           const availabilityRes = await fetch('/api/get-availability');
           const availabilityData = await availabilityRes.json();
-          let html = `<p>${data.message}</p>`;
           if (availabilityData.slots && availabilityData.slots.length > 0) {
             html += `<p>Hier sind die nächsten freien Termine. Bitte wählen Sie einen passenden aus:</p><div class="booking-options">`;
             availabilityData.slots.forEach(slot => {
@@ -88,23 +92,23 @@ async function handleConversation(userInput) {
         });
         const bookingData = await bookingResponse.json();
         showAIResponse(bookingData.message, false);
-        // Gespräch zurücksetzen für die nächste Anfrage
         conversationState = { step: 'idle', data: {} };
         break;
     }
   } catch (error) {
     console.error('Fehler im Dialog-Manager:', error);
     showAIResponse('Oh, da ist ein technischer Fehler aufgetreten. Bitte versuchen Sie es später noch einmal.', false);
-    conversationState = { step: 'idle', data: {} }; // Reset bei Fehler
+    conversationState = { step: 'idle', data: {} };
   } finally {
     hideLoadingState();
-    if (chatModalInput) chatModalInput.disabled = false;
-    if (chatModalInput) chatModalInput.focus();
+    if (chatModalInput) {
+        chatModalInput.disabled = false;
+        chatModalInput.focus();
+    }
   }
 }
 
 // --- Event Listener ---
-// Nur hinzufügen, wenn die Elemente auf der Seite existieren.
 
 // 1. Für das Formular auf der Startseite
 if (mainAiForm) {
@@ -112,11 +116,8 @@ if (mainAiForm) {
     e.preventDefault();
     const userInput = mainAiInput.value.trim();
     if (!userInput) return;
-    
-    // Gesprächszustand und Chatverlauf für eine saubere neue Anfrage zurücksetzen
     conversationState = { step: 'idle', data: {} };
     if (chatModalHistory) chatModalHistory.innerHTML = ''; 
-    
     handleConversation(userInput);
     mainAiInput.value = '';
   });
@@ -128,7 +129,6 @@ if (chatModalForm) {
     e.preventDefault();
     const userInput = chatModalInput.value.trim();
     if (!userInput) return;
-    
     handleConversation(userInput);
     chatModalInput.value = '';
   });
