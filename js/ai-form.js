@@ -363,23 +363,6 @@ document.addEventListener('click', (e) => {
   }
 });
 
-// 5. Fallback Event-Delegation - KEIN STATE RESET
-document.addEventListener('submit', (e) => {
-  if (e.target && e.target.id === 'ai-chat-form') {
-    console.log('Fallback submit event fuer ai-chat-form');
-    e.preventDefault();
-    const chatInput = document.getElementById('ai-chat-input');
-    if (!chatInput) return;
-    
-    const userInput = chatInput.value.trim();
-    if (!userInput) return;
-    
-    console.log('Fallback Chat-Input:', userInput);
-    logCurrentState('FALLBACK SUBMIT');
-    // KEIN conversationState RESET hier!
-    handleConversation(userInput);
-    chatInput.value = '';
-  }
-});
+// 5. Fallback Event-Delegation entfernt - verursachte doppelte Submits
 
 console.log('AI-Form Modul geladen. selectSlot-Funktion verfuegbar:', typeof window.selectSlot);
