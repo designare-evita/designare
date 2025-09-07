@@ -157,8 +157,8 @@ export default async function handler(req, res) {
       });
     }
 
-    // Wir setzen die Termindauer auf 30 Minuten
-    const endTime = new Date(startTime.getTime() + 30 * 60000);
+    // Wir setzen die Termindauer auf 60 Minuten
+    const endTime = new Date(startTime.getTime() + 60 * 60000);
 
     console.log('Event times:', {
       start: startTime.toISOString(),
