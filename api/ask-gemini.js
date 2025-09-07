@@ -53,7 +53,7 @@ module.exports = async function handler(req, res) {
     if (intent === 'booking') {
       res.status(200).json({
         action: 'start_booking',
-        message: 'Gerne, ich prüfe kurz meine Verfügbarkeiten für Sie. Einen Moment bitte...'
+        message: 'Gerne, ich prüfe kurz Michaels Kalender. Einen Moment bitte...'
       });
       return; // Wichtig: Die Funktion hier beenden
     }
