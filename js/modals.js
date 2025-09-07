@@ -1,10 +1,9 @@
-// js/modals.js (FINALE REPARATUR-VERSION)
+// js/modals.js (REPARATUR-VERSION BASIEREND AUF IHREM ORIGINAL)
 
 // ===================================================================
-// 1. IHR ORIGINALCODE: ALLGEMEINE HELFERFUNKTIONEN
-// Diese bleiben exakt so, wie sie bei Ihnen funktioniert haben.
+// 1. IHR ORIGINALCODE: HELFERFUNKTIONEN
+// DIESER TEIL WIRD 1:1 AUS IHRER FUNKTIONIERENDEN DATEI ÜBERNOMMEN
 // ===================================================================
-
 export const openLightbox = (lightboxElement) => {
     if (lightboxElement) {
         lightboxElement.classList.add('visible');
@@ -20,22 +19,20 @@ export const closeLightbox = (lightboxElement) => {
 };
 
 // ===================================================================
-// 2. NEUE FUNKTIONEN FÜR EVITA
-// WICHTIG: Diese nutzen jetzt Ihre originalen open/close Funktionen.
+// 2. MINIMALE ERWEITERUNG FÜR EVITA
+// Diese 3 Funktionen werden sauber hinzugefügt, ohne etwas zu verändern.
 // ===================================================================
 
 export function showAIResponse(content, isHTML = false) {
   const modal = document.getElementById('ai-response-modal');
-  const contentArea = document.getElementById('ai-chat-history'); 
-  
+  const contentArea = document.getElementById('ai-chat-history');
   if (modal && contentArea) {
     if (isHTML) {
       contentArea.innerHTML = content;
     } else {
       contentArea.textContent = content;
     }
-    // REPARATUR: Nutzt jetzt wieder Ihre funktionierende 'openLightbox' Funktion!
-    openLightbox(modal); 
+    openLightbox(modal);
   }
 }
 
@@ -55,9 +52,10 @@ export function hideLoadingState() {
   }
 }
 
+
 // ===================================================================
-// 3. IHR ORIGINALCODE: SETUP-FUNKTIONEN FÜR JEDES MODAL
-// Dieser Code wird wieder exakt so hergestellt, wie er war.
+// 3. IHR ORIGINALCODE: SETUP-FUNKTIONEN
+// DIESER TEIL WIRD 1:1 AUS IHRER FUNKTIONIERENDEN DATEI ÜBERNOMMEN
 // ===================================================================
 
 function setupCookieModal() {
@@ -138,7 +136,7 @@ function setupAiModal() {
 }
 
 // ===================================================================
-// 4. IHRE ORIGINALE HAUPT-INITIALISIERUNG
+// 4. IHR ORIGINALCODE: HAUPT-INITIALISIERUNG
 // ===================================================================
 
 export function initModals() {
