@@ -1,5 +1,5 @@
-// js/ai-form.js (FINALE REPARATUR-VERSION - CONVERSATION STATE & BOOKING FLOW)
-import { showAIResponse, showLoadingState, hideLoadingState } from './modals.js';
+// js/ai-form.js (FINALE FUNKTIONIERENDE VERSION)
+import { showLoadingState, hideLoadingState } from './modals.js';
 
 // Formular auf der Hauptseite
 const mainAiForm = document.getElementById('ai-form');
@@ -10,6 +10,40 @@ let conversationState = {
   step: 'idle', // idle | awaiting_slot | awaiting_name | awaiting_email
   data: {}      // Hier sammeln wir die Infos (slot, name, email)
 };
+
+// ===================================================================
+// NEUE FUNKTION: Öffnet das AI-Modal und zeigt Inhalt an
+// ===================================================================
+function openAIModal() {
+  const modal = document.getElementById('ai-response-modal');
+  if (modal) {
+    modal.classList.add('visible');
+    document.body.style.overflow = 'hidden';
+    document.body.classList.add('no-scroll');
+  }
+}
+
+// ===================================================================
+// NEUE FUNKTION: Fügt Nachrichten zur Chat-History hinzu
+// ===================================================================
+function addMessageToHistory(message, sender) {
+  const chatHistory = document.getElementById('ai-chat-history');
+  if (!chatHistory) return;
+
+  const messageDiv = document.createElement('div');
+  messageDiv.className = `chat-message ${sender}`;
+  
+  if (sender === 'ai' && typeof message === 'string' && message.includes('<')) {
+    messageDiv.innerHTML = message;
+  } else {
+    messageDiv.textContent = message;
+  }
+  
+  chatHistory.appendChild(messageDiv);
+  
+  // Scroll zum Ende
+  chatHistory.scrollTop = chatHistory.scrollHeight;
+}
 
 // ===================================================================
 // KORRIGIERTE FUNKTION: Diese wird global verfügbar gemacht
@@ -36,27 +70,6 @@ function selectSlot(slot) {
 
 // Mache die Funktion global verfügbar
 window.selectSlot = selectSlot;
-
-// ===================================================================
-// NEUE FUNKTION: Fügt Nachrichten zur Chat-History hinzu
-// ===================================================================
-function addMessageToHistory(message, sender) {
-  const chatHistory = document.getElementById('ai-chat-history');
-  if (!chatHistory) return;
-
-  const messageDiv = document.createElement('div');
-  messageDiv.className = `chat-message ${sender}`;
-  if (sender === 'ai' && typeof message === 'string' && message.includes('<')) {
-    messageDiv.innerHTML = message;
-  } else {
-    messageDiv.textContent = message;
-  }
-  
-  chatHistory.appendChild(messageDiv);
-  
-  // Scroll zum Ende
-  chatHistory.scrollTop = chatHistory.scrollHeight;
-}
 
 // ===================================================================
 // NEUE FUNKTION: Prüft ob eine Eingabe im Booking-Kontext steht
@@ -230,12 +243,7 @@ if (mainAiForm) {
     if (chatHistory) chatHistory.innerHTML = ''; 
     
     // Modal öffnen
-    const modal = document.getElementById('ai-response-modal');
-    if (modal) {
-      modal.classList.add('visible');
-      document.body.style.overflow = 'hidden';
-      document.body.classList.add('no-scroll');
-    }
+    openAIModal();
     
     handleConversation(userInput);
     mainAiInput.value = '';
@@ -257,10 +265,33 @@ document.addEventListener('submit', (e) => {
   }
 });
 
-// 3. Debug-Info für Termin-Buttons
+// 3. Modal schließen Buttons
 document.addEventListener('click', (e) => {
+  // Schließen Buttons
+  if (e.target && (e.target.id === 'close-ai-response-modal-top' || e.target.id === 'close-ai-response-modal-bottom')) {
+    const modal = document.getElementById('ai-response-modal');
+    if (modal) {
+      modal.classList.remove('visible');
+      document.body.style.overflow = '';
+      document.body.classList.remove('no-scroll');
+    }
+  }
+  
+  // Debug-Info für Termin-Buttons
   if (e.target && e.target.classList.contains('slot-button')) {
     console.log('Slot-Button geklickt:', e.target);
+  }
+});
+
+// 4. Modal schließen bei Hintergrund-Klick
+document.addEventListener('click', (e) => {
+  if (e.target && e.target.id === 'ai-response-modal') {
+    const modal = document.getElementById('ai-response-modal');
+    if (modal) {
+      modal.classList.remove('visible');
+      document.body.style.overflow = '';
+      document.body.classList.remove('no-scroll');
+    }
   }
 });
 
