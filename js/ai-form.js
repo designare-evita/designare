@@ -1,4 +1,4 @@
-// js/ai-form.js (ENCODING-SICHERE VERSION)
+// js/ai-form.js (KORRIGIERTE EVENT-LISTENER VERSION)
 import { showLoadingState, hideLoadingState } from './modals.js';
 
 // Formular auf der Hauptseite
@@ -146,6 +146,9 @@ async function handleBookingInput(userInput) {
 
 // Die zentrale Logik, die die Eingaben verarbeitet
 async function handleConversation(userInput) {
+  console.log('=== handleConversation GESTARTET ===');
+  console.log('handleConversation called with:', userInput, 'current state:', conversationState);
+  
   showLoadingState();
   
   // Disable input waehrend der Verarbeitung
@@ -153,8 +156,6 @@ async function handleConversation(userInput) {
   if (currentChatInput) currentChatInput.disabled = true;
 
   try {
-    console.log('handleConversation called with:', userInput, 'current state:', conversationState);
-    
     // ===================================================================
     // NEUE PRIORITAET: Pruefe zuerst, ob wir im Booking-Prozess sind
     // ===================================================================
@@ -229,6 +230,7 @@ async function handleConversation(userInput) {
     addMessageToHistory('Oh, da ist ein technischer Fehler aufgetreten. Bitte versuche es spaeter noch einmal.', 'ai');
     conversationState = { step: 'idle', data: {} };
   } finally {
+    console.log('=== handleConversation BEENDET ===');
     hideLoadingState();
     if (currentChatInput) {
         currentChatInput.disabled = false;
@@ -238,7 +240,7 @@ async function handleConversation(userInput) {
 }
 
 // ===================================================================
-// EVENT LISTENER SETUP
+// EVENT LISTENER SETUP - KORRIGIERT
 // ===================================================================
 
 // 1. Fuer das Formular auf der Startseite
@@ -247,6 +249,8 @@ if (mainAiForm) {
     e.preventDefault();
     const userInput = mainAiInput.value.trim();
     if (!userInput) return;
+    
+    console.log('Hauptformular submit:', userInput);
     
     // Conversation state zuruecksetzen fuer neue Gespraeche
     conversationState = { step: 'idle', data: {} };
@@ -263,20 +267,55 @@ if (mainAiForm) {
   });
 }
 
-// 2. Event Delegation fuer das Chat-Modal (da es dynamisch geladen wird)
-document.addEventListener('submit', (e) => {
-  if (e.target && e.target.id === 'ai-chat-form') {
-    e.preventDefault();
-    const chatInput = document.getElementById('ai-chat-input');
-    if (!chatInput) return;
+// 2. KORRIGIERTE Event Delegation - Verwende 'input' und 'keydown' Events
+function setupChatFormListener() {
+  console.log('setupChatFormListener aufgerufen');
+  
+  // Direkte Event-Listener auf den Elementen
+  const aiChatForm = document.getElementById('ai-chat-form');
+  const aiChatInput = document.getElementById('ai-chat-input');
+  
+  if (aiChatForm && aiChatInput) {
+    console.log('Chat-Form und Input gefunden, richte Event-Listener ein');
     
-    const userInput = chatInput.value.trim();
-    if (!userInput) return;
+    // Form Submit Event
+    aiChatForm.addEventListener('submit', (e) => {
+      console.log('Chat-Form submit event ausgeloest');
+      e.preventDefault();
+      
+      const userInput = aiChatInput.value.trim();
+      if (!userInput) return;
+      
+      console.log('Chat-Form Input:', userInput);
+      handleConversation(userInput);
+      aiChatInput.value = '';
+    });
     
-    handleConversation(userInput);
-    chatInput.value = '';
+    // Enter-Taste auf dem Input
+    aiChatInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        console.log('Enter-Taste im Chat-Input gedrueckt');
+        e.preventDefault();
+        
+        const userInput = aiChatInput.value.trim();
+        if (!userInput) return;
+        
+        console.log('Enter-Input:', userInput);
+        handleConversation(userInput);
+        aiChatInput.value = '';
+      }
+    });
+    
+    console.log('Event-Listener auf Chat-Form eingerichtet');
+  } else {
+    console.log('Chat-Form oder Input nicht gefunden, versuche in 100ms erneut');
+    // Versuche es erneut, falls die Elemente noch nicht geladen sind
+    setTimeout(setupChatFormListener, 100);
   }
-});
+}
+
+// Starte die Chat-Form-Listener-Einrichtung
+setupChatFormListener();
 
 // 3. Modal schliessen Buttons
 document.addEventListener('click', (e) => {
@@ -305,6 +344,23 @@ document.addEventListener('click', (e) => {
       document.body.style.overflow = '';
       document.body.classList.remove('no-scroll');
     }
+  }
+});
+
+// 5. Fallback Event-Delegation (falls direkte Event-Listener nicht funktionieren)
+document.addEventListener('submit', (e) => {
+  if (e.target && e.target.id === 'ai-chat-form') {
+    console.log('Fallback submit event fuer ai-chat-form');
+    e.preventDefault();
+    const chatInput = document.getElementById('ai-chat-input');
+    if (!chatInput) return;
+    
+    const userInput = chatInput.value.trim();
+    if (!userInput) return;
+    
+    console.log('Fallback Chat-Input:', userInput);
+    handleConversation(userInput);
+    chatInput.value = '';
   }
 });
 
