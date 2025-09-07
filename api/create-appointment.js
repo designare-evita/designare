@@ -165,6 +165,37 @@ export default async function handler(req, res) {
       end: endTime.toISOString()
     });
 
+
+    // ===================================================================
+    // NEU: Prüfung auf Doppelbuchungen
+    // ===================================================================
+    console.log('Checking for existing events in this slot...');
+    
+    // Wir fragen die Calendar API, ob es im gewünschten Zeitraum bereits Termine gibt.
+    const existingEvents = await calendar.events.list({
+      calendarId: 'designare.design@gmail.com', // Der zu prüfende Kalender
+      timeMin: startTime.toISOString(),        // Start des Zeitfensters
+      timeMax: endTime.toISOString(),          // Ende des Zeitfensters
+      maxResults: 1,                           // Wir brauchen nur einen Treffer, um zu wissen, dass der Slot belegt ist
+      singleEvents: true,                      // Wichtig für wiederkehrende Termine
+    });
+
+    // Wenn die Liste der Termine (items) nicht leer ist, gibt es eine Überschneidung.
+    if (existingEvents.data.items.length > 0) {
+      console.warn('Conflict detected: Slot is already booked.');
+      // Wir senden den Status 409 (Conflict) und eine klare Nachricht zurück.
+      return res.status(409).json({
+        success: false,
+        message: 'Dieser Termin ist leider bereits vergeben. Bitte wähle einen anderen Slot.'
+      });
+    }
+    
+    console.log('Slot is free. Proceeding to create event.');
+    // ===================================================================
+    // ENDE: Prüfung auf Doppelbuchungen
+    // ===================================================================
+
+
     // Das ist das Termin-Objekt, das an Google gesendet wird
     // WICHTIG: Keine attendees mehr, da das Domain-Wide Delegation erfordern würde
     const event = {
