@@ -786,3 +786,11 @@
     max-width: none !important;
     width: 100% !important;
 }
+
+/* ----------- FIX: Unsichtbare Ebene ----------- */
+/* Holt das AI-Formular in den Vordergrund, über alle Animationen */
+
+.ai-container {
+    position: relative; /* Notwendig, damit z-index funktioniert */
+    z-index: 10;      /* Ein hoher Wert stellt sicher, dass es über anderen Elementen liegt */
+}
