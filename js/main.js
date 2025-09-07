@@ -1,4 +1,4 @@
-// js/main.js (FINALE VERSION)
+// js/main.js (angepasste Version)
 
 // === 1. IMPORTE ===
 import { initEffects } from './effects.js';
@@ -35,8 +35,6 @@ const initializeDynamicScripts = () => {
 const initializeStaticScripts = () => {
     initEffects();
     initTypewriters();
-    initAiForm();
-    initSilasForm();
 };
 
 // === 4. HAUPTEINSTIEGSPUNKT ===
@@ -51,6 +49,10 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(() => {
             console.log("✅ Header und Modals erfolgreich geladen.");
             initializeDynamicScripts();
+
+            // 👉 Formulare erst jetzt initialisieren, wenn DOM + Modals geladen sind
+            initAiForm();
+            initSilasForm();
         })
         .catch(error => {
             console.error("❌ Kritischer Fehler beim Laden der Seitenstruktur:", error);
