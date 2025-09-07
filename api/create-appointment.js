@@ -187,7 +187,7 @@ export default async function handler(req, res) {
 
     // Sendet den Termin an die Google Calendar API
     const result = await calendar.events.insert({
-      calendarId: 'primary',
+      calendarId: 'designare.design@gmail.com',
       resource: event,
       sendNotifications: false, // Auf false gesetzt, da keine attendees
     });
