@@ -34,38 +34,197 @@
 }
 
 /* ======================================== */
+/* MODAL GRUNDLAGEN - EVITA CHAT           */
+/* ======================================== */
+
+/* GRUND-MODAL OVERLAY */
+.modal-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 9999 !important;
+    background-color: rgba(10, 10, 10, 0.9) !important;
+    
+    display: none !important; /* Standardmäßig versteckt */
+    align-items: center !important;
+    justify-content: center !important;
+    
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transition: opacity 0.3s ease, visibility 0.3s ease !important;
+}
+
+/* MODAL SICHTBAR MACHEN */
+.modal-overlay.visible {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
+
+/* ALTERNATIVE: Direkte Display-Steuerung */
+.modal-overlay[style*="display: flex"] {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
+
+/* FALLBACK: Falls .visible nicht funktioniert */
+.modal-overlay.show,
+.modal-overlay.open {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
+
+/* DEBUG: Zum Testen sichtbar machen */
+.modal-overlay[data-debug="true"] {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    background-color: rgba(255, 0, 0, 0.3) !important; /* Rote Farbe zum Debuggen */
+}
+
+/* ======================================== */
+/* AI-RESPONSE-MODAL SPEZIFISCH            */
+/* ======================================== */
+
+#ai-response-modal .modal-content {
+    background-color: #1e1e1e !important;
+    color: #e0e0e0 !important;
+    border-radius: 10px !important;
+    width: 90vw !important;
+    height: 80vh !important;
+    max-width: 800px !important;
+    max-height: 600px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+    transform: scale(0.95) !important;
+    transition: transform 0.3s ease !important;
+    overflow: hidden !important;
+}
+
+.modal-overlay.visible #ai-response-modal .modal-content,
+.modal-overlay[style*="display: flex"] #ai-response-modal .modal-content {
+    transform: scale(1) !important;
+}
+
+/* CLOSE BUTTON */
+.close-button {
+    position: absolute !important;
+    top: 15px !important;
+    right: 20px !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: none !important;
+    color: #fff !important;
+    border-radius: 50% !important;
+    width: 35px !important;
+    height: 35px !important;
+    cursor: pointer !important;
+    font-size: 1.2rem !important;
+    z-index: 10 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: background-color 0.3s ease !important;
+}
+
+.close-button:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* ======================================== */
+/* AI-CHAT-HISTORY - CHAT-VERLAUF          */
+/* ======================================== */
+
+#ai-chat-history {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    padding: 60px 20px 20px 20px !important; /* Top-Padding für Close-Button */
+    background-color: rgba(0, 0, 0, 0.1) !important;
+    border-radius: 8px !important;
+    margin-bottom: 15px !important;
+    min-height: 200px !important;
+    max-height: 400px !important;
+}
+
+/* CHAT-NACHRICHTEN */
+.chat-message {
+    padding: 12px 16px !important;
+    border-radius: 12px !important;
+    margin-bottom: 12px !important;
+    max-width: 85% !important;
+    line-height: 1.5 !important;
+    word-wrap: break-word !important;
+    position: relative !important;
+    clear: both !important;
+    animation: fadeIn 0.3s ease !important;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.chat-message.user {
+    background-color: var(--accent-color, #ffc107) !important;
+    color: #1a1a1a !important;
+    margin-left: auto !important;
+    margin-right: 0 !important;
+    border-bottom-right-radius: 4px !important;
+    float: right !important;
+}
+
+.chat-message.ai {
+    background-color: #2a2a2a !important;
+    color: var(--text-color, #e0e0e0) !important;
+    margin-left: 0 !important;
+    margin-right: auto !important;
+    border-bottom-left-radius: 4px !important;
+    float: left !important;
+}
+
+/* ======================================== */
 /* AI-CHAT-FORM - MODAL FORMULAR           */
 /* ======================================== */
 
 #ai-chat-form {
-  background-color: var(--bg-color) !important;
-  border: none !important;                  /* kein schwarzer Rahmen */
-  border-radius: 10px !important;
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: stretch !important;
-  overflow: hidden !important;              /* Kanten sauber clippen */
+    flex-shrink: 0 !important;
+    background-color: var(--bg-color, #1a1a1a) !important;
+    border: 1px solid var(--border-color, #444) !important;
+    border-radius: 10px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: stretch !important;
+    overflow: hidden !important;
+    margin-bottom: 15px !important;
 }
 
 #ai-chat-form:focus-within {
-  border-color: var(--accent-color) !important;
+    border-color: var(--accent-color) !important;
 }
 
 #ai-chat-form input[type="text"] {
-  flex: 1 1 auto !important;
-  background: none !important;
-  border: 1px solid var(--border-color) !important;
-  border-right: none !important;            /* rechts offen zum Button */
-  border-radius: 10px 0 0 10px !important;  /* nur links rund */
-  color: var(--text-color) !important;
-  font-size: 1rem !important;
-  outline: none !important;
-  padding: 12px 15px !important;
-  box-sizing: border-box !important;
+    flex: 1 1 auto !important;
+    background: none !important;
+    border: none !important;
+    color: var(--text-color, #e0e0e0) !important;
+    font-size: 1rem !important;
+    outline: none !important;
+    padding: 12px 15px !important;
+    box-sizing: border-box !important;
 }
 
 #ai-chat-form input[type="text"]::placeholder {
-    color: var(--text-color) !important;
+    color: var(--text-color, #e0e0e0) !important;
     opacity: 0.5 !important;
     transition: opacity 0.6s ease-in-out !important;
 }
@@ -76,101 +235,55 @@
 
 #ai-chat-form button,
 #ai-response-modal #ai-chat-form button {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-
-  background: var(--accent-color) !important;
-  color: #fff !important;
-
-  border: 1px solid var(--accent-color) !important;
-  border-radius: 0 10px 10px 0 !important;  /* nur rechts rund */
-  padding: 12px 18px !important;
-  margin: 0 !important;
-  line-height: 1 !important;
-  box-sizing: border-box !important;
-
-  flex: 0 0 auto !important;
-  transition: background-color 0.3s ease !important;
+    background: var(--accent-color, #ffc107) !important;
+    color: #1a1a1a !important;
+    border: none !important;
+    padding: 12px 18px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: background-color 0.3s ease !important;
+    margin: 0 !important;
+    line-height: 1 !important;
+    box-sizing: border-box !important;
+    flex: 0 0 auto !important;
 }
 
 #ai-chat-form button:hover,
 #ai-response-modal #ai-chat-form button:hover {
-  background: #d39a00 !important;
-}
-/* ======================================== */
-/* AI-CHAT-HISTORY - CHAT-VERLAUF          */
-/* ======================================== */
-
-#ai-chat-history {
-    max-height: 60vh;
-    overflow-y: auto;
-    padding: 10px;
-    border-bottom: 1px solid #333;
-    margin-bottom: 15px;
-    display: flex;
-    flex-direction: column;
-}
-
-.chat-message {
-    padding: 10px 15px;
-    border-radius: 15px;
-    margin-bottom: 10px;
-    max-width: 80%;
-    line-height: 1.5;
-    word-wrap: break-word;
-}
-
-.chat-message.ai {
-    background-color: #2a2a2a;
-    border-top-left-radius: 0;
-    align-self: flex-start;
-}
-
-.chat-message.user {
-    background-color: #0044cc;
-    color: white;
-    border-top-right-radius: 0;
-    align-self: flex-end;
+    background: #d39a00 !important;
 }
 
 /* ======================================== */
-/* AI-RESPONSE-MODAL                       */
+/* MODAL FOOTER                             */
 /* ======================================== */
-
-#ai-response-content-area {
-    max-height: 60vh;
-    overflow-y: auto;
-    padding-right: 15px;
-    text-align: left;
-    white-space: pre-wrap;
-    color: #ccc;
-    line-height: 1.6;
-}
 
 .modal-footer {
-    text-align: center;
-    margin-top: 2rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid #444;
+    flex-shrink: 0 !important;
+    text-align: center !important;
+    padding: 15px 20px !important;
+    border-top: 1px solid var(--border-color, #444) !important;
+    background-color: rgba(0, 0, 0, 0.1) !important;
 }
 
 .modal-footer .button {
-    background-color: #ffc107;
-    color: #1a1a1a;
-    cursor: pointer;
-    padding: 0.75rem 1.5rem;
-    transition: all 0.3s ease;
-    border: 2px solid #ffc107;
-    font-size: 1rem;
-    border-radius: 5px;
-    text-decoration: none;
+    background-color: var(--accent-color, #ffc107) !important;
+    color: #1a1a1a !important;
+    cursor: pointer !important;
+    padding: 0.75rem 1.5rem !important;
+    transition: all 0.3s ease !important;
+    border: 2px solid var(--accent-color, #ffc107) !important;
+    font-size: 1rem !important;
+    border-radius: 5px !important;
+    text-decoration: none !important;
+    display: inline-block !important;
 }
 
 .modal-footer .button:hover {
-    background-color: #ffca2c;
-    border-color: #ffca2c;
-    transform: translateY(-1px);
+    background-color: #ffca2c !important;
+    border-color: #ffca2c !important;
+    transform: translateY(-1px) !important;
 }
 
 /* ======================================== */
@@ -180,6 +293,8 @@
 .ai-container {
     width: 100%;
     margin: 0 auto;
+    position: relative; /* Notwendig, damit z-index funktioniert */
+    z-index: 10;      /* Ein hoher Wert stellt sicher, dass es über anderen Elementen liegt */
 }
 
 .ai-container h3 {
@@ -631,6 +746,34 @@
 /* ======================================== */
 
 @media (max-width: 768px) {
+    /* AI Modal Responsive */
+    #ai-response-modal .modal-content {
+        width: 95vw !important;
+        height: 90vh !important;
+        max-height: none !important;
+        border-radius: 5px !important;
+    }
+    
+    #ai-chat-history {
+        padding: 50px 15px 15px 15px !important;
+        max-height: none !important;
+        flex: 1 !important;
+    }
+    
+    .chat-message {
+        max-width: 90% !important;
+        padding: 10px 12px !important;
+    }
+    
+    .close-button {
+        top: 10px !important;
+        right: 15px !important;
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 1.1rem !important;
+    }
+
+    /* Silas Responsive */
     #silas-form {
         flex-direction: column;
         gap: 10px;
@@ -785,12 +928,4 @@
 .performance-tip .keyword-list-container {
     max-width: none !important;
     width: 100% !important;
-}
-
-/* ----------- FIX: Unsichtbare Ebene ----------- */
-/* Holt das AI-Formular in den Vordergrund, über alle Animationen */
-
-.ai-container {
-    position: relative; /* Notwendig, damit z-index funktioniert */
-    z-index: 10;      /* Ein hoher Wert stellt sicher, dass es über anderen Elementen liegt */
 }
