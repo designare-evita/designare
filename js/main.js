@@ -4,7 +4,7 @@
 import { initEffects } from './effects.js';
 import { initTypewriters } from './typewriter.js';
 import { initModals } from './modals.js';
-import { initAiForm } from './ai-form.js';
+import './ai-form.js'; 
 import { initSilasForm } from './silas-form.js';
 
 // === 2. HELFERFUNKTIONEN ===
