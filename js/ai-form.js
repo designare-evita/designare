@@ -1,4 +1,4 @@
-// js/ai-form.js (KORRIGIERTE EVENT-LISTENER VERSION)
+// js/ai-form.js (PERSISTENTER STATE VERSION)
 import { showLoadingState, hideLoadingState } from './modals.js';
 
 // Formular auf der Hauptseite
@@ -10,6 +10,13 @@ let conversationState = {
   step: 'idle', // idle | awaiting_slot | awaiting_name | awaiting_email
   data: {}      // Hier sammeln wir die Infos (slot, name, email)
 };
+
+// ===================================================================
+// DEBUG FUNCTION: Zeigt den aktuellen State
+// ===================================================================
+function logCurrentState(location) {
+  console.log(`[${location}] conversationState:`, JSON.stringify(conversationState));
+}
 
 // ===================================================================
 // NEUE FUNKTION: Oeffnet das AI-Modal und zeigt Inhalt an
@@ -50,12 +57,13 @@ function addMessageToHistory(message, sender) {
 // ===================================================================
 function selectSlot(slot) {
   console.log('selectSlot aufgerufen mit:', slot);
+  logCurrentState('selectSlot START');
   
   // Direkt die Slot-Auswahl verarbeiten
   conversationState.data.slot = slot;
   conversationState.step = 'awaiting_name';
   
-  console.log('conversationState nach selectSlot:', conversationState);
+  logCurrentState('selectSlot AFTER SET');
   
   // Chat-History updaten
   addMessageToHistory(`Termin gewaehlt: ${slot}`, 'user');
@@ -77,6 +85,7 @@ window.selectSlot = selectSlot;
 // NEUE FUNKTION: Prueft ob eine Eingabe im Booking-Kontext steht
 // ===================================================================
 function isInBookingProcess() {
+  logCurrentState('isInBookingProcess');
   const result = conversationState.step !== 'idle';
   console.log('isInBookingProcess:', result, 'current step:', conversationState.step);
   return result;
@@ -87,6 +96,7 @@ function isInBookingProcess() {
 // ===================================================================
 async function handleBookingInput(userInput) {
   console.log('Handle Booking Input:', conversationState.step, userInput);
+  logCurrentState('handleBookingInput START');
   
   // Fuege die User-Nachricht zur History hinzu
   addMessageToHistory(userInput, 'user');
@@ -95,7 +105,7 @@ async function handleBookingInput(userInput) {
     case 'awaiting_name':
       conversationState.data.name = userInput;
       conversationState.step = 'awaiting_email';
-      console.log('Name gespeichert, wechsle zu awaiting_email:', conversationState);
+      logCurrentState('handleBookingInput AFTER NAME SET');
       addMessageToHistory(`Danke, ${userInput}! Und wie lautet Deine E-Mail-Adresse fuer die Terminbestaetigung?`, 'ai');
       return true; // Indicates this was handled
 
@@ -136,6 +146,7 @@ async function handleBookingInput(userInput) {
       
       // Gespraech zuruecksetzen
       conversationState = { step: 'idle', data: {} };
+      logCurrentState('handleBookingInput RESET');
       return true; // Indicates this was handled
 
     default:
@@ -147,7 +158,8 @@ async function handleBookingInput(userInput) {
 // Die zentrale Logik, die die Eingaben verarbeitet
 async function handleConversation(userInput) {
   console.log('=== handleConversation GESTARTET ===');
-  console.log('handleConversation called with:', userInput, 'current state:', conversationState);
+  logCurrentState('handleConversation START');
+  console.log('handleConversation called with:', userInput);
   
   showLoadingState();
   
@@ -185,7 +197,7 @@ async function handleConversation(userInput) {
 
       if (data.action === 'start_booking') {
         conversationState.step = 'awaiting_slot';
-        console.log('Booking gestartet, state:', conversationState);
+        logCurrentState('handleConversation BOOKING STARTED');
         
         // Erste AI-Antwort
         addMessageToHistory(data.message, 'ai');
@@ -223,14 +235,17 @@ async function handleConversation(userInput) {
       console.log('Unerwarteter Zustand:', conversationState.step);
       addMessageToHistory('Es gab einen unerwarteten Fehler im Gespraechsablauf. Bitte starte erneut.', 'ai');
       conversationState = { step: 'idle', data: {} };
+      logCurrentState('handleConversation FALLBACK RESET');
     }
 
   } catch (error) {
     console.error('Fehler im Dialog-Manager:', error);
     addMessageToHistory('Oh, da ist ein technischer Fehler aufgetreten. Bitte versuche es spaeter noch einmal.', 'ai');
     conversationState = { step: 'idle', data: {} };
+    logCurrentState('handleConversation ERROR RESET');
   } finally {
     console.log('=== handleConversation BEENDET ===');
+    logCurrentState('handleConversation END');
     hideLoadingState();
     if (currentChatInput) {
         currentChatInput.disabled = false;
@@ -240,10 +255,10 @@ async function handleConversation(userInput) {
 }
 
 // ===================================================================
-// EVENT LISTENER SETUP - KORRIGIERT
+// EVENT LISTENER SETUP - NUR CHAT, KEIN RESET BEI NEUEN NACHRICHTEN
 // ===================================================================
 
-// 1. Fuer das Formular auf der Startseite
+// 1. Fuer das Formular auf der Startseite - RESET NUR HIER
 if (mainAiForm) {
   mainAiForm.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -252,8 +267,9 @@ if (mainAiForm) {
     
     console.log('Hauptformular submit:', userInput);
     
-    // Conversation state zuruecksetzen fuer neue Gespraeche
+    // WICHTIG: Conversation state NUR bei neuen Gespraechen zuruecksetzen
     conversationState = { step: 'idle', data: {} };
+    logCurrentState('MAIN FORM RESET');
     
     // Chat-History leeren und Modal oeffnen
     const chatHistory = document.getElementById('ai-chat-history');
@@ -267,18 +283,17 @@ if (mainAiForm) {
   });
 }
 
-// 2. KORRIGIERTE Event Delegation - Verwende 'input' und 'keydown' Events
+// 2. Chat-Modal Event-Listener - KEIN STATE RESET
 function setupChatFormListener() {
   console.log('setupChatFormListener aufgerufen');
   
-  // Direkte Event-Listener auf den Elementen
   const aiChatForm = document.getElementById('ai-chat-form');
   const aiChatInput = document.getElementById('ai-chat-input');
   
   if (aiChatForm && aiChatInput) {
     console.log('Chat-Form und Input gefunden, richte Event-Listener ein');
     
-    // Form Submit Event
+    // Form Submit Event - KEIN STATE RESET
     aiChatForm.addEventListener('submit', (e) => {
       console.log('Chat-Form submit event ausgeloest');
       e.preventDefault();
@@ -287,11 +302,13 @@ function setupChatFormListener() {
       if (!userInput) return;
       
       console.log('Chat-Form Input:', userInput);
+      logCurrentState('CHAT FORM SUBMIT');
+      // KEIN conversationState RESET hier!
       handleConversation(userInput);
       aiChatInput.value = '';
     });
     
-    // Enter-Taste auf dem Input
+    // Enter-Taste auf dem Input - KEIN STATE RESET
     aiChatInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && !e.shiftKey) {
         console.log('Enter-Taste im Chat-Input gedrueckt');
@@ -301,6 +318,8 @@ function setupChatFormListener() {
         if (!userInput) return;
         
         console.log('Enter-Input:', userInput);
+        logCurrentState('CHAT ENTER KEY');
+        // KEIN conversationState RESET hier!
         handleConversation(userInput);
         aiChatInput.value = '';
       }
@@ -309,7 +328,6 @@ function setupChatFormListener() {
     console.log('Event-Listener auf Chat-Form eingerichtet');
   } else {
     console.log('Chat-Form oder Input nicht gefunden, versuche in 100ms erneut');
-    // Versuche es erneut, falls die Elemente noch nicht geladen sind
     setTimeout(setupChatFormListener, 100);
   }
 }
@@ -319,7 +337,6 @@ setupChatFormListener();
 
 // 3. Modal schliessen Buttons
 document.addEventListener('click', (e) => {
-  // Schliessen Buttons
   if (e.target && (e.target.id === 'close-ai-response-modal-top' || e.target.id === 'close-ai-response-modal-bottom')) {
     const modal = document.getElementById('ai-response-modal');
     if (modal) {
@@ -329,7 +346,6 @@ document.addEventListener('click', (e) => {
     }
   }
   
-  // Debug-Info fuer Termin-Buttons
   if (e.target && e.target.classList.contains('slot-button')) {
     console.log('Slot-Button geklickt:', e.target);
   }
@@ -347,7 +363,7 @@ document.addEventListener('click', (e) => {
   }
 });
 
-// 5. Fallback Event-Delegation (falls direkte Event-Listener nicht funktionieren)
+// 5. Fallback Event-Delegation - KEIN STATE RESET
 document.addEventListener('submit', (e) => {
   if (e.target && e.target.id === 'ai-chat-form') {
     console.log('Fallback submit event fuer ai-chat-form');
@@ -359,6 +375,8 @@ document.addEventListener('submit', (e) => {
     if (!userInput) return;
     
     console.log('Fallback Chat-Input:', userInput);
+    logCurrentState('FALLBACK SUBMIT');
+    // KEIN conversationState RESET hier!
     handleConversation(userInput);
     chatInput.value = '';
   }
