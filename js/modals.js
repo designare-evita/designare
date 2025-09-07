@@ -1,5 +1,20 @@
 // js/modals.js
 
+export function showAIResponse(content, isHTML = false) {
+  const contentArea = document.getElementById('ai-response-content-area');
+  if (isHTML) {
+    contentArea.innerHTML = content;
+  } else {
+    contentArea.textContent = content; // Ihre bisherige Logik
+  }
+  
+  const modal = document.getElementById('ai-response-modal');
+  modal.classList.add('active');
+  document.body.classList.add('no-scroll');
+}
+
+
+
 export function showLoadingState() {
   const aiStatus = document.getElementById('ai-status');
   if (aiStatus) {
