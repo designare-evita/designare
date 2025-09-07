@@ -6,6 +6,7 @@ import { initTypewriters } from './typewriter.js';
 import { initModals } from './modals.js';
 import './ai-form.js'; 
 import { initSilasForm } from './silas-form.js';
+import { initBookingModal } from './booking.js';
 
 // === 2. HELFERFUNKTIONEN ===
 
