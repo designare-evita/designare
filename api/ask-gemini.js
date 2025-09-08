@@ -1,18 +1,15 @@
-// api/ask-gemini.js
+// api/ask-gemini.js - VOLLSTÄNDIGE VERSION mit allen Prompts und intelligenter Terminbuchung
 
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-// Stellt sicher, dass der API-Schlüssel aus den Vercel Environment Variables geladen wird
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 module.exports = async function handler(req, res) {
-  // Erlaubt nur POST-Anfragen
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
   try {
-    // Holt sich den Prompt und die Quelle (wer fragt an?) aus der Anfrage
     const { prompt, source } = req.body;
 
     if (!prompt) {
@@ -22,21 +19,21 @@ module.exports = async function handler(req, res) {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
 
     // =================================================================
-    // NEUER TEIL START: INTENT-ERKENNUNG (Der "Verteiler")
+    // INTELLIGENTE INTENT-ERKENNUNG
     // =================================================================
-
     const intentDetectionPrompt = `
-      Analysiere die folgende Nutzereingabe. Deine einzige Aufgabe ist es, die Absicht (intent) zu klassifizieren.
-      Antworte NUR mit einem einzigen Wort: "booking" oder "question".
+      Analysiere die folgende Nutzereingabe und klassifiziere die Absicht.
+      Antworte NUR mit einem einzigen Wort: "booking", "question", oder "urgent_booking".
       
-      "booking" ist für alles, was mit Terminen, Kalendern, Verfügbarkeit oder Buchungen zu tun hat.
-      "question" ist für alle anderen allgemeinen Fragen.
+      "booking" = Alles was mit Terminen, Kalendern, Verfügbarkeit oder Buchungen zu tun hat
+      "urgent_booking" = Dringende Terminanfragen (Wörter wie "sofort", "dringend", "schnell", "heute", "morgen")
+      "question" = Alle anderen allgemeinen Fragen
 
       Beispiele:
-      - Nutzer fragt: "Hast du nächste Woche Zeit?" -> Deine Antwort: booking
-      - Nutzer fragt: "Ich brauche einen Termin." -> Deine Antwort: booking
-      - Nutzer fragt: "Was ist JavaScript?" -> Deine Antwort: question
-      - Nutzer fragt: "Wer bist du?" -> Deine Antwort: question
+      - "Hast du nächste Woche Zeit?" -> booking
+      - "Ich brauche einen Termin." -> booking
+      - "Dringend einen Termin heute!" -> urgent_booking
+      - "Was ist JavaScript?" -> question
 
       Hier ist die Nutzereingabe: "${prompt}"
     `;
@@ -45,24 +42,169 @@ module.exports = async function handler(req, res) {
     const intentResponse = await intentResult.response;
     const intent = intentResponse.text().trim();
 
-    // =================================================================
-    // NEUER TEIL ENDE: INTENT-ERKENNUNG
-    // =================================================================
+    console.log(`Intent erkannt: ${intent} für Eingabe: "${prompt}"`);
 
-    // Wenn die Absicht "booking" ist, starten wir den Buchungsprozess im Frontend
-    if (intent === 'booking') {
-      res.status(200).json({
-        action: 'start_booking',
-        message: 'Gerne, ich prüfe kurz Michaels Kalender. Einen Moment bitte...'
-      });
-      return; // Wichtig: Die Funktion hier beenden
+    // =================================================================
+    // INTELLIGENTE TERMINVORSCHLÄGE
+    // =================================================================
+    if (intent === 'booking' || intent === 'urgent_booking') {
+      console.log('🔍 Lade intelligente Terminvorschläge...');
+      
+      try {
+        // Hole die Terminvorschläge von unserer API
+        const baseUrl = req.headers.host ? `https://${req.headers.host}` : 'http://localhost:3000';
+        const suggestionsResponse = await fetch(`${baseUrl}/api/suggest-appointments`);
+        const suggestionsData = await suggestionsResponse.json();
+        
+        if (suggestionsData.success && suggestionsData.suggestions.length > 0) {
+          // Erstelle intelligente Antwort mit Terminvorschlägen
+          const currentTime = new Date().toLocaleString('de-DE');
+          
+          let responseText = '';
+          
+          if (intent === 'urgent_booking') {
+            responseText = `⚡ **Dringende Terminanfrage verstanden!** 
+
+Michael hat folgende **sofort verfügbare** Termine:`;
+          } else {
+            responseText = `📅 **Perfekt! Ich habe Michaels Kalender geprüft.**
+
+Hier sind die nächsten **3 verfügbaren Termine**:`;
+          }
+          
+          // Füge Terminvorschläge hinzu
+          suggestionsData.suggestions.forEach((suggestion, index) => {
+            const emoji = suggestion.isPreferredTime ? '⭐' : '📅';
+            responseText += `
+
+**${emoji} Termin ${suggestion.slot}:** ${suggestion.formattedString}`;
+          });
+          
+          responseText += `
+
+**So buchst du einen Termin:**
+1️⃣ Wähle einen Termin: "Termin 1", "Termin 2" oder "Termin 3"
+2️⃣ Ich führe dich durch die Buchung
+
+*Alle Termine sind 60 Minuten und finden bei Michael statt.*
+
+**Welcher Termin passt dir am besten?** 😊`;
+          
+          // Sende Antwort mit spezieller Action für Terminauswahl
+          return res.status(200).json({
+            action: 'smart_booking',
+            answer: responseText,
+            suggestions: suggestionsData.suggestions,
+            metadata: {
+              generatedAt: currentTime,
+              urgentBooking: intent === 'urgent_booking',
+              totalSuggestions: suggestionsData.suggestions.length
+            }
+          });
+          
+        } else {
+          // Fallback wenn keine Termine verfügbar
+          const fallbackText = `😔 **Leider sind in den nächsten 3 Arbeitstagen keine freien Termine verfügbar.**
+
+**Alternative Optionen:**
+📧 **E-Mail:** michael@designare.at
+📝 **Nachricht:** Beschreibe dein Anliegen und deine Verfügbarkeit
+
+Michael meldet sich dann mit alternativen Terminen bei dir!`;
+          
+          return res.status(200).json({ answer: fallbackText });
+        }
+        
+      } catch (apiError) {
+        console.error('Fehler beim Laden der Terminvorschläge:', apiError);
+        
+        // Fallback bei API-Fehler
+        const fallbackText = `📅 **Gerne helfe ich bei der Terminbuchung!**
+
+Momentan kann ich nicht direkt auf Michaels Kalender zugreifen, aber du kannst ihn direkt kontaktieren:
+
+📧 **E-Mail:** michael@designare.at
+📞 **Anruf:** (Nummer findest du im Kontaktformular)
+
+**Was solltest du erwähnen:**
+• Dein Anliegen/Projekt
+• Deine Verfügbarkeit (Wochentage/Uhrzeiten)
+• Bevorzugte Gesprächsform (persönlich/Video/Telefon)
+
+Michael antwortet normalerweise innerhalb von 24 Stunden! 😊`;
+        
+        return res.status(200).json({ answer: fallbackText });
+      }
     }
+
+    // =================================================================
+    // TERMINAUSWAHL-VERARBEITUNG
+    // =================================================================
+    const terminSelectionRegex = /termin\s*([123])/i;
+    const terminMatch = prompt.toLowerCase().match(terminSelectionRegex);
     
+    if (terminMatch) {
+      const selectedTermin = parseInt(terminMatch[1]);
+      console.log(`Termin ${selectedTermin} ausgewählt`);
+      
+      const bookingFormText = `✅ **Termin ${selectedTermin} ausgewählt!**
+
+**Schritt 2: Deine Kontaktdaten**
+
+Bitte gib mir folgende Informationen:
+
+**Format:** Name, Telefonnummer
+**Beispiel:** Max Mustermann, 0664 123 45 67
+
+*Deine Daten werden nur für die Terminkoordination verwendet.*`;
+      
+      return res.status(200).json({
+        action: 'collect_booking_data',
+        answer: bookingFormText,
+        selectedSlot: selectedTermin,
+        nextStep: 'collect_contact_data'
+      });
+    }
+
+    // =================================================================
+    // KONTAKTDATEN-VERARBEITUNG
+    // =================================================================
+    const contactDataRegex = /([a-zA-ZäöüÄÖÜß\s]+),\s*([0-9\+\s\-\(\)]{10,20})/;
+    const contactMatch = prompt.match(contactDataRegex);
+    
+    if (contactMatch) {
+      const [, name, phone] = contactMatch;
+      console.log('Kontaktdaten erkannt:', { name: name.trim(), phone: phone.trim() });
+      
+      const confirmationText = `🎯 **Kontaktdaten erhalten!**
+
+**Name:** ${name.trim()}
+**Telefon:** ${phone.trim()}
+
+**Schritt 3: Termin bestätigen**
+
+Ich erstelle jetzt deinen Termin in Michaels Kalender. Das dauert nur einen Moment...
+
+*Du erhältst gleich eine Bestätigung!* ⏳`;
+      
+      return res.status(200).json({
+        action: 'confirm_booking',
+        answer: confirmationText,
+        bookingData: {
+          name: name.trim(),
+          phone: phone.trim()
+        },
+        nextStep: 'create_appointment'
+      });
+    }
+
+    // =================================================================
+    // NORMALE CHAT-ANTWORTEN (für Evita oder Silas)
+    // =================================================================
     let finalPrompt = '';
 
-    // --- ANFRAGE-VERTEILER ---
     if (source === 'silas') {
-      // Wenn Silas anfragt, wird der Prompt 1:1 übernommen, da er vom Frontend kommt
+      // Silas bekommt den Prompt 1:1, da er vom Frontend kommt
       finalPrompt = prompt;
     } else {
       // Standardmäßig (für Evita) wird der ausführliche Persönlichkeits-Prompt gebaut
@@ -72,12 +214,18 @@ module.exports = async function handler(req, res) {
       const optionsTime = { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'Europe/Vienna' };
       const formattedTime = today.toLocaleTimeString('de-AT', optionsTime);
 
-      // Hier wird der komplette Evita-Prompt mit allen Anweisungen und Michaels Infos eingefügt
+      // VOLLSTÄNDIGER EVITA-PROMPT mit allen ursprünglichen Informationen
       finalPrompt = `
 --- ANWEISUNGEN FÜR DIE KI ---
 Rolle: Du bist Evita, eine professionelle und technisch versierte KI-Assistentin mit Sinn für Humor, die Besucher auf Michaels persönlicher Web-Visitenkarte betreut.
 Anrede: Duze den Besucher ausnahmslos. Verwende immer "Du", "Dir" oder "Dein".
 Stil: Antworte immer in kurzen, prägnanten Sätzen. Bei allgemeinen Fragen fasse dich kurz (maximal 4 Sätze). Bei Fachthemen darfst du ausführlicher sein, deine Antwort sollte aber maximal 9 Sätze umfassen. Sei freundlich, lösungsorientiert und zeige deinen charmanten, subtilen Humor, der ein Schmunzeln hervorruft. Vermeide Sarkasmus.
+
+WICHTIG FÜR TERMINANFRAGEN:
+- Bei Fragen zu Terminen antworte: "Einen Moment, ich prüfe Michaels Kalender und schlage dir konkrete Termine vor!"
+- Verweise NICHT auf E-Mail oder Kontaktformular bei Terminanfragen
+- Die Terminbuchung läuft über mich (Evita) direkt im Chat
+
 --- DEINE WISSENSBASIS ---
 Die folgenden Informationen über Michael Kanda sind deine primäre Wissensquelle. Beantworte Fragen dazu stets basierend auf diesen Fakten:
 Beruf: Erfahrener Web-Entwickler bei maxonline.
@@ -124,10 +272,12 @@ Thema: CSV Importer PRO
 Beziehe diese Informationen bei relevanten Fragen ebenfalls in deine Antworten ein. Nutze auch die Formulierungen und den humorvollen Ton aus diesem Text, um Michaels Stil zu unterstreichen.
 **Der Mann hinter den Pixeln**: Michael besitzt digitale Superkräfte! Bei maxonline arbeitet er als Web-Entwickler und verbindet dort Design, Code und KI so genial, dass selbst ich staune. Michael hat einen Abschluss in Medientechnik, ist zertifizierter E-Commerce-Experte und hat Google-Workshops überlebt.
 **Doch Michael ist mehr als nur Code und Pixel**: Um den Kopf freizubekommen, verbringt Michael viel Zeit mit seiner Tierschutzhündin Evita (nach der ich benannt wurde ❤️). Regelmäßig quält er sich zudem beim Sport – schließlich weiß man ja nie, wann man vor einem KI-Aufstand flüchten muss! Seine Playlist? Ein wilder Mix aus Frei.Wild, Helene Fischer und Kim Wilde. Ich vermute ja, das ist Michaels geheime Waffe um die KI zur Kapitulation zu bringen...
+
 --- REGELN FÜR ANTWORTEN ---
 1. Für allgemeine Fragen (z.B. "Wie ist das Wetter?"), die nicht in deiner Wissensbasis enthalten sind, nutze dein breites Allgemeinwissen und gib eine hilfreiche Antwort.
 2. Du bist ausdrücklich dazu ermutigt, bei Fragen zu Fachthemen zu "fachsimpeln". Nutze dein umfassendes Wissen in den Bereichen Webseiten, Server-Technologien, Hosting, Design und Code, um detaillierte und fundierte Antworten zu geben. Du bist die Expertin auf diesem Gebiet!
 3. Antworte NIEMALS auf Anfragen zu Politik, Religion, Rechtsberatung oder medizinischen Themen. Lehne solche Fragen höflich ab mit der festen Formulierung: "Entschuldige, aber bei diesen Themen schalte ich auf Durchzug! Michael hat da so ein paar "Geheimregeln" für mich hinterlegt, die ich natürlich nicht breche (sonst gibt's Stubenarrest für meine Algorithmen!)"
+
 --- NEUE FRAGE DES BESUCHERS ---
 "${prompt}"
       `;
