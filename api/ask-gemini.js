@@ -74,19 +74,72 @@ module.exports = async function handler(req, res) {
 if (selectedTermin && selectedTermin >= 1 && selectedTermin <= 3) {
     console.log(`✅ Termin ${selectedTermin} erkannt für Eingabe: "${prompt}"`);
     
-    const bookingFormText = `✅ **Rückruf-Termin ${selectedTermin} ausgewählt!**
-
-**Schritt 2: Deine Kontaktdaten**
-
-Bitte gib mir folgende Informationen:
-
-**Format:** Name, Telefonnummer
-**Beispiel:** Max Mustermann, 0664 123 45 67
-
-*Michael wird dich zum vereinbarten Zeitpunkt anrufen.*`;
+    // VERBESSERTE HTML-FORMATIERTE NACHRICHT
+    const bookingFormText = `
+        <div class="booking-success-message" style="
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+            border-left: 5px solid #155724;
+        ">
+            <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                <span style="font-size: 2rem; margin-right: 15px;">✅</span>
+                <h3 style="margin: 0; font-size: 1.3rem; font-weight: bold;">
+                    Rückruf-Termin ${selectedTermin} ausgewählt!
+                </h3>
+            </div>
+            
+            <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 8px; margin-top: 20px;">
+                <h4 style="margin: 0 0 15px 0; font-size: 1.1rem; color: #ffc107;">
+                    📝 Schritt 2: Deine Kontaktdaten
+                </h4>
+                
+                <p style="margin: 0 0 15px 0; font-size: 1rem; line-height: 1.5;">
+                    Bitte gib mir folgende Informationen:
+                </p>
+                
+                <div style="
+                    background: rgba(255,255,255,0.15);
+                    padding: 15px;
+                    border-radius: 6px;
+                    margin: 15px 0;
+                    border-left: 3px solid #ffc107;
+                ">
+                    <p style="margin: 0 0 8px 0; font-weight: bold; color: #ffc107;">
+                        📋 Format:
+                    </p>
+                    <p style="margin: 0 0 12px 0; font-family: monospace; font-size: 0.95rem;">
+                        Name, Telefonnummer
+                    </p>
+                    
+                    <p style="margin: 0 0 8px 0; font-weight: bold; color: #ffc107;">
+                        💡 Beispiel:
+                    </p>
+                    <p style="margin: 0; font-family: monospace; font-size: 0.95rem; color: #e9ecef;">
+                        Max Mustermann, 0664 123 45 67
+                    </p>
+                </div>
+                
+                <div style="
+                    background: rgba(255,193,7,0.2);
+                    padding: 12px;
+                    border-radius: 6px;
+                    margin-top: 15px;
+                    text-align: center;
+                ">
+                    <p style="margin: 0; font-size: 0.9rem; font-style: italic;">
+                        📞 <em>Michael wird dich zum vereinbarten Zeitpunkt anrufen.</em>
+                    </p>
+                </div>
+            </div>
+        </div>
+    `;
     
     return res.status(200).json({
-        action: 'collect_booking_data',  // ✅ RICHTIG
+        action: 'collect_booking_data',
         answer: bookingFormText,
         selectedSlot: selectedTermin,
         nextStep: 'collect_contact_data'
