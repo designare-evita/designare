@@ -181,74 +181,79 @@ export const initAiForm = () => {
     // ===================================================================
     // KORRIGIERTE BOOKING-AUSFÜHRUNG
     // ===================================================================
-    const executeBooking = async () => {
-        console.log('🔍 executeBooking gestartet');
-        console.log('📋 Aktueller State:', currentBookingState);
-        
-        // Validiere Booking-Daten
-        if (!currentBookingState.bookingData?.name || !currentBookingState.bookingData?.phone) {
-            throw new Error('Unvollständige Buchungsdaten');
-        }
 
-        try {
-            // Bestimme Termin-Zeit
-            let appointmentSlot;
-            
-            if (currentBookingState.selectedSlot && currentBookingState.suggestions?.length > 0) {
-                const selectedSuggestion = currentBookingState.suggestions.find(s => s.slot === currentBookingState.selectedSlot);
-                
-                if (selectedSuggestion) {
-                    // Verwende das formatierte String-Format für create-appointment
-                    appointmentSlot = selectedSuggestion.formattedString || selectedSuggestion.fullDateTime;
-                    console.log('✅ Verwende ausgewählten Termin:', appointmentSlot);
-                } else {
-                    console.warn('⚠️ Ausgewählter Termin nicht in Suggestions gefunden');
-                    appointmentSlot = generateFallbackSlot();
-                }
+const executeBooking = async () => {
+    console.log('🔍 executeBooking gestartet mit korrigierter Logik');
+    console.log('📋 Aktueller State:', currentBookingState);
+
+    // Validiere Booking-Daten
+    if (!currentBookingState.bookingData?.name || !currentBookingState.bookingData?.phone) {
+        throw new Error('Unvollständige Buchungsdaten. Name oder Telefonnummer fehlen.');
+    }
+
+    try {
+        // Bestimme Termin-Zeit
+        let appointmentSlot;
+        if (currentBookingState.selectedSlot && currentBookingState.suggestions?.length > 0) {
+            const selectedSuggestion = currentBookingState.suggestions.find(s => s.slot === currentBookingState.selectedSlot);
+            if (selectedSuggestion) {
+                appointmentSlot = selectedSuggestion.formattedString || selectedSuggestion.fullDateTime;
+                console.log('✅ Verwende ausgewählten Termin:', appointmentSlot);
             } else {
-                console.warn('⚠️ Kein Termin ausgewählt, verwende Fallback');
+                console.warn('⚠️ Ausgewählter Termin nicht in Suggestions gefunden, verwende Fallback');
                 appointmentSlot = generateFallbackSlot();
             }
+        } else {
+            console.warn('⚠️ Kein Termin ausgewählt, verwende Fallback');
+            appointmentSlot = generateFallbackSlot();
+        }
 
-            console.log('📅 Finale Buchungsdaten:', {
-                slot: appointmentSlot,
-                name: currentBookingState.bookingData.name,
-                email: currentBookingState.bookingData.phone + '@temp.booking'
-            });
+        const bookingPayload = {
+            slot: appointmentSlot,
+            // KORREKTUR 1: Telefonnummer zum Namen hinzufügen für Sichtbarkeit
+            name: `${currentBookingState.bookingData.name} (Tel: ${currentBookingState.bookingData.phone})`,
+            // KORREKTUR 2: Statische, gültige E-Mail verwenden, um API-Fehler zu vermeiden
+            email: `rueckruf@designare.at`
+        };
 
-            // KORRIGIERT: Verwende create-appointment API (nicht book-appointment-phone)
-            const response = await fetch('/api/create-appointment', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    slot: appointmentSlot,
-                    name: currentBookingState.bookingData.name,
-                    email: currentBookingState.bookingData.phone + '@temp.booking' // Fallback E-Mail
-                })
-            });
+        console.log('📅 Finale Buchungsdaten an API:', bookingPayload);
 
-            const responseText = await response.text();
-            console.log('📨 Raw API Response:', responseText);
+        // API-Aufruf an create-appointment
+        const response = await fetch('/api/create-appointment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(bookingPayload)
+        });
 
-            if (!response.ok) {
+        const responseText = await response.text();
+        console.log('📨 Raw API Response:', responseText);
+
+        if (!response.ok) {
+            // Versuche, JSON zu parsen, auch bei Fehlern
+            try {
+                const errorData = JSON.parse(responseText);
+                throw new Error(errorData.message || `HTTP ${response.status}`);
+            } catch (e) {
                 throw new Error(`HTTP ${response.status}: ${responseText}`);
             }
-
-            const result = JSON.parse(responseText);
-            console.log('📨 Parsed Result:', result);
-
-            if (result.success) {
-                showBookingSuccess(result, appointmentSlot);
-                resetBookingState();
-            } else {
-                throw new Error(result.message || 'Unbekannter API-Fehler');
-            }
-
-        } catch (error) {
-            console.error('❌ Booking execution error:', error);
-            throw error;
         }
-    };
+
+        const result = JSON.parse(responseText);
+        console.log('📨 Parsed Result:', result);
+
+        if (result.success) {
+            showBookingSuccess(result, appointmentSlot);
+            resetBookingState();
+        } else {
+            throw new Error(result.message || 'Unbekannter API-Fehler');
+        }
+
+    } catch (error) {
+        console.error('❌ Kritischer Fehler bei der Buchungsausführung:', error);
+        // Wirf den Fehler weiter, damit er im aufrufenden try/catch behandelt wird
+        throw error;
+    }
+};
 
     const generateFallbackSlot = () => {
         const tomorrow = new Date();
