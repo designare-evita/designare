@@ -93,61 +93,38 @@ export const initAiForm = () => {
     // BOOKING-FUNKTIONEN
     // ===================================================================
     
-    const createInteractiveTerminMessage = (message, suggestions) => {
-        console.log("📅 Erstelle interaktive Termin-Nachricht mit", suggestions?.length || 0, "Vorschlägen");
-        
-        let enhancedHtml = `
-            <div class="booking-message">
-                <div class="booking-text" style="margin-bottom: 20px; font-size: 1.1rem;">
-                    Hier sind die nächsten 3 verfügbaren Rückruf-Termine:
-                </div>
-        `;
-        
-        if (suggestions && suggestions.length > 0) {
-            enhancedHtml += `<div class="booking-buttons" style="margin-top: 20px;">`;
-            
-            suggestions.forEach((suggestion) => {
-                const emoji = suggestion.isPreferredTime ? '⭐' : '📞';
-                enhancedHtml += `
-                    <button class="termin-button" 
-                            data-slot="${suggestion.slot}" 
-                            data-datetime="${suggestion.fullDateTime || ''}" 
-                            data-formatted="${suggestion.formattedString || ''}"
-                            style="
-                                display: block;
-                                width: 100%;
-                                margin-bottom: 12px;
-                                padding: 15px 20px;
-                                background: linear-gradient(135deg, #ffc107 0%, #ffca2c 100%);
-                                color: #1a1a1a;
-                                border: none;
-                                border-radius: 8px;
-                                cursor: pointer;
-                                font-weight: bold;
-                                font-size: 1rem;
-                                transition: all 0.3s ease;
-                            " 
-                            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 5px 15px rgba(255,193,7,0.4)'" 
-                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
-                        ${emoji} Termin ${suggestion.slot}: ${suggestion.formattedString}
-                    </button>
-                `;
-            });
-            
-            enhancedHtml += `</div>`;
-        }
-        
-        enhancedHtml += `
-            <div style="margin-top: 20px; padding: 15px; background: rgba(255,193,7,0.1); border-radius: 8px; border-left: 4px solid #ffc107;">
-                <strong style="color: #ffc107;">💡 So funktioniert's:</strong><br>
-                1. Klicke auf einen Termin oder schreibe "Termin 1", "Termin 2" oder "Termin 3"<br>
-                2. Gib deine Kontaktdaten ein<br>
-                3. Michael ruft dich zum vereinbarten Zeitpunkt an
+  const createInteractiveTerminMessage = (message, suggestions) => {
+    console.log("📅 Erstelle BEREINIGTE interaktive Termin-Nachricht");
+
+    // Nur der Einleitungstext bleibt
+    let enhancedHtml = `
+        <div class="booking-message">
+            <div class="booking-text">
+                Hier sind die nächsten 3 verfügbaren Rückruf-Termine:
             </div>
-        </div>`;
-        
-        return enhancedHtml;
-    };
+    `;
+
+    if (suggestions && suggestions.length > 0) {
+        enhancedHtml += `<div class="booking-buttons" style="margin-top: 15px;">`;
+
+        suggestions.forEach((suggestion) => {
+            // KEIN HTML, KEIN CSS, nur der Button
+            enhancedHtml += `
+                <button class="termin-button"
+                        data-slot="${suggestion.slot}"
+                        data-datetime="${suggestion.fullDateTime || ''}"
+                        data-formatted="${suggestion.formattedString || ''}">
+                    Termin ${suggestion.slot}: ${suggestion.formattedString}
+                </button>
+            `;
+        });
+
+        enhancedHtml += `</div>`;
+    }
+
+    enhancedHtml += `</div>`;
+    return enhancedHtml;
+};
 
     const handleBookingDataCollection = (data) => {
         console.log("📝 Sammle Kontaktdaten");
