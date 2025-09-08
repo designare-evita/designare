@@ -244,19 +244,16 @@ export const initAiForm = () => {
             if (data.action === 'smart_booking') {
                 console.log("🎯 SMART BOOKING ERKANNT!");
                 
-                if (isFromChat) {
-                    // Bei Chat-Aufruf: Nur State aktualisieren, KEINE neue Anzeige
-                    currentBookingState.suggestions = data.suggestions || [];
-                    currentBookingState.step = 'slot_selection';
-                    console.log("✅ State aktualisiert, keine doppelte Anzeige");
-                } else {
-                    // Bei erster Anfrage: Modal mit Terminliste zeigen
-                    const enhancedMessage = createInteractiveTerminMessage(data.answer, data.suggestions);
-                    initializeChat(enhancedMessage, true);
-                    showModal();
-                    currentBookingState.suggestions = data.suggestions || [];
-                    currentBookingState.step = 'slot_selection';
-                }
+            if (isFromChat) {
+    // Bei Chat-Aufruf: GAR NICHTS tun
+    console.log("✅ Chat-Aufruf ignoriert");
+} else {
+    // Bei erster Anfrage: NUR den Text zeigen, OHNE zusätzliche Optionen
+    initializeChat(data.answer, false);  // ✅ Nur der Text
+    showModal();
+    currentBookingState.suggestions = data.suggestions || [];
+    currentBookingState.step = 'slot_selection';
+}
                 return true;
             }
             
