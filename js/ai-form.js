@@ -134,11 +134,9 @@ const handleBookingDataCollection = (data) => {
     console.log("📝 Sammle Kontaktdaten mit ROBUSTEM FORMULAR");
     currentBookingState.step = 'contact_data';
 
-    // 1. Zeige die saubere Bestätigungs- und Info-Nachricht
     const selectedTerminText = currentBookingState.selectedSlotFormatted || `Nummer ${currentBookingState.selectedSlot}`;
     addMessageToHistory(`Termin (${selectedTerminText}) ausgewählt`, 'ai', false);
 
-    // 2. Erstelle und zeige das Eingabeformular direkt im Chat
     const formHtml = `
         <div class="chat-message ai">
             <form id="contact-details-form" style="margin-top: 10px;">
@@ -152,9 +150,14 @@ const handleBookingDataCollection = (data) => {
         </div>
     `;
 
-    // Füge das Formular zum Chat hinzu
     responseArea.insertAdjacentHTML('beforeend', formHtml);
-    responseArea.scrollTop = responseArea.scrollHeight; // Nach unten scrollen
+    responseArea.scrollTop = responseArea.scrollHeight;
+
+    // KORREKTUR: Hänge den Event-Listener direkt an das neue Formular
+    const contactForm = document.getElementById('contact-details-form');
+    if (contactForm) {
+        contactForm.addEventListener('submit', handleContactDataSubmit);
+    }
 };
 
     const handleBookingConfirmation = async (data) => {
