@@ -244,8 +244,6 @@ const handleSmartBookingResponse = (data) => {
             // INTELLIGENTE ANTWORT-BEHANDLUNG
             // ===================================================================
             
-         if (data.action === 'smart_booking') {
-    console.log("🎯 SMART BOOKING ERKANNT!");
     
 if (data.action === 'smart_booking') {
     console.log("🎯 SMART BOOKING ERKANNT!");
