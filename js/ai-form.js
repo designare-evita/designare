@@ -1,4 +1,4 @@
-// js/ai-form.js - KOMPLETTE KORRIGIERTE FASSUNG
+// js/ai-form.js - KOMPLETTE KORRIGIERTE FASSUNG OHNE DUPLIKATE
 
 export const initAiForm = () => {
     console.log("🚀 initAiForm mit intelligenter Terminbuchung gestartet");
@@ -115,146 +115,133 @@ export const initAiForm = () => {
     const handleBookingDataCollection = (data) => {
         console.log("📝 Datensammlung:", data);
         currentBookingState.step = 'contact_data';
-        addMessageToHistory(data.answer, 'ai');
+        addMessageToHistory(data.answer, 'ai', true); // HTML-Formatierung aktivieren
     };
 
+    // ===================================================================
+    // KORRIGIERTE BOOKING-BESTÄTIGUNG (NUR EINMAL DEFINIERT)
+    // ===================================================================
     const handleBookingConfirmation = async (data) => {
         console.log("✅ Booking-Bestätigung:", data);
         currentBookingState.bookingData = data.bookingData;
         currentBookingState.step = 'confirming';
         
-        // Zeige Bestätigungsnachricht
-        addMessageToHistory(data.answer, 'ai');
+        // Zeige Bestätigungsnachricht mit HTML-Formatierung
+        addMessageToHistory(data.answer, 'ai', true);
         
-        // Führe die eigentliche Buchung durch
-        try {
-            await executeBooking();
-        } catch (error) {
-            console.error('Fehler bei der Buchung:', error);
-            addMessageToHistory("❌ Fehler bei der Terminbuchung. Bitte versuche es erneut oder kontaktiere Michael direkt.", 'ai');
-        }
+        // Warte kurz, dann führe die eigentliche Buchung durch
+        setTimeout(async () => {
+            try {
+                await executeBooking();
+            } catch (error) {
+                console.error('Fehler bei der Buchung:', error);
+                addMessageToHistory(`
+                    <div style="background: #dc3545; color: white; padding: 15px; border-radius: 8px; margin: 10px 0;">
+                        <strong>❌ Fehler bei der Terminbuchung</strong><br>
+                        Bitte versuche es erneut oder kontaktiere Michael direkt unter:<br>
+                        📧 <a href="mailto:michael@designare.at" style="color: #ffc107;">michael@designare.at</a>
+                    </div>
+                `, 'ai', true);
+            }
+        }, 2000);
     };
 
-   // In js/ai-form.js - KORRIGIERTE executeBooking Integration
+    // ===================================================================
+    // KORRIGIERTE BOOKING-AUSFÜHRUNG (NUR EINMAL DEFINIERT)
+    // ===================================================================
+    const executeBooking = async () => {
+        if (!currentBookingState.selectedSlot || !currentBookingState.bookingData) {
+            console.error('Unvollständige Buchungsdaten');
+            return;
+        }
 
-const handleBookingConfirmation = async (data) => {
-    console.log("✅ Booking-Bestätigung:", data);
-    currentBookingState.bookingData = data.bookingData;
-    currentBookingState.step = 'confirming';
-    
-    // Zeige Bestätigungsnachricht
-    addMessageToHistory(data.answer, 'ai', true); // ✅ isHtml = true für korrekte Anzeige
-    
-    // ✅ WICHTIG: Warte kurz, dann führe die eigentliche Buchung durch
-    setTimeout(async () => {
         try {
-            await executeBooking();
-        } catch (error) {
-            console.error('Fehler bei der Buchung:', error);
-            addMessageToHistory(`
-                <div style="background: #dc3545; color: white; padding: 15px; border-radius: 8px; margin: 10px 0;">
-                    <strong>❌ Fehler bei der Terminbuchung</strong><br>
-                    Bitte versuche es erneut oder kontaktiere Michael direkt unter:<br>
-                    📧 <a href="mailto:michael@designare.at" style="color: #ffc107;">michael@designare.at</a>
-                </div>
-            `, 'ai', true);
-        }
-    }, 2000); // 2 Sekunden warten für bessere UX
-};
+            console.log('🔍 Suche Suggestion für Slot:', currentBookingState.selectedSlot);
+            console.log('📋 Verfügbare Suggestions:', currentBookingState.suggestions);
+            
+            const selectedSuggestion = currentBookingState.suggestions.find(s => s.slot === currentBookingState.selectedSlot);
+            
+            if (!selectedSuggestion) {
+                throw new Error(`Ausgewählter Slot ${currentBookingState.selectedSlot} nicht gefunden`);
+            }
 
-const executeBooking = async () => {
-    if (!currentBookingState.selectedSlot || !currentBookingState.bookingData) {
-        console.error('Unvollständige Buchungsdaten');
-        return;
-    }
-
-    try {
-        console.log('🔍 Suche Suggestion für Slot:', currentBookingState.selectedSlot);
-        console.log('📋 Verfügbare Suggestions:', currentBookingState.suggestions);
-        
-        const selectedSuggestion = currentBookingState.suggestions.find(s => s.slot === currentBookingState.selectedSlot);
-        
-        if (!selectedSuggestion) {
-            throw new Error(`Ausgewählter Slot ${currentBookingState.selectedSlot} nicht gefunden`);
-        }
-
-        console.log('📅 Erstelle Termin für:', {
-            slot: selectedSuggestion.fullDateTime,
-            name: currentBookingState.bookingData.name,
-            phone: currentBookingState.bookingData.phone
-        });
-
-        const response = await fetch('/api/book-appointment-phone', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
+            console.log('📅 Erstelle Termin für:', {
                 slot: selectedSuggestion.fullDateTime,
                 name: currentBookingState.bookingData.name,
                 phone: currentBookingState.bookingData.phone
-            })
-        });
+            });
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`HTTP ${response.status}: ${errorText}`);
-        }
+            const response = await fetch('/api/book-appointment-phone', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    slot: selectedSuggestion.fullDateTime,
+                    name: currentBookingState.bookingData.name,
+                    phone: currentBookingState.bookingData.phone
+                })
+            });
 
-        const result = await response.json();
-        console.log('📨 Booking API Response:', result);
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`HTTP ${response.status}: ${errorText}`);
+            }
 
-        if (result.success) {
-            // ✅ Erfolgreiche Buchung - zeige schöne Bestätigung
-            const successMessage = `
-                <div style="
-                    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-                    color: white;
-                    padding: 25px;
-                    border-radius: 12px;
-                    margin: 20px 0;
-                    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
-                    text-align: center;
-                ">
-                    <div style="font-size: 3rem; margin-bottom: 15px;">🎉</div>
-                    <h3 style="margin: 0 0 20px 0; font-size: 1.5rem;">
-                        Perfekt! Dein Termin ist gebucht!
-                    </h3>
-                    <div style="background: rgba(255,255,255,0.15); padding: 20px; border-radius: 8px; margin: 20px 0;">
-                        ${result.message}
+            const result = await response.json();
+            console.log('📨 Booking API Response:', result);
+
+            if (result.success) {
+                // Erfolgreiche Buchung - zeige schöne Bestätigung
+                const successMessage = `
+                    <div style="
+                        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+                        color: white;
+                        padding: 25px;
+                        border-radius: 12px;
+                        margin: 20px 0;
+                        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+                        text-align: center;
+                    ">
+                        <div style="font-size: 3rem; margin-bottom: 15px;">🎉</div>
+                        <h3 style="margin: 0 0 20px 0; font-size: 1.5rem;">
+                            Perfekt! Dein Termin ist gebucht!
+                        </h3>
+                        <div style="background: rgba(255,255,255,0.15); padding: 20px; border-radius: 8px; margin: 20px 0;">
+                            ${result.message}
+                        </div>
+                        <p style="margin: 15px 0 0 0; font-size: 0.9rem; opacity: 0.9;">
+                            Du erhältst etwa 15 Minuten vor dem Termin einen Anruf von Michael.
+                        </p>
                     </div>
-                    <p style="margin: 15px 0 0 0; font-size: 0.9rem; opacity: 0.9;">
-                        Du erhältst etwa 15 Minuten vor dem Termin einen Anruf von Michael.
-                    </p>
+                `;
+                
+                addMessageToHistory(successMessage, 'ai', true);
+                
+                // Reset booking state
+                currentBookingState = { 
+                    suggestions: [], 
+                    selectedSlot: null, 
+                    bookingData: null, 
+                    step: 'initial' 
+                };
+            } else {
+                throw new Error(result.message || 'Unbekannter Fehler bei der Buchung');
+            }
+
+        } catch (error) {
+            console.error('❌ Booking execution error:', error);
+            
+            const errorMessage = `
+                <div style="background: #dc3545; color: white; padding: 20px; border-radius: 8px; margin: 10px 0;">
+                    <strong>❌ Fehler bei der Terminbuchung</strong><br><br>
+                    <strong>Details:</strong> ${error.message}<br><br>
+                    Bitte versuche es erneut oder kontaktiere Michael direkt:<br>
+                    📧 <a href="mailto:michael@designare.at" style="color: #ffc107;">michael@designare.at</a>
                 </div>
             `;
             
-            addMessageToHistory(successMessage, 'ai', true);
-            
-            // Reset booking state
-            currentBookingState = { 
-                suggestions: [], 
-                selectedSlot: null, 
-                bookingData: null, 
-                step: 'initial' 
-            };
-        } else {
-            throw new Error(result.message || 'Unbekannter Fehler bei der Buchung');
+            addMessageToHistory(errorMessage, 'ai', true);
         }
-
-    } catch (error) {
-        console.error('❌ Booking execution error:', error);
-        
-        const errorMessage = `
-            <div style="background: #dc3545; color: white; padding: 20px; border-radius: 8px; margin: 10px 0;">
-                <strong>❌ Fehler bei der Terminbuchung</strong><br><br>
-                <strong>Details:</strong> ${error.message}<br><br>
-                Bitte versuche es erneut oder kontaktiere Michael direkt:<br>
-                📧 <a href="mailto:michael@designare.at" style="color: #ffc107;">michael@designare.at</a>
-            </div>
-        `;
-        
-        addMessageToHistory(errorMessage, 'ai', true);
-    }
-};
+    };
 
     // ===================================================================
     // EVENT-HANDLER FÜR TERMIN-BUTTONS
