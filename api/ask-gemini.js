@@ -145,57 +145,97 @@ if (selectedTermin && selectedTermin >= 1 && selectedTermin <= 3) {
     });
 }
 
-    // =================================================================
-    // ERWEITERTE KONTAKTDATEN-ERKENNUNG
-    // =================================================================
+   // In api/ask-gemini.js - VERBESSERTE KONTAKTDATEN-ERKENNUNG
 
-    // Mehrere Patterns für Name und Telefonnummer
-    const contactPatterns = [
-      // Standard: "Max Mustermann, 0664 123 45 67"
-      /([a-zA-ZäöüÄÖÜß\s]{2,50}),\s*([0-9\+\s\-\(\)]{8,20})/,
-      
-      // Mit "Name:" und "Tel:" Präfixen
-      /name:?\s*([a-zA-ZäöüÄÖÜß\s]{2,50}),?\s*(?:tel|telefon|phone)?:?\s*([0-9\+\s\-\(\)]{8,20})/i,
-      
-      // Umgekehrte Reihenfolge: "0664 123 45 67, Max Mustermann"
-      /([0-9\+\s\-\(\)]{8,20}),\s*([a-zA-ZäöüÄÖÜß\s]{2,50})/,
-      
-      // Mehrzeilig mit Zeilenwechsel
-      /([a-zA-ZäöüÄÖÜß\s]{2,50})\s*[\n\r]+\s*([0-9\+\s\-\(\)]{8,20})/
-    ];
+// =================================================================
+// ERWEITERTE KONTAKTDATEN-ERKENNUNG
+// =================================================================
 
-    let contactData = null;
+// Mehrere Patterns für Name und Telefonnummer
+const contactPatterns = [
+    // Standard: "Max Mustermann, 0664 123 45 67"
+    /([a-zA-ZäöüÄÖÜß\s]{2,50}),\s*([0-9\+\s\-\(\)]{7,20})/,
+    
+    // Mit "Name:" und "Tel:" Präfixen
+    /name:?\s*([a-zA-ZäöüÄÖÜß\s]{2,50}),?\s*(?:tel|telefon|phone)?:?\s*([0-9\+\s\-\(\)]{7,20})/i,
+    
+    // Umgekehrte Reihenfolge: "0664 123 45 67, Max Mustermann"
+    /([0-9\+\s\-\(\)]{7,20}),\s*([a-zA-ZäöüÄÖÜß\s]{2,50})/,
+    
+    // Mehrzeilig mit Zeilenwechsel
+    /([a-zA-ZäöüÄÖÜß\s]{2,50})\s*[\n\r]+\s*([0-9\+\s\-\(\)]{7,20})/,
+    
+    // NEUE PATTERNS für informelle Eingaben:
+    // "Hans hier, 0124589"
+    /([a-zA-ZäöüÄÖÜß\s]{2,50})\s+hier,?\s*([0-9\+\s\-\(\)]{7,20})/i,
+    
+    // "Ich bin Maria, 0123456789"
+    /ich\s+bin\s+([a-zA-ZäöüÄÖÜß\s]{2,50}),?\s*([0-9\+\s\-\(\)]{7,20})/i,
+    
+    // "Mein Name ist Peter, Tel 0987654321"
+    /mein\s+name\s+ist\s+([a-zA-ZäöüÄÖÜß\s]{2,50}),?\s*(?:tel|telefon)?:?\s*([0-9\+\s\-\(\)]{7,20})/i,
+    
+    // "Peter Schmidt - 0123456789"
+    /([a-zA-ZäöüÄÖÜß\s]{2,50})\s*[-–]\s*([0-9\+\s\-\(\)]{7,20})/,
+    
+    // "Peter / 0123456789"
+    /([a-zA-ZäöüÄÖÜß\s]{2,50})\s*\/\s*([0-9\+\s\-\(\)]{7,20})/,
+    
+    // Nur Leerzeichen getrennt: "Peter Schmidt 0123456789"
+    /^([a-zA-ZäöüÄÖÜß]+(?:\s+[a-zA-ZäöüÄÖÜß]+)*)\s+([0-9\+\s\-\(\)]{7,20})$/
+];
 
-    for (const pattern of contactPatterns) {
-      const match = prompt.match(pattern);
-      if (match) {
+let contactData = null;
+
+for (const pattern of contactPatterns) {
+    const match = prompt.match(pattern);
+    if (match) {
         let name, phone;
         
-        // Bei umgekehrter Reihenfolge (Telefon zuerst)
-        if (pattern.source.includes('([0-9\\+\\s\\-\\(\\)]{8,20})')) {
-          if (/^[0-9\+\s\-\(\)]+$/.test(match[1].trim())) {
+        console.log('📋 Pattern Match gefunden:', match);
+        
+        // Spezielle Behandlung für verschiedene Patterns
+        if (pattern.source.includes('hier')) {
+            // "Hans hier, 0124589"
+            name = match[1].trim();
+            phone = match[2].trim();
+        } else if (pattern.source.includes('ich\\s+bin')) {
+            // "Ich bin Maria, 0123456789"
+            name = match[1].trim();
+            phone = match[2].trim();
+        } else if (pattern.source.includes('mein\\s+name')) {
+            // "Mein Name ist Peter, Tel 0987654321"
+            name = match[1].trim();
+            phone = match[2].trim();
+        } else if (/^[0-9\+\s\-\(\)]+$/.test(match[1].trim())) {
             // Erstes Match ist eine Telefonnummer
             phone = match[1].trim();
             name = match[2].trim();
-          } else {
-            // Erstes Match ist ein Name
+        } else {
+            // Standard: Erstes Match ist ein Name
             name = match[1].trim();
             phone = match[2].trim();
-          }
-        } else {
-          name = match[1].trim();
-          phone = match[2].trim();
         }
         
-        // Validierung
-        if (name.length >= 2 && phone.length >= 8) {
-          contactData = { name, phone };
-          break;
+        // Erweiterte Validierung
+        if (name && phone && name.length >= 2 && phone.length >= 7) {
+            // Bereinige den Namen von häufigen Fehlern
+            name = name.replace(/^(ich bin|mein name ist|hier ist)\s*/i, '').trim();
+            name = name.replace(/,\s*$/, ''); // Entferne Komma am Ende
+            
+            // Bereinige die Telefonnummer
+            phone = phone.replace(/[^\d\+]/g, ''); // Nur Zahlen und +
+            
+            if (name.length >= 2 && phone.length >= 7) {
+                contactData = { name, phone };
+                console.log('✅ Kontaktdaten erfolgreich extrahiert:', contactData);
+                break;
+            }
         }
-      }
     }
+}
 
-    if (contactData) {
+if (contactData) {
     console.log('✅ Kontaktdaten erkannt:', contactData);
     
     const confirmationText = `
