@@ -1,4 +1,4 @@
-// api/ask-gemini.js - VOLLSTÄNDIGE VERSION mit allen Prompts und intelligenter Terminbuchung
+// api/ask-gemini.js - KOMPLETT KORRIGIERTE VERSION mit allen Prompts und intelligenter Terminbuchung
 
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
@@ -19,21 +19,171 @@ module.exports = async function handler(req, res) {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
 
     // =================================================================
+    // ERWEITERTE TERMINAUSWAHL-ERKENNUNG (ZUERST PRÜFEN)
+    // =================================================================
+    
+    // Erweiterte Regex für verschiedene Terminauswahl-Formate
+    const terminSelectionPatterns = [
+      /termin\s*([123])/i,           // "Termin 1", "Termin 2", "Termin 3"
+      /^([123])$/,                   // Nur "1", "2", "3"
+      /nummer\s*([123])/i,           // "Nummer 1", "Nummer 2", "Nummer 3"
+      /option\s*([123])/i,           // "Option 1", "Option 2", "Option 3"
+      /den\s*([123])\./i,            // "den 1.", "den 2.", "den 3."
+      /^([123])\s*\.?$/,             // "1.", "2.", "3."
+      /(erste|zweite|dritte)/i       // "erste", "zweite", "dritte"
+    ];
+
+    let selectedTermin = null;
+
+    // Prüfe alle Patterns
+    for (const pattern of terminSelectionPatterns) {
+      const match = prompt.toLowerCase().match(pattern);
+      if (match) {
+        if (pattern.source.includes('erste|zweite|dritte')) {
+          // Wandle Wörter in Zahlen um
+          const wordToNumber = {
+            'erste': 1,
+            'zweite': 2, 
+            'dritte': 3
+          };
+          selectedTermin = wordToNumber[match[1]];
+        } else {
+          selectedTermin = parseInt(match[1]);
+        }
+        break;
+      }
+    }
+
+    // Zusätzliche direkte Wort-Erkennung
+    if (!selectedTermin) {
+      const directWords = {
+        'eins': 1, 'first': 1, 'ersten': 1, 'erstes': 1,
+        'zwei': 2, 'second': 2, 'zweiten': 2, 'zweites': 2,
+        'drei': 3, 'third': 3, 'dritten': 3, 'drittes': 3
+      };
+      
+      const lowerPrompt = prompt.toLowerCase().trim();
+      for (const [word, number] of Object.entries(directWords)) {
+        if (lowerPrompt === word || lowerPrompt.includes(word)) {
+          selectedTermin = number;
+          break;
+        }
+      }
+    }
+
+    if (selectedTermin && selectedTermin >= 1 && selectedTermin <= 3) {
+      console.log(`✅ Termin ${selectedTermin} erkannt für Eingabe: "${prompt}"`);
+      
+      const bookingFormText = `✅ **Termin ${selectedTermin} ausgewählt!**
+
+**Schritt 2: Deine Kontaktdaten**
+
+Bitte gib mir folgende Informationen:
+
+**Format:** Name, Telefonnummer
+**Beispiel:** Max Mustermann, 0664 123 45 67
+
+*Deine Daten werden nur für die Terminkoordination verwendet.*`;
+      
+      return res.status(200).json({
+        action: 'collect_booking_data',
+        answer: bookingFormText,
+        selectedSlot: selectedTermin,
+        nextStep: 'collect_contact_data'
+      });
+    }
+
+    // =================================================================
+    // ERWEITERTE KONTAKTDATEN-ERKENNUNG
+    // =================================================================
+
+    // Mehrere Patterns für Name und Telefonnummer
+    const contactPatterns = [
+      // Standard: "Max Mustermann, 0664 123 45 67"
+      /([a-zA-ZäöüÄÖÜß\s]{2,50}),\s*([0-9\+\s\-\(\)]{8,20})/,
+      
+      // Mit "Name:" und "Tel:" Präfixen
+      /name:?\s*([a-zA-ZäöüÄÖÜß\s]{2,50}),?\s*(?:tel|telefon|phone)?:?\s*([0-9\+\s\-\(\)]{8,20})/i,
+      
+      // Umgekehrte Reihenfolge: "0664 123 45 67, Max Mustermann"
+      /([0-9\+\s\-\(\)]{8,20}),\s*([a-zA-ZäöüÄÖÜß\s]{2,50})/,
+      
+      // Mehrzeilig mit Zeilenwechsel
+      /([a-zA-ZäöüÄÖÜß\s]{2,50})\s*[\n\r]+\s*([0-9\+\s\-\(\)]{8,20})/
+    ];
+
+    let contactData = null;
+
+    for (const pattern of contactPatterns) {
+      const match = prompt.match(pattern);
+      if (match) {
+        let name, phone;
+        
+        // Bei umgekehrter Reihenfolge (Telefon zuerst)
+        if (pattern.source.includes('([0-9\\+\\s\\-\\(\\)]{8,20})')) {
+          if (/^[0-9\+\s\-\(\)]+$/.test(match[1].trim())) {
+            // Erstes Match ist eine Telefonnummer
+            phone = match[1].trim();
+            name = match[2].trim();
+          } else {
+            // Erstes Match ist ein Name
+            name = match[1].trim();
+            phone = match[2].trim();
+          }
+        } else {
+          name = match[1].trim();
+          phone = match[2].trim();
+        }
+        
+        // Validierung
+        if (name.length >= 2 && phone.length >= 8) {
+          contactData = { name, phone };
+          break;
+        }
+      }
+    }
+
+    if (contactData) {
+      console.log('✅ Kontaktdaten erkannt:', contactData);
+      
+      const confirmationText = `🎯 **Kontaktdaten erhalten!**
+
+**Name:** ${contactData.name}
+**Telefon:** ${contactData.phone}
+
+**Schritt 3: Termin bestätigen**
+
+Ich erstelle jetzt deinen Termin in Michaels Kalender. Das dauert nur einen Moment...
+
+*Du erhältst gleich eine Bestätigung!* ⏳`;
+      
+      return res.status(200).json({
+        action: 'confirm_booking',
+        answer: confirmationText,
+        bookingData: contactData,
+        nextStep: 'create_appointment'
+      });
+    }
+
+    // =================================================================
     // INTELLIGENTE INTENT-ERKENNUNG
     // =================================================================
     const intentDetectionPrompt = `
       Analysiere die folgende Nutzereingabe und klassifiziere die Absicht.
       Antworte NUR mit einem einzigen Wort: "booking", "question", oder "urgent_booking".
       
-      "booking" = Alles was mit Terminen, Kalendern, Verfügbarkeit oder Buchungen zu tun hat
+      "booking" = Alles was mit Terminen, Kalendern, Verfügbarkeit, Buchungen, Rückruf oder Gesprächen zu tun hat
       "urgent_booking" = Dringende Terminanfragen (Wörter wie "sofort", "dringend", "schnell", "heute", "morgen")
       "question" = Alle anderen allgemeinen Fragen
 
       Beispiele:
       - "Hast du nächste Woche Zeit?" -> booking
       - "Ich brauche einen Termin." -> booking
+      - "Ich möchte einen Rückruf" -> booking
+      - "Können wir telefonieren?" -> booking
       - "Dringend einen Termin heute!" -> urgent_booking
       - "Was ist JavaScript?" -> question
+      - "Wer bist du?" -> question
 
       Hier ist die Nutzereingabe: "${prompt}"
     `;
@@ -54,6 +204,11 @@ module.exports = async function handler(req, res) {
         // Hole die Terminvorschläge von unserer API
         const baseUrl = req.headers.host ? `https://${req.headers.host}` : 'http://localhost:3000';
         const suggestionsResponse = await fetch(`${baseUrl}/api/suggest-appointments`);
+        
+        if (!suggestionsResponse.ok) {
+          throw new Error(`HTTP ${suggestionsResponse.status}: ${suggestionsResponse.statusText}`);
+        }
+        
         const suggestionsData = await suggestionsResponse.json();
         
         if (suggestionsData.success && suggestionsData.suggestions.length > 0) {
@@ -72,7 +227,7 @@ Michael hat folgende **sofort verfügbare** Termine:`;
 Hier sind die nächsten **3 verfügbaren Termine**:`;
           }
           
-          // Füge Terminvorschläge hinzu
+          // Füge Terminvorschläge hinzu - ALLE 3 Termine
           suggestionsData.suggestions.forEach((suggestion, index) => {
             const emoji = suggestion.isPreferredTime ? '⭐' : '📅';
             responseText += `
@@ -135,67 +290,6 @@ Michael antwortet normalerweise innerhalb von 24 Stunden! 😊`;
         
         return res.status(200).json({ answer: fallbackText });
       }
-    }
-
-    // =================================================================
-    // TERMINAUSWAHL-VERARBEITUNG
-    // =================================================================
-    const terminSelectionRegex = /termin\s*([123])/i;
-    const terminMatch = prompt.toLowerCase().match(terminSelectionRegex);
-    
-    if (terminMatch) {
-      const selectedTermin = parseInt(terminMatch[1]);
-      console.log(`Termin ${selectedTermin} ausgewählt`);
-      
-      const bookingFormText = `✅ **Termin ${selectedTermin} ausgewählt!**
-
-**Schritt 2: Deine Kontaktdaten**
-
-Bitte gib mir folgende Informationen:
-
-**Format:** Name, Telefonnummer
-**Beispiel:** Max Mustermann, 0664 123 45 67
-
-*Deine Daten werden nur für die Terminkoordination verwendet.*`;
-      
-      return res.status(200).json({
-        action: 'collect_booking_data',
-        answer: bookingFormText,
-        selectedSlot: selectedTermin,
-        nextStep: 'collect_contact_data'
-      });
-    }
-
-    // =================================================================
-    // KONTAKTDATEN-VERARBEITUNG
-    // =================================================================
-    const contactDataRegex = /([a-zA-ZäöüÄÖÜß\s]+),\s*([0-9\+\s\-\(\)]{10,20})/;
-    const contactMatch = prompt.match(contactDataRegex);
-    
-    if (contactMatch) {
-      const [, name, phone] = contactMatch;
-      console.log('Kontaktdaten erkannt:', { name: name.trim(), phone: phone.trim() });
-      
-      const confirmationText = `🎯 **Kontaktdaten erhalten!**
-
-**Name:** ${name.trim()}
-**Telefon:** ${phone.trim()}
-
-**Schritt 3: Termin bestätigen**
-
-Ich erstelle jetzt deinen Termin in Michaels Kalender. Das dauert nur einen Moment...
-
-*Du erhältst gleich eine Bestätigung!* ⏳`;
-      
-      return res.status(200).json({
-        action: 'confirm_booking',
-        answer: confirmationText,
-        bookingData: {
-          name: name.trim(),
-          phone: phone.trim()
-        },
-        nextStep: 'create_appointment'
-      });
     }
 
     // =================================================================
