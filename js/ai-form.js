@@ -77,17 +77,16 @@ export const initAiForm = () => {
     // INTELLIGENTE TERMINBUCHUNG - SPEZIELLE BEHANDLUNG
     // ===================================================================
     
-    const handleSmartBookingResponse = (data) => {
-        console.log("📅 Smart Booking Response erhalten:", data);
-        
-        // Speichere Terminvorschläge
-        currentBookingState.suggestions = data.suggestions || [];
-        currentBookingState.step = 'slot_selection';
-        
-        // Zeige die Terminvorschläge mit interaktiven Buttons
-        const enhancedMessage = createInteractiveTerminMessage(data.answer, data.suggestions);
-        addMessageToHistory(enhancedMessage, 'ai', true);
-    };
+const handleSmartBookingResponse = (data) => {
+    console.log("📅 Smart Booking Response erhalten:", data);
+    
+    // Speichere Terminvorschläge
+    currentBookingState.suggestions = data.suggestions || [];
+    currentBookingState.step = 'slot_selection';
+    
+    // ✅ KORREKTUR: KEINE erneute Nachricht hinzufügen bei Chat-Aufrufen
+    console.log("✅ Smart Booking State aktualisiert, keine doppelte Anzeige");
+};
 
     const createInteractiveTerminMessage = (message, suggestions) => {
         let enhancedHtml = `<div class="booking-message">
