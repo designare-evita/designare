@@ -247,14 +247,15 @@ const handleSmartBookingResponse = (data) => {
          if (data.action === 'smart_booking') {
     console.log("🎯 SMART BOOKING ERKANNT!");
     
-if (isFromChat) {
-    // ✅ KORREKTUR: Bei Chat-Aufruf passiert GAR NICHTS (keine Anzeige)
-    currentBookingState.suggestions = data.suggestions || [];
-    currentBookingState.step = 'slot_selection';
-    console.log("✅ State aktualisiert, aber keine Anzeige bei Chat-Aufruf");
-}  
-
-else {
+if (data.action === 'smart_booking') {
+    console.log("🎯 SMART BOOKING ERKANNT!");
+    
+    if (isFromChat) {
+        // Das hier muss geändert werden
+        currentBookingState.suggestions = data.suggestions || [];
+        currentBookingState.step = 'slot_selection';
+        console.log("✅ State aktualisiert, aber keine Anzeige bei Chat-Aufruf");
+    } else {
         // ✅ KORREKTUR: Nur beim ERSTEN Aufruf wird das Modal mit Inhalt gefüllt
         const enhancedMessage = createInteractiveTerminMessage(data.answer, data.suggestions);
         initializeChat(enhancedMessage, true);
