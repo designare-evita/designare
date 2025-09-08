@@ -235,79 +235,17 @@ for (const pattern of contactPatterns) {
     }
 }
 
+// In api/ask-gemini.js - NUR die Bestätigungsnachricht ändern
+
 if (contactData) {
     console.log('✅ Kontaktdaten erkannt:', contactData);
     
-    const confirmationText = `
-        <div class="booking-confirmation-message" style="
-            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-            color: white;
-            padding: 25px;
-            border-radius: 12px;
-            margin: 20px 0;
-            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
-            border-left: 5px solid #004085;
-        ">
-            <div style="display: flex; align-items: center; margin-bottom: 20px;">
-                <span style="font-size: 2.5rem; margin-right: 15px;">🎯</span>
-                <h3 style="margin: 0; font-size: 1.4rem; font-weight: bold;">
-                    Kontaktdaten erhalten!
-                </h3>
-            </div>
-            
-            <div style="background: rgba(255,255,255,0.15); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                <div style="display: grid; grid-template-columns: auto 1fr; gap: 15px; margin-bottom: 15px;">
-                    <span style="font-weight: bold; color: #ffc107;">👤 Name:</span>
-                    <span style="font-size: 1.1rem;">${contactData.name}</span>
-                    
-                    <span style="font-weight: bold; color: #ffc107;">📞 Telefon:</span>
-                    <span style="font-size: 1.1rem; font-family: monospace;">${contactData.phone}</span>
-                </div>
-            </div>
-            
-            <div style="
-                background: rgba(255,193,7,0.2);
-                padding: 20px;
-                border-radius: 8px;
-                text-align: center;
-                border: 2px dashed #ffc107;
-            ">
-                <h4 style="margin: 0 0 10px 0; font-size: 1.2rem; color: #ffc107;">
-                    📅 Schritt 3: Rückruf-Termin bestätigen
-                </h4>
-                
-                <div style="display: flex; align-items: center; justify-content: center; margin: 15px 0;">
-                    <div class="booking-spinner" style="
-                        border: 3px solid rgba(255,193,7,0.3);
-                        border-top: 3px solid #ffc107;
-                        border-radius: 50%;
-                        width: 24px;
-                        height: 24px;
-                        animation: spin 1s linear infinite;
-                        margin-right: 15px;
-                    "></div>
-                    <span style="font-size: 1rem;">
-                        Ich erstelle jetzt deinen Rückruf-Termin in Michaels Kalender...
-                    </span>
-                </div>
-                
-                <p style="margin: 15px 0 0 0; font-size: 0.9rem; font-style: italic; opacity: 0.9;">
-                    📞 <em>Michael wird dich zum vereinbarten Zeitpunkt anrufen!</em>
-                </p>
-            </div>
-        </div>
-        
-        <style>
-            @keyframes spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
-            }
-        </style>
-    `;
+    // EINFACHE BESTÄTIGUNGSNACHRICHT (Rest bleibt unverändert)
+    const simpleConfirmation = `Danke ${contactData.name}! Michael wird Dich unter der Nummer ${contactData.phone} zum gewünschten Termin anrufen!`;
     
     return res.status(200).json({
-        action: 'confirm_booking',  // ✅ RICHTIGE ACTION
-        answer: confirmationText,
+        action: 'confirm_booking',  // ✅ BEHALTE die Action für executeBooking()
+        answer: simpleConfirmation,
         bookingData: contactData,
         nextStep: 'create_appointment'
     });
