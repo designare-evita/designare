@@ -345,101 +345,200 @@ if (contactData) {
     // =================================================================
     // INTELLIGENTE TERMINVORSCHLÄGE (KORRIGIERT FÜR RÜCKRUF)
     // =================================================================
-    if (intent === 'booking' || intent === 'urgent_booking') {
-      console.log('🔍 Lade intelligente Rückruf-Terminvorschläge...');
-      
-      try {
+// In api/ask-gemini.js - KORRIGIERTE SMART BOOKING NACHRICHT
+
+if (intent === 'booking' || intent === 'urgent_booking') {
+    console.log('🔍 Lade intelligente Rückruf-Terminvorschläge...');
+    
+    try {
         // Hole die Terminvorschläge von unserer API
         const baseUrl = req.headers.host ? `https://${req.headers.host}` : 'http://localhost:3000';
         const suggestionsResponse = await fetch(`${baseUrl}/api/suggest-appointments`);
         
         if (!suggestionsResponse.ok) {
-          throw new Error(`HTTP ${suggestionsResponse.status}: ${suggestionsResponse.statusText}`);
+            throw new Error(`HTTP ${suggestionsResponse.status}: ${suggestionsResponse.statusText}`);
         }
         
         const suggestionsData = await suggestionsResponse.json();
         
         if (suggestionsData.success && suggestionsData.suggestions.length > 0) {
-          // Erstelle intelligente Antwort mit Rückruf-Terminvorschlägen
-          const currentTime = new Date().toLocaleString('de-DE');
-          
-          let responseText = '';
-          
-          if (intent === 'urgent_booking') {
-            responseText = `⚡ **Dringende Rückruf-Anfrage verstanden!** 
-
-Michael kann dich zu diesen **sofort verfügbaren** Zeiten anrufen:`;
-          } else {
-            responseText = `📞 **Perfekt! Ich habe Michaels Kalender geprüft.**
-
-Hier sind die nächsten **3 verfügbaren Rückruf-Termine**:`;
-          }
-          
-          // Füge Terminvorschläge hinzu - ALLE 3 Termine (KORRIGIERT)
-          suggestionsData.suggestions.forEach((suggestion, index) => {
-            const emoji = suggestion.isPreferredTime ? '⭐' : '📞';
+            const currentTime = new Date().toLocaleString('de-DE');
+            
+            // NEUE: HTML-FORMATIERTE TERMINAUSWAHL-NACHRICHT
+            let responseText = `
+                <div class="smart-booking-message" style="
+                    background: linear-gradient(135deg, #ffc107 0%, #ffca2c 100%);
+                    color: #1a1a1a;
+                    padding: 25px;
+                    border-radius: 12px;
+                    margin: 20px 0;
+                    box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+                    border-left: 5px solid #e0a800;
+                ">
+                    <div style="display: flex; align-items: center; margin-bottom: 20px;">
+                        <span style="font-size: 2rem; margin-right: 15px;">📞</span>
+                        <h3 style="margin: 0; font-size: 1.4rem; font-weight: bold;">
+                            ${intent === 'urgent_booking' ? 
+                                'Dringende Rückruf-Anfrage verstanden!' : 
+                                'Perfekt! Ich habe Michaels Kalender geprüft.'}
+                        </h3>
+                    </div>
+                    
+                    <p style="margin: 0 0 20px 0; font-size: 1.1rem; font-weight: 500;">
+                        Hier sind die nächsten <strong>3 verfügbaren Rückruf-Termine</strong>:
+                    </p>
+                    
+                    <div style="background: rgba(26,26,26,0.1); padding: 20px; border-radius: 8px; margin: 20px 0;">
+            `;
+            
+            // Füge Terminvorschläge hinzu
+            suggestionsData.suggestions.forEach((suggestion, index) => {
+                const emoji = suggestion.isPreferredTime ? '⭐' : '📞';
+                responseText += `
+                    <div style="
+                        background: rgba(255,255,255,0.3);
+                        padding: 15px;
+                        border-radius: 6px;
+                        margin-bottom: 12px;
+                        border-left: 3px solid #e0a800;
+                    ">
+                        <strong style="font-size: 1.1rem;">
+                            ${emoji} Termin ${suggestion.slot}:
+                        </strong>
+                        <span style="margin-left: 10px; font-size: 1rem;">
+                            ${suggestion.formattedString}
+                        </span>
+                    </div>
+                `;
+            });
+            
             responseText += `
-
-**${emoji} Termin ${suggestion.slot}:** ${suggestion.formattedString}`;
-          });
-          
-          responseText += `
-
-**So buchst du einen Rückruf-Termin:**
-1️⃣ Wähle einen Termin: "Termin 1", "Termin 2" oder "Termin 3"
-2️⃣ Ich führe dich durch die Buchung
-
-*Michael ruft dich zum vereinbarten Zeitpunkt an.*
-
-**Welcher Termin passt dir am besten?** 😊`;
-          
-          // Sende Antwort mit spezieller Action für Terminauswahl
-          return res.status(200).json({
-            action: 'smart_booking',
-            answer: responseText,
-            suggestions: suggestionsData.suggestions,
-            metadata: {
-              generatedAt: currentTime,
-              urgentBooking: intent === 'urgent_booking',
-              totalSuggestions: suggestionsData.suggestions.length,
-              appointmentType: 'callback'
-            }
-          });
-          
+                    </div>
+                    
+                    <div style="
+                        background: rgba(26,26,26,0.1);
+                        padding: 20px;
+                        border-radius: 8px;
+                        margin-top: 20px;
+                    ">
+                        <h4 style="margin: 0 0 15px 0; font-size: 1.2rem; color: #e0a800;">
+                            📋 So buchst du einen Rückruf-Termin:
+                        </h4>
+                        <div style="margin-bottom: 10px;">
+                            <strong>1️⃣</strong> Wähle einen Termin: "Termin 1", "Termin 2" oder "Termin 3"
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <strong>2️⃣</strong> Ich führe dich durch die Buchung
+                        </div>
+                        
+                        <div style="
+                            background: rgba(255,255,255,0.2);
+                            padding: 12px;
+                            border-radius: 6px;
+                            text-align: center;
+                            margin-top: 15px;
+                        ">
+                            <em>📞 Michael ruft dich zum vereinbarten Zeitpunkt an.</em>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 20px;">
+                        <strong style="font-size: 1.1rem; color: #e0a800;">
+                            Welcher Termin passt dir am besten? 😊
+                        </strong>
+                    </div>
+                </div>
+            `;
+            
+            // Sende Antwort mit spezieller Action für Terminauswahl
+            return res.status(200).json({
+                action: 'smart_booking',
+                answer: responseText,
+                suggestions: suggestionsData.suggestions,
+                metadata: {
+                    generatedAt: currentTime,
+                    urgentBooking: intent === 'urgent_booking',
+                    totalSuggestions: suggestionsData.suggestions.length,
+                    appointmentType: 'callback'
+                }
+            });
+            
         } else {
-          // Fallback wenn keine Termine verfügbar
-          const fallbackText = `😔 **Leider sind in den nächsten 3 Arbeitstagen keine freien Rückruf-Termine verfügbar.**
-
-**Alternative Optionen:**
-📧 **E-Mail:** michael@designare.at
-📝 **Nachricht:** Beschreibe dein Anliegen und deine Verfügbarkeit
-
-Michael meldet sich dann mit alternativen Rückruf-Zeiten bei dir!`;
-          
-          return res.status(200).json({ answer: fallbackText });
+            // Fallback wenn keine Termine verfügbar
+            const fallbackText = `
+                <div style="
+                    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+                    color: white;
+                    padding: 25px;
+                    border-radius: 12px;
+                    margin: 20px 0;
+                    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+                    text-align: center;
+                ">
+                    <div style="font-size: 2rem; margin-bottom: 15px;">😔</div>
+                    <h3 style="margin: 0 0 20px 0; font-size: 1.4rem;">
+                        Leider sind in den nächsten 3 Arbeitstagen keine freien Rückruf-Termine verfügbar.
+                    </h3>
+                    
+                    <div style="background: rgba(255,255,255,0.15); padding: 20px; border-radius: 8px;">
+                        <h4 style="margin: 0 0 15px 0; color: #ffc107;">Alternative Optionen:</h4>
+                        <p style="margin: 5px 0;">📧 <strong>E-Mail:</strong> michael@designare.at</p>
+                        <p style="margin: 5px 0;">📝 <strong>Nachricht:</strong> Beschreibe dein Anliegen und deine Verfügbarkeit</p>
+                    </div>
+                    
+                    <p style="margin: 15px 0 0 0; font-style: italic;">
+                        Michael meldet sich dann mit alternativen Rückruf-Zeiten bei dir!
+                    </p>
+                </div>
+            `;
+            
+            return res.status(200).json({ answer: fallbackText });
         }
         
-      } catch (apiError) {
+    } catch (apiError) {
         console.error('Fehler beim Laden der Terminvorschläge:', apiError);
         
         // Fallback bei API-Fehler
-        const fallbackText = `📞 **Gerne helfe ich bei der Rückruf-Terminbuchung!**
-
-Momentan kann ich nicht direkt auf Michaels Kalender zugreifen, aber du kannst ihn direkt kontaktieren:
-
-📧 **E-Mail:** michael@designare.at
-📞 **Direkt anrufen:** (Nummer findest du im Kontaktformular)
-
-**Was solltest du erwähnen:**
-• Dein Anliegen/Projekt
-• Deine Verfügbarkeit (Wochentage/Uhrzeiten)
-• Deine bevorzugte Telefonnummer
-
-Michael ruft normalerweise innerhalb von 24 Stunden zurück! 😊`;
+        const fallbackText = `
+            <div style="
+                background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+                color: white;
+                padding: 25px;
+                border-radius: 12px;
+                margin: 20px 0;
+                box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+            ">
+                <h3 style="margin: 0 0 20px 0; font-size: 1.4rem;">
+                    📞 Gerne helfe ich bei der Rückruf-Terminbuchung!
+                </h3>
+                
+                <p style="margin-bottom: 20px;">
+                    Momentan kann ich nicht direkt auf Michaels Kalender zugreifen, aber du kannst ihn direkt kontaktieren:
+                </p>
+                
+                <div style="background: rgba(255,255,255,0.15); padding: 20px; border-radius: 8px;">
+                    <p style="margin: 5px 0;">📧 <strong>E-Mail:</strong> michael@designare.at</p>
+                    <p style="margin: 5px 0;">📞 <strong>Direkt anrufen:</strong> (Nummer findest du im Kontaktformular)</p>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <h4 style="color: #ffc107; margin-bottom: 10px;">Was solltest du erwähnen:</h4>
+                    <ul style="margin: 0; padding-left: 20px;">
+                        <li>Dein Anliegen/Projekt</li>
+                        <li>Deine Verfügbarkeit (Wochentage/Uhrzeiten)</li>
+                        <li>Deine bevorzugte Telefonnummer</li>
+                    </ul>
+                </div>
+                
+                <p style="margin: 20px 0 0 0; text-align: center; font-weight: bold;">
+                    Michael ruft normalerweise innerhalb von 24 Stunden zurück! 😊
+                </p>
+            </div>
+        `;
         
         return res.status(200).json({ answer: fallbackText });
-      }
     }
+}
 
     // =================================================================
     // NORMALE CHAT-ANTWORTEN (für Evita oder Silas)
