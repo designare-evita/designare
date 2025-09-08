@@ -14,44 +14,27 @@ const bookingState = {
 // ===================================================================
 const validateBookingTime = (selectedSlot) => {
     console.log("🔍 Validiere Buchungszeit:", selectedSlot);
-    
+
     try {
-        // Parse das deutsche Datum
-        const slotString = selectedSlot.replace(/\s+um\s+/, ' ').trim();
-        const slotTime = new Date(slotString);
-        
-        if (isNaN(slotTime.getTime())) {
-            console.warn("⚠️ Ungültiges Datum:", selectedSlot);
-            showBookingError('Ungültiges Datumsformat. Bitte wähle einen anderen Slot.');
-            return false;
-        }
-        
-        const now = new Date();
-        const minFutureTime = new Date(now.getTime() + 30 * 60000); // 30 Minuten Vorlauf
-        
-        if (slotTime <= minFutureTime) {
-            console.warn("⚠️ Slot zu nah in der Zukunft:", slotTime.toLocaleString('de-DE'));
-            showBookingError('Dieser Termin liegt zu nah in der Zukunft. Bitte wähle einen späteren Zeitpunkt.');
-            return false;
-        }
-        
-        // Prüfe auf gesperrte Slots
+        // Die Prüfung auf "zu nah in der Zukunft" wird entfernt.
+        // Das Backend ist dafür besser geeignet und hat die korrekte Parsing-Logik.
+
+        // Prüfe NUR noch auf gesperrte Slots im Frontend
         if (isSlotLocked(selectedSlot)) {
             console.warn("⚠️ Slot ist temporär gesperrt:", selectedSlot);
             showBookingError('Dieser Termin wird gerade von einem anderen Nutzer gebucht. Bitte wähle einen anderen Slot.');
             return false;
         }
-        
-        console.log("✅ Slot-Validierung erfolgreich");
+
+        console.log("✅ Frontend-Slot-Validierung erfolgreich (Sperr-Prüfung)");
         return true;
-        
+
     } catch (error) {
         console.error("❌ Fehler bei der Slot-Validierung:", error);
         showBookingError('Fehler bei der Terminvalidierung. Bitte versuche es erneut.');
         return false;
     }
 };
-
 // ===================================================================
 // NEUE FUNKTION: OPTIMISTISCHE SLOT-SPERRUNG
 // ===================================================================
