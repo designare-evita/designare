@@ -130,11 +130,23 @@ const createInteractiveTerminMessage = (message, suggestions) => {
     return enhancedHtml;
 };
 
-    const handleBookingDataCollection = (data) => {
-        console.log("📝 Sammle Kontaktdaten");
-        currentBookingState.step = 'contact_data';
-        addMessageToHistory(data.answer, 'ai', true);
-    };
+ const handleBookingDataCollection = (data) => {
+    console.log("📝 Sammle Kontaktdaten (BEREINIGTE NACHRICHT)");
+    currentBookingState.step = 'contact_data';
+
+    // Hole den gespeicherten Text des Termins
+    const selectedTerminText = currentBookingState.selectedSlotFormatted || `Nummer ${currentBookingState.selectedSlot}`;
+
+    // Erstelle die sauberen Nachrichten
+    const message1 = `Termin (${selectedTerminText}) ausgewählt`;
+    const message2 = "Bitte Deinen Namen und Telefonnummer für den Rückruf";
+
+    // Füge die Nachrichten zum Chat hinzu
+    addMessageToHistory(message1, 'ai', false);
+    setTimeout(() => {
+        addMessageToHistory(message2, 'ai', false);
+    }, 300); // Kurze Verzögerung für besseren Lesefluss
+};
 
     const handleBookingConfirmation = async (data) => {
         console.log("✅ Booking-Bestätigung empfangen");
