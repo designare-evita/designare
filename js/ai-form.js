@@ -1,9 +1,7 @@
-// js/ai-form.js (FINALE VERSION mit einfachem Booking-Interface)
-
-import { initBookingModal, showStep } from './booking.js';
+// Ersetzen Sie Ihre ai-form.js mit dieser intelligenten Version:
 
 export const initAiForm = () => {
-    console.log("🚀 initAiForm gestartet");
+    console.log("🚀 initAiForm mit intelligenter Terminbuchung gestartet");
 
     const aiForm = document.getElementById('ai-form');
     if (!aiForm) {
@@ -16,6 +14,14 @@ export const initAiForm = () => {
     const modalOverlay = document.getElementById('ai-response-modal');
     const responseArea = document.getElementById('ai-chat-history');
     const closeButtons = document.querySelectorAll('#close-ai-response-modal-top, #close-ai-response-modal-bottom');
+
+    // Globale Variablen für Booking-State
+    let currentBookingState = {
+        suggestions: [],
+        selectedSlot: null,
+        bookingData: null,
+        step: 'initial'
+    };
 
     // Modal-Steuerung
     const showModal = () => {
@@ -44,307 +50,13 @@ export const initAiForm = () => {
         document.body.classList.remove('no-scroll');
     };
 
-    // ===================================================================
-    // EINFACHES BOOKING-INTERFACE (ersetzt das komplexe Modal)
-    // ===================================================================
-    const launchBookingModal = async () => {
-        console.log("📅 EINFACHES Booking-Interface gestartet");
-        
-        try {
-            // Schritt 1: Verstecke Chat-Modal
-            hideModal();
-            
-            // Schritt 2: Erstelle einfaches Booking-Interface
-            const simpleBookingHtml = `
-                <div id="simple-booking-overlay" style="
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background: rgba(0,0,0,0.85);
-                    z-index: 10000;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    backdrop-filter: blur(5px);
-                ">
-                    <div style="
-                        background: linear-gradient(135deg, #1e1e1e 0%, #2d2d2d 100%);
-                        color: #e0e0e0;
-                        padding: 40px;
-                        border-radius: 15px;
-                        max-width: 600px;
-                        width: 90%;
-                        text-align: center;
-                        box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-                        border: 1px solid #444;
-                        position: relative;
-                        animation: modalSlideIn 0.3s ease-out;
-                    ">
-                        <button onclick="closeSimpleBooking()" style="
-                            position: absolute;
-                            top: 15px;
-                            right: 20px;
-                            background: rgba(255,255,255,0.1);
-                            border: none;
-                            color: #fff;
-                            border-radius: 50%;
-                            width: 35px;
-                            height: 35px;
-                            cursor: pointer;
-                            font-size: 1.5rem;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            transition: background-color 0.3s ease;
-                        " onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">×</button>
-                        
-                        <div style="margin-bottom: 30px;">
-                            <div style="
-                                width: 80px;
-                                height: 80px;
-                                background: linear-gradient(135deg, #ffc107 0%, #ffca2c 100%);
-                                border-radius: 50%;
-                                margin: 0 auto 20px;
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                font-size: 2.5rem;
-                            ">📅</div>
-                            <h2 style="color: #ffc107; margin: 0 0 15px 0; font-size: 2rem;">Termin mit Michael buchen</h2>
-                            <p style="margin: 0; color: #ccc; font-size: 1.1rem;">
-                                Lass uns einen passenden Termin für dein Projekt finden!
-                            </p>
-                        </div>
-                        
-                        <div style="
-                            background: rgba(255,193,7,0.1);
-                            border: 1px solid #ffc107;
-                            border-radius: 10px;
-                            padding: 25px;
-                            margin-bottom: 30px;
-                            text-align: left;
-                        ">
-                            <h3 style="color: #ffc107; margin-top: 0; margin-bottom: 15px; font-size: 1.3rem;">
-                                📧 Direkter Kontakt
-                            </h3>
-                            <div style="margin-bottom: 15px;">
-                                <strong style="color: #fff;">E-Mail:</strong><br>
-                                <a href="mailto:michael@designare.at?subject=Terminanfrage über Evita&body=Hallo Michael,%0D%0A%0D%0AIch würde gerne einen Termin vereinbaren.%0D%0A%0D%0AMein Thema/Projekt:%0D%0A%0D%0AMeine Verfügbarkeit:%0D%0A%0D%0AVielen Dank!" 
-                                   style="
-                                    color: #ffc107; 
-                                    font-size: 1.2rem; 
-                                    text-decoration: none;
-                                    font-weight: bold;
-                                ">michael@designare.at</a>
-                            </div>
-                            <div style="font-size: 0.95rem; color: #aaa;">
-                                <strong>Tipp:</strong> Beschreibe kurz dein Projekt und deine Verfügbarkeit - 
-                                Michael antwortet meist innerhalb von 24 Stunden mit konkreten Terminvorschlägen.
-                            </div>
-                        </div>
-                        
-                        <div style="
-                            display: grid;
-                            grid-template-columns: 1fr 1fr;
-                            gap: 15px;
-                            margin-bottom: 25px;
-                        ">
-                            <button onclick="openContactModal()" style="
-                                background: #ffc107;
-                                color: #1a1a1a;
-                                border: none;
-                                padding: 15px 20px;
-                                border-radius: 8px;
-                                cursor: pointer;
-                                font-weight: bold;
-                                font-size: 1rem;
-                                transition: all 0.3s ease;
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                gap: 8px;
-                            " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 5px 15px rgba(255,193,7,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
-                                📝 Kontakt-Formular
-                            </button>
-                            
-                            <a href="mailto:michael@designare.at?subject=Terminanfrage über Evita&body=Hallo Michael,%0D%0A%0D%0AIch würde gerne einen Termin vereinbaren.%0D%0A%0D%0AMein Thema/Projekt:%0D%0A%0D%0AMeine Verfügbarkeit:%0D%0A- Montag:%0D%0A- Dienstag:%0D%0A- Mittwoch:%0D%0A- Donnerstag:%0D%0A- Freitag:%0D%0A%0D%0ABevorzugte Uhrzeit:%0D%0A%0D%0AVielen Dank!" 
-                               style="
-                                background: #28a745;
-                                color: white;
-                                text-decoration: none;
-                                padding: 15px 20px;
-                                border-radius: 8px;
-                                font-weight: bold;
-                                font-size: 1rem;
-                                transition: all 0.3s ease;
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                gap: 8px;
-                            " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 5px 15px rgba(40,167,69,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
-                                📬 E-Mail schreiben
-                            </a>
-                        </div>
-                        
-                        <div style="
-                            background: rgba(255,255,255,0.05);
-                            border-radius: 8px;
-                            padding: 20px;
-                            margin-bottom: 20px;
-                        ">
-                            <h4 style="color: #ffc107; margin-top: 0; margin-bottom: 12px;">⏰ Michael's Verfügbarkeit</h4>
-                            <div style="font-size: 0.95rem; color: #ccc; line-height: 1.6;">
-                                <strong>Reguläre Zeiten:</strong> Montag - Freitag, 9:00 - 17:00 Uhr<br>
-                                <strong>Termine nach Vereinbarung:</strong> Auch abends und am Wochenende möglich<br>
-                                <strong>Antwortzeit:</strong> Meist innerhalb von 24 Stunden
-                            </div>
-                        </div>
-                        
-                        <button onclick="closeSimpleBooking()" style="
-                            background: #6c757d;
-                            color: white;
-                            border: none;
-                            padding: 12px 25px;
-                            border-radius: 6px;
-                            cursor: pointer;
-                            font-size: 0.95rem;
-                            transition: background-color 0.3s ease;
-                        " onmouseover="this.style.background='#5a6268'" onmouseout="this.style.background='#6c757d'">
-                            Später kontaktieren
-                        </button>
-                    </div>
-                </div>
-                
-                <style>
-                    @keyframes modalSlideIn {
-                        from {
-                            opacity: 0;
-                            transform: scale(0.9) translateY(-20px);
-                        }
-                        to {
-                            opacity: 1;
-                            transform: scale(1) translateY(0);
-                        }
-                    }
-                    
-                    @media (max-width: 768px) {
-                        #simple-booking-overlay > div {
-                            grid-template-columns: 1fr !important;
-                            padding: 25px !important;
-                            margin: 20px !important;
-                        }
-                        
-                        #simple-booking-overlay > div > div:nth-of-type(4) {
-                            grid-template-columns: 1fr !important;
-                        }
-                    }
-                </style>
-            `;
-            
-            // Füge das Interface hinzu
-            document.body.insertAdjacentHTML('beforeend', simpleBookingHtml);
-            
-            // Globale Funktionen für die Buttons
-            window.closeSimpleBooking = () => {
-                const overlay = document.getElementById('simple-booking-overlay');
-                if (overlay) {
-                    overlay.style.opacity = '0';
-                    overlay.style.transform = 'scale(0.9)';
-                    setTimeout(() => {
-                        overlay.remove();
-                    }, 300);
-                }
-                document.body.style.overflow = '';
-                document.body.classList.remove('no-scroll');
-                console.log("✅ Einfaches Booking-Interface geschlossen");
-            };
-            
-            window.openContactModal = () => {
-                window.closeSimpleBooking();
-                // Kurze Verzögerung, dann Kontakt-Modal öffnen
-                setTimeout(() => {
-                    const contactButton = document.getElementById('contact-button');
-                    if (contactButton) {
-                        contactButton.click();
-                        console.log("📧 Kontakt-Modal geöffnet");
-                    } else {
-                        console.warn("⚠️ Kontakt-Button nicht gefunden");
-                        // Fallback: Direkte E-Mail
-                        window.location.href = 'mailto:michael@designare.at?subject=Terminanfrage über Evita';
-                    }
-                }, 100);
-            };
-            
-            // Event-Listener für das Overlay
-            const overlay = document.getElementById('simple-booking-overlay');
-            if (overlay) {
-                // Schließen bei Klick außerhalb des Modals
-                overlay.addEventListener('click', (e) => {
-                    if (e.target === overlay) {
-                        window.closeSimpleBooking();
-                    }
-                });
-                
-                // ESC-Taste zum Schließen
-                const escHandler = (e) => {
-                    if (e.key === 'Escape') {
-                        window.closeSimpleBooking();
-                        document.removeEventListener('keydown', escHandler);
-                    }
-                };
-                document.addEventListener('keydown', escHandler);
-            }
-            
-            // Verhindere Body-Scrolling
-            document.body.style.overflow = 'hidden';
-            document.body.classList.add('no-scroll');
-            
-            console.log("✅ Einfaches Booking-Interface erfolgreich angezeigt");
-            
-        } catch (error) {
-            console.error("❌ Fehler beim einfachen Booking:", error);
-            
-            // Fallback: Direkte E-Mail mit vorausgefülltem Inhalt
-            const emailSubject = encodeURIComponent("Terminanfrage über Evita");
-            const emailBody = encodeURIComponent(`Hallo Michael,
-
-ich würde gerne einen Termin vereinbaren.
-
-Mein Thema/Projekt:
-
-
-Meine Verfügbarkeit:
-- Montag: 
-- Dienstag: 
-- Mittwoch: 
-- Donnerstag: 
-- Freitag: 
-
-Bevorzugte Uhrzeit:
-
-
-Vielen Dank!`);
-            const emailUrl = `mailto:michael@designare.at?subject=${emailSubject}&body=${emailBody}`;
-            
-            if (confirm("Das Buchungssystem ist momentan nicht verfügbar. Möchtest du stattdessen direkt eine E-Mail an Michael schreiben?")) {
-                window.location.href = emailUrl;
-            } else {
-                // Zeige das Chat-Modal wieder an
-                showModal();
-                addMessageToHistory("Entschuldigung, das Buchungssystem ist momentan nicht verfügbar. Du kannst Michael gerne direkt per E-Mail kontaktieren: michael@designare.at", 'ai');
-            }
-        }
-    };
-
-    const addMessageToHistory = (message, sender) => {
+    const addMessageToHistory = (message, sender, isHtml = false) => {
         if (!responseArea) return;
 
         const messageDiv = document.createElement('div');
         messageDiv.className = `chat-message ${sender}`;
         
-        if (message.includes('<') && message.includes('>')) {
+        if (isHtml || (message.includes('<') && message.includes('>'))) {
             messageDiv.innerHTML = message;
         } else {
             messageDiv.textContent = message;
@@ -354,14 +66,164 @@ Vielen Dank!`);
         responseArea.scrollTop = responseArea.scrollHeight;
     };
 
-    const initializeChat = (initialMessage) => {
+    const initializeChat = (initialMessage, isHtml = false) => {
         if (!responseArea) return;
         
         responseArea.innerHTML = '';
-        addMessageToHistory(initialMessage, 'ai');
+        addMessageToHistory(initialMessage, 'ai', isHtml);
     };
 
-    // API-Kommunikation
+    // ===================================================================
+    // INTELLIGENTE TERMINBUCHUNG - SPEZIELLE BEHANDLUNG
+    // ===================================================================
+    
+    const handleSmartBookingResponse = (data) => {
+        console.log("📅 Smart Booking Response erhalten:", data);
+        
+        // Speichere Terminvorschläge
+        currentBookingState.suggestions = data.suggestions || [];
+        currentBookingState.step = 'slot_selection';
+        
+        // Zeige die Terminvorschläge mit interaktiven Buttons
+        const enhancedMessage = createInteractiveTerminMessage(data.answer, data.suggestions);
+        addMessageToHistory(enhancedMessage, 'ai', true);
+    };
+
+    const createInteractiveTerminMessage = (message, suggestions) => {
+        let enhancedHtml = `<div class="booking-message">
+            <div class="booking-text">${message.replace(/\n/g, '<br>')}</div>`;
+        
+        if (suggestions && suggestions.length > 0) {
+            enhancedHtml += `<div class="booking-buttons" style="margin-top: 15px;">`;
+            
+            suggestions.forEach((suggestion, index) => {
+                const emoji = suggestion.isPreferredTime ? '⭐' : '📅';
+                enhancedHtml += `
+                    <button class="termin-button" data-slot="${suggestion.slot}" data-datetime="${suggestion.fullDateTime}" style="
+                        display: block;
+                        width: 100%;
+                        margin-bottom: 8px;
+                        padding: 12px 15px;
+                        background: linear-gradient(135deg, #ffc107 0%, #ffca2c 100%);
+                        color: #1a1a1a;
+                        border: none;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        font-weight: bold;
+                        font-size: 0.95rem;
+                        transition: all 0.3s ease;
+                        text-align: left;
+                    " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 5px 15px rgba(255,193,7,0.4)'" 
+                       onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                        ${emoji} <strong>Termin ${suggestion.slot}:</strong> ${suggestion.formattedString}
+                    </button>`;
+            });
+            
+            enhancedHtml += `</div>`;
+        }
+        
+        enhancedHtml += `</div>`;
+        return enhancedHtml;
+    };
+
+    const handleBookingDataCollection = (data) => {
+        console.log("📝 Datensammlung:", data);
+        currentBookingState.step = 'contact_data';
+        addMessageToHistory(data.answer, 'ai');
+    };
+
+    const handleBookingConfirmation = async (data) => {
+        console.log("✅ Booking-Bestätigung:", data);
+        currentBookingState.bookingData = data.bookingData;
+        currentBookingState.step = 'confirming';
+        
+        // Zeige Bestätigungsnachricht
+        addMessageToHistory(data.answer, 'ai');
+        
+        // Führe die eigentliche Buchung durch
+        try {
+            await executeBooking();
+        } catch (error) {
+            console.error('Fehler bei der Buchung:', error);
+            addMessageToHistory("❌ Fehler bei der Terminbuchung. Bitte versuche es erneut oder kontaktiere Michael direkt.", 'ai');
+        }
+    };
+
+    const executeBooking = async () => {
+        if (!currentBookingState.selectedSlot || !currentBookingState.bookingData) {
+            console.error('Unvollständige Buchungsdaten');
+            return;
+        }
+
+        try {
+            const selectedSuggestion = currentBookingState.suggestions.find(s => s.slot === currentBookingState.selectedSlot);
+            
+            if (!selectedSuggestion) {
+                throw new Error('Ausgewählter Slot nicht gefunden');
+            }
+
+            const response = await fetch('/api/book-appointment-phone', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    slot: selectedSuggestion.fullDateTime,
+                    name: currentBookingState.bookingData.name,
+                    phone: currentBookingState.bookingData.phone
+                })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                addMessageToHistory(result.message, 'ai');
+                // Reset booking state
+                currentBookingState = { suggestions: [], selectedSlot: null, bookingData: null, step: 'initial' };
+            } else {
+                addMessageToHistory(`❌ ${result.message}`, 'ai');
+            }
+
+        } catch (error) {
+            console.error('Booking execution error:', error);
+            addMessageToHistory("❌ Entschuldigung, bei der Terminbuchung ist ein Fehler aufgetreten. Bitte kontaktiere Michael direkt unter michael@designare.at", 'ai');
+        }
+    };
+
+    // ===================================================================
+    // EVENT-HANDLER FÜR TERMIN-BUTTONS
+    // ===================================================================
+    
+    const handleTerminButtonClick = (event) => {
+        if (event.target.classList.contains('termin-button')) {
+            const slotNumber = parseInt(event.target.dataset.slot);
+            const datetime = event.target.dataset.datetime;
+            
+            console.log(`Termin ${slotNumber} ausgewählt:`, datetime);
+            
+            currentBookingState.selectedSlot = slotNumber;
+            
+            // Markiere ausgewählten Button
+            document.querySelectorAll('.termin-button').forEach(btn => {
+                btn.style.background = 'linear-gradient(135deg, #6c757d 0%, #5a6268 100%)';
+                btn.style.color = '#fff';
+            });
+            
+            event.target.style.background = 'linear-gradient(135deg, #28a745 0%, #20c997 100%)';
+            event.target.style.color = '#fff';
+            
+            // Sende "Termin X" als Chat-Nachricht
+            addMessageToHistory(`Termin ${slotNumber}`, 'user');
+            
+            // Simuliere API-Aufruf für Datensammlung
+            setTimeout(() => {
+                sendToEvita(`Termin ${slotNumber}`, true);
+            }, 500);
+        }
+    };
+
+    // ===================================================================
+    // ERWEITERTE API-KOMMUNIKATION
+    // ===================================================================
+    
     const sendToEvita = async (userInput, isFromChat = false) => {
         console.log(`🌐 Sende ${isFromChat ? 'Chat-' : ''}Anfrage:`, userInput);
         
@@ -379,27 +241,38 @@ Vielen Dank!`);
             const data = await response.json();
             console.log(`📨 ${isFromChat ? 'Chat-' : ''}Response:`, data);
 
-            // Prüfe auf Booking-Aktion
-            if (data.action === 'start_booking') {
-                console.log("🎯 BOOKING-AKTION ERKANNT!");
+            // ===================================================================
+            // INTELLIGENTE ANTWORT-BEHANDLUNG
+            // ===================================================================
+            
+            if (data.action === 'smart_booking') {
+                console.log("🎯 SMART BOOKING ERKANNT!");
                 
                 if (isFromChat) {
-                    addMessageToHistory(data.message, 'ai');
+                    handleSmartBookingResponse(data);
                 } else {
-                    initializeChat(data.message);
+                    initializeChat(data.answer);
                     showModal();
+                    setTimeout(() => {
+                        handleSmartBookingResponse(data);
+                    }, 100);
                 }
-                
-                console.log("⏰ Starte einfaches Booking in 2 Sekunden...");
-                setTimeout(async () => {
-                    console.log("🚀 Timeout erreicht, starte einfaches Booking...");
-                    await launchBookingModal();
-                }, 2000);
-                
+                return true;
+            }
+            
+            if (data.action === 'collect_booking_data') {
+                console.log("📝 DATENSAMMLUNG ERKANNT!");
+                handleBookingDataCollection(data);
+                return true;
+            }
+            
+            if (data.action === 'confirm_booking') {
+                console.log("✅ BOOKING-BESTÄTIGUNG ERKANNT!");
+                await handleBookingConfirmation(data);
                 return true;
             }
 
-            // Normale Antwort
+            // Normale Antworten
             if (data.answer) {
                 if (isFromChat) {
                     addMessageToHistory(data.answer, 'ai');
@@ -433,7 +306,10 @@ Vielen Dank!`);
         }
     };
 
-    // Hauptformular Submit Handler
+    // ===================================================================
+    // STANDARD-EVENT-HANDLER
+    // ===================================================================
+    
     const handleFormSubmit = async (event) => {
         event.preventDefault();
 
@@ -455,7 +331,6 @@ Vielen Dank!`);
         }
     };
 
-    // Chat Submit Handler
     const handleChatSubmit = async (event) => {
         event.preventDefault();
         console.log("💬 Chat-Submit Handler aufgerufen");
@@ -486,7 +361,10 @@ Vielen Dank!`);
         await sendToEvita(userInput, true);
     };
 
-    // Event Listener Setup
+    // ===================================================================
+    // EVENT-LISTENER SETUP
+    // ===================================================================
+    
     let chatFormHandled = false;
 
     // Event Listener für Hauptformular
@@ -511,17 +389,26 @@ Vielen Dank!`);
     });
     console.log("✅ Chat-Submit-Listener registriert");
 
+    // Event-Listener für Termin-Buttons (Event-Delegation)
+    document.addEventListener('click', handleTerminButtonClick);
+    console.log("✅ Termin-Button-Listener registriert");
+
     // Close-Button Event Listeners
     closeButtons.forEach(button => {
         button.addEventListener('click', () => {
             hideModal();
+            // Reset booking state when closing
+            currentBookingState = { suggestions: [], selectedSlot: null, bookingData: null, step: 'initial' };
         });
     });
     console.log("✅ Close-Button-Listener registriert");
 
-    // Debug-Funktion
-    window.testSimpleBooking = launchBookingModal;
+    // Debug-Funktionen
+    window.debugBookingState = () => console.log('Current Booking State:', currentBookingState);
+    window.testSmartBooking = () => sendToEvita('Ich brauche einen Termin', false);
 
-    console.log("✅ Evita AI-Form mit einfachem Booking vollständig initialisiert");
-    console.log("🔧 Test-Funktion verfügbar: window.testSimpleBooking()");
+    console.log("✅ Evita AI-Form mit intelligenter Terminbuchung vollständig initialisiert");
+    console.log("🔧 Debug-Funktionen verfügbar:");
+    console.log("   - window.debugBookingState()");
+    console.log("   - window.testSmartBooking()");
 };
