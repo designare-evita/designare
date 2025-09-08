@@ -93,10 +93,10 @@ export const initAiForm = () => {
     // BOOKING-FUNKTIONEN
     // ===================================================================
     
-  const createInteractiveTerminMessage = (message, suggestions) => {
-    console.log("📅 Erstelle BEREINIGTE interaktive Termin-Nachricht");
+const createInteractiveTerminMessage = (message, suggestions) => {
+    console.log("📅 Erstelle absolut BEREINIGTE Termin-Nachricht (Version 4)");
 
-    // Nur der Einleitungstext bleibt
+    // 1. Der Einleitungstext
     let enhancedHtml = `
         <div class="booking-message">
             <div class="booking-text">
@@ -104,13 +104,13 @@ export const initAiForm = () => {
             </div>
     `;
 
+    // 2. Die Buttons - jetzt OHNE jegliche CSS-Klasse
     if (suggestions && suggestions.length > 0) {
         enhancedHtml += `<div class="booking-buttons" style="margin-top: 15px;">`;
 
         suggestions.forEach((suggestion) => {
-            // KEIN HTML, KEIN CSS, nur der Button
             enhancedHtml += `
-                <button class="termin-button"
+                <button 
                         data-slot="${suggestion.slot}"
                         data-datetime="${suggestion.fullDateTime || ''}"
                         data-formatted="${suggestion.formattedString || ''}">
@@ -122,7 +122,9 @@ export const initAiForm = () => {
         enhancedHtml += `</div>`;
     }
 
+    // 3. KEINE weiteren Texte oder HTML-Elemente
     enhancedHtml += `</div>`;
+
     return enhancedHtml;
 };
 
