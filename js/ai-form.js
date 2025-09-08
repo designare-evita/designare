@@ -124,13 +124,15 @@ export const initAiForm = () => {
     const handleBookingConfirmation = async (data) => {
         console.log("✅ Booking-Bestätigung empfangen:", data);
         console.log("📋 BookingData:", data.bookingData);
+        console.log("📋 Answer length:", data.answer ? data.answer.length : 'undefined');
+        console.log("📋 Answer preview:", data.answer ? data.answer.substring(0, 100) + '...' : 'undefined');
         
         currentBookingState.bookingData = data.bookingData;
         currentBookingState.step = 'confirming';
         
-        // Zeige Bestätigungsnachricht mit HTML-Formatierung
+        // FORCE HTML-Behandlung für Bestätigungsnachricht
         addMessageToHistory(data.answer, 'ai', true);
-        console.log("📝 Bestätigungsnachricht angezeigt");
+        console.log("📝 Bestätigungsnachricht mit FORCE HTML angezeigt");
         
         // Warte kurz, dann führe die eigentliche Buchung durch
         console.log("⏰ Starte 2-Sekunden-Timer für Buchungsausführung...");
