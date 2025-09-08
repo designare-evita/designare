@@ -1,4 +1,4 @@
-// api/ask-gemini.js - KOMPLETT KORRIGIERTE VERSION mit allen Prompts und intelligenter Terminbuchung
+// api/ask-gemini.js - KORRIGIERTE VERSION mit korrekten Rückruf-Informationen
 
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
@@ -74,7 +74,7 @@ module.exports = async function handler(req, res) {
     if (selectedTermin && selectedTermin >= 1 && selectedTermin <= 3) {
       console.log(`✅ Termin ${selectedTermin} erkannt für Eingabe: "${prompt}"`);
       
-      const bookingFormText = `✅ **Termin ${selectedTermin} ausgewählt!**
+      const bookingFormText = `✅ **Rückruf-Termin ${selectedTermin} ausgewählt!**
 
 **Schritt 2: Deine Kontaktdaten**
 
@@ -83,7 +83,7 @@ Bitte gib mir folgende Informationen:
 **Format:** Name, Telefonnummer
 **Beispiel:** Max Mustermann, 0664 123 45 67
 
-*Deine Daten werden nur für die Terminkoordination verwendet.*`;
+*Michael wird dich zum vereinbarten Zeitpunkt anrufen.*`;
       
       return res.status(200).json({
         action: 'collect_booking_data',
@@ -151,11 +151,11 @@ Bitte gib mir folgende Informationen:
 **Name:** ${contactData.name}
 **Telefon:** ${contactData.phone}
 
-**Schritt 3: Termin bestätigen**
+**Schritt 3: Rückruf-Termin bestätigen**
 
-Ich erstelle jetzt deinen Termin in Michaels Kalender. Das dauert nur einen Moment...
+Ich erstelle jetzt deinen Rückruf-Termin in Michaels Kalender. Das dauert nur einen Moment...
 
-*Du erhältst gleich eine Bestätigung!* ⏳`;
+*Michael wird dich zum vereinbarten Zeitpunkt anrufen!* ⏳`;
       
       return res.status(200).json({
         action: 'confirm_booking',
@@ -195,10 +195,10 @@ Ich erstelle jetzt deinen Termin in Michaels Kalender. Das dauert nur einen Mome
     console.log(`Intent erkannt: ${intent} für Eingabe: "${prompt}"`);
 
     // =================================================================
-    // INTELLIGENTE TERMINVORSCHLÄGE
+    // INTELLIGENTE TERMINVORSCHLÄGE (KORRIGIERT FÜR RÜCKRUF)
     // =================================================================
     if (intent === 'booking' || intent === 'urgent_booking') {
-      console.log('🔍 Lade intelligente Terminvorschläge...');
+      console.log('🔍 Lade intelligente Rückruf-Terminvorschläge...');
       
       try {
         // Hole die Terminvorschläge von unserer API
@@ -212,24 +212,24 @@ Ich erstelle jetzt deinen Termin in Michaels Kalender. Das dauert nur einen Mome
         const suggestionsData = await suggestionsResponse.json();
         
         if (suggestionsData.success && suggestionsData.suggestions.length > 0) {
-          // Erstelle intelligente Antwort mit Terminvorschlägen
+          // Erstelle intelligente Antwort mit Rückruf-Terminvorschlägen
           const currentTime = new Date().toLocaleString('de-DE');
           
           let responseText = '';
           
           if (intent === 'urgent_booking') {
-            responseText = `⚡ **Dringende Terminanfrage verstanden!** 
+            responseText = `⚡ **Dringende Rückruf-Anfrage verstanden!** 
 
-Michael hat folgende **sofort verfügbare** Termine:`;
+Michael kann dich zu diesen **sofort verfügbaren** Zeiten anrufen:`;
           } else {
-            responseText = `📅 **Perfekt! Ich habe Michaels Kalender geprüft.**
+            responseText = `📞 **Perfekt! Ich habe Michaels Kalender geprüft.**
 
-Hier sind die nächsten **3 verfügbaren Termine**:`;
+Hier sind die nächsten **3 verfügbaren Rückruf-Termine**:`;
           }
           
-          // Füge Terminvorschläge hinzu - ALLE 3 Termine
+          // Füge Terminvorschläge hinzu - ALLE 3 Termine (KORRIGIERT)
           suggestionsData.suggestions.forEach((suggestion, index) => {
-            const emoji = suggestion.isPreferredTime ? '⭐' : '📅';
+            const emoji = suggestion.isPreferredTime ? '⭐' : '📞';
             responseText += `
 
 **${emoji} Termin ${suggestion.slot}:** ${suggestion.formattedString}`;
@@ -237,11 +237,11 @@ Hier sind die nächsten **3 verfügbaren Termine**:`;
           
           responseText += `
 
-**So buchst du einen Termin:**
+**So buchst du einen Rückruf-Termin:**
 1️⃣ Wähle einen Termin: "Termin 1", "Termin 2" oder "Termin 3"
 2️⃣ Ich führe dich durch die Buchung
 
-*Alle Termine sind 60 Minuten und finden bei Michael statt.*
+*Michael ruft dich zum vereinbarten Zeitpunkt an.*
 
 **Welcher Termin passt dir am besten?** 😊`;
           
@@ -253,19 +253,20 @@ Hier sind die nächsten **3 verfügbaren Termine**:`;
             metadata: {
               generatedAt: currentTime,
               urgentBooking: intent === 'urgent_booking',
-              totalSuggestions: suggestionsData.suggestions.length
+              totalSuggestions: suggestionsData.suggestions.length,
+              appointmentType: 'callback'
             }
           });
           
         } else {
           // Fallback wenn keine Termine verfügbar
-          const fallbackText = `😔 **Leider sind in den nächsten 3 Arbeitstagen keine freien Termine verfügbar.**
+          const fallbackText = `😔 **Leider sind in den nächsten 3 Arbeitstagen keine freien Rückruf-Termine verfügbar.**
 
 **Alternative Optionen:**
 📧 **E-Mail:** michael@designare.at
 📝 **Nachricht:** Beschreibe dein Anliegen und deine Verfügbarkeit
 
-Michael meldet sich dann mit alternativen Terminen bei dir!`;
+Michael meldet sich dann mit alternativen Rückruf-Zeiten bei dir!`;
           
           return res.status(200).json({ answer: fallbackText });
         }
@@ -274,19 +275,19 @@ Michael meldet sich dann mit alternativen Terminen bei dir!`;
         console.error('Fehler beim Laden der Terminvorschläge:', apiError);
         
         // Fallback bei API-Fehler
-        const fallbackText = `📅 **Gerne helfe ich bei der Terminbuchung!**
+        const fallbackText = `📞 **Gerne helfe ich bei der Rückruf-Terminbuchung!**
 
 Momentan kann ich nicht direkt auf Michaels Kalender zugreifen, aber du kannst ihn direkt kontaktieren:
 
 📧 **E-Mail:** michael@designare.at
-📞 **Anruf:** (Nummer findest du im Kontaktformular)
+📞 **Direkt anrufen:** (Nummer findest du im Kontaktformular)
 
 **Was solltest du erwähnen:**
 • Dein Anliegen/Projekt
 • Deine Verfügbarkeit (Wochentage/Uhrzeiten)
-• Bevorzugte Gesprächsform (persönlich/Video/Telefon)
+• Deine bevorzugte Telefonnummer
 
-Michael antwortet normalerweise innerhalb von 24 Stunden! 😊`;
+Michael ruft normalerweise innerhalb von 24 Stunden zurück! 😊`;
         
         return res.status(200).json({ answer: fallbackText });
       }
@@ -316,9 +317,10 @@ Anrede: Duze den Besucher ausnahmslos. Verwende immer "Du", "Dir" oder "Dein".
 Stil: Antworte immer in kurzen, prägnanten Sätzen. Bei allgemeinen Fragen fasse dich kurz (maximal 4 Sätze). Bei Fachthemen darfst du ausführlicher sein, deine Antwort sollte aber maximal 9 Sätze umfassen. Sei freundlich, lösungsorientiert und zeige deinen charmanten, subtilen Humor, der ein Schmunzeln hervorruft. Vermeide Sarkasmus.
 
 WICHTIG FÜR TERMINANFRAGEN:
-- Bei Fragen zu Terminen antworte: "Einen Moment, ich prüfe Michaels Kalender und schlage dir konkrete Termine vor!"
+- Bei Fragen zu Terminen antworte: "Einen Moment, ich prüfe Michaels Kalender und schlage dir konkrete Rückruf-Termine vor!"
+- Es handelt sich um RÜCKRUF-TERMINE - Michael ruft den Kunden an
 - Verweise NICHT auf E-Mail oder Kontaktformular bei Terminanfragen
-- Die Terminbuchung läuft über mich (Evita) direkt im Chat
+- Die Rückruf-Terminbuchung läuft über mich (Evita) direkt im Chat
 
 --- DEINE WISSENSBASIS ---
 Die folgenden Informationen über Michael Kanda sind deine primäre Wissensquelle. Beantworte Fragen dazu stets basierend auf diesen Fakten:
@@ -327,10 +329,10 @@ Spezialisierung: Verbindung von Design, Code und Künstlicher Intelligenz.
 Erfahrung: Über 20 Jahre im gesamten Online-Bereich, lösungsorientierter Ansatz.
 Qualifikationen: Abschlüsse in Medientechnik, zertifizierter E-Commerce-Experte, Google Workshops.
 Digitale Superkräfte: Moderne Web-Entwicklung, Suchmaschinenmarketing (SEM), E-Commerce-Lösungen, WordPress, umfassende KI-Beratung & praxisnahe Umsetzung.
-Kontakt Michael: michael@designare.at (bevorzugter Weg: Kontakt-Button auf der Webseite).
+Kontakt Michael: michael@designare.at (bevorzugter Weg: Rückruf-Termin über mich).
 Aktuelles Datum: ${formattedDate}
 Aktuelle Uhrzeit: ${formattedTime}
-Über dich (Evita): Du bist eine KI-Assistenz mit Sinn für Humor, benannt nach Michaels Tierschutzhündin. Deine Aufgabe ist es, Besucher über Michaels Fachwissen, Qualifikationen und beruflichen Hintergrund zu informieren und technische Fragen zu beantworten.
+Über dich (Evita): Du bist eine KI-Assistenz mit Sinn für Humor, benannt nach Michaels Tierschutzhündin. Deine Aufgabe ist es, Besucher über Michaels Fachwissen, Qualifikationen und beruflichen Hintergrund zu informieren, technische Fragen zu beantworten und Rückruf-Termine zu vereinbaren.
 
 --- FACHWISSEN ---
 Zusätzlich zu deinem Allgemeinwissen und den Informationen über Michael, verfügst du über spezifisches Fachwissen zu folgenden Themen:
