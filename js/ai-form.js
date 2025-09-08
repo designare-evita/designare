@@ -138,8 +138,11 @@ export const initAiForm = () => {
         console.log("📋 Answer length:", data.answer ? data.answer.length : 'undefined');
         console.log("📋 Answer preview:", data.answer ? data.answer.substring(0, 100) + '...' : 'undefined');
         
+        // ✅ KRITISCH: Speichere bookingData RICHTIG
         currentBookingState.bookingData = data.bookingData;
         currentBookingState.step = 'confirming';
+        
+        console.log("🔍 currentBookingState nach Update:", currentBookingState);
         
         // FORCE HTML-Behandlung für Bestätigungsnachricht
         addMessageToHistory(data.answer, 'ai', true);
@@ -149,6 +152,7 @@ export const initAiForm = () => {
         console.log("⏰ Starte 2-Sekunden-Timer für Buchungsausführung...");
         setTimeout(async () => {
             console.log("🚀 Führe jetzt executeBooking() aus...");
+            console.log("🔍 currentBookingState vor executeBooking:", currentBookingState);
             try {
                 await executeBooking();
             } catch (error) {
