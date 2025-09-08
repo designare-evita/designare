@@ -74,7 +74,6 @@ module.exports = async function handler(req, res) {
 if (selectedTermin && selectedTermin >= 1 && selectedTermin <= 3) {
     console.log(`✅ Termin ${selectedTermin} erkannt für Eingabe: "${prompt}"`);
     
-    // VERBESSERTE HTML-FORMATIERTE NACHRICHT
     const bookingFormText = `
         <div class="booking-success-message" style="
             background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
@@ -139,7 +138,7 @@ if (selectedTermin && selectedTermin >= 1 && selectedTermin <= 3) {
     `;
     
     return res.status(200).json({
-        action: 'collect_booking_data',
+        action: 'collect_booking_data',  // ✅ RICHTIG
         answer: bookingFormText,
         selectedSlot: selectedTermin,
         nextStep: 'collect_contact_data'
@@ -197,9 +196,9 @@ if (selectedTermin && selectedTermin >= 1 && selectedTermin <= 3) {
     }
 
     if (contactData) {
-      console.log('✅ Kontaktdaten erkannt:', contactData);
-      
-      const confirmationText = `
+    console.log('✅ Kontaktdaten erkannt:', contactData);
+    
+    const confirmationText = `
         <div class="booking-confirmation-message" style="
             background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
             color: white;
