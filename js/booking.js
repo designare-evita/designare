@@ -16,10 +16,9 @@ const validateBookingTime = (selectedSlot) => {
     console.log("🔍 Validiere Buchungszeit:", selectedSlot);
 
     try {
-        // Die Prüfung auf "zu nah in der Zukunft" wird entfernt.
-        // Das Backend ist dafür besser geeignet und hat die korrekte Parsing-Logik.
+        // Die Datums- und Zeitprüfung wird entfernt und dem Backend überlassen.
 
-        // Prüfe NUR noch auf gesperrte Slots im Frontend
+        // Prüfe NUR noch, ob der Slot temporär gesperrt ist.
         if (isSlotLocked(selectedSlot)) {
             console.warn("⚠️ Slot ist temporär gesperrt:", selectedSlot);
             showBookingError('Dieser Termin wird gerade von einem anderen Nutzer gebucht. Bitte wähle einen anderen Slot.');
@@ -27,7 +26,7 @@ const validateBookingTime = (selectedSlot) => {
         }
 
         console.log("✅ Frontend-Slot-Validierung erfolgreich (Sperr-Prüfung)");
-        return true;
+        return true; // Gibt jetzt immer `true` zurück (außer bei Sperrung)
 
     } catch (error) {
         console.error("❌ Fehler bei der Slot-Validierung:", error);
