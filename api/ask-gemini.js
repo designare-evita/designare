@@ -71,10 +71,10 @@ module.exports = async function handler(req, res) {
       }
     }
 
-    if (selectedTermin && selectedTermin >= 1 && selectedTermin <= 3) {
-      console.log(`✅ Termin ${selectedTermin} erkannt für Eingabe: "${prompt}"`);
-      
-      const bookingFormText = `✅ **Rückruf-Termin ${selectedTermin} ausgewählt!**
+if (selectedTermin && selectedTermin >= 1 && selectedTermin <= 3) {
+    console.log(`✅ Termin ${selectedTermin} erkannt für Eingabe: "${prompt}"`);
+    
+    const bookingFormText = `✅ **Rückruf-Termin ${selectedTermin} ausgewählt!**
 
 **Schritt 2: Deine Kontaktdaten**
 
@@ -84,14 +84,14 @@ Bitte gib mir folgende Informationen:
 **Beispiel:** Max Mustermann, 0664 123 45 67
 
 *Michael wird dich zum vereinbarten Zeitpunkt anrufen.*`;
-      
-      return res.status(200).json({
-        action: 'collect_booking_data',
+    
+    return res.status(200).json({
+        action: 'collect_booking_data',  // ✅ RICHTIG
         answer: bookingFormText,
         selectedSlot: selectedTermin,
         nextStep: 'collect_contact_data'
-      });
-    }
+    });
+}
 
     // =================================================================
     // ERWEITERTE KONTAKTDATEN-ERKENNUNG
