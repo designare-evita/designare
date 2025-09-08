@@ -1,4 +1,4 @@
-// js/ai-form.js - KOMPLETT KORRIGIERTE FASSUNG
+// js/ai-form.js - KOMPLETTE KORRIGIERTE FASSUNG
 
 export const initAiForm = () => {
     console.log("🚀 initAiForm mit intelligenter Terminbuchung gestartet");
@@ -74,44 +74,35 @@ export const initAiForm = () => {
     };
 
     // ===================================================================
-    // TERMINBUCHUNG - KORREKTE IMPLEMENTIERUNG
+    // TERMINBUCHUNG - EINFACHE IMPLEMENTIERUNG
     // ===================================================================
     
-    const handleSmartBookingResponse = (data) => {
-        console.log("📅 Smart Booking Response erhalten:", data);
-        
-        // Speichere Terminvorschläge
-        currentBookingState.suggestions = data.suggestions || [];
-        currentBookingState.step = 'slot_selection';
-        
-        // Erstelle Terminliste mit klickbaren Text-Optionen
-        const enhancedMessage = createInteractiveTerminMessage(data.answer, data.suggestions);
-        addMessageToHistory(enhancedMessage, 'ai', true);
-    };
-
     const createInteractiveTerminMessage = (message, suggestions) => {
         let enhancedHtml = `<div class="booking-message">
-            <div class="booking-text">${message.replace(/\n/g, '<br>')}</div>`;
+            <div class="booking-text">Hier sind die nächsten 3 verfügbaren Rückruftermine:</div>`;
         
         if (suggestions && suggestions.length > 0) {
-            enhancedHtml += `<div class="booking-options" style="margin-top: 15px;">`;
+            enhancedHtml += `<div class="booking-buttons" style="margin-top: 20px;">`;
             
             suggestions.forEach((suggestion, index) => {
-                const emoji = suggestion.isPreferredTime ? '⭐' : '📞';
                 enhancedHtml += `
-                    <div class="termin-option" data-slot="${suggestion.slot}" data-datetime="${suggestion.fullDateTime}" style="
-                        padding: 12px 15px;
-                        margin-bottom: 8px;
-                        background: rgba(255,255,255,0.1);
+                    <button class="termin-button" data-slot="${suggestion.slot}" data-datetime="${suggestion.fullDateTime}" style="
+                        display: block;
+                        width: 100%;
+                        margin-bottom: 12px;
+                        padding: 15px 20px;
+                        background: linear-gradient(135deg, #ffc107 0%, #ffca2c 100%);
+                        color: #1a1a1a;
+                        border: none;
                         border-radius: 8px;
                         cursor: pointer;
-                        transition: all 0.3s ease;
-                        border-left: 4px solid #ffc107;
                         font-weight: bold;
-                    " onmouseover="this.style.background='rgba(255,193,7,0.2)'" 
-                       onmouseout="this.style.background='rgba(255,255,255,0.1)'">
-                        ${emoji} <strong>Termin ${suggestion.slot}:</strong> ${suggestion.formattedString}
-                    </div>`;
+                        font-size: 1rem;
+                        transition: all 0.3s ease;
+                    " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 5px 15px rgba(255,193,7,0.4)'" 
+                       onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                        Termin ${suggestion.slot}: ${suggestion.formattedString}
+                    </button>`;
             });
             
             enhancedHtml += `</div>`;
@@ -184,27 +175,26 @@ export const initAiForm = () => {
     };
 
     // ===================================================================
-    // EVENT-HANDLER FÜR TERMIN-OPTIONEN
+    // EVENT-HANDLER FÜR TERMIN-BUTTONS
     // ===================================================================
     
-    const handleTerminOptionClick = (event) => {
-        const terminDiv = event.target.closest('.termin-option');
-        if (terminDiv) {
-            const slotNumber = parseInt(terminDiv.dataset.slot);
-            const datetime = terminDiv.dataset.datetime;
+    const handleTerminButtonClick = (event) => {
+        if (event.target.classList.contains('termin-button')) {
+            const slotNumber = parseInt(event.target.dataset.slot);
+            const datetime = event.target.dataset.datetime;
             
             console.log(`Termin ${slotNumber} ausgewählt:`, datetime);
             
             currentBookingState.selectedSlot = slotNumber;
             
-            // Markiere ausgewählte Option
-            document.querySelectorAll('.termin-option').forEach(div => {
-                div.style.background = 'rgba(255,255,255,0.1)';
-                div.style.borderLeft = '4px solid #ffc107';
+            // Markiere ausgewählten Button
+            document.querySelectorAll('.termin-button').forEach(btn => {
+                btn.style.background = 'linear-gradient(135deg, #6c757d 0%, #5a6268 100%)';
+                btn.style.color = '#fff';
             });
             
-            terminDiv.style.background = 'rgba(40,167,69,0.3)';
-            terminDiv.style.borderLeft = '4px solid #28a745';
+            event.target.style.background = 'linear-gradient(135deg, #28a745 0%, #20c997 100%)';
+            event.target.style.color = '#fff';
             
             // Sende "Termin X" als Chat-Nachricht
             addMessageToHistory(`Termin ${slotNumber}`, 'user');
@@ -244,16 +234,17 @@ export const initAiForm = () => {
             if (data.action === 'smart_booking') {
                 console.log("🎯 SMART BOOKING ERKANNT!");
                 
-            if (isFromChat) {
-    // Bei Chat-Aufruf: GAR NICHTS tun
-    console.log("✅ Chat-Aufruf ignoriert");
-} else {
-    // Bei erster Anfrage: NUR den Text zeigen, OHNE zusätzliche Optionen
-    initializeChat(data.answer, false);  // ✅ Nur der Text
-    showModal();
-    currentBookingState.suggestions = data.suggestions || [];
-    currentBookingState.step = 'slot_selection';
-}
+                if (isFromChat) {
+                    // Bei Chat-Aufruf: GAR NICHTS anzeigen
+                    console.log("✅ Chat-Aufruf ignoriert");
+                } else {
+                    // Bei erster Anfrage: Modal mit Buttons zeigen
+                    const enhancedMessage = createInteractiveTerminMessage(data.answer, data.suggestions);
+                    initializeChat(enhancedMessage, true);
+                    showModal();
+                    currentBookingState.suggestions = data.suggestions || [];
+                    currentBookingState.step = 'slot_selection';
+                }
                 return true;
             }
             
@@ -386,9 +377,9 @@ export const initAiForm = () => {
     });
     console.log("✅ Chat-Submit-Listener registriert");
 
-    // Event-Listener für Termin-Optionen (Event-Delegation)
-    document.addEventListener('click', handleTerminOptionClick);
-    console.log("✅ Termin-Option-Listener registriert");
+    // Event-Listener für Termin-Buttons (Event-Delegation)
+    document.addEventListener('click', handleTerminButtonClick);
+    console.log("✅ Termin-Button-Listener registriert");
 
     // Close-Button Event Listeners
     closeButtons.forEach(button => {
