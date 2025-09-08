@@ -122,22 +122,28 @@ export const initAiForm = () => {
     // KORRIGIERTE BOOKING-BESTÄTIGUNG (NUR EINMAL DEFINIERT)
     // ===================================================================
     const handleBookingConfirmation = async (data) => {
-        console.log("✅ Booking-Bestätigung:", data);
+        console.log("✅ Booking-Bestätigung empfangen:", data);
+        console.log("📋 BookingData:", data.bookingData);
+        
         currentBookingState.bookingData = data.bookingData;
         currentBookingState.step = 'confirming';
         
         // Zeige Bestätigungsnachricht mit HTML-Formatierung
         addMessageToHistory(data.answer, 'ai', true);
+        console.log("📝 Bestätigungsnachricht angezeigt");
         
         // Warte kurz, dann führe die eigentliche Buchung durch
+        console.log("⏰ Starte 2-Sekunden-Timer für Buchungsausführung...");
         setTimeout(async () => {
+            console.log("🚀 Führe jetzt executeBooking() aus...");
             try {
                 await executeBooking();
             } catch (error) {
-                console.error('Fehler bei der Buchung:', error);
+                console.error('❌ Fehler bei der Buchung:', error);
                 addMessageToHistory(`
                     <div style="background: #dc3545; color: white; padding: 15px; border-radius: 8px; margin: 10px 0;">
                         <strong>❌ Fehler bei der Terminbuchung</strong><br>
+                        <strong>Details:</strong> ${error.message}<br><br>
                         Bitte versuche es erneut oder kontaktiere Michael direkt unter:<br>
                         📧 <a href="mailto:michael@designare.at" style="color: #ffc107;">michael@designare.at</a>
                     </div>
