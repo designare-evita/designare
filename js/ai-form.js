@@ -320,34 +320,36 @@ const executeBooking = async () => {
     // ===================================================================
     // EVENT-HANDLER FÜR TERMIN-BUTTONS
     // ===================================================================
-    const handleTerminButtonClick = (event) => {
-        if (event.target.classList.contains('termin-button')) {
-            const slotNumber = parseInt(event.target.dataset.slot);
-            const datetime = event.target.dataset.datetime;
-            const formatted = event.target.dataset.formatted;
-            
-            console.log(`✅ Termin ${slotNumber} ausgewählt:`, formatted || datetime);
-            
-            currentBookingState.selectedSlot = slotNumber;
-            
-            // Visuelles Feedback
-            document.querySelectorAll('.termin-button').forEach(btn => {
-                btn.style.background = 'linear-gradient(135deg, #6c757d 0%, #5a6268 100%)';
-                btn.style.color = '#fff';
-            });
-            
-            event.target.style.background = 'linear-gradient(135deg, #28a745 0%, #20c997 100%)';
-            event.target.style.color = '#fff';
-            
-            // Sende Termin-Auswahl als Chat-Nachricht
-            addMessageToHistory(`Termin ${slotNumber}`, 'user');
-            
-            // API-Aufruf für Kontaktdaten-Sammlung
-            setTimeout(() => {
-                sendToEvita(`Termin ${slotNumber}`, true);
-            }, 500);
-        }
-    };
+ const handleTerminButtonClick = (event) => {
+    if (event.target.classList.contains('termin-button')) {
+        const slotNumber = parseInt(event.target.dataset.slot);
+        const datetime = event.target.dataset.datetime;
+        const formatted = event.target.dataset.formatted;
+        
+        console.log(`✅ Termin ${slotNumber} ausgewählt:`, formatted || datetime);
+        
+        currentBookingState.selectedSlot = slotNumber;
+        // NEU: Speichere den formatierten Text für die nächste Nachricht
+        currentBookingState.selectedSlotFormatted = formatted; 
+        
+        // Visuelles Feedback
+        document.querySelectorAll('.termin-button').forEach(btn => {
+            btn.style.background = 'linear-gradient(135deg, #6c757d 0%, #5a6268 100%)';
+            btn.style.color = '#fff';
+        });
+        
+        event.target.style.background = 'linear-gradient(135deg, #28a745 0%, #20c997 100%)';
+        event.target.style.color = '#fff';
+        
+        // Sende Termin-Auswahl als Chat-Nachricht
+        addMessageToHistory(`Termin ${slotNumber}`, 'user');
+        
+        // API-Aufruf für Kontaktdaten-Sammlung
+        setTimeout(() => {
+            sendToEvita(`Termin ${slotNumber}`, true);
+        }, 500);
+    }
+};
 
     // ===================================================================
     // KORRIGIERTE API-KOMMUNIKATION
