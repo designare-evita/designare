@@ -125,11 +125,19 @@ const handleSmartBookingResponse = (data) => {
         return enhancedHtml;
     };
 
-    const handleBookingDataCollection = (data) => {
-        console.log("📝 Datensammlung:", data);
-        currentBookingState.step = 'contact_data';
-        addMessageToHistory(data.answer, 'ai');
-    };
+ const handleBookingDataCollection = (data) => {
+    console.log("📝 Datensammlung:", data);
+    currentBookingState.step = 'contact_data';
+    
+    // ✅ LÖSUNG: Ersetze die gesamte Chat-History mit der neuen Nachricht
+    if (responseArea) {
+        responseArea.innerHTML = ''; // Lösche alles
+        addMessageToHistory("Ich brauche einen Termin", 'user'); // Ursprüngliche Anfrage
+        addMessageToHistory("Terminliste wurde angezeigt", 'ai'); // Zusammenfassung
+        addMessageToHistory(`Termin ${currentBookingState.selectedSlot}`, 'user'); // Button-Klick
+        addMessageToHistory(data.answer, 'ai'); // Neue Nachricht
+    }
+};
 
     const handleBookingConfirmation = async (data) => {
         console.log("✅ Booking-Bestätigung:", data);
