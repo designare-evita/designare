@@ -245,20 +245,23 @@ export const initAiForm = () => {
             // INTELLIGENTE ANTWORT-BEHANDLUNG
             // ===================================================================
             
-            if (data.action === 'smart_booking') {
-                console.log("🎯 SMART BOOKING ERKANNT!");
-                
-                if (isFromChat) {
-                    handleSmartBookingResponse(data);
-                } else {
-                    initializeChat(data.answer);
-                    showModal();
-                    setTimeout(() => {
-                        handleSmartBookingResponse(data);
-                    }, 100);
-                }
-                return true;
-            }
+         if (data.action === 'smart_booking') {
+    console.log("🎯 SMART BOOKING ERKANNT!");
+    
+    if (isFromChat) {
+        // ✅ KORREKTUR: Bei Chat-Aufruf wird nur der State aktualisiert
+        handleSmartBookingResponse(data);
+    } else {
+        // ✅ KORREKTUR: Nur beim ERSTEN Aufruf wird das Modal mit Inhalt gefüllt
+        const enhancedMessage = createInteractiveTerminMessage(data.answer, data.suggestions);
+        initializeChat(enhancedMessage, true);
+        showModal();
+        // State auch hier aktualisieren
+        currentBookingState.suggestions = data.suggestions || [];
+        currentBookingState.step = 'slot_selection';
+    }
+    return true;
+}
             
             if (data.action === 'collect_booking_data') {
                 console.log("📝 DATENSAMMLUNG ERKANNT!");
