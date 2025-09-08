@@ -1,4 +1,4 @@
-// js/ai-form.js (FINALE REPARIERTE VERSION - Chat funktioniert)
+// js/ai-form.js (REPARIERTE VERSION - Booking aus Chat funktioniert)
 
 import { initBookingModal, showStep } from './booking.js';
 
@@ -44,11 +44,12 @@ export const initAiForm = () => {
         document.body.classList.remove('no-scroll');
     };
 
-    // Booking-Modal-Funktion
+    // REPARIERTE Booking-Modal-Funktion
     const launchBookingModal = async () => {
         console.log("📅 launchBookingModal gestartet");
         
         try {
+            // Verstecke das Chat-Modal zuerst
             hideModal();
             
             const modalContainer = document.getElementById('modal-container');
@@ -58,6 +59,7 @@ export const initAiForm = () => {
             
             let bookingModal = document.getElementById('booking-modal');
             
+            // KRITISCHE VERBESSERUNG: Prüfe ob das Modal bereits existiert
             if (!bookingModal) {
                 console.log("📄 Lade booking-modal.html...");
                 
@@ -75,21 +77,51 @@ export const initAiForm = () => {
                 }
                 
                 console.log("✅ Booking-Modal HTML geladen");
+                
+                // WICHTIG: Initialisiere das Booking-Modal erst NACH dem HTML-Laden
+                await new Promise(resolve => setTimeout(resolve, 100)); // Kurze Wartezeit für DOM-Update
                 initBookingModal();
+            } else {
+                console.log("✅ Booking-Modal bereits vorhanden");
             }
             
+            // VERBESSERUNG: Sichere Anzeige des Modals
             bookingModal.style.display = 'flex';
-            bookingModal.style.opacity = '1';
-            bookingModal.style.visibility = 'visible';
-            bookingModal.style.pointerEvents = 'auto';
-            console.log("✅ Booking-Modal angezeigt");
             
-            showStep('step-day-selection');
+            // Warte kurz und setze dann alle Sichtbarkeits-Eigenschaften
+            setTimeout(() => {
+                bookingModal.style.opacity = '1';
+                bookingModal.style.visibility = 'visible';
+                bookingModal.style.pointerEvents = 'auto';
+                
+                // Verhindere Body-Scrolling
+                document.body.style.overflow = 'hidden';
+                document.body.classList.add('no-scroll');
+                
+                console.log("✅ Booking-Modal vollständig angezeigt");
+                
+                // Zeige den ersten Schritt
+                showStep('step-day-selection');
+                
+                // ZUSÄTZLICHE SICHERHEIT: Prüfe ob die Tages-Buttons funktionieren
+                const dayButtons = document.querySelectorAll('.day-button');
+                console.log("🔧 Gefundene Tag-Buttons:", dayButtons.length);
+                
+                if (dayButtons.length === 0) {
+                    console.warn("⚠️ Keine Tag-Buttons gefunden! Re-initialisiere...");
+                    // Warte etwas länger und versuche erneut
+                    setTimeout(() => {
+                        initBookingModal();
+                        showStep('step-day-selection');
+                    }, 200);
+                }
+                
+            }, 50);
             
         } catch (error) {
             console.error("❌ Fehler beim Laden des Booking-Modals:", error);
             addMessageToHistory(`Entschuldigung, beim Öffnen des Buchungsfensters ist ein Fehler aufgetreten: ${error.message}`, 'ai');
-            showModal();
+            showModal(); // Zeige das Chat-Modal wieder an
         }
     };
 
@@ -146,9 +178,9 @@ export const initAiForm = () => {
                 }
                 
                 console.log("⏰ Starte Booking in 2 Sekunden...");
-                setTimeout(() => {
+                setTimeout(async () => {
                     console.log("🚀 Timeout erreicht, starte Booking...");
-                    launchBookingModal();
+                    await launchBookingModal();
                 }, 2000);
                 
                 return true;
@@ -215,7 +247,6 @@ export const initAiForm = () => {
         event.preventDefault();
         console.log("💬 Chat-Submit Handler aufgerufen");
 
-        // WICHTIG: Stoppe die weitere Event-Propagation
         event.stopImmediatePropagation();
 
         const chatInput = document.getElementById('ai-chat-input');
@@ -242,31 +273,42 @@ export const initAiForm = () => {
         await sendToEvita(userInput, true);
     };
 
-    // REPARIERTE Event Listener Setup
+    // Event Listener Setup
     let chatFormHandled = false;
 
     // Event Listener für Hauptformular
     aiForm.addEventListener('submit', handleFormSubmit);
     console.log("✅ AI-Form Submit-Listener registriert");
 
-    // VEREINFACHTER Chat-Form Event Listener (nur Event-Delegation)
+    // Chat-Form Event Listener mit verbesserter Event-Delegation
     document.addEventListener('submit', (e) => {
         if (e.target.id === 'ai-chat-form') {
             console.log("🎯 Chat-Form Submit erkannt - Event-Delegation");
             
-            // Verhindere doppelte Behandlung
             if (chatFormHandled) {
                 console.log("⚠️ Chat bereits behandelt, überspringe");
                 return;
             }
             
             chatFormHandled = true;
-            setTimeout(() => { chatFormHandled = false; }, 100); // Reset nach 100ms
+            setTimeout(() => { chatFormHandled = false; }, 100);
             
             handleChatSubmit(e);
         }
     });
     console.log("✅ Chat-Submit-Listener (Event-Delegation) registriert");
+
+    // ZUSÄTZLICHER EVENT LISTENER: Direkte Behandlung für Chat-Eingabe
+    document.addEventListener('keydown', (e) => {
+        if (e.target.id === 'ai-chat-input' && e.key === 'Enter') {
+            e.preventDefault();
+            const chatForm = document.getElementById('ai-chat-form');
+            if (chatForm) {
+                console.log("⌨️ Enter-Taste im Chat erkannt - triggere Submit");
+                chatForm.dispatchEvent(new Event('submit'));
+            }
+        }
+    });
 
     // Close-Button Event Listeners
     closeButtons.forEach(button => {
@@ -276,5 +318,12 @@ export const initAiForm = () => {
     });
     console.log("✅ Close-Button-Listener registriert");
 
+    // ZUSÄTZLICHE DEBUGGING-FUNKTION
+    window.debugBookingLaunch = () => {
+        console.log("🔧 DEBUG: Manueller Booking-Launch");
+        launchBookingModal();
+    };
+
     console.log("✅ Evita AI-Form vollständig initialisiert");
+    console.log("🔧 Debug-Funktion verfügbar: window.debugBookingLaunch()");
 };
