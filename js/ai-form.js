@@ -67,12 +67,18 @@ export const initAiForm = () => {
     };
 
     const initializeChat = (initialMessage, isHtml = false) => {
-        if (!responseArea) return;
-        
         console.log("🔄 initializeChat aufgerufen mit isHtml:", isHtml);
         console.log("📝 Message length:", initialMessage ? initialMessage.length : 'undefined');
+        console.log("🔍 responseArea verfügbar in initializeChat?", !!responseArea);
+        
+        if (!responseArea) {
+            console.error("❌ responseArea ist null in initializeChat!");
+            return;
+        }
         
         responseArea.innerHTML = '';
+        console.log("🧹 responseArea geleert, rufe jetzt addMessageToHistory auf...");
+        
         addMessageToHistory(initialMessage, 'ai', isHtml);
         
         console.log("✅ initializeChat abgeschlossen");
