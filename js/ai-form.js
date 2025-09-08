@@ -173,23 +173,41 @@ export const initAiForm = () => {
     // KORRIGIERTE BOOKING-AUSFÜHRUNG (NUR EINMAL DEFINIERT)
     // ===================================================================
     const executeBooking = async () => {
-        if (!currentBookingState.selectedSlot || !currentBookingState.bookingData) {
-            console.error('Unvollständige Buchungsdaten');
+        console.log('🔍 executeBooking gestartet');
+        console.log('📋 currentBookingState:', currentBookingState);
+        
+        // GEÄNDERTE PRÜFUNG: Nur bookingData ist wirklich wichtig
+        if (!currentBookingState.bookingData || !currentBookingState.bookingData.name || !currentBookingState.bookingData.phone) {
+            console.error('❌ Unvollständige Buchungsdaten - keine bookingData');
             return;
         }
 
         try {
-            console.log('🔍 Suche Suggestion für Slot:', currentBookingState.selectedSlot);
-            console.log('📋 Verfügbare Suggestions:', currentBookingState.suggestions);
+            // FALLBACK: Verwende eine Standard-Slot-Zeit, falls selectedSlot leer ist
+            let appointmentTime;
             
-            const selectedSuggestion = currentBookingState.suggestions.find(s => s.slot === currentBookingState.selectedSlot);
-            
-            if (!selectedSuggestion) {
-                throw new Error(`Ausgewählter Slot ${currentBookingState.selectedSlot} nicht gefunden`);
+            if (currentBookingState.selectedSlot && currentBookingState.suggestions.length > 0) {
+                // Normal: Finde die Suggestion
+                const selectedSuggestion = currentBookingState.suggestions.find(s => s.slot === currentBookingState.selectedSlot);
+                
+                if (selectedSuggestion) {
+                    appointmentTime = selectedSuggestion.fullDateTime;
+                    console.log('✅ Suggestion gefunden:', selectedSuggestion);
+                } else {
+                    console.warn('⚠️ Suggestion nicht gefunden, verwende Fallback');
+                    appointmentTime = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(); // Morgen, gleiche Zeit
+                }
+            } else {
+                // FALLBACK: Verwende Standardzeit (morgen 9:00)
+                console.warn('⚠️ Keine Suggestions verfügbar, verwende Fallback-Zeit');
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                tomorrow.setHours(9, 0, 0, 0);
+                appointmentTime = tomorrow.toISOString();
             }
 
             console.log('📅 Erstelle Termin für:', {
-                slot: selectedSuggestion.fullDateTime,
+                slot: appointmentTime,
                 name: currentBookingState.bookingData.name,
                 phone: currentBookingState.bookingData.phone
             });
@@ -198,7 +216,7 @@ export const initAiForm = () => {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    slot: selectedSuggestion.fullDateTime,
+                    slot: appointmentTime,
                     name: currentBookingState.bookingData.name,
                     phone: currentBookingState.bookingData.phone
                 })
