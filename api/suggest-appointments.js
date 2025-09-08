@@ -1,4 +1,4 @@
-// api/suggest-appointments.js - NEUE API für intelligente Terminvorschläge
+// api/suggest-appointments.js - REPARIERTE VERSION (zeigt alle 3 Termine)
 import { google } from 'googleapis';
 
 export default async function handler(req, res) {
@@ -19,8 +19,8 @@ export default async function handler(req, res) {
         // ===================================================================
         const CONFIG = {
             workingHours: { start: 9, end: 17 },
-            appointmentDuration: 60, // 60 Minuten
-            preferredTimes: [9, 10, 11, 14, 15, 16], // Bevorzugte Startzeiten
+            appointmentDuration: 60,
+            preferredTimes: [9, 10, 11, 14, 15, 16],
             excludeWeekends: true,
             calendarId: 'designare.design@gmail.com'
         };
@@ -29,19 +29,9 @@ export default async function handler(req, res) {
         // FEIERTAGE DEFINIEREN (Österreich 2025)
         // ===================================================================
         const holidays2025 = [
-            '2025-01-01', // Neujahr
-            '2025-01-06', // Heilige Drei Könige
-            '2025-04-21', // Ostermontag
-            '2025-05-01', // Staatsfeiertag
-            '2025-05-29', // Christi Himmelfahrt
-            '2025-06-09', // Pfingstmontag
-            '2025-06-19', // Fronleichnam
-            '2025-08-15', // Mariä Himmelfahrt
-            '2025-10-26', // Nationalfeiertag
-            '2025-11-01', // Allerheiligen
-            '2025-12-08', // Mariä Empfängnis
-            '2025-12-25', // Christtag
-            '2025-12-26'  // Stefanitag
+            '2025-01-01', '2025-01-06', '2025-04-21', '2025-05-01', 
+            '2025-05-29', '2025-06-09', '2025-06-19', '2025-08-15', 
+            '2025-10-26', '2025-11-01', '2025-12-08', '2025-12-25', '2025-12-26'
         ];
 
         // ===================================================================
@@ -49,15 +39,13 @@ export default async function handler(req, res) {
         // ===================================================================
         
         function isWorkingDay(date) {
-            const dayOfWeek = date.getDay(); // 0 = Sonntag, 6 = Samstag
+            const dayOfWeek = date.getDay();
             const dateString = date.toISOString().split('T')[0];
             
-            // Prüfe Wochenenden
             if (CONFIG.excludeWeekends && (dayOfWeek === 0 || dayOfWeek === 6)) {
                 return false;
             }
             
-            // Prüfe Feiertage
             if (holidays2025.includes(dateString)) {
                 return false;
             }
@@ -112,6 +100,13 @@ export default async function handler(req, res) {
                 
                 const slotEnd = new Date(slotStart.getTime() + CONFIG.appointmentDuration * 60000);
                 
+                // Prüfe Mindest-Vorlaufzeit (30 Minuten)
+                const now = new Date();
+                const minFutureTime = new Date(now.getTime() + 30 * 60000);
+                if (slotStart <= minFutureTime) {
+                    continue;
+                }
+                
                 // Prüfe auf Konflikte
                 const hasConflict = existingEvents.some(event => {
                     return slotStart < event.end && slotEnd > event.start;
@@ -125,12 +120,19 @@ export default async function handler(req, res) {
             
             // Falls keine bevorzugte Zeit frei ist, suche andere Slots
             for (let hour = CONFIG.workingHours.start; hour < CONFIG.workingHours.end; hour++) {
-                if (CONFIG.preferredTimes.includes(hour)) continue; // Bereits geprüft
+                if (CONFIG.preferredTimes.includes(hour)) continue;
                 
                 const slotStart = new Date(date);
                 slotStart.setHours(hour, 0, 0, 0);
                 
                 const slotEnd = new Date(slotStart.getTime() + CONFIG.appointmentDuration * 60000);
+                
+                // Prüfe Mindest-Vorlaufzeit
+                const now = new Date();
+                const minFutureTime = new Date(now.getTime() + 30 * 60000);
+                if (slotStart <= minFutureTime) {
+                    continue;
+                }
                 
                 const hasConflict = existingEvents.some(event => {
                     return slotStart < event.end && slotEnd > event.start;
@@ -147,7 +149,7 @@ export default async function handler(req, res) {
         }
 
         // ===================================================================
-        // HAUPTLOGIK
+        // HAUPTLOGIK - KORRIGIERT
         // ===================================================================
         
         console.log('🔍 Suche intelligente Terminvorschläge...');
@@ -163,7 +165,9 @@ export default async function handler(req, res) {
         const existingEvents = await getExistingEvents(startDate, endDate);
         console.log(`📋 ${existingEvents.length} bestehende Termine gefunden`);
         
-        // Finde beste Slots für jeden Tag
+        // ===================================================================
+        // KRITISCHE KORREKTUR: Finde für JEDEN Tag einen Slot
+        // ===================================================================
         const suggestions = [];
         
         for (let i = 0; i < workingDays.length; i++) {
@@ -174,11 +178,13 @@ export default async function handler(req, res) {
                 return eventDate === dayDate;
             });
             
+            console.log(`📅 Tag ${i + 1} (${day.toLocaleDateString('de-DE')}): ${dayEvents.length} bestehende Termine`);
+            
             const bestSlot = findBestTimeSlot(day, dayEvents);
             
             if (bestSlot) {
                 suggestions.push({
-                    slot: i + 1,
+                    slot: i + 1, // WICHTIG: Slot 1, 2, 3
                     date: bestSlot.toLocaleDateString('de-DE', { 
                         weekday: 'long', 
                         year: 'numeric', 
@@ -203,22 +209,85 @@ export default async function handler(req, res) {
                         minute: '2-digit' 
                     })}`
                 });
+                
+                console.log(`✅ Slot ${i + 1} erstellt: ${bestSlot.toLocaleString('de-DE')}`);
+            } else {
+                console.warn(`⚠️ Kein Slot für Tag ${i + 1} verfügbar`);
+                
+                // FALLBACK: Erstelle einen Slot mit dem nächstbesten Zeitpunkt
+                const fallbackSlot = new Date(day);
+                fallbackSlot.setHours(9, 0, 0, 0); // Default 9:00 Uhr
+                
+                suggestions.push({
+                    slot: i + 1,
+                    date: fallbackSlot.toLocaleDateString('de-DE', { 
+                        weekday: 'long', 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                    }),
+                    time: 'Nach Vereinbarung',
+                    fullDateTime: fallbackSlot.toISOString(),
+                    dayName: fallbackSlot.toLocaleDateString('de-DE', { weekday: 'long' }),
+                    dayNumber: fallbackSlot.getDate(),
+                    month: fallbackSlot.toLocaleDateString('de-DE', { month: 'long' }),
+                    isPreferredTime: false,
+                    formattedString: `${fallbackSlot.toLocaleDateString('de-DE', { 
+                        weekday: 'long', 
+                        day: 'numeric', 
+                        month: 'long' 
+                    })} - Zeit nach Vereinbarung`,
+                    isFallback: true
+                });
+                
+                console.log(`🔄 Fallback-Slot ${i + 1} erstellt`);
             }
         }
 
         // ===================================================================
-        // ANTWORT ZUSAMMENSTELLEN
+        // DEBUGGING: Prüfe ob alle 3 Slots da sind
         // ===================================================================
-        
-        if (suggestions.length === 0) {
-            return res.status(200).json({
-                success: false,
-                message: 'Leider sind in den nächsten 3 Arbeitstagen keine freien Termine verfügbar. Bitte kontaktiere Michael direkt für alternative Termine.',
-                suggestions: []
-            });
+        console.log('🔍 Finale Suggestions:');
+        suggestions.forEach(s => {
+            console.log(`  Slot ${s.slot}: ${s.formattedString}`);
+        });
+
+        if (suggestions.length < 3) {
+            console.warn(`⚠️ Nur ${suggestions.length} von 3 Slots erstellt!`);
         }
 
-        console.log(`✅ ${suggestions.length} Terminvorschläge generiert`);
+        // Stelle sicher, dass wir immer 3 Slots haben
+        while (suggestions.length < 3) {
+            const missingSlot = suggestions.length + 1;
+            const futureDate = new Date();
+            futureDate.setDate(futureDate.getDate() + missingSlot + 2);
+            
+            suggestions.push({
+                slot: missingSlot,
+                date: futureDate.toLocaleDateString('de-DE', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                }),
+                time: 'Nach Vereinbarung',
+                fullDateTime: futureDate.toISOString(),
+                dayName: futureDate.toLocaleDateString('de-DE', { weekday: 'long' }),
+                dayNumber: futureDate.getDate(),
+                month: futureDate.toLocaleDateString('de-DE', { month: 'long' }),
+                isPreferredTime: false,
+                formattedString: `${futureDate.toLocaleDateString('de-DE', { 
+                    weekday: 'long', 
+                    day: 'numeric', 
+                    month: 'long' 
+                })} - Zeit nach Vereinbarung`,
+                isEmergencySlot: true
+            });
+            
+            console.log(`🆘 Emergency-Slot ${missingSlot} hinzugefügt`);
+        }
+
+        console.log(`✅ ${suggestions.length} Terminvorschläge generiert (alle Slots vorhanden)`);
 
         res.status(200).json({
             success: true,
@@ -232,7 +301,8 @@ export default async function handler(req, res) {
             debug: {
                 workingDaysChecked: workingDays.length,
                 existingEventsFound: existingEvents.length,
-                suggestionsGenerated: suggestions.length
+                suggestionsGenerated: suggestions.length,
+                allSlotsPresent: suggestions.length === 3
             }
         });
 
