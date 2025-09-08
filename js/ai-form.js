@@ -93,8 +93,10 @@ export const initAiForm = () => {
     // BOOKING-FUNKTIONEN
     // ===================================================================
     
+// js/ai-form.js
+
 const createInteractiveTerminMessage = (message, suggestions) => {
-    console.log("📅 Erstelle absolut BEREINIGTE Termin-Nachricht (Version 4)");
+    console.log("📅 Erstelle Termin-Nachricht (Version 5 - FUNKTIONAL)");
 
     // 1. Der Einleitungstext
     let enhancedHtml = `
@@ -104,13 +106,13 @@ const createInteractiveTerminMessage = (message, suggestions) => {
             </div>
     `;
 
-    // 2. Die Buttons - jetzt OHNE jegliche CSS-Klasse
+    // 2. Die Buttons - mit ihrer wichtigen CSS-Klasse, damit Klicks funktionieren
     if (suggestions && suggestions.length > 0) {
         enhancedHtml += `<div class="booking-buttons" style="margin-top: 15px;">`;
 
         suggestions.forEach((suggestion) => {
             enhancedHtml += `
-                <button 
+                <button class="termin-button" 
                         data-slot="${suggestion.slot}"
                         data-datetime="${suggestion.fullDateTime || ''}"
                         data-formatted="${suggestion.formattedString || ''}">
@@ -122,7 +124,7 @@ const createInteractiveTerminMessage = (message, suggestions) => {
         enhancedHtml += `</div>`;
     }
 
-    // 3. KEINE weiteren Texte oder HTML-Elemente
+    // 3. Kein zusätzlicher "So funktioniert's"-Text
     enhancedHtml += `</div>`;
 
     return enhancedHtml;
