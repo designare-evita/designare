@@ -55,16 +55,100 @@
     </div>
 </div>
 
+<!-- REPARIERTES AI-RESPONSE-MODAL mit besserer Chat-Integration -->
 <div id="ai-response-modal" class="modal-overlay">
     <div class="modal-content">
         <button id="close-ai-response-modal-top" class="close-button">&times;</button>
         
         <div id="ai-chat-history">
+            <!-- Chat-Nachrichten werden hier dynamisch eingefügt -->
         </div>
 
-        <form id="ai-chat-form">
-            <input type="text" id="ai-chat-input" placeholder="Frag Evita..." autocomplete="off" required>
-            <button type="submit" aria-label="Senden"><i class="fa-regular fa-paper-plane"></i></button>
+        <!-- VERBESSERTE Chat-Form mit besserer Event-Behandlung -->
+        <form id="ai-chat-form" autocomplete="off">
+            <input type="text" 
+                   id="ai-chat-input" 
+                   placeholder="Frag Evita..." 
+                   autocomplete="off" 
+                   required
+                   data-chat-input="true">
+            <button type="submit" aria-label="Senden">
+                <i class="fa-regular fa-paper-plane"></i>
+            </button>
         </form>
     </div>
 </div>
+
+<!-- DEBUG: Booking-Test-Button (nur für Entwicklung) -->
+<div id="debug-booking-trigger" style="position: fixed; bottom: 80px; right: 20px; z-index: 9999; display: none;">
+    <button onclick="window.debugBookingLaunch && window.debugBookingLaunch()" 
+            style="background: #28a745; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer;">
+        🔧 Test Booking
+    </button>
+</div>
+
+<script>
+// ZUSÄTZLICHE CHAT-UNTERSTÜTZUNG: Stelle sicher, dass Chat-Events korrekt behandelt werden
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🔧 Modal-Ereignis-Setup wird geladen...');
+    
+    // Zeige Debug-Button in Entwicklungsumgebung
+    if (window.location.hostname === 'localhost' || window.location.hostname.includes('127.0.0.1') || window.location.search.includes('debug=true')) {
+        const debugButton = document.getElementById('debug-booking-trigger');
+        if (debugButton) {
+            debugButton.style.display = 'block';
+        }
+    }
+    
+    // FALLBACK: Stelle sicher, dass Chat-Submit-Events verarbeitet werden
+    let chatSubmitBackup = false;
+    
+    const setupChatBackup = () => {
+        const chatForm = document.getElementById('ai-chat-form');
+        const chatInput = document.getElementById('ai-chat-input');
+        
+        if (chatForm && chatInput && !chatSubmitBackup) {
+            console.log('🔧 Richte Chat-Backup-Handler ein...');
+            
+            // Backup Submit Handler
+            chatForm.addEventListener('submit', function(e) {
+                console.log('🔧 Chat-Backup-Submit ausgelöst');
+                // Der echte Handler ist in ai-form.js - dies ist nur ein Fallback
+            });
+            
+            // Backup Enter-Handler
+            chatInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    console.log('🔧 Chat-Backup-Enter ausgelöst');
+                    e.preventDefault();
+                    chatForm.dispatchEvent(new Event('submit', {bubbles: true}));
+                }
+            });
+            
+            chatSubmitBackup = true;
+        }
+    };
+    
+    // Versuche Chat-Backup sofort und nach kurzer Verzögerung
+    setupChatBackup();
+    setTimeout(setupChatBackup, 500);
+    setTimeout(setupChatBackup, 1000);
+    
+    // Überwache Modal-Änderungen für dynamisch geladene Inhalte
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.type === 'childList') {
+                setupChatBackup();
+            }
+        });
+    });
+    
+    const modalContainer = document.getElementById('modal-container');
+    if (modalContainer) {
+        observer.observe(modalContainer, {
+            childList: true,
+            subtree: true
+        });
+    }
+});
+</script>
