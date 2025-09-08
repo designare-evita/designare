@@ -130,22 +130,31 @@ const createInteractiveTerminMessage = (message, suggestions) => {
     return enhancedHtml;
 };
 
- const handleBookingDataCollection = (data) => {
-    console.log("📝 Sammle Kontaktdaten (BEREINIGTE NACHRICHT)");
+const handleBookingDataCollection = (data) => {
+    console.log("📝 Sammle Kontaktdaten mit ROBUSTEM FORMULAR");
     currentBookingState.step = 'contact_data';
 
-    // Hole den gespeicherten Text des Termins
+    // 1. Zeige die saubere Bestätigungs- und Info-Nachricht
     const selectedTerminText = currentBookingState.selectedSlotFormatted || `Nummer ${currentBookingState.selectedSlot}`;
+    addMessageToHistory(`Termin (${selectedTerminText}) ausgewählt`, 'ai', false);
 
-    // Erstelle die sauberen Nachrichten
-    const message1 = `Termin (${selectedTerminText}) ausgewählt`;
-    const message2 = "Bitte Deinen Namen und Telefonnummer für den Rückruf";
+    // 2. Erstelle und zeige das Eingabeformular direkt im Chat
+    const formHtml = `
+        <div class="chat-message ai">
+            <form id="contact-details-form" style="margin-top: 10px;">
+                <p>Bitte Deinen Namen und Telefonnummer für den Rückruf:</p>
+                <input type="text" id="contact-name" name="name" placeholder="Dein Name" required style="display: block; width: 95%; padding: 10px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ccc;">
+                <input type="tel" id="contact-phone" name="phone" placeholder="Deine Telefonnummer" required style="display: block; width: 95%; padding: 10px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ccc;">
+                <button type="submit" id="submit-contact-details" style="padding: 10px 15px; border-radius: 5px; border: none; background-color: #28a745; color: white; cursor: pointer;">
+                    Bestätigen & Buchen
+                </button>
+            </form>
+        </div>
+    `;
 
-    // Füge die Nachrichten zum Chat hinzu
-    addMessageToHistory(message1, 'ai', false);
-    setTimeout(() => {
-        addMessageToHistory(message2, 'ai', false);
-    }, 300); // Kurze Verzögerung für besseren Lesefluss
+    // Füge das Formular zum Chat hinzu
+    responseArea.insertAdjacentHTML('beforeend', formHtml);
+    responseArea.scrollTop = responseArea.scrollHeight; // Nach unten scrollen
 };
 
     const handleBookingConfirmation = async (data) => {
