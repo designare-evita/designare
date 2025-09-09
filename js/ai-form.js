@@ -188,41 +188,52 @@ export const initAiForm = () => {
     // ===================================================================
     // API-KOMMUNIKATION
     // ===================================================================
-    const sendToEvita = async (userInput, isFromChat = false) => {
-        console.log(`🌐 Sende an Evita:`, userInput);
-        try {
-            const response = await fetch('/api/ask-gemini', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt: userInput }),
-            });
-            if (!response.ok) throw new Error(`HTTP-Fehler: ${response.status}`);
-            const data = await response.json();
-            console.log(`📨 Evita Response:`, data);
+// js/ai-form.js
 
-            if (data.action === 'smart_booking') {
-                const enhancedMessage = createInteractiveTerminMessage(data.answer, data.suggestions);
-                initializeChat(enhancedMessage, true);
-                if (!isFromChat) showModal();
-                currentBookingState.suggestions = data.suggestions || [];
-                currentBookingState.step = 'slot_selection';
-            } else if (data.action === 'collect_booking_data') {
-                handleBookingDataCollection();
+const sendToEvita = async (userInput, isFromChat = false) => {
+    console.log(`🌐 Sende an Evita:`, userInput);
+    try {
+        const response = await fetch('/api/ask-gemini', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt: userInput }),
+        });
+        if (!response.ok) throw new Error(`HTTP-Fehler: ${response.status}`);
+        const data = await response.json();
+        console.log(`📨 Evita Response:`, data);
+
+        if (data.action === 'smart_booking') {
+            const enhancedMessage = createInteractiveTerminMessage(data.answer, data.suggestions);
+            initializeChat(enhancedMessage, true);
+            if (!isFromChat) showModal(); // Modal bei erster Buchungsanfrage zeigen
+            currentBookingState.suggestions = data.suggestions || [];
+            currentBookingState.step = 'slot_selection';
+        } else if (data.action === 'collect_booking_data') {
+            handleBookingDataCollection();
+        } else {
+            // KORREKTUR: Behandle normale Chat-Antworten
+            if (!isFromChat) {
+                // Wenn dies die ERSTE Anfrage von der Hauptseite ist:
+                // 1. Initialisiere den Chat mit der Antwort.
+                initializeChat(data.answer || "Ich konnte keine Antwort finden.", 'ai');
+                // 2. ZEIGE DAS MODAL AN.
+                showModal();
             } else {
+                // Wenn wir uns bereits im Chat befinden, füge die Nachricht einfach hinzu.
                 addMessageToHistory(data.answer || "Ich konnte keine Antwort finden.", 'ai');
             }
-        } catch (error) {
-            console.error(`❌ Evita-Fehler:`, error);
-            const errorMessage = "Entschuldigung, ich habe gerade technische Schwierigkeiten. Bitte versuche es später noch einmal.";
-            if (isFromChat) {
-                addMessageToHistory(errorMessage, 'ai');
-            } else {
-                initializeChat(errorMessage);
-                showModal();
-            }
         }
-    };
-
+    } catch (error) {
+        console.error(`❌ Evita-Fehler:`, error);
+        const errorMessage = "Entschuldigung, ich habe gerade technische Schwierigkeiten. Bitte versuche es später noch einmal.";
+        if (isFromChat) {
+            addMessageToHistory(errorMessage, 'ai');
+        } else {
+            initializeChat(errorMessage);
+            showModal();
+        }
+    }
+};
     // ===================================================================
     // EVENT-HANDLER
     // ===================================================================
