@@ -29,7 +29,8 @@ class FactChecker {
             confidenceScore: 95, // Der Basis-Score ist hoch, da der Prompt schon gut ist
         };
 
-        const fieldsToCheck = ['hero_text', 'social_proof', 'guarantee_text', 'meta_description', 'benefits_list', 'features_list', 'testimonial_1', 'testimonial_2'];
+        // NEU: Die neuen Fließtext-Felder zur Prüfung hinzugefügt
+        const fieldsToCheck = ['hero_text', 'social_proof', 'guarantee_text', 'meta_description', 'benefits_list', 'features_list', 'benefits_list_fließtext', 'features_list_fließtext', 'testimonial_1', 'testimonial_2'];
         let penalty = 0;
 
         fieldsToCheck.forEach(field => {
@@ -104,6 +105,8 @@ class FactChecker {
               "hero_subtext": "Erfahren Sie, wie Sie mit jeder Tasse einen Unterschied machen können.",
               "benefits_list": "<ul><li>Faire Löhne und sichere Arbeitsbedingungen für Kaffeebauern unterstützen.</li><li>Die Umwelt durch biologischen Anbau und den Verzicht auf Monokulturen schonen.</li><li>Höhere Qualität und reineren Geschmack durch sorgfältige, traditionelle Anbaumethoden genießen.</li><li>Transparenz über die Herkunft und Verarbeitung der Bohnen erhalten.</li></ul>",
               "features_list": "<ul><li>Zertifiziert durch anerkannte Siegel wie Fairtrade, Bio oder Rainforest Alliance.</li><li>Schonende Langzeit-Trommelröstung zur vollen Entfaltung der Aromen.</li><li>Direkter Handel (Direct Trade) mit Kaffeekooperativen vor Ort.</li><li>Verpackung aus recycelbaren Materialien.</li></ul>",
+              "benefits_list_fließtext": "Unterstützen Sie faire Löhne und sichere Arbeitsbedingungen für Kaffeebauern, schonen Sie die Umwelt durch biologischen Anbau und genießen Sie höhere Qualität durch traditionelle Methoden.",
+              "features_list_fließtext": "Unser Kaffee ist durch Siegel wie Fairtrade und Bio zertifiziert, wird schonend geröstet und direkt von Kooperativen bezogen. Zudem verwenden wir recycelbare Verpackungen.",
               "social_proof": "Von über 3.000 zufriedenen Kunden als 'hervorragend' bewertet.",
               "testimonial_1": "Der beste Kaffee, den ich seit langem getrunken habe. Man schmeckt die Qualität und das gute Gewissen trinkt mit. - Anna L., Wien",
               "testimonial_2": "Endlich ein Anbieter, bei dem Transparenz wirklich gelebt wird. Die Informationen zur Herkunft sind erstklassig. - Markus T., Berlin",
@@ -139,7 +142,7 @@ class FactChecker {
             
             Das JSON-Objekt muss exakt diese Struktur haben:
             {
-              "post_title": "...", "post_name": "...", "meta_title": "...", "meta_description": "...", "h1": "...", "h2_1": "...", "h2_2": "...", "h2_3": "...", "h2_4": "...", "primary_cta": "...", "secondary_cta": "...", "hero_text": "...", "hero_subtext": "...", "benefits_list": "...", "features_list": "...", "social_proof": "...", "testimonial_1": "...", "testimonial_2": "...", "pricing_title": "...", "price_1": "...", "price_2": "...", "price_3": "...", "faq_1": "...", "faq_answer_1": "...", "faq_2": "...", "faq_answer_2": "...", "faq_3": "...", "faq_answer_3": "...", "contact_info": "...", "footer_cta": "...", "trust_signals": "...", "guarantee_text": "..."
+              "post_title": "...", "post_name": "...", "meta_title": "...", "meta_description": "...", "h1": "...", "h2_1": "...", "h2_2": "...", "h2_3": "...", "h2_4": "...", "primary_cta": "...", "secondary_cta": "...", "hero_text": "...", "hero_subtext": "...", "benefits_list": "...", "features_list": "...", "benefits_list_fließtext": "...", "features_list_fließtext": "...", "social_proof": "...", "testimonial_1": "...", "testimonial_2": "...", "pricing_title": "...", "price_1": "...", "price_2": "...", "price_3": "...", "faq_1": "...", "faq_answer_1": "...", "faq_2": "...", "faq_answer_2": "...", "faq_3": "...", "faq_answer_3": "...", "contact_info": "...", "footer_cta": "...", "trust_signals": "...", "guarantee_text": "..."
             }
         `;
     }
