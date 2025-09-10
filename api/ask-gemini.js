@@ -3,6 +3,22 @@
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const isBookingRequest = (text) => {
+    const keywords = ['termin', 'buchung', 'kalender', 'verfügbar', 'rückruf', 'buchen'];
+    const lowerText = text.toLowerCase();
+    return keywords.some(keyword => lowerText.includes(keyword));
+};
+
+const fetchAppointmentSuggestions = async (origin) => {
+    try {
+        const response = await fetch(`${origin}/api/suggest-appointments`);
+        if (!response.ok) return null;
+        return await response.json();
+    } catch (error) {
+        console.error("Fehler beim Abrufen der Terminvorschläge:", error);
+        return null;
+    }
+};
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -12,7 +28,25 @@ module.exports = async function handler(req, res) {
   try {
     const { prompt, source } = req.body;
 
-    if (!prompt) {
+    if (!prompt)
+const isInitialBookingRequest = isBookingRequest(prompt) && !prompt.match(/termin\s*[123]/i) && !prompt.match(/^[123]$/);
+
+    if (isInitialBookingRequest) {
+        console.log("✅ Initiale Buchungsanfrage im Chat erkannt. Rufe Terminvorschläge ab.");
+        const appointmentData = await fetchAppointmentSuggestions(req.headers.origin);
+
+        if (appointmentData && appointmentData.success && appointmentData.suggestions?.length > 0) {
+            return res.status(200).json({
+                action: 'smart_booking',
+                suggestions: appointmentData.suggestions
+            });
+        } else {
+            return res.status(200).json({ 
+                answer: "Ich konnte leider keine freien Termine finden. Bitte versuche es später noch einmal." 
+            });
+        }
+    }
+    {
       return res.status(400).json({ message: 'A prompt is required.' });
     }
 
