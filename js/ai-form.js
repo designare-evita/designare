@@ -188,7 +188,6 @@ export const initAiForm = () => {
     // ===================================================================
     // API-KOMMUNIKATION
     // ===================================================================
-// js/ai-form.js
 
 const sendToEvita = async (userInput, isFromChat = false) => {
     console.log(`🌐 Sende an Evita:`, userInput);
@@ -234,6 +233,8 @@ const sendToEvita = async (userInput, isFromChat = false) => {
         }
     }
 };
+
+
     // ===================================================================
     // EVENT-HANDLER
     // ===================================================================
