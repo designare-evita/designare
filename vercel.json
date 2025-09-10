@@ -1,9 +1,9 @@
+// vercel.json
 {
-  "rewrites": [
-    { "source": "/CSV-Creator", "destination": "/CSV-Creator.html" },
-    { "source": "/CSV-Importer-PRO", "destination": "/CSV-Importer-PRO.html" },
-{ "source": "/KI-Integration-auf-Webseiten", "destination": "/KI-Integration-auf-Webseiten.html" },
-    { "source": "/", "destination": "/index.html" }
-  ],
-  "cleanUrls": true
+  "functions": {
+    "api/**/*.js": {
+      "runtime": "nodejs18.x"
+    }
+  },
+  "regions": ["iad1", "fra1"]
 }
