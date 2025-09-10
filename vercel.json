@@ -1,5 +1,10 @@
 {
-  "engines": {
+  "name": "mein-projekt",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "engines": { // <-- Hier ist es richtig!
     "node": "18.x"
   }
 }
