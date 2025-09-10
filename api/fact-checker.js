@@ -29,7 +29,6 @@ class FactChecker {
             confidenceScore: 95, // Der Basis-Score ist hoch, da der Prompt schon gut ist
         };
 
-        // NEU: Die neuen Fließtext-Felder zur Prüfung hinzugefügt
         const fieldsToCheck = ['hero_text', 'social_proof', 'guarantee_text', 'meta_description', 'benefits_list', 'features_list', 'benefits_list_fließtext', 'features_list_fließtext', 'testimonial_1', 'testimonial_2'];
         let penalty = 0;
 
@@ -46,16 +45,14 @@ class FactChecker {
             }
         });
         
-        // Berechnet den finalen Score, aber nicht unter 30
         result.confidenceScore = Math.max(30, 95 - penalty);
         console.log(`E-E-A-T Check für '${keyword}': Score ${result.confidenceScore}%, ${result.flaggedClaims.length} problematische Phrasen gefunden.`);
         return result;
     }
 
     /**
-     * Erstellt den vollständigen, qualitativ hochwertigen Prompt für die KI,
-     * inklusive des "Few-Shot"-Beispiels zur Orientierung.
-     * @param {object} keywordData - Das Objekt mit allen Nutzer-Eingaben (keyword, brand, usp etc.).
+     * Erstellt den vollständigen, qualitativ hochwertigen Prompt für die KI.
+     * @param {object} keywordData - Das Objekt mit allen Nutzer-Eingaben.
      * @returns {string} Der fertige Prompt für die Gemini API.
      */
     generateResponsiblePrompt(keywordData) {
@@ -73,19 +70,6 @@ class FactChecker {
         if (domain) kontext += `- WEBSEITE: ${domain}\n`;
         if (email) kontext += `- E-MAIL FÜR CTA: ${email}\n`;
         if (phone) kontext += `- TELEFONNUMMER FÜR CTA: ${phone}\n`;
-
-        const grammaticalPersonInstruction = `
-            🚨 WICHTIGE GRAMMATIK-REGEL:
-            - Der Nutzer hat die Form "${grammaticalPerson}" gewählt.
-            - Wenn die Form 'singular' ist, schreibe den gesamten Text in der Ich-Form (z.B. "Mein Angebot", "Ich biete an", "Bei mir erhalten Sie").
-            - Wenn die Form 'plural' ist, verwende die Wir-Form (z.B. "Unsere Angebote", "Wir bieten an").
-        `;
-
-        const faqSchemaInstruction = `
-            - Erstelle ZUSÄTZLICH zu den FAQ-Texten ein valides "FAQPage" Schema.org Script im JSON-LD Format.
-            - Das Script muss die exakt gleichen Fragen und Antworten enthalten, die du in den Feldern faq_1, faq_answer_1 etc. generierst.
-            - Gib dieses komplette Script als einen einzigen, escaped JSON-String in das Feld "faq_schema_script" aus.
-        `;
 
         return `
             Hier ist ein Beispiel für einen perfekten, faktenbasierten JSON-Output zum Thema "nachhaltige Kaffeebohnen":
@@ -120,6 +104,10 @@ class FactChecker {
               "faq_answer_2": "Achten Sie auf anerkannte Siegel. Informieren Sie sich zudem auf der Webseite des Anbieters über die Herkunft und die Handelsbeziehungen. Direkter Handel (Direct Trade) ist oft ein sehr gutes Zeichen für Fairness und Qualität.",
               "faq_3": "Ist nachhaltiger Kaffee teurer?",
               "faq_answer_3": "Nachhaltiger Kaffee ist oft etwas teurer, da faire Löhne und umweltschonende Methoden mehr Kosten verursachen. Dieser Aufpreis ist jedoch eine direkte Investition in bessere Lebensbedingungen und den Schutz der Umwelt.",
+              "faq_4": "Welche Rolle spielt die Röstung?",
+              "faq_answer_4": "Die Röstung ist entscheidend für das Aroma. Eine schonende Langzeit-Trommelröstung bei niedrigen Temperaturen sorgt dafür, dass sich die Aromen voll entfalten können und der Kaffee bekömmlicher wird.",
+              "faq_5": "Woher beziehen Sie Ihren Kaffee?",
+              "faq_answer_5": "Wir setzen auf direkten Handel mit kleinen Kaffeekooperativen in den besten Anbaugebieten der Welt. Das sichert nicht nur exzellente Qualität, sondern auch eine faire Bezahlung der Bauern.",
               "contact_info": "Bei Fragen zu unseren Kaffeesorten stehen wir Ihnen gerne zur Verfügung.",
               "footer_cta": "Entdecken Sie jetzt die Vielfalt nachhaltiger Kaffees",
               "trust_signals": "Bio-zertifiziert | Fairtrade-Partner | CO2-neutraler Versand",
@@ -142,7 +130,7 @@ class FactChecker {
             
             Das JSON-Objekt muss exakt diese Struktur haben:
             {
-              "post_title": "...", "post_name": "...", "meta_title": "...", "meta_description": "...", "h1": "...", "h2_1": "...", "h2_2": "...", "h2_3": "...", "h2_4": "...", "primary_cta": "...", "secondary_cta": "...", "hero_text": "...", "hero_subtext": "...", "benefits_list": "...", "features_list": "...", "benefits_list_fließtext": "...", "features_list_fließtext": "...", "social_proof": "...", "testimonial_1": "...", "testimonial_2": "...", "pricing_title": "...", "price_1": "...", "price_2": "...", "price_3": "...", "faq_1": "...", "faq_answer_1": "...", "faq_2": "...", "faq_answer_2": "...", "faq_3": "...", "faq_answer_3": "...", "contact_info": "...", "footer_cta": "...", "trust_signals": "...", "guarantee_text": "..."
+              "post_title": "...", "post_name": "...", "meta_title": "...", "meta_description": "...", "h1": "...", "h2_1": "...", "h2_2": "...", "h2_3": "...", "h2_4": "...", "primary_cta": "...", "secondary_cta": "...", "hero_text": "...", "hero_subtext": "...", "benefits_list": "...", "features_list": "...", "benefits_list_fließtext": "...", "features_list_fließtext": "...", "social_proof": "...", "testimonial_1": "...", "testimonial_2": "...", "pricing_title": "...", "price_1": "...", "price_2": "...", "price_3": "...", "faq_1": "...", "faq_answer_1": "...", "faq_2": "...", "faq_answer_2": "...", "faq_3": "...", "faq_answer_3": "...", "faq_4": "...", "faq_answer_4": "...", "faq_5": "...", "faq_answer_5": "...", "contact_info": "...", "footer_cta": "...", "trust_signals": "...", "guarantee_text": "..."
             }
         `;
     }
