@@ -1,7 +1,7 @@
-// js/ai-form.js - NEUE EINHEITLICHE VERSION für Booking-Modal
+// js/ai-form.js - KOMPLETT NEUE VERSION mit garantierter Modal-Sichtbarkeit
 
 export const initAiForm = () => {
-    console.log("🚀 Initialisiere einheitliche AI-Form");
+    console.log("🚀 Initialisiere komplett neue AI-Form mit Modal-Fix");
 
     const aiForm = document.getElementById('ai-form');
     if (!aiForm) {
@@ -17,21 +17,30 @@ export const initAiForm = () => {
     const closeButtons = document.querySelectorAll('#close-ai-response-modal-top, #close-ai-response-modal-bottom');
 
     // ===================================================================
-    // HILFSFUNKTIONEN FÜR MODAL & CHAT
+    // HILFSFUNKTIONEN FÜR CHAT-MODAL
     // ===================================================================
 
-    const showModal = () => {
-        if (modalOverlay) modalOverlay.classList.add('visible');
-        document.body.classList.add('no-scroll');
+    const showChatModal = () => {
+        if (modalOverlay) {
+            modalOverlay.classList.add('visible');
+            document.body.classList.add('no-scroll');
+            console.log("✅ Chat-Modal geöffnet");
+        }
     };
 
-    const hideModal = () => {
-        if (modalOverlay) modalOverlay.classList.remove('visible');
-        document.body.classList.remove('no-scroll');
+    const hideChatModal = () => {
+        if (modalOverlay) {
+            modalOverlay.classList.remove('visible');
+            document.body.classList.remove('no-scroll');
+            console.log("✅ Chat-Modal geschlossen");
+        }
     };
 
     const addMessageToHistory = (message, sender) => {
-        if (!responseArea) return;
+        if (!responseArea) {
+            console.warn("⚠️ Response Area nicht gefunden");
+            return;
+        }
         
         const messageDiv = document.createElement('div');
         messageDiv.className = `chat-message ${sender}`;
@@ -39,107 +48,273 @@ export const initAiForm = () => {
         
         responseArea.appendChild(messageDiv);
         responseArea.scrollTop = responseArea.scrollHeight;
+        
+        console.log(`📝 Nachricht hinzugefügt (${sender}):`, message.substring(0, 50) + "...");
     };
 
     const initializeChat = (initialMessage) => {
-        if (responseArea) {
-            responseArea.innerHTML = '';
-            
-            // Chat-Input hinzufügen (falls noch nicht vorhanden)
-            if (!document.getElementById('ai-chat-input')) {
-                const chatForm = document.createElement('form');
-                chatForm.id = 'ai-chat-form';
-                chatForm.innerHTML = `
-                    <div style="display: flex; margin-top: 20px; gap: 10px;">
-                        <input type="text" id="ai-chat-input" placeholder="Deine Antwort..." 
-                               style="flex: 1; padding: 10px; border-radius: 5px; border: 1px solid #ccc; background: rgba(255,255,255,0.1); color: #fff;">
-                        <button type="submit" style="padding: 10px 15px; background: #ffc107; border: none; border-radius: 5px; cursor: pointer; color: #1a1a1a; font-weight: bold;">
-                            Senden
-                        </button>
-                    </div>
-                `;
-                document.getElementById('ai-response-content-area').appendChild(chatForm);
-            }
+        if (!responseArea) {
+            console.warn("⚠️ Response Area nicht gefunden für Chat-Initialisierung");
+            return;
         }
         
+        // Leere den Chat
+        responseArea.innerHTML = '';
+        
+        // Chat-Input hinzufügen (falls noch nicht vorhanden)
+        const existingChatForm = document.getElementById('ai-chat-form');
+        if (!existingChatForm) {
+            const chatForm = document.createElement('form');
+            chatForm.id = 'ai-chat-form';
+            chatForm.style.cssText = 'margin-top: 20px; display: flex; gap: 10px;';
+            
+            const chatInput = document.createElement('input');
+            chatInput.type = 'text';
+            chatInput.id = 'ai-chat-input';
+            chatInput.placeholder = 'Deine Antwort...';
+            chatInput.style.cssText = 'flex: 1; padding: 10px; border-radius: 5px; border: 1px solid #ccc; background: rgba(255,255,255,0.1); color: #fff;';
+            
+            const chatButton = document.createElement('button');
+            chatButton.type = 'submit';
+            chatButton.textContent = 'Senden';
+            chatButton.style.cssText = 'padding: 10px 15px; background: #ffc107; border: none; border-radius: 5px; cursor: pointer; color: #1a1a1a; font-weight: bold;';
+            
+            chatForm.appendChild(chatInput);
+            chatForm.appendChild(chatButton);
+            
+            const contentArea = document.getElementById('ai-response-content-area');
+            if (contentArea) {
+                contentArea.appendChild(chatForm);
+            }
+            
+            console.log("✅ Chat-Form erstellt");
+        }
+        
+        // Erste Nachricht hinzufügen
         addMessageToHistory(initialMessage, 'ai');
     };
 
     // ===================================================================
-    // BOOKING-MODAL LAUNCHER (EINHEITLICH FÜR BEIDE WEGE)
+    // BOOKING-MODAL LAUNCHER - KOMPLETT NEU MIT FORCIERTER SICHTBARKEIT
     // ===================================================================
 
     const launchBookingModal = async () => {
-        console.log("🚀 Starte einheitliches Booking-Modal");
+        console.log("🚀 launchBookingModal() - NEUE VERSION gestartet");
         
         try {
-            // 1. Schließe Chat-Modal falls offen
-            hideModal();
+            // 1. Schließe alle anderen Modals
+            hideChatModal();
+            console.log("🔒 Chat-Modal geschlossen");
             
-            // 2. Warte kurz für smooth transition
-            await new Promise(resolve => setTimeout(resolve, 200));
+            // 2. Kurze Pause für saubere Transition
+            await new Promise(resolve => setTimeout(resolve, 300));
             
-            // 3. Lade Booking-Modal falls nicht vorhanden
-            let bookingModal = document.getElementById('booking-modal');
-            
-            if (!bookingModal) {
-                console.log("📄 Lade booking-modal.html...");
-                
-                const response = await fetch('/booking-modal.html');
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-                
-                const html = await response.text();
-                const modalContainer = document.getElementById('modal-container') || document.body;
-                modalContainer.insertAdjacentHTML('beforeend', html);
-                
-                bookingModal = document.getElementById('booking-modal');
-                console.log("✅ Booking-Modal HTML eingefügt");
+            // 3. Entferne eventuell existierendes Booking-Modal
+            const existingModal = document.getElementById('booking-modal');
+            if (existingModal) {
+                existingModal.remove();
+                console.log("🗑️ Altes Booking-Modal entfernt");
             }
             
-            // 4. Setup Event-Listener für Booking
+            // 4. Lade Booking-Modal HTML
+            console.log("📥 Lade booking-modal.html...");
+            const response = await fetch('/booking-modal.html');
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const html = await response.text();
+            console.log("📄 HTML geladen, Größe:", html.length, "Zeichen");
+            
+            // 5. Füge HTML zum DOM hinzu
+            const modalContainer = document.getElementById('modal-container') || document.body;
+            modalContainer.insertAdjacentHTML('beforeend', html);
+            console.log("✅ HTML in DOM eingefügt");
+            
+            // 6. Finde das Modal-Element
+            const bookingModal = document.getElementById('booking-modal');
+            if (!bookingModal) {
+                throw new Error("Booking-Modal Element nicht gefunden nach HTML-Insert");
+            }
+            
+            console.log("🎯 Modal-Element gefunden");
+            
+            // 7. FORCIERE MODAL-SICHTBARKEIT MIT WICHTIGEN CSS-REGELN
+            console.log("🎭 Forciere Modal-Sichtbarkeit...");
+            
+            bookingModal.style.cssText = `
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                background: rgba(0, 0, 0, 0.85) !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                z-index: 999999 !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+                pointer-events: auto !important;
+                overflow-y: auto !important;
+                box-sizing: border-box !important;
+            `;
+            
+            // 8. Stelle sicher, dass der Modal-Content sichtbar ist
+            const modalContent = bookingModal.querySelector('.modal-content, .booking-content, .container');
+            if (modalContent) {
+                modalContent.style.cssText = `
+                    background: white !important;
+                    border-radius: 10px !important;
+                    padding: 20px !important;
+                    max-width: 600px !important;
+                    width: 90% !important;
+                    max-height: 90% !important;
+                    overflow-y: auto !important;
+                    position: relative !important;
+                    z-index: 1000000 !important;
+                `;
+                console.log("✅ Modal-Content Styles gesetzt");
+            }
+            
+            // 9. Body-Scroll verhindern
+            document.body.style.overflow = 'hidden';
+            document.body.classList.add('no-scroll');
+            
+            // 10. Setup Event-Listener für Booking-Funktionalität
             setupBookingEventListeners();
             
-            // 5. Modal anzeigen
-            if (bookingModal) {
-                bookingModal.style.display = 'flex';
-                bookingModal.style.opacity = '1';
-                bookingModal.style.visibility = 'visible';
-                bookingModal.style.pointerEvents = 'auto';
-                
-                document.body.style.overflow = 'hidden';
-                document.body.classList.add('no-scroll');
-                
-                // Aktiviere ersten Schritt
-                document.querySelectorAll('.booking-step').forEach(step => {
-                    step.classList.remove('active');
-                });
-                
-                const firstStep = document.getElementById('step-day-selection');
-                if (firstStep) {
-                    firstStep.classList.add('active');
-                }
-                
-                console.log("✅ Booking-Modal erfolgreich gestartet");
+            // 11. Aktiviere ersten Schritt
+            const allSteps = document.querySelectorAll('.booking-step');
+            allSteps.forEach(step => step.classList.remove('active'));
+            
+            const firstStep = document.getElementById('step-day-selection');
+            if (firstStep) {
+                firstStep.classList.add('active');
+                console.log("✅ Erster Booking-Schritt aktiviert");
+            }
+            
+            // 12. Finale Überprüfung der Sichtbarkeit
+            const rect = bookingModal.getBoundingClientRect();
+            console.log("📊 FINALE MODAL-ÜBERPRÜFUNG:", {
+                width: rect.width,
+                height: rect.height,
+                top: rect.top,
+                left: rect.left,
+                isVisible: rect.width > 0 && rect.height > 0,
+                zIndex: bookingModal.style.zIndex,
+                display: bookingModal.style.display,
+                opacity: bookingModal.style.opacity
+            });
+            
+            if (rect.width > 0 && rect.height > 0) {
+                console.log("🎉 BOOKING-MODAL IST ERFOLGREICH SICHTBAR!");
                 return true;
+            } else {
+                throw new Error("Modal wurde geladen aber ist nicht sichtbar");
             }
             
         } catch (error) {
             console.error("❌ Booking-Modal Launch fehlgeschlagen:", error);
             
-            // Fallback: Zeige Fehlermeldung im Chat
-            if (responseArea) {
-                addMessageToHistory("Entschuldigung, das Buchungssystem konnte nicht geladen werden. Bitte kontaktiere Michael direkt unter michael@designare.at", 'ai');
-                showModal();
-            }
-            
+            // Fallback: Erstelle Minimal-Modal
+            createFallbackModal();
             return false;
         }
     };
 
     // ===================================================================
-    // BOOKING EVENT LISTENERS SETUP
+    // FALLBACK: MINIMAL-MODAL ALS NOTLÖSUNG
+    // ===================================================================
+
+    const createFallbackModal = () => {
+        console.log("🆘 Erstelle Fallback-Modal...");
+        
+        // Entferne alle anderen Modals
+        document.querySelectorAll('#booking-modal, .fallback-modal').forEach(el => el.remove());
+        
+        const fallbackModal = document.createElement('div');
+        fallbackModal.className = 'fallback-modal';
+        fallbackModal.id = 'booking-modal'; // Gleiche ID für Konsistenz
+        fallbackModal.style.cssText = `
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            background: rgba(0, 0, 0, 0.85) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            z-index: 999999 !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        `;
+        
+        fallbackModal.innerHTML = `
+            <div style="
+                background: white;
+                border-radius: 10px;
+                padding: 30px;
+                max-width: 500px;
+                width: 90%;
+                text-align: center;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            ">
+                <div style="font-size: 3rem; margin-bottom: 20px;">📅</div>
+                <h2 style="color: #1a1a1a; margin-bottom: 20px; font-size: 1.5rem;">Termin buchen</h2>
+                <p style="color: #666; margin-bottom: 25px; line-height: 1.5;">
+                    Das Booking-System konnte nicht vollständig geladen werden.<br>
+                    Bitte kontaktiere Michael direkt für einen Termin.
+                </p>
+                
+                <div style="margin-bottom: 25px;">
+                    <a href="mailto:michael@designare.at?subject=Terminanfrage&body=Hallo Michael,%0D%0A%0D%0AIch möchte gerne einen Rückruf-Termin vereinbaren.%0D%0A%0D%0AMeine Telefonnummer:%0D%0AMein Anliegen:%0D%0A%0D%0AVielen Dank!" 
+                       style="
+                           display: inline-block;
+                           background: #ffc107;
+                           color: #1a1a1a;
+                           text-decoration: none;
+                           padding: 12px 24px;
+                           border-radius: 5px;
+                           font-weight: bold;
+                           margin-right: 10px;
+                       ">
+                        📧 E-Mail senden
+                    </a>
+                </div>
+                
+                <button onclick="closeFallbackModal()" 
+                        style="
+                            background: #6c757d;
+                            color: white;
+                            border: none;
+                            padding: 10px 20px;
+                            border-radius: 5px;
+                            cursor: pointer;
+                        ">
+                    Schließen
+                </button>
+            </div>
+        `;
+        
+        document.body.appendChild(fallbackModal);
+        document.body.style.overflow = 'hidden';
+        
+        // Globale Schließen-Funktion
+        window.closeFallbackModal = () => {
+            fallbackModal.remove();
+            document.body.style.overflow = '';
+            document.body.classList.remove('no-scroll');
+        };
+        
+        console.log("✅ Fallback-Modal erstellt und angezeigt");
+        return fallbackModal;
+    };
+
+    // ===================================================================
+    // BOOKING EVENT-LISTENER SETUP
     // ===================================================================
 
     const setupBookingEventListeners = () => {
@@ -217,7 +392,7 @@ export const initAiForm = () => {
         console.log("❎ Schließe Booking-Modal");
         const bookingModal = document.getElementById('booking-modal');
         if (bookingModal) {
-            bookingModal.style.display = 'none';
+            bookingModal.remove();
         }
         
         document.body.style.overflow = '';
@@ -230,6 +405,11 @@ export const initAiForm = () => {
         const nameInput = document.getElementById('name');
         const emailInput = document.getElementById('email');
         const slotInput = document.getElementById('selected-slot-input');
+        
+        if (!nameInput || !emailInput || !slotInput) {
+            alert('Formular-Elemente nicht gefunden');
+            return;
+        }
         
         if (!nameInput.value || !emailInput.value || !slotInput.value) {
             alert('Bitte fülle alle Felder aus');
@@ -337,11 +517,11 @@ export const initAiForm = () => {
     };
 
     // ===================================================================
-    // API-KOMMUNIKATION
+    // API-KOMMUNIKATION MIT EVITA
     // ===================================================================
 
     const sendToEvita = async (userInput, isFromChat = false) => {
-        console.log(`🌐 Sende an Evita:`, userInput);
+        console.log(`🌐 Sende an Evita: "${userInput}"`);
         
         try {
             const response = await fetch('/api/ask-gemini', {
@@ -350,28 +530,35 @@ export const initAiForm = () => {
                 body: JSON.stringify({ prompt: userInput }),
             });
             
-            if (!response.ok) throw new Error(`HTTP-Fehler: ${response.status}`);
+            if (!response.ok) {
+                throw new Error(`HTTP-Fehler: ${response.status}`);
+            }
+            
             const data = await response.json();
             console.log(`📨 Evita Response:`, data);
 
             if (data.action === 'launch_booking_modal') {
                 console.log("🎯 Booking-Anfrage erkannt → Starte Modal");
                 
-                // Antworte im Chat
                 const message = data.answer || "Einen Moment, ich öffne den Kalender für dich...";
+                
                 if (!isFromChat) {
+                    // Erste Anfrage von Index-Seite
                     initializeChat(message);
-                    showModal();
+                    showChatModal();
                     
-                    // Nach kurzer Verzögerung: Modal schließen und Booking öffnen
+                    // Nach kurzer Verzögerung: Booking-Modal öffnen
                     setTimeout(() => {
+                        console.log("⏰ Starte Booking-Modal nach Chat-Antwort");
                         launchBookingModal();
                     }, 1500);
                 } else {
+                    // Anfrage aus dem Chat heraus
                     addMessageToHistory(message, 'ai');
                     
-                    // Sofort Booking öffnen
+                    // Sofort Booking-Modal öffnen
                     setTimeout(() => {
+                        console.log("⏰ Starte Booking-Modal aus Chat");
                         launchBookingModal();
                     }, 500);
                 }
@@ -379,9 +566,10 @@ export const initAiForm = () => {
             } else {
                 // Normale Chat-Antworten
                 const message = data.answer || "Ich konnte keine Antwort finden.";
+                
                 if (!isFromChat) {
                     initializeChat(message);
-                    showModal();
+                    showChatModal();
                 } else {
                     addMessageToHistory(message, 'ai');
                 }
@@ -395,7 +583,7 @@ export const initAiForm = () => {
                 addMessageToHistory(errorMessage, 'ai');
             } else {
                 initializeChat(errorMessage);
-                showModal();
+                showChatModal();
             }
         }
     };
@@ -410,7 +598,10 @@ export const initAiForm = () => {
         const question = aiQuestion.value.trim();
         if (!question) return;
         
+        console.log("📝 Haupt-Form submitted:", question);
+        
         aiStatus.style.display = 'block';
+        aiStatus.textContent = 'Evita denkt nach...';
         aiForm.querySelector('button').disabled = true;
         
         try {
@@ -422,7 +613,7 @@ export const initAiForm = () => {
         }
     });
 
-    // Chat-Formular (Modal)
+    // Chat-Formular (Modal) - Event-Delegation
     document.addEventListener('submit', (e) => {
         if (e.target.id === 'ai-chat-form') {
             e.preventDefault();
@@ -432,15 +623,17 @@ export const initAiForm = () => {
             const userInput = chatInput.value.trim();
             if (!userInput) return;
             
+            console.log("💬 Chat-Form submitted:", userInput);
+            
             addMessageToHistory(userInput, 'user');
             chatInput.value = '';
             sendToEvita(userInput, true);
         }
     });
 
-    // Modal schließen
+    // Chat-Modal schließen
     closeButtons.forEach(button => {
-        button.addEventListener('click', hideModal);
+        button.addEventListener('click', hideChatModal);
     });
 
     // ===================================================================
@@ -450,11 +643,39 @@ export const initAiForm = () => {
     // Für externe Nutzung (z.B. Header-Button)
     window.launchBookingFromAnywhere = launchBookingModal;
     
-    // Debug-Funktion
+    // Debug-Funktionen
     window.debugBookingLaunch = launchBookingModal;
+    window.debugCreateFallback = createFallbackModal;
     
-    console.log("✅ Einheitliche AI-Form initialisiert");
-    console.log("🔧 Verfügbare Funktionen:");
+    // Force-Show Funktion für Notfälle
+    window.forceShowExistingModal = () => {
+        const modal = document.getElementById('booking-modal');
+        if (modal) {
+            modal.style.cssText = `
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                background: rgba(0, 0, 0, 0.8) !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                z-index: 999999 !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+            `;
+            console.log("✅ Modal forciert sichtbar gemacht");
+            return true;
+        }
+        console.log("❌ Kein Modal gefunden");
+        return false;
+    };
+    
+    console.log("✅ AI-Form komplett neu initialisiert");
+    console.log("🔧 Verfügbare Debug-Funktionen:");
     console.log("  - window.launchBookingFromAnywhere()");
     console.log("  - window.debugBookingLaunch()");
+    console.log("  - window.debugCreateFallback()");
+    console.log("  - window.forceShowExistingModal()");
 };
