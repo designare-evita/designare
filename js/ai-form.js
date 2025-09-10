@@ -279,8 +279,8 @@ export const initAiForm = () => {
                         text-align: center;
                         color: #1a1a1a;
                     ">
-                        <div style="font-size: 2.5rem; margin-bottom: 10px;">📞</div>
-                        <h2 style="margin: 0; font-size: 1.4rem; font-weight: bold;">
+                        <div style="font-size: 2.5rem; margin-bottom: 10px;"></div>
+                        <h2 style="margin: 0; font-size: 1.3rem; font-weight: bold;">
                             Rückruf-Termin buchen
                         </h2>
                         <p style="margin: 10px 0 0 0; opacity: 0.8; font-size: 0.95rem;">
@@ -292,7 +292,7 @@ export const initAiForm = () => {
                     <div style="padding: 25px; max-height: 400px; overflow-y: auto;">
                         <!-- Schritt 1: Slot-Auswahl -->
                         <div id="step-slot-selection" class="callback-step" style="display: block;">
-                            <h3 style="margin: 0 0 20px 0; color: #1a1a1a; font-size: 1.2rem;">
+                            <h3 style="margin: 0 0 20px 0; color: #1a1a1a; font-size: 1.15rem;">
                                 Wähle deinen Rückruf-Termin:
                             </h3>
                             
@@ -315,7 +315,7 @@ export const initAiForm = () => {
                         <!-- Schritt 2: Kontaktdaten -->
                         <div id="step-contact-details" class="callback-step" style="display: none;">
                             <div style="margin-bottom: 20px;">
-                                <h3 style="margin: 0 0 10px 0; color: #1a1a1a; font-size: 1.2rem;">
+                                <h3 style="margin: 0 0 10px 0; color: #1a1a1a; font-size: 1.15rem;">
                                     Deine Kontaktdaten:
                                 </h3>
                                 <div id="selected-slot-display" style="
@@ -402,7 +402,7 @@ export const initAiForm = () => {
                                         font-size: 1rem;
                                         font-weight: bold;
                                     ">
-                                        📞 Rückruf buchen
+                                         Rückruf buchen
                                     </button>
                                 </div>
                             </form>
@@ -411,7 +411,7 @@ export const initAiForm = () => {
                         <!-- Schritt 3: Bestätigung -->
                         <div id="step-confirmation" class="callback-step" style="display: none;">
                             <div style="text-align: center;">
-                                <div style="font-size: 3rem; margin-bottom: 20px;">🎉</div>
+                                <div style="font-size: 3rem; margin-bottom: 20px;"></div>
                                 <h3 style="margin: 0 0 15px 0; color: #28a745; font-size: 1.3rem;">
                                     Rückruf-Termin erfolgreich gebucht!
                                 </h3>
@@ -426,7 +426,7 @@ export const initAiForm = () => {
                                     <!-- Bestätigungsdetails werden hier eingefügt -->
                                 </div>
                                 <p style="color: #666; margin-bottom: 25px; font-size: 0.95rem;">
-                                    📞 <strong>Michael wird dich zum vereinbarten Zeitpunkt anrufen.</strong><br>
+                                    <strong>Michael wird dich zum vereinbarten Zeitpunkt anrufen.</strong><br>
                                     Halte bitte dein Telefon 5 Minuten vor dem Termin bereit.
                                 </p>
                                 <button onclick="closeCallbackModal()" style="
@@ -439,7 +439,7 @@ export const initAiForm = () => {
                                     font-size: 1rem;
                                     font-weight: bold;
                                 ">
-                                    Perfekt! 👍
+                                    Perfekt! 
                                 </button>
                             </div>
                         </div>
