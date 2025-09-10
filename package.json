@@ -2,8 +2,8 @@
   "name": "digital-business-card-ai",
   "version": "1.0.0",
   "private": true,
-  "scripts": {
-    "start": "node index.js"
+  "engines": {
+    "node": "18.x"
   },
   "dependencies": {
     "@google/generative-ai": "^0.12.0",
