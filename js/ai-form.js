@@ -1,7 +1,7 @@
-// js/ai-form.js - FINALE KORRIGIERTE VERSION
+// js/ai-form.js - NEUE EINHEITLICHE VERSION für Booking-Modal
 
 export const initAiForm = () => {
-    console.log("🚀 Initialisiere AI-Form mit finaler Buchungslogik");
+    console.log("🚀 Initialisiere einheitliche AI-Form");
 
     const aiForm = document.getElementById('ai-form');
     if (!aiForm) {
@@ -17,21 +17,9 @@ export const initAiForm = () => {
     const closeButtons = document.querySelectorAll('#close-ai-response-modal-top, #close-ai-response-modal-bottom');
 
     // ===================================================================
-    // GLOBALER BOOKING-STATE
+    // HILFSFUNKTIONEN FÜR MODAL & CHAT
     // ===================================================================
-    let currentBookingState = {
-        suggestions: [],
-        selectedSlot: null,
-        selectedSlotFormatted: '',
-        bookingData: null,
-        step: 'initial'
-    };
 
-    window.currentBookingState = currentBookingState; // Für Debugging
-
-    // ===================================================================
-    // MODAL- & CHAT-HILFSFUNKTIONEN
-    // ===================================================================
     const showModal = () => {
         if (modalOverlay) modalOverlay.classList.add('visible');
         document.body.classList.add('no-scroll');
@@ -42,208 +30,389 @@ export const initAiForm = () => {
         document.body.classList.remove('no-scroll');
     };
 
-    const addMessageToHistory = (message, sender, isHtml = false) => {
+    const addMessageToHistory = (message, sender) => {
         if (!responseArea) return;
+        
         const messageDiv = document.createElement('div');
         messageDiv.className = `chat-message ${sender}`;
-        if (isHtml) {
-            messageDiv.innerHTML = message;
-        } else {
-            messageDiv.textContent = message;
-        }
+        messageDiv.textContent = message;
+        
         responseArea.appendChild(messageDiv);
         responseArea.scrollTop = responseArea.scrollHeight;
     };
 
-    const initializeChat = (initialMessage, isHtml = false) => {
-        if (responseArea) responseArea.innerHTML = '';
-        addMessageToHistory(initialMessage, 'ai', isHtml);
-    };
-
-    // ===================================================================
-    // BOOKING-PROZESS FUNKTIONEN
-    // ===================================================================
-
-    const createInteractiveTerminMessage = (message, suggestions) => {
-        let enhancedHtml = `
-            <div class="booking-message">
-                <div class="booking-text">Hier sind die nächsten 3 verfügbaren Rückruf-Termine:</div>
-                <div class="booking-buttons" style="margin-top: 15px;">`;
+    const initializeChat = (initialMessage) => {
+        if (responseArea) {
+            responseArea.innerHTML = '';
+            
+            // Chat-Input hinzufügen (falls noch nicht vorhanden)
+            if (!document.getElementById('ai-chat-input')) {
+                const chatForm = document.createElement('form');
+                chatForm.id = 'ai-chat-form';
+                chatForm.innerHTML = `
+                    <div style="display: flex; margin-top: 20px; gap: 10px;">
+                        <input type="text" id="ai-chat-input" placeholder="Deine Antwort..." 
+                               style="flex: 1; padding: 10px; border-radius: 5px; border: 1px solid #ccc; background: rgba(255,255,255,0.1); color: #fff;">
+                        <button type="submit" style="padding: 10px 15px; background: #ffc107; border: none; border-radius: 5px; cursor: pointer; color: #1a1a1a; font-weight: bold;">
+                            Senden
+                        </button>
+                    </div>
+                `;
+                document.getElementById('ai-response-content-area').appendChild(chatForm);
+            }
+        }
         
-        suggestions.forEach((suggestion) => {
-            enhancedHtml += `
-                <button class="termin-button" 
-                        data-slot="${suggestion.slot}"
-                        data-formatted="${suggestion.formattedString || ''}">
-                    Termin ${suggestion.slot}: ${suggestion.formattedString}
-                </button>`;
+        addMessageToHistory(initialMessage, 'ai');
+    };
+
+    // ===================================================================
+    // BOOKING-MODAL LAUNCHER (EINHEITLICH FÜR BEIDE WEGE)
+    // ===================================================================
+
+    const launchBookingModal = async () => {
+        console.log("🚀 Starte einheitliches Booking-Modal");
+        
+        try {
+            // 1. Schließe Chat-Modal falls offen
+            hideModal();
+            
+            // 2. Warte kurz für smooth transition
+            await new Promise(resolve => setTimeout(resolve, 200));
+            
+            // 3. Lade Booking-Modal falls nicht vorhanden
+            let bookingModal = document.getElementById('booking-modal');
+            
+            if (!bookingModal) {
+                console.log("📄 Lade booking-modal.html...");
+                
+                const response = await fetch('/booking-modal.html');
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const html = await response.text();
+                const modalContainer = document.getElementById('modal-container') || document.body;
+                modalContainer.insertAdjacentHTML('beforeend', html);
+                
+                bookingModal = document.getElementById('booking-modal');
+                console.log("✅ Booking-Modal HTML eingefügt");
+            }
+            
+            // 4. Setup Event-Listener für Booking
+            setupBookingEventListeners();
+            
+            // 5. Modal anzeigen
+            if (bookingModal) {
+                bookingModal.style.display = 'flex';
+                bookingModal.style.opacity = '1';
+                bookingModal.style.visibility = 'visible';
+                bookingModal.style.pointerEvents = 'auto';
+                
+                document.body.style.overflow = 'hidden';
+                document.body.classList.add('no-scroll');
+                
+                // Aktiviere ersten Schritt
+                document.querySelectorAll('.booking-step').forEach(step => {
+                    step.classList.remove('active');
+                });
+                
+                const firstStep = document.getElementById('step-day-selection');
+                if (firstStep) {
+                    firstStep.classList.add('active');
+                }
+                
+                console.log("✅ Booking-Modal erfolgreich gestartet");
+                return true;
+            }
+            
+        } catch (error) {
+            console.error("❌ Booking-Modal Launch fehlgeschlagen:", error);
+            
+            // Fallback: Zeige Fehlermeldung im Chat
+            if (responseArea) {
+                addMessageToHistory("Entschuldigung, das Buchungssystem konnte nicht geladen werden. Bitte kontaktiere Michael direkt unter michael@designare.at", 'ai');
+                showModal();
+            }
+            
+            return false;
+        }
+    };
+
+    // ===================================================================
+    // BOOKING EVENT LISTENERS SETUP
+    // ===================================================================
+
+    const setupBookingEventListeners = () => {
+        console.log("🔧 Richte Booking Event-Listener ein...");
+        
+        // Tag-Buttons
+        document.querySelectorAll('.day-button').forEach(button => {
+            if (!button.hasAttribute('data-listener-added')) {
+                button.addEventListener('click', handleDaySelection);
+                button.setAttribute('data-listener-added', 'true');
+            }
         });
-
-        enhancedHtml += `</div></div>`;
-        return enhancedHtml;
-    };
-
-    const handleBookingDataCollection = () => {
-        console.log("📝 Sammle Kontaktdaten mit ROBUSTEM FORMULAR");
-        currentBookingState.step = 'contact_data';
-
-        const selectedTerminText = currentBookingState.selectedSlotFormatted || `Nummer ${currentBookingState.selectedSlot}`;
-        addMessageToHistory(`Termin (${selectedTerminText}) ausgewählt`, 'ai', false);
-
-        const formHtml = `
-            <div class="chat-message ai">
-                <form id="contact-details-form" style="margin-top: 10px;">
-                    <p>Bitte Deinen Namen und Telefonnummer für den Rückruf:</p>
-                    <input type="text" id="contact-name" name="name" placeholder="Dein Name" required style="display: block; width: 95%; padding: 10px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ccc;">
-                    <input type="tel" id="contact-phone" name="phone" placeholder="Deine Telefonnummer" required style="display: block; width: 95%; padding: 10px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ccc;">
-                    <button type="submit" id="submit-contact-details" style="padding: 10px 15px; border-radius: 5px; border: none; background-color: #28a745; color: white; cursor: pointer;">
-                        Bestätigen & Buchen
-                    </button>
-                </form>
-            </div>`;
-
-        responseArea.insertAdjacentHTML('beforeend', formHtml);
-        responseArea.scrollTop = responseArea.scrollHeight;
-
-        const contactForm = document.getElementById('contact-details-form');
-        if (contactForm) {
-            contactForm.addEventListener('submit', handleContactDataSubmit);
-        }
-    };
-
-    const executeBooking = async () => {
-        console.log('🔍 executeBooking gestartet');
-        if (!currentBookingState.bookingData?.name || !currentBookingState.bookingData?.phone) {
-            throw new Error('Unvollständige Buchungsdaten.');
-        }
-
-        const selectedSuggestion = currentBookingState.suggestions.find(s => s.slot === currentBookingState.selectedSlot);
-        const appointmentSlot = selectedSuggestion ? selectedSuggestion.formattedString : generateFallbackSlot();
-
-        const bookingPayload = {
-            slot: appointmentSlot,
-            name: `${currentBookingState.bookingData.name} (Tel: ${currentBookingState.bookingData.phone})`,
-            email: `rueckruf@designare.at`
-        };
-
-        console.log('📅 Finale Buchungsdaten an API:', bookingPayload);
-
-        const response = await fetch('/api/create-appointment', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(bookingPayload)
+        
+        // Zurück-Buttons
+        document.querySelectorAll('.back-button').forEach(button => {
+            if (!button.hasAttribute('data-listener-added')) {
+                button.addEventListener('click', handleBackButton);
+                button.setAttribute('data-listener-added', 'true');
+            }
         });
-
-        const responseText = await response.text();
-        if (!response.ok) {
-            throw new Error(`API Fehler: ${responseText}`);
+        
+        // Schließen-Button
+        const closeButton = document.getElementById('close-booking-modal');
+        if (closeButton && !closeButton.hasAttribute('data-listener-added')) {
+            closeButton.addEventListener('click', closeBookingModal);
+            closeButton.setAttribute('data-listener-added', 'true');
         }
+        
+        // Buchungsformular
+        const bookingForm = document.getElementById('booking-form');
+        if (bookingForm && !bookingForm.hasAttribute('data-listener-added')) {
+            bookingForm.addEventListener('submit', handleBookingSubmit);
+            bookingForm.setAttribute('data-listener-added', 'true');
+        }
+        
+        console.log("✅ Booking Event-Listener eingerichtet");
+    };
 
-        const result = JSON.parse(responseText);
-        if (result.success) {
-            showBookingSuccess(result, appointmentSlot);
-            resetBookingState();
-        } else {
-            throw new Error(result.message || 'Unbekannter API-Fehler');
+    // ===================================================================
+    // BOOKING EVENT-HANDLER
+    // ===================================================================
+
+    const handleDaySelection = async (event) => {
+        const day = event.target.dataset.day;
+        console.log("📅 Tag ausgewählt:", day);
+        
+        showLoadingForSlots();
+        
+        try {
+            const response = await fetch(`/api/get-availability?day=${day}`);
+            const data = await response.json();
+            
+            if (data.success && data.slots) {
+                displaySlots(data.slots, day, data.date);
+                showBookingStep('step-time-selection');
+            } else {
+                alert('Keine Termine verfügbar für ' + day);
+            }
+            
+        } catch (error) {
+            console.error('Fehler beim Laden der Slots:', error);
+            alert('Fehler beim Laden der verfügbaren Termine');
+        } finally {
+            hideLoadingForSlots();
         }
     };
 
-    const showBookingSuccess = (result, appointmentSlot) => {
-        const successMessage = `
-            <div style="background: #28a745; color: white; padding: 20px; border-radius: 8px; text-align: center;">
-                <h3>🎉 Perfekt! Dein Termin ist gebucht!</h3>
-                <p>
-                    <strong>Name:</strong> ${currentBookingState.bookingData.name}<br>
-                    <strong>Telefon:</strong> ${currentBookingState.bookingData.phone}<br>
-                    <strong>Termin:</strong> ${appointmentSlot}
-                </p>
-                <p style="font-size: 0.9rem;">Michael ruft dich zum vereinbarten Zeitpunkt an.</p>
-            </div>`;
-        addMessageToHistory(successMessage, 'ai', true);
+    const handleBackButton = (event) => {
+        const targetStep = event.target.dataset.target;
+        console.log("⬅️ Zurück zu:", targetStep);
+        showBookingStep(targetStep);
     };
 
-    const showBookingError = (errorMessage) => {
-        const errorHtml = `
-            <div style="background: #dc3545; color: white; padding: 20px; border-radius: 8px;">
-                <strong>❌ Fehler bei der Terminbuchung</strong><br><br>${errorMessage}
-            </div>`;
-        addMessageToHistory(errorHtml, 'ai', true);
+    const closeBookingModal = () => {
+        console.log("❎ Schließe Booking-Modal");
+        const bookingModal = document.getElementById('booking-modal');
+        if (bookingModal) {
+            bookingModal.style.display = 'none';
+        }
+        
+        document.body.style.overflow = '';
+        document.body.classList.remove('no-scroll');
     };
 
-    const resetBookingState = () => {
-        currentBookingState = { suggestions: [], selectedSlot: null, selectedSlotFormatted: '', bookingData: null, step: 'initial' };
-        window.currentBookingState = currentBookingState;
-        console.log('🔄 Booking-State zurückgesetzt');
+    const handleBookingSubmit = async (event) => {
+        event.preventDefault();
+        
+        const nameInput = document.getElementById('name');
+        const emailInput = document.getElementById('email');
+        const slotInput = document.getElementById('selected-slot-input');
+        
+        if (!nameInput.value || !emailInput.value || !slotInput.value) {
+            alert('Bitte fülle alle Felder aus');
+            return;
+        }
+        
+        const submitButton = document.getElementById('submit-booking-button');
+        const loader = document.getElementById('booking-loader');
+        
+        if (submitButton) submitButton.disabled = true;
+        if (loader) loader.style.display = 'block';
+        
+        try {
+            const response = await fetch('/api/create-appointment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    slot: slotInput.value,
+                    name: nameInput.value,
+                    email: emailInput.value
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                showBookingStep('step-confirmation');
+                const confirmationMessage = document.getElementById('confirmation-message');
+                if (confirmationMessage) {
+                    confirmationMessage.textContent = data.message;
+                }
+            } else {
+                alert('Fehler bei der Buchung: ' + data.message);
+            }
+            
+        } catch (error) {
+            console.error('Buchungsfehler:', error);
+            alert('Fehler bei der Buchung. Bitte versuche es erneut.');
+        } finally {
+            if (submitButton) submitButton.disabled = false;
+            if (loader) loader.style.display = 'none';
+        }
     };
 
-    const generateFallbackSlot = () => {
-        // Fallback-Logik (unverändert)
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        while (tomorrow.getDay() % 6 === 0) { tomorrow.setDate(tomorrow.getDate() + 1); }
-        tomorrow.setHours(9, 0, 0, 0);
-        return `${tomorrow.toLocaleDateString('de-DE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })} um 09:00`;
+    // ===================================================================
+    // BOOKING HILFSFUNKTIONEN
+    // ===================================================================
+
+    const showBookingStep = (stepId) => {
+        document.querySelectorAll('.booking-step').forEach(step => {
+            step.classList.remove('active');
+        });
+        
+        const targetStep = document.getElementById(stepId);
+        if (targetStep) {
+            targetStep.classList.add('active');
+        }
+    };
+
+    const displaySlots = (slots, day, date) => {
+        const slotsContainer = document.getElementById('slots-container');
+        const selectedDayDisplay = document.getElementById('selected-day-display');
+        const selectedDateDisplay = document.getElementById('selected-date-display');
+        
+        if (selectedDayDisplay) selectedDayDisplay.textContent = day;
+        if (selectedDateDisplay) selectedDateDisplay.textContent = date;
+        
+        if (slotsContainer) {
+            slotsContainer.innerHTML = '';
+            
+            if (slots.length > 0) {
+                slots.forEach(slot => {
+                    const button = document.createElement('button');
+                    button.className = 'slot-button';
+                    button.textContent = slot.time;
+                    button.addEventListener('click', () => selectSlot(slot.fullString));
+                    slotsContainer.appendChild(button);
+                });
+            } else {
+                slotsContainer.innerHTML = '<p>Keine Termine verfügbar</p>';
+            }
+        }
+    };
+
+    const selectSlot = (fullSlot) => {
+        console.log("🕐 Slot ausgewählt:", fullSlot);
+        
+        const selectedSlotDisplay = document.getElementById('selected-slot-display');
+        const selectedSlotInput = document.getElementById('selected-slot-input');
+        
+        if (selectedSlotDisplay) selectedSlotDisplay.textContent = fullSlot;
+        if (selectedSlotInput) selectedSlotInput.value = fullSlot;
+        
+        showBookingStep('step-details');
+    };
+
+    const showLoadingForSlots = () => {
+        const loader = document.getElementById('slots-loader');
+        if (loader) loader.style.display = 'block';
+    };
+
+    const hideLoadingForSlots = () => {
+        const loader = document.getElementById('slots-loader');
+        if (loader) loader.style.display = 'none';
     };
 
     // ===================================================================
     // API-KOMMUNIKATION
     // ===================================================================
 
-const sendToEvita = async (userInput, isFromChat = false) => {
-    console.log(`🌐 Sende an Evita:`, userInput);
-    try {
-        const response = await fetch('/api/ask-gemini', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt: userInput }),
-        });
-        if (!response.ok) throw new Error(`HTTP-Fehler: ${response.status}`);
-        const data = await response.json();
-        console.log(`📨 Evita Response:`, data);
+    const sendToEvita = async (userInput, isFromChat = false) => {
+        console.log(`🌐 Sende an Evita:`, userInput);
+        
+        try {
+            const response = await fetch('/api/ask-gemini', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: userInput }),
+            });
+            
+            if (!response.ok) throw new Error(`HTTP-Fehler: ${response.status}`);
+            const data = await response.json();
+            console.log(`📨 Evita Response:`, data);
 
-        if (data.action === 'smart_booking') {
-            const enhancedMessage = createInteractiveTerminMessage(data.answer, data.suggestions);
-            initializeChat(enhancedMessage, true);
-            if (!isFromChat) showModal(); // Modal bei erster Buchungsanfrage zeigen
-            currentBookingState.suggestions = data.suggestions || [];
-            currentBookingState.step = 'slot_selection';
-        } else if (data.action === 'collect_booking_data') {
-            handleBookingDataCollection();
-        } else {
-            // KORREKTUR: Behandle normale Chat-Antworten
-            if (!isFromChat) {
-                // Wenn dies die ERSTE Anfrage von der Hauptseite ist:
-                // 1. Initialisiere den Chat mit der Antwort.
-                initializeChat(data.answer || "Ich konnte keine Antwort finden.", 'ai');
-                // 2. ZEIGE DAS MODAL AN.
-                showModal();
+            if (data.action === 'launch_booking_modal') {
+                console.log("🎯 Booking-Anfrage erkannt → Starte Modal");
+                
+                // Antworte im Chat
+                const message = data.answer || "Einen Moment, ich öffne den Kalender für dich...";
+                if (!isFromChat) {
+                    initializeChat(message);
+                    showModal();
+                    
+                    // Nach kurzer Verzögerung: Modal schließen und Booking öffnen
+                    setTimeout(() => {
+                        launchBookingModal();
+                    }, 1500);
+                } else {
+                    addMessageToHistory(message, 'ai');
+                    
+                    // Sofort Booking öffnen
+                    setTimeout(() => {
+                        launchBookingModal();
+                    }, 500);
+                }
+                
             } else {
-                // Wenn wir uns bereits im Chat befinden, füge die Nachricht einfach hinzu.
-                addMessageToHistory(data.answer || "Ich konnte keine Antwort finden.", 'ai');
+                // Normale Chat-Antworten
+                const message = data.answer || "Ich konnte keine Antwort finden.";
+                if (!isFromChat) {
+                    initializeChat(message);
+                    showModal();
+                } else {
+                    addMessageToHistory(message, 'ai');
+                }
+            }
+            
+        } catch (error) {
+            console.error(`❌ Evita-Fehler:`, error);
+            const errorMessage = "Entschuldigung, ich habe gerade technische Schwierigkeiten. Bitte versuche es später noch einmal.";
+            
+            if (isFromChat) {
+                addMessageToHistory(errorMessage, 'ai');
+            } else {
+                initializeChat(errorMessage);
+                showModal();
             }
         }
-    } catch (error) {
-        console.error(`❌ Evita-Fehler:`, error);
-        const errorMessage = "Entschuldigung, ich habe gerade technische Schwierigkeiten. Bitte versuche es später noch einmal.";
-        if (isFromChat) {
-            addMessageToHistory(errorMessage, 'ai');
-        } else {
-            initializeChat(errorMessage);
-            showModal();
-        }
-    }
-};
-
+    };
 
     // ===================================================================
-    // EVENT-HANDLER
+    // EVENT-LISTENER SETUP
     // ===================================================================
-    const handleFormSubmit = async (event) => {
+
+    // Hauptformular (Index-Seite)
+    aiForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         const question = aiQuestion.value.trim();
         if (!question) return;
+        
         aiStatus.style.display = 'block';
         aiForm.querySelector('button').disabled = true;
+        
         try {
             await sendToEvita(question, false);
         } finally {
@@ -251,59 +420,41 @@ const sendToEvita = async (userInput, isFromChat = false) => {
             aiStatus.style.display = 'none';
             aiForm.querySelector('button').disabled = false;
         }
-    };
-
-    const handleChatSubmit = async (event) => {
-        event.preventDefault();
-        const chatInput = document.getElementById('ai-chat-input');
-        if (!chatInput) return;
-        const userInput = chatInput.value.trim();
-        if (!userInput) return;
-        addMessageToHistory(userInput, 'user');
-        chatInput.value = '';
-        await sendToEvita(userInput, true);
-    };
-
-    const handleTerminButtonClick = (event) => {
-        if (!event.target.classList.contains('termin-button')) return;
-        currentBookingState.selectedSlot = parseInt(event.target.dataset.slot);
-        currentBookingState.selectedSlotFormatted = event.target.dataset.formatted;
-        document.querySelectorAll('.termin-button').forEach(btn => btn.disabled = true);
-        event.target.style.backgroundColor = '#28a745';
-        addMessageToHistory(`Termin ${currentBookingState.selectedSlot}`, 'user');
-        setTimeout(() => sendToEvita(`Termin ${currentBookingState.selectedSlot}`, true), 300);
-    };
-    
-    const handleContactDataSubmit = async (event) => {
-        event.preventDefault();
-        console.log("✅ Kontaktdaten aus Formular erhalten");
-        const nameInput = document.getElementById('contact-name');
-        const phoneInput = document.getElementById('contact-phone');
-        document.getElementById('submit-contact-details').disabled = true;
-        
-        currentBookingState.bookingData = { name: nameInput.value, phone: phoneInput.value };
-        addMessageToHistory("Alles klar, ich trage den Termin für dich ein...", 'ai');
-
-        try {
-            await executeBooking();
-        } catch (error) {
-            console.error('❌ Buchungsfehler nach Formular-Submit:', error);
-            showBookingError(`Buchung fehlgeschlagen: ${error.message}`);
-        }
-    };
-
-    // ===================================================================
-    // EVENT-LISTENER SETUP
-    // ===================================================================
-    aiForm.addEventListener('submit', handleFormSubmit);
-    document.addEventListener('submit', (e) => {
-        if (e.target.id === 'ai-chat-form') handleChatSubmit(e);
     });
-    document.addEventListener('click', handleTerminButtonClick);
-    closeButtons.forEach(button => button.addEventListener('click', () => {
-        hideModal();
-        resetBookingState();
-    }));
 
-    console.log("✅ AI-Form vollständig initialisiert");
+    // Chat-Formular (Modal)
+    document.addEventListener('submit', (e) => {
+        if (e.target.id === 'ai-chat-form') {
+            e.preventDefault();
+            const chatInput = document.getElementById('ai-chat-input');
+            if (!chatInput) return;
+            
+            const userInput = chatInput.value.trim();
+            if (!userInput) return;
+            
+            addMessageToHistory(userInput, 'user');
+            chatInput.value = '';
+            sendToEvita(userInput, true);
+        }
+    });
+
+    // Modal schließen
+    closeButtons.forEach(button => {
+        button.addEventListener('click', hideModal);
+    });
+
+    // ===================================================================
+    // GLOBALE FUNKTIONEN FÜR EXTERNE NUTZUNG
+    // ===================================================================
+
+    // Für externe Nutzung (z.B. Header-Button)
+    window.launchBookingFromAnywhere = launchBookingModal;
+    
+    // Debug-Funktion
+    window.debugBookingLaunch = launchBookingModal;
+    
+    console.log("✅ Einheitliche AI-Form initialisiert");
+    console.log("🔧 Verfügbare Funktionen:");
+    console.log("  - window.launchBookingFromAnywhere()");
+    console.log("  - window.debugBookingLaunch()");
 };
