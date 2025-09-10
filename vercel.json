@@ -1,7 +1,22 @@
 {
-  "version": 2,
-  "env": {
-    "GOOGLE_CREDENTIALS": "google_credentials",
-    "GEMINI_API_KEY": "@gemini_api_key"
-  }
-}
+
+
+  "rewrites": [
+
+
+    { "source": "/CSV-Creator", "destination": "/CSV-Creator.html" },
+
+
+    { "source": "/CSV-Importer-PRO", "destination": "/CSV-Importer-PRO.html" },
+
+
+{ "source": "/KI-Integration-auf-Webseiten", "destination": "/KI-Integration-auf-Webseiten.html" },
+
+
+    { "source": "/", "destination": "/index.html" }
+
+
+  ],
+
+
+  "cleanUrls": true
