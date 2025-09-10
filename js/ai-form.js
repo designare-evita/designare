@@ -411,7 +411,6 @@ export const initAiForm = () => {
                         <!-- Schritt 3: Bestätigung -->
                         <div id="step-confirmation" class="callback-step" style="display: none;">
                             <div style="text-align: center;">
-                                <div style="font-size: 3rem; margin-bottom: 20px;"></div>
                                 <h3 style="margin: 0 0 15px 0; color: #28a745; font-size: 1.3rem;">
                                     Rückruf-Termin erfolgreich gebucht!
                                 </h3>
