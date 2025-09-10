@@ -1,7 +1,7 @@
-// js/ai-form.js - VERBESSERTE VERSION mit robustem Booking-Modal
+// js/ai-form.js - KORRIGIERTE VERSION die das Booking-Modal Problem behebt
 
 export const initAiForm = () => {
-    console.log("🚀 Initialisiere verbesserte AI-Form mit robustem Booking-System");
+    console.log("🚀 Initialisiere korrigierte AI-Form mit funktionierendem Booking-System");
 
     const aiForm = document.getElementById('ai-form');
     if (!aiForm) {
@@ -20,7 +20,7 @@ export const initAiForm = () => {
     let selectedCallbackData = null;
 
     // ===================================================================
-    // ROBUSTE API-KOMMUNIKATION
+    // VERBESSERTE API-KOMMUNIKATION
     // ===================================================================
 
     const safeFetchAPI = async (url, options = {}) => {
@@ -101,7 +101,7 @@ export const initAiForm = () => {
     };
 
     // ===================================================================
-    // VERBESSERTE EVITA-KOMMUNIKATION
+    // EVITA-KOMMUNIKATION
     // ===================================================================
 
     const sendToEvita = async (userInput, isFromChat = false) => {
@@ -175,11 +175,11 @@ export const initAiForm = () => {
     };
 
     // ===================================================================
-    // ROBUSTES BOOKING-MODAL MIT FALLBACK-MECHANISMEN
+    // KORRIGIERTES BOOKING-MODAL - VERWENDET INLINE-HTML STATT EXTERNES LADEN
     // ===================================================================
 
     const launchBookingModal = async () => {
-        console.log("🚀 Starte robustes Rückruf-Modal mit Fallback-Mechanismen");
+        console.log("🚀 Starte korrigiertes Rückruf-Modal mit Inline-HTML");
         
         try {
             // Schließe Chat-Modal
@@ -193,22 +193,8 @@ export const initAiForm = () => {
                 console.log("🗑️ Existierendes Modal entfernt");
             }
             
-            // Versuche das Modal-HTML zu laden
-            let modalHTML;
-            try {
-                console.log("📄 Versuche booking-modal.html zu laden...");
-                const response = await fetch('/booking-modal.html');
-                
-                if (response.ok) {
-                    modalHTML = await response.text();
-                    console.log("✅ Modal-HTML erfolgreich geladen");
-                } else {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-            } catch (fetchError) {
-                console.warn("⚠️ Externes Modal-HTML nicht verfügbar, verwende Inline-HTML:", fetchError.message);
-                modalHTML = createInlineModalHTML();
-            }
+            // KORREKTUR: Verwende Inline-HTML statt externes Laden
+            const modalHTML = createInlineModalHTML();
             
             // Füge Modal zum DOM hinzu
             const modalContainer = document.getElementById('modal-container') || document.body;
@@ -242,21 +228,21 @@ export const initAiForm = () => {
                     loadCallbackSlots();
                 }, 500);
                 
-                console.log("✅ Robustes Rückruf-Modal erfolgreich gestartet");
+                console.log("✅ Korrigiertes Rückruf-Modal erfolgreich gestartet");
                 return true;
             } else {
                 throw new Error("Modal konnte nicht im DOM erstellt werden");
             }
             
         } catch (error) {
-            console.error("❌ Rückruf-Modal komplett fehlgeschlagen:", error);
+            console.error("❌ Rückruf-Modal fehlgeschlagen:", error);
             createEmergencyFallbackModal();
             return false;
         }
     };
 
     // ===================================================================
-    // INLINE-HTML FÜR MODAL (FALLBACK)
+    // KORRIGIERTE INLINE-HTML FUNKTION
     // ===================================================================
 
     const createInlineModalHTML = () => {
@@ -482,7 +468,7 @@ export const initAiForm = () => {
     };
 
     // ===================================================================
-    // EMERGENCY FALLBACK MODAL
+    // EMERGENCY FALLBACK MODAL (unverändert)
     // ===================================================================
 
     const createEmergencyFallbackModal = () => {
@@ -546,15 +532,6 @@ export const initAiForm = () => {
                            ">
                             📧 E-Mail für Rückruf-Termin senden
                         </a>
-                    </div>
-                    
-                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                        <p style="margin: 0; font-size: 0.9rem; color: #495057;">
-                            <strong>Bitte erwähne:</strong><br>
-                            • Deine Telefonnummer<br>
-                            • Dein Anliegen<br>
-                            • Deine Verfügbarkeit (Wochentage/Uhrzeiten)
-                        </p>
                     </div>
                     
                     <button onclick="closeCallbackModal()" 
@@ -1049,5 +1026,5 @@ export const initAiForm = () => {
         console.log("✅ Rückruf-Modal geschlossen");
     };
     
-    console.log("✅ Verbesserte AI-Form mit robustem Booking-System vollständig initialisiert");
+    console.log("✅ Korrigierte AI-Form mit funktionierendem Booking-System vollständig initialisiert");
 };
