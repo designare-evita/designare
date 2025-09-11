@@ -140,9 +140,10 @@ const setupChatIntegration = () => {
                         if (node.nodeType === Node.ELEMENT_NODE && node.classList.contains('chat-message')) {
                             const text = node.textContent.toLowerCase();
                             if (text.includes('buchung') || text.includes('termin') || text.includes('kalender')) {
-                                console.log("🎯 Booking-relevante Nachricht erkannt");
-                                // Automatisches Booking kann hier implementiert werden
-                            }
+    console.log("🎯 Booking-relevante Nachricht erkannt -> Starte Booking-Modal");
+    // Ruft die globale Funktion auf, die in ai-form.js definiert wurde
+    window.launchBookingFromAnywhere(); 
+}
                         }
                     });
                 });
