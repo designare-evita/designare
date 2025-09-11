@@ -723,17 +723,20 @@ const createEmergencyFallbackModal = () => {
     // HILFSFUNKTIONEN
     // ===================================================================
 
-    const showCallbackStep = (stepId) => {
-        document.querySelectorAll('.callback-step').forEach(step => {
-            step.style.display = 'none';
-        });
-        
-        const targetStep = document.getElementById(stepId);
-        if (targetStep) {
-            targetStep.style.display = 'block';
-            console.log("✅ Wechsel zu Callback-Schritt:", stepId);
-        }
-    };
+const showCallbackStep = (stepId) => {
+    // 1. Finde alle Schritte mit der NEUEN Klasse ".booking-step" und entferne die "active" Klasse
+    document.querySelectorAll('.booking-step').forEach(step => {
+        step.classList.remove('active');
+    });
+    
+    // 2. Finde den Ziel-Schritt und füge ihm die "active" Klasse hinzu
+    const targetStep = document.getElementById(stepId);
+    if (targetStep) {
+        targetStep.classList.add('active');
+        console.log("✅ Wechsel zu Callback-Schritt:", stepId);
+    }
+};
+
 
     const showCallbackError = (message) => {
         console.error("❌ Callback-Fehler:", message);
