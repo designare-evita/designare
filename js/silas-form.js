@@ -1,4 +1,4 @@
-// js/silas-form.js - FINALE, VOLLSTÄNDIGE VERSION MIT ALLEN FUNKTIONEN UND KORREKTUREN
+// js/silas-form.js - Reparierte Version
 
 export function initSilasForm() {
     const silasForm = document.getElementById('silas-form');
@@ -28,7 +28,8 @@ export function initSilasForm() {
     const brandInput = document.getElementById('text-brand-input');
     const emailInput = document.getElementById('text-email-input');
     const phoneInput = document.getElementById('text-phone-input');
-    const addressInput = document.getElementById('text-address-input'); // NEUES ELEMENT
+    // KORREKTUR: Sucht jetzt nach der ID, die Sie in Ihrem HTML verwenden.
+    const addressInput = document.getElementById('text-adress-input'); 
     const grammaticalPersonSelect = document.getElementById('grammatical-person-select');
 
     let keywordList = [];
@@ -199,7 +200,8 @@ export function initSilasForm() {
                 brand: brandInput.value.trim(),
                 email: emailInput.value.trim(),
                 phone: phoneInput.value.trim(),
-                address: addressInput.value.trim(), // NEUES FELD
+                // KORREKTUR: Liest den Wert vom Adressfeld aus (und prüft, ob es existiert).
+                address: addressInput ? addressInput.value.trim() : '', 
                 grammaticalPerson: grammaticalPersonSelect.value,
             };
 
@@ -261,7 +263,7 @@ export function initSilasForm() {
                 createBadge(item.brand ? `Brand: ${item.brand}`: '', '#fd7e14'),
                 createBadge(item.email ? `E-Mail: ${item.email}`: '', '#007bff'),
                 createBadge(item.phone ? `Tel: ${item.phone}`: '', '#dc3545'),
-                createBadge(item.address ? `Adresse: ${item.address}`: '', '#17a2b8'), // NEUES BADGE
+                createBadge(item.address ? `Adresse: ${item.address}`: '', '#17a2b8'),
                 createBadge(item.zielgruppe ? `Für: ${item.zielgruppe}`: '', '#6c757d'),
                 createBadge(item.tonalitaet ? `Ton: ${item.tonalitaet}`: '', '#6c757d'),
                 createBadge(item.usp ? `USP: ${item.usp}`: '', '#6c757d')
