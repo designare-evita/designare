@@ -1,0 +1,383 @@
+/* booking.css - Ausgelagerte Styles für das Rückruf-Modal */
+
+/* ------------------------- */
+/* 1. Modal Grundstruktur    */
+/* ------------------------- */
+
+#booking-modal {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: rgba(0, 0, 0, 0.85) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 999999 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+.booking-modal-content {
+    background: white;
+    border-radius: 15px;
+    padding: 0;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90%;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+    position: relative;
+    color: #1a1a1a;
+}
+
+.booking-modal-header {
+    background: linear-gradient(135deg, #ffc107 0%, #ffca2c 100%);
+    padding: 25px;
+    text-align: center;
+    color: #1a1a1a;
+}
+
+.booking-modal-header-icon {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.booking-modal-title {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: bold;
+}
+
+.booking-modal-subtitle {
+    margin: 10px 0 0 0;
+    opacity: 0.8;
+    font-size: 0.95rem;
+}
+
+.booking-modal-body {
+    padding: 25px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.booking-modal-close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(0,0,0,0.2);
+    border: none;
+    color: #1a1a1a;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+/* ------------------------- */
+/* 2. Schritte (Steps)       */
+/* ------------------------- */
+
+.booking-step {
+    display: none; /* Wird per JS gesteuert */
+}
+
+.booking-step.active {
+    display: block;
+}
+
+.booking-step-title {
+    margin: 0 0 20px 0;
+    color: #1a1a1a;
+    font-size: 1.15rem;
+}
+
+/* ------------------------- */
+/* 3. Slot-Auswahl           */
+/* ------------------------- */
+
+#callback-loading {
+    text-align: center;
+}
+#callback-loading > div {
+    color: #666;
+    margin: 20px 0;
+}
+#callback-loading .loader-icon {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+#callback-slots-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.callback-slot-button {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: left;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.callback-slot-button:hover {
+    border-color: #ffc107;
+    background-color: #fff9e6;
+    transform: translateY(-1px);
+}
+
+.callback-slot-button.selected {
+    opacity: 1 !important;
+    border-color: #28a745 !important;
+    background-color: #e8f5e8 !important;
+}
+
+.callback-slot-button .slot-icon {
+    font-size: 1.2rem;
+}
+.callback-slot-button .slot-info {
+    flex: 1;
+    text-align: left;
+}
+.callback-slot-button .slot-title {
+    font-weight: bold;
+    color: #1a1a1a;
+    margin-bottom: 4px;
+}
+.callback-slot-button .slot-time {
+    color: #666;
+    font-size: 0.9rem;
+}
+.callback-slot-button .slot-arrow {
+    color: #ffc107;
+    font-size: 1.1rem;
+    transition: transform 0.3s ease;
+}
+.callback-slot-button:hover .slot-arrow {
+    transform: translateX(3px);
+}
+
+
+#no-slots-message {
+    display: none; /* JS-gesteuert */
+    text-align: center;
+    color: #666;
+    margin: 20px 0;
+}
+
+#no-slots-message .icon {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+#no-slots-message a {
+    color: #ffc107;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+
+/* ------------------------- */
+/* 4. Kontaktdaten-Formular  */
+/* ------------------------- */
+
+#selected-slot-display {
+    background: #fff9e6;
+    padding: 12px;
+    border-radius: 6px;
+    color: #1a1a1a;
+    font-size: 0.9rem;
+    border-left: 4px solid #ffc107;
+    margin-bottom: 20px;
+}
+
+.booking-form-group {
+    margin-bottom: 15px;
+}
+
+.booking-form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #495057;
+    font-weight: 500;
+}
+
+.booking-form-group input,
+.booking-form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e9ecef;
+    border-radius: 6px;
+    font-size: 1rem;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+}
+.booking-form-group input:focus,
+.booking-form-group textarea:focus {
+    outline: none;
+    border-color: #ffc107;
+}
+
+.booking-form-group textarea {
+    resize: vertical;
+}
+
+.booking-form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.booking-btn {
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.booking-btn:hover {
+    transform: translateY(-1px);
+}
+
+.booking-btn.back-btn {
+    background: #6c757d;
+    color: white;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.booking-btn.submit-btn {
+    background: #28a745;
+    color: white;
+}
+
+.booking-btn.submit-btn:disabled {
+    background-color: #a5d6a7;
+    cursor: not-allowed;
+}
+
+/* ------------------------- */
+/* 5. Bestätigung (Confirm)  */
+/* ------------------------- */
+
+#step-confirmation .confirmation-content {
+    text-align: center;
+}
+
+#step-confirmation .confirmation-icon {
+    font-size: 3rem;
+    margin-bottom: 20px;
+}
+
+#step-confirmation .confirmation-title {
+    margin: 0 0 15px 0;
+    color: #28a745;
+    font-size: 1.3rem;
+}
+
+#confirmation-details {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin: 20px 0;
+    text-align: left;
+    border-left: 4px solid #28a745;
+}
+
+#confirmation-details > div {
+    margin-bottom: 12px;
+}
+#confirmation-details > div:last-child {
+    margin-bottom: 0;
+}
+
+#confirmation-details .confirmation-notice {
+    background: #e7f3ff;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 15px;
+    font-size: 0.9rem;
+}
+
+.confirmation-subtext {
+    color: #666;
+    margin-bottom: 25px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.booking-btn.confirm-close-btn {
+    background: #ffc107;
+    color: #1a1a1a;
+}
+
+/* ------------------------- */
+/* 6. Notfall-Modal (Fallback)*/
+/* ------------------------- */
+
+.fallback-modal-content {
+    text-align: center;
+}
+
+.fallback-modal-header {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    padding: 25px;
+    color: white;
+}
+.fallback-modal-header .fallback-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+}
+.fallback-modal-header .fallback-title {
+    margin: 0;
+    font-size: 1.4rem;
+}
+
+.fallback-modal-body {
+    padding: 30px;
+}
+
+.fallback-modal-body p {
+    color: #666;
+    margin-bottom: 25px;
+    line-height: 1.5;
+}
+
+.fallback-modal-body .fallback-email-link {
+    display: inline-block;
+    background: #ffc107;
+    color: #1a1a1a;
+    text-decoration: none;
+    padding: 15px 25px;
+    border-radius: 8px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    transition: background-color 0.3s ease;
+}
+.fallback-modal-body .fallback-email-link:hover {
+    background-color: #e0a800;
+}
+
+.fallback-modal-body .fallback-close-btn {
+    background: #6c757d;
+    color: white;
+}
