@@ -289,314 +289,127 @@ export const initAiForm = () => {
     // INLINE-HTML FUNKTION
     // ===================================================================
 
-    const createInlineModalHTML = () => {
-        return `
-            <div id="booking-modal" class="callback-modal" style="
-                position: fixed !important;
-                top: 0 !important;
-                left: 0 !important;
-                width: 100% !important;
-                height: 100% !important;
-                background: rgba(0, 0, 0, 0.85) !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                z-index: 999999 !important;
-                opacity: 1 !important;
-                visibility: visible !important;
-            ">
-                <div style="
-                    background: white;
-                    border-radius: 15px;
-                    padding: 0;
-                    max-width: 500px;
-                    width: 90%;
-                    max-height: 90%;
-                    overflow: hidden;
-                    box-shadow: 0 15px 35px rgba(0,0,0,0.3);
-                    position: relative;
-                ">
-                    <!-- Header -->
-                    <div style="
-                        background: linear-gradient(135deg, #ffc107 0%, #ffca2c 100%);
-                        padding: 25px;
-                        text-align: center;
-                        color: #1a1a1a;
-                    ">
-                       
-                        <h2 style="margin: 0; font-size: 1.3rem; font-weight: bold;">
-                            Rückruf-Termin buchen
-                        </h2>
-                        <p style="margin: 10px 0 0 0; opacity: 0.8; font-size: 0.95rem;">
-                            Michael ruft dich zum gewünschten Zeitpunkt an
-                        </p>
-                    </div>
-                    
-                    <!-- Content Area -->
-                    <div style="padding: 25px; max-height: 400px; overflow-y: auto;">
-                        <!-- Schritt 1: Slot-Auswahl -->
-                        <div id="step-slot-selection" class="callback-step" style="display: block;">
-                            <h3 style="margin: 0 0 20px 0; color: #1a1a1a; font-size: 1.15rem;">
-                                Wähle deinen Rückruf-Termin:
-                            </h3>
-                            
-                            <div id="callback-loading" style="text-align: center; display: block;">
-                                <div style="color: #666; margin: 20px 0;">
-                                    <div style="font-size: 1.5rem; margin-bottom: 10px;">⏳</div>
-                                    Lade verfügbare Rückruf-Termine...
-                                </div>
-                            </div>
-                            
-                            <div id="callback-slots-container" style="display: flex; flex-direction: column; gap: 12px;">
-                                <!-- Slots werden hier eingefügt -->
-                            </div>
-                            
-                            <div id="no-slots-message" style="display: none; text-align: center; color: #666; margin: 20px 0;">
-                                <!-- Wird von loadCallbackSlots() gefüllt -->
-                            </div>
-                        </div>
-                        
-                        <!-- Schritt 2: Kontaktdaten -->
-                        <div id="step-contact-details" class="callback-step" style="display: none;">
-                            <div style="margin-bottom: 20px;">
-                                <h3 style="margin: 0 0 10px 0; color: #1a1a1a; font-size: 1.15rem;">
-                                    Deine Kontaktdaten:
-                                </h3>
-                                <div id="selected-slot-display" style="
-                                    background: #fff9e6;
-                                    padding: 12px;
-                                    border-radius: 6px;
-                                    color: #1a1a1a;
-                                    font-size: 0.9rem;
-                                    border-left: 4px solid #ffc107;
-                                ">
-                                    Ausgewählter Rückruf-Termin wird hier angezeigt
-                                </div>
-                            </div>
-                            
-                            <form id="callback-form">
-                                <div style="margin-bottom: 15px;">
-                                    <label style="display: block; margin-bottom: 5px; color: #495057; font-weight: 500;">
-                                        Dein Name *
-                                    </label>
-                                    <input type="text" id="callback-name" required 
-                                           style="
-                                               width: 100%;
-                                               padding: 12px;
-                                               border: 2px solid #e9ecef;
-                                               border-radius: 6px;
-                                               font-size: 1rem;
-                                               box-sizing: border-box;
-                                           ">
-                                </div>
-                                
-                                <div style="margin-bottom: 20px;">
-                                    <label style="display: block; margin-bottom: 5px; color: #495057; font-weight: 500;">
-                                        Deine Telefonnummer *
-                                    </label>
-                                    <input type="tel" id="callback-phone" required 
-                                           placeholder="z.B. 0664 123 45 67"
-                                           style="
-                                               width: 100%;
-                                               padding: 12px;
-                                               border: 2px solid #e9ecef;
-                                               border-radius: 6px;
-                                               font-size: 1rem;
-                                               box-sizing: border-box;
-                                           ">
-                                </div>
-                                
-                                <div style="margin-bottom: 20px;">
-                                    <label style="display: block; margin-bottom: 5px; color: #495057; font-weight: 500;">
-                                        Dein Anliegen (optional)
-                                    </label>
-                                    <textarea id="callback-topic" rows="3" 
-                                              placeholder="Kurze Beschreibung deines Anliegens..."
-                                              style="
-                                                  width: 100%;
-                                                  padding: 12px;
-                                                  border: 2px solid #e9ecef;
-                                                  border-radius: 6px;
-                                                  font-size: 0.9rem;
-                                                  box-sizing: border-box;
-                                                  resize: vertical;
-                                              "></textarea>
-                                </div>
-                                
-                                <div style="display: flex; gap: 10px; justify-content: space-between;">
-                                    <button type="button" id="back-to-slots" style="
-                                        background: #6c757d;
-                                        color: white;
-                                        border: none;
-                                        padding: 12px 20px;
-                                        border-radius: 6px;
-                                        cursor: pointer;
-                                        font-size: 1rem;
-                                    ">
-                                        ← Zurück
-                                    </button>
-                                    
-                                    <button type="submit" id="submit-callback" style="
-                                        background: #28a745;
-                                        color: white;
-                                        border: none;
-                                        padding: 12px 24px;
-                                        border-radius: 6px;
-                                        cursor: pointer;
-                                        font-size: 1rem;
-                                        font-weight: bold;
-                                    ">
-                                        Rückruf buchen
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                        
-                        <!-- Schritt 3: Bestätigung -->
-                        <div id="step-confirmation" class="callback-step" style="display: none;">
-                            <div style="text-align: center;">
-                                <h3 style="margin: 0 0 15px 0; color: #28a745; font-size: 1.3rem;">
-                                    Rückruf-Termin erfolgreich gebucht!
-                                </h3>
-                                <div id="confirmation-details" style="
-                                    background: #f8f9fa;
-                                    padding: 20px;
-                                    border-radius: 8px;
-                                    margin: 20px 0;
-                                    text-align: left;
-                                    border-left: 4px solid #28a745;
-                                ">
-                                    <!-- Bestätigungsdetails werden hier eingefügt -->
-                                </div>
-                               <strong>Michael wird dich zum vereinbarten Zeitpunkt anrufen.</strong><br>
-                                    Halte bitte dein Telefon 5 Minuten vor dem Termin bereit.
-                                </p>
-                                <button onclick="closeCallbackModal()" style="
-                                    background: #ffc107;
-                                    color: #1a1a1a;
-                                    border: none;
-                                    padding: 12px 24px;
-                                    border-radius: 6px;
-                                    cursor: pointer;
-                                    font-size: 1rem;
-                                    font-weight: bold;
-                                ">
-                                    Perfekt! 👍
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Close Button -->
-                    <button onclick="closeCallbackModal()" style="
-                        position: absolute;
-                        top: 15px;
-                        right: 15px;
-                        background: rgba(0,0,0,0.2);
-                        border: none;
-                        color: #1a1a1a;
-                        width: 30px;
-                        height: 30px;
-                        border-radius: 50%;
-                        cursor: pointer;
-                        font-size: 1.2rem;
-                        font-weight: bold;
-                    ">
-                        ×
-                    </button>
+const createInlineModalHTML = () => {
+    return `
+        <div id="booking-modal" class="callback-modal">
+            <div class="booking-modal-content">
+                <div class="booking-modal-header">
+                    <div class="booking-modal-header-icon">📞</div>
+                    <h2 class="booking-modal-title">Rückruf-Termin buchen</h2>
+                    <p class="booking-modal-subtitle">Michael ruft dich zum gewünschten Zeitpunkt an</p>
                 </div>
+                
+                <div class="booking-modal-body">
+                    <div id="step-slot-selection" class="booking-step active">
+                        <h3 class="booking-step-title">Wähle deinen Rückruf-Termin:</h3>
+                        
+                        <div id="callback-loading">
+                            <div>
+                                <div class="loader-icon">⏳</div>
+                                Lade verfügbare Rückruf-Termine...
+                            </div>
+                        </div>
+                        
+                        <div id="callback-slots-container">
+                            </div>
+                        
+                        <div id="no-slots-message">
+                            </div>
+                    </div>
+                    
+                    <div id="step-contact-details" class="booking-step">
+                        <h3 class="booking-step-title">Deine Kontaktdaten:</h3>
+                        <div id="selected-slot-display">
+                            Ausgewählter Rückruf-Termin wird hier angezeigt
+                        </div>
+                        
+                        <form id="callback-form">
+                            <div class="booking-form-group">
+                                <label for="callback-name">Dein Name *</label>
+                                <input type="text" id="callback-name" required>
+                            </div>
+                            
+                            <div class="booking-form-group">
+                                <label for="callback-phone">Deine Telefonnummer *</label>
+                                <input type="tel" id="callback-phone" required placeholder="z.B. 0664 123 45 67">
+                            </div>
+                            
+                            <div class="booking-form-group">
+                                <label for="callback-topic">Dein Anliegen (optional)</label>
+                                <textarea id="callback-topic" rows="3" placeholder="Kurze Beschreibung deines Anliegens..."></textarea>
+                            </div>
+                            
+                            <div class="booking-form-actions">
+                                <button type="button" id="back-to-slots" class="booking-btn back-btn">← Zurück</button>
+                                <button type="submit" id="submit-callback" class="booking-btn submit-btn">📞 Rückruf buchen</button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <div id="step-confirmation" class="booking-step">
+                        <div class="confirmation-content">
+                            <div class="confirmation-icon">🎉</div>
+                            <h3 class="confirmation-title">Rückruf-Termin erfolgreich gebucht!</h3>
+                            <div id="confirmation-details">
+                                </div>
+                            <p class="confirmation-subtext">
+                                📞 <strong>Michael wird dich zum vereinbarten Zeitpunkt anrufen.</strong><br>
+                                Halte bitte dein Telefon 5 Minuten vor dem Termin bereit.
+                            </p>
+                            <button onclick="closeCallbackModal()" class="booking-btn confirm-close-btn">Perfekt! 👍</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <button onclick="closeCallbackModal()" class="booking-modal-close-btn" aria-label="Schließen">×</button>
             </div>
-        `;
-    };
+        </div>
+    `;
+};
 
     // ===================================================================
     // EMERGENCY FALLBACK MODAL
     // ===================================================================
 
-    const createEmergencyFallbackModal = () => {
-        console.log("🆘 Erstelle Emergency-Fallback-Modal...");
-        
-        const emergencyModal = document.createElement('div');
-        emergencyModal.id = 'booking-modal';
-        emergencyModal.style.cssText = `
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 100% !important;
-            height: 100% !important;
-            background: rgba(0, 0, 0, 0.9) !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            z-index: 999999 !important;
-            opacity: 1 !important;
-            visibility: visible !important;
-        `;
-        
-        emergencyModal.innerHTML = `
-            <div style="
-                background: white;
-                border-radius: 10px;
-                padding: 0;
-                max-width: 500px;
-                width: 90%;
-                text-align: center;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-                overflow: hidden;
-            ">
-                <div style="
-                    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-                    padding: 25px;
-                    color: white;
-                ">
-                    <div style="font-size: 3rem; margin-bottom: 15px;">⚠️</div>
-                    <h2 style="margin: 0; font-size: 1.4rem;">Technisches Problem</h2>
+const createEmergencyFallbackModal = () => {
+    console.log("🆘 Erstelle Emergency-Fallback-Modal...");
+    
+    const emergencyModal = document.createElement('div');
+    emergencyModal.id = 'booking-modal';
+    
+    emergencyModal.innerHTML = `
+        <div class="booking-modal-content fallback-modal-content">
+            <div class="fallback-modal-header">
+                <div class="fallback-icon">⚠️</div>
+                <h2 class="fallback-title">Technisches Problem</h2>
+            </div>
+            
+            <div class="fallback-modal-body">
+                <p>
+                    Das automatische Buchungssystem ist momentan nicht verfügbar.<br>
+                    <strong>Kontaktiere Michael direkt für deinen Rückruf-Termin:</strong>
+                </p>
+                
+                <div>
+                    <a href="mailto:michael@designare.at?subject=Rückruf-Termin Anfrage&body=Hallo Michael,%0D%0A%0D%0AIch möchte gerne einen Rückruf-Termin vereinbaren.%0D%0A%0D%0AMeine Telefonnummer: %0D%0AMein Anliegen: %0D%0A%0D%0AVielen Dank!" 
+                       class="fallback-email-link">
+                        📧 E-Mail für Rückruf-Termin senden
+                    </a>
                 </div>
                 
-                <div style="padding: 30px;">
-                    <p style="color: #666; margin-bottom: 25px; line-height: 1.5;">
-                        Das automatische Buchungssystem ist momentan nicht verfügbar.<br>
-                        <strong>Kontaktiere Michael direkt für deinen Rückruf-Termin:</strong>
-                    </p>
-                    
-                    <div style="margin-bottom: 25px;">
-                        <a href="mailto:michael@designare.at?subject=Rückruf-Termin Anfrage&body=Hallo Michael,%0D%0A%0D%0AIch möchte gerne einen Rückruf-Termin vereinbaren.%0D%0A%0D%0AMeine Telefonnummer: %0D%0AMein Anliegen: %0D%0A%0D%0AVielen Dank!" 
-                           style="
-                               display: inline-block;
-                               background: #ffc107;
-                               color: #1a1a1a;
-                               text-decoration: none;
-                               padding: 15px 25px;
-                               border-radius: 8px;
-                               font-weight: bold;
-                               margin-bottom: 15px;
-                               transition: background-color 0.3s ease;
-                           ">
-                            📧 E-Mail für Rückruf-Termin senden
-                        </a>
-                    </div>
-                    
-                    <button onclick="closeCallbackModal()" 
-                            style="
-                                background: #6c757d;
-                                color: white;
-                                border: none;
-                                padding: 12px 20px;
-                                border-radius: 6px;
-                                cursor: pointer;
-                            ">
-                        Schließen
-                    </button>
-                </div>
+                <button onclick="closeCallbackModal()" class="booking-btn fallback-close-btn">
+                    Schließen
+                </button>
             </div>
-        `;
-        
-        document.body.appendChild(emergencyModal);
-        document.body.style.overflow = 'hidden';
-        
-        console.log("✅ Emergency-Fallback-Modal erstellt");
-        return emergencyModal;
-    };
+        </div>
+    `;
+    
+    document.body.appendChild(emergencyModal);
+    document.body.style.overflow = 'hidden';
+    
+    console.log("✅ Emergency-Fallback-Modal erstellt");
+    return emergencyModal;
+};
 
     // ===================================================================
     // EVENT LISTENERS FÜR BOOKING MODAL
