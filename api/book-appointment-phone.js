@@ -1,4 +1,4 @@
-// api/book-appointment-phone.js - Terminbuchung mit Telefonnummer
+// api/book-appointment-phone.js - KORRIGIERTER DATEINAME (ohne Bindestrich am Ende!)
 import { google } from 'googleapis';
 
 export default async function handler(req, res) {
@@ -7,9 +7,9 @@ export default async function handler(req, res) {
     }
 
     try {
-        const { slot, name, phone } = req.body;
+        const { slot, name, phone, topic } = req.body;
 
-        console.log('Received phone booking data:', { slot, name, phone });
+        console.log('Received phone booking data:', { slot, name, phone, topic });
 
         if (!slot || !name || !phone) {
             return res.status(400).json({ 
@@ -34,9 +34,7 @@ export default async function handler(req, res) {
 
         const calendar = google.calendar({ version: 'v3', auth });
 
-        // ===================================================================
-        // SLOT-PARSING (ISO-Format erwarten)
-        // ===================================================================
+        // Slot-Parsing (ISO-Format erwarten)
         let startTime;
         try {
             startTime = new Date(slot);
@@ -61,9 +59,7 @@ export default async function handler(req, res) {
             localEnd: endTime.toLocaleString('de-DE')
         });
 
-        // ===================================================================
-        // DOPPELBUCHUNGS-PRÜFUNG
-        // ===================================================================
+        // Doppelbuchungs-Prüfung
         console.log('Checking for conflicts...');
         
         const conflictCheck = await calendar.events.list({
@@ -73,7 +69,7 @@ export default async function handler(req, res) {
             singleEvents: true,
         });
 
-        if (conflictCheck.data.items.length > 0) {
+        if (conflictCheck.data.items && conflictCheck.data.items.length > 0) {
             console.warn('Conflict detected:', conflictCheck.data.items[0].summary);
             return res.status(409).json({
                 success: false,
@@ -82,16 +78,15 @@ export default async function handler(req, res) {
             });
         }
 
-        // ===================================================================
-        // TERMIN ERSTELLEN
-        // ===================================================================
+        // Termin erstellen
         const event = {
-            summary: `Beratungsgespräch: ${name}`,
-            description: `Termin gebucht über Evita (Chat-Assistent) auf designare.at
+            summary: `Rückruf: ${name}`,
+            description: `Rückruf-Termin gebucht über Evita (Chat-Assistent) auf designare.at
 
 KONTAKTDATEN:
 Name: ${name}
 Telefon: ${phone}
+${topic ? `Anliegen: ${topic}` : ''}
 
 BUCHUNGSDETAILS:
 Gebucht am: ${new Date().toLocaleString('de-DE')}
@@ -99,7 +94,7 @@ Ursprünglicher Slot: ${startTime.toLocaleString('de-DE')}
 
 NOTIZEN:
 - Kunde wurde über Chat-System gebucht
-- Bitte 15 Minuten vor dem Termin anrufen
+- Bitte 5-10 Minuten vor dem Termin anrufen
 - Bei Rückfragen: ${phone}
 
 ---
@@ -133,7 +128,7 @@ Automatisch erstellt durch Evita AI-Assistent`,
                 }
             },
             
-            // Farbe für Chat-gebuchte Termine (optional)
+            // Farbe für Chat-gebuchte Termine
             colorId: '2' // Grün für Chat-Buchungen
         };
 
@@ -147,10 +142,8 @@ Automatisch erstellt durch Evita AI-Assistent`,
 
         console.log('✅ Phone booking event created:', result.data.id);
 
-        // ===================================================================
-        // BESTÄTIGUNGS-NACHRICHT ERSTELLEN
-        // ===================================================================
-        const confirmationMessage = `🎉 Perfekt! Dein Termin ist gebucht!
+        // Bestätigungs-Nachricht erstellen
+        const confirmationMessage = `🎉 Perfekt! Dein Rückruf-Termin ist gebucht!
 
 📅 **Termin-Details:**
 Datum: ${startTime.toLocaleDateString('de-DE', { 
@@ -169,13 +162,14 @@ Uhrzeit: ${startTime.toLocaleTimeString('de-DE', {
 
 👤 **Kontakt:** ${name}
 📞 **Telefon:** ${phone}
+${topic ? `💬 **Anliegen:** ${topic}` : ''}
 
 **Was passiert als nächstes?**
 ✓ Michael hat den Termin in seinem Kalender
-✓ Du erhältst ca. 15 Minuten vor dem Termin einen Anruf
+✓ Du erhältst ca. 5-10 Minuten vor dem Termin einen Anruf
 ✓ Bei Fragen oder Änderungen: michael@designare.at
 
-**Termin-Erinnerung:** Bitte halte dich 15 Minuten vor dem Termin bereit!
+**Termin-Erinnerung:** Bitte halte dich kurz vor dem Termin bereit!
 
 Freue mich auf unser Gespräch! 😊`;
 
