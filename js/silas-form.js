@@ -10,6 +10,7 @@ export function initSilasForm() {
     let DEMO_LIMITS = { maxKeywordsPerSession: 3, maxGenerationsPerHour: 5, maxGenerationsPerDay: 10, cooldownBetweenRequests: 30000 };
     const MASTER_LIMITS = { maxKeywordsPerSession: 50, maxGenerationsPerHour: 100, maxGenerationsPerDay: 500, cooldownBetweenRequests: 1000 };
     
+    // DOM-ELEMENTE
     const keywordInput = document.getElementById('silas-keyword-input');
     const keywordDisplayList = document.getElementById('keyword-display-list');
     const startGenerationBtn = document.getElementById('start-generation-btn');
@@ -27,6 +28,7 @@ export function initSilasForm() {
     const brandInput = document.getElementById('text-brand-input');
     const emailInput = document.getElementById('text-email-input');
     const phoneInput = document.getElementById('text-phone-input');
+    const addressInput = document.getElementById('text-address-input'); // NEUES ELEMENT
     const grammaticalPersonSelect = document.getElementById('grammatical-person-select');
 
     let keywordList = [];
@@ -57,9 +59,7 @@ export function initSilasForm() {
             unlockBtn.innerHTML = '🔓';
             unlockBtn.title = 'Master Access';
             unlockBtn.style.cssText = 'position: fixed; bottom: 40px; right: 20px; background: linear-gradient(135deg, #ffc107 0%, #ffca2c 100%); border: 2px solid #e0a800; color: #1a1a1a; width: 50px; height: 50px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3); transition: all 0.3s ease; z-index: 1000;';
-            unlockBtn.onclick = function() {
-                showPasswordPrompt();
-            };
+            unlockBtn.onclick = () => showPasswordPrompt();
             document.body.appendChild(unlockBtn);
         }
         if (isMasterModeActive()) {
@@ -80,9 +80,7 @@ export function initSilasForm() {
         sessionStorage.setItem('silas_master_mode', 'true');
         sessionStorage.setItem('silas_master_timestamp', Date.now().toString());
         DEMO_LIMITS = Object.assign({}, MASTER_LIMITS);
-        localStorage.removeItem('silas_daily');
-        localStorage.removeItem('silas_hourly');
-        localStorage.removeItem('silas_last_request');
+        ['silas_daily', 'silas_hourly', 'silas_last_request'].forEach(item => localStorage.removeItem(item));
         showMasterModeIndicator();
         hideUnlockButton();
         showDemoStatus();
@@ -97,7 +95,7 @@ export function initSilasForm() {
         indicator.style.cssText = 'background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; padding: 12px 20px; text-align: center; font-weight: bold; border-radius: 8px; margin: 15px 0; box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3); border: 2px solid #155724; position: relative;';
         indicator.innerHTML = '🔓 <strong>MASTER MODE AKTIV</strong> 🔓<br><small style="opacity: 0.9;">Unlimited Keywords • No Rate Limits • Full Access</small><button onclick="deactivateMasterMode()" style="position: absolute; top: 8px; right: 12px; background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-size: 14px;" title="Master Mode deaktivieren">×</button>';
         silasForm.parentNode.insertBefore(indicator, silasForm);
-        window.deactivateMasterMode = function() {
+        window.deactivateMasterMode = () => {
             if (confirm('Master Mode deaktivieren? Die Seite wird neu geladen.')) {
                 sessionStorage.removeItem('silas_master_mode');
                 sessionStorage.removeItem('silas_master_timestamp');
@@ -113,7 +111,7 @@ export function initSilasForm() {
 
     function showNotification(message, color) {
         const notification = document.createElement('div');
-        notification.style.cssText = 'position: fixed; top: 20px; right: 20px; background: ' + (color || '#ffc107') + '; color: white; padding: 15px 25px; border-radius: 8px; font-weight: bold; z-index: 9999; box-shadow: 0 4px 20px rgba(0,0,0,0.3);';
+        notification.style.cssText = `position: fixed; top: 20px; right: 20px; background: ${color || '#ffc107'}; color: white; padding: 15px 25px; border-radius: 8px; font-weight: bold; z-index: 9999; box-shadow: 0 4px 20px rgba(0,0,0,0.3);`;
         notification.innerHTML = message;
         document.body.appendChild(notification);
         setTimeout(() => notification.remove(), 4000);
@@ -127,7 +125,7 @@ export function initSilasForm() {
             localStorage.setItem('silas_daily', JSON.stringify({ date: today, count: 0 }));
         }
         const hourlyData = JSON.parse(localStorage.getItem('silas_hourly') || '{}');
-        const currentHour = Math.floor(now / (1000 * 60 * 60));
+        const currentHour = Math.floor(now / 3600000);
         if (hourlyData.hour !== currentHour) {
             localStorage.setItem('silas_hourly', JSON.stringify({ hour: currentHour, count: 0 }));
         }
@@ -201,6 +199,7 @@ export function initSilasForm() {
                 brand: brandInput.value.trim(),
                 email: emailInput.value.trim(),
                 phone: phoneInput.value.trim(),
+                address: addressInput.value.trim(), // NEUES FELD
                 grammaticalPerson: grammaticalPersonSelect.value,
             };
 
@@ -249,21 +248,26 @@ export function initSilasForm() {
             badgesContainer.style.cssText = 'display: flex; flex-wrap: wrap; gap: 8px;';
             
             const createBadge = (text, bgColor) => {
-                if (!text) return '';
+                if (!text) return null;
                 const badge = document.createElement('span');
                 badge.textContent = text;
                 badge.style.cssText = `background-color: ${bgColor}; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: normal;`;
                 return badge;
             };
 
-            badgesContainer.appendChild(createBadge(item.intent === 'commercial' ? 'Kommerziell' : 'Informativ', item.intent === 'commercial' ? '#28a745' : '#17a2b8'));
-            if(item.domain) badgesContainer.appendChild(createBadge(`Domain: ${item.domain}`, '#4CAF50'));
-            if(item.brand) badgesContainer.appendChild(createBadge(`Brand: ${item.brand}`, '#fd7e14'));
-            if(item.email) badgesContainer.appendChild(createBadge(`E-Mail: ${item.email}`, '#007bff'));
-            if(item.phone) badgesContainer.appendChild(createBadge(`Tel: ${item.phone}`, '#dc3545'));
-            if(item.zielgruppe) badgesContainer.appendChild(createBadge(`Für: ${item.zielgruppe}`, '#6c757d'));
-            if(item.tonalitaet) badgesContainer.appendChild(createBadge(`Ton: ${item.tonalitaet}`, '#6c757d'));
-            if(item.usp) badgesContainer.appendChild(createBadge(`USP: ${item.usp}`, '#6c757d'));
+            const badges = [
+                createBadge(item.intent === 'commercial' ? 'Kommerziell' : 'Informativ', item.intent === 'commercial' ? '#28a745' : '#17a2b8'),
+                createBadge(item.domain ? `Domain: ${item.domain}`: '', '#4CAF50'),
+                createBadge(item.brand ? `Brand: ${item.brand}`: '', '#fd7e14'),
+                createBadge(item.email ? `E-Mail: ${item.email}`: '', '#007bff'),
+                createBadge(item.phone ? `Tel: ${item.phone}`: '', '#dc3545'),
+                createBadge(item.address ? `Adresse: ${item.address}`: '', '#17a2b8'), // NEUES BADGE
+                createBadge(item.zielgruppe ? `Für: ${item.zielgruppe}`: '', '#6c757d'),
+                createBadge(item.tonalitaet ? `Ton: ${item.tonalitaet}`: '', '#6c757d'),
+                createBadge(item.usp ? `USP: ${item.usp}`: '', '#6c757d')
+            ].filter(Boolean);
+            
+            badges.forEach(badge => badgesContainer.appendChild(badge));
             
             contentDiv.appendChild(badgesContainer);
             
@@ -412,7 +416,6 @@ export function initSilasForm() {
     });
 
     function generateLandingpageHtml(data) {
-        // Helfer-Funktion zur Erstellung von FAQ-Einträgen
         const createFaqEntry = (question, answer) => {
             if (!question || !answer) return '';
             return `<details style="background-color: rgba(255,255,255,0.05); border-radius: 8px; padding: 15px; margin-bottom: 15px;">
@@ -464,18 +467,11 @@ export function initSilasForm() {
                 <style>body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #121212; color: #e0e0e0; line-height: 1.6; margin: 0; padding: 20px; }</style>
             </head><body>${landingpageContent}</body></html>`;
 
-        const blob = new Blob([fullHtml], { type: 'text/html;charset=utf-8;' });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = (data.post_name || data.keyword.trim().replace(/\s+/g, '-').toLowerCase()) + '.html';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(link.href);
+        downloadFile(fullHtml, (data.post_name || data.keyword.trim().replace(/\s+/g, '-').toLowerCase()) + '.html', 'text/html;charset=utf-8;');
     }
-
+    
     function downloadFile(content, fileName, mimeType) {
-        if (allGeneratedData.length === 0) return alert('Keine Daten zum Download verfügbar.');
+        if (allGeneratedData.length === 0 && !content) return alert('Keine Daten zum Download verfügbar.');
         const blob = new Blob([content], { type: mimeType });
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
@@ -487,7 +483,7 @@ export function initSilasForm() {
     }
 
     function downloadTxt() {
-        const headers = ["keyword", "brand", "domain", "email", "phone", "post_title", "post_name", "meta_title", "meta_description", "h1", "h2_1", "h2_2", "h2_3", "h2_4", "primary_cta", "secondary_cta", "hero_text", "hero_subtext", "benefits_list", "features_list", "benefits_list_fließtext", "features_list_fließtext", "social_proof", "testimonial_1", "testimonial_2", "pricing_title", "price_1", "price_2", "price_3", "faq_1", "faq_answer_1", "faq_2", "faq_answer_2", "faq_3", "faq_answer_3", "faq_4", "faq_answer_4", "faq_5", "faq_answer_5", "faq_schema_script", "contact_info", "footer_cta", "trust_signals", "guarantee_text"];
+        const headers = ["keyword", "brand", "domain", "email", "phone", "address", "post_title", "post_name", "meta_title", "meta_description", "h1", "h2_1", "h2_2", "h2_3", "h2_4", "primary_cta", "secondary_cta", "hero_text", "hero_subtext", "benefits_list", "features_list", "benefits_list_fließtext", "features_list_fließtext", "social_proof", "testimonial_1", "testimonial_2", "pricing_title", "price_1", "price_2", "price_3", "faq_1", "faq_answer_1", "faq_2", "faq_answer_2", "faq_3", "faq_answer_3", "faq_4", "faq_answer_4", "faq_5", "faq_answer_5", "faq_schema_script", "contact_info", "footer_cta", "trust_signals", "guarantee_text"];
         let txtContent = '';
         allGeneratedData.forEach((rowData, index) => {
             if (rowData.error) return;
@@ -507,7 +503,7 @@ export function initSilasForm() {
     }
 
     function downloadCsv() {
-        const headers = ["keyword", "brand", "domain", "email", "phone", "post_title", "post_name", "meta_title", "meta_description", "h1", "h2_1", "h2_2", "h2_3", "h2_4", "primary_cta", "secondary_cta", "hero_text", "hero_subtext", "benefits_list", "features_list", "benefits_list_fließtext", "features_list_fließtext", "social_proof", "testimonial_1", "testimonial_2", "pricing_title", "price_1", "price_2", "price_3", "faq_1", "faq_answer_1", "faq_2", "faq_answer_2", "faq_3", "faq_answer_3", "faq_4", "faq_answer_4", "faq_5", "faq_answer_5", "faq_schema_script", "contact_info", "footer_cta", "trust_signals", "guarantee_text"];
+        const headers = ["keyword", "brand", "domain", "email", "phone", "address", "post_title", "post_name", "meta_title", "meta_description", "h1", "h2_1", "h2_2", "h2_3", "h2_4", "primary_cta", "secondary_cta", "hero_text", "hero_subtext", "benefits_list", "features_list", "benefits_list_fließtext", "features_list_fließtext", "social_proof", "testimonial_1", "testimonial_2", "pricing_title", "price_1", "price_2", "price_3", "faq_1", "faq_answer_1", "faq_2", "faq_answer_2", "faq_3", "faq_answer_3", "faq_4", "faq_answer_4", "faq_5", "faq_answer_5", "faq_schema_script", "contact_info", "footer_cta", "trust_signals", "guarantee_text"];
         let csvContent = headers.join(",") + "\n";
         allGeneratedData.forEach(rowData => {
             if (rowData.error) return;
