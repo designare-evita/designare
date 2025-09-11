@@ -2,7 +2,6 @@
 
 class FactChecker {
     constructor() {
-        // Diese Definitionen werden für die nachträgliche E-E-A-T-Analyse benötigt.
         this.problematicPhrases = {
             'garantiert': { severity: 'high' },
             '100%': { severity: 'high' },
@@ -16,19 +15,12 @@ class FactChecker {
         };
     }
 
-    /**
-     * Führt die nachträgliche E-E-A-T-Analyse des von der KI generierten Inhalts durch.
-     * @param {object} contentData - Das von der KI generierte JSON-Objekt.
-     * @param {string} keyword - Das ursprüngliche Keyword für den Kontext.
-     * @returns {object} Ein Analyse-Ergebnis mit Score und gefundenen Problemen.
-     */
     async checkContent(contentData, keyword) {
         const result = {
             keyword,
             flaggedClaims: [],
-            confidenceScore: 95, // Der Basis-Score ist hoch, da der Prompt schon gut ist
+            confidenceScore: 95,
         };
-
         const fieldsToCheck = ['hero_text', 'social_proof', 'guarantee_text', 'meta_description', 'benefits_list', 'features_list', 'benefits_list_fließtext', 'features_list_fließtext', 'testimonial_1', 'testimonial_2'];
         let penalty = 0;
 
@@ -37,9 +29,9 @@ class FactChecker {
                 Object.keys(this.problematicPhrases).forEach(phrase => {
                     const regex = new RegExp(`\\b${phrase}\\b`, 'gi');
                     if (regex.test(contentData[field])) {
-                        const severity = this.problematicPhrases[phrase].severity;
+                        const { severity } = this.problematicPhrases[phrase];
                         penalty += (severity === 'high' ? 15 : (severity === 'medium' ? 10 : 5));
-                        result.flaggedClaims.push({ original: phrase, field: field, severity: severity });
+                        result.flaggedClaims.push({ original: phrase, field, severity });
                     }
                 });
             }
@@ -50,13 +42,8 @@ class FactChecker {
         return result;
     }
 
-    /**
-     * Erstellt den vollständigen, qualitativ hochwertigen Prompt für die KI.
-     * @param {object} keywordData - Das Objekt mit allen Nutzer-Eingaben.
-     * @returns {string} Der fertige Prompt für die Gemini API.
-     */
     generateResponsiblePrompt(keywordData) {
-        const { keyword, intent, zielgruppe, tonalitaet, usp, domain, email, phone, brand, grammaticalPerson } = keywordData;
+        const { keyword, intent, zielgruppe, tonalitaet, usp, domain, email, phone, address, brand, grammaticalPerson } = keywordData;
 
         const roleAndTask = intent === 'commercial' 
             ? 'Du bist ein erstklassiger Marketing-Texter und SEO-Stratege. Dein Stil ist überzeugend, klar und auf Conversions ausgerichtet.'
@@ -70,6 +57,7 @@ class FactChecker {
         if (domain) kontext += `- WEBSEITE: ${domain}\n`;
         if (email) kontext += `- E-MAIL FÜR CTA: ${email}\n`;
         if (phone) kontext += `- TELEFONNUMMER FÜR CTA: ${phone}\n`;
+        if (address) kontext += `- ADRESSE FÜR CTA: ${address}\n`; // NEUES FELD
 
         return `
             Hier ist ein Beispiel für einen perfekten, faktenbasierten JSON-Output zum Thema "nachhaltige Kaffeebohnen":
@@ -108,7 +96,7 @@ class FactChecker {
               "faq_answer_4": "Die Röstung ist entscheidend für das Aroma. Eine schonende Langzeit-Trommelröstung bei niedrigen Temperaturen sorgt dafür, dass sich die Aromen voll entfalten können und der Kaffee bekömmlicher wird.",
               "faq_5": "Woher beziehen Sie Ihren Kaffee?",
               "faq_answer_5": "Wir setzen auf direkten Handel mit kleinen Kaffeekooperativen in den besten Anbaugebieten der Welt. Das sichert nicht nur exzellente Qualität, sondern auch eine faire Bezahlung der Bauern.",
-              "contact_info": "Bei Fragen zu unseren Kaffeesorten stehen wir Ihnen gerne zur Verfügung.",
+              "contact_info": "Bei Fragen zu unseren Kaffeesorten stehen wir Ihnen unter beispiel@kaffee.de oder unter 0123 456789 zur Verfügung. Unsere Adresse: Kaffeestraße 1, 12345 Röststadt",
               "footer_cta": "Entdecken Sie jetzt die Vielfalt nachhaltiger Kaffees",
               "trust_signals": "Bio-zertifiziert | Fairtrade-Partner | CO2-neutraler Versand",
               "guarantee_text": "Wir stehen für Qualität und Transparenz in jeder Bohne."
