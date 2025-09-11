@@ -1,4 +1,4 @@
-// fact-checker.js - Finale, kombinierte Version für höchste Content-Qualität
+// fact-checker.js - Angepasste Version
 
 class FactChecker {
     constructor() {
@@ -57,7 +57,7 @@ class FactChecker {
         if (domain) kontext += `- WEBSEITE: ${domain}\n`;
         if (email) kontext += `- E-MAIL FÜR CTA: ${email}\n`;
         if (phone) kontext += `- TELEFONNUMMER FÜR CTA: ${phone}\n`;
-        if (address) kontext += `- ADRESSE FÜR CTA: ${address}\n`; // NEUES FELD
+        if (address) kontext += `- ADRESSE FÜR CTA: ${address}\n`;
 
         return `
             Hier ist ein Beispiel für einen perfekten, faktenbasierten JSON-Output zum Thema "nachhaltige Kaffeebohnen":
