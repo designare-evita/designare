@@ -294,7 +294,6 @@ const createInlineModalHTML = () => {
         <div id="booking-modal" class="callback-modal">
             <div class="booking-modal-content">
                 <div class="booking-modal-header">
-                    <div class="booking-modal-header-icon">📞</div>
                     <h2 class="booking-modal-title">Rückruf-Termin buchen</h2>
                     <p class="booking-modal-subtitle">Michael ruft dich zum gewünschten Zeitpunkt an</p>
                 </div>
@@ -305,7 +304,6 @@ const createInlineModalHTML = () => {
                         
                         <div id="callback-loading">
                             <div>
-                                <div class="loader-icon">⏳</div>
                                 Lade verfügbare Rückruf-Termine...
                             </div>
                         </div>
@@ -341,19 +339,17 @@ const createInlineModalHTML = () => {
                             
                             <div class="booking-form-actions">
                                 <button type="button" id="back-to-slots" class="booking-btn back-btn">← Zurück</button>
-                                <button type="submit" id="submit-callback" class="booking-btn submit-btn">📞 Rückruf buchen</button>
+                                <button type="submit" id="submit-callback" class="booking-btn submit-btn">Rückruf buchen</button>
                             </div>
                         </form>
                     </div>
                     
                     <div id="step-confirmation" class="booking-step">
                         <div class="confirmation-content">
-                            <div class="confirmation-icon">🎉</div>
                             <h3 class="confirmation-title">Rückruf-Termin erfolgreich gebucht!</h3>
                             <div id="confirmation-details">
                                 </div>
-                            <p class="confirmation-subtext">
-                                📞 <strong>Michael wird dich zum vereinbarten Zeitpunkt anrufen.</strong><br>
+                            <p class="confirmation-subtext"><strong>Michael wird dich zum vereinbarten Zeitpunkt anrufen.</strong><br>
                                 Halte bitte dein Telefon 5 Minuten vor dem Termin bereit.
                             </p>
                             <button onclick="closeCallbackModal()" class="booking-btn confirm-close-btn">Perfekt! 👍</button>
