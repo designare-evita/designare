@@ -1,6 +1,6 @@
 <div id="contact-modal" class="modal-overlay">
     <div class="modal-content">
-        <button id="close-modal" class="close-button">&times;</button>
+        <button class="close-button close-modal-trigger">&times;</button>
         <h2>Frag Michael!</h2>
         <form id="contact-form-inner">
             <input type="text" name="name" placeholder="Dein Name (oder Künstlername):" required>
@@ -9,146 +9,85 @@
             <textarea name="message" placeholder="Deine Botschaft an mich (und Evita):" rows="5" required></textarea>
             <div class="privacy-checkbox">
                 <input type="checkbox" name="privacy" id="privacy" required>
-                <label for="privacy">Michael darf meine Nachricht lesen und Evita darf alles verarbeiten, was sie versteht. (Details im Datenschutz)</label>
+                <label for="privacy">Michael darf meine Nachricht lesen und Evita darf alles verarbeiten, was sie versteht. (Details im <a href="#" data-modal-target="legal-modal" data-legal-type="datenschutz">Datenschutz</a>)</label>
             </div>
             <button type="submit" class="cta-button">Ab die Post!</button>
         </form>
         <div id="contact-success-message" class="contact-success-hidden">
             <h2>Nachricht empfangen! </h2>
             <p>Michael (oder Evita, wenn er zu sehr bastelt) meldet sich in Kürze.</p>
-            <p class="success-close-wrapper"><a href="#" id="close-success-message" class="cta-button">Schließen</a></p>
+            <p class="success-close-wrapper"><a href="#" id="close-success-message" class="cta-button close-modal-trigger">Schließen</a></p>
         </div>
     </div>
 </div>
 
 <div id="cookie-info-lightbox" class="modal-overlay">
     <div class="modal-content">
-        <h2>Hinweis zu Cookies</h2>
-        <p class="cookie-info-text">Wir backen hier nur Cookies, die unsere Website am Laufen halten. Reine Technik, kein Schnickschnack!</p>
+        <button class="close-button close-modal-trigger">&times;</button>
+        <h2>Cookie-Hinweis von Evita</h2>
+        <p>Ich belle kurz, um zu sagen, dass diese Webseite Cookies nutzt. Nicht die leckeren, sondern die digitalen. Sie helfen Michael zu verstehen, welche Inhalte euch am besten gefallen. Wenn du weitersurfst, bist du damit einverstanden. Mehr Infos gibt's im <a href="#" data-modal-target="legal-modal" data-legal-type="datenschutz">Datenschutz</a>.</p>
         <div class="cookie-lightbox-buttons">
-            <a href="datenschutz.html" id="privacy-policy-link-button" class="lightbox-button">Datenschutzerklärung</a>
-            <button id="acknowledge-cookie-lightbox" class="lightbox-button">Alles klar</button>
+            <button id="acknowledge-cookie-lightbox" class="lightbox-button close-modal-trigger">Verstanden & Akzeptiert</button>
+        </div>
+    </div>
+</div>
+
+<div id="about-me-modal" class="modal-overlay">
+    <div class="modal-content">
+        <button class="close-button close-modal-trigger">&times;</button>
+        <div id="about-me-content-wrapper">
+            <div class="modal-page">
+                <div class="legal-container">
+                    <p class="about-image-wrapper"><img src="https://designare.at/images/Michael@work.webp" alt="Michael Kanda"></p>
+                    <h2 class="about-section-header">Michael Kanda: Der kreative Kopf hinter Evita</h2>
+                    <p><strong>Evita:</strong> Okay, hören wir auf, um den heißen Brei herumzureden. Der Typ, der mich zum Leben erweckt hat, ist Michael Kanda. Stellt euch einen kreativen Nerd vor, der SEO, Webdesign und künstliche Intelligenz so genial kombiniert, dass selbst ich staune. Michael hat einen Abschluss in Medientechnik, ist zertifizierter E-Commerce-Experte und hat Google-Workshops überlebt.</p>
+                </div>
+            </div>
+            <div class="modal-page" style="display: none;">
+                 <div class="legal-container">
+                    <h2 class="about-section-header">Doch Michael ist mehr als nur Code und Pixel</h2>
+                    <p>Um den Kopf freizubekommen, verbringt Michael viel Zeit mit seiner Tierschutzhündin Evita (nach der ich benannt wurde ❤️). Regelmäßig quält er sich zudem beim Sport – schließlich weiß man ja nie, wann man vor einem KI-Aufstand flüchten muss! Seine Playlist? Ein wilder Mix aus Frei.Wild, Helene Fischer und Kim Wilde. Ich vermute ja, das ist Michaels geheime Waffe um die KI zur Kapitulation zu bringen...</p>
+                    <p class="about-image-wrapper-bottom"><img src="https://designare.at/images/Evita&KI.webp" alt="Evita & KI"></p>
+                </div>
+            </div>
+        </div>
+        <div class="legal-modal-pagination-buttons">
+            <button class="prev-page" disabled>&laquo; Zurück</button>
+            <button class="next-page">Weiter &raquo;</button>
         </div>
     </div>
 </div>
 
 <div id="legal-modal" class="modal-overlay">
     <div class="modal-content">
-        <button id="close-legal-modal" class="close-button">&times;</button>
-        <div id="legal-modal-content-area"></div>
+        <button class="close-button close-modal-trigger">&times;</button>
+        <h2 id="legal-modal-title"></h2>
+        <div id="legal-content-container">
+            <div id="legal-content-page-1" class="modal-page"></div>
+            <div id="legal-content-page-2" class="modal-page" style="display:none;"></div>
+        </div>
+        <div class="legal-modal-pagination-buttons">
+             <button id="prev-legal-page" class="prev-page" disabled>&laquo; Zurück</button>
+             <button id="next-legal-page" class="next-page">Weiter &raquo;</button>
+        </div>
     </div>
 </div>
 
-<div id="about-me-content" class="about-me-hidden">
-    <div class="legal-container">
-        <h1>Über Michael</h1>
-        <h3>Der Mann hinter den Pixeln</h3>
-        <p class="about-image-wrapper">
-            <img src="https://designare.at/images/Michael@work.webp" alt="Michael@work" />
-        </p>
-        <p>Okay, aufgepasst! Michael besitzt digitale Superkräfte! Bei maxonline arbeitet er als Web-Entwickler und verbindet dort Design, Code und KI so genial, dass selbst ich staune. Michael hat einen Abschluss in Medientechnik, ist zertifizierter E-Commerce-Experte und hat Google-Workshops überlebt.</p>
-        <h2 class="about-section-header">Doch Michael ist mehr als nur Code und Pixel</h2>
-        <p>Um den Kopf freizubekommen, verbringt Michael viel Zeit mit seiner Tierschutzhündin Evita (nach der ich benannt wurde ❤️). Regelmäßig quält er sich zudem beim Sport – schließlich weiß man ja nie, wann man vor einem KI-Aufstand flüchten muss! Seine Playlist? Ein wilder Mix aus Frei.Wild, Helene Fischer und Kim Wilde. Ich vermute ja, das ist Michaels geheime Waffe um die KI zur Kapitulation zu bringen...</p>
-        <p class="about-image-wrapper-bottom">
-            <img src="https://designare.at/images/Evita&KI.webp" alt="Evita & KI" />
-        </p>
-    </div>
-</div>
-
-<!-- REPARIERTES AI-RESPONSE-MODAL mit besserer Chat-Integration -->
 <div id="ai-response-modal" class="modal-overlay">
     <div class="modal-content">
-        <button id="close-ai-response-modal-top" class="close-button">&times;</button>
-        
-        <div id="ai-chat-history">
-            <!-- Chat-Nachrichten werden hier dynamisch eingefügt -->
-        </div>
-
-        <!-- VERBESSERTE Chat-Form mit besserer Event-Behandlung -->
-        <form id="ai-chat-form" autocomplete="off">
-            <input type="text" 
-                   id="ai-chat-input" 
-                   placeholder="Frag Evita..." 
-                   autocomplete="off" 
-                   required
-                   data-chat-input="true">
-            <button type="submit" aria-label="Senden">
-                <i class="fa-regular fa-paper-plane"></i>
-            </button>
+        <button id="close-ai-response-modal-top" class="close-button close-modal-trigger">&times;</button>
+        <div id="ai-chat-history"></div>
+        <form id="ai-chat-form">
+            <input type="text" id="ai-chat-input" placeholder="Deine Folgefrage an Evita..." autocomplete="off">
+            <button type="submit" aria-label="Senden"><i class="fas fa-paper-plane"></i></button>
         </form>
     </div>
 </div>
 
-<!-- DEBUG: Booking-Test-Button (nur für Entwicklung) -->
-<div id="debug-booking-trigger" style="position: fixed; bottom: 80px; right: 20px; z-index: 9999; display: none;">
-    <button onclick="window.debugBookingLaunch && window.debugBookingLaunch()" 
-            style="background: #28a745; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer;">
-        🔧 Test Booking
-    </button>
+<div id="booking-modal" class="modal-overlay">
+    <div class="modal-content">
+        <button id="close-booking-modal" class="close-button close-modal-trigger">&times;</button>
+        <div id="booking-content-area">
+             </div>
+    </div>
 </div>
-
-<script>
-// ZUSÄTZLICHE CHAT-UNTERSTÜTZUNG: Stelle sicher, dass Chat-Events korrekt behandelt werden
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('🔧 Modal-Ereignis-Setup wird geladen...');
-    
-    // Zeige Debug-Button in Entwicklungsumgebung
-    if (window.location.hostname === 'localhost' || window.location.hostname.includes('127.0.0.1') || window.location.search.includes('debug=true')) {
-        const debugButton = document.getElementById('debug-booking-trigger');
-        if (debugButton) {
-            debugButton.style.display = 'block';
-        }
-    }
-    
-    // FALLBACK: Stelle sicher, dass Chat-Submit-Events verarbeitet werden
-    let chatSubmitBackup = false;
-    
-    const setupChatBackup = () => {
-        const chatForm = document.getElementById('ai-chat-form');
-        const chatInput = document.getElementById('ai-chat-input');
-        
-        if (chatForm && chatInput && !chatSubmitBackup) {
-            console.log('🔧 Richte Chat-Backup-Handler ein...');
-            
-            // Backup Submit Handler
-            chatForm.addEventListener('submit', function(e) {
-                console.log('🔧 Chat-Backup-Submit ausgelöst');
-                // Der echte Handler ist in ai-form.js - dies ist nur ein Fallback
-            });
-            
-            // Backup Enter-Handler
-            chatInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    console.log('🔧 Chat-Backup-Enter ausgelöst');
-                    e.preventDefault();
-                    chatForm.dispatchEvent(new Event('submit', {bubbles: true}));
-                }
-            });
-            
-            chatSubmitBackup = true;
-        }
-    };
-    
-    // Versuche Chat-Backup sofort und nach kurzer Verzögerung
-    setupChatBackup();
-    setTimeout(setupChatBackup, 500);
-    setTimeout(setupChatBackup, 1000);
-    
-    // Überwache Modal-Änderungen für dynamisch geladene Inhalte
-    const observer = new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutation) {
-            if (mutation.type === 'childList') {
-                setupChatBackup();
-            }
-        });
-    });
-    
-    const modalContainer = document.getElementById('modal-container');
-    if (modalContainer) {
-        observer.observe(modalContainer, {
-            childList: true,
-            subtree: true
-        });
-    }
-});
-</script>
