@@ -68,11 +68,14 @@
 
         </div>
     </div>
-
-	<footer>
-        <a href="impressum.html" id="impressum-link">Impressum</a>
-        <a href="datenschutz.html" id="datenschutz-link">Datenschutz</a>
-    </footer>
+<div id="footer-container"></div>
+<script>
+    fetch('footer.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('footer-container').innerHTML = data;
+        });
+</script>
 
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script type="module" src="js/main.js"></script>
