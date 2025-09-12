@@ -1,4 +1,4 @@
-// js/silas-form.js - Reparierte Version
+// js/silas-form.js - FINALE, VOLLSTÄNDIGE VERSION MIT ALLEN FUNKTIONEN UND KORREKTUREN
 
 export function initSilasForm() {
     const silasForm = document.getElementById('silas-form');
@@ -28,7 +28,6 @@ export function initSilasForm() {
     const brandInput = document.getElementById('text-brand-input');
     const emailInput = document.getElementById('text-email-input');
     const phoneInput = document.getElementById('text-phone-input');
-    // KORREKTUR: Sucht jetzt nach der ID, die Sie in Ihrem HTML verwenden.
     const addressInput = document.getElementById('text-adress-input'); 
     const grammaticalPersonSelect = document.getElementById('grammatical-person-select');
 
@@ -200,7 +199,6 @@ export function initSilasForm() {
                 brand: brandInput.value.trim(),
                 email: emailInput.value.trim(),
                 phone: phoneInput.value.trim(),
-                // KORREKTUR: Liest den Wert vom Adressfeld aus (und prüft, ob es existiert).
                 address: addressInput ? addressInput.value.trim() : '', 
                 grammaticalPerson: grammaticalPersonSelect.value,
             };
@@ -331,18 +329,25 @@ export function initSilasForm() {
             if (allGeneratedData.some(d => !d.error && !d._fallback_used)) {
                 const downloadContainer = document.createElement('div');
                 downloadContainer.style.marginTop = '1rem';
-                
-                const createButton = (id, text, icon, clickHandler, marginLeft = '10px') => {
+                // KORREKTUR: Container nutzt Flexbox für perfekte vertikale Ausrichtung
+                downloadContainer.style.display = 'flex';
+                downloadContainer.style.flexDirection = 'column';
+                downloadContainer.style.gap = '1rem';
+                downloadContainer.style.alignItems = 'center';
+
+                // KORREKTUR: marginLeft aus der Funktion entfernt
+                const createButton = (id, text, icon, clickHandler) => {
                     const button = document.createElement('button');
                     button.id = id;
                     button.className = 'cta-button';
                     button.innerHTML = `<i class="fas ${icon}"></i> ${text}`;
-                    button.style.marginLeft = marginLeft;
+                    button.style.maxWidth = '400px'; // Buttons nicht zu breit machen
+                    button.style.width = '100%';
                     button.addEventListener('click', clickHandler);
                     return button;
                 };
-
-                downloadContainer.appendChild(createButton('download-csv-dynamic', 'CSV Herunterladen', 'fa-download', downloadCsv, '0px'));
+                
+                downloadContainer.appendChild(createButton('download-csv-dynamic', 'CSV Herunterladen', 'fa-download', downloadCsv));
                 downloadContainer.appendChild(createButton('download-txt-dynamic', 'TXT Herunterladen', 'fa-file-alt', downloadTxt));
                 
                 silasResponseContainer.appendChild(downloadContainer);
