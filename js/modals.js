@@ -255,35 +255,69 @@ function loadAboutContentWithPagination() {
     }
 }
 
-function setupLegalModals() {
-    const impressumLink = document.getElementById('impressum-link');
-    const datenschutzLink = document.getElementById('datenschutz-link');
-    const closeLegalModalBtn = document.getElementById('close-legal-modal');
+const setupLegalModals = () => {
+    const legalModal = document.getElementById('legal-modal');
+    const legalModalTitle = document.getElementById('legal-modal-title');
+    const page1 = document.getElementById('legal-content-page-1');
+    const page2 = document.getElementById('legal-content-page-2');
+    const prevButton = document.getElementById('prev-legal-page');
+    const nextButton = document.getElementById('next-legal-page');
+    let currentPage = 1;
 
-    // Impressum Link
-    if (impressumLink) {
-        impressumLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            loadLegalContentWithPagination('impressum.html');
+    const updatePageVisibility = () => {
+        if (!page1 || !page2) return;
+        page1.style.display = currentPage === 1 ? 'block' : 'none';
+        page2.style.display = currentPage === 2 ? 'block' : 'none';
+        if (prevButton) prevButton.disabled = currentPage === 1;
+        if (nextButton) nextButton.disabled = currentPage === 2;
+    };
+
+    const showLegalModal = (type) => {
+        if (!legalModal || !legalModalTitle) return;
+        if (type === 'impressum') {
+            legalModalTitle.textContent = 'Impressum';
+            currentPage = 1;
+        } else if (type === 'datenschutz') {
+            legalModalTitle.textContent = 'Datenschutzerklärung';
+            currentPage = 2;
+        }
+        updatePageVisibility();
+        openModal(legalModal);
+    };
+
+    // KORREKTUR: Die alte Link-Suche wird durch diesen robusten Event-Listener ersetzt.
+    // Er lauscht auf Klicks im gesamten Dokument und funktioniert auch mit nachgeladenen Elementen.
+    document.body.addEventListener('click', function(event) {
+        // Prüft, ob der Klick auf den Impressum-Link (oder ein Kind-Element davon) war.
+        if (event.target.closest('#impressum-link')) {
+            event.preventDefault(); // Verhindert das Springen zur URL
+            showLegalModal('impressum');
+        }
+        // Prüft, ob der Klick auf den Datenschutz-Link war.
+        if (event.target.closest('#datenschutz-link')) {
+            event.preventDefault();
+            showLegalModal('datenschutz');
+        }
+    });
+
+    if (prevButton) {
+        prevButton.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                updatePageVisibility();
+            }
         });
     }
 
-    // Datenschutz Link
-    if (datenschutzLink) {
-        datenschutzLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            loadLegalContentWithPagination('datenschutz.html');
+    if (nextButton) {
+        nextButton.addEventListener('click', () => {
+            if (currentPage < 2) {
+                currentPage++;
+                updatePageVisibility();
+            }
         });
     }
-
-    // Legal Modal schließen
-    if (closeLegalModalBtn) {
-        closeLegalModalBtn.addEventListener('click', () => {
-            const legalModal = document.getElementById('legal-modal');
-            closeModal(legalModal);
-        });
-    }
-}
+};
 
 // ===================================================================
 // PAGINATION FUNKTIONALITÄT
