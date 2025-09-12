@@ -2,3 +2,97 @@
     <a href="#" id="impressum-link" data-modal-target="legal-modal" data-legal-type="impressum">Impressum</a>
     <a href="#" id="datenschutz-link" data-modal-target="legal-modal" data-legal-type="datenschutz">Datenschutz</a>
 </footer>
+
+<div id="contact-modal" class="modal-overlay">
+    <div class="modal-content">
+        <button class="close-button close-modal-trigger">&times;</button>
+        <h2>Frag Michael!</h2>
+        <form id="contact-form-inner">
+            <input type="text" name="name" placeholder="Dein Name (oder Künstlername):" required>
+            <input type="email" name="email" placeholder="Deine E-Mail (Anti-Spam-Zone!)" required>
+            <input type="text" name="_subject" placeholder="Worum geht's? (Bitte kein KI-Drama)">
+            <textarea name="message" placeholder="Deine Botschaft an mich (und Evita):" rows="5" required></textarea>
+            <div class="privacy-checkbox">
+                <input type="checkbox" name="privacy" id="privacy" required>
+                <label for="privacy">Michael darf meine Nachricht lesen und Evita darf alles verarbeiten, was sie versteht. (Details im <a href="#" data-modal-target="legal-modal" data-legal-type="datenschutz">Datenschutz</a>)</label>
+            </div>
+            <button type="submit" class="cta-button">Ab die Post!</button>
+        </form>
+        <div id="contact-success-message" class="contact-success-hidden">
+            <h2>Nachricht empfangen! </h2>
+            <p>Michael (oder Evita, wenn er zu sehr bastelt) meldet sich in Kürze.</p>
+            <p class="success-close-wrapper"><a href="#" id="close-success-message" class="cta-button close-modal-trigger">Schließen</a></p>
+        </div>
+    </div>
+</div>
+
+<div id="cookie-info-lightbox" class="modal-overlay">
+    <div class="modal-content">
+        <button class="close-button close-modal-trigger">&times;</button>
+        <h2>Cookie-Hinweis von Evita</h2>
+        <p>Ich belle kurz, um zu sagen, dass diese Webseite Cookies nutzt. Nicht die leckeren, sondern die digitalen. Sie helfen Michael zu verstehen, welche Inhalte euch am besten gefallen. Wenn du weitersurfst, bist du damit einverstanden. Mehr Infos gibt's im <a href="#" data-modal-target="legal-modal" data-legal-type="datenschutz">Datenschutz</a>.</p>
+        <div class="cookie-lightbox-buttons">
+            <button id="acknowledge-cookie-lightbox" class="lightbox-button close-modal-trigger">Verstanden & Akzeptiert</button>
+        </div>
+    </div>
+</div>
+
+<div id="about-me-modal" class="modal-overlay">
+    <div class="modal-content">
+        <button class="close-button close-modal-trigger">&times;</button>
+        <div id="about-me-content-wrapper">
+            <div class="modal-page">
+                <div class="legal-container">
+                    <p class="about-image-wrapper"><img src="https://designare.at/images/Michael@work.webp" alt="Michael Kanda"></p>
+                    <h2 class="about-section-header">Michael Kanda: Der kreative Kopf hinter Evita</h2>
+                    <p><strong>Evita:</strong> Okay, hören wir auf, um den heißen Brei herumzureden. Der Typ, der mich zum Leben erweckt hat, ist Michael Kanda. Stellt euch einen kreativen Nerd vor, der SEO, Webdesign und künstliche Intelligenz so genial kombiniert, dass selbst ich staune. Michael hat einen Abschluss in Medientechnik, ist zertifizierter E-Commerce-Experte und hat Google-Workshops überlebt.</p>
+                </div>
+            </div>
+            <div class="modal-page" style="display: none;">
+                 <div class="legal-container">
+                    <h2 class="about-section-header">Doch Michael ist mehr als nur Code und Pixel</h2>
+                    <p>Um den Kopf freizubekommen, verbringt Michael viel Zeit mit seiner Tierschutzhündin Evita (nach der ich benannt wurde ❤️). Regelmäßig quält er sich zudem beim Sport – schließlich weiß man ja nie, wann man vor einem KI-Aufstand flüchten muss! Seine Playlist? Ein wilder Mix aus Frei.Wild, Helene Fischer und Kim Wilde. Ich vermute ja, das ist Michaels geheime Waffe um die KI zur Kapitulation zu bringen...</p>
+                    <p class="about-image-wrapper-bottom"><img src="https://designare.at/images/Evita&KI.webp" alt="Evita & KI"></p>
+                </div>
+            </div>
+        </div>
+        <div class="legal-modal-pagination-buttons">
+            <button class="prev-page" disabled>&laquo; Zurück</button>
+            <button class="next-page">Weiter &raquo;</button>
+        </div>
+    </div>
+</div>
+
+<div id="legal-modal" class="modal-overlay">
+    <div class="modal-content">
+        <button class="close-button close-modal-trigger">&times;</button>
+        <h2 id="legal-modal-title"></h2>
+        <div id="legal-content-container">
+            <div id="legal-content-page-1" class="modal-page"></div>
+            <div id="legal-content-page-2" class="modal-page" style="display:none;"></div>
+        </div>
+        <div class="legal-modal-pagination-buttons">
+             <button id="prev-legal-page" class="prev-page" disabled>&laquo; Zurück</button>
+             <button id="next-legal-page" class="next-page">Weiter &raquo;</button>
+        </div>
+    </div>
+</div>
+
+<div id="ai-response-modal" class="modal-overlay">
+    <div class="modal-content">
+        <button id="close-ai-response-modal-top" class="close-button close-modal-trigger">&times;</button>
+        <div id="ai-chat-history"></div>
+        <form id="ai-chat-form">
+            <input type="text" id="ai-chat-input" placeholder="Deine Folgefrage an Evita..." autocomplete="off">
+            <button type="submit" aria-label="Senden"><i class="fas fa-paper-plane"></i></button>
+        </form>
+    </div>
+</div>
+
+<div id="booking-modal" class="modal-overlay">
+    <div class="modal-content">
+        <button id="close-booking-modal" class="close-button close-modal-trigger">&times;</button>
+        <div id="booking-content-area">
+             </div>
+    </div>
+</div>
