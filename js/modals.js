@@ -1,4 +1,4 @@
-// js/modals.js - KORRIGIERTE VERSION ohne Syntax-Fehler
+// js/modals.js - ERWEITERTE VERSION mit Evita Chat Button Support
 
 // ===================================================================
 // EINHEITLICHE MODAL-FUNKTIONEN
@@ -63,13 +63,48 @@ export function hideLoadingState() {
 }
 
 // ===================================================================
+// NEUE FUNKTION: EVITA CHAT DIREKT ÖFFNEN
+// ===================================================================
+
+export function openEvitaChat() {
+    console.log("💬 Öffne Evita Chat direkt...");
+    
+    const modal = document.getElementById('ai-response-modal');
+    const contentArea = document.getElementById('ai-chat-history');
+    
+    if (modal && contentArea) {
+        // Leere den Chat-Verlauf oder zeige Begrüßungsnachricht
+        contentArea.innerHTML = '';
+        
+        // Füge Begrüßungsnachricht hinzu
+        addMessageToHistory("Hi! Ich bin Evita, Michaels KI-Assistentin. Was kann ich für dich tun?", 'ai');
+        
+        // Öffne das Modal
+        openModal(modal);
+        
+        // Fokus auf Chat-Input setzen
+        setTimeout(() => {
+            const chatInput = document.getElementById('ai-chat-input');
+            if (chatInput) {
+                chatInput.focus();
+                console.log("✅ Evita Chat geöffnet und Input fokussiert");
+            }
+        }, 100);
+        
+        return true;
+    } else {
+        console.error("❌ Chat-Modal oder Content-Area nicht gefunden");
+        return false;
+    }
+}
+
+// ===================================================================
 // CHAT-FUNKTIONALITÄT FÜR AI-MODAL
 // ===================================================================
 
 function setupAiChatFunctionality() {
     const aiChatForm = document.getElementById('ai-chat-form');
     const aiChatInput = document.getElementById('ai-chat-input');
-    const aiChatHistory = document.getElementById('ai-chat-history');
 
     if (aiChatForm && aiChatInput) {
         aiChatForm.addEventListener('submit', async (e) => {
@@ -122,7 +157,54 @@ function addMessageToHistory(message, sender) {
 }
 
 // ===================================================================
-// MODAL SETUP FUNKTIONEN
+// ERWEITERTE MODAL SETUP FUNKTIONEN
+// ===================================================================
+
+function setupEvitaChatButton() {
+    console.log("🔧 Richte Evita Chat Button ein...");
+    
+    // Warte auf Header-Laden und versuche mehrmals
+    const setupButton = () => {
+        const evitaChatButton = document.getElementById('evita-chat-button');
+        
+        if (evitaChatButton && !evitaChatButton.hasAttribute('data-listener-attached')) {
+            console.log("✅ Evita Chat Button gefunden, füge Event-Listener hinzu");
+            
+            evitaChatButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                console.log("🤖 Evita Chat Button geklickt");
+                openEvitaChat();
+            });
+            
+            // Markiere Button als konfiguriert
+            evitaChatButton.setAttribute('data-listener-attached', 'true');
+            
+            return true;
+        }
+        
+        return false;
+    };
+    
+    // Versuche sofort
+    if (!setupButton()) {
+        // Versuche nach kurzer Verzögerung (für dynamisch geladene Header)
+        setTimeout(() => {
+            if (!setupButton()) {
+                console.warn("⚠️ Evita Chat Button nicht gefunden nach 500ms");
+                
+                // Letzter Versuch nach 1 Sekunde
+                setTimeout(() => {
+                    if (!setupButton()) {
+                        console.error("❌ Evita Chat Button konnte nicht initialisiert werden");
+                    }
+                }, 1000);
+            }
+        }, 500);
+    }
+}
+
+// ===================================================================
+// BESTEHENDE MODAL SETUP FUNKTIONEN (unverändert)
 // ===================================================================
 
 function setupCookieModal() {
@@ -196,9 +278,6 @@ function setupContactModal() {
     if (contactForm) {
         contactForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
-            // Hier könntest du echte Formular-Verarbeitung einfügen
-            // Für jetzt zeigen wir die Erfolgsmeldung
             showContactSuccess();
         });
     }
@@ -237,13 +316,9 @@ function loadAboutContentWithPagination() {
     const aboutContent = document.getElementById('about-me-content');
     
     if (aboutContent && legalContentArea) {
-        // About-Content direkt kopieren (es ist bereits im DOM verfügbar)
         const content = aboutContent.innerHTML;
-        
-        // Erstelle manuell sinnvolle Seitenaufteilungen basierend auf dem Inhalt
         const pages = splitAboutContentManually(content);
         
-        // Pagination-State initialisieren
         window.modalPaginationState = {
             pages: pages,
             currentPage: 0,
@@ -260,7 +335,6 @@ function setupLegalModals() {
     const datenschutzLink = document.getElementById('datenschutz-link');
     const closeLegalModalBtn = document.getElementById('close-legal-modal');
 
-    // Impressum Link
     if (impressumLink) {
         impressumLink.addEventListener('click', (e) => {
             e.preventDefault();
@@ -268,7 +342,6 @@ function setupLegalModals() {
         });
     }
 
-    // Datenschutz Link
     if (datenschutzLink) {
         datenschutzLink.addEventListener('click', (e) => {
             e.preventDefault();
@@ -276,7 +349,6 @@ function setupLegalModals() {
         });
     }
 
-    // Legal Modal schließen
     if (closeLegalModalBtn) {
         closeLegalModalBtn.addEventListener('click', () => {
             const legalModal = document.getElementById('legal-modal');
@@ -286,7 +358,7 @@ function setupLegalModals() {
 }
 
 // ===================================================================
-// PAGINATION FUNKTIONALITÄT
+// PAGINATION FUNKTIONALITÄT (unverändert)
 // ===================================================================
 
 function loadLegalContentWithPagination(page) {
@@ -295,11 +367,9 @@ function loadLegalContentWithPagination(page) {
     
     if (!legalContentArea) return;
 
-    // Loading-Anzeige
     legalContentArea.innerHTML = '<div style="text-align: center; padding: 2rem;"><i class="fas fa-spinner fa-spin"></i> Lade Inhalt...</div>';
     openModal(legalModal);
 
-    // Lade den Inhalt der entsprechenden Seite
     fetch(page)
         .then(response => {
             if (!response.ok) {
@@ -308,11 +378,9 @@ function loadLegalContentWithPagination(page) {
             return response.text();
         })
         .then(html => {
-            // Extrahiere den Inhalt
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
             
-            // Suche nach dem legal-container
             let legalContainer = doc.querySelector('.legal-container');
             
             if (legalContainer) {
@@ -331,14 +399,11 @@ function setupPaginationForContent(content, pageType) {
     let pages = [];
     
     if (pageType === 'datenschutz.html') {
-        // Datenschutz: Teilung bei jedem H3
         pages = splitContentByH3(content);
     } else {
-        // Impressum: 50% Teilung
         pages = splitContentByHalf(content);
     }
     
-    // Pagination-State initialisieren
     window.modalPaginationState = {
         pages: pages,
         currentPage: 0,
@@ -357,7 +422,6 @@ function splitContentByH3(content) {
     
     Array.from(tempDiv.children).forEach(element => {
         if (element.tagName === 'H3' && currentPageContent.length > 0) {
-            // Neue Seite beginnen bei H3
             pages.push(`<div class="legal-container">${currentPageContent.map(el => el.outerHTML).join('')}</div>`);
             currentPageContent = [element];
         } else {
@@ -365,7 +429,6 @@ function splitContentByH3(content) {
         }
     });
     
-    // Letzte Seite hinzufügen
     if (currentPageContent.length > 0) {
         pages.push(`<div class="legal-container">${currentPageContent.map(el => el.outerHTML).join('')}</div>`);
     }
@@ -395,15 +458,12 @@ function showModalPage(pageIndex) {
     
     if (!state || !legalContentArea) return;
     
-    // Seiteninhalt anzeigen
     legalContentArea.innerHTML = state.pages[pageIndex];
     
-    // Pagination-Buttons hinzufügen (wenn mehr als 1 Seite)
     if (state.totalPages > 1) {
         const paginationDiv = document.createElement('div');
         paginationDiv.className = 'legal-modal-pagination-buttons';
         
-        // Zurück-Button
         const prevButton = document.createElement('button');
         prevButton.textContent = '← Zurück';
         prevButton.disabled = pageIndex === 0;
@@ -414,7 +474,6 @@ function showModalPage(pageIndex) {
             }
         });
         
-        // Weiter-Button
         const nextButton = document.createElement('button');
         nextButton.textContent = 'Weiter →';
         nextButton.disabled = pageIndex === state.totalPages - 1;
@@ -444,19 +503,16 @@ function setupAiModal() {
         }
     });
 
-    // Setup Chat-Funktionalität
     setupAiChatFunctionality();
 }
 
 function setupModalBackgroundClose() {
-    // Schließe Modals beim Klick auf den Hintergrund
     document.addEventListener('click', (e) => {
         if (e.target.classList.contains('modal-overlay')) {
             closeModal(e.target);
         }
     });
 
-    // Schließe Modals mit ESC-Taste
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             const openModal = document.querySelector('.modal-overlay.visible');
@@ -468,7 +524,6 @@ function setupModalBackgroundClose() {
 }
 
 function splitAboutContentManually(content) {
-    // Seite 1: Bis einschließlich "Der Mann hinter den Pixeln" Abschnitt
     const page1Content = `
         <div class="legal-container">
             <h1>Über Michael</h1>
@@ -480,7 +535,6 @@ function splitAboutContentManually(content) {
         </div>
     `;
     
-    // Seite 2: Der Rest des Inhalts
     const page2Content = `
         <div class="legal-container">
             <h2 class="about-section-header">Doch Michael ist mehr als nur Code und Pixel</h2>
@@ -495,11 +549,11 @@ function splitAboutContentManually(content) {
 }
 
 // ===================================================================
-// HAUPT-INITIALISIERUNG
+// HAUPT-INITIALISIERUNG (ERWEITERT)
 // ===================================================================
 
 export function initModals() {
-    console.log('Initialisiere Modals...');
+    console.log('🚀 Initialisiere erweiterte Modals mit Evita Chat Button...');
     
     setupCookieModal();
     setupContactModal();
@@ -508,5 +562,15 @@ export function initModals() {
     setupAiModal();
     setupModalBackgroundClose();
     
-    console.log('Modals erfolgreich initialisiert');
+    // NEU: Setup Evita Chat Button
+    setupEvitaChatButton();
+    
+    console.log('✅ Erweiterte Modals erfolgreich initialisiert');
 }
+
+// ===================================================================
+// GLOBALE FUNKTIONEN FÜR EXTERNE NUTZUNG
+// ===================================================================
+
+// Stelle Evita Chat Funktion global zur Verfügung
+window.openEvitaChat = openEvitaChat;
