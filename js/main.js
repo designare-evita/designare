@@ -193,7 +193,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Lade externe Inhalte
         const headerPromise = loadContent('/header.html', 'header-placeholder');
         const modalsPromise = loadContent('/modals.html', 'modal-container');
-        const footerPromise = loadContent('/footer.html', 'footer-placeholder');
         
         await Promise.all([headerPromise, modalsPromise]);
         console.log("✅ Header und Modals erfolgreich geladen.");
