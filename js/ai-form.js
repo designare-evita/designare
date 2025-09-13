@@ -1,20 +1,13 @@
-// js/ai-form.js - VOLLSTÄNDIGE VERSION mit allen ursprünglichen Funktionen
+// js/ai-form.js - VOLLSTÄNDIGE KORRIGIERTE VERSION
 
 export const initAiForm = () => {
-    console.log("🚀 Initialisiere AI-Form...");
+    console.log("🚀 Initialisiere korrigierte AI-Form mit funktionierendem Booking-System");
 
     const aiForm = document.getElementById('ai-form');
-    
-    // VERBESSERUNG: Saubere Behandlung wenn kein AI-Form vorhanden ist
     if (!aiForm) {
-        console.log("ℹ️ Kein AI-Formular auf dieser Seite vorhanden (normal für Unterseiten)");
-        
-        // Trotzdem globale Chat-Funktionen bereitstellen für Header-Button
-        setupGlobalChatFunctions();
+        console.warn("⚠️ #ai-form nicht gefunden!");
         return;
     }
-
-    console.log("✅ AI-Formular gefunden, richte vollständige Funktionalität ein...");
 
     // DOM-Elemente
     const aiQuestion = document.getElementById('ai-question');
@@ -241,13 +234,7 @@ export const initAiForm = () => {
                 console.log("🗑️ Existierendes Modal entfernt");
             }
             
-            // Verwende einheitliche Booking-Funktion wenn verfügbar
-            if (typeof window.launchUnifiedBookingModal === 'function') {
-                console.log("✅ Verwende globale einheitliche Booking-Funktion");
-                return await window.launchUnifiedBookingModal();
-            }
-            
-            // Fallback: Verwende Inline-HTML
+            // Verwende Inline-HTML
             const modalHTML = createInlineModalHTML();
             
             // Füge Modal zum DOM hinzu
@@ -302,123 +289,123 @@ export const initAiForm = () => {
     // INLINE-HTML FUNKTION
     // ===================================================================
 
-    const createInlineModalHTML = () => {
-        return `
-            <div id="booking-modal" class="callback-modal">
-                <div class="booking-modal-content">
-                    <div class="booking-modal-header">
-                        <h2 class="booking-modal-title">Rückruf-Termin buchen</h2>
-                        <p class="booking-modal-subtitle">Michael ruft dich zum gewünschten Zeitpunkt an</p>
-                    </div>
-                    
-                    <div class="booking-modal-body">
-                        <div id="step-slot-selection" class="booking-step active">
-                            <h3 class="booking-step-title">Wähle deinen Rückruf-Termin:</h3>
-                            
-                            <div id="callback-loading">
-                                <div>
-                                    Lade verfügbare Rückruf-Termine...
-                                </div>
-                            </div>
-                            
-                            <div id="callback-slots-container">
-                                </div>
-                            
-                            <div id="no-slots-message">
-                                </div>
-                        </div>
-                        
-                        <div id="step-contact-details" class="booking-step">
-                            <h3 class="booking-step-title">Deine Kontaktdaten:</h3>
-                            <div id="selected-slot-display">
-                                Ausgewählter Rückruf-Termin wird hier angezeigt
-                            </div>
-                            
-                            <form id="callback-form">
-                                <div class="booking-form-group">
-                                    <label for="callback-name">Dein Name *</label>
-                                    <input type="text" id="callback-name" required>
-                                </div>
-                                
-                                <div class="booking-form-group">
-                                    <label for="callback-phone">Deine Telefonnummer *</label>
-                                    <input type="tel" id="callback-phone" required placeholder="z.B. 0664 123 45 67">
-                                </div>
-                                
-                                <div class="booking-form-group">
-                                    <label for="callback-topic">Dein Anliegen (optional)</label>
-                                    <textarea id="callback-topic" rows="3" placeholder="Kurze Beschreibung deines Anliegens..."></textarea>
-                                </div>
-                                
-                                <div class="booking-form-actions">
-                                    <button type="button" id="back-to-slots" class="booking-btn back-btn">← Zurück</button>
-                                    <button type="submit" id="submit-callback" class="booking-btn submit-btn">Rückruf buchen</button>
-                                </div>
-                            </form>
-                        </div>
-                        
-                        <div id="step-confirmation" class="booking-step">
-                            <div class="confirmation-content">
-                                <h3 class="confirmation-title">Rückruf-Termin erfolgreich gebucht!</h3>
-                                <div id="confirmation-details">
-                                    </div>
-                                <p class="confirmation-subtext"><strong>Michael wird dich zum vereinbarten Zeitpunkt anrufen.</strong><br>
-                                    Halte bitte dein Telefon 5 Minuten vor dem Termin bereit.
-                                </p>
-                                <button onclick="closeCallbackModal()" class="booking-btn confirm-close-btn">Perfekt! 👍</button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <button onclick="closeCallbackModal()" class="booking-modal-close-btn" aria-label="Schließen">×</button>
+const createInlineModalHTML = () => {
+    return `
+        <div id="booking-modal" class="callback-modal">
+            <div class="booking-modal-content">
+                <div class="booking-modal-header">
+                    <h2 class="booking-modal-title">Rückruf-Termin buchen</h2>
+                    <p class="booking-modal-subtitle">Michael ruft dich zum gewünschten Zeitpunkt an</p>
                 </div>
+                
+                <div class="booking-modal-body">
+                    <div id="step-slot-selection" class="booking-step active">
+                        <h3 class="booking-step-title">Wähle deinen Rückruf-Termin:</h3>
+                        
+                        <div id="callback-loading">
+                            <div>
+                                Lade verfügbare Rückruf-Termine...
+                            </div>
+                        </div>
+                        
+                        <div id="callback-slots-container">
+                            </div>
+                        
+                        <div id="no-slots-message">
+                            </div>
+                    </div>
+                    
+                    <div id="step-contact-details" class="booking-step">
+                        <h3 class="booking-step-title">Deine Kontaktdaten:</h3>
+                        <div id="selected-slot-display">
+                            Ausgewählter Rückruf-Termin wird hier angezeigt
+                        </div>
+                        
+                        <form id="callback-form">
+                            <div class="booking-form-group">
+                                <label for="callback-name">Dein Name *</label>
+                                <input type="text" id="callback-name" required>
+                            </div>
+                            
+                            <div class="booking-form-group">
+                                <label for="callback-phone">Deine Telefonnummer *</label>
+                                <input type="tel" id="callback-phone" required placeholder="z.B. 0664 123 45 67">
+                            </div>
+                            
+                            <div class="booking-form-group">
+                                <label for="callback-topic">Dein Anliegen (optional)</label>
+                                <textarea id="callback-topic" rows="3" placeholder="Kurze Beschreibung deines Anliegens..."></textarea>
+                            </div>
+                            
+                            <div class="booking-form-actions">
+                                <button type="button" id="back-to-slots" class="booking-btn back-btn">← Zurück</button>
+                                <button type="submit" id="submit-callback" class="booking-btn submit-btn">Rückruf buchen</button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <div id="step-confirmation" class="booking-step">
+                        <div class="confirmation-content">
+                            <h3 class="confirmation-title">Rückruf-Termin erfolgreich gebucht!</h3>
+                            <div id="confirmation-details">
+                                </div>
+                            <p class="confirmation-subtext"><strong>Michael wird dich zum vereinbarten Zeitpunkt anrufen.</strong><br>
+                                Halte bitte dein Telefon 5 Minuten vor dem Termin bereit.
+                            </p>
+                            <button onclick="closeCallbackModal()" class="booking-btn confirm-close-btn">Perfekt! 👍</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <button onclick="closeCallbackModal()" class="booking-modal-close-btn" aria-label="Schließen">×</button>
             </div>
-        `;
-    };
+        </div>
+    `;
+};
 
     // ===================================================================
     // EMERGENCY FALLBACK MODAL
     // ===================================================================
 
-    const createEmergencyFallbackModal = () => {
-        console.log("🆘 Erstelle Emergency-Fallback-Modal...");
-        
-        const emergencyModal = document.createElement('div');
-        emergencyModal.id = 'booking-modal';
-        
-        emergencyModal.innerHTML = `
-            <div class="booking-modal-content fallback-modal-content">
-                <div class="fallback-modal-header">
-                    <div class="fallback-icon">⚠️</div>
-                    <h2 class="fallback-title">Technisches Problem</h2>
+const createEmergencyFallbackModal = () => {
+    console.log("🆘 Erstelle Emergency-Fallback-Modal...");
+    
+    const emergencyModal = document.createElement('div');
+    emergencyModal.id = 'booking-modal';
+    
+    emergencyModal.innerHTML = `
+        <div class="booking-modal-content fallback-modal-content">
+            <div class="fallback-modal-header">
+                <div class="fallback-icon">⚠️</div>
+                <h2 class="fallback-title">Technisches Problem</h2>
+            </div>
+            
+            <div class="fallback-modal-body">
+                <p>
+                    Das automatische Buchungssystem ist momentan nicht verfügbar.<br>
+                    <strong>Kontaktiere Michael direkt für deinen Rückruf-Termin:</strong>
+                </p>
+                
+                <div>
+                    <a href="mailto:michael@designare.at?subject=Rückruf-Termin Anfrage&body=Hallo Michael,%0D%0A%0D%0AIch möchte gerne einen Rückruf-Termin vereinbaren.%0D%0A%0D%0AMeine Telefonnummer: %0D%0AMein Anliegen: %0D%0A%0D%0AVielen Dank!" 
+                       class="fallback-email-link">
+                        📧 E-Mail für Rückruf-Termin senden
+                    </a>
                 </div>
                 
-                <div class="fallback-modal-body">
-                    <p>
-                        Das automatische Buchungssystem ist momentan nicht verfügbar.<br>
-                        <strong>Kontaktiere Michael direkt für deinen Rückruf-Termin:</strong>
-                    </p>
-                    
-                    <div>
-                        <a href="mailto:michael@designare.at?subject=Rückruf-Termin Anfrage&body=Hallo Michael,%0D%0A%0D%0AIch möchte gerne einen Rückruf-Termin vereinbaren.%0D%0A%0D%0AMeine Telefonnummer: %0D%0AMein Anliegen: %0D%0A%0D%0AVielen Dank!" 
-                           class="fallback-email-link">
-                            📧 E-Mail für Rückruf-Termin senden
-                        </a>
-                    </div>
-                    
-                    <button onclick="closeCallbackModal()" class="booking-btn fallback-close-btn">
-                        Schließen
-                    </button>
-                </div>
+                <button onclick="closeCallbackModal()" class="booking-btn fallback-close-btn">
+                    Schließen
+                </button>
             </div>
-        `;
-        
-        document.body.appendChild(emergencyModal);
-        document.body.style.overflow = 'hidden';
-        
-        console.log("✅ Emergency-Fallback-Modal erstellt");
-        return emergencyModal;
-    };
+        </div>
+    `;
+    
+    document.body.appendChild(emergencyModal);
+    document.body.style.overflow = 'hidden';
+    
+    console.log("✅ Emergency-Fallback-Modal erstellt");
+    return emergencyModal;
+};
 
     // ===================================================================
     // EVENT LISTENERS FÜR BOOKING MODAL
@@ -732,19 +719,20 @@ export const initAiForm = () => {
     // HILFSFUNKTIONEN
     // ===================================================================
 
-    const showCallbackStep = (stepId) => {
-        // Finde alle Schritte mit der Klasse ".booking-step" und entferne die "active" Klasse
-        document.querySelectorAll('.booking-step').forEach(step => {
-            step.classList.remove('active');
-        });
-        
-        // Finde den Ziel-Schritt und füge ihm die "active" Klasse hinzu
-        const targetStep = document.getElementById(stepId);
-        if (targetStep) {
-            targetStep.classList.add('active');
-            console.log("✅ Wechsel zu Callback-Schritt:", stepId);
-        }
-    };
+const showCallbackStep = (stepId) => {
+    // 1. Finde alle Schritte mit der NEUEN Klasse ".booking-step" und entferne die "active" Klasse
+    document.querySelectorAll('.booking-step').forEach(step => {
+        step.classList.remove('active');
+    });
+    
+    // 2. Finde den Ziel-Schritt und füge ihm die "active" Klasse hinzu
+    const targetStep = document.getElementById(stepId);
+    if (targetStep) {
+        targetStep.classList.add('active');
+        console.log("✅ Wechsel zu Callback-Schritt:", stepId);
+    }
+};
+
 
     const showCallbackError = (message) => {
         console.error("❌ Callback-Fehler:", message);
@@ -828,18 +816,18 @@ export const initAiForm = () => {
         if (!existingChatForm) {
             const chatForm = document.createElement('form');
             chatForm.id = 'ai-chat-form';
-            chatForm.style.cssText = 'margin-top: 20px; display: flex; gap: 0; border: 1px solid #444; border-radius: 10px; overflow: hidden; background-color: #2d2d2d;';
+            chatForm.style.cssText = 'margin-top: 20px; display: flex; gap: 10px;';
             
             const chatInput = document.createElement('input');
             chatInput.type = 'text';
             chatInput.id = 'ai-chat-input';
             chatInput.placeholder = 'Deine Antwort...';
-            chatInput.style.cssText = 'flex: 1; background: none; border: none; color: #e0e0e0; font-size: 1rem; outline: none; padding: 12px 15px;';
+            chatInput.style.cssText = 'flex: 1; padding: 10px; border-radius: 5px; border: 1px solid #ccc; background: rgba(255,255,255,0.1); color: #fff;';
             
             const chatButton = document.createElement('button');
             chatButton.type = 'submit';
-            chatButton.innerHTML = '<i class="fa-regular fa-paper-plane"></i>';
-            chatButton.style.cssText = 'background: #ffc107; color: #1a1a1a; border: none; padding: 12px 18px; cursor: pointer; display: flex; align-items: center; justify-content: center;';
+            chatButton.textContent = 'Senden';
+            chatButton.style.cssText = 'padding: 10px 15px; background: #ffc107; border: none; border-radius: 5px; cursor: pointer; color: #1a1a1a; font-weight: bold;';
             
             chatForm.appendChild(chatInput);
             chatForm.appendChild(chatButton);
@@ -982,55 +970,6 @@ export const initAiForm = () => {
         selectedCallbackData = null;
         console.log("✅ Rückruf-Modal geschlossen");
     };
-
-    // Setup globale Funktionen
-    setupGlobalChatFunctions();
     
-    console.log("✅ AI-Form vollständig initialisiert!");
+    console.log("✅ Korrigierte AI-Form mit funktionierendem Booking-System vollständig initialisiert");
 };
-
-// ===================================================================
-// GLOBALE CHAT-FUNKTIONEN (für Header-Button auf allen Seiten)
-// ===================================================================
-
-function setupGlobalChatFunctions() {
-    console.log("🔧 Richte globale Chat-Funktionen ein...");
-    
-    // Globale Evita-Chat-Funktion für Header-Button
-    window.openEvitaChatFromAnyPage = () => {
-        console.log("💬 Evita Chat von beliebiger Seite geöffnet");
-        
-        // Nutze die Funktion aus modals.js wenn verfügbar
-        if (typeof window.openEvitaChat === 'function') {
-            return window.openEvitaChat();
-        } else {
-            console.warn("⚠️ Globale Chat-Funktion nicht verfügbar");
-            // Fallback: Einfache Weiterleitung zur Startseite
-            if (window.location.pathname !== '/' && window.location.pathname !== '/index.html') {
-                window.location.href = '/#chat';
-            }
-            return false;
-        }
-    };
-    
-    // Booking-Launch-Funktion global verfügbar machen
-    window.launchBookingFromChat = () => {
-        console.log("🚀 Booking von Chat aus gestartet");
-        
-        // Nutze die globale einheitliche Funktion wenn verfügbar
-        if (typeof window.launchUnifiedBookingModal === 'function') {
-            return window.launchUnifiedBookingModal();
-        } else {
-            console.warn("⚠️ Globale Booking-Funktion nicht verfügbar, verwende lokale Implementierung");
-            // Falls ai-form.js geladen ist, nutze lokale Funktion
-            if (typeof window.launchBookingFromAnywhere === 'function') {
-                return window.launchBookingFromAnywhere();
-            } else {
-                alert("Für einen Rückruf-Termin kontaktiere Michael bitte direkt: michael@designare.at");
-                return false;
-            }
-        }
-    };
-    
-    console.log("✅ Globale Chat-Funktionen eingerichtet");
-}
