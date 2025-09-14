@@ -112,7 +112,7 @@ export const initAiForm = () => {
             'termin', 'rückruf', 'buchung', 'buchen', 
             'anrufen', 'telefonieren', 'kalender', 'zeit',
             'verfügbar', 'wann', 'sprechen', 'gespräch',
-            'callback', 'appointment', 'ruf', 'michael',
+            'callback', 'appointment', 'ruf', 
             'kontakt', 'erreichen', 'melden', 'telefon'
         ];
         
