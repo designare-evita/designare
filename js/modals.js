@@ -1,13 +1,12 @@
 // js/modals.js - BEREINIGTE & FINALE VERSION
 
-// === 1. EINHEITLICHE MODAL-HELFER ===
-// Diese zentralen Funktionen können von überall in der App genutzt werden.
+// === 1. ZENTRALE HELFERFUNKTIONEN ===
+// Diese Funktionen können von überall genutzt werden, um Modals zu steuern.
 
 export const openModal = (modalElement) => {
     if (modalElement) {
         modalElement.classList.add('visible');
         document.body.style.overflow = 'hidden';
-        document.body.classList.add('no-scroll');
     }
 };
 
@@ -15,54 +14,52 @@ export const closeModal = (modalElement) => {
     if (modalElement) {
         modalElement.classList.remove('visible');
         document.body.style.overflow = '';
-        document.body.classList.remove('no-scroll');
     }
 };
 
-// === 2. MODAL-INITIALISIERUNG ===
-// Diese Funktion richtet die Event-Listener für alle Standard-Modals ein.
-
+// === 2. HAUPT-INITIALISIERUNG ===
+// Richtet die Event-Listener für alle Standard-Modals ein.
 export function initModals() {
     console.log("Initialisiere Standard-Modals...");
 
-    // Schließt alle Modals, wenn auf den Hintergrund geklickt wird
-    setupModalBackgroundClose();
-
-    // Setup für spezifische Modals (Beispiele)
+    // Setup für spezifische Modals durch Trigger- und Modal-IDs
     setupSpecificModal('contact-modal-trigger', 'contact-modal');
-    setupSpecificModal('about-modal-trigger', 'about-modal');
     setupSpecificModal('impressum-trigger', 'legal-modal-impressum');
     setupSpecificModal('datenschutz-trigger', 'legal-modal-datenschutz');
-    setupSpecificModal('cookie-settings-trigger', 'cookie-modal'); // Falls vorhanden
+    // Füge hier bei Bedarf weitere hinzu...
 
-    console.log("✅ Standard-Modals erfolgreich initialisiert.");
+    // Richtet das Schließen durch Klick auf den Hintergrund ein
+    setupModalBackgroundClose();
+
+    console.log("✅ Standard-Modals initialisiert.");
 }
 
+// === 3. INTERNE SETUP-FUNKTIONEN ===
 
-// === 3. SETUP-FUNKTIONEN ===
-
+// Verbindet einen Trigger-Button mit einem Modal
 const setupSpecificModal = (triggerId, modalId) => {
     const trigger = document.getElementById(triggerId);
     const modal = document.getElementById(modalId);
     
     if (trigger && modal) {
-        // Öffnen des Modals
+        // Öffnen
         trigger.addEventListener('click', (e) => {
             e.preventDefault();
             openModal(modal);
         });
 
-        // Schließen mit Buttons, die die Klasse 'close-modal' haben
+        // Schließen mit jedem Button, der die Klasse 'close-modal' hat
         modal.querySelectorAll('.close-modal').forEach(button => {
             button.addEventListener('click', () => closeModal(modal));
         });
     }
 };
 
+// Ermöglicht das Schließen von Modals durch Klick auf den dunklen Hintergrund
 const setupModalBackgroundClose = () => {
     document.querySelectorAll('.modal-overlay').forEach(overlay => {
         overlay.addEventListener('click', (event) => {
-            // Schließt das Modal nur, wenn direkt auf den Overlay-Hintergrund geklickt wird
+            // Nur schließen, wenn direkt auf den Hintergrund geklickt wird
             if (event.target === overlay) {
                 closeModal(overlay);
             }
@@ -70,9 +67,5 @@ const setupModalBackgroundClose = () => {
     });
 };
 
-
-// === 4. ALTLASTEN ENTFERNT ===
-// Der gesamte Code bezüglich `setupAiModal`, `checkForBookingKeywords`, 
-// `launchCurrentBookingModal` und die zugehörigen globalen Funktionen wurde entfernt.
-// Diese Logik gehört ausschließlich zu `ai-form.js`, um Konflikte zu vermeiden.
-// `modals.js` ist jetzt nur noch für allgemeine, nicht-KI-spezifische Modals zuständig.
+// HINWEIS: Alle AI-spezifischen Logiken wurden entfernt, da sie nun zentral
+// und konfliktfrei in `ai-form.js` verwaltet werden.
