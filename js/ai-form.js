@@ -104,75 +104,103 @@ export const initAiForm = () => {
     // INTELLIGENTE BOOKING-ERKENNUNG - VOLLSTÄNDIG KORRIGIERT
     // ===================================================================
 
-    const isLocalBookingRequest = (userInput) => {
-        const lowerInput = userInput.toLowerCase();
-        
-        // Basis-Keywords für Terminbuchung (OHNE "michael")
-        const basicBookingKeywords = [
-            'termin', 'rückruf', 'buchung', 'buchen', 
-            'anrufen', 'telefonieren', 'kalender', 'zeit',
-            'verfügbar', 'sprechen', 'gespräch',
-            'callback', 'appointment', 'ruf',
-            'kontakt', 'erreichen', 'melden', 'telefon'
-        ];
-        
-        // Kontext-spezifische Kombinationen (MIT Michael)
-        const contextBookingPhrases = [
-            'termin mit michael',
-            'michael anrufen',
-            'rückruf von michael',
-            'gespräch mit michael',
-            'michael erreichen',
-            'michael kontaktieren',
-            'wann hat michael zeit',
-            'michael verfügbar',
-            'kann michael',
-            'möchte michael sprechen',
-            'michael telefonieren',
-            'ruf mich michael'
-        ];
-        
-        // Fragen über Michael (DEFINITIV NICHT booking)
-        const infoAboutMichaelPhrases = [
-            'wer ist michael',
-            'was macht michael',
-            'über michael',
-            'michael kanda',
-            'michael arbeitet',
-            'michaels erfahrung',
-            'qualifikation michael',
-            'michael bei maxonline',
-            'erzähl mir über michael',
-            'informationen über michael',
-            'was kann michael',
-            'michael fähigkeiten',
-            'michael background',
-            'michael hintergrund'
-        ];
-        
-        // SCHRITT 1: Prüfe zuerst Info-Anfragen (haben absolute Vorrang)
-        if (infoAboutMichaelPhrases.some(phrase => lowerInput.includes(phrase))) {
-            console.log("🔍 Info-Anfrage über Michael erkannt - KEIN Booking");
-            return false; // Definitiv KEINE Booking-Anfrage
-        }
-        
-        // SCHRITT 2: Prüfe Kontext-spezifische Booking-Phrasen mit Michael
-        if (contextBookingPhrases.some(phrase => lowerInput.includes(phrase))) {
-            console.log("🔍 Kontext-Booking mit Michael erkannt - Booking JA");
-            return true; // Definitiv Booking-Anfrage
-        }
-        
-        // SCHRITT 3: Prüfe Basis-Keywords (ohne Michael-Kontext)
-        const hasBasicBookingKeyword = basicBookingKeywords.some(keyword => lowerInput.includes(keyword));
-        
-        if (hasBasicBookingKeyword) {
-            console.log("🔍 Basis-Booking-Keyword erkannt - Booking JA");
-            return true;
-        }
-        
-        console.log("🔍 Keine Booking-Keywords erkannt");
-        return false;
-    };
+const isLocalBookingRequest = (userInput) => {
+    const lowerInput = userInput.toLowerCase();
+    
+    // SCHRITT 1: Prüfe zuerst explizite Info-Anfragen über Michael (haben absolute Vorrang)
+    const infoAboutMichaelPhrases = [
+        'wer ist michael',
+        'was macht michael',
+        'über michael', 
+        'michael kanda',
+        'michael arbeitet',
+        'michaels erfahrung',
+        'qualifikation michael',
+        'michael bei maxonline',
+        'erzähl mir über michael',
+        'informationen über michael',
+        'was kann michael',
+        'michael fähigkeiten',
+        'michael background',
+        'michael hintergrund',
+        'michael freizeit',           // NEU
+        'freizeit michael',           // NEU
+        'hobby michael',              // NEU
+        'michael hobbys',             // NEU
+        'michael privat',             // NEU
+        'was macht michael privat',   // NEU
+        'michael in seiner freizeit', // NEU
+        'michael sport',              // NEU
+        'michael musik',              // NEU
+        'michael hund',               // NEU
+        'michael evita'               // NEU
+    ];
+    
+    // WICHTIG: Info-Anfragen haben absolute Vorrang - sofort return false
+    if (infoAboutMichaelPhrases.some(phrase => lowerInput.includes(phrase))) {
+        console.log("🔍 Info-Anfrage über Michael erkannt - KEIN Booking");
+        return false; // Definitiv KEINE Booking-Anfrage
+    }
+    
+    // SCHRITT 2: Prüfe Kontext-spezifische Booking-Phrasen (nur explizite Terminwünsche)
+    const contextBookingPhrases = [
+        'termin mit michael',
+        'michael anrufen', 
+        'rückruf von michael',
+        'gespräch mit michael',
+        'michael erreichen',
+        'michael kontaktieren',
+        'wann hat michael zeit',
+        'michael verfügbar',
+        'kann michael mich anrufen',
+        'kann michael anrufen',
+        'möchte michael sprechen',
+        'michael telefonieren',
+        'ruf mich michael',
+        'michael rückruf'
+    ];
+    
+    if (contextBookingPhrases.some(phrase => lowerInput.includes(phrase))) {
+        console.log("🔍 Kontext-Booking mit Michael erkannt - Booking JA");
+        return true; // Definitiv Booking-Anfrage
+    }
+    
+    // SCHRITT 3: Prüfe allgemeine Basis-Keywords (ohne Michael-Bezug)
+    const basicBookingKeywords = [
+        'termin buchen',
+        'rückruf buchen', 
+        'callback',
+        'appointment',
+        'buchung',
+        'terminvereinbarung',
+        'verfügbare termine',
+        'freie termine'
+    ];
+    
+    const hasBasicBookingKeyword = basicBookingKeywords.some(keyword => lowerInput.includes(keyword));
+    
+    if (hasBasicBookingKeyword) {
+        console.log("🔍 Basis-Booking-Keyword erkannt - Booking JA");
+        return true;
+    }
+    
+    // SCHRITT 4: Prüfe einzelne Begriffe nur in sehr spezifischem Kontext
+    const potentialBookingWords = ['termin', 'rückruf', 'anrufen', 'telefon', 'kontakt'];
+    const hasBookingWord = potentialBookingWords.some(word => lowerInput.includes(word));
+    
+    // Nur als Booking werten, wenn KEIN "michael" UND KEIN Fragenwort vorhanden
+    const hasQuestionWords = ['was', 'wie', 'wer', 'wo', 'wann', 'warum', 'welche', 'erzähl', 'erkläre'].some(q => lowerInput.includes(q));
+    const hasMichael = lowerInput.includes('michael');
+    
+    if (hasBookingWord && !hasQuestionWords && !hasMichael) {
+        console.log("🔍 Isoliertes Booking-Keyword ohne Frage - Booking JA");
+        return true;
+    }
+    
+    console.log("🔍 Keine Booking-Keywords erkannt");
+    return false;
+};
+    
 
     // ===================================================================
     // KORRIGIERTE EVITA-KOMMUNIKATION
