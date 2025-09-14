@@ -1,4 +1,4 @@
-// api/ask-gemini.js - NEUE VEREINFACHTE VERSION für einheitliches Booking-Modal
+// api/ask-gemini.js - KORRIGIERTE VERSION mit intelligenter Intent-Erkennung
 
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
@@ -19,24 +19,49 @@ module.exports = async function handler(req, res) {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
 
     // =================================================================
-    // INTELLIGENTE INTENT-ERKENNUNG
+    // KORRIGIERTE INTELLIGENTE INTENT-ERKENNUNG
     // =================================================================
     const intentDetectionPrompt = `
-      Analysiere die folgende Nutzereingabe und klassifiziere die Absicht.
+      Analysiere die folgende Nutzereingabe und klassifiziere die Absicht SEHR PRÄZISE.
       Antworte NUR mit einem einzigen Wort: "booking", "question", oder "urgent_booking".
       
-      "booking" = Alles was mit Terminen, Kalendern, Verfügbarkeit, Buchungen, Rückruf oder Gesprächen zu tun hat
-      "urgent_booking" = Dringende Terminanfragen (Wörter wie "sofort", "dringend", "schnell", "heute", "morgen")
-      "question" = Alle anderen allgemeinen Fragen
+      WICHTIG: Unterscheide genau zwischen:
+      
+      "booking" = NUR wenn es explizit um Terminvereinbarung, Rückruf oder direkten Kontakt geht:
+      - "Ich möchte einen Termin"
+      - "Kann Michael mich anrufen?"
+      - "Rückruf vereinbaren"
+      - "Termin mit Michael"
+      - "Wann hat Michael Zeit?"
+      - "Michael erreichen" (im Kontext von Kontakt)
+      
+      "urgent_booking" = Dringende Terminanfragen:
+      - "Dringend einen Termin heute!"
+      - "Sofort sprechen"
+      - "Schnell einen Rückruf"
+      
+      "question" = ALLE anderen Fragen, besonders Informationsanfragen über Michael:
+      - "Wer ist Michael?"
+      - "Was macht Michael?"
+      - "Über Michael"
+      - "Michael Kanda"
+      - "Michaels Erfahrung"
+      - "Qualifikationen von Michael"
+      - "Michael bei maxonline"
+      - "Erzähl mir über Michael"
+      - Alle anderen allgemeinen Fragen
 
+      REGEL: Bei Zweifel zwischen Info-Anfrage und Booking → wähle "question"
+      
       Beispiele:
-      - "Hast du nächste Woche Zeit?" -> booking
-      - "Ich brauche einen Termin." -> booking
-      - "Ich möchte einen Rückruf" -> booking
-      - "Können wir telefonieren?" -> booking
+      - "Wer ist Michael?" -> question (Info-Anfrage)
+      - "Was macht Michael?" -> question (Info-Anfrage)
+      - "Michael Kanda" -> question (Info-Anfrage)
+      - "Termin mit Michael" -> booking (explizite Terminanfrage)
+      - "Kann Michael mich anrufen?" -> booking (explizite Kontaktanfrage)
       - "Dringend einen Termin heute!" -> urgent_booking
       - "Was ist JavaScript?" -> question
-      - "Wer bist du?" -> question
+      - "Hallo Evita" -> question
 
       Hier ist die Nutzereingabe: "${prompt}"
     `;
