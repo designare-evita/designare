@@ -1291,9 +1291,26 @@ export function initModals() {
     setupCookieModal();
     setupContactModal();
     setupAboutModal();
-    setupLegalModals();
+    setupLegalModals(); // Diese Funktion bleibt für den Close-Button etc.
     setupAiModal();
     setupModalBackgroundClose();
+
+    // ===================================================================
+    // NEU: EVENT DELEGATION FÜR DYNAMISCHE LINKS (FOOTER)
+    // ===================================================================
+    document.body.addEventListener('click', (e) => {
+        // Prüfen, ob auf den Impressum-Link geklickt wurde
+        if (e.target.matches('#impressum-link')) {
+            e.preventDefault(); // Verhindert, dass der Browser zu "#" springt
+            loadLegalContentWithPagination('impressum.html');
+        }
+
+        // Prüfen, ob auf den Datenschutz-Link geklickt wurde
+        if (e.target.matches('#datenschutz-link')) {
+            e.preventDefault();
+            loadLegalContentWithPagination('datenschutz.html');
+        }
+    });
     
     // Zusätzliche Evita Chat Button Einrichtung mit Retry
     setTimeout(() => {
