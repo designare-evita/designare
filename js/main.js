@@ -177,6 +177,7 @@ const initializeFormsWithDelay = async () => {
     
     console.log("✅ Alle Formulare erfolgreich initialisiert");
 };
+
 // === 9. CHAT-INTEGRATION SETUP ===
 const setupChatIntegration = () => {
     console.log("💬 Richte erweiterte Chat-Integration ein...");
@@ -201,42 +202,8 @@ const setupChatIntegration = () => {
         window.launchBookingFromAnywhere();
     });
     
-    /*
-    // AUSKOMMENTIERT: Dieser Observer ist redundant, da modals.js dies bereits lokal behandelt.
-    // Überwache Chat-Nachrichten auf Booking-Keywords
-    const observeChatMessages = () => {
-        const chatHistory = document.getElementById('ai-chat-history');
-        if (chatHistory) {
-            const observer = new MutationObserver((mutations) => {
-                mutations.forEach((mutation) => {
-                    mutation.addedNodes.forEach((node) => {
-                        if (node.nodeType === Node.ELEMENT_NODE && node.classList.contains('chat-message')) {
-                            const text = node.textContent.toLowerCase();
-                            if (text.includes('buchung') || text.includes('termin') || text.includes('kalender')) {
-                                console.log("🎯 Booking-relevante Nachricht erkannt -> Starte Booking-Modal");
-                                window.launchBookingFromAnywhere();
-                            }
-                        }
-                    });
-                });
-            });
-            
-            observer.observe(chatHistory, { childList: true });
-            console.log("👁️ Chat-Message-Observer aktiviert");
-        }
-    };
-    
-    // Observer starten
-    observeChatMessages();
-    
-    // Retry-Mechanismus für Chat-Observer
-    setTimeout(observeChatMessages, 1000);
-    setTimeout(observeChatMessages, 3000);
-    */
-    
     console.log("✅ Chat-Integration erfolgreich eingerichtet");
 };
-
 
 // === 10. FEHLERBEHANDLUNG UND RETRY-MECHANISMUS ===
 const withRetry = async (fn, retries = 3, delay = 1000) => {
@@ -296,9 +263,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Lade externe Inhalte
         const headerPromise = loadContent('/header.html', 'header-placeholder');
         const modalsPromise = loadContent('/modals.html', 'modal-container');
-        
-        await Promise.all([headerPromise, modalsPromise]);
-        console.log("✅ Header und Modals erfolgreich geladen.");
+        const footerPromise = loadContent('/footer.html', 'footer-placeholder'); // <-- HIER IST DIE ÄNDERUNG
+
+        await Promise.all([headerPromise, modalsPromise, footerPromise]); // <-- HIER IST DIE ÄNDERUNG
+        console.log("✅ Header, Modals und Footer erfolgreich geladen."); // <-- HIER IST DIE ÄNDERUNG
         
         // Erweitere Header nach dem Laden
         setTimeout(() => {
