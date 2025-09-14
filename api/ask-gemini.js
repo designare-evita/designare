@@ -21,73 +21,99 @@ module.exports = async function handler(req, res) {
     // =================================================================
     // KORRIGIERTE INTELLIGENTE INTENT-ERKENNUNG
     // =================================================================
-    const intentDetectionPrompt = `
-      Analysiere die folgende Nutzereingabe und klassifiziere die Absicht SEHR PRÄZISE.
-      Antworte NUR mit einem einzigen Wort: "booking", "question", oder "urgent_booking".
-      
-      WICHTIG: Unterscheide genau zwischen:
-      
-      "booking" = NUR wenn es explizit um Terminvereinbarung, Rückruf oder direkten Kontakt geht:
-      - "Ich möchte einen Termin"
-      - "Kann Michael mich anrufen?"
-      - "Rückruf vereinbaren"
-      - "Termin mit Michael"
-      - "Wann hat Michael Zeit?"
-      - "Michael erreichen" (im Kontext von Kontakt)
-      
-      "urgent_booking" = Dringende Terminanfragen:
-      - "Dringend einen Termin heute!"
-      - "Sofort sprechen"
-      - "Schnell einen Rückruf"
-      
-      "question" = ALLE anderen Fragen, besonders Informationsanfragen über Michael:
-      - "Wer ist Michael?"
-      - "Was macht Michael?"
-      - "Über Michael"
-      - "Michael Kanda"
-      - "Michaels Erfahrung"
-      - "Qualifikationen von Michael"
-      - "Michael bei maxonline"
-      - "Erzähl mir über Michael"
-      - Alle anderen allgemeinen Fragen
+   // ANPASSUNG in api/ask-gemini.js 
+// Ersetze den Intent-Detection-Block (Zeile ca. 20-70)
 
-      REGEL: Bei Zweifel zwischen Info-Anfrage und Booking → wähle "question"
-      
-      Beispiele:
-      - "Wer ist Michael?" -> question (Info-Anfrage)
-      - "Was macht Michael?" -> question (Info-Anfrage)
-      - "Michael Kanda" -> question (Info-Anfrage)
-      - "Termin mit Michael" -> booking (explizite Terminanfrage)
-      - "Kann Michael mich anrufen?" -> booking (explizite Kontaktanfrage)
-      - "Dringend einen Termin heute!" -> urgent_booking
-      - "Was ist JavaScript?" -> question
-      - "Hallo Evita" -> question
+// =================================================================
+// NEUE INTELLIGENTE INTENT-ERKENNUNG MIT RÜCKFRAGE-SYSTEM
+// =================================================================
+const intentDetectionPrompt = `
+Analysiere die folgende Nutzereingabe und klassifiziere die Absicht SEHR PRÄZISE.
+Antworte NUR mit einem einzigen Wort: "booking_maybe", "question", oder "urgent_booking".
 
-      Hier ist die Nutzereingabe: "${prompt}"
+WICHTIG: Unterscheide genau zwischen:
+
+"urgent_booking" = Dringende/explizite Terminanfragen:
+- "Dringend einen Termin heute!"
+- "Sofort sprechen"
+- "Schnell einen Rückruf"
+- "Termin mit Michael buchen"
+- "Michael soll mich anrufen"
+
+"booking_maybe" = Unklare Anfragen, die Termine ERWÄHNEN aber nicht eindeutig sind:
+- "Ich brauche einen Termin" (nicht klar, ob mit Michael)
+- "Wann ist Michael verfügbar?"
+- "Kann man einen Rückruf vereinbaren?"
+- "Ich möchte sprechen" (nicht klar mit wem)
+- "Wie funktioniert die Terminbuchung?"
+
+"question" = ALLE Info-Anfragen und klare Nicht-Booking-Fragen:
+- "Wer ist Michael?"
+- "Was macht Michael?"
+- "Was macht Michael in seiner Freizeit?"
+- "Über Michael"
+- "Michael Kanda"
+- "Michaels Erfahrung"
+- "Wie funktioniert Termin-Management?" (Info-Frage, kein Booking-Wunsch)
+- "Was ist JavaScript?"
+- "Hallo Evita"
+
+REGEL: Bei Zweifel zwischen Info-Anfrage und unsicherem Booking → wähle "question"
+REGEL: Nur "urgent_booking" wenn 100% klar ist, dass ein Termin mit Michael gewünscht wird
+REGEL: "booking_maybe" nur wenn Terminbezug vorhanden, aber unklar ob wirklich gewünscht
+
+Hier ist die Nutzereingabe: "${prompt}"
+`;
+
+const intentResult = await model.generateContent(intentDetectionPrompt);
+const intentResponse = await intentResult.response;
+const intent = intentResponse.text().trim();
+
+console.log(`Intent erkannt: ${intent} für Eingabe: "${prompt}"`);
+
+// =================================================================
+// BEHANDLUNG DER VERSCHIEDENEN INTENTS
+// =================================================================
+if (intent === 'urgent_booking') {
+    console.log('🎯 Explizite Booking-Intent erkannt - direktes Modal');
+    
+    const directBookingResponse = "Perfekt! Ich öffne gleich Michaels Kalender für dich.";
+
+    return res.status(200).json({
+        action: 'launch_booking_modal',
+        answer: directBookingResponse,
+        urgentBooking: true
+    });
+} else if (intent === 'booking_maybe') {
+    console.log('🤔 Unklare Booking-Intent - Backend fordert Rückfrage an');
+    
+    // Lasse Evita eine intelligente Rückfrage stellen
+    const clarificationPrompt = `
+Der Nutzer hat geschrieben: "${prompt}"
+
+Das könnte eine Terminanfrage sein, ist aber nicht ganz klar. 
+
+Stelle eine freundliche, natürliche Rückfrage, um zu klären, ob der Nutzer wirklich einen Termin mit Michael möchte.
+
+Beispiele für gute Rückfragen:
+- "Möchtest du einen Termin mit Michael vereinbaren? Ich kann dir gerne seine verfügbaren Zeiten zeigen."
+- "Soll ich Michaels Kalender öffnen und dir freie Termine für einen Rückruf zeigen?"
+- "Brauchst du einen Rückruf-Termin mit Michael? Ich kann dir sofort verfügbare Zeiten anzeigen."
+
+WICHTIG: 
+- Beende deine Antwort mit: [BOOKING_CONFIRM_REQUEST]
+- Sei freundlich und natürlich
+- Biete konkret an, den Kalender zu öffnen
     `;
-
-    const intentResult = await model.generateContent(intentDetectionPrompt);
-    const intentResponse = await intentResult.response;
-    const intent = intentResponse.text().trim();
-
-    console.log(`Intent erkannt: ${intent} für Eingabe: "${prompt}"`);
-
-    // =================================================================
-    // BOOKING-ANFRAGEN → MODAL WEITERLEITUNG
-    // =================================================================
-    if (intent === 'booking' || intent === 'urgent_booking') {
-        console.log('🎯 Booking-Intent erkannt - leite zu Modal weiter');
-        
-        const simpleBookingResponse = intent === 'urgent_booking' 
-            ? "Verstehe, du brauchst dringend einen Termin! Ich öffne gleich Michaels Kalender für dich."
-            : "Perfekt! Ich öffne Michaels Kalender und zeige dir die verfügbaren Termine.";
-
-        return res.status(200).json({
-            action: 'launch_booking_modal',
-            answer: simpleBookingResponse,
-            urgentBooking: intent === 'urgent_booking'
-        });
-    }
+    
+    const clarificationResult = await model.generateContent(clarificationPrompt);
+    const clarificationResponse = await clarificationResult.response;
+    const clarificationText = clarificationResponse.text();
+    
+    return res.status(200).json({
+        answer: clarificationText
+    });
+}
 
     // =================================================================
     // NORMALE CHAT-ANTWORTEN (für Evita oder Silas)
