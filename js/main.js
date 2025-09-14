@@ -189,48 +189,6 @@ const setupChatIntegration = () => {
             await window.debugBookingLaunch();
         } else {
             console.warn("⚠️ Debug-Booking-Launch nicht verfügbar. Das alte Booking-Modal ist deaktiviert.");
-            
-            /*
-            // AUSKOMMENTIERT: Fallback zum Laden des alten Booking-Modals
-            
-            const modalContainer = document.getElementById('modal-container');
-            if (modalContainer) {
-                try {
-                    const response = await fetch('/booking-modal.html');
-                    const html = await response.text();
-                    
-                    // Prüfe ob bereits vorhanden
-                    if (!document.getElementById('booking-modal')) {
-                        modalContainer.insertAdjacentHTML('beforeend', html);
-                    }
-                    
-                    // Dynamischer Import der Booking-Funktionen
-                    const { initBookingModal, showStep } = await import('./booking.js');
-                    
-                    setTimeout(() => {
-                        initBookingModal();
-                        
-                        const bookingModal = document.getElementById('booking-modal');
-                        if (bookingModal) {
-                            bookingModal.style.display = 'flex';
-                            bookingModal.style.opacity = '1';
-                            bookingModal.style.visibility = 'visible';
-                            bookingModal.style.pointerEvents = 'auto';
-                            
-                            document.body.style.overflow = 'hidden';
-                            document.body.classList.add('no-scroll');
-                            
-                            showStep('step-day-selection');
-                            console.log("✅ Fallback Booking-Modal erfolgreich gestartet");
-                        }
-                    }, 100);
-                    
-                } catch (error) {
-                    console.error("❌ Fallback Booking-Launch fehlgeschlagen:", error);
-                    alert("Entschuldigung, das Buchungssystem konnte nicht geladen werden. Bitte kontaktiere Michael direkt.");
-                }
-            }
-            */
         }
     };
     
@@ -243,6 +201,8 @@ const setupChatIntegration = () => {
         window.launchBookingFromAnywhere();
     });
     
+    /*
+    // AUSKOMMENTIERT: Dieser Observer ist redundant, da modals.js dies bereits lokal behandelt.
     // Überwache Chat-Nachrichten auf Booking-Keywords
     const observeChatMessages = () => {
         const chatHistory = document.getElementById('ai-chat-history');
@@ -272,9 +232,11 @@ const setupChatIntegration = () => {
     // Retry-Mechanismus für Chat-Observer
     setTimeout(observeChatMessages, 1000);
     setTimeout(observeChatMessages, 3000);
+    */
     
     console.log("✅ Chat-Integration erfolgreich eingerichtet");
 };
+
 
 // === 10. FEHLERBEHANDLUNG UND RETRY-MECHANISMUS ===
 const withRetry = async (fn, retries = 3, delay = 1000) => {
