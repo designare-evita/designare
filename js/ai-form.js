@@ -103,117 +103,217 @@ export const initAiForm = () => {
     // ===================================================================
     // KORRIGIERTE EVITA-KOMMUNIKATION MIT LOKALER BOOKING-ERKENNUNG
     // ===================================================================
-
-    const sendToEvita = async (userInput, isFromChat = false) => {
-        console.log(`🌐 Sende an Evita: "${userInput}" (fromChat: ${isFromChat})`);
+const sendToEvita = async (userInput, isFromChat = false) => {
+    console.log(`🌐 Sende an Evita: "${userInput}" (fromChat: ${isFromChat})`);
+    
+    // LOKALE BOOKING-KEYWORD-ERKENNUNG
+    const bookingKeywords = [
+        'termin', 'rückruf', 'buchung', 'buchen', 
+        'anrufen', 'telefonieren', 'kalender', 'zeit',
+        'verfügbar', 'wann', 'sprechen', 'gespräch',
+        'callback', 'appointment', 'ruf', 'michael',
+        'kontakt', 'erreichen', 'melden', 'telefon'
+    ];
+    
+    const lowerInput = userInput.toLowerCase();
+    const isLocalBookingRequest = bookingKeywords.some(keyword => lowerInput.includes(keyword));
+    
+    console.log(`🔍 Booking-Keywords gefunden: ${isLocalBookingRequest}`);
+    
+    // NEUER VERBESSERTER BOOKING-FLOW
+    if (isLocalBookingRequest) {
+        console.log("🎯 Booking-Keywords LOKAL erkannt → Starte natürlichen Flow");
         
-        // WICHTIG: Lokale Booking-Keyword-Erkennung
-        const bookingKeywords = [
-            'termin', 'rückruf', 'buchung', 'buchen', 
-            'anrufen', 'telefonieren', 'kalender', 'zeit',
-            'verfügbar', 'wann', 'sprechen', 'gespräch',
-            'callback', 'appointment', 'ruf', 'michael',
-            'kontakt', 'erreichen', 'melden', 'telefon'
-        ];
+        // SCHRITT 1: Zeige natürliche Antwort
+        const naturalResponse = "Einen Moment, ich schaue in Michaels Kalender und suche die besten verfügbaren Termine für dich...";
         
-        const lowerInput = userInput.toLowerCase();
-        const isLocalBookingRequest = bookingKeywords.some(keyword => lowerInput.includes(keyword));
+        if (!isFromChat) {
+            initializeChat(naturalResponse);
+            showChatModal();
+        } else {
+            addMessageToHistory(naturalResponse, 'ai');
+        }
         
-        console.log(`🔍 Booking-Keywords gefunden: ${isLocalBookingRequest}`);
+        // SCHRITT 2: Zeige Typing-Indikator für Realismus
+        let typingIndicatorId = null;
+        if (isFromChat) {
+            typingIndicatorId = showTypingIndicator();
+        }
         
-        // Bei Booking-Keywords direkt Modal starten
-        if (isLocalBookingRequest) {
-            console.log("🎯 Booking-Keywords LOKAL erkannt → Starte Rückruf-Modal direkt");
+        // SCHRITT 3: Warte 2-3 Sekunden für natürlichen Flow
+        setTimeout(() => {
+            // Entferne Typing-Indikator
+            if (typingIndicatorId) {
+                removeTypingIndicator(typingIndicatorId);
+            }
             
-            const message = "Perfekt! Ich öffne gleich Michaels Kalender für dich und zeige dir die verfügbaren Rückruf-Termine.";
+            // Zweite Nachricht mit Kalenderergebnis
+            const calendarResponse = "Perfekt! Ich habe verfügbare Termine gefunden. Öffne jetzt die Terminbuchung für dich.";
+            
+            if (isFromChat) {
+                addMessageToHistory(calendarResponse, 'ai');
+            }
+            
+            // SCHRITT 4: Öffne Booking-Modal nach weiterer kurzer Pause
+            setTimeout(() => {
+                console.log("⏰ Starte Rückruf-Modal nach natürlicher Verzögerung");
+                launchBookingModal();
+            }, 1500); // 1.5 Sekunden nach der zweiten Nachricht
+            
+        }, 2500); // 2.5 Sekunden für "Kalender-Suche"
+        
+        return; // Beende hier ohne API-Call
+    }
+    
+    // REST DER FUNKTION BLEIBT GLEICH...
+    // Normale API-Anfrage für andere Fragen
+    try {
+        const data = await safeFetchAPI('/api/ask-gemini', {
+            method: 'POST',
+            body: JSON.stringify({ prompt: userInput }),
+        });
+
+        console.log(`📨 Evita Response:`, data);
+
+        if (data.action === 'launch_booking_modal') {
+            console.log("🎯 Rückruf-Anfrage von API erkannt → Starte natürlichen Flow");
+            
+            // AUCH HIER NATÜRLICHEN FLOW ANWENDEN
+            const message = data.answer || "Einen Moment, ich schaue in Michaels Kalender...";
             
             if (!isFromChat) {
                 initializeChat(message);
                 showChatModal();
-                
-                setTimeout(() => {
-                    console.log("⏰ Starte Rückruf-Modal nach Chat-Antwort");
-                    launchBookingModal();
-                }, 1500);
             } else {
                 addMessageToHistory(message, 'ai');
+            }
+            
+            // Typing-Indikator und Verzögerung auch für API-Antworten
+            let typingId = null;
+            if (isFromChat) {
+                typingId = showTypingIndicator();
+            }
+            
+            setTimeout(() => {
+                if (typingId) removeTypingIndicator(typingId);
+                
+                const followUpMessage = "Ich habe verfügbare Termine gefunden! Öffne die Buchung für dich.";
+                if (isFromChat) {
+                    addMessageToHistory(followUpMessage, 'ai');
+                }
                 
                 setTimeout(() => {
-                    console.log("⏰ Starte Rückruf-Modal direkt aus Chat");
                     launchBookingModal();
-                }, 800);
-            }
+                }, 1200);
+            }, 2000);
             
-            return; // Beende hier ohne API-Call
+        } else {
+            // Normale Antworten
+            const message = data.answer || "Ich konnte keine Antwort finden.";
+            
+            if (!isFromChat) {
+                initializeChat(message);
+                showChatModal();
+            } else {
+                addMessageToHistory(message, 'ai');
+            }
         }
         
-        // Normale API-Anfrage für andere Fragen
-        try {
-            const data = await safeFetchAPI('/api/ask-gemini', {
-                method: 'POST',
-                body: JSON.stringify({ prompt: userInput }),
-            });
-
-            console.log(`📨 Evita Response:`, data);
-
-            if (data.action === 'launch_booking_modal') {
-                console.log("🎯 Rückruf-Anfrage von API erkannt → Starte Rückruf-Modal");
-                
-                const message = data.answer || "Einen Moment, ich öffne Michaels Kalender für dich...";
-                
-                if (!isFromChat) {
-                    initializeChat(message);
-                    showChatModal();
-                    
-                    setTimeout(() => {
-                        console.log("⏰ Starte Rückruf-Modal nach Chat-Antwort");
-                        launchBookingModal();
-                    }, 1500);
-                } else {
-                    addMessageToHistory(message, 'ai');
-                    
-                    setTimeout(() => {
-                        console.log("⏰ Starte Rückruf-Modal aus Chat");
-                        launchBookingModal();
-                    }, 500);
-                }
-                
-            } else {
-                const message = data.answer || "Ich konnte keine Antwort finden.";
-                
-                if (!isFromChat) {
-                    initializeChat(message);
-                    showChatModal();
-                } else {
-                    addMessageToHistory(message, 'ai');
-                }
-            }
-            
-        } catch (error) {
-            console.error(`❌ Evita-Fehler:`, error);
-            
-            let errorMessage = "Entschuldigung, ich habe gerade technische Schwierigkeiten.";
-            
-            if (error.message.includes('Netzwerkfehler')) {
-                errorMessage = "🌐 Verbindungsproblem erkannt. Bitte überprüfe deine Internetverbindung und versuche es erneut.";
-            } else if (error.message.includes('Server-Fehler') || error.message.includes('HTML-Seite')) {
-                errorMessage = "🔧 Server-Problem erkannt. Bitte versuche es in ein paar Minuten noch einmal.";
-            } else if (error.message.includes('Timeout')) {
-                errorMessage = "⏱️ Der Server antwortet nicht. Bitte versuche es später noch einmal.";
-            } else if (error.message.includes('502') || error.message.includes('503')) {
-                errorMessage = "🚧 Server wird gerade gewartet. Bitte versuche es in ein paar Minuten erneut.";
-            }
-            
-            errorMessage += "\n\nFür dringende Anfragen: michael@designare.at";
-            
-            if (isFromChat) {
-                addMessageToHistory(errorMessage, 'ai');
-            } else {
-                initializeChat(errorMessage);
-                showChatModal();
-            }
+    } catch (error) {
+        console.error(`❌ Evita-Fehler:`, error);
+        
+        // Error handling bleibt gleich...
+        let errorMessage = "Entschuldigung, ich habe gerade technische Schwierigkeiten.";
+        
+        if (error.message.includes('Netzwerkfehler')) {
+            errorMessage = "🌐 Verbindungsproblem erkannt. Bitte überprüfe deine Internetverbindung und versuche es erneut.";
+        } else if (error.message.includes('Server-Fehler') || error.message.includes('HTML-Seite')) {
+            errorMessage = "🔧 Server-Problem erkannt. Bitte versuche es in ein paar Minuten noch einmal.";
+        } else if (error.message.includes('Timeout')) {
+            errorMessage = "⏱️ Der Server antwortet nicht. Bitte versuche es später noch einmal.";
+        } else if (error.message.includes('502') || error.message.includes('503')) {
+            errorMessage = "🚧 Server wird gerade gewartet. Bitte versuche es in ein paar Minuten erneut.";
         }
-    };
+        
+        errorMessage += "\n\nFür dringende Anfragen: michael@designare.at";
+        
+        if (isFromChat) {
+            addMessageToHistory(errorMessage, 'ai');
+        } else {
+            initializeChat(errorMessage);
+            showChatModal();
+        }
+    }
+};
+
+// HILFSFUNKTION FÜR TYPING-INDIKATOR (falls noch nicht vorhanden)
+const showTypingIndicator = () => {
+    const chatHistory = document.getElementById('ai-chat-history');
+    if (!chatHistory) return null;
+
+    const typingDiv = document.createElement('div');
+    const typingId = 'typing-' + Date.now();
+    typingDiv.id = typingId;
+    typingDiv.className = 'chat-message ai typing';
+    typingDiv.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="typing-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <span>Evita schaut in den Kalender...</span>
+        </div>
+    `;
+    
+    chatHistory.appendChild(typingDiv);
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+    
+    return typingId;
+};
+
+const removeTypingIndicator = (typingId) => {
+    if (typingId) {
+        const typingDiv = document.getElementById(typingId);
+        if (typingDiv) {
+            typingDiv.remove();
+        }
+    }
+};
+
+// CSS FÜR TYPING-DOTS ANIMATION (füge zu ai-styles.css hinzu)
+/*
+.typing-dots {
+    display: flex;
+    gap: 4px;
+}
+
+.typing-dots span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--accent-color);
+    animation: typing-bounce 1.4s infinite both;
+}
+
+.typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+.typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes typing-bounce {
+    0%, 80%, 100% { 
+        transform: scale(0);
+        opacity: 0.5;
+    } 
+    40% { 
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.chat-message.typing {
+    background-color: rgba(42, 42, 42, 0.7) !important;
+    opacity: 0.8;
+}
 
     // ===================================================================
     // KORRIGIERTES BOOKING-MODAL
