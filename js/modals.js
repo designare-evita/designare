@@ -1,4 +1,4 @@
-// js/modals.js - KORRIGIERTE VERSION ohne Syntax-Fehler
+// js/modals.js - VOLLSTÄNDIGE VERSION mit Evita Chat Button Support
 
 // ===================================================================
 // EINHEITLICHE MODAL-FUNKTIONEN
@@ -21,7 +21,7 @@ export const closeModal = (modalElement) => {
 };
 
 // ===================================================================
-// AI-SPEZIFISCHE FUNKTIONEN MIT CHAT-UNTERSTÜTZUNG
+// AI-SPEZIFISCHE FUNKTIONEN MIT EVITA CHAT UNTERSTÜTZUNG
 // ===================================================================
 
 export function showAIResponse(content, isHTML = false) {
@@ -63,6 +63,60 @@ export function hideLoadingState() {
 }
 
 // ===================================================================
+// EVITA CHAT FUNKTIONEN
+// ===================================================================
+
+export function initEvitaChat() {
+    console.log("🤖 Initialisiere Evita Chat Funktionalität...");
+    
+    const modal = document.getElementById('ai-response-modal');
+    const chatHistory = document.getElementById('ai-chat-history');
+    
+    if (modal && chatHistory) {
+        // Setup Chat-Event-Listener
+        setupAiChatFunctionality();
+        console.log("✅ Evita Chat erfolgreich initialisiert");
+        return true;
+    } else {
+        console.warn("⚠️ Evita Chat Komponenten nicht gefunden");
+        return false;
+    }
+}
+
+export function launchEvitaChatModal() {
+    console.log("🚀 Starte Evita Chat Modal...");
+    
+    const modal = document.getElementById('ai-response-modal');
+    const chatHistory = document.getElementById('ai-chat-history');
+    
+    if (!modal || !chatHistory) {
+        console.error("❌ Chat Modal Komponenten nicht gefunden");
+        return false;
+    }
+    
+    // Leere vorherige Chat-Historie
+    chatHistory.innerHTML = '';
+    
+    // Füge Begrüßungsnachricht hinzu
+    const welcomeMessage = "Hallo! Ich bin Evita, Michaels KI-Assistentin. Wie kann ich dir heute helfen?";
+    addMessageToHistory(welcomeMessage, 'ai');
+    
+    // Öffne Modal
+    openModal(modal);
+    
+    // Fokus auf Chat-Input
+    setTimeout(() => {
+        const chatInput = document.getElementById('ai-chat-input');
+        if (chatInput) {
+            chatInput.focus();
+        }
+    }, 300);
+    
+    console.log("✅ Evita Chat Modal erfolgreich gestartet");
+    return true;
+}
+
+// ===================================================================
 // CHAT-FUNKTIONALITÄT FÜR AI-MODAL
 // ===================================================================
 
@@ -72,6 +126,12 @@ function setupAiChatFunctionality() {
     const aiChatHistory = document.getElementById('ai-chat-history');
 
     if (aiChatForm && aiChatInput) {
+        // Verhindere doppelte Event-Listener
+        if (aiChatForm.hasAttribute('data-evita-initialized')) {
+            return;
+        }
+        aiChatForm.setAttribute('data-evita-initialized', 'true');
+
         aiChatForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -83,6 +143,9 @@ function setupAiChatFunctionality() {
             aiChatInput.value = '';
 
             try {
+                // Zeige Typing-Indikator
+                const typingId = showTypingIndicator();
+
                 // API-Anfrage an Evita
                 const response = await fetch('/api/ask-gemini', {
                     method: 'POST',
@@ -90,20 +153,45 @@ function setupAiChatFunctionality() {
                     body: JSON.stringify({ prompt: userInput, source: 'evita' })
                 });
 
+                // Entferne Typing-Indikator
+                removeTypingIndicator(typingId);
+
                 const data = await response.json();
                 
-                // AI-Antwort zur History hinzufügen
-                if (data.answer) {
-                    addMessageToHistory(data.answer, 'ai');
-                } else if (data.message) {
-                    addMessageToHistory(data.message, 'ai');
+                // Prüfe auf Booking-Aktion
+                if (data.action === 'launch_booking_modal') {
+                    console.log("🎯 Booking-Anfrage erkannt");
+                    
+                    // AI-Antwort zur History hinzufügen
+                    if (data.answer) {
+                        addMessageToHistory(data.answer, 'ai');
+                    }
+                    
+                    // Starte Booking-Modal nach kurzer Verzögerung
+                    setTimeout(() => {
+                        if (window.launchBookingFromAnywhere) {
+                            window.launchBookingFromAnywhere();
+                        } else {
+                            console.warn("⚠️ Booking-Funktion nicht verfügbar");
+                        }
+                    }, 1500);
+                    
+                } else {
+                    // Normale AI-Antwort zur History hinzufügen
+                    if (data.answer) {
+                        addMessageToHistory(data.answer, 'ai');
+                    } else if (data.message) {
+                        addMessageToHistory(data.message, 'ai');
+                    }
                 }
 
             } catch (error) {
                 console.error('Fehler bei AI-Chat:', error);
-                addMessageToHistory('Entschuldigung, da ist ein technischer Fehler aufgetreten.', 'ai');
+                addMessageToHistory('Entschuldigung, da ist ein technischer Fehler aufgetreten. Versuche es bitte noch einmal.', 'ai');
             }
         });
+
+        console.log("✅ Chat-Funktionalität eingerichtet");
     }
 }
 
@@ -119,6 +207,31 @@ function addMessageToHistory(message, sender) {
     
     // Scroll zum Ende
     chatHistory.scrollTop = chatHistory.scrollHeight;
+}
+
+function showTypingIndicator() {
+    const chatHistory = document.getElementById('ai-chat-history');
+    if (!chatHistory) return null;
+
+    const typingDiv = document.createElement('div');
+    const typingId = 'typing-' + Date.now();
+    typingDiv.id = typingId;
+    typingDiv.className = 'chat-message ai typing';
+    typingDiv.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Evita tippt...';
+    
+    chatHistory.appendChild(typingDiv);
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+    
+    return typingId;
+}
+
+function removeTypingIndicator(typingId) {
+    if (typingId) {
+        const typingDiv = document.getElementById(typingId);
+        if (typingDiv) {
+            typingDiv.remove();
+        }
+    }
 }
 
 // ===================================================================
@@ -446,6 +559,9 @@ function setupAiModal() {
 
     // Setup Chat-Funktionalität
     setupAiChatFunctionality();
+    
+    // Initialisiere Evita Chat
+    initEvitaChat();
 }
 
 function setupModalBackgroundClose() {
@@ -495,11 +611,92 @@ function splitAboutContentManually(content) {
 }
 
 // ===================================================================
-// HAUPT-INITIALISIERUNG
+// EVITA CHAT BUTTON SPEZIFISCHE FUNKTIONEN
+// ===================================================================
+
+export function setupEvitaChatButton() {
+    console.log("🤖 Richte Evita Chat Button ein...");
+    
+    const evitaChatButton = document.getElementById('evita-chat-button');
+    if (!evitaChatButton) {
+        console.warn("⚠️ Evita Chat Button nicht im DOM gefunden");
+        return false;
+    }
+
+    // Verhindere doppelte Event-Listener
+    if (evitaChatButton.hasAttribute('data-evita-ready')) {
+        console.log("✅ Evita Chat Button bereits eingerichtet");
+        return true;
+    }
+
+    // Markiere Button als eingerichtet
+    evitaChatButton.setAttribute('data-evita-ready', 'true');
+
+    // Event Listener für Evita Chat Button
+    evitaChatButton.addEventListener('click', async (e) => {
+        e.preventDefault();
+        console.log("🤖 Evita Chat Button geklickt");
+        
+        // Loading-State anzeigen
+        evitaChatButton.classList.add('loading');
+        
+        try {
+            // Stelle sicher, dass das AI-Modal verfügbar ist
+            const success = await ensureAiModalReady();
+            
+            if (success) {
+                // Starte Evita Chat
+                const chatStarted = launchEvitaChatModal();
+                
+                if (chatStarted) {
+                    console.log("✅ Evita Chat erfolgreich gestartet");
+                } else {
+                    throw new Error("Chat konnte nicht gestartet werden");
+                }
+            } else {
+                throw new Error("AI-Modal nicht verfügbar");
+            }
+        } catch (error) {
+            console.error("❌ Fehler beim Öffnen des Evita Chats:", error);
+            alert("Entschuldigung, der Chat konnte nicht geöffnet werden. Bitte versuche es später noch einmal.");
+        } finally {
+            // Loading-State entfernen
+            evitaChatButton.classList.remove('loading');
+        }
+    });
+
+    console.log("✅ Evita Chat Button erfolgreich eingerichtet");
+    return true;
+}
+
+async function ensureAiModalReady() {
+    console.log("🔍 Überprüfe AI-Modal Verfügbarkeit...");
+    
+    const modal = document.getElementById('ai-response-modal');
+    const chatHistory = document.getElementById('ai-chat-history');
+    const chatForm = document.getElementById('ai-chat-form');
+    
+    if (modal && chatHistory && chatForm) {
+        console.log("✅ AI-Modal bereits verfügbar");
+        
+        // Stelle sicher, dass Chat-Funktionalität initialisiert ist
+        if (!chatForm.hasAttribute('data-evita-initialized')) {
+            setupAiChatFunctionality();
+        }
+        
+        return true;
+    }
+    
+    console.warn("⚠️ AI-Modal Komponenten fehlen");
+    return false;
+}
+
+// ===================================================================
+// HAUPT-INITIALISIERUNG (erweitert für Evita Chat)
 // ===================================================================
 
 export function initModals() {
-    console.log('Initialisiere Modals...');
+    console.log('Initialisiere erweiterte Modals mit Evita Chat Support...');
     
     setupCookieModal();
     setupContactModal();
@@ -508,5 +705,18 @@ export function initModals() {
     setupAiModal();
     setupModalBackgroundClose();
     
-    console.log('Modals erfolgreich initialisiert');
+    // Zusätzliche Evita Chat Button Einrichtung mit Retry
+    setTimeout(() => {
+        setupEvitaChatButton();
+    }, 200);
+    
+    // Retry-Mechanismus für Evita Button
+    setTimeout(() => {
+        const button = document.getElementById('evita-chat-button');
+        if (button && !button.hasAttribute('data-evita-ready')) {
+            setupEvitaChatButton();
+        }
+    }, 1000);
+    
+    console.log('Erweiterte Modals mit Evita Chat Support erfolgreich initialisiert');
 }
