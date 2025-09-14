@@ -244,7 +244,6 @@ const sendToEvita = async (userInput, isFromChat = false) => {
             showChatModal();
         }
     }
-};
 
 // HILFSFUNKTION FÜR TYPING-INDIKATOR (falls noch nicht vorhanden)
 const showTypingIndicator = () => {
