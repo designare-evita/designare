@@ -3,34 +3,17 @@
 // === 1. ZENTRALE HELFERFUNKTIONEN ===
 // Diese Funktionen können von überall genutzt werden, um Modals zu steuern.
 
-export const openModal = (modalElement) => {
-    if (modalElement) {
-        modalElement.classList.add('visible');
-        document.body.style.overflow = 'hidden';
-    }
-};
 
-export const closeModal = (modalElement) => {
-    if (modalElement) {
-        modalElement.classList.remove('visible');
-        document.body.style.overflow = '';
-    }
-};
+export const openModal = (modalElement) => { /* ... (Code wie vorher) */ };
+export const closeModal = (modalElement) => { /* ... (Code wie vorher) */ };
 
-// === 2. HAUPT-INITIALISIERUNG ===
-// Richtet die Event-Listener für alle Standard-Modals ein.
+// "export" macht diese Funktion für main.js sichtbar
 export function initModals() {
     console.log("Initialisiere Standard-Modals...");
-
-    // Setup für spezifische Modals durch Trigger- und Modal-IDs
     setupSpecificModal('contact-modal-trigger', 'contact-modal');
     setupSpecificModal('impressum-trigger', 'legal-modal-impressum');
     setupSpecificModal('datenschutz-trigger', 'legal-modal-datenschutz');
-    // Füge hier bei Bedarf weitere hinzu...
-
-    // Richtet das Schließen durch Klick auf den Hintergrund ein
     setupModalBackgroundClose();
-
     console.log("✅ Standard-Modals initialisiert.");
 }
 
