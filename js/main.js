@@ -177,7 +177,6 @@ const initializeFormsWithDelay = async () => {
     
     console.log("✅ Alle Formulare erfolgreich initialisiert");
 };
-
 // === 9. CHAT-INTEGRATION SETUP ===
 const setupChatIntegration = () => {
     console.log("💬 Richte erweiterte Chat-Integration ein...");
@@ -189,9 +188,11 @@ const setupChatIntegration = () => {
         if (typeof window.debugBookingLaunch === 'function') {
             await window.debugBookingLaunch();
         } else {
-            console.warn("⚠️ Debug-Booking-Launch nicht verfügbar, versuche direkten Launch...");
+            console.warn("⚠️ Debug-Booking-Launch nicht verfügbar. Das alte Booking-Modal ist deaktiviert.");
             
-            // Fallback: Versuche direktes Modal-Laden
+            /*
+            // AUSKOMMENTIERT: Fallback zum Laden des alten Booking-Modals
+            
             const modalContainer = document.getElementById('modal-container');
             if (modalContainer) {
                 try {
@@ -229,6 +230,7 @@ const setupChatIntegration = () => {
                     alert("Entschuldigung, das Buchungssystem konnte nicht geladen werden. Bitte kontaktiere Michael direkt.");
                 }
             }
+            */
         }
     };
     
