@@ -12,6 +12,7 @@
 
 #ai-chat-form button .fa-paper-plane {
     color: white;
+   font-size: 16px;
 }
 
 #ai-question::placeholder {
