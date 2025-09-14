@@ -969,25 +969,15 @@ function loadAboutContentWithPagination() {
 }
 
 function setupLegalModals() {
-    const impressumLink = document.getElementById('impressum-link');
-    const datenschutzLink = document.getElementById('datenschutz-link');
+    // const impressumLink = document.getElementById('impressum-link'); // WIRD NICHT MEHR GEBRAUCHT
+    // const datenschutzLink = document.getElementById('datenschutz-link'); // WIRD NICHT MEHR GEBRAUCHT
     const closeLegalModalBtn = document.getElementById('close-legal-modal');
 
-    // Impressum Link
-    if (impressumLink) {
-        impressumLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            loadLegalContentWithPagination('impressum.html');
-        });
-    }
+    // Impressum Link (LOGIK ENTFERNT)
+    // if (impressumLink) { ... }
 
-    // Datenschutz Link
-    if (datenschutzLink) {
-        datenschutzLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            loadLegalContentWithPagination('datenschutz.html');
-        });
-    }
+    // Datenschutz Link (LOGIK ENTFERNT)
+    // if (datenschutzLink) { ... }
 
     // Legal Modal schließen
     if (closeLegalModalBtn) {
