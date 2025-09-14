@@ -10,6 +10,10 @@
 /* Das Haupt-AI-Formular auf der Startseite verwendet die Stile aus style.css */
 /* Hier nur spezielle Ergänzungen falls nötig */
 
+#ai-chat-form button .fa-paper-plane {
+    color: white;
+}
+
 #ai-question::placeholder {
     color: var(--text-color);
     opacity: 0.5;
