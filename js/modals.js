@@ -1310,6 +1310,10 @@ export function initModals() {
             e.preventDefault();
             loadLegalContentWithPagination('datenschutz.html');
         }
+        if (e.target.matches('#disclaimer-link')) {
+    e.preventDefault();
+    loadLegalContentWithPagination('disclaimer.html');
+}
     });
     
     // Zusätzliche Evita Chat Button Einrichtung mit Retry
