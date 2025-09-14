@@ -352,7 +352,7 @@ const createInlineModalHTML = () => {
                             <p class="confirmation-subtext"><strong>Michael wird dich zum vereinbarten Zeitpunkt anrufen.</strong><br>
                                 Halte bitte dein Telefon 5 Minuten vor dem Termin bereit.
                             </p>
-                            <button onclick="closeCallbackModal()" class="booking-btn confirm-close-btn">Perfekt! 👍</button>
+                            <button onclick="closeCallbackModal()" class="booking-btn confirm-close-btn">Perfekt!</button>
                         </div>
                     </div>
                 </div>
@@ -444,7 +444,7 @@ const createEmergencyFallbackModal = () => {
     // ===================================================================
 
     const loadCallbackSlots = async () => {
-        console.log("📞 Lade Rückruf-Slots...");
+        console.log("Lade Rückruf-Slots...");
         
         const loadingDiv = document.getElementById('callback-loading');
         const slotsContainer = document.getElementById('callback-slots-container');
@@ -641,7 +641,7 @@ const createEmergencyFallbackModal = () => {
         // Button deaktivieren während Buchung
         if (submitButton) {
             submitButton.disabled = true;
-            submitButton.textContent = '📞 Wird gebucht...';
+            submitButton.textContent = 'Wird gebucht...';
         }
         
         try {
@@ -665,18 +665,18 @@ const createEmergencyFallbackModal = () => {
                 if (confirmationDetails) {
                     confirmationDetails.innerHTML = `
                         <div style="margin-bottom: 12px;">
-                            <strong>📞 Rückruf-Termin:</strong><br>
+                            <strong>Rückruf-Termin:</strong><br>
                             <span style="color: #28a745;">${selectedCallbackData.formattedString}</span>
                         </div>
                         <div style="margin-bottom: 12px;">
-                            <strong>👤 Name:</strong> ${name}
+                            <strong>Name:</strong> ${name}
                         </div>
                         <div style="margin-bottom: 12px;">
-                            <strong>📱 Telefonnummer:</strong> ${phone}
+                            <strong>Telefonnummer:</strong> ${phone}
                         </div>
                         ${topic ? `
                         <div style="margin-bottom: 12px;">
-                            <strong>💬 Anliegen:</strong> ${topic}
+                            <strong>Anliegen:</strong> ${topic}
                         </div>
                         ` : ''}
                         <div style="background: #e7f3ff; padding: 10px; border-radius: 5px; margin-top: 15px; font-size: 0.9rem;">
@@ -710,7 +710,7 @@ const createEmergencyFallbackModal = () => {
             // Button wieder aktivieren
             if (submitButton) {
                 submitButton.disabled = false;
-                submitButton.textContent = '📞 Rückruf buchen';
+                submitButton.textContent = 'Rückruf buchen';
             }
         }
     };
