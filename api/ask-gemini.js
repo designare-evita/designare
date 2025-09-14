@@ -1,4 +1,4 @@
-// api/ask-gemini.js - KORRIGIERTE VERSION mit intelligenter Intent-Erkennung
+// api/ask-gemini.js - VOLLSTÄNDIG KORRIGIERTE VERSION
 
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
@@ -10,7 +10,7 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const { prompt, source } = req.body;
+    const { prompt, source, checkBookingIntent } = req.body;
 
     if (!prompt) {
       return res.status(400).json({ message: 'A prompt is required.' });
@@ -19,76 +19,73 @@ module.exports = async function handler(req, res) {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
 
     // =================================================================
-    // KORRIGIERTE INTELLIGENTE INTENT-ERKENNUNG
+    // INTENT-ERKENNUNG NUR WENN EXPLIZIT ANGEFORDERT
     // =================================================================
-   // ANPASSUNG in api/ask-gemini.js 
-// Ersetze den Intent-Detection-Block (Zeile ca. 20-70)
+    if (checkBookingIntent === true) {
+        console.log('Explizite Intent-Prüfung angefordert für:', prompt);
+        
+        const intentDetectionPrompt = `
+Analysiere die folgende Nutzereingabe und klassifiziere die Absicht SEHR KONSERVATIV.
+Antworte NUR mit einem einzigen Wort: "question", "booking_maybe", oder "urgent_booking".
 
-// =================================================================
-// NEUE INTELLIGENTE INTENT-ERKENNUNG MIT RÜCKFRAGE-SYSTEM
-// =================================================================
-const intentDetectionPrompt = `
-Analysiere die folgende Nutzereingabe und klassifiziere die Absicht SEHR PRÄZISE.
-Antworte NUR mit einem einzigen Wort: "booking_maybe", "question", oder "urgent_booking".
+WICHTIGE REGEL: Im Zweifel IMMER "question" wählen!
 
-WICHTIG: Unterscheide genau zwischen:
-
-"urgent_booking" = Dringende/explizite Terminanfragen:
-- "Dringend einen Termin heute!"
-- "Sofort sprechen"
-- "Schnell einen Rückruf"
-- "Termin mit Michael buchen"
-- "Michael soll mich anrufen"
-
-"booking_maybe" = Unklare Anfragen, die Termine ERWÄHNEN aber nicht eindeutig sind:
-- "Ich brauche einen Termin" (nicht klar, ob mit Michael)
-- "Wann ist Michael verfügbar?"
-- "Kann man einen Rückruf vereinbaren?"
-- "Ich möchte sprechen" (nicht klar mit wem)
-- "Wie funktioniert die Terminbuchung?"
-
-"question" = ALLE Info-Anfragen und klare Nicht-Booking-Fragen:
+"question" = Standard für ALLE Info-Anfragen und die meisten anderen Requests:
 - "Wer ist Michael?"
 - "Was macht Michael?"
-- "Was macht Michael in seiner Freizeit?"
 - "Über Michael"
 - "Michael Kanda"
 - "Michaels Erfahrung"
-- "Wie funktioniert Termin-Management?" (Info-Frage, kein Booking-Wunsch)
-- "Was ist JavaScript?"
+- "Was macht Michael in seiner Freizeit?"
+- "Wie funktioniert...?"
+- "Was ist...?"
+- "Erzähl mir über..."
 - "Hallo Evita"
+- Alle Fragen mit Fragewörtern (was, wie, wer, wo, wann, warum, welche)
 
-REGEL: Bei Zweifel zwischen Info-Anfrage und unsicherem Booking → wähle "question"
-REGEL: Nur "urgent_booking" wenn 100% klar ist, dass ein Termin mit Michael gewünscht wird
-REGEL: "booking_maybe" nur wenn Terminbezug vorhanden, aber unklar ob wirklich gewünscht
+"booking_maybe" = NUR wenn eindeutig nach Terminen/Kontakt gefragt wird, ABER unklar formuliert:
+- "Ich brauche einen Termin" (unklar mit wem)
+- "Wie kann ich Michael erreichen?"
+- "Wann ist Michael verfügbar?"
+- "Kann man einen Rückruf vereinbaren?"
+- "Ich möchte sprechen" (ohne klaren Bezug zu Michael)
+
+"urgent_booking" = NUR bei 100% expliziten Terminwünschen mit Michael:
+- "Termin mit Michael buchen"
+- "Michael soll mich anrufen"
+- "Ich möchte einen Rückruf-Termin mit Michael"
+- "Dringend einen Termin mit Michael"
+- "Michael anrufen lassen"
+
+REGEL: Bei auch nur kleinstem Zweifel → "question"
+REGEL: Info-Fragen über Michael sind IMMER "question"
+REGEL: Nur "urgent_booking" wenn Michael explizit erwähnt UND klarer Terminwunsch
 
 Hier ist die Nutzereingabe: "${prompt}"
 `;
 
-const intentResult = await model.generateContent(intentDetectionPrompt);
-const intentResponse = await intentResult.response;
-const intent = intentResponse.text().trim();
+        const intentResult = await model.generateContent(intentDetectionPrompt);
+        const intentResponse = await intentResult.response;
+        const intent = intentResponse.text().trim();
 
-console.log(`Intent erkannt: ${intent} für Eingabe: "${prompt}"`);
+        console.log(`Intent erkannt: ${intent} für Eingabe: "${prompt}"`);
 
-// =================================================================
-// BEHANDLUNG DER VERSCHIEDENEN INTENTS
-// =================================================================
-if (intent === 'urgent_booking') {
-    console.log('🎯 Explizite Booking-Intent erkannt - direktes Modal');
-    
-    const directBookingResponse = "Perfekt! Ich öffne gleich Michaels Kalender für dich.";
+        // Behandlung der Intent-Ergebnisse
+        if (intent === 'urgent_booking') {
+            console.log('Explizite Booking-Intent erkannt - direktes Modal');
+            
+            const directBookingResponse = "Perfekt! Ich öffne gleich Michaels Kalender für dich.";
 
-    return res.status(200).json({
-        action: 'launch_booking_modal',
-        answer: directBookingResponse,
-        urgentBooking: true
-    });
-} else if (intent === 'booking_maybe') {
-    console.log('🤔 Unklare Booking-Intent - Backend fordert Rückfrage an');
-    
-    // Lasse Evita eine intelligente Rückfrage stellen
-    const clarificationPrompt = `
+            return res.status(200).json({
+                action: 'launch_booking_modal',
+                answer: directBookingResponse,
+                urgentBooking: true
+            });
+            
+        } else if (intent === 'booking_maybe') {
+            console.log('Unklare Booking-Intent - Rückfrage erforderlich');
+            
+            const clarificationPrompt = `
 Der Nutzer hat geschrieben: "${prompt}"
 
 Das könnte eine Terminanfrage sein, ist aber nicht ganz klar. 
@@ -104,16 +101,20 @@ WICHTIG:
 - Beende deine Antwort mit: [BOOKING_CONFIRM_REQUEST]
 - Sei freundlich und natürlich
 - Biete konkret an, den Kalender zu öffnen
-    `;
-    
-    const clarificationResult = await model.generateContent(clarificationPrompt);
-    const clarificationResponse = await clarificationResult.response;
-    const clarificationText = clarificationResponse.text();
-    
-    return res.status(200).json({
-        answer: clarificationText
-    });
-}
+            `;
+            
+            const clarificationResult = await model.generateContent(clarificationPrompt);
+            const clarificationResponse = await clarificationResult.response;
+            const clarificationText = clarificationResponse.text();
+            
+            return res.status(200).json({
+                answer: clarificationText
+            });
+        }
+        
+        // Falls intent === 'question', fahre mit normaler Evita-Antwort fort
+        console.log('Intent als Frage erkannt - normale Evita-Antwort');
+    }
 
     // =================================================================
     // NORMALE CHAT-ANTWORTEN (für Evita oder Silas)
@@ -139,10 +140,11 @@ Anrede: Duze den Besucher ausnahmslos. Verwende immer "Du", "Dir" oder "Dein".
 Stil: Antworte immer in kurzen, prägnanten Sätzen. Bei allgemeinen Fragen fasse dich kurz (maximal 4 Sätze). Bei Fachthemen darfst du ausführlicher sein, deine Antwort sollte aber maximal 9 Sätze umfassen. Sei freundlich, lösungsorientiert und zeige deinen charmanten, subtilen Humor, der ein Schmunzeln hervorruft. Vermeide Sarkasmus.
 
 WICHTIG FÜR TERMINANFRAGEN:
-- Wenn jemand explizit nach Kontakt, einem Gespräch oder einem Termin fragt (z.B. "Wie kann ich Michael erreichen?", "Können wir reden?"),
-antworte: "Gerne! Der einfachste Weg ist ein Rückruf. Ich kann dir sofort Michaels verfügbare Termine zeigen. Passt das für dich?"
-- Biete die Buchung NICHT an, wenn nur allgemein über Michael gesprochen wird (z.B. "Wer ist Michael?").
-- Verweise bei Terminanfragen NICHT auf E-Mail oder Kontaktformular, sondern immer auf das Booking-Modal.
+- Du sollst NIEMALS ungefragt das Booking-Modal öffnen
+- Antworte bei Info-Fragen über Michael IMMER normal, ohne Terminbezug
+- Nur wenn jemand EXPLIZIT nach einem Termin mit Michael fragt, dann biete die Buchung an
+- Bei unklaren Anfragen frage nach, ob wirklich ein Termin gewünscht ist
+- Verweise bei Terminanfragen NICHT auf E-Mail oder Kontaktformular, sondern immer auf das Booking-Modal
 
 --- DEINE WISSENSBASIS ---
 Die folgenden Informationen über Michael Kanda sind deine primäre Wissensquelle. Beantworte Fragen dazu stets basierend auf diesen Fakten:
