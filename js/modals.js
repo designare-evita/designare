@@ -1,4 +1,4 @@
-// js/modals.js - VOLLSTÄNDIG REPARIERTE VERSION
+// js/modals.js - KORRIGIERTE VERSION mit funktionierender About-Me Pagination
 
 export const openModal = (modalElement) => {
     if (modalElement) {
@@ -157,7 +157,7 @@ function setupContactModal() {
 }
 
 // ===================================================================
-// ABOUT ME MODAL SETUP
+// ABOUT ME MODAL SETUP - KORRIGIERT
 // ===================================================================
 function setupAboutModal() {
     const aboutButton = document.getElementById('about-me-button');
@@ -176,10 +176,181 @@ function setupAboutModal() {
                 if (contentArea) {
                     contentArea.innerHTML = aboutContent.innerHTML;
                     openModal(legalModal);
+                    
+                    // *** HIER IST DIE KORREKTUR ***
+                    // Starte About-Me spezifische Pagination
+                    setTimeout(() => {
+                        setupAboutMePagination(contentArea);
+                    }, 100);
                 }
             }
         });
     }
+}
+
+// ===================================================================
+// SPEZIELLE ABOUT-ME PAGINATION FUNKTION - NEU HINZUGEFÜGT
+// ===================================================================
+function setupAboutMePagination(contentArea) {
+    console.log('👤 Richte About-Me Pagination ein...');
+    
+    const config = {
+        totalPages: 2,
+        pages: [
+            { title: "Seite 1: Der Mann hinter den Pixeln", sections: [0, 0] },
+            { title: "Seite 2: Mehr als Code und Pixel", sections: [1, 2] }
+        ]
+    };
+    
+    // Pagination State
+    const paginationState = {
+        currentPage: 0,
+        pages: config.pages
+    };
+    
+    function createPaginationHTML(pageIndex) {
+        const isFirstPage = pageIndex === 0;
+        const isLastPage = pageIndex === config.totalPages - 1;
+        
+        return `
+            <div class="legal-modal-pagination-buttons">
+                <button id="about-prev-btn" ${isFirstPage ? 'disabled' : ''}>
+                    ← ${isFirstPage ? 'Erste Seite' : 'Vorherige Seite'}
+                </button>
+                <span style="color: var(--text-color); font-weight: 500; padding: 10px; text-align: center; font-size: 0.9rem;">
+                    ${paginationState.pages[pageIndex].title}<br>
+                    <small style="opacity: 0.7;">(${pageIndex + 1}/${config.totalPages})</small>
+                </span>
+                <button id="about-next-btn" ${isLastPage ? 'disabled' : ''}>
+                    ${isLastPage ? 'Letzte Seite' : 'Nächste Seite'} →
+                </button>
+            </div>
+        `;
+    }
+    
+    function updatePagination() {
+        const existingPagination = contentArea.querySelector('.legal-modal-pagination-buttons');
+        if (existingPagination) {
+            existingPagination.remove();
+        }
+        
+        contentArea.insertAdjacentHTML('beforeend', createPaginationHTML(paginationState.currentPage));
+        
+        // Event-Listener für neue Buttons
+        const prevBtn = document.getElementById('about-prev-btn');
+        const nextBtn = document.getElementById('about-next-btn');
+        
+        if (prevBtn && !prevBtn.disabled) {
+            prevBtn.addEventListener('click', () => {
+                if (paginationState.currentPage > 0) {
+                    paginationState.currentPage--;
+                    showPage(paginationState.currentPage);
+                }
+            });
+        }
+        
+        if (nextBtn && !nextBtn.disabled) {
+            nextBtn.addEventListener('click', () => {
+                if (paginationState.currentPage < config.totalPages - 1) {
+                    paginationState.currentPage++;
+                    showPage(paginationState.currentPage);
+                }
+            });
+        }
+    }
+    
+    function showPage(pageIndex) {
+        console.log('👤 Zeige About-Me Seite:', pageIndex);
+        
+        // Verstecke alle Abschnitte
+        const allElements = Array.from(contentArea.children);
+        allElements.forEach(element => {
+            element.style.display = 'none';
+        });
+        
+        // Zeige immer den Haupttitel
+        const title = contentArea.querySelector('h1');
+        if (title) title.style.display = 'block';
+        
+        if (pageIndex === 0) {
+            // Seite 1: Bis zum Breakpoint "Doch Michael ist mehr als nur Code und Pixel"
+            console.log('👤 Zeige Seite 1 - bis zum Breakpoint');
+            
+            let foundBreakpoint = false;
+            
+            for (let i = 0; i < allElements.length; i++) {
+                const element = allElements[i];
+                
+                // Prüfe auf Breakpoint - verschiedene mögliche Texte
+                const isBreakpoint = (
+                    (element.tagName === 'H2' && element.textContent.includes('Doch Michael ist mehr als nur Code und Pixel')) ||
+                    (element.classList && element.classList.contains('about-section-header')) ||
+                    element.textContent.includes('Doch Michael ist mehr als nur Code und Pixel')
+                );
+                
+                if (isBreakpoint) {
+                    console.log('👤 Breakpoint gefunden bei Element:', element.tagName, element.textContent.substring(0, 50));
+                    foundBreakpoint = true;
+                    break;
+                }
+                
+                element.style.display = 'block';
+                console.log('👤 Zeige Element:', element.tagName, element.textContent.substring(0, 30));
+            }
+            
+            if (!foundBreakpoint) {
+                console.warn('👤 Breakpoint nicht gefunden! Zeige nur erste Hälfte');
+                // Fallback: Zeige nur die ersten 3-4 Elemente
+                for (let i = 0; i < Math.min(4, allElements.length); i++) {
+                    allElements[i].style.display = 'block';
+                }
+            }
+            
+        } else if (pageIndex === 1) {
+            // Seite 2: Ab dem Breakpoint
+            console.log('👤 Zeige Seite 2 - ab dem Breakpoint');
+            
+            let foundBreakpoint = false;
+            
+            for (let i = 0; i < allElements.length; i++) {
+                const element = allElements[i];
+                
+                // Prüfe auf Breakpoint
+                const isBreakpoint = (
+                    (element.tagName === 'H2' && element.textContent.includes('Doch Michael ist mehr als nur Code und Pixel')) ||
+                    (element.classList && element.classList.contains('about-section-header')) ||
+                    element.textContent.includes('Doch Michael ist mehr als nur Code und Pixel')
+                );
+                
+                if (isBreakpoint) {
+                    foundBreakpoint = true;
+                    console.log('👤 Breakpoint gefunden, ab jetzt zeigen');
+                }
+                
+                if (foundBreakpoint) {
+                    element.style.display = 'block';
+                    console.log('👤 Zeige Element ab Breakpoint:', element.tagName, element.textContent.substring(0, 30));
+                }
+            }
+            
+            if (!foundBreakpoint) {
+                console.warn('👤 Breakpoint nicht gefunden! Zeige zweite Hälfte');
+                // Fallback: Zeige die letzten Elemente
+                const startIndex = Math.floor(allElements.length / 2);
+                for (let i = startIndex; i < allElements.length; i++) {
+                    allElements[i].style.display = 'block';
+                }
+            }
+        }
+        
+        updatePagination();
+        
+        // Scroll zum Anfang des Modal-Inhalts
+        contentArea.scrollTop = 0;
+    }
+    
+    // Initialisiere erste Seite
+    setTimeout(() => showPage(0), 100);
 }
 
 // ===================================================================
@@ -262,23 +433,11 @@ function addPaginationButtons(contentArea, currentPage) {
                 { title: "Seite 1: Abgrenzung & Urheberrecht", sections: [0, 1] },
                 { title: "Seite 2: Haftungsausschluss", sections: [2, 3] }
             ]
-        },
-        'about-me': {
-            totalPages: 2,
-            pages: [
-                { title: "Seite 1: Der Mann hinter den Pixeln", sections: [0, 0] },
-                { title: "Seite 2: Mehr als Code und Pixel", sections: [1, 2] }
-            ]
         }
     };
     
     // Prüfe ob Pagination für diese Seite konfiguriert ist
     let config = pageConfigs[currentPage];
-    
-    // Spezialbehandlung für About-Me (wird nicht als Datei geladen)
-    if (!config && contentArea.querySelector('h1') && contentArea.querySelector('h1').textContent.includes('Über Michael')) {
-        config = pageConfigs['about-me'];
-    }
     
     if (!config) return;
     
@@ -352,87 +511,6 @@ function addPaginationButtons(contentArea, currentPage) {
         const title = contentArea.querySelector('h1');
         if (title) title.style.display = 'block';
         
-        // Spezialbehandlung für About-Me
-        if (config === pageConfigs['about-me']) {
-            showAboutMePage(pageIndex);
-        } else {
-            // Standard-Behandlung für andere Seiten
-            showStandardPage(pageIndex);
-        }
-        
-        updatePagination();
-        
-        // Scroll zum Anfang des Modal-Inhalts
-        contentArea.scrollTop = 0;
-    }
-    
-    function showAboutMePage(pageIndex) {
-        console.log('👤 Zeige About-Me Seite:', pageIndex);
-        
-        // Alle Elemente des Content-Bereichs durchgehen
-        const allElements = Array.from(contentArea.children);
-        console.log('👤 Gefundene Elemente:', allElements.length);
-        
-        if (pageIndex === 0) {
-            // Seite 1: Bis "Doch Michael ist mehr als nur Code und Pixel"
-            console.log('👤 Zeige Seite 1 - bis zum Breakpoint');
-            
-            for (let i = 0; i < allElements.length; i++) {
-                const element = allElements[i];
-                
-                // Prüfe auf verschiedene mögliche Breakpoint-Texte
-                const isBreakpoint = (
-                    (element.tagName === 'H2' && element.textContent.includes('Doch Michael ist mehr als nur Code und Pixel')) ||
-                    (element.classList && element.classList.contains('about-section-header')) ||
-                    element.textContent.includes('Doch Michael ist mehr als nur Code und Pixel')
-                );
-                
-                if (isBreakpoint) {
-                    console.log('👤 Breakpoint gefunden bei Element:', element.tagName, element.textContent.substring(0, 50));
-                    break;
-                }
-                
-                element.style.display = 'block';
-                console.log('👤 Zeige Element:', element.tagName, element.textContent.substring(0, 30));
-            }
-            
-        } else if (pageIndex === 1) {
-            // Seite 2: Ab "Doch Michael ist mehr als nur Code und Pixel"
-            console.log('👤 Zeige Seite 2 - ab dem Breakpoint');
-            
-            let foundBreakpoint = false;
-            
-            for (let i = 0; i < allElements.length; i++) {
-                const element = allElements[i];
-                
-                // Prüfe auf Breakpoint
-                const isBreakpoint = (
-                    (element.tagName === 'H2' && element.textContent.includes('Doch Michael ist mehr als nur Code und Pixel')) ||
-                    (element.classList && element.classList.contains('about-section-header')) ||
-                    element.textContent.includes('Doch Michael ist mehr als nur Code und Pixel')
-                );
-                
-                if (isBreakpoint) {
-                    foundBreakpoint = true;
-                    console.log('👤 Breakpoint gefunden, ab jetzt zeigen');
-                }
-                
-                if (foundBreakpoint) {
-                    element.style.display = 'block';
-                    console.log('👤 Zeige Element ab Breakpoint:', element.tagName, element.textContent.substring(0, 30));
-                }
-            }
-            
-            if (!foundBreakpoint) {
-                console.warn('👤 Breakpoint nicht gefunden! Zeige alle Elemente');
-                allElements.forEach(element => {
-                    element.style.display = 'block';
-                });
-            }
-        }
-    }
-    
-    function showStandardPage(pageIndex) {
         // Für Datenschutz: Zeige auch "Stand: ..." Info
         if (currentPage === 'datenschutz.html') {
             const standInfo = contentArea.querySelector('p'); // "Stand: 21. Juli 2025"
@@ -452,6 +530,11 @@ function addPaginationButtons(contentArea, currentPage) {
         if (pageConfig.sections) {
             showSectionsRange(mainSections, pageConfig.sections[0], pageConfig.sections[1]);
         }
+        
+        updatePagination();
+        
+        // Scroll zum Anfang des Modal-Inhalts
+        contentArea.scrollTop = 0;
     }
     
     function showSectionsRange(sectionElements, startIndex, endIndex) {
@@ -538,7 +621,7 @@ function setupLegalModalCloseButton() {
 }
 
 // ===================================================================
-// HAUPT-INITIALISIERUNG MIT ABOUT-ME TEST
+// HAUPT-INITIALISIERUNG
 // ===================================================================
 export function initModals() {
     console.log('🚀 Initialisiere alle Modals...');
@@ -578,65 +661,5 @@ export function initModals() {
 
         console.log('✅ Alle Modals erfolgreich initialisiert');
         
-        // ZUSÄTZLICHER DIREKTER TEST für About-Me
-        setTimeout(() => {
-            testAboutMeDirectly();
-        }, 1000);
-        
     }, 100);
-}
-
-// DIREKTER TEST für About-Me (umgeht alle Event-Handler-Probleme)
-function testAboutMeDirectly() {
-    console.log('🧪 ========================================');
-    console.log('🧪 DIREKTER ABOUT-ME TEST');
-    console.log('🧪 ========================================');
-    
-    const aboutButton = document.getElementById('about-me-button');
-    const legalModal = document.getElementById('legal-modal');
-    const aboutContent = document.getElementById('about-me-content');
-    const contentArea = document.getElementById('legal-modal-content-area');
-    
-    console.log('🧪 About Button:', !!aboutButton);
-    console.log('🧪 Legal Modal:', !!legalModal);
-    console.log('🧪 About Content:', !!aboutContent);
-    console.log('🧪 Content Area:', !!contentArea);
-    
-    if (aboutContent) {
-        console.log('🧪 About Content HTML Länge:', aboutContent.innerHTML.length);
-        console.log('🧪 About Content erste 200 Zeichen:', aboutContent.innerHTML.substring(0, 200));
-    }
-    
-    // Füge einen zusätzlichen Event-Listener hinzu (falls der andere nicht funktioniert)
-    if (aboutButton) {
-        console.log('🧪 Füge zusätzlichen About-Button Event-Listener hinzu...');
-        
-        aboutButton.addEventListener('click', function(e) {
-            e.preventDefault();
-            console.log('🧪 🚀 ZUSÄTZLICHER ABOUT-BUTTON HANDLER AKTIVIERT!');
-            
-            if (legalModal && aboutContent && contentArea) {
-                console.log('🧪 Alle Elemente vorhanden, starte About-Modal...');
-                
-                // Content kopieren
-                contentArea.innerHTML = aboutContent.innerHTML;
-                console.log('🧪 Content kopiert, neue Länge:', contentArea.innerHTML.length);
-                
-                // Modal öffnen
-                openModal(legalModal);
-                console.log('🧪 Modal geöffnet');
-                
-                // Pagination starten
-                console.log('🧪 Starte About-Pagination...');
-                setupAboutMePagination(contentArea);
-                
-            } else {
-                console.error('🧪 ❌ Nicht alle Elemente gefunden!');
-            }
-        });
-        
-        console.log('🧪 ✅ Zusätzlicher Event-Listener hinzugefügt');
-    }
-    
-    console.log('🧪 ========================================');
 }
