@@ -105,8 +105,6 @@ export const initAiForm = () => {
     // ===================================================================
 
     const isLocalBookingRequest = (userInput) => {
-return false;
-/*
 const lowerInput = userInput.toLowerCase();
 
         
@@ -256,7 +254,6 @@ const lowerInput = userInput.toLowerCase();
         } catch (error) {
             console.error(`Evita-Fehler:`, error);
             handleEvitaError(error, isFromChat);
-        }*/
     };
 
     // ===================================================================
