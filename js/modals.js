@@ -624,7 +624,6 @@ function showModalPage(pageIndex) {
         legalContentArea.appendChild(paginationDiv);
     }
 }
-
 function setupAiModal() {
     const aiResponseModal = document.getElementById('ai-response-modal');
     const closeButtons = [
@@ -638,9 +637,11 @@ function setupAiModal() {
         }
     });
 
-    setupAiChatFunctionality();
+    // WICHTIG: Diese Zeile MUSS auskommentiert bleiben, da sie den Konflikt verursacht.
+    // setupAiChatFunctionality(); 
     
-    initEvitaChat();
+    // Die Funktion `initEvitaChat` wird hier nicht mehr benötigt, da `ai-form.js` die Kontrolle hat.
+    // initEvitaChat();
 }
 
 function setupModalBackgroundClose() {
