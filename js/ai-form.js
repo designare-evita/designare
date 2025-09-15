@@ -180,15 +180,12 @@ export const initAiForm = () => {
         console.log(`Sende an Evita: "${userInput}" (fromChat: ${isFromChat})`);
         
         // NUR bei sehr offensichtlichen Booking-Keywords Backend-Intent-Check anfordern
-        const obviousBookingKeywords = [
-            'termin buchen',
-            'rückruf buchen', 
-            'appointment',
-            'terminvereinbarung',
-            'callback buchen',
-            'michael anrufen',
-            'rückruf von michael',
-            'termin mit michael'
+       const obviousBookingKeywords = [
+    'termin buchen',
+    'rückruf buchen', 
+    'appointment',
+    'terminvereinbarung',
+    'callback buchen'
         ];
         
         const lowerInput = userInput.toLowerCase();
