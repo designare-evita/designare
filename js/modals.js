@@ -538,7 +538,7 @@ function setupLegalModalCloseButton() {
 }
 
 // ===================================================================
-// HAUPT-INITIALISIERUNG
+// HAUPT-INITIALISIERUNG MIT ABOUT-ME TEST
 // ===================================================================
 export function initModals() {
     console.log('🚀 Initialisiere alle Modals...');
@@ -577,5 +577,66 @@ export function initModals() {
         });
 
         console.log('✅ Alle Modals erfolgreich initialisiert');
+        
+        // ZUSÄTZLICHER DIREKTER TEST für About-Me
+        setTimeout(() => {
+            testAboutMeDirectly();
+        }, 1000);
+        
     }, 100);
+}
+
+// DIREKTER TEST für About-Me (umgeht alle Event-Handler-Probleme)
+function testAboutMeDirectly() {
+    console.log('🧪 ========================================');
+    console.log('🧪 DIREKTER ABOUT-ME TEST');
+    console.log('🧪 ========================================');
+    
+    const aboutButton = document.getElementById('about-me-button');
+    const legalModal = document.getElementById('legal-modal');
+    const aboutContent = document.getElementById('about-me-content');
+    const contentArea = document.getElementById('legal-modal-content-area');
+    
+    console.log('🧪 About Button:', !!aboutButton);
+    console.log('🧪 Legal Modal:', !!legalModal);
+    console.log('🧪 About Content:', !!aboutContent);
+    console.log('🧪 Content Area:', !!contentArea);
+    
+    if (aboutContent) {
+        console.log('🧪 About Content HTML Länge:', aboutContent.innerHTML.length);
+        console.log('🧪 About Content erste 200 Zeichen:', aboutContent.innerHTML.substring(0, 200));
+    }
+    
+    // Füge einen zusätzlichen Event-Listener hinzu (falls der andere nicht funktioniert)
+    if (aboutButton) {
+        console.log('🧪 Füge zusätzlichen About-Button Event-Listener hinzu...');
+        
+        aboutButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('🧪 🚀 ZUSÄTZLICHER ABOUT-BUTTON HANDLER AKTIVIERT!');
+            
+            if (legalModal && aboutContent && contentArea) {
+                console.log('🧪 Alle Elemente vorhanden, starte About-Modal...');
+                
+                // Content kopieren
+                contentArea.innerHTML = aboutContent.innerHTML;
+                console.log('🧪 Content kopiert, neue Länge:', contentArea.innerHTML.length);
+                
+                // Modal öffnen
+                openModal(legalModal);
+                console.log('🧪 Modal geöffnet');
+                
+                // Pagination starten
+                console.log('🧪 Starte About-Pagination...');
+                setupAboutMePagination(contentArea);
+                
+            } else {
+                console.error('🧪 ❌ Nicht alle Elemente gefunden!');
+            }
+        });
+        
+        console.log('🧪 ✅ Zusätzlicher Event-Listener hinzugefügt');
+    }
+    
+    console.log('🧪 ========================================');
 }
