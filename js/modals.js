@@ -239,122 +239,208 @@ function loadLegalContentWithPagination(page) {
 }
 
 function addPaginationButtons(contentArea, currentPage) {
-    // Nur für Datenschutz Pagination hinzufügen
-    if (currentPage === 'datenschutz.html') {
-        let currentPageIndex = 0;
-        const totalPages = 3; // Datenschutz hat 3 Seiten
-        
-        // Pagination State
-        const paginationState = {
-            currentPage: 0,
+    // Konfiguration für alle Seiten
+    const pageConfigs = {
+        'datenschutz.html': {
+            totalPages: 3,
             pages: [
-                { start: 0, title: "Seite 1: Grundlagen & Rechte" },
-                { start: 2, title: "Seite 2: Datenverarbeitung" }, 
-                { start: 4, title: "Seite 3: Cookies & Kontakt" }
+                { title: "Seite 1: Grundlagen & Rechte", sections: [0, 1] },
+                { title: "Seite 2: Datenverarbeitung", sections: [2, 3] }, 
+                { title: "Seite 3: Cookies & KI", sections: [4, 6] }
             ]
-        };
-        
-        function createPaginationHTML(pageIndex) {
-            const isFirstPage = pageIndex === 0;
-            const isLastPage = pageIndex === totalPages - 1;
-            
-            return `
-                <div class="legal-modal-pagination-buttons">
-                    <button id="legal-prev-btn" ${isFirstPage ? 'disabled' : ''}>
-                        ← ${isFirstPage ? 'Erste Seite' : 'Vorherige Seite'}
-                    </button>
-                    <span style="color: var(--text-color); font-weight: 500; padding: 10px;">
-                        ${paginationState.pages[pageIndex].title} (${pageIndex + 1}/${totalPages})
-                    </span>
-                    <button id="legal-next-btn" ${isLastPage ? 'disabled' : ''}>
-                        ${isLastPage ? 'Letzte Seite' : 'Nächste Seite'} →
-                    </button>
-                </div>
-            `;
+        },
+        'impressum.html': {
+            totalPages: 2,
+            pages: [
+                { title: "Seite 1: Kontakt & Grundlagen", sections: [0, 1] },
+                { title: "Seite 2: Haftung & Urheberrecht", sections: [2, 4] }
+            ]
+        },
+        'disclaimer.html': {
+            totalPages: 2,
+            pages: [
+                { title: "Seite 1: Abgrenzung & Urheberrecht", sections: [0, 1] },
+                { title: "Seite 2: Haftungsausschluss", sections: [2, 3] }
+            ]
+        },
+        'about-me': {
+            totalPages: 2,
+            pages: [
+                { title: "Seite 1: Der Mann hinter den Pixeln", sections: [0, 0] },
+                { title: "Seite 2: Mehr als Code und Pixel", sections: [1, 2] }
+            ]
         }
-        
-        function updatePagination() {
-            const existingPagination = contentArea.querySelector('.legal-modal-pagination-buttons');
-            if (existingPagination) {
-                existingPagination.remove();
-            }
-            
-            contentArea.insertAdjacentHTML('beforeend', createPaginationHTML(paginationState.currentPage));
-            
-            // Event-Listener für neue Buttons
-            const prevBtn = document.getElementById('legal-prev-btn');
-            const nextBtn = document.getElementById('legal-next-btn');
-            
-            if (prevBtn && !prevBtn.disabled) {
-                prevBtn.addEventListener('click', () => {
-                    if (paginationState.currentPage > 0) {
-                        paginationState.currentPage--;
-                        showPage(paginationState.currentPage);
-                    }
-                });
-            }
-            
-            if (nextBtn && !nextBtn.disabled) {
-                nextBtn.addEventListener('click', () => {
-                    if (paginationState.currentPage < totalPages - 1) {
-                        paginationState.currentPage++;
-                        showPage(paginationState.currentPage);
-                    }
-                });
-            }
-        }
-        
-        function showPage(pageIndex) {
-            // Verstecke alle Abschnitte
-            const allSections = contentArea.querySelectorAll('h3, p, ul');
-            allSections.forEach(section => {
-                section.style.display = 'none';
-            });
-            
-            // Zeige immer Titel und Stand
-            const title = contentArea.querySelector('h1');
-            const standInfo = contentArea.querySelector('p'); // "Stand: 21. Juli 2025"
-            if (title) title.style.display = 'block';
-            if (standInfo) standInfo.style.display = 'block';
-            
-            // Zeige spezifische Abschnitte basierend auf der Seite
-            const pageConfig = paginationState.pages[pageIndex];
-            const allH3s = contentArea.querySelectorAll('h3');
-            
-            if (pageIndex === 0) {
-                // Seite 1: Grundlagen (Abschnitte 1-2)
-                showSectionsRange(allH3s, 0, 1);
-            } else if (pageIndex === 1) {
-                // Seite 2: Datenverarbeitung (Abschnitte 3-4)  
-                showSectionsRange(allH3s, 2, 3);
-            } else if (pageIndex === 2) {
-                // Seite 3: Cookies & Rest (Abschnitte 5-7)
-                showSectionsRange(allH3s, 4, 6);
-            }
-            
-            updatePagination();
-            
-            // Scroll zum Anfang des Modal-Inhalts
-            contentArea.scrollTop = 0;
-        }
-        
-        function showSectionsRange(h3Elements, startIndex, endIndex) {
-            for (let i = startIndex; i <= endIndex && i < h3Elements.length; i++) {
-                const h3 = h3Elements[i];
-                h3.style.display = 'block';
-                
-                // Zeige alle Elemente bis zum nächsten h3
-                let nextElement = h3.nextElementSibling;
-                while (nextElement && nextElement.tagName !== 'H3') {
-                    nextElement.style.display = 'block';
-                    nextElement = nextElement.nextElementSibling;
-                }
-            }
-        }
-        
-        // Initialisiere erste Seite
-        setTimeout(() => showPage(0), 100);
+    };
+    
+    // Prüfe ob Pagination für diese Seite konfiguriert ist
+    let config = pageConfigs[currentPage];
+    
+    // Spezialbehandlung für About-Me (wird nicht als Datei geladen)
+    if (!config && contentArea.querySelector('h1') && contentArea.querySelector('h1').textContent.includes('Über Michael')) {
+        config = pageConfigs['about-me'];
     }
+    
+    if (!config) return;
+    
+    const totalPages = config.totalPages;
+    
+    // Pagination State
+    const paginationState = {
+        currentPage: 0,
+        pages: config.pages
+    };
+    
+    function createPaginationHTML(pageIndex) {
+        const isFirstPage = pageIndex === 0;
+        const isLastPage = pageIndex === totalPages - 1;
+        
+        return `
+            <div class="legal-modal-pagination-buttons">
+                <button id="legal-prev-btn" ${isFirstPage ? 'disabled' : ''}>
+                    ← ${isFirstPage ? 'Erste Seite' : 'Vorherige Seite'}
+                </button>
+                <span style="color: var(--text-color); font-weight: 500; padding: 10px; text-align: center; font-size: 0.9rem;">
+                    ${paginationState.pages[pageIndex].title}<br>
+                    <small style="opacity: 0.7;">(${pageIndex + 1}/${totalPages})</small>
+                </span>
+                <button id="legal-next-btn" ${isLastPage ? 'disabled' : ''}>
+                    ${isLastPage ? 'Letzte Seite' : 'Nächste Seite'} →
+                </button>
+            </div>
+        `;
+    }
+    
+    function updatePagination() {
+        const existingPagination = contentArea.querySelector('.legal-modal-pagination-buttons');
+        if (existingPagination) {
+            existingPagination.remove();
+        }
+        
+        contentArea.insertAdjacentHTML('beforeend', createPaginationHTML(paginationState.currentPage));
+        
+        // Event-Listener für neue Buttons
+        const prevBtn = document.getElementById('legal-prev-btn');
+        const nextBtn = document.getElementById('legal-next-btn');
+        
+        if (prevBtn && !prevBtn.disabled) {
+            prevBtn.addEventListener('click', () => {
+                if (paginationState.currentPage > 0) {
+                    paginationState.currentPage--;
+                    showPage(paginationState.currentPage);
+                }
+            });
+        }
+        
+        if (nextBtn && !nextBtn.disabled) {
+            nextBtn.addEventListener('click', () => {
+                if (paginationState.currentPage < totalPages - 1) {
+                    paginationState.currentPage++;
+                    showPage(paginationState.currentPage);
+                }
+            });
+        }
+    }
+    
+    function showPage(pageIndex) {
+        // Verstecke alle Abschnitte
+        const allSections = contentArea.querySelectorAll('h1, h2, h3, h4, p, ul, ol, li, div');
+        allSections.forEach(section => {
+            section.style.display = 'none';
+        });
+        
+        // Zeige immer den Haupttitel
+        const title = contentArea.querySelector('h1');
+        if (title) title.style.display = 'block';
+        
+        // Spezialbehandlung für About-Me
+        if (config === pageConfigs['about-me']) {
+            showAboutMePage(pageIndex);
+        } else {
+            // Standard-Behandlung für andere Seiten
+            showStandardPage(pageIndex);
+        }
+        
+        updatePagination();
+        
+        // Scroll zum Anfang des Modal-Inhalts
+        contentArea.scrollTop = 0;
+    }
+    
+    function showAboutMePage(pageIndex) {
+        const allElements = Array.from(contentArea.children);
+        
+        if (pageIndex === 0) {
+            // Seite 1: Bis "Doch Michael ist mehr als nur Code und Pixel"
+            let foundBreakPoint = false;
+            
+            allElements.forEach(element => {
+                if (element.tagName === 'H2' && element.textContent.includes('Doch Michael ist mehr als nur Code und Pixel')) {
+                    foundBreakPoint = true;
+                    return;
+                }
+                
+                if (!foundBreakPoint) {
+                    element.style.display = 'block';
+                }
+            });
+        } else if (pageIndex === 1) {
+            // Seite 2: Ab "Doch Michael ist mehr als nur Code und Pixel"
+            let foundBreakPoint = false;
+            
+            allElements.forEach(element => {
+                if (element.tagName === 'H2' && element.textContent.includes('Doch Michael ist mehr als nur Code und Pixel')) {
+                    foundBreakPoint = true;
+                }
+                
+                if (foundBreakPoint) {
+                    element.style.display = 'block';
+                }
+            });
+        }
+    }
+    
+    function showStandardPage(pageIndex) {
+        // Für Datenschutz: Zeige auch "Stand: ..." Info
+        if (currentPage === 'datenschutz.html') {
+            const standInfo = contentArea.querySelector('p'); // "Stand: 21. Juli 2025"
+            if (standInfo && standInfo.textContent.includes('Stand:')) {
+                standInfo.style.display = 'block';
+            }
+        }
+        
+        // Zeige spezifische Abschnitte basierend auf der Konfiguration
+        const pageConfig = paginationState.pages[pageIndex];
+        const allH3s = contentArea.querySelectorAll('h3');
+        const allH4s = contentArea.querySelectorAll('h4'); // Für feinere Unterteilungen
+        
+        // Verwende H3s als Hauptabschnitte, H4s als Unterabschnitte
+        const mainSections = allH3s.length > 0 ? allH3s : allH4s;
+        
+        if (pageConfig.sections) {
+            showSectionsRange(mainSections, pageConfig.sections[0], pageConfig.sections[1]);
+        }
+    }
+    
+    function showSectionsRange(sectionElements, startIndex, endIndex) {
+        for (let i = startIndex; i <= endIndex && i < sectionElements.length; i++) {
+            const section = sectionElements[i];
+            section.style.display = 'block';
+            
+            // Zeige alle Elemente bis zum nächsten Hauptabschnitt
+            let nextElement = section.nextElementSibling;
+            while (nextElement && !isMainSection(nextElement)) {
+                nextElement.style.display = 'block';
+                nextElement = nextElement.nextElementSibling;
+            }
+        }
+    }
+    
+    function isMainSection(element) {
+        return element.tagName === 'H3' || element.tagName === 'H4';
+    }
+    
+    // Initialisiere erste Seite
+    setTimeout(() => showPage(0), 100);
 }
 
 // ===================================================================
