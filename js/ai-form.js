@@ -4,11 +4,7 @@ export const initAiForm = () => {
     console.log("🚀 Initialisiere AI-Form mit Debug-Logging");
 
     const aiForm = document.getElementById('ai-form');
-    if (!aiForm) {
-        console.warn("Warning: #ai-form nicht gefunden!");
-        return;
-    }
-
+   
     // DOM-Elemente
     const aiQuestion = document.getElementById('ai-question');
     const aiStatus = document.getElementById('ai-status');
@@ -523,6 +519,7 @@ export const initAiForm = () => {
     // ===================================================================
 
     // Haupt-Formular (Index-Seite)
+if (aiForm) {
     aiForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const userInput = aiQuestion.value.trim();
@@ -546,6 +543,7 @@ export const initAiForm = () => {
             aiQuestion.value = '';
         }
     });
+}
 
     // Chat-Form im Modal (dynamisch)
     const setupChatFormListener = () => {
