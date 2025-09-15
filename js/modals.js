@@ -769,9 +769,7 @@ export function initModals() {
     setupContactModal();
     setupAboutModal();
     setupLegalModals();
-   // HIER IST DIE ENTSCHEIDENDE ÄNDERUNG:
-    // Diese Zeile auskommentieren, damit `ai-form.js` die alleinige Kontrolle hat.
-    // setupAiModal(); 
+    setupAiModal(); 
     setupModalBackgroundClose();
 
     // ===================================================================
