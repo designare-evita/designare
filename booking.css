@@ -1,4 +1,4 @@
-/* booking.css - Ausgelagerte Styles für das Rückruf-Modal */
+/* booking.css - Modern & Clean Redesign */
 
 /* ------------------------- */
 /* 1. Modal Grundstruktur    */
@@ -10,109 +10,103 @@
     left: 0 !important;
     width: 100% !important;
     height: 100% !important;
-    background: rgba(0, 0, 0, 0.85) !important;
+    background: rgba(10, 10, 10, 0.85) !important; /* Dunklerer Hintergrund */
+    backdrop-filter: blur(5px); /* Moderner Blur-Effekt */
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     z-index: 999999 !important;
     opacity: 1 !important;
-    visibility: visible !important;
+    font-family: 'Poppins', sans-serif;
 }
 
 .booking-modal-content {
-    background: white;
-    border-radius: 15px;
+    background: #1e1e1e; /* Passend zum Dark-Mode */
+    border-radius: 12px;
+    border: 1px solid #333;
     padding: 0;
-    max-width: 500px;
+    max-width: 480px;
     width: 90%;
-    max-height: 90%;
+    max-height: 90vh;
     overflow: hidden;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
     position: relative;
-    color: #1a1a1a;
+    color: #f0f0f0; /* Hellere Schriftfarbe */
+    display: flex;
+    flex-direction: column;
 }
 
 .booking-modal-header {
-    background: linear-gradient(135deg, #ffc107 0%, #ffca2c 100%);
-    padding: 25px;
+    padding: 24px 30px;
     text-align: center;
-    color: #1a1a1a;
-}
-
-.booking-modal-header-icon {
-    font-size: 2.5rem;
-    margin-bottom: 10px;
+    border-bottom: 1px solid #333;
 }
 
 .booking-modal-title {
-    margin: 0;
-    font-size: 1.3rem;
-    font-weight: bold;
+    margin: 0 0 5px 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #ffffff;
 }
 
 .booking-modal-subtitle {
-    margin: 10px 0 0 0;
-    opacity: 0.8;
+    margin: 0;
+    color: #aaa;
     font-size: 0.95rem;
 }
 
 .booking-modal-body {
-    padding: 25px;
-    max-height: 400px;
+    padding: 30px;
     overflow-y: auto;
+    flex-grow: 1;
 }
 
 .booking-modal-close-btn {
     position: absolute;
     top: 15px;
     right: 15px;
-    background: rgba(0,0,0,0.2);
+    background: none;
     border: none;
-    color: #1a1a1a;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
+    font-size: 2rem;
+    color: #888;
     cursor: pointer;
-    font-size: 1.2rem;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     line-height: 1;
+    transition: color 0.2s;
+}
+.booking-modal-close-btn:hover {
+    color: #ffc107;
 }
 
+
 /* ------------------------- */
-/* 2. Schritte (Steps)       */
+/* 2. Schritte & Navigation  */
 /* ------------------------- */
 
 .booking-step {
-    display: none; /* Wird per JS gesteuert */
+    display: none;
 }
-
 .booking-step.active {
     display: block;
 }
-
 .booking-step-title {
-    margin: 0 0 20px 0;
-    color: #1a1a1a;
-    font-size: 1.15rem;
+    font-size: 1.2rem;
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #ffffff;
+    text-align: center;
 }
 
 /* ------------------------- */
 /* 3. Slot-Auswahl           */
 /* ------------------------- */
 
-#callback-loading {
+#callback-loading, #no-slots-message {
     text-align: center;
+    padding: 40px 20px;
+    color: #aaa;
 }
-#callback-loading > div {
-    color: #666;
-    margin: 20px 0;
-}
-#callback-loading .loader-icon {
-    font-size: 1.5rem;
-    margin-bottom: 10px;
+#no-slots-message a {
+    color: #ffc107;
 }
 
 #callback-slots-container {
@@ -122,262 +116,155 @@
 }
 
 .callback-slot-button {
-    width: 100%;
-    padding: 15px;
-    border: 2px solid #e9ecef;
-    border-radius: 8px;
-    background: white;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-align: left;
-    margin-bottom: 10px;
     display: flex;
     align-items: center;
-    gap: 12px;
+    width: 100%;
+    padding: 15px 20px;
+    background: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s ease;
+    color: #f0f0f0;
 }
-
 .callback-slot-button:hover {
     border-color: #ffc107;
-    background-color: #fff9e6;
-    transform: translateY(-1px);
+    background: #333;
 }
 
-.callback-slot-button.selected {
-    opacity: 1 !important;
-    border-color: #28a745 !important;
-    background-color: #e8f5e8 !important;
+.slot-info {
+    flex-grow: 1;
 }
-
-.callback-slot-button .slot-icon {
-    font-size: 1.2rem;
-}
-.callback-slot-button .slot-info {
-    flex: 1;
-    text-align: left;
-}
-.callback-slot-button .slot-title {
-    font-weight: bold;
-    color: #1a1a1a;
-    margin-bottom: 4px;
-}
-.callback-slot-button .slot-time {
-    color: #666;
-    font-size: 0.9rem;
-}
-.callback-slot-button .slot-arrow {
-    color: #ffc107;
+.slot-time {
     font-size: 1.1rem;
-    transition: transform 0.3s ease;
+    font-weight: 500;
+    color: #ffffff;
+}
+.slot-day {
+    font-size: 0.9rem;
+    color: #aaa;
+}
+.slot-arrow {
+    font-size: 1.5rem;
+    color: #888;
+    transition: transform 0.2s;
 }
 .callback-slot-button:hover .slot-arrow {
-    transform: translateX(3px);
-}
-
-
-#no-slots-message {
-    display: none; /* JS-gesteuert */
-    text-align: center;
-    color: #666;
-    margin: 20px 0;
-}
-
-#no-slots-message .icon {
-    font-size: 2rem;
-    margin-bottom: 10px;
-}
-#no-slots-message a {
+    transform: translateX(5px);
     color: #ffc107;
-    text-decoration: none;
-    font-weight: bold;
 }
 
 
 /* ------------------------- */
 /* 4. Kontaktdaten-Formular  */
 /* ------------------------- */
-
 #selected-slot-display {
-    background: #fff9e6;
+    text-align: center;
+    margin-bottom: 25px;
     padding: 12px;
-    border-radius: 6px;
-    color: #1a1a1a;
-    font-size: 0.9rem;
-    border-left: 4px solid #ffc107;
-    margin-bottom: 20px;
+    background: rgba(255, 193, 7, 0.1);
+    border: 1px solid #ffc107;
+    border-radius: 8px;
+    color: #ffc107;
 }
-
 .booking-form-group {
-    margin-bottom: 15px;
+    margin-bottom: 18px;
 }
-
 .booking-form-group label {
     display: block;
-    margin-bottom: 5px;
-    color: #495057;
-    font-weight: 500;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+    color: #aaa;
 }
-
 .booking-form-group input,
 .booking-form-group textarea {
     width: 100%;
-    padding: 12px;
-    border: 2px solid #e9ecef;
-    border-radius: 6px;
+    padding: 12px 15px;
+    background: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 8px;
+    color: #f0f0f0;
     font-size: 1rem;
+    transition: border-color 0.2s;
     box-sizing: border-box;
-    transition: border-color 0.3s ease;
 }
 .booking-form-group input:focus,
 .booking-form-group textarea:focus {
     outline: none;
     border-color: #ffc107;
 }
-
-.booking-form-group textarea {
-    resize: vertical;
-}
-
 .booking-form-actions {
     display: flex;
-    gap: 10px;
-    justify-content: space-between;
-    margin-top: 20px;
+    gap: 15px;
+    margin-top: 30px;
 }
-
 .booking-btn {
+    flex-grow: 1;
+    padding: 14px 20px;
     border: none;
-    padding: 12px 24px;
-    border-radius: 6px;
-    cursor: pointer;
+    border-radius: 8px;
     font-size: 1rem;
-    font-weight: bold;
-    transition: background-color 0.3s ease, transform 0.2s ease;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
 }
-
-.booking-btn:hover {
-    transform: translateY(-1px);
-}
-
 .booking-btn.back-btn {
-    background: #6c757d;
-    color: white;
-    padding-left: 20px;
-    padding-right: 20px;
+    background: #333;
+    color: #f0f0f0;
+    border: 1px solid #555;
 }
-
+.booking-btn.back-btn:hover {
+    background: #444;
+}
 .booking-btn.submit-btn {
-    background: #28a745;
-    color: white;
+    background: #ffc107;
+    color: #1a1a1a;
+    border: 1px solid #ffc107;
 }
-
-.booking-btn.submit-btn:disabled {
-    background-color: #a5d6a7;
+.booking-btn.submit-btn:hover {
+    background: #ffca2c;
+}
+.booking-btn:disabled {
+    opacity: 0.6;
     cursor: not-allowed;
 }
 
 /* ------------------------- */
-/* 5. Bestätigung (Confirm)  */
+/* 5. Bestätigung            */
 /* ------------------------- */
 
-#step-confirmation .confirmation-content {
+.confirmation-content {
     text-align: center;
 }
-
-#step-confirmation .confirmation-icon {
-    font-size: 3rem;
+.confirmation-icon {
+    font-size: 3.5rem;
+    color: #ffc107;
     margin-bottom: 20px;
 }
-
-#step-confirmation .confirmation-title {
-    margin: 0 0 15px 0;
-    color: #28a745;
-    font-size: 1.3rem;
+.confirmation-title {
+    font-size: 1.4rem;
+    color: #ffffff;
+    margin-bottom: 15px;
 }
-
 #confirmation-details {
-    background: #f8f9fa;
+    margin: 25px 0;
     padding: 20px;
+    background: #2a2a2a;
     border-radius: 8px;
-    margin: 20px 0;
     text-align: left;
-    border-left: 4px solid #28a745;
+    color: #ccc;
+    line-height: 1.7;
 }
-
-#confirmation-details > div {
-    margin-bottom: 12px;
+#confirmation-details strong {
+    color: #fff;
 }
-#confirmation-details > div:last-child {
-    margin-bottom: 0;
-}
-
-#confirmation-details .confirmation-notice {
-    background: #e7f3ff;
-    padding: 10px;
-    border-radius: 5px;
-    margin-top: 15px;
-    font-size: 0.9rem;
-}
-
 .confirmation-subtext {
-    color: #666;
+    color: #aaa;
     margin-bottom: 25px;
-    font-size: 0.95rem;
-    line-height: 1.5;
 }
-
 .booking-btn.confirm-close-btn {
     background: #ffc107;
     color: #1a1a1a;
-}
-
-/* ------------------------- */
-/* 6. Notfall-Modal (Fallback)*/
-/* ------------------------- */
-
-.fallback-modal-content {
-    text-align: center;
-}
-
-.fallback-modal-header {
-    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-    padding: 25px;
-    color: white;
-}
-.fallback-modal-header .fallback-icon {
-    font-size: 3rem;
-    margin-bottom: 15px;
-}
-.fallback-modal-header .fallback-title {
-    margin: 0;
-    font-size: 1.4rem;
-}
-
-.fallback-modal-body {
-    padding: 30px;
-}
-
-.fallback-modal-body p {
-    color: #666;
-    margin-bottom: 25px;
-    line-height: 1.5;
-}
-
-.fallback-modal-body .fallback-email-link {
-    display: inline-block;
-    background: #ffc107;
-    color: #1a1a1a;
-    text-decoration: none;
-    padding: 15px 25px;
-    border-radius: 8px;
-    font-weight: bold;
-    margin-bottom: 15px;
-    transition: background-color 0.3s ease;
-}
-.fallback-modal-body .fallback-email-link:hover {
-    background-color: #e0a800;
-}
-
-.fallback-modal-body .fallback-close-btn {
-    background: #6c757d;
-    color: white;
+    width: 100%;
 }
