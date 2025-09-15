@@ -15,6 +15,13 @@ export const initAiForm = () => {
     const modalOverlay = document.getElementById('ai-response-modal');
     const responseArea = document.getElementById('ai-chat-history');
     const closeButtons = document.querySelectorAll('#close-ai-response-modal-top, #close-ai-response-modal-bottom');
+    const MAX_HISTORY_LENGTH = 20; // 10 Runden (user + model)
+
+// NEU: Variable für das Gedächtnis
+    let chatHistory = []; 
+    const MAX_HISTORY_LENGTH = 20; // 10 Runden (user + model)
+
+    let selectedCallbackData = null;
 
     // Globale Variable für ausgewählten Rückruf-Slot
     let selectedCallbackData = null;
