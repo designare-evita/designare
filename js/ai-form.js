@@ -105,7 +105,10 @@ export const initAiForm = () => {
     // ===================================================================
 
     const isLocalBookingRequest = (userInput) => {
-        const lowerInput = userInput.toLowerCase();
+return false;
+/*
+const lowerInput = userInput.toLowerCase();
+
         
         // SCHRITT 1: Prüfe zuerst explizite Info-Anfragen über Michael (haben absolute Vorrang)
         const infoAboutMichaelPhrases = [
@@ -253,7 +256,7 @@ export const initAiForm = () => {
         } catch (error) {
             console.error(`Evita-Fehler:`, error);
             handleEvitaError(error, isFromChat);
-        }
+        }*/
     };
 
     // ===================================================================
