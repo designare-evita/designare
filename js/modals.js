@@ -443,7 +443,7 @@ function addPaginationButtons(contentArea, currentPage) {
             totalPages: 2,
             pages: [
                 { title: "Seite 1: Kontakt & Grundlagen", sections: [0, 1] },
-                { title: "Seite 2: Haftung & Urheberrecht", sections: [2, 4] }
+                { title: "Seite 2: Haftung & Urheberrecht", sections: [2, 3] }
             ]
         },
         'disclaimer.html': {
