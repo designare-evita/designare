@@ -486,6 +486,38 @@ export const initAiForm = () => {
         }
     };
 
+
+    // ===================================================================
+    // HEADER CHAT BUTTON
+    // ===================================================================
+
+    const setupHeaderChatButton = () => {
+        const chatButton = document.getElementById('evita-chat-button');
+        if (!chatButton) {
+            // Button ist auf dieser Seite nicht vorhanden, alles ok.
+            return;
+        }
+
+        chatButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log("🤖 Header Chat Button geklickt, öffne Modal.");
+
+            // Modal öffnen
+            openAIModal();
+
+            // Chat-Historie für eine neue Konversation vorbereiten
+            const chatHistoryDiv = document.getElementById('ai-chat-history');
+            if (chatHistoryDiv) {
+                chatHistoryDiv.innerHTML = ''; // Bisherigen Verlauf aus der Anzeige entfernen
+            }
+            chatHistory = []; // Evita's Gedächtnis für diese Sitzung zurücksetzen
+
+            // Eine freundliche Begrüßung von Evita hinzufügen, da der Chat leer startet
+            addMessageToHistory("Hallo! Ich bin Evita, Michaels persönliche KI-Assistentin. Womit kann ich dir heute helfen?", 'ai');
+        });
+        console.log("✅ Header Chat Button erfolgreich eingerichtet.");
+    };
+
     // ===================================================================
     // EVENT LISTENERS
     // ===================================================================
@@ -573,6 +605,7 @@ export const initAiForm = () => {
 
     // Starte Chat-Form Listener Setup
     setupChatFormListener();
+setupHeaderChatButton();
 
     // ===================================================================
     // GLOBALE FUNKTIONEN
