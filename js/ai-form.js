@@ -1,7 +1,7 @@
-// js/ai-form.js - KORREKTE VERSION (unverändert)
+// js/ai-form.js - KORRIGIERTE VERSION MIT KONVERSATIONSGEDÄCHTNIS
 
 export const initAiForm = () => {
-    console.log("Initialisiere korrigierte AI-Form mit konservativer Booking-Erkennung");
+    console.log("Initialisiere AI-Form mit Konversationsgedächtnis (10 Runden)");
 
     const aiForm = document.getElementById('ai-form');
     if (!aiForm) {
@@ -15,15 +15,12 @@ export const initAiForm = () => {
     const modalOverlay = document.getElementById('ai-response-modal');
     const responseArea = document.getElementById('ai-chat-history');
     const closeButtons = document.querySelectorAll('#close-ai-response-modal-top, #close-ai-response-modal-bottom');
-    const MAX_HISTORY_LENGTH = 20; // 10 Runden (user + model)
 
-// NEU: Variable für das Gedächtnis
+    // --- KORREKTUREN FÜR DAS GEDÄCHTNIS ---
     let chatHistory = []; 
     const MAX_HISTORY_LENGTH = 20; // 10 Runden (user + model)
+    // --- ENDE KORREKTUREN ---
 
-    let selectedCallbackData = null;
-
-    // Globale Variable für ausgewählten Rückruf-Slot
     let selectedCallbackData = null;
 
     // ===================================================================
@@ -33,30 +30,19 @@ export const initAiForm = () => {
     const safeFetchAPI = async (url, options = {}) => {
         try {
             console.log(`API-Anfrage an: ${url}`);
-            console.log(`Request Data:`, options.body);
-            
             const response = await fetch(url, {
                 ...options,
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...options.headers
-                }
+                headers: { 'Content-Type': 'application/json', ...options.headers }
             });
-            
-            console.log(`Response Status: ${response.status}`);
-            
             if (!response.ok) {
                 const errorText = await response.text();
                 throw new Error(`HTTP ${response.status} - ${response.statusText}. Details: ${errorText}`);
             }
-            
             const contentType = response.headers.get('content-type');
             if (contentType && contentType.includes('application/json')) {
                 return await response.json();
-            } else {
-                return await response.text();
             }
-            
+            return await response.text();
         } catch (error) {
             console.error(`❌ API-Fehler bei ${url}:`, error);
             throw error;
@@ -64,99 +50,65 @@ export const initAiForm = () => {
     };
 
     // ===================================================================
-    // KORRIGIERTE BOOKING-LOGIK
+    // LOGIK ZUM SENDEN AN EVITA (MIT GEDÄCHTNIS)
     // ===================================================================
 
     const sendToEvita = async (userInput, isFromChat = false) => {
-        console.log(`Sende an Evita: "${userInput}"`);
-        
         if (isFromChat) {
             showTypingIndicator();
         } else {
             if (aiStatus) aiStatus.textContent = 'Evita denkt nach...';
         }
-        
-        // KONSERVATIVE KEYWORD-ERKENNUNG
-        const bookingKeywords = [
-            'termin buchen', 'rückruf anfordern', 'kalender', 
-            'termin vereinbaren', 'gesprächstermin', 'callback', 
-            'appointment', 'buchung'
-        ];
-        
-        const lowerInput = userInput.toLowerCase();
-        const isBookingRequest = bookingKeywords.some(keyword => lowerInput.includes(keyword));
+
+        const bookingKeywords = ['termin buchen', 'rückruf anfordern', 'kalender', 'termin vereinbaren', 'gesprächstermin', 'callback', 'appointment', 'buchung'];
+        const isBookingRequest = bookingKeywords.some(keyword => userInput.toLowerCase().includes(keyword));
 
         if (isBookingRequest) {
-            console.log("🎯 Konservative Booking-Anfrage erkannt -> starte Modal");
-            
-            let message;
+            let message = "Gerne! Ich öffne Michaels Kalender für dich, damit du einen passenden Rückruf-Termin findest.";
             if (isFromChat) {
                 removeTypingIndicator();
-                message = "Gerne! Ich öffne Michaels Kalender für dich, damit du einen passenden Rückruf-Termin findest.";
                 addMessageToHistory(message, 'ai');
             } else {
                 if (aiStatus) aiStatus.textContent = '';
-                showAIResponse("Gerne! Ich öffne Michaels Kalender für dich, damit du einen passenden Rückruf-Termin findest.", false);
+                showAIResponse(message, false);
             }
-            
-            setTimeout(() => {
-                launchBookingModal();
-            }, 800);
-            
+            setTimeout(() => launchBookingModal(), 800);
             return;
         }
 
-        // Normale API-Anfrage
         try {
             const data = await safeFetchAPI('/api/ask-gemini', {
                 method: 'POST',
-                body: JSON.stringify({ prompt: userInput, source: 'main-form' })
+                body: JSON.stringify({
+                    history: chatHistory,
+                    message: userInput
+                })
             });
-            
-            if (isFromChat) {
-                removeTypingIndicator();
-            }
+
+            if (isFromChat) removeTypingIndicator();
 
             if (data.action === 'launch_booking_modal') {
                 const message = data.answer || "Einen Moment, ich öffne den Kalender für dich...";
-                if (isFromChat) {
-                    addMessageToHistory(message, 'ai');
-                } else {
-                    showAIResponse(message, false);
-                }
+                addMessageToHistory(message, 'ai');
                 setTimeout(() => launchBookingModal(), 500);
             } else {
                 const answer = data.answer || data.message || "Es gab ein Problem mit der Antwort.";
-                if (isFromChat) {
-                    addMessageToHistory(answer, 'ai');
-                } else {
-                    showAIResponse(answer, false);
-                }
+                addMessageToHistory(answer, 'ai');
             }
-            
         } catch (error) {
-            console.error('Fehler bei der Kommunikation mit Evita:', error);
-            const errorMessage = "Entschuldigung, es ist ein technischer Fehler aufgetreten. Bitte versuche es später erneut oder kontaktiere Michael direkt.";
-            
-            if (isFromChat) {
-                removeTypingIndicator();
-                addMessageToHistory(errorMessage, 'ai');
-            } else {
-                showAIResponse(errorMessage, false);
-            }
-            
+            const errorMessage = "Entschuldigung, es ist ein technischer Fehler aufgetreten.";
+            if (isFromChat) removeTypingIndicator();
+            addMessageToHistory(errorMessage, 'ai');
         } finally {
-            if (!isFromChat && aiStatus) {
-                aiStatus.textContent = '';
-            }
+            if (!isFromChat && aiStatus) aiStatus.textContent = '';
         }
     };
-    
-    // Event-Listener für das Haupt-Formular
+
     aiForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const userInput = aiQuestion.value.trim();
         if (userInput) {
+            addMessageToHistory(userInput, 'user');
             sendToEvita(userInput, false);
             aiQuestion.value = '';
         }
