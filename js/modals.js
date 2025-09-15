@@ -367,35 +367,68 @@ function addPaginationButtons(contentArea, currentPage) {
     }
     
     function showAboutMePage(pageIndex) {
+        console.log('👤 Zeige About-Me Seite:', pageIndex);
+        
+        // Alle Elemente des Content-Bereichs durchgehen
         const allElements = Array.from(contentArea.children);
+        console.log('👤 Gefundene Elemente:', allElements.length);
         
         if (pageIndex === 0) {
             // Seite 1: Bis "Doch Michael ist mehr als nur Code und Pixel"
-            let foundBreakPoint = false;
+            console.log('👤 Zeige Seite 1 - bis zum Breakpoint');
             
-            allElements.forEach(element => {
-                if (element.tagName === 'H2' && element.textContent.includes('Doch Michael ist mehr als nur Code und Pixel')) {
-                    foundBreakPoint = true;
-                    return;
+            for (let i = 0; i < allElements.length; i++) {
+                const element = allElements[i];
+                
+                // Prüfe auf verschiedene mögliche Breakpoint-Texte
+                const isBreakpoint = (
+                    (element.tagName === 'H2' && element.textContent.includes('Doch Michael ist mehr als nur Code und Pixel')) ||
+                    (element.classList && element.classList.contains('about-section-header')) ||
+                    element.textContent.includes('Doch Michael ist mehr als nur Code und Pixel')
+                );
+                
+                if (isBreakpoint) {
+                    console.log('👤 Breakpoint gefunden bei Element:', element.tagName, element.textContent.substring(0, 50));
+                    break;
                 }
                 
-                if (!foundBreakPoint) {
-                    element.style.display = 'block';
-                }
-            });
+                element.style.display = 'block';
+                console.log('👤 Zeige Element:', element.tagName, element.textContent.substring(0, 30));
+            }
+            
         } else if (pageIndex === 1) {
             // Seite 2: Ab "Doch Michael ist mehr als nur Code und Pixel"
-            let foundBreakPoint = false;
+            console.log('👤 Zeige Seite 2 - ab dem Breakpoint');
             
-            allElements.forEach(element => {
-                if (element.tagName === 'H2' && element.textContent.includes('Doch Michael ist mehr als nur Code und Pixel')) {
-                    foundBreakPoint = true;
+            let foundBreakpoint = false;
+            
+            for (let i = 0; i < allElements.length; i++) {
+                const element = allElements[i];
+                
+                // Prüfe auf Breakpoint
+                const isBreakpoint = (
+                    (element.tagName === 'H2' && element.textContent.includes('Doch Michael ist mehr als nur Code und Pixel')) ||
+                    (element.classList && element.classList.contains('about-section-header')) ||
+                    element.textContent.includes('Doch Michael ist mehr als nur Code und Pixel')
+                );
+                
+                if (isBreakpoint) {
+                    foundBreakpoint = true;
+                    console.log('👤 Breakpoint gefunden, ab jetzt zeigen');
                 }
                 
-                if (foundBreakPoint) {
+                if (foundBreakpoint) {
                     element.style.display = 'block';
+                    console.log('👤 Zeige Element ab Breakpoint:', element.tagName, element.textContent.substring(0, 30));
                 }
-            });
+            }
+            
+            if (!foundBreakpoint) {
+                console.warn('👤 Breakpoint nicht gefunden! Zeige alle Elemente');
+                allElements.forEach(element => {
+                    element.style.display = 'block';
+                });
+            }
         }
     }
     
