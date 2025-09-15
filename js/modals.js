@@ -241,25 +241,119 @@ function loadLegalContentWithPagination(page) {
 function addPaginationButtons(contentArea, currentPage) {
     // Nur für Datenschutz Pagination hinzufügen
     if (currentPage === 'datenschutz.html') {
-        const paginationHTML = `
-            <div class="legal-modal-pagination-buttons">
-                <button id="legal-prev-btn" onclick="scrollToSection('datenschutz-part-2-start')">
-                    ← Vorherige Seite
-                </button>
-                <button id="legal-next-btn" onclick="scrollToSection('datenschutz-part-3-start')">
-                    Nächste Seite →
-                </button>
-            </div>
-        `;
-        contentArea.insertAdjacentHTML('beforeend', paginationHTML);
-
-        // Scrolling-Funktion global verfügbar machen
-        window.scrollToSection = (sectionId) => {
-            const section = document.getElementById(sectionId);
-            if (section) {
-                section.scrollIntoView({ behavior: 'smooth' });
-            }
+        let currentPageIndex = 0;
+        const totalPages = 3; // Datenschutz hat 3 Seiten
+        
+        // Pagination State
+        const paginationState = {
+            currentPage: 0,
+            pages: [
+                { start: 0, title: "Seite 1: Grundlagen & Rechte" },
+                { start: 2, title: "Seite 2: Datenverarbeitung" }, 
+                { start: 4, title: "Seite 3: Cookies & Kontakt" }
+            ]
         };
+        
+        function createPaginationHTML(pageIndex) {
+            const isFirstPage = pageIndex === 0;
+            const isLastPage = pageIndex === totalPages - 1;
+            
+            return `
+                <div class="legal-modal-pagination-buttons">
+                    <button id="legal-prev-btn" ${isFirstPage ? 'disabled' : ''}>
+                        ← ${isFirstPage ? 'Erste Seite' : 'Vorherige Seite'}
+                    </button>
+                    <span style="color: var(--text-color); font-weight: 500; padding: 10px;">
+                        ${paginationState.pages[pageIndex].title} (${pageIndex + 1}/${totalPages})
+                    </span>
+                    <button id="legal-next-btn" ${isLastPage ? 'disabled' : ''}>
+                        ${isLastPage ? 'Letzte Seite' : 'Nächste Seite'} →
+                    </button>
+                </div>
+            `;
+        }
+        
+        function updatePagination() {
+            const existingPagination = contentArea.querySelector('.legal-modal-pagination-buttons');
+            if (existingPagination) {
+                existingPagination.remove();
+            }
+            
+            contentArea.insertAdjacentHTML('beforeend', createPaginationHTML(paginationState.currentPage));
+            
+            // Event-Listener für neue Buttons
+            const prevBtn = document.getElementById('legal-prev-btn');
+            const nextBtn = document.getElementById('legal-next-btn');
+            
+            if (prevBtn && !prevBtn.disabled) {
+                prevBtn.addEventListener('click', () => {
+                    if (paginationState.currentPage > 0) {
+                        paginationState.currentPage--;
+                        showPage(paginationState.currentPage);
+                    }
+                });
+            }
+            
+            if (nextBtn && !nextBtn.disabled) {
+                nextBtn.addEventListener('click', () => {
+                    if (paginationState.currentPage < totalPages - 1) {
+                        paginationState.currentPage++;
+                        showPage(paginationState.currentPage);
+                    }
+                });
+            }
+        }
+        
+        function showPage(pageIndex) {
+            // Verstecke alle Abschnitte
+            const allSections = contentArea.querySelectorAll('h3, p, ul');
+            allSections.forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // Zeige immer Titel und Stand
+            const title = contentArea.querySelector('h1');
+            const standInfo = contentArea.querySelector('p'); // "Stand: 21. Juli 2025"
+            if (title) title.style.display = 'block';
+            if (standInfo) standInfo.style.display = 'block';
+            
+            // Zeige spezifische Abschnitte basierend auf der Seite
+            const pageConfig = paginationState.pages[pageIndex];
+            const allH3s = contentArea.querySelectorAll('h3');
+            
+            if (pageIndex === 0) {
+                // Seite 1: Grundlagen (Abschnitte 1-2)
+                showSectionsRange(allH3s, 0, 1);
+            } else if (pageIndex === 1) {
+                // Seite 2: Datenverarbeitung (Abschnitte 3-4)  
+                showSectionsRange(allH3s, 2, 3);
+            } else if (pageIndex === 2) {
+                // Seite 3: Cookies & Rest (Abschnitte 5-7)
+                showSectionsRange(allH3s, 4, 6);
+            }
+            
+            updatePagination();
+            
+            // Scroll zum Anfang des Modal-Inhalts
+            contentArea.scrollTop = 0;
+        }
+        
+        function showSectionsRange(h3Elements, startIndex, endIndex) {
+            for (let i = startIndex; i <= endIndex && i < h3Elements.length; i++) {
+                const h3 = h3Elements[i];
+                h3.style.display = 'block';
+                
+                // Zeige alle Elemente bis zum nächsten h3
+                let nextElement = h3.nextElementSibling;
+                while (nextElement && nextElement.tagName !== 'H3') {
+                    nextElement.style.display = 'block';
+                    nextElement = nextElement.nextElementSibling;
+                }
+            }
+        }
+        
+        // Initialisiere erste Seite
+        setTimeout(() => showPage(0), 100);
     }
 }
 
