@@ -10,9 +10,10 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const { prompt, source, checkBookingIntent } = req.body;
+    const { prompt, source, checkBookingIntent, history, message } = req.body;
+    const userMessage = message || prompt;
 
-    if (!prompt) {
+    if (!userMessage) {
       return res.status(400).json({ message: 'A prompt is required.' });
     }
 
