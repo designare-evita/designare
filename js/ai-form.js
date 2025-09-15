@@ -1,7 +1,7 @@
-// js/ai-form.js - KORREKTE VERSION mit booking.css und Conversation Memory
+// js/ai-form.js - DEBUGGING FIX für API-Kommunikation
 
 export const initAiForm = () => {
-    console.log("🚀 Initialisiere AI-Form mit Evita Conversation Memory");
+    console.log("🚀 Initialisiere AI-Form mit Debug-Logging");
 
     const aiForm = document.getElementById('ai-form');
     if (!aiForm) {
@@ -19,25 +19,39 @@ export const initAiForm = () => {
     let chatHistory = [];
 
     // ===================================================================
-    // HILFSFUNKTIONEN
+    // VERBESSERTE API-KOMMUNIKATION MIT DEBUG-LOGGING
     // ===================================================================
 
     const safeFetchAPI = async (url, options = {}) => {
         try {
-            console.log(`API-Anfrage an: ${url}`);
+            console.log(`🔄 API-Anfrage an: ${url}`);
+            console.log(`📤 Sende Daten:`, options.body ? JSON.parse(options.body) : 'Keine Daten');
+            
             const response = await fetch(url, {
                 ...options,
                 headers: { 'Content-Type': 'application/json', ...options.headers }
             });
+            
+            console.log(`📥 Response Status: ${response.status} ${response.statusText}`);
+            
             if (!response.ok) {
                 const errorText = await response.text();
+                console.error(`❌ API-Fehler: ${response.status} - ${errorText}`);
                 throw new Error(`HTTP ${response.status} - ${response.statusText}. Details: ${errorText}`);
             }
+            
             const contentType = response.headers.get('content-type');
+            let responseData;
+            
             if (contentType && contentType.includes('application/json')) {
-                return await response.json();
+                responseData = await response.json();
+            } else {
+                responseData = await response.text();
             }
-            return await response.text();
+            
+            console.log(`📋 API-Antwort:`, responseData);
+            return responseData;
+            
         } catch (error) {
             console.error(`❌ API-Fehler bei ${url}:`, error);
             throw error;
@@ -45,11 +59,11 @@ export const initAiForm = () => {
     };
 
     const addMessageToHistory = (message, sender) => {
-        console.log(`💬 Nachricht hinzufügen: ${sender}: ${message.substring(0, 50)}...`);
+        console.log(`💬 Nachricht hinzufügen: ${sender}: ${message.substring(0, 100)}...`);
         
         const chatHistoryDiv = document.getElementById('ai-chat-history');
         if (!chatHistoryDiv) {
-            console.warn("Chat-History Div nicht gefunden");
+            console.warn("⚠️ Chat-History Div nicht gefunden");
             return;
         }
 
@@ -63,9 +77,12 @@ export const initAiForm = () => {
         // Füge zur Evita's Gedächtnis hinzu
         chatHistory.push({ role: sender === 'user' ? 'user' : 'assistant', content: message });
         
+        console.log(`📝 Chat-Historie aktualisiert. Nachrichten: ${chatHistory.length}`);
+        
         // Begrenze Historie auf 20 Nachrichten (10 Runden)
         if (chatHistory.length > 20) {
             chatHistory = chatHistory.slice(-20);
+            console.log(`✂️ Chat-Historie gekürzt auf ${chatHistory.length} Nachrichten`);
         }
     };
 
@@ -82,6 +99,9 @@ export const initAiForm = () => {
                 const chatInput = document.getElementById('ai-chat-input');
                 if (chatInput) {
                     chatInput.focus();
+                    console.log("🎯 Fokus auf Chat-Input gesetzt");
+                } else {
+                    console.warn("⚠️ Chat-Input nicht gefunden für Fokus");
                 }
             }, 300);
         }
@@ -112,7 +132,10 @@ export const initAiForm = () => {
         
         // Entferne existierendes Rückruf-Modal zur Sicherheit
         const existingModal = document.getElementById('booking-modal');
-        if (existingModal) existingModal.remove();
+        if (existingModal) {
+            console.log("🗑️ Entferne existierendes Rückruf-Modal");
+            existingModal.remove();
+        }
         
         // Erstelle das Rückruf-Modal HTML (nutzt booking.css Klassen)
         const modalHTML = createCallbackModalHTML();
@@ -216,6 +239,8 @@ export const initAiForm = () => {
     };
 
     const setupCallbackModalEventListeners = () => {
+        console.log("🔧 Richte Rückruf-Modal Event-Listener ein");
+        
         const callbackForm = document.getElementById('callback-form');
         if (callbackForm) {
             callbackForm.addEventListener('submit', submitCallback);
@@ -228,6 +253,8 @@ export const initAiForm = () => {
     };
 
     const loadCallbackSlots = async () => {
+        console.log("📅 Lade Rückruf-Termine");
+        
         const loadingDiv = document.getElementById('callback-loading');
         const slotsContainer = document.getElementById('callback-slots-container');
         const noSlotsMessage = document.getElementById('no-slots-message');
@@ -238,6 +265,7 @@ export const initAiForm = () => {
             if (loadingDiv) loadingDiv.style.display = 'none';
 
             if (data.success && data.suggestions && data.suggestions.length > 0) {
+                console.log(`✅ ${data.suggestions.length} Termine geladen`);
                 slotsContainer.innerHTML = '';
                 data.suggestions.forEach(suggestion => {
                     const button = document.createElement('button');
@@ -254,10 +282,11 @@ export const initAiForm = () => {
                     slotsContainer.appendChild(button);
                 });
             } else {
+                console.warn("⚠️ Keine Termine verfügbar");
                 noSlotsMessage.style.display = 'block';
             }
         } catch (error) {
-            console.error("Fehler beim Laden der Rückruf-Termine:", error);
+            console.error("❌ Fehler beim Laden der Rückruf-Termine:", error);
             noSlotsMessage.innerHTML = `
                 <div class="icon">❌</div>
                 Fehler beim Laden der Termine.<br>
@@ -278,6 +307,8 @@ export const initAiForm = () => {
 
     const submitCallback = async (event) => {
         event.preventDefault();
+        console.log("📝 Rückruf-Formular abgesendet");
+        
         const name = document.getElementById('callback-name').value.trim();
         const phone = document.getElementById('callback-phone').value.trim();
         const topic = document.getElementById('callback-topic').value.trim();
@@ -301,6 +332,7 @@ export const initAiForm = () => {
             });
 
             if (data.success) {
+                console.log("✅ Rückruf erfolgreich gebucht");
                 document.getElementById('confirmation-details').innerHTML = `
                     <div><strong>Termin:</strong> ${selectedCallbackData.formattedString}</div>
                     <div><strong>Name:</strong> ${name}</div>
@@ -315,6 +347,7 @@ export const initAiForm = () => {
                 throw new Error(data.message || 'Unbekannter Fehler');
             }
         } catch (error) {
+            console.error("❌ Rückruf-Buchung fehlgeschlagen:", error);
             alert(`Buchung fehlgeschlagen: ${error.message}`);
         } finally {
             submitButton.disabled = false;
@@ -323,11 +356,13 @@ export const initAiForm = () => {
     };
 
     const showCallbackStep = (stepId) => {
+        console.log(`🔄 Wechsle zu Schritt: ${stepId}`);
         document.querySelectorAll('.booking-step').forEach(step => step.classList.remove('active'));
         document.getElementById(stepId).classList.add('active');
     };
 
     const createEmergencyFallbackModal = () => {
+        console.log("🚨 Erstelle Notfall-Modal");
         const fallbackHTML = `
             <div id="booking-modal" class="callback-modal">
                 <div class="fallback-modal-content">
@@ -348,11 +383,12 @@ export const initAiForm = () => {
     };
 
     // ===================================================================
-    // EVITA CONVERSATION - MIT GEDÄCHTNIS UND RÜCKFRAGE
+    // EVITA CONVERSATION - VERBESSERTE FEHLERBEHANDLUNG
     // ===================================================================
 
     const sendToEvita = async (userInput, isFromChat = false) => {
-        console.log("🤖 Sende an Evita (mit Gedächtnis):", userInput);
+        console.log(`🤖 Sende an Evita (Chat: ${isFromChat}):`, userInput);
+        console.log(`📝 Aktuelle Chat-Historie:`, chatHistory);
         
         if (isFromChat) {
             showTypingIndicator();
@@ -361,36 +397,61 @@ export const initAiForm = () => {
         }
 
         try {
-            // Sende die KOMPLETTE Chat-Historie an Evita (für Gedächtnis)
+            // Stelle sicher, dass die API korrekt aufgerufen wird
+            const requestData = {
+                history: chatHistory,
+                message: userInput
+            };
+            
+            console.log("📤 Sende an API:", requestData);
+            
             const data = await safeFetchAPI('/api/ask-gemini', {
                 method: 'POST',
-                body: JSON.stringify({
-                    history: chatHistory, // <-- WICHTIG: Evita's Gedächtnis
-                    message: userInput
-                })
+                body: JSON.stringify(requestData)
             });
+
+            console.log("📥 Evita-Antwort erhalten:", data);
 
             if (isFromChat) removeTypingIndicator();
 
+            // Verarbeite die Antwort
+            let answer = '';
+            
+            if (typeof data === 'string') {
+                // Falls die Antwort als String kommt
+                answer = data;
+            } else if (data && data.answer) {
+                // Standard JSON-Format
+                answer = data.answer;
+            } else if (data && data.message) {
+                // Alternativer Key
+                answer = data.message;
+            } else {
+                // Fallback
+                console.warn("⚠️ Unerwartetes Antwortformat:", data);
+                answer = "Es gab ein Problem mit der Antwort.";
+            }
+
+            console.log("💬 Verwende Antwort:", answer);
+
             // Prüfe ob Evita das Rückruf-Modal öffnen möchte
-            if (data.action === 'launch_booking_modal') {
-                const message = data.answer || "Einen Moment, ich öffne den Kalender für dich...";
-                addMessageToHistory(message, 'ai');
+            if (data && data.action === 'launch_booking_modal') {
+                addMessageToHistory(answer, 'ai');
                 setTimeout(() => launchCallbackModal(), 500);
             } else {
-                const answer = data.answer || data.message || "Es gab ein Problem mit der Antwort.";
                 addMessageToHistory(answer, 'ai');
                 
                 // Prüfe auf Booking-Trigger in Evita's Antwort
                 if (answer.includes('[buchung_starten]')) {
+                    console.log("🎯 Booking-Trigger erkannt in Antwort");
                     setTimeout(() => launchCallbackModal(), 800);
                 }
             }
         } catch (error) {
-            const errorMessage = "Entschuldigung, es ist ein technischer Fehler aufgetreten.";
+            console.error("❌ Evita Conversation Error:", error);
+            const errorMessage = `Entschuldigung, es ist ein technischer Fehler aufgetreten: ${error.message}`;
             if (isFromChat) removeTypingIndicator();
             addMessageToHistory(errorMessage, 'ai');
-            console.error("Evita Conversation Error:", error);
         } finally {
             if (!isFromChat && aiStatus) aiStatus.textContent = '';
         }
@@ -434,8 +495,17 @@ export const initAiForm = () => {
         e.preventDefault();
         const userInput = aiQuestion.value.trim();
         if (userInput) {
+            console.log("📝 Index-Form Submit:", userInput);
+            
             // Modal öffnen
             openAIModal();
+            
+            // Chat-Historie für neue Konversation initialisieren
+            const chatHistoryDiv = document.getElementById('ai-chat-history');
+            if (chatHistoryDiv) {
+                chatHistoryDiv.innerHTML = '';
+            }
+            chatHistory = []; // WICHTIG: Neue Konversation beginnt mit leerer Historie
             
             // User-Nachricht hinzufügen und verarbeiten
             addMessageToHistory(userInput, 'user');
@@ -521,5 +591,5 @@ export const initAiForm = () => {
         console.log("✅ Rückruf-Modal geschlossen");
     };
 
-    console.log("✅ AI-Form mit Evita Gedächtnis und booking.css vollständig initialisiert");
+    console.log("✅ AI-Form mit verbessertem Debug-Logging vollständig initialisiert");
 };
