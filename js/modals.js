@@ -262,83 +262,102 @@ function setupAboutMePagination(contentArea) {
     function showPage(pageIndex) {
         console.log('👤 Zeige About-Me Seite:', pageIndex);
         
-        // Verstecke alle Abschnitte
-        const allElements = Array.from(contentArea.children);
+        // Verstecke alle Abschnitte - aber arbeite mit ALL Elementen innerhalb des .legal-container
+        const legalContainer = contentArea.querySelector('.legal-container');
+        if (!legalContainer) {
+            console.error('👤 Legal Container nicht gefunden!');
+            return;
+        }
+        
+        const allElements = Array.from(legalContainer.children);
+        console.log('👤 Gefundene Elemente im Container:', allElements.length);
+        
         allElements.forEach(element => {
             element.style.display = 'none';
         });
         
         // Zeige immer den Haupttitel
-        const title = contentArea.querySelector('h1');
+        const title = legalContainer.querySelector('h1');
         if (title) title.style.display = 'block';
         
         if (pageIndex === 0) {
-            // Seite 1: Bis zum Breakpoint "Doch Michael ist mehr als nur Code und Pixel"
-            console.log('👤 Zeige Seite 1 - bis zum Breakpoint');
+            // Seite 1: Bis zum H2 mit "Doch Michael ist mehr als nur Code und Pixel"
+            console.log('👤 Zeige Seite 1 - bis zum H2 Breakpoint');
             
             let foundBreakpoint = false;
             
             for (let i = 0; i < allElements.length; i++) {
                 const element = allElements[i];
                 
-                // Prüfe auf Breakpoint - verschiedene mögliche Texte
+                // SPEZIFISCHERE Breakpoint-Erkennung: Nur H2 mit exakter Klasse oder Text
                 const isBreakpoint = (
-                    (element.tagName === 'H2' && element.textContent.includes('Doch Michael ist mehr als nur Code und Pixel')) ||
-                    (element.classList && element.classList.contains('about-section-header')) ||
-                    element.textContent.includes('Doch Michael ist mehr als nur Code und Pixel')
+                    element.tagName === 'H2' && 
+                    (element.classList.contains('about-section-header') || 
+                     element.textContent.includes('Doch Michael ist mehr als nur Code und Pixel'))
                 );
                 
                 if (isBreakpoint) {
-                    console.log('👤 Breakpoint gefunden bei Element:', element.tagName, element.textContent.substring(0, 50));
+                    console.log('👤 H2-Breakpoint gefunden bei:', element.textContent.substring(0, 50));
                     foundBreakpoint = true;
                     break;
                 }
                 
                 element.style.display = 'block';
-                console.log('👤 Zeige Element:', element.tagName, element.textContent.substring(0, 30));
+                console.log('👤 Zeige Element Seite 1:', element.tagName, element.textContent.substring(0, 30));
             }
             
             if (!foundBreakpoint) {
-                console.warn('👤 Breakpoint nicht gefunden! Zeige nur erste Hälfte');
-                // Fallback: Zeige nur die ersten 3-4 Elemente
-                for (let i = 0; i < Math.min(4, allElements.length); i++) {
-                    allElements[i].style.display = 'block';
+                console.warn('👤 H2-Breakpoint nicht gefunden! Verwende Element-basierte Aufteilung');
+                // Fallback: Zeige etwa die ersten 60% der Elemente
+                const splitIndex = Math.floor(allElements.length * 0.6);
+                for (let i = 0; i < splitIndex; i++) {
+                    if (allElements[i]) {
+                        allElements[i].style.display = 'block';
+                        console.log('👤 Fallback Seite 1:', allElements[i].tagName);
+                    }
                 }
             }
             
         } else if (pageIndex === 1) {
-            // Seite 2: Ab dem Breakpoint
-            console.log('👤 Zeige Seite 2 - ab dem Breakpoint');
+            // Seite 2: Ab dem H2 Breakpoint
+            console.log('👤 Zeige Seite 2 - ab dem H2 Breakpoint');
             
             let foundBreakpoint = false;
+            let breakpointIndex = -1;
             
+            // Finde den Breakpoint-Index
             for (let i = 0; i < allElements.length; i++) {
                 const element = allElements[i];
                 
-                // Prüfe auf Breakpoint
                 const isBreakpoint = (
-                    (element.tagName === 'H2' && element.textContent.includes('Doch Michael ist mehr als nur Code und Pixel')) ||
-                    (element.classList && element.classList.contains('about-section-header')) ||
-                    element.textContent.includes('Doch Michael ist mehr als nur Code und Pixel')
+                    element.tagName === 'H2' && 
+                    (element.classList.contains('about-section-header') || 
+                     element.textContent.includes('Doch Michael ist mehr als nur Code und Pixel'))
                 );
                 
                 if (isBreakpoint) {
                     foundBreakpoint = true;
-                    console.log('👤 Breakpoint gefunden, ab jetzt zeigen');
-                }
-                
-                if (foundBreakpoint) {
-                    element.style.display = 'block';
-                    console.log('👤 Zeige Element ab Breakpoint:', element.tagName, element.textContent.substring(0, 30));
+                    breakpointIndex = i;
+                    console.log('👤 H2-Breakpoint gefunden bei Index:', i);
+                    break;
                 }
             }
             
-            if (!foundBreakpoint) {
-                console.warn('👤 Breakpoint nicht gefunden! Zeige zweite Hälfte');
-                // Fallback: Zeige die letzten Elemente
-                const startIndex = Math.floor(allElements.length / 2);
-                for (let i = startIndex; i < allElements.length; i++) {
+            if (foundBreakpoint) {
+                // Zeige alle Elemente ab dem Breakpoint
+                for (let i = breakpointIndex; i < allElements.length; i++) {
                     allElements[i].style.display = 'block';
+                    console.log('👤 Zeige Element Seite 2:', allElements[i].tagName, allElements[i].textContent.substring(0, 30));
+                }
+            } else {
+                console.warn('👤 H2-Breakpoint nicht gefunden! Verwende Element-basierte Aufteilung');
+                // Fallback: Zeige die letzten 40% der Elemente
+                const splitIndex = Math.floor(allElements.length * 0.6);
+                for (let i = splitIndex; i < allElements.length; i++) {
+                    if (allElements[i]) {
+                        allElements[i].style.display = 'block';
+                        console.log('👤 Fallback Seite 2:', allElements[i].tagName);
+                    }
                 }
             }
         }
