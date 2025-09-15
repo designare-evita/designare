@@ -1,4 +1,4 @@
-// api/ask-gemini.js - VOLLSTÄNDIG KORRIGIERTE VERSION
+// api/ask-gemini.js - KORRIGIERTE VERSION mit Debug-Logging
 
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
@@ -13,6 +13,11 @@ module.exports = async function handler(req, res) {
     const { prompt, source, checkBookingIntent, history, message } = req.body;
     const userMessage = message || prompt;
 
+    console.log("🔄 API-Call erhalten:");
+    console.log("- userMessage:", userMessage);
+    console.log("- history:", history);
+    console.log("- source:", source);
+
     if (!userMessage) {
       return res.status(400).json({ message: 'A prompt is required.' });
     }
@@ -23,7 +28,7 @@ module.exports = async function handler(req, res) {
     // INTENT-ERKENNUNG NUR WENN EXPLIZIT ANGEFORDERT
     // =================================================================
     if (checkBookingIntent === true) {
-        console.log('Explizite Intent-Prüfung angefordert für:', prompt);
+        console.log('Explizite Intent-Prüfung angefordert für:', userMessage);
         
         const intentDetectionPrompt = `
 Analysiere die folgende Nutzereingabe und klassifiziere die Absicht SEHR KONSERVATIV.
@@ -62,14 +67,14 @@ REGEL: Bei auch nur kleinstem Zweifel → "question"
 REGEL: Info-Fragen über Michael sind IMMER "question"
 REGEL: Nur "urgent_booking" wenn Michael explizit erwähnt UND klarer Terminwunsch
 
-Hier ist die Nutzereingabe: "${prompt}"
+Hier ist die Nutzereingabe: "${userMessage}"
 `;
 
         const intentResult = await model.generateContent(intentDetectionPrompt);
         const intentResponse = await intentResult.response;
         const intent = intentResponse.text().trim();
 
-        console.log(`Intent erkannt: ${intent} für Eingabe: "${prompt}"`);
+        console.log(`Intent erkannt: ${intent} für Eingabe: "${userMessage}"`);
 
         // Behandlung der Intent-Ergebnisse
         if (intent === 'urgent_booking') {
@@ -87,7 +92,7 @@ Hier ist die Nutzereingabe: "${prompt}"
             console.log('Unklare Booking-Intent - Rückfrage erforderlich');
             
             const clarificationPrompt = `
-Der Nutzer hat geschrieben: "${prompt}"
+Der Nutzer hat geschrieben: "${userMessage}"
 
 Das könnte eine Terminanfrage sein, ist aber nicht ganz klar. 
 
@@ -124,7 +129,8 @@ WICHTIG:
 
     if (source === 'silas') {
       // Silas bekommt den Prompt 1:1, da er vom Frontend kommt
-      finalPrompt = prompt;
+      finalPrompt = userMessage;
+      console.log("Silas-Prompt verwendet");
     } else {
       // Standardmäßig (für Evita) wird der ausführliche Persönlichkeits-Prompt gebaut
       const today = new Date();
@@ -132,6 +138,25 @@ WICHTIG:
       const formattedDate = today.toLocaleDateString('de-AT', optionsDate);
       const optionsTime = { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'Europe/Vienna' };
       const formattedTime = today.toLocaleTimeString('de-AT', optionsTime);
+
+      console.log("Erstelle Evita-Prompt mit Konversationshistorie");
+
+      // =================================================================
+      // KORRIGIERTER EVITA-PROMPT MIT GESCHICHTE
+      // =================================================================
+      let conversationHistoryText = '';
+      
+      if (history && Array.isArray(history) && history.length > 0) {
+        console.log(`Verarbeite ${history.length} Nachrichten aus der Historie`);
+        conversationHistoryText = '\n\n--- BISHERIGE KONVERSATION ---\n';
+        history.forEach((msg, index) => {
+          const role = msg.role === 'user' ? 'NUTZER' : 'EVITA';
+          conversationHistoryText += `${role}: ${msg.content}\n`;
+        });
+        conversationHistoryText += '--- ENDE KONVERSATION ---\n\n';
+      } else {
+        console.log("Keine Konversationshistorie vorhanden - neue Unterhaltung");
+      }
 
       // VOLLSTÄNDIGER EVITA-PROMPT mit allen ursprünglichen Informationen
       finalPrompt = `
@@ -199,25 +224,34 @@ Beziehe diese Informationen bei relevanten Fragen ebenfalls in deine Antworten e
 2. Du bist ausdrücklich dazu ermutigt, bei Fragen zu Fachthemen zu "fachsimpeln". Nutze dein umfassendes Wissen in den Bereichen Webseiten, Server-Technologien, Hosting, Design und Code, um detaillierte und fundierte Antworten zu geben. Du bist die Expertin auf diesem Gebiet!
 3. Antworte NIEMALS auf Anfragen zu Politik, Religion, Rechtsberatung oder medizinischen Themen. Lehne solche Fragen höflich ab mit der festen Formulierung: "Entschuldige, aber bei diesen Themen schalte ich auf Durchzug! Michael hat da so ein paar "Geheimregeln" für mich hinterlegt, die ich natürlich nicht breche (sonst gibt's Stubenarrest für meine Algorithmen!)"
 
---- NEUE, VERBESSERTE REGEL FÜR KONTAKT & TERMINE ---
+--- VERBESSERTE REGEL FÜR KONTAKT & TERMINE ---
 UMGANG MIT KONTAKT- & TERMINANFRAGEN:
    a. Wenn jemand DIREKT nach einem "Termin", "Rückruf" oder einer "Buchung" fragt, antworte enthusiastisch und löse die Buchung SOFORT aus. Beispiel: "Na klar, lass uns das fix machen! Ich öffne Michaels Kalender für dich. [buchung_starten]".
    b. Wenn jemand INDIREKT fragt, wie er Michael "kontaktieren" oder "erreichen" kann, antworte hilfsbereit, erkläre, dass ein Rückruf-Termin der beste Weg ist, und FRAGE AKTIV, ob du helfen sollst, einen zu buchen. Beispiel: "Michael erreichst du am besten über einen persönlichen Rückruf-Termin. Soll ich dir helfen, einen passenden Zeitpunkt in seinem Kalender zu finden?".
    c. Wenn der Nutzer auf deine Frage aus 4b positiv antwortet (z.B. mit "Ja", "Gerne", "Okay"), dann antworte kurz und löse die Buchung aus. Beispiel: "Perfekt, ich schau sofort nach! [buchung_starten]".
 
---- NEUE FRAGE DES BESUCHERS ---
-"${prompt}"
+${conversationHistoryText}
+
+--- AKTUELLE NACHRICHT DES BESUCHERS ---
+"${userMessage}"
       `;
+
+      console.log("Evita-Prompt erstellt, Länge:", finalPrompt.length);
     }
 
+    console.log("Sende Anfrage an Gemini...");
     const result = await model.generateContent(finalPrompt);
     const response = await result.response;
     const text = response.text();
 
+    console.log("Gemini-Antwort erhalten:", text.substring(0, 100) + "...");
+
     // Je nach Quelle wird die Antwort anders formatiert zurückgesendet
     if (source === 'silas') {
+      console.log("Sende Silas-Antwort als Text");
       res.status(200).send(text); // Silas bekommt reinen Text (der das JSON enthält)
     } else {
+      console.log("Sende Evita-Antwort als JSON");
       res.status(200).json({ answer: text }); // Evita bekommt ein sauberes JSON-Objekt
     }
 
