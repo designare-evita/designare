@@ -105,8 +105,7 @@ export const initAiForm = () => {
     // ===================================================================
 
     const isLocalBookingRequest = (userInput) => {
-const lowerInput = userInput.toLowerCase();
-
+        const lowerInput = userInput.toLowerCase();
         
         // SCHRITT 1: Prüfe zuerst explizite Info-Anfragen über Michael (haben absolute Vorrang)
         const infoAboutMichaelPhrases = [
@@ -153,14 +152,14 @@ const lowerInput = userInput.toLowerCase();
         
         // SCHRITT 3: Prüfe nur SEHR explizite Booking-Phrasen
         const explicitBookingPhrases = [
-            'termin mit michael buchen',
-            'michael soll mich anrufen',
+            'termin buchen',
+            'anrufen',
             'rückruf-termin buchen',
             'ich möchte einen rückruf-termin',
-            'termin vereinbaren mit michael',
+            'termin vereinbaren',
             'callback buchen',
-            'terminbuchung mit michael',
-            'michael anrufen lassen'
+            'terminbuchung',
+            'anrufen lassen'
         ];
         
         const isExplicitBooking = explicitBookingPhrases.some(phrase => lowerInput.includes(phrase));
@@ -254,6 +253,7 @@ const lowerInput = userInput.toLowerCase();
         } catch (error) {
             console.error(`Evita-Fehler:`, error);
             handleEvitaError(error, isFromChat);
+        }
     };
 
     // ===================================================================
