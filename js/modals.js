@@ -520,31 +520,57 @@ function addPaginationButtons(contentArea, currentPage) {
     }
     
     function showPage(pageIndex) {
+        console.log('📄 Zeige Legal Seite:', pageIndex, 'für', currentPage);
+        
         // Verstecke alle Abschnitte
         const allSections = contentArea.querySelectorAll('h1, h2, h3, h4, p, ul, ol, li, div');
+        console.log('📄 Gefundene Abschnitte insgesamt:', allSections.length);
+        
         allSections.forEach(section => {
             section.style.display = 'none';
         });
         
         // Zeige immer den Haupttitel
         const title = contentArea.querySelector('h1');
-        if (title) title.style.display = 'block';
+        if (title) {
+            title.style.display = 'block';
+            console.log('📄 Haupttitel gefunden und angezeigt:', title.textContent);
+        }
         
         // Für Datenschutz: Zeige auch "Stand: ..." Info
         if (currentPage === 'datenschutz.html') {
             const standInfo = contentArea.querySelector('p'); // "Stand: 21. Juli 2025"
             if (standInfo && standInfo.textContent.includes('Stand:')) {
                 standInfo.style.display = 'block';
+                console.log('📄 Stand-Info angezeigt für Datenschutz');
             }
         }
         
         // Zeige spezifische Abschnitte basierend auf der Konfiguration
         const pageConfig = paginationState.pages[pageIndex];
-        const allH3s = contentArea.querySelectorAll('h3');
-        const allH4s = contentArea.querySelectorAll('h4'); // Für feinere Unterteilungen
+        console.log('📄 Page Config für Seite', pageIndex, ':', pageConfig);
         
-        // Verwende H3s als Hauptabschnitte, H4s als Unterabschnitte
-        const mainSections = allH3s.length > 0 ? allH3s : allH4s;
+        const allH2s = contentArea.querySelectorAll('h2');
+        const allH3s = contentArea.querySelectorAll('h3');
+        const allH4s = contentArea.querySelectorAll('h4');
+        
+        console.log('📄 Gefunden - H2:', allH2s.length, 'H3:', allH3s.length, 'H4:', allH4s.length);
+        
+        // Für Disclaimer: H2 als Hauptabschnitte verwenden
+        let mainSections;
+        if (currentPage === 'disclaimer.html' && allH2s.length > 0) {
+            mainSections = allH2s;
+            console.log('📄 Verwende H2s als Hauptabschnitte für Disclaimer');
+        } else {
+            // Standard: H3s als Hauptabschnitte, H4s als Unterabschnitte
+            mainSections = allH3s.length > 0 ? allH3s : allH4s;
+            console.log('📄 Verwende H3s/H4s als Hauptabschnitte');
+        }
+        
+        console.log('📄 Hauptabschnitte für Pagination:', mainSections.length);
+        mainSections.forEach((section, index) => {
+            console.log(`📄 Abschnitt ${index}:`, section.textContent.substring(0, 50));
+        });
         
         if (pageConfig.sections) {
             showSectionsRange(mainSections, pageConfig.sections[0], pageConfig.sections[1]);
