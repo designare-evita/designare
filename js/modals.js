@@ -428,8 +428,11 @@ function loadLegalContentWithPagination(page) {
         });
 }
 
+// KORRIGIERTE PAGINATION FÜR IMPRESSUM UND DISCLAIMER
+// Diese Funktion ersetzt die fehlerhafte addPaginationButtons Funktion in modals.js
+
 function addPaginationButtons(contentArea, currentPage) {
-    // Konfiguration für alle Seiten
+    // Verbesserte Konfiguration für alle Seiten
     const pageConfigs = {
         'datenschutz.html': {
             totalPages: 3,
@@ -442,8 +445,8 @@ function addPaginationButtons(contentArea, currentPage) {
         'impressum.html': {
             totalPages: 2,
             pages: [
-                { title: "Seite 1: Kontakt & Grundlagen", sections: [0, 1] },
-                { title: "Seite 2: Haftung & Urheberrecht", sections: [2, 3] }
+                { title: "Seite 1: Kontakt & Grundlagen", sections: [0, 2] },
+                { title: "Seite 2: Haftungsausschluss", sections: [3, 5] }
             ]
         },
         'disclaimer.html': {
@@ -522,12 +525,12 @@ function addPaginationButtons(contentArea, currentPage) {
     function showPage(pageIndex) {
         console.log('📄 Zeige Legal Seite:', pageIndex, 'für', currentPage);
         
-        // Verstecke alle Abschnitte
-        const allSections = contentArea.querySelectorAll('h1, h2, h3, h4, p, ul, ol, li, div');
-        console.log('📄 Gefundene Abschnitte insgesamt:', allSections.length);
+        // KORREKTUR: Verstecke alle Abschnitte - aber spezifischere Selektion
+        const allElements = contentArea.querySelectorAll('h1, h2, h3, h4, p, ul, ol, li, div:not(.legal-modal-pagination-buttons)');
+        console.log('📄 Gefundene Elemente insgesamt:', allElements.length);
         
-        allSections.forEach(section => {
-            section.style.display = 'none';
+        allElements.forEach(element => {
+            element.style.display = 'none';
         });
         
         // Zeige immer den Haupttitel
@@ -537,43 +540,13 @@ function addPaginationButtons(contentArea, currentPage) {
             console.log('📄 Haupttitel gefunden und angezeigt:', title.textContent);
         }
         
-        // Für Datenschutz: Zeige auch "Stand: ..." Info
-        if (currentPage === 'datenschutz.html') {
-            const standInfo = contentArea.querySelector('p'); // "Stand: 21. Juli 2025"
-            if (standInfo && standInfo.textContent.includes('Stand:')) {
-                standInfo.style.display = 'block';
-                console.log('📄 Stand-Info angezeigt für Datenschutz');
-            }
-        }
-        
-        // Zeige spezifische Abschnitte basierend auf der Konfiguration
-        const pageConfig = paginationState.pages[pageIndex];
-        console.log('📄 Page Config für Seite', pageIndex, ':', pageConfig);
-        
-        const allH2s = contentArea.querySelectorAll('h2');
-        const allH3s = contentArea.querySelectorAll('h3');
-        const allH4s = contentArea.querySelectorAll('h4');
-        
-        console.log('📄 Gefunden - H2:', allH2s.length, 'H3:', allH3s.length, 'H4:', allH4s.length);
-        
-        // Für Disclaimer: H2 als Hauptabschnitte verwenden
-        let mainSections;
-        if (currentPage === 'disclaimer.html' && allH2s.length > 0) {
-            mainSections = allH2s;
-            console.log('📄 Verwende H2s als Hauptabschnitte für Disclaimer');
-        } else {
-            // Standard: H3s als Hauptabschnitte, H4s als Unterabschnitte
-            mainSections = allH3s.length > 0 ? allH3s : allH4s;
-            console.log('📄 Verwende H3s/H4s als Hauptabschnitte');
-        }
-        
-        console.log('📄 Hauptabschnitte für Pagination:', mainSections.length);
-        mainSections.forEach((section, index) => {
-            console.log(`📄 Abschnitt ${index}:`, section.textContent.substring(0, 50));
-        });
-        
-        if (pageConfig.sections) {
-            showSectionsRange(mainSections, pageConfig.sections[0], pageConfig.sections[1]);
+        // SPEZIELLE BEHANDLUNG FÜR IMPRESSUM UND DISCLAIMER
+        if (currentPage === 'impressum.html') {
+            handleImpressumPagination(pageIndex, allElements);
+        } else if (currentPage === 'disclaimer.html') {
+            handleDisclaimerPagination(pageIndex, allElements);
+        } else if (currentPage === 'datenschutz.html') {
+            handleDatenschutzPagination(pageIndex, allElements);
         }
         
         updatePagination();
@@ -582,28 +555,92 @@ function addPaginationButtons(contentArea, currentPage) {
         contentArea.scrollTop = 0;
     }
     
-    function showSectionsRange(sectionElements, startIndex, endIndex) {
-        for (let i = startIndex; i <= endIndex && i < sectionElements.length; i++) {
-            const section = sectionElements[i];
-            section.style.display = 'block';
+    function handleImpressumPagination(pageIndex, allElements) {
+        console.log('📄 Impressum Pagination für Seite:', pageIndex);
+        
+        // Finde alle H3-Überschriften (das sind die Hauptabschnitte im Impressum)
+        const h3Elements = Array.from(contentArea.querySelectorAll('h3'));
+        console.log('📄 Impressum H3-Elemente gefunden:', h3Elements.length);
+        h3Elements.forEach((h3, index) => {
+            console.log(`📄 H3 ${index}:`, h3.textContent.substring(0, 50));
+        });
+        
+        if (pageIndex === 0) {
+            // Seite 1: Zeige die ersten 3 H3-Abschnitte (Index 0-2)
+            console.log('📄 Impressum Seite 1: Zeige H3-Abschnitte 0-2');
+            showH3SectionsRange(h3Elements, 0, 2);
+        } else if (pageIndex === 1) {
+            // Seite 2: Zeige die restlichen H3-Abschnitte (ab Index 3)
+            console.log('📄 Impressum Seite 2: Zeige H3-Abschnitte ab 3');
+            showH3SectionsRange(h3Elements, 3, h3Elements.length - 1);
+        }
+    }
+    
+    function handleDisclaimerPagination(pageIndex, allElements) {
+        console.log('📄 Disclaimer Pagination für Seite:', pageIndex);
+        
+        // Für Disclaimer verwenden wir H3-Elemente als Hauptabschnitte
+        const h3Elements = Array.from(contentArea.querySelectorAll('h3'));
+        console.log('📄 Disclaimer H3-Elemente gefunden:', h3Elements.length);
+        h3Elements.forEach((h3, index) => {
+            console.log(`📄 H3 ${index}:`, h3.textContent.substring(0, 50));
+        });
+        
+        if (pageIndex === 0) {
+            // Seite 1: Zeige die ersten 2 H3-Abschnitte (Index 0-1)
+            console.log('📄 Disclaimer Seite 1: Zeige H3-Abschnitte 0-1');
+            showH3SectionsRange(h3Elements, 0, 1);
+        } else if (pageIndex === 1) {
+            // Seite 2: Zeige die restlichen H3-Abschnitte (ab Index 2)
+            console.log('📄 Disclaimer Seite 2: Zeige H3-Abschnitte ab 2');
+            showH3SectionsRange(h3Elements, 2, h3Elements.length - 1);
+        }
+    }
+    
+    function handleDatenschutzPagination(pageIndex, allElements) {
+        console.log('📄 Datenschutz Pagination für Seite:', pageIndex);
+        
+        // Für Datenschutz: Zeige auch "Stand: ..." Info auf jeder Seite
+        const standInfo = contentArea.querySelector('p'); // "Stand: 21. Juli 2025"
+        if (standInfo && standInfo.textContent.includes('Stand:')) {
+            standInfo.style.display = 'block';
+            console.log('📄 Stand-Info angezeigt für Datenschutz');
+        }
+        
+        // Verwende H3-Elemente für Datenschutz
+        const h3Elements = Array.from(contentArea.querySelectorAll('h3'));
+        console.log('📄 Datenschutz H3-Elemente gefunden:', h3Elements.length);
+        
+        const pageConfig = paginationState.pages[pageIndex];
+        if (pageConfig.sections) {
+            showH3SectionsRange(h3Elements, pageConfig.sections[0], pageConfig.sections[1]);
+        }
+    }
+    
+    function showH3SectionsRange(h3Elements, startIndex, endIndex) {
+        console.log(`📄 Zeige H3-Abschnitte von ${startIndex} bis ${endIndex}`);
+        
+        for (let i = startIndex; i <= endIndex && i < h3Elements.length; i++) {
+            const h3 = h3Elements[i];
+            h3.style.display = 'block';
+            console.log(`📄 Zeige H3 ${i}:`, h3.textContent.substring(0, 30));
             
-            // Zeige alle Elemente bis zum nächsten Hauptabschnitt
-            let nextElement = section.nextElementSibling;
-            while (nextElement && !isMainSection(nextElement)) {
-                nextElement.style.display = 'block';
+            // Zeige alle nachfolgenden Elemente bis zum nächsten H3
+            let nextElement = h3.nextElementSibling;
+            while (nextElement && nextElement.tagName !== 'H3') {
+                // Überspringe Pagination-Buttons
+                if (!nextElement.classList.contains('legal-modal-pagination-buttons')) {
+                    nextElement.style.display = 'block';
+                    console.log(`📄 Zeige nachfolgendes Element:`, nextElement.tagName, nextElement.textContent.substring(0, 30));
+                }
                 nextElement = nextElement.nextElementSibling;
             }
         }
     }
     
-    function isMainSection(element) {
-        return element.tagName === 'H3' || element.tagName === 'H4';
-    }
-    
     // Initialisiere erste Seite
     setTimeout(() => showPage(0), 100);
 }
-
 // ===================================================================
 // AI MODAL SETUP (nur Close-Buttons)
 // ===================================================================
