@@ -27,23 +27,58 @@
     z-index: 0;
     border-radius: 10px;
 }
-
-/* Einzelner blinkender Punkt (wird per JavaScript gesteuert) */
+* Verstärkter Pulsar mit erhöhter Strahlkraft */
 .circuit-pulse-dot {
     position: absolute;
     width: 4px;
     height: 4px;
-    background: rgba(252, 181, 0, 0.9);
+    background-color: rgba(252, 181, 0, 0.8);
     border-radius: 50%;
     pointer-events: none;
-    z-index: 1;
+    z-index: 15;
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.2s ease-in;
 }
 
 .circuit-pulse-dot.active {
     opacity: 1;
-    box-shadow: 0 0 8px rgba(252, 181, 0, 0.6);
+}
+
+/* Expanding Ring-Effekt mit erhöhter Strahlkraft */
+.circuit-pulse-dot.active::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(252, 181, 0, 0.85);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: pulsate 3.25s ease-out;
+}
+
+@keyframes pulsate {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;  /* Vollständige Sichtbarkeit am Start */
+        box-shadow: 0 0 15px rgba(252, 181, 0, 0.9); /* Heller Glüheffekt */
+    }
+    30% {
+        transform: translate(-50%, -50%) scale(2.5);
+        opacity: 0.7;
+        box-shadow: 0 0 25px rgba(252, 181, 0, 0.7); /* Erweiterte Abstrahlung */
+    }
+    70% {
+        transform: translate(-50%, -50%) scale(5);
+        opacity: 0.3;
+        box-shadow: 0 0 35px rgba(252, 181, 0, 0.4); /* Maximale Ausdehnung */
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(7);  /* Größerer Endradius für mehr Strahlkraft */
+        opacity: 0;
+        box-shadow: 0 0 45px rgba(252, 181, 0, 0.1); /* Sanftes Verblassen */
+    }
 }
 
 /* Chat-Inhalte über dem Pattern */
