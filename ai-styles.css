@@ -55,7 +55,7 @@
     background-color: rgba(252, 181, 0, 0.85);
     border-radius: 50%;
     transform: translate(-50%, -50%);
-    animation: pulsate 3.25s ease-out;
+    animation: pulsate 2.25s ease-out;
 }
 
 @keyframes pulsate {
