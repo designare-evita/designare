@@ -736,9 +736,10 @@ export const initAiForm = () => {
             ChatUI.addMessage(answer, 'ai');
 
             // Prüfen, ob Buchungs-Modal geöffnet werden soll
-            if (data?.action === 'launch_booking_modal' || answer.includes('[buchung_starten]')) {
-                setTimeout(() => BookingModal.launch(), 800);
-            }
+            if (data?.action === 'launch_booking_modal') {
+    setTimeout(() => BookingModal.launch(), 800);
+}
+            
 
         } catch (error) {
             ChatUI.removeTypingIndicator();
