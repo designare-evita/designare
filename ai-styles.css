@@ -1399,3 +1399,22 @@
         background: rgba(252, 181, 0, 0.7) !important;
     }
 }
+
+@media (max-width: 768px) {
+    /* Chat-Form Focus-Effekt auch auf Mobile */
+    #ai-chat-form:focus-within {
+        border-color: var(--accent-color, #ffc107) !important;
+    }
+    
+    /* Auch für keyboard-active State */
+    body.keyboard-active #ai-chat-form:focus-within {
+        border-color: var(--accent-color, #ffc107) !important;
+        box-shadow: 0 0 10px rgba(255, 193, 7, 0.3) !important; /* Optional: Glüheffekt */
+    }
+    
+    /* Input-Feld Focus (zusätzliche Sicherheit) */
+    #ai-chat-form input[type="text"]:focus {
+        outline: none !important;
+        /* Der Border wird vom Parent #ai-chat-form:focus-within gesteuert */
+    }
+}
