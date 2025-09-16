@@ -18,6 +18,66 @@ export const initAiForm = () => {
     };
 
     // ===================================================================
+    // Puls
+    // ===================================================================
+
+
+    function initCircuitAnimation() {
+    const modalContent = document.querySelector('#ai-response-modal .modal-content');
+    if (!modalContent) return;
+
+    // Definiere die Knotenpunkt-Positionen (relativ zum 30px Grid)
+    const nodePositions = [
+        { x: 15, y: 15 },
+        { x: 45, y: 45 }, 
+        { x: 75, y: 15 },
+        { x: 15, y: 75 },
+        { x: 60, y: 30 }
+    ];
+
+    // Erstelle die Pulse-Dots
+    const dots = nodePositions.map((pos, index) => {
+        const dot = document.createElement('div');
+        dot.className = 'circuit-pulse-dot';
+        dot.style.left = pos.x + 'px';
+        dot.style.top = pos.y + 'px';
+        modalContent.appendChild(dot);
+        return dot;
+    });
+
+    let currentIndex = 0;
+
+    function pulseNext() {
+        // Alle Punkte ausschalten
+        dots.forEach(dot => dot.classList.remove('active'));
+        
+        // Nächsten Punkt einschalten
+        dots[currentIndex].classList.add('active');
+        
+        // Nach 800ms wieder ausschalten
+        setTimeout(() => {
+            dots[currentIndex].classList.remove('active');
+        }, 800);
+        
+        // Nächster Index
+        currentIndex = (currentIndex + 1) % dots.length;
+        
+        // Nächsten Puls nach 3-5 Sekunden (zufällig)
+        setTimeout(pulseNext, 3000 + Math.random() * 2000);
+    }
+
+    // Erste Aktivierung nach 2 Sekunden
+    setTimeout(pulseNext, 2000);
+}
+
+// Rufe die Funktion auf, wenn das Modal geöffnet wird
+const originalOpenChatModal = ModalController.openChatModal;
+ModalController.openChatModal = function() {
+    originalOpenChatModal.call(this);
+    setTimeout(initCircuitAnimation, 500);
+};
+
+    // ===================================================================
     // DOM-ELEMENTE (Selektoren an einem Ort)
     // ===================================================================
     const DOM = {
