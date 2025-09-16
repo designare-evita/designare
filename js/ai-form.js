@@ -111,7 +111,7 @@ export const initAiForm = () => {
                         if (dots[randomIndex] && state.animationRunning) {
                             dots[randomIndex].classList.remove('active');
                         }
-                    }, 3250);
+                    }, 2250);
                 }
                 
                 // Nächster Puls nach 5 Sekunden
