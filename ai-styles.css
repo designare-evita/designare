@@ -27,7 +27,7 @@
     z-index: 0;
     border-radius: 10px;
 }
-* Verstärkter Pulsar mit erhöhter Strahlkraft */
+/* Verstärkter Pulsar mit erhöhter Strahlkraft */
 .circuit-pulse-dot {
     position: absolute;
     width: 4px;
