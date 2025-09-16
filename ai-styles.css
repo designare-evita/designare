@@ -2,39 +2,7 @@
    AI-STYLES.CSS - KOMPLETT NEU UND KORRIGIERT
    Für Evita KI (Hauptseite) und Silas KI (CSV-Creator)
    ============== */
-/* Pattern 4: Neural Network für ai-styles.css */
 
-#ai-response-modal .modal-content {
-    /* Deine bestehenden Styles bleiben... */
-    background-color: #1e1e1e !important;
-    background-image: 
-        radial-gradient(circle at 25% 25%, rgba(252, 181, 0, 0.18) 1px, transparent 2px),
-        radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.08) 1px, transparent 2px);
-    background-size: 40px 40px, 28px 28px;
-    position: relative;
-}
-
-#ai-response-modal .modal-content::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: 
-        linear-gradient(135deg, transparent 30%, rgba(252, 181, 0, 0.04) 50%, transparent 70%);
-    background-size: 80px 80px;
-    pointer-events: none;
-    z-index: 0;
-    border-radius: 10px;
-}
-
-/* Stelle sicher, dass Chat-Inhalte über dem Pattern sind */
-#ai-chat-history,
-#ai-chat-form {
-    position: relative;
-    z-index: 1;
-}
 /* ======================================== */
 /* EVITA KI - HAUPTSEITEN-FORMULAR         */
 /* ======================================== */
