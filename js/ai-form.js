@@ -1,12 +1,11 @@
-// js/ai-form.js - Refactored for Clarity and Maintainability
+// js/ai-form.js - Komplett überarbeitete Version mit integrierter Pulsar-Animation
 
 /**
- * Initialisiert das gesamte AI-Chat-Modul, einschließlich des Evita-Chats
- * und des Rückruf-Buchungs-Modals.
- * Dieses Skript ist so konzipiert, dass es auf allen Seiten der Website funktioniert.
+ * Initialisiert das gesamte AI-Chat-Modul, einschließlich des Evita-Chats,
+ * des Rückruf-Buchungs-Modals und der Circuit-Animation.
  */
 export const initAiForm = () => {
-    console.log("🚀 Initialisiere AI-Form-Modul (Refactored Version)");
+    console.log("🚀 Initialisiere AI-Form-Modul (Komplette Neufassung)");
 
     // ===================================================================
     // ZENTRALER ZUSTAND (State Management)
@@ -14,81 +13,12 @@ export const initAiForm = () => {
     const state = {
         chatHistory: [], // Speichert die Konversationshistorie für die API
         selectedCallbackData: null, // Speichert die Daten des ausgewählten Rückruf-Termins
-        typingIndicatorId: null // Hält die ID des "tippt..."-Indikators
+        typingIndicatorId: null, // Hält die ID des "tippt..."-Indikators
+        animationRunning: false // Steuert die Circuit-Animation
     };
 
     // ===================================================================
-    // Puls
-    // ===================================================================
-
-/*
-   function initCircuitAnimation() {
-    const modalContent = document.querySelector('#ai-response-modal .modal-content');
-    if (!modalContent) return;
-
-    // Existierende Dots entfernen
-    const existingDots = modalContent.querySelectorAll('.circuit-pulse-dot');
-    existingDots.forEach(dot => dot.remove());
-
-    // Grid-Schnittpunkte berechnen
-    const modalWidth = 800;
-    const modalHeight = 600;
-    const gridSize = 30;
-    
-    const gridPositions = [];
-    for (let x = 15; x < modalWidth - 15; x += gridSize) {
-        for (let y = 15; y < modalHeight - 15; y += gridSize) {
-            if (y > 60 && y < modalHeight - 60) {
-                gridPositions.push({ x, y });
-            }
-        }
-    }
-
-    // Dots an Grid-Schnittpunkten erstellen
-    const dots = gridPositions.map((pos, index) => {
-        const dot = document.createElement('div');
-        dot.className = 'circuit-pulse-dot';
-        dot.style.left = pos.x + 'px';
-        dot.style.top = pos.y + 'px';
-        modalContent.appendChild(dot);
-        return dot;
-    });
-
-    let animationRunning = true;
-
-    function pulseNext() {
-        if (!animationRunning) return;
-
-        // Alle Dots deaktivieren
-        dots.forEach(dot => dot.classList.remove('active'));
-        
-        // Zufälligen Knotenpunkt auswählen
-        const randomIndex = Math.floor(Math.random() * dots.length);
-        dots[randomIndex].classList.add('active');
-        
-        // Nach Animation deaktivieren
-        setTimeout(() => {
-            dots[randomIndex].classList.remove('active');
-        }, 3250);
-        
-        // Nächster Puls nach 5 Sekunden
-        setTimeout(pulseNext, 5000);
-    }
-
-    // Erste Aktivierung nach 2 Sekunden
-    setTimeout(pulseNext, 2000);
-}
-
-// Integration
-const originalOpenChatModal = ModalController.openChatModal;
-ModalController.openChatModal = function() {
-    originalOpenChatModal.call(this);
-    setTimeout(initCircuitAnimation, 500);
-};
-*/
-    
-    // ===================================================================
-    // DOM-ELEMENTE (Selektoren an einem Ort)
+    // DOM-ELEMENTE (Selektoren)
     // ===================================================================
     const DOM = {
         // Haupt-Formular auf der Startseite
@@ -106,28 +36,120 @@ ModalController.openChatModal = function() {
         // Header Button
         headerChatButton: document.getElementById('evita-chat-button'),
 
-        // Dynamische Elemente (werden später gesucht)
-        get chatForm() {
+        // Dynamische Elemente (Getter für später geladene Elemente)
+        get chatFormDynamic() {
             return document.getElementById('ai-chat-form');
         },
-        get chatInput() {
+        get chatInputDynamic() {
             return document.getElementById('ai-chat-input');
         }
     };
 
     // ===================================================================
+    // MODUL: Circuit Animation
+    // Steuert die Pulsar-Animation im Chat-Modal
+    // ===================================================================
+    const CircuitAnimation = {
+        /**
+         * Initialisiert die Pulsar-Animation an Grid-Knotenpunkten
+         */
+        init() {
+            const modalContent = document.querySelector('#ai-response-modal .modal-content');
+            if (!modalContent) {
+                console.warn('Modal content nicht gefunden - Animation übersprungen');
+                return;
+            }
+
+            console.log('🔵 Starte Grid-Knotenpunkt Pulsar-Animation...');
+
+            // Existierende Dots entfernen
+            this.cleanup();
+
+            // Grid-Schnittpunkte berechnen
+            const modalWidth = 800;
+            const modalHeight = 600;
+            const gridSize = 30;
+            
+            const gridPositions = [];
+            for (let x = 15; x < modalWidth - 15; x += gridSize) {
+                for (let y = 15; y < modalHeight - 15; y += gridSize) {
+                    // Bereiche für Header und Footer aussparen
+                    if (y > 60 && y < modalHeight - 60) {
+                        gridPositions.push({ x, y });
+                    }
+                }
+            }
+
+            // Dots an Grid-Schnittpunkten erstellen
+            const dots = gridPositions.map((pos) => {
+                const dot = document.createElement('div');
+                dot.className = 'circuit-pulse-dot';
+                dot.style.left = pos.x + 'px';
+                dot.style.top = pos.y + 'px';
+                modalContent.appendChild(dot);
+                return dot;
+            });
+
+            console.log(`Grid-Knotenpunkte erstellt: ${dots.length} Positionen`);
+
+            state.animationRunning = true;
+
+            // Pulsar-Sequenz starten
+            const pulseNext = () => {
+                if (!state.animationRunning) return;
+
+                // Alle Dots deaktivieren
+                dots.forEach(dot => dot.classList.remove('active'));
+                
+                // Zufälligen Knotenpunkt auswählen
+                const randomIndex = Math.floor(Math.random() * dots.length);
+                if (dots[randomIndex]) {
+                    dots[randomIndex].classList.add('active');
+                    
+                    // Nach Animation deaktivieren
+                    setTimeout(() => {
+                        if (dots[randomIndex] && state.animationRunning) {
+                            dots[randomIndex].classList.remove('active');
+                        }
+                    }, 3250);
+                }
+                
+                // Nächster Puls nach 5 Sekunden
+                setTimeout(pulseNext, 5000);
+            };
+
+            // Erste Aktivierung nach 2 Sekunden
+            setTimeout(pulseNext, 2000);
+        },
+
+        /**
+         * Stoppt die Animation und entfernt alle Dots
+         */
+        stop() {
+            state.animationRunning = false;
+            this.cleanup();
+            console.log('🔴 Pulsar-Animation gestoppt');
+        },
+
+        /**
+         * Entfernt alle vorhandenen Pulse-Dots
+         */
+        cleanup() {
+            const existingDots = document.querySelectorAll('.circuit-pulse-dot');
+            existingDots.forEach(dot => dot.remove());
+        }
+    };
+
+    // ===================================================================
     // MODUL: API Handler
-    // Kümmert sich um die gesamte Kommunikation mit den Server-Endpunkten.
+    // Kümmert sich um die gesamte Kommunikation mit den Server-Endpunkten
     // ===================================================================
     const ApiHandler = {
         /**
-         * Eine sichere Fetch-Funktion mit verbessertem Logging und Fehlerbehandlung.
-         * @param {string} url - Die Endpunkt-URL.
-         * @param {object} options - Fetch-Optionen (z.B. method, body).
-         * @returns {Promise<object|string>} - Die geparste JSON-Antwort oder Text.
+         * Sichere Fetch-Funktion mit verbessertem Logging und Fehlerbehandlung
          */
         async safeFetch(url, options = {}) {
-            console.log(`🔄 API-Anfrage an: ${url}`);
+            console.log(`📤 API-Anfrage an: ${url}`);
             if (options.body) {
                 console.log(`📤 Sende Daten:`, JSON.parse(options.body));
             }
@@ -161,9 +183,7 @@ ModalController.openChatModal = function() {
         },
 
         /**
-         * Sendet die Nutzer-Nachricht und die Historie an die Gemini-API.
-         * @param {string} userInput - Die aktuelle Nachricht des Nutzers.
-         * @returns {Promise<object>} - Die Antwort der KI.
+         * Sendet Nutzer-Nachricht an die Gemini-API
          */
         sendToEvita(userInput) {
             const requestData = {
@@ -177,17 +197,14 @@ ModalController.openChatModal = function() {
         },
 
         /**
-         * Ruft die verfügbaren Rückruf-Termine ab.
-         * @returns {Promise<object>} - Die Liste der verfügbaren Termine.
+         * Ruft verfügbare Rückruf-Termine ab
          */
         getAvailableSlots() {
             return this.safeFetch('/api/suggest-appointments');
         },
         
         /**
-         * Bucht einen Rückruf-Termin.
-         * @param {object} bookingData - Die Daten für die Buchung (slot, name, phone, topic).
-         * @returns {Promise<object>} - Die Bestätigung der Buchung.
+         * Bucht einen Rückruf-Termin
          */
         bookAppointment(bookingData) {
             return this.safeFetch('/api/book-appointment-phone', {
@@ -199,13 +216,11 @@ ModalController.openChatModal = function() {
     
     // ===================================================================
     // MODUL: Chat UI
-    // Verwaltet alle Interaktionen und Anzeigen im Chat-Fenster.
+    // Verwaltet alle Interaktionen und Anzeigen im Chat-Fenster
     // ===================================================================
     const ChatUI = {
         /**
-         * Fügt eine Nachricht zur Chat-Anzeige und zur `state.chatHistory` hinzu.
-         * @param {string} message - Der Text der Nachricht.
-         * @param {string} sender - 'user' oder 'ai'.
+         * Fügt eine Nachricht zur Chat-Anzeige und zur Historie hinzu
          */
         addMessage(message, sender) {
             if (!DOM.chatHistoryContainer) return;
@@ -217,16 +232,19 @@ ModalController.openChatModal = function() {
             DOM.chatHistoryContainer.scrollTop = DOM.chatHistoryContainer.scrollHeight;
 
             // Zur API-Historie hinzufügen
-            state.chatHistory.push({ role: sender === 'user' ? 'user' : 'assistant', content: message });
+            state.chatHistory.push({ 
+                role: sender === 'user' ? 'user' : 'assistant', 
+                content: message 
+            });
             
-            // Historie begrenzen, um den Kontext nicht zu überladen
+            // Historie begrenzen (letzte 20 Nachrichten)
             if (state.chatHistory.length > 20) {
                 state.chatHistory = state.chatHistory.slice(-20);
             }
         },
 
         /**
-         * Zeigt den "tippt..."-Indikator an.
+         * Zeigt den "tippt..."-Indikator an
          */
         showTypingIndicator() {
             this.removeTypingIndicator(); // Sicherstellen, dass kein alter Indikator existiert
@@ -242,7 +260,7 @@ ModalController.openChatModal = function() {
         },
 
         /**
-         * Entfernt den "tippt..."-Indikator.
+         * Entfernt den "tippt..."-Indikator
          */
         removeTypingIndicator() {
             if (state.typingIndicatorId) {
@@ -253,7 +271,7 @@ ModalController.openChatModal = function() {
         },
         
         /**
-         * Leert das Chat-Fenster und die Historie für eine neue Konversation.
+         * Leert das Chat-Fenster und die Historie
          */
         resetChat() {
             if (DOM.chatHistoryContainer) {
@@ -265,28 +283,38 @@ ModalController.openChatModal = function() {
 
     // ===================================================================
     // MODUL: Modal Controller
-    // Steuert das Öffnen und Schließen der verschiedenen Modals.
+    // Steuert das Öffnen und Schließen der verschiedenen Modals
     // ===================================================================
     const ModalController = {
         /**
-         * Öffnet das AI-Chat-Modal.
+         * Öffnet das AI-Chat-Modal mit Animation
          */
         openChatModal() {
             if (!DOM.modalOverlay) return;
+            
             DOM.modalOverlay.style.display = 'flex';
             document.body.classList.add('no-scroll');
             
             setTimeout(() => {
                 DOM.modalOverlay.classList.add('visible');
-                DOM.chatInput?.focus();
+                DOM.chatInputDynamic?.focus();
+                
+                // Circuit-Animation nach Modal-Öffnung starten
+                setTimeout(() => {
+                    CircuitAnimation.init();
+                }, 300);
             }, 10);
         },
 
         /**
-         * Schließt das AI-Chat-Modal.
+         * Schließt das AI-Chat-Modal und stoppt Animation
          */
         closeChatModal() {
             if (!DOM.modalOverlay) return;
+            
+            // Animation stoppen
+            CircuitAnimation.stop();
+            
             DOM.modalOverlay.classList.remove('visible');
             setTimeout(() => {
                 DOM.modalOverlay.style.display = 'none';
@@ -297,16 +325,16 @@ ModalController.openChatModal = function() {
     
     // ===================================================================
     // MODUL: Booking Modal
-    // Enthält die gesamte Logik für das Rückruf-Buchungs-Modal.
+    // Enthält die gesamte Logik für das Rückruf-Buchungs-Modal
     // ===================================================================
     const BookingModal = {
         /**
-         * Startet und zeigt das Rückruf-Buchungs-Modal an.
+         * Startet und zeigt das Rückruf-Buchungs-Modal an
          */
         async launch() {
             console.log("📞 Starte Rückruf-Modal");
             ModalController.closeChatModal();
-            await new Promise(resolve => setTimeout(resolve, 300)); // Kurze Pause für UX
+            await new Promise(resolve => setTimeout(resolve, 300)); // UX-Pause
 
             this.remove(); // Altes Modal sicherheitshalber entfernen
             
@@ -320,29 +348,27 @@ ModalController.openChatModal = function() {
                 this.setupEventListeners();
                 this.loadSlots();
             } else {
-                 console.error("❌ Rückruf-Modal konnte nicht erstellt werden.");
+                console.error("❌ Rückruf-Modal konnte nicht erstellt werden.");
             }
         },
 
         /**
-         * Entfernt das Buchungs-Modal aus dem DOM.
+         * Entfernt das Buchungs-Modal aus dem DOM
          */
         remove() {
             const modal = document.getElementById('booking-modal');
-            if (modal) {
-                modal.remove();
-            }
+            if (modal) modal.remove();
+            
             document.body.classList.remove('no-scroll');
             state.selectedCallbackData = null;
             console.log("✅ Rückruf-Modal geschlossen.");
         },
 
         /**
-         * Generiert das HTML für das clean gestaltete Modal.
-         * @returns {string} - Das HTML-Markup für das Modal.
+         * Generiert das HTML für das Modal
          */
         createHTML() {
-             return `
+            return `
                 <div id="booking-modal" class="callback-modal">
                     <div class="booking-modal-content">
                         <div class="booking-modal-header">
@@ -364,9 +390,18 @@ ModalController.openChatModal = function() {
                                 <div id="selected-slot-display"></div>
                                 <h3 class="booking-step-title">Deine Kontaktdaten</h3>
                                 <form id="callback-form">
-                                    <div class="booking-form-group"><label for="callback-name">Dein Name *</label><input type="text" id="callback-name" required></div>
-                                    <div class="booking-form-group"><label for="callback-phone">Deine Telefonnummer *</label><input type="tel" id="callback-phone" required placeholder="z.B. 0664 123 45 67"></div>
-                                    <div class="booking-form-group"><label for="callback-topic">Dein Anliegen (optional)</label><textarea id="callback-topic" rows="3" placeholder="Worum geht es bei deinem Projekt?"></textarea></div>
+                                    <div class="booking-form-group">
+                                        <label for="callback-name">Dein Name *</label>
+                                        <input type="text" id="callback-name" required>
+                                    </div>
+                                    <div class="booking-form-group">
+                                        <label for="callback-phone">Deine Telefonnummer *</label>
+                                        <input type="tel" id="callback-phone" required placeholder="z.B. 0664 123 45 67">
+                                    </div>
+                                    <div class="booking-form-group">
+                                        <label for="callback-topic">Dein Anliegen (optional)</label>
+                                        <textarea id="callback-topic" rows="3" placeholder="Worum geht es bei deinem Projekt?"></textarea>
+                                    </div>
                                     <div class="booking-form-actions">
                                         <button type="button" id="back-to-slots" class="booking-btn back-btn">Zurück</button>
                                         <button type="submit" id="submit-callback" class="booking-btn submit-btn">Rückruf buchen</button>
@@ -390,15 +425,22 @@ ModalController.openChatModal = function() {
         },
 
         /**
-         * Richtet die Event-Listener für das Buchungs-Modal ein.
+         * Richtet Event-Listener für das Buchungs-Modal ein
          */
         setupEventListeners() {
-            document.getElementById('callback-form')?.addEventListener('submit', (e) => this.handleSubmit(e));
-            document.getElementById('back-to-slots')?.addEventListener('click', () => this.showStep('step-slot-selection'));
+            const callbackForm = document.getElementById('callback-form');
+            if (callbackForm) {
+                callbackForm.addEventListener('submit', (e) => this.handleSubmit(e));
+            }
+
+            const backButton = document.getElementById('back-to-slots');
+            if (backButton) {
+                backButton.addEventListener('click', () => this.showStep('step-slot-selection'));
+            }
         },
         
         /**
-         * Lädt die verfügbaren Termine und zeigt sie an.
+         * Lädt verfügbare Termine und zeigt sie an
          */
         async loadSlots() {
             const loadingDiv = document.getElementById('callback-loading');
@@ -425,27 +467,30 @@ ModalController.openChatModal = function() {
                         slotsContainer.appendChild(button);
                     });
                 } else {
-                    noSlotsMessage.style.display = 'block';
+                    if (noSlotsMessage) noSlotsMessage.style.display = 'block';
                 }
             } catch (error) {
-                noSlotsMessage.innerHTML = 'Fehler beim Laden der Termine. Bitte versuche es später erneut.';
-                noSlotsMessage.style.display = 'block';
+                if (noSlotsMessage) {
+                    noSlotsMessage.innerHTML = 'Fehler beim Laden der Termine. Bitte versuche es später erneut.';
+                    noSlotsMessage.style.display = 'block';
+                }
             }
         },
 
         /**
-         * Verarbeitet die Auswahl eines Termin-Slots.
-         * @param {object} suggestion - Die Daten des ausgewählten Termins.
+         * Verarbeitet die Auswahl eines Termin-Slots
          */
         selectSlot(suggestion) {
             state.selectedCallbackData = suggestion;
-            document.getElementById('selected-slot-display').innerHTML = `Dein Termin: <strong>${suggestion.formattedString}</strong>`;
+            const displayElement = document.getElementById('selected-slot-display');
+            if (displayElement) {
+                displayElement.innerHTML = `Dein Termin: <strong>${suggestion.formattedString}</strong>`;
+            }
             this.showStep('step-contact-details');
         },
 
         /**
-         * Verarbeitet das Absenden des Buchungs-Formulars.
-         * @param {Event} event - Das Submit-Event.
+         * Verarbeitet das Absenden des Buchungs-Formulars
          */
         async handleSubmit(event) {
             event.preventDefault();
@@ -466,16 +511,21 @@ ModalController.openChatModal = function() {
             try {
                 const data = await ApiHandler.bookAppointment({
                     slot: state.selectedCallbackData.fullDateTime,
-                    name, phone, topic
+                    name, 
+                    phone, 
+                    topic
                 });
 
                 if (data.success) {
-                    document.getElementById('confirmation-details').innerHTML = `
-                        <div><strong>Termin:</strong> ${state.selectedCallbackData.formattedString}</div>
-                        <div><strong>Name:</strong> ${name}</div>
-                        <div><strong>Telefon:</strong> ${phone}</div>
-                        ${topic ? `<div><strong>Anliegen:</strong> ${topic}</div>` : ''}
-                    `;
+                    const confirmationDetails = document.getElementById('confirmation-details');
+                    if (confirmationDetails) {
+                        confirmationDetails.innerHTML = `
+                            <div><strong>Termin:</strong> ${state.selectedCallbackData.formattedString}</div>
+                            <div><strong>Name:</strong> ${name}</div>
+                            <div><strong>Telefon:</strong> ${phone}</div>
+                            ${topic ? `<div><strong>Anliegen:</strong> ${topic}</div>` : ''}
+                        `;
+                    }
                     this.showStep('step-confirmation');
                 } else {
                     throw new Error(data.message || 'Unbekannter Buchungsfehler');
@@ -489,18 +539,18 @@ ModalController.openChatModal = function() {
         },
 
         /**
-         * Zeigt einen bestimmten Schritt im Modal an (z.B. Terminauswahl, Bestätigung).
-         * @param {string} stepId - Die ID des anzuzeigenden Schritts.
+         * Zeigt einen bestimmten Schritt im Modal an
          */
         showStep(stepId) {
             document.querySelectorAll('.booking-step').forEach(step => step.classList.remove('active'));
-            document.getElementById(stepId)?.classList.add('active');
+            const targetStep = document.getElementById(stepId);
+            if (targetStep) targetStep.classList.add('active');
         }
     };
     
     // ===================================================================
     // KERNLOGIK: Conversation Flow
-    // Steuert den Ablauf des Chats mit Evita.
+    // Steuert den Ablauf des Chats mit Evita
     // ===================================================================
     async function handleUserMessage(userInput) {
         ChatUI.addMessage(userInput, 'user');
@@ -511,13 +561,17 @@ ModalController.openChatModal = function() {
             ChatUI.removeTypingIndicator();
 
             let answer = "Entschuldigung, ich konnte keine passende Antwort finden.";
-            if (typeof data === 'string') answer = data;
-            else if (data?.answer) answer = data.answer;
-            else if (data?.message) answer = data.message;
+            if (typeof data === 'string') {
+                answer = data;
+            } else if (data?.answer) {
+                answer = data.answer;
+            } else if (data?.message) {
+                answer = data.message;
+            }
             
             ChatUI.addMessage(answer, 'ai');
 
-            // Prüfen, ob eine Aktion ausgelöst werden soll (z.B. Buchungs-Modal öffnen)
+            // Prüfen, ob Buchungs-Modal geöffnet werden soll
             if (data?.action === 'launch_booking_modal' || answer.includes('[buchung_starten]')) {
                 setTimeout(() => BookingModal.launch(), 800);
             }
@@ -530,10 +584,10 @@ ModalController.openChatModal = function() {
     
     // ===================================================================
     // EVENT LISTENERS SETUP
-    // Verbindet die UI-Elemente mit den entsprechenden Aktionen.
+    // Verbindet die UI-Elemente mit den entsprechenden Aktionen
     // ===================================================================
     function initializeEventListeners() {
-        // Listener für das Hauptformular auf der Startseite (falls vorhanden)
+        // Haupt-Formular auf der Startseite
         if (DOM.aiForm) {
             DOM.aiForm.addEventListener('submit', (e) => {
                 e.preventDefault();
@@ -547,15 +601,15 @@ ModalController.openChatModal = function() {
             });
         }
 
-        // Listener für das Chat-Formular im Modal (wird dynamisch eingerichtet)
+        // Chat-Formular im Modal (dynamisch)
         const setupChatFormListener = () => {
-            const chatForm = DOM.chatForm; // Getter verwenden
+            const chatForm = DOM.chatFormDynamic;
             if (chatForm && !chatForm.hasAttribute('data-listener-added')) {
                 chatForm.setAttribute('data-listener-added', 'true');
                 chatForm.addEventListener('submit', async (e) => {
                     e.preventDefault();
-                    const chatInput = DOM.chatInput; // Getter verwenden
-                    const userInput = chatInput.value.trim();
+                    const chatInput = DOM.chatInputDynamic;
+                    const userInput = chatInput?.value.trim();
                     if (userInput) {
                         await handleUserMessage(userInput);
                         chatInput.value = '';
@@ -563,26 +617,37 @@ ModalController.openChatModal = function() {
                 });
             }
         };
-        // Observer, um das Chat-Formular zu finden, sobald es im DOM ist
-        new MutationObserver(setupChatFormListener).observe(document.body, { childList: true, subtree: true });
 
-        // Listener für den Header-Chat-Button
-        DOM.headerChatButton?.addEventListener('click', (e) => {
-            e.preventDefault();
-            ChatUI.resetChat();
-            ChatUI.addMessage("Hallo! Ich bin Evita, Michaels persönliche KI-Assistentin. Womit kann ich dir heute helfen?", 'ai');
-            ModalController.openChatModal();
+        // Observer für dynamisches Chat-Formular
+        const observer = new MutationObserver(setupChatFormListener);
+        observer.observe(document.body, { childList: true, subtree: true });
+
+        // Header-Chat-Button
+        if (DOM.headerChatButton) {
+            DOM.headerChatButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                ChatUI.resetChat();
+                ChatUI.addMessage("Hallo! Ich bin Evita, Michaels persönliche KI-Assistentin. Womit kann ich dir heute helfen?", 'ai');
+                ModalController.openChatModal();
+            });
+        }
+
+        // Modal schließen
+        DOM.closeModalButtons.forEach(button => {
+            button.addEventListener('click', ModalController.closeChatModal);
         });
 
-        // Listener zum Schließen des Chat-Modals
-        DOM.closeModalButtons.forEach(button => button.addEventListener('click', ModalController.closeChatModal));
-        DOM.modalOverlay?.addEventListener('click', (e) => {
-            if (e.target === DOM.modalOverlay) ModalController.closeChatModal();
-        });
+        if (DOM.modalOverlay) {
+            DOM.modalOverlay.addEventListener('click', (e) => {
+                if (e.target === DOM.modalOverlay) {
+                    ModalController.closeChatModal();
+                }
+            });
+        }
     }
 
     // ===================================================================
-    // GLOBALE FUNKTIONEN (falls von außerhalb benötigt)
+    // GLOBALE FUNKTIONEN
     // ===================================================================
     window.launchCallbackFromAnywhere = () => BookingModal.launch();
     window.closeCallbackModal = () => BookingModal.remove();
