@@ -1,11 +1,11 @@
-// js/ai-form.js - Komplett überarbeitete Version mit integrierter Pulsar-Animation
+// js/ai-form.js - Komplett überarbeitete Version mit Pulsar-Animation und Mobile-Support
 
 /**
  * Initialisiert das gesamte AI-Chat-Modul, einschließlich des Evita-Chats,
  * des Rückruf-Buchungs-Modals und der Circuit-Animation.
  */
 export const initAiForm = () => {
-    console.log("🚀 Initialisiere AI-Form-Modul (Komplette Neufassung)");
+    console.log("🚀 Initialisiere AI-Form-Modul (Komplette Neufassung mit Mobile-Support)");
 
     // ===================================================================
     // ZENTRALER ZUSTAND (State Management)
@@ -42,6 +42,144 @@ export const initAiForm = () => {
         },
         get chatInputDynamic() {
             return document.getElementById('ai-chat-input');
+        }
+    };
+
+    // ===================================================================
+    // MODUL: Mobile Keyboard Handler
+    // Behandelt mobile Tastatur-Events für bessere UX
+    // ===================================================================
+    const MobileKeyboardHandler = {
+        /**
+         * Erkennt Tastatur-Events und passt das Layout entsprechend an
+         */
+        init() {
+            if (!this.isMobile()) return;
+            
+            console.log('📱 Mobile Keyboard Handler initialisiert');
+            
+            // Viewport-Höhen-Tracking
+            this.setupViewportTracking();
+            
+            // Input-Focus-Events
+            this.setupInputEvents();
+            
+            // Orientierungsänderungen
+            this.setupOrientationChange();
+        },
+
+        /**
+         * Prüft ob es sich um ein mobiles Gerät handelt
+         */
+        isMobile() {
+            return /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+                   window.innerWidth <= 768;
+        },
+
+        /**
+         * Überwacht Viewport-Änderungen (Tastatur auf/zu)
+         */
+        setupViewportTracking() {
+            let initialViewportHeight = window.visualViewport?.height || window.innerHeight;
+            let isKeyboardOpen = false;
+
+            const handleViewportChange = () => {
+                const currentHeight = window.visualViewport?.height || window.innerHeight;
+                const heightDifference = initialViewportHeight - currentHeight;
+                
+                // Tastatur ist wahrscheinlich offen wenn Höhe um >150px reduziert
+                const keyboardOpen = heightDifference > 150;
+                
+                if (keyboardOpen !== isKeyboardOpen) {
+                    isKeyboardOpen = keyboardOpen;
+                    document.body.classList.toggle('keyboard-active', keyboardOpen);
+                    
+                    if (keyboardOpen) {
+                        this.onKeyboardOpen();
+                    } else {
+                        this.onKeyboardClose();
+                    }
+                }
+            };
+
+            // Visual Viewport API (moderne Browser)
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', handleViewportChange);
+            }
+            
+            // Fallback für ältere Browser
+            window.addEventListener('resize', handleViewportChange);
+        },
+
+        /**
+         * Input-Field Focus/Blur Events
+         */
+        setupInputEvents() {
+            // Focus Event
+            document.addEventListener('focusin', (e) => {
+                if (e.target.matches('#ai-chat-input')) {
+                    setTimeout(() => {
+                        this.scrollToBottom();
+                    }, 300); // Warten bis Tastatur vollständig geöffnet
+                }
+            });
+            
+            // Blur Event
+            document.addEventListener('focusout', (e) => {
+                if (e.target.matches('#ai-chat-input')) {
+                    setTimeout(() => {
+                        this.scrollToBottom();
+                    }, 300);
+                }
+            });
+        },
+
+        /**
+         * Orientierungsänderungen handhaben
+         */
+        setupOrientationChange() {
+            window.addEventListener('orientationchange', () => {
+                setTimeout(() => {
+                    this.scrollToBottom();
+                }, 500); // Mehr Zeit für Orientierungsänderung
+            });
+        },
+
+        /**
+         * Wenn Tastatur geöffnet wird
+         */
+        onKeyboardOpen() {
+            console.log('📱 Tastatur geöffnet');
+            
+            // Chat-Container anpassen
+            setTimeout(() => {
+                this.scrollToBottom();
+            }, 100);
+        },
+
+        /**
+         * Wenn Tastatur geschlossen wird
+         */
+        onKeyboardClose() {
+            console.log('📱 Tastatur geschlossen');
+            
+            // Layout reset
+            setTimeout(() => {
+                this.scrollToBottom();
+            }, 100);
+        },
+
+        /**
+         * Scrollt zum Ende des Chats
+         */
+        scrollToBottom() {
+            const chatHistory = document.getElementById('ai-chat-history');
+            if (chatHistory) {
+                chatHistory.scrollTo({
+                    top: chatHistory.scrollHeight,
+                    behavior: 'smooth'
+                });
+            }
         }
     };
 
@@ -106,12 +244,12 @@ export const initAiForm = () => {
                 if (dots[randomIndex]) {
                     dots[randomIndex].classList.add('active');
                     
-                    // Nach Animation deaktivieren
+                    // Nach Animation deaktivieren (3.25s für CSS Animation)
                     setTimeout(() => {
                         if (dots[randomIndex] && state.animationRunning) {
                             dots[randomIndex].classList.remove('active');
                         }
-                    }, 2250);
+                    }, 3250);
                 }
                 
                 // Nächster Puls nach 5 Sekunden
@@ -220,7 +358,7 @@ export const initAiForm = () => {
     // ===================================================================
     const ChatUI = {
         /**
-         * Fügt eine Nachricht zur Chat-Anzeige und zur Historie hinzu
+         * Fügt eine Nachricht zur Chat-Anzeige und zur Historie hinzu (Mobile-optimiert)
          */
         addMessage(message, sender) {
             if (!DOM.chatHistoryContainer) return;
@@ -229,7 +367,15 @@ export const initAiForm = () => {
             msgDiv.className = `chat-message ${sender}`;
             msgDiv.textContent = message;
             DOM.chatHistoryContainer.appendChild(msgDiv);
-            DOM.chatHistoryContainer.scrollTop = DOM.chatHistoryContainer.scrollHeight;
+            
+            // Mobile-optimiertes Scrolling
+            if (MobileKeyboardHandler.isMobile()) {
+                setTimeout(() => {
+                    MobileKeyboardHandler.scrollToBottom();
+                }, 50);
+            } else {
+                DOM.chatHistoryContainer.scrollTop = DOM.chatHistoryContainer.scrollHeight;
+            }
 
             // Zur API-Historie hinzufügen
             state.chatHistory.push({ 
@@ -256,7 +402,15 @@ export const initAiForm = () => {
             indicator.className = 'chat-message ai';
             indicator.innerHTML = '<i>Evita tippt...</i>';
             DOM.chatHistoryContainer.appendChild(indicator);
-            DOM.chatHistoryContainer.scrollTop = DOM.chatHistoryContainer.scrollHeight;
+            
+            // Mobile-optimiertes Scrolling
+            if (MobileKeyboardHandler.isMobile()) {
+                setTimeout(() => {
+                    MobileKeyboardHandler.scrollToBottom();
+                }, 50);
+            } else {
+                DOM.chatHistoryContainer.scrollTop = DOM.chatHistoryContainer.scrollHeight;
+            }
         },
 
         /**
@@ -297,7 +451,16 @@ export const initAiForm = () => {
             
             setTimeout(() => {
                 DOM.modalOverlay.classList.add('visible');
-                DOM.chatInputDynamic?.focus();
+                
+                // Mobile-optimierter Focus
+                if (MobileKeyboardHandler.isMobile()) {
+                    // Auf Mobile erst nach Animation fokussieren
+                    setTimeout(() => {
+                        DOM.chatInputDynamic?.focus();
+                    }, 500);
+                } else {
+                    DOM.chatInputDynamic?.focus();
+                }
                 
                 // Circuit-Animation nach Modal-Öffnung starten
                 setTimeout(() => {
@@ -319,6 +482,7 @@ export const initAiForm = () => {
             setTimeout(() => {
                 DOM.modalOverlay.style.display = 'none';
                 document.body.classList.remove('no-scroll');
+                document.body.classList.remove('keyboard-active'); // Mobile cleanup
             }, 300);
         }
     };
@@ -587,6 +751,9 @@ export const initAiForm = () => {
     // Verbindet die UI-Elemente mit den entsprechenden Aktionen
     // ===================================================================
     function initializeEventListeners() {
+        // Mobile Keyboard Handler initialisieren
+        MobileKeyboardHandler.init();
+
         // Haupt-Formular auf der Startseite
         if (DOM.aiForm) {
             DOM.aiForm.addEventListener('submit', (e) => {
@@ -613,6 +780,13 @@ export const initAiForm = () => {
                     if (userInput) {
                         await handleUserMessage(userInput);
                         chatInput.value = '';
+                        
+                        // Mobile: Focus wieder setzen nach Nachricht
+                        if (MobileKeyboardHandler.isMobile()) {
+                            setTimeout(() => {
+                                chatInput.focus();
+                            }, 100);
+                        }
                     }
                 });
             }
@@ -656,5 +830,5 @@ export const initAiForm = () => {
     // INITIALISIERUNG
     // ===================================================================
     initializeEventListeners();
-    console.log("✅ AI-Form-Modul erfolgreich initialisiert.");
+    console.log("✅ AI-Form-Modul erfolgreich initialisiert mit Mobile-Support.");
 };
