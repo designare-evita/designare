@@ -2,8 +2,7 @@
    AI-STYLES.CSS - KOMPLETT NEU UND KORRIGIERT
    Für Evita KI (Hauptseite) und Silas KI (CSV-Creator)
    ============== */
-/* Pattern 1: Subtle Circuit Board - NUR EIN Punkt blinkt zur Zeit */
-
+/* Pattern 1: Statisches Schaltkreis-Muster */
 #ai-response-modal .modal-content {
     background-color: #1e1e1e !important;
     background-image: 
@@ -29,84 +28,22 @@
     border-radius: 10px;
 }
 
-/* EIN blinkender Punkt - Position wechselt */
-#ai-response-modal .modal-content::after {
-    content: '';
+/* Einzelner blinkender Punkt (wird per JavaScript gesteuert) */
+.circuit-pulse-dot {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: 
-        radial-gradient(circle at 15px 15px, rgba(252, 181, 0, 0.9) 2px, transparent 3px);
-    background-size: 30px 30px;
+    width: 4px;
+    height: 4px;
+    background: rgba(252, 181, 0, 0.9);
+    border-radius: 50%;
     pointer-events: none;
     z-index: 1;
-    border-radius: 10px;
     opacity: 0;
-    animation: singleNodeSequence 20s linear infinite;
+    transition: opacity 0.3s ease;
 }
 
-@keyframes singleNodeSequence {
-    /* Punkt 1: Position 15px 15px */
-    0%, 5% {
-        background-image: radial-gradient(circle at 15px 15px, rgba(252, 181, 0, 0.9) 2px, transparent 3px);
-        opacity: 0;
-    }
-    8% {
-        opacity: 1;
-    }
-    12%, 18% {
-        opacity: 0;
-    }
-    
-    /* Punkt 2: Position 45px 45px */
-    20%, 23% {
-        background-image: radial-gradient(circle at 45px 45px, rgba(252, 181, 0, 0.9) 2px, transparent 3px);
-        opacity: 0;
-    }
-    28% {
-        opacity: 1;
-    }
-    32%, 38% {
-        opacity: 0;
-    }
-    
-    /* Punkt 3: Position 75px 15px */
-    40%, 43% {
-        background-image: radial-gradient(circle at 75px 15px, rgba(252, 181, 0, 0.9) 2px, transparent 3px);
-        opacity: 0;
-    }
-    48% {
-        opacity: 1;
-    }
-    52%, 58% {
-        opacity: 0;
-    }
-    
-    /* Punkt 4: Position 15px 75px */
-    60%, 63% {
-        background-image: radial-gradient(circle at 15px 75px, rgba(252, 181, 0, 0.9) 2px, transparent 3px);
-        opacity: 0;
-    }
-    68% {
-        opacity: 1;
-    }
-    72%, 78% {
-        opacity: 0;
-    }
-    
-    /* Punkt 5: Position 60px 30px */
-    80%, 83% {
-        background-image: radial-gradient(circle at 60px 30px, rgba(252, 181, 0, 0.9) 2px, transparent 3px);
-        opacity: 0;
-    }
-    88% {
-        opacity: 1;
-    }
-    92%, 100% {
-        opacity: 0;
-    }
+.circuit-pulse-dot.active {
+    opacity: 1;
+    box-shadow: 0 0 8px rgba(252, 181, 0, 0.6);
 }
 
 /* Chat-Inhalte über dem Pattern */
@@ -115,7 +52,6 @@
     position: relative;
     z-index: 2;
 }
-
 /* ======================================== */
 /* EVITA KI - HAUPTSEITEN-FORMULAR         */
 /* ======================================== */
