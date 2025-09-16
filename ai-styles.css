@@ -3,6 +3,78 @@
    Für Evita KI (Hauptseite) und Silas KI (CSV-Creator)
    ============== */
 
+/* Pattern 1: Subtle Circuit Board mit blinkenden Verbindungspunkten */
+
+#ai-response-modal .modal-content {
+    /* Deine bestehenden Styles bleiben... */
+    background-color: #1e1e1e !important;
+    background-image: 
+        linear-gradient(90deg, rgba(252, 181, 0, 0.12) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(252, 181, 0, 0.12) 1px, transparent 1px);
+    background-size: 30px 30px;
+    position: relative;
+}
+
+#ai-response-modal .modal-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        radial-gradient(circle at 15px 15px, rgba(252, 181, 0, 0.25) 1.5px, transparent 2px),
+        radial-gradient(circle at 45px 30px, rgba(252, 181, 0, 0.25) 1.5px, transparent 2px),
+        radial-gradient(circle at 75px 60px, rgba(252, 181, 0, 0.25) 1.5px, transparent 2px);
+    background-size: 90px 90px;
+    pointer-events: none;
+    z-index: 0;
+    border-radius: 10px;
+    animation: circuitPulse 8s ease-in-out infinite;
+}
+
+#ai-response-modal .modal-content::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        radial-gradient(circle at 30px 45px, rgba(252, 181, 0, 0.3) 1px, transparent 2px),
+        radial-gradient(circle at 60px 15px, rgba(252, 181, 0, 0.3) 1px, transparent 2px),
+        radial-gradient(circle at 90px 75px, rgba(252, 181, 0, 0.3) 1px, transparent 2px);
+    background-size: 90px 90px;
+    pointer-events: none;
+    z-index: 0;
+    border-radius: 10px;
+    animation: circuitPulse2 6s ease-in-out infinite 2s;
+}
+
+/* Animationen für die blinkenden Verbindungspunkte */
+@keyframes circuitPulse {
+    0%, 20% { opacity: 0.3; }
+    10% { opacity: 0.8; }
+    30%, 60% { opacity: 0.2; }
+    45% { opacity: 0.7; }
+    70%, 100% { opacity: 0.3; }
+}
+
+@keyframes circuitPulse2 {
+    0%, 30% { opacity: 0.2; }
+    15% { opacity: 0.6; }
+    40%, 70% { opacity: 0.1; }
+    55% { opacity: 0.5; }
+    80%, 100% { opacity: 0.2; }
+}
+
+/* Chat-Inhalte über dem Pattern */
+#ai-chat-history,
+#ai-chat-form {
+    position: relative;
+    z-index: 1;
+}
+
 /* ======================================== */
 /* EVITA KI - HAUPTSEITEN-FORMULAR         */
 /* ======================================== */
