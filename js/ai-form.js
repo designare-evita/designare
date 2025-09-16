@@ -21,7 +21,7 @@ export const initAiForm = () => {
     // Puls
     // ===================================================================
 
-
+/*
    function initCircuitAnimation() {
     const modalContent = document.querySelector('#ai-response-modal .modal-content');
     if (!modalContent) return;
@@ -85,6 +85,7 @@ ModalController.openChatModal = function() {
     originalOpenChatModal.call(this);
     setTimeout(initCircuitAnimation, 500);
 };
+*/
     
     // ===================================================================
     // DOM-ELEMENTE (Selektoren an einem Ort)
