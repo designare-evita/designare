@@ -1258,3 +1258,140 @@
 #close-booking-modal:hover {
     background: rgba(255, 255, 255, 0.2) !important;
 }
+
+/* ======================================== */
+/* MOBILE VIEWPORT UND TASTATUR-FIX        */
+/* ======================================== */
+
+/* Viewport-Einstellungen für Mobile */
+@supports (-webkit-touch-callout: none) {
+    /* iOS Safari spezifisch */
+    #ai-response-modal .modal-content {
+        /* Verwende 100vh statt feste Werte für bessere mobile Anpassung */
+        height: 100vh !important;
+        max-height: 100vh !important;
+    }
+    
+    #ai-chat-history {
+        /* Flexible Höhe die sich an Tastatur anpasst */
+        max-height: calc(100vh - 200px) !important;
+        min-height: 200px !important;
+    }
+}
+
+/* Allgemeine mobile Verbesserungen */
+@media (max-width: 768px) {
+    /* Modal nimmt vollen Bildschirm ein */
+    #ai-response-modal .modal-content {
+        width: 100vw !important;
+        height: 100vh !important;
+        max-width: none !important;
+        max-height: none !important;
+        border-radius: 0 !important;
+        
+        /* Wichtig: Flexbox-Container für bessere Kontrolle */
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    
+    /* Chat-History: Flexible Höhe mit Scroll */
+    #ai-chat-history {
+        flex: 1 1 auto !important;
+        min-height: 150px !important;
+        max-height: none !important;
+        overflow-y: auto !important;
+        
+        /* Wichtig: Scroll-Verhalten optimieren */
+        -webkit-overflow-scrolling: touch !important;
+        scroll-behavior: smooth !important;
+        
+        /* Padding anpassen */
+        padding: 50px 15px 15px 15px !important;
+    }
+    
+    /* Chat-Form: Feste Höhe am unteren Rand */
+    #ai-chat-form {
+        flex: 0 0 auto !important;
+        margin: 10px 15px 15px 15px !important;
+        
+        /* Mindesthöhe für Touch-Targets */
+        min-height: 50px !important;
+    }
+    
+    /* Input-Feld größer für mobile Eingabe */
+    #ai-chat-form input[type="text"] {
+        font-size: 16px !important; /* Verhindert Zoom auf iOS */
+        padding: 15px !important;
+        line-height: 1.4 !important;
+    }
+    
+    /* Button größer für Touch */
+    #ai-chat-form button {
+        min-width: 60px !important;
+        min-height: 50px !important;
+        padding: 15px 20px !important;
+    }
+    
+    /* Close Button optimiert */
+    .close-button {
+        top: 10px !important;
+        right: 15px !important;
+        width: 44px !important; /* Mindestgröße für Touch-Targets */
+        height: 44px !important;
+        font-size: 1.2rem !important;
+        z-index: 1000 !important;
+    }
+}
+
+/* Spezielle Behandlung für Tastatur-Events */
+@media (max-width: 768px) {
+    /* Wenn Tastatur aktiv ist, Chat-History anpassen */
+    body.keyboard-active #ai-chat-history {
+        max-height: 40vh !important;
+    }
+    
+    /* Input-Container fixiert am unteren Rand */
+    body.keyboard-active #ai-chat-form {
+        position: sticky !important;
+        bottom: 0 !important;
+        background: var(--bg-color, #1a1a1a) !important;
+        border-top: 1px solid var(--border-color, #444) !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        padding: 15px !important;
+    }
+}
+
+/* Verbessertes Scroll-Verhalten für Chat-Nachrichten */
+@media (max-width: 768px) {
+    .chat-message {
+        /* Bessere Lesbarkeit auf kleinen Bildschirmen */
+        font-size: 0.9rem !important;
+        line-height: 1.4 !important;
+        max-width: 95% !important;
+        margin-bottom: 15px !important;
+        
+        /* Verhindert, dass Nachrichten zu klein werden */
+        min-height: 40px !important;
+    }
+    
+    /* Scroll-Indikator sichtbar machen */
+    #ai-chat-history::-webkit-scrollbar {
+        width: 6px !important;
+        display: block !important;
+    }
+    
+    #ai-chat-history::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.1) !important;
+        border-radius: 3px !important;
+    }
+    
+    #ai-chat-history::-webkit-scrollbar-thumb {
+        background: rgba(252, 181, 0, 0.5) !important;
+        border-radius: 3px !important;
+    }
+    
+    #ai-chat-history::-webkit-scrollbar-thumb:hover {
+        background: rgba(252, 181, 0, 0.7) !important;
+    }
+}
