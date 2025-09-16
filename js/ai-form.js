@@ -22,21 +22,30 @@ export const initAiForm = () => {
     // ===================================================================
 
 
-    function initCircuitAnimation() {
+   function initCircuitAnimation() {
     const modalContent = document.querySelector('#ai-response-modal .modal-content');
     if (!modalContent) return;
 
-    // Definiere die Knotenpunkt-Positionen (relativ zum 30px Grid)
-    const nodePositions = [
-        { x: 15, y: 15 },
-        { x: 45, y: 45 }, 
-        { x: 75, y: 15 },
-        { x: 15, y: 75 },
-        { x: 60, y: 30 }
-    ];
+    // Existierende Dots entfernen
+    const existingDots = modalContent.querySelectorAll('.circuit-pulse-dot');
+    existingDots.forEach(dot => dot.remove());
 
-    // Erstelle die Pulse-Dots
-    const dots = nodePositions.map((pos, index) => {
+    // Grid-Schnittpunkte berechnen
+    const modalWidth = 800;
+    const modalHeight = 600;
+    const gridSize = 30;
+    
+    const gridPositions = [];
+    for (let x = 15; x < modalWidth - 15; x += gridSize) {
+        for (let y = 15; y < modalHeight - 15; y += gridSize) {
+            if (y > 60 && y < modalHeight - 60) {
+                gridPositions.push({ x, y });
+            }
+        }
+    }
+
+    // Dots an Grid-Schnittpunkten erstellen
+    const dots = gridPositions.map((pos, index) => {
         const dot = document.createElement('div');
         dot.className = 'circuit-pulse-dot';
         dot.style.left = pos.x + 'px';
@@ -45,38 +54,38 @@ export const initAiForm = () => {
         return dot;
     });
 
-    let currentIndex = 0;
+    let animationRunning = true;
 
     function pulseNext() {
-        // Alle Punkte ausschalten
+        if (!animationRunning) return;
+
+        // Alle Dots deaktivieren
         dots.forEach(dot => dot.classList.remove('active'));
         
-        // Nächsten Punkt einschalten
-        dots[currentIndex].classList.add('active');
+        // Zufälligen Knotenpunkt auswählen
+        const randomIndex = Math.floor(Math.random() * dots.length);
+        dots[randomIndex].classList.add('active');
         
-        // Nach 800ms wieder ausschalten
+        // Nach Animation deaktivieren
         setTimeout(() => {
-            dots[currentIndex].classList.remove('active');
-        }, 800);
+            dots[randomIndex].classList.remove('active');
+        }, 3250);
         
-        // Nächster Index
-        currentIndex = (currentIndex + 1) % dots.length;
-        
-        // Nächsten Puls nach 3-5 Sekunden (zufällig)
-        setTimeout(pulseNext, 3000 + Math.random() * 2000);
+        // Nächster Puls nach 5 Sekunden
+        setTimeout(pulseNext, 5000);
     }
 
     // Erste Aktivierung nach 2 Sekunden
     setTimeout(pulseNext, 2000);
 }
 
-// Rufe die Funktion auf, wenn das Modal geöffnet wird
+// Integration
 const originalOpenChatModal = ModalController.openChatModal;
 ModalController.openChatModal = function() {
     originalOpenChatModal.call(this);
     setTimeout(initCircuitAnimation, 500);
 };
-
+    
     // ===================================================================
     // DOM-ELEMENTE (Selektoren an einem Ort)
     // ===================================================================
