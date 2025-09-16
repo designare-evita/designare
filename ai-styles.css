@@ -1260,20 +1260,18 @@
 }
 
 /* ======================================== */
-/* MOBILE VIEWPORT UND TASTATUR-FIX        */
+/* MOBILE VIEWPORT UND TASTATUR-FIX - KORRIGIERT */
 /* ======================================== */
 
 /* Viewport-Einstellungen für Mobile */
 @supports (-webkit-touch-callout: none) {
     /* iOS Safari spezifisch */
     #ai-response-modal .modal-content {
-        /* Verwende 100vh statt feste Werte für bessere mobile Anpassung */
         height: 100vh !important;
         max-height: 100vh !important;
     }
     
     #ai-chat-history {
-        /* Flexible Höhe die sich an Tastatur anpasst */
         max-height: calc(100vh - 200px) !important;
         min-height: 200px !important;
     }
@@ -1312,10 +1310,14 @@
     /* Chat-Form: Feste Höhe am unteren Rand */
     #ai-chat-form {
         flex: 0 0 auto !important;
-        margin: 10px 15px 15px 15px !important;
+        margin: 10px 15px 20px 15px !important; /* Mehr bottom margin */
         
         /* Mindesthöhe für Touch-Targets */
         min-height: 50px !important;
+        
+        /* WICHTIG: Border und Rundungen beibehalten */
+        border-radius: 10px !important;
+        border: 1px solid var(--border-color, #444) !important;
     }
     
     /* Input-Feld größer für mobile Eingabe */
@@ -1336,42 +1338,44 @@
     .close-button {
         top: 10px !important;
         right: 15px !important;
-        width: 44px !important; /* Mindestgröße für Touch-Targets */
+        width: 44px !important;
         height: 44px !important;
         font-size: 1.2rem !important;
         z-index: 1000 !important;
     }
 }
 
-/* Spezielle Behandlung für Tastatur-Events */
+/* KORRIGIERTE Tastatur-Events Behandlung */
 @media (max-width: 768px) {
     /* Wenn Tastatur aktiv ist, Chat-History anpassen */
     body.keyboard-active #ai-chat-history {
-        max-height: 40vh !important;
+        max-height: 35vh !important; /* Weniger drastische Reduzierung */
+        flex: 1 1 auto !important;
     }
     
-    /* Input-Container fixiert am unteren Rand */
+    /* KORRIGIERT: Input-Container NICHT sticky, normale Position */
     body.keyboard-active #ai-chat-form {
-        position: sticky !important;
-        bottom: 0 !important;
-        background: var(--bg-color, #1a1a1a) !important;
-        border-top: 1px solid var(--border-color, #444) !important;
-        border-radius: 0 !important;
-        margin: 0 !important;
-        padding: 15px !important;
+        /* Entfernt: position: sticky und bottom: 0 */
+        flex: 0 0 auto !important;
+        margin: 10px 15px 20px 15px !important; /* Normale margins beibehalten */
+        
+        /* WICHTIG: Design-Eigenschaften beibehalten */
+        border-radius: 10px !important; /* Rundungen bleiben */
+        border: 1px solid var(--border-color, #444) !important; /* Vollständiger Border */
+        background-color: var(--bg-color, #1a1a1a) !important;
+        
+        /* Kein zusätzlicher border-top nötig */
+        padding: 0 !important; /* Reset padding override */
     }
 }
 
 /* Verbessertes Scroll-Verhalten für Chat-Nachrichten */
 @media (max-width: 768px) {
     .chat-message {
-        /* Bessere Lesbarkeit auf kleinen Bildschirmen */
         font-size: 0.9rem !important;
         line-height: 1.4 !important;
         max-width: 95% !important;
         margin-bottom: 15px !important;
-        
-        /* Verhindert, dass Nachrichten zu klein werden */
         min-height: 40px !important;
     }
     
