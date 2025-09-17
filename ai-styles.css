@@ -44,8 +44,7 @@
 
 /* GRUND-MODAL OVERLAY */
 @media (max-width: 768px) {
-.modal-overlay {
-    .modal-overlay {
+  .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -57,18 +56,20 @@
     display: none;
     
     /* KORREKTUR: Modal am oberen Rand ausrichten, nicht zentrieren. */
-    align-items: flex-start; 
-    padding-top: 5vh;        /* Ein kleiner Abstand von oben für die Optik */
+    align-items: flex-start;  
+    padding-top: 5vh;      /* Ein kleiner Abstand von oben für die Optik */
     
     justify-content: center;
     z-index: 10000;
     opacity: 0;
     transition: opacity 0.3s ease-in-out;
     /* Wichtig: Erlaube das Scrollen im Overlay selbst, falls der Inhalt doch mal zu groß ist */
-    overflow-y: auto; 
+    overflow-y: auto;  
+  }
 }
-}
-.modal-overlay {
+
+@media (min-width: 769px) {
+  .modal-overlay {
     position: fixed !important;
     top: 0 !important;
     left: 0 !important;
@@ -85,7 +86,9 @@
     visibility: hidden !important;
     pointer-events: none !important;
     transition: opacity 0.3s ease, visibility 0.3s ease !important;
+  }
 }
+
 
    
 /* MODAL SICHTBAR MACHEN */
