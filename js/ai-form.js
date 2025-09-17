@@ -223,12 +223,19 @@ export const initAiForm = () => {
             DOM.modalOverlay.style.display = 'flex';
             document.body.classList.add('no-scroll');
             
-            setTimeout(() => {
+   setTimeout(() => {
                 DOM.modalOverlay.classList.add('visible');
                 DOM.chatInputDynamic?.focus();
+
+                // NEU: Füge einen leichten Delay hinzu, um dem Keyboard Zeit zum Erscheinen zu geben,
+                // und scrolle dann den Chat-Verlauf nach ganz unten.
+                // Das sorgt dafür, dass die erste Nachricht sichtbar bleibt.
+                setTimeout(() => {
+                    ChatUI.scrollToBottom();
+                }, 400); // 400ms ist ein guter Wert für die meisten Geräte.
+
             }, 10);
         },
-
         closeChatModal() {
             if (!DOM.modalOverlay) return;
             
