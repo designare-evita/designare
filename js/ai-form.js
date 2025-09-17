@@ -603,13 +603,17 @@ export const initAiForm = () => {
             
             ChatUI.addMessage(answer, 'ai');
 
-            // WICHTIGER PUNKT: Es gibt NIEMALS einen direkten Launch!
-            // Das Modal wird IMMER nur nach einer Rückfrage und Bestätigung geöffnet
+            // WICHTIGER PUNKT: Modal wird NIEMALS bei der ersten Nachricht geöffnet!
+            // Es muss IMMER eine Rückfrage geben, dann Bestätigung, dann Modal
             
             const isBookingConfirmRequest = answer.includes('[BOOKING_CONFIRM_REQUEST]');
             
-            // Prüfe auf Launch-Trigger NUR nach einer vorherigen Rückfrage
-            const shouldLaunchAfterConfirmation = (
+            // Prüfe ob das eine Antwort auf eine vorherige Rückfrage ist
+            const wasBookingQuestion = state.chatHistory
+                .filter(msg => msg.role === 'assistant')
+                .some(msg => msg.content.includes('[BOOKING_CONFIRM_REQUEST]'));
+            
+            const shouldLaunchAfterConfirmation = wasBookingQuestion && (
                 answer.includes('[buchung_starten]') ||
                 answer.toLowerCase().includes('öffne') && answer.toLowerCase().includes('kalender') ||
                 answer.toLowerCase().includes('schau sofort nach') ||
@@ -618,8 +622,9 @@ export const initAiForm = () => {
 
             console.log("🔍 Antwort-Analyse:");
             console.log("   - Ist Rückfrage:", isBookingConfirmRequest);
+            console.log("   - War vorher schon Rückfrage:", wasBookingQuestion);
             console.log("   - Launch nach Bestätigung:", shouldLaunchAfterConfirmation);
-            console.log("   - Antwort:", answer.substring(0, 100));
+            console.log("   - Chat-Historie Länge:", state.chatHistory.length);
 
             if (shouldLaunchAfterConfirmation) {
                 console.log("🎯 Launch nach Bestätigung erkannt - starte Modal in 800ms");
@@ -627,7 +632,10 @@ export const initAiForm = () => {
                     BookingModal.launch();
                 }, 800);
             } else if (isBookingConfirmRequest) {
-                console.log("🤔 Booking-Rückfrage gestellt - warte auf User-Bestätigung");
+                console.log("🤔 Erste Booking-Rückfrage gestellt - KEIN Modal-Launch");
+                // Hier passiert NICHTS - nur die Rückfrage wird angezeigt
+            } else {
+                console.log("ℹ️ Normale Antwort ohne Booking-Bezug");
             }
 
         } catch (error) {
