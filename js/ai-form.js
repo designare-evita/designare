@@ -609,7 +609,7 @@ export const initAiForm = () => {
             const isBookingConfirmRequest = answer.includes('[BOOKING_CONFIRM_REQUEST]');
             
              // Prüfe ob das eine Antwort auf eine vorherige Rückfrage ist
-            const lastAiMessage = state.chatHistory
+             const lastAiMessage = state.chatHistory
                 .filter(msg => msg.role === 'assistant')
                 .pop();
 
