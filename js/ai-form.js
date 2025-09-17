@@ -347,8 +347,8 @@ export const initAiForm = () => {
                                     <div style="font-size: 3.5rem; color: #ffc107; margin-bottom: 20px;">🎉</div>
                                     <h3 style="color: #ffffff; margin-bottom: 15px;">Termin erfolgreich gebucht!</h3>
                                     <div id="confirmation-details" style="margin: 25px 0; padding: 20px; background: #2a2a2a; border-radius: 8px; text-align: left; color: #ccc;"></div>
-                                    <p style="color: #aaa; margin-bottom: 25px;">Michael wird dich zum vereinbarten Zeitpunkt anrufen.<br>Halte bitte dein Telefon 5 Minuten vor dem Termin bereit.</p>
-                                    <button onclick="closeCallbackModal()" style="background: #ffc107; color: #1a1a1a; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-weight: 600;">Perfekt!</button>
+                    
+                                <button onclick="closeCallbackModal()" style="background: #ffc107; color: #1a1a1a; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-weight: 600;">Perfekt!</button>
                                 </div>
                             </div>
                         </div>
