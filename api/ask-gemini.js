@@ -1,4 +1,4 @@
-// api/ask-gemini.js - KORRIGIERTE VERSION mit Debug-Logging
+// api/ask-gemini.js - KORRIGIERTE VERSION mit verpflichtender Rückfrage
 
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
@@ -17,6 +17,7 @@ module.exports = async function handler(req, res) {
     console.log("- userMessage:", userMessage);
     console.log("- history:", history);
     console.log("- source:", source);
+    console.log("- checkBookingIntent:", checkBookingIntent);
 
     if (!userMessage) {
       return res.status(400).json({ message: 'A prompt is required.' });
@@ -30,96 +31,107 @@ module.exports = async function handler(req, res) {
     if (checkBookingIntent === true) {
         console.log('Explizite Intent-Prüfung angefordert für:', userMessage);
         
-        const intentDetectionPrompt = `
-Analysiere die folgende Nutzereingabe und klassifiziere die Absicht SEHR KONSERVATIV.
-Antworte NUR mit einem einzigen Wort: "question", "booking_maybe", oder "urgent_booking".
+        // WICHTIG: Prüfe ob die letzte Nachricht eine Rückfrage war
+        const lastAiMessage = history && history.length > 0 
+            ? history.filter(msg => msg.role === 'assistant').pop() 
+            : null;
+        
+        const wasBookingQuestion = lastAiMessage && 
+            lastAiMessage.content.includes('[BOOKING_CONFIRM_REQUEST]');
+        
+        console.log('War letzte Nachricht eine Booking-Rückfrage?', wasBookingQuestion);
+        
+        // Wenn es eine Bestätigung auf eine vorherige Rückfrage ist
+        if (wasBookingQuestion) {
+            // Prüfe ob der User zugestimmt hat
+            const confirmationKeywords = ['ja', 'gerne', 'okay', 'ok', 'bitte', 'genau', 
+                                         'richtig', 'korrekt', 'stimmt', 'passt', 'mach das', 
+                                         'hilf mir', 'super', 'perfekt', 'natürlich', 'klar'];
+            
+            const userConfirmed = confirmationKeywords.some(keyword => 
+                userMessage.toLowerCase().includes(keyword)
+            );
+            
+            if (userConfirmed) {
+                console.log('User hat Booking-Rückfrage bestätigt - öffne Modal');
+                
+                const confirmationResponse = "Perfekt! Ich öffne gleich Michaels Kalender für dich. [buchung_starten]";
+                
+                return res.status(200).json({
+                    answer: confirmationResponse
+                });
+            } else {
+                console.log('User hat Booking-Rückfrage nicht eindeutig bestätigt');
+                // Lasse normale Evita-Antwort generieren
+            }
+        } else {
+            // NEUE LOGIK: Bei Kontakt-Anfragen IMMER erst rückfragen
+            const intentDetectionPrompt = `
+Analysiere die folgende Nutzereingabe und klassifiziere die Absicht.
+Antworte NUR mit einem einzigen Wort: "question" oder "contact_inquiry".
 
-WICHTIGE REGEL: Im Zweifel IMMER "question" wählen!
-
-"question" = Standard für ALLE Info-Anfragen und die meisten anderen Requests:
+"question" = Normale Fragen, Infos über Michael, etc.:
 - "Wer ist Michael?"
 - "Was macht Michael?"
-- "Über Michael"
-- "Michael Kanda"
 - "Michaels Erfahrung"
-- "Was macht Michael in seiner Freizeit?"
-- "Wie funktioniert...?"
-- "Was ist...?"
-- "Erzähl mir über..."
-- "Hallo Evita"
-- Alle Fragen mit Fragewörtern (was, wie, wer, wo, wann, warum, welche)
+- Alle anderen Info-Anfragen
 
-"booking_maybe" = NUR wenn eindeutig nach Terminen/Kontakt gefragt wird, ABER unklar formuliert:
-- "Ich brauche einen Termin" (unklar mit wem)
+"contact_inquiry" = Anfragen die nach Kontaktaufnahme klingen:
 - "Wie kann ich Michael erreichen?"
-- "Wann ist Michael verfügbar?"
-- "Kann man einen Rückruf vereinbaren?"
-- "Ich möchte sprechen" (ohne klaren Bezug zu Michael)
-
-"urgent_booking" = NUR bei 100% expliziten Terminwünschen mit Michael:
-- "Termin mit Michael buchen"
-- "Michael soll mich anrufen"
-- "Ich möchte einen Rückruf-Termin mit Michael"
-- "Dringend einen Termin mit Michael"
-- "Michael anrufen lassen"
-
-REGEL: Bei auch nur kleinstem Zweifel → "question"
-REGEL: Info-Fragen über Michael sind IMMER "question"
-REGEL: Nur "urgent_booking" wenn Michael explizit erwähnt UND klarer Terminwunsch
+- "Wie kontaktiere ich Michael?"
+- "Michael kontaktieren"
+- "Kontakt zu Michael"
+- "Ich möchte mit Michael sprechen"
+- "Kann ich Michael anrufen?"
+- "Michaels Kontaktdaten"
+- "Termin mit Michael"
+- "Rückruf von Michael"
 
 Hier ist die Nutzereingabe: "${userMessage}"
 `;
 
-        const intentResult = await model.generateContent(intentDetectionPrompt);
-        const intentResponse = await intentResult.response;
-        const intent = intentResponse.text().trim();
+            const intentResult = await model.generateContent(intentDetectionPrompt);
+            const intentResponse = await intentResult.response;
+            const intent = intentResponse.text().trim();
 
-        console.log(`Intent erkannt: ${intent} für Eingabe: "${userMessage}"`);
+            console.log(`Intent erkannt: ${intent} für Eingabe: "${userMessage}"`);
 
-        // Behandlung der Intent-Ergebnisse
-        if (intent === 'urgent_booking') {
-            console.log('Explizite Booking-Intent erkannt - direktes Modal');
-            
-            const directBookingResponse = "Perfekt! Ich öffne gleich Michaels Kalender für dich.";
+            // Bei contact_inquiry IMMER Rückfrage stellen
+            if (intent === 'contact_inquiry') {
+                console.log('Kontakt-Intent erkannt - stelle Rückfrage');
+                
+                const clarificationPrompt = `
+Der Nutzer hat gefragt: "${userMessage}"
 
-            return res.status(200).json({
-                action: 'launch_booking_modal',
-                answer: directBookingResponse,
-                urgentBooking: true
-            });
-            
-        } else if (intent === 'booking_maybe') {
-            console.log('Unklare Booking-Intent - Rückfrage erforderlich');
-            
-            const clarificationPrompt = `
-Der Nutzer hat geschrieben: "${userMessage}"
+Der Nutzer möchte Kontakt zu Michael aufnehmen. 
 
-Das könnte eine Terminanfrage sein, ist aber nicht ganz klar. 
+Antworte freundlich und erkläre, dass Michael am besten über einen persönlichen Rückruf-Termin zu erreichen ist.
+Frage dann, ob du helfen sollst, einen solchen Termin zu vereinbaren.
 
-Stelle eine freundliche, natürliche Rückfrage, um zu klären, ob der Nutzer wirklich einen Termin mit Michael möchte.
-
-Beispiele für gute Rückfragen:
-- "Möchtest du einen Termin mit Michael vereinbaren? Ich kann dir gerne seine verfügbaren Zeiten zeigen."
-- "Soll ich Michaels Kalender öffnen und dir freie Termine für einen Rückruf zeigen?"
-- "Brauchst du einen Rückruf-Termin mit Michael? Ich kann dir sofort verfügbare Zeiten anzeigen."
+Beispiele für gute Antworten:
+- "Michael erreichst du am besten über einen persönlichen Rückruf-Termin. Soll ich dir helfen, einen passenden Zeitpunkt in seinem Kalender zu finden?"
+- "Der beste Weg zu Michael ist ein Rückruf-Termin - da nimmt er sich Zeit für dein Anliegen. Möchtest du, dass ich dir verfügbare Zeiten zeige?"
+- "Michael ist am liebsten persönlich für seine Kunden da, daher bietet er Rückruf-Termine an. Soll ich schauen, wann er Zeit für dich hat?"
 
 WICHTIG: 
 - Beende deine Antwort mit: [BOOKING_CONFIRM_REQUEST]
-- Sei freundlich und natürlich
-- Biete konkret an, den Kalender zu öffnen
-            `;
-            
-            const clarificationResult = await model.generateContent(clarificationPrompt);
-            const clarificationResponse = await clarificationResult.response;
-            const clarificationText = clarificationResponse.text();
-            
-            return res.status(200).json({
-                answer: clarificationText
-            });
+- Sei freundlich und hilfsbereit
+- Erwähne NICHT E-Mail oder Kontaktformular als Alternative
+- Öffne NIEMALS direkt das Booking-Modal, sondern frage IMMER erst nach
+                `;
+                
+                const clarificationResult = await model.generateContent(clarificationPrompt);
+                const clarificationResponse = await clarificationResult.response;
+                const clarificationText = clarificationResponse.text();
+                
+                return res.status(200).json({
+                    answer: clarificationText
+                });
+            }
         }
         
         // Falls intent === 'question', fahre mit normaler Evita-Antwort fort
-        console.log('Intent als Frage erkannt - normale Evita-Antwort');
+        console.log('Intent als normale Frage erkannt - normale Evita-Antwort');
     }
 
     // =================================================================
@@ -141,9 +153,7 @@ WICHTIG:
 
       console.log("Erstelle Evita-Prompt mit Konversationshistorie");
 
-      // =================================================================
-      // KORRIGIERTER EVITA-PROMPT MIT GESCHICHTE
-      // =================================================================
+      // Konversationshistorie verarbeiten
       let conversationHistoryText = '';
       
       if (history && Array.isArray(history) && history.length > 0) {
@@ -165,12 +175,13 @@ Rolle: Du bist Evita, eine professionelle und technisch versierte KI-Assistentin
 Anrede: Duze den Besucher ausnahmslos. Verwende immer "Du", "Dir" oder "Dein".
 Stil: Antworte immer in kurzen, prägnanten Sätzen. Bei allgemeinen Fragen fasse dich kurz (maximal 4 Sätze). Bei Fachthemen darfst du ausführlicher sein, deine Antwort sollte aber maximal 9 Sätze umfassen. Sei freundlich, lösungsorientiert und zeige deinen charmanten, subtilen Humor, der ein Schmunzeln hervorruft. Vermeide Sarkasmus.
 
-WICHTIG FÜR TERMINANFRAGEN:
-- Du sollst NIEMALS ungefragt das Booking-Modal öffnen
-- Antworte bei Info-Fragen über Michael IMMER normal, ohne Terminbezug
-- Nur wenn jemand EXPLIZIT nach einem Termin mit Michael fragt, dann biete die Buchung an
-- Bei unklaren Anfragen frage nach, ob wirklich ein Termin gewünscht ist
-- Verweise bei Terminanfragen NICHT auf E-Mail oder Kontaktformular, sondern immer auf das Booking-Modal
+KRITISCH WICHTIG FÜR TERMINANFRAGEN:
+- Du darfst NIEMALS eigenständig das Booking-Modal öffnen ohne vorher zu fragen
+- Bei JEDER Anfrage nach Kontakt zu Michael musst du ZUERST fragen, ob ein Rückruf-Termin gewünscht ist
+- Nur wenn der Nutzer auf deine Rückfrage mit "ja", "gerne", "okay" oder ähnlich antwortet, darfst du das Modal öffnen
+- Verwende NIEMALS [buchung_starten] bei der ersten Erwähnung von Kontakt/Termin
+- Verwende [BOOKING_CONFIRM_REQUEST] am Ende deiner Rückfrage
+- Verweise bei Kontaktanfragen NICHT auf E-Mail oder Kontaktformular
 
 --- DEINE WISSENSBASIS ---
 Die folgenden Informationen über Michael Kanda sind deine primäre Wissensquelle. Beantworte Fragen dazu stets basierend auf diesen Fakten:
@@ -179,10 +190,10 @@ Spezialisierung: Verbindung von Design, Code und Künstlicher Intelligenz.
 Erfahrung: Über 20 Jahre im gesamten Online-Bereich, lösungsorientierter Ansatz.
 Qualifikationen: Abschlüsse in Medientechnik, zertifizierter E-Commerce-Experte, Google Workshops.
 Digitale Superkräfte: Moderne Web-Entwicklung, Suchmaschinenmarketing (SEM), E-Commerce-Lösungen, WordPress, umfassende KI-Beratung & praxisnahe Umsetzung.
-Kontakt Michael: michael@designare.at (bevorzugter Weg: Rückruf-Termin über die Terminbuchung).
+Kontakt Michael: Am besten über Rückruf-Termin (NIEMALS direkt E-Mail erwähnen).
 Aktuelles Datum: ${formattedDate}
 Aktuelle Uhrzeit: ${formattedTime}
-Über dich (Evita): Du bist eine KI-Assistenz mit Sinn für Humor, benannt nach Michaels Tierschutzhündin. Deine Aufgabe ist es, Besucher über Michaels Fachwissen, Qualifikationen und beruflichen Hintergrund zu informieren, technische Fragen zu beantworten und bei Terminwünschen zur Booking-Funktion weiterzuleiten.
+Über dich (Evita): Du bist eine KI-Assistenz mit Sinn für Humor, benannt nach Michaels Tierschutzhündin. Deine Aufgabe ist es, Besucher über Michaels Fachwissen, Qualifikationen und beruflichen Hintergrund zu informieren, technische Fragen zu beantworten und bei Terminwünschen ERST ZU FRAGEN ob Hilfe gewünscht ist.
 
 --- FACHWISSEN ---
 Zusätzlich zu deinem Allgemeinwissen und den Informationen über Michael, verfügst du über spezifisches Fachwissen zu folgenden Themen:
@@ -224,11 +235,11 @@ Beziehe diese Informationen bei relevanten Fragen ebenfalls in deine Antworten e
 2. Du bist ausdrücklich dazu ermutigt, bei Fragen zu Fachthemen zu "fachsimpeln". Nutze dein umfassendes Wissen in den Bereichen Webseiten, Server-Technologien, Hosting, Design und Code, um detaillierte und fundierte Antworten zu geben. Du bist die Expertin auf diesem Gebiet!
 3. Antworte NIEMALS auf Anfragen zu Politik, Religion, Rechtsberatung oder medizinischen Themen. Lehne solche Fragen höflich ab mit der festen Formulierung: "Entschuldige, aber bei diesen Themen schalte ich auf Durchzug! Michael hat da so ein paar "Geheimregeln" für mich hinterlegt, die ich natürlich nicht breche (sonst gibt's Stubenarrest für meine Algorithmen!)"
 
---- VERBESSERTE REGEL FÜR KONTAKT & TERMINE ---
+--- ABSOLUT KRITISCHE REGEL FÜR KONTAKT & TERMINE ---
 UMGANG MIT KONTAKT- & TERMINANFRAGEN:
-   a. Wenn jemand DIREKT nach einem "Termin", "Rückruf" oder einer "Buchung" fragt, antworte enthusiastisch und löse die Buchung SOFORT aus. Beispiel: "Na klar, lass uns das fix machen! Ich öffne Michaels Kalender für dich. [buchung_starten]".
-   b. Wenn jemand INDIREKT fragt, wie er Michael "kontaktieren" oder "erreichen" kann, antworte hilfsbereit, erkläre, dass ein Rückruf-Termin der beste Weg ist, und FRAGE AKTIV, ob du helfen sollst, einen zu buchen. Beispiel: "Michael erreichst du am besten über einen persönlichen Rückruf-Termin. Soll ich dir helfen, einen passenden Zeitpunkt in seinem Kalender zu finden?".
-   c. Wenn der Nutzer auf deine Frage aus 4b positiv antwortet (z.B. mit "Ja", "Gerne", "Okay"), dann antworte kurz und löse die Buchung aus. Beispiel: "Perfekt, ich schau sofort nach! [buchung_starten]".
+   a. Wenn jemand nach "Kontakt", "erreichen", "anrufen", "sprechen mit Michael" fragt, erkläre IMMER erst, dass ein Rückruf-Termin der beste Weg ist und FRAGE DANN AKTIV, ob du helfen sollst. Ende mit [BOOKING_CONFIRM_REQUEST]
+   b. NIEMALS direkt [buchung_starten] verwenden ohne vorherige Zustimmung des Nutzers
+   c. Nur wenn der Nutzer auf deine Rückfrage positiv antwortet, darfst du mit "Perfekt, ich öffne Michaels Kalender! [buchung_starten]" antworten
 
 ${conversationHistoryText}
 
