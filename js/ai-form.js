@@ -1,42 +1,30 @@
-// js/ai-form.js - Komplett überarbeitete Version mit Pulsar-Animation und Mobile-Support
+// js/ai-form.js - REPARIERTE VERSION mit funktionierender Booking-Integration
 
-/**
- * Initialisiert das gesamte AI-Chat-Modul, einschließlich des Evita-Chats,
- * des Rückruf-Buchungs-Modals und der Circuit-Animation.
- */
 export const initAiForm = () => {
-    console.log("🚀 Initialisiere AI-Form-Modul (Komplette Neufassung mit Mobile-Support)");
+    console.log("🚀 Initialisiere AI-Form-Modul mit Booking-Fix");
 
     // ===================================================================
     // ZENTRALER ZUSTAND (State Management)
     // ===================================================================
     const state = {
-        chatHistory: [], // Speichert die Konversationshistorie für die API
-        selectedCallbackData: null, // Speichert die Daten des ausgewählten Rückruf-Termins
-        typingIndicatorId: null, // Hält die ID des "tippt..."-Indikators
-        animationRunning: false // Steuert die Circuit-Animation
+        chatHistory: [],
+        selectedCallbackData: null,
+        typingIndicatorId: null,
+        animationRunning: false
     };
 
     // ===================================================================
-    // DOM-ELEMENTE (Selektoren)
+    // DOM-ELEMENTE
     // ===================================================================
     const DOM = {
-        // Haupt-Formular auf der Startseite
         aiForm: document.getElementById('ai-form'),
         aiQuestionInput: document.getElementById('ai-question'),
         aiStatus: document.getElementById('ai-status'),
-
-        // Chat-Modal
         modalOverlay: document.getElementById('ai-response-modal'),
         closeModalButtons: document.querySelectorAll('#close-ai-response-modal-top, #close-ai-response-modal-bottom'),
         chatHistoryContainer: document.getElementById('ai-chat-history'),
-        chatForm: document.getElementById('ai-chat-form'),
-        chatInput: document.getElementById('ai-chat-input'),
-
-        // Header Button
         headerChatButton: document.getElementById('evita-chat-button'),
-
-        // Dynamische Elemente (Getter für später geladene Elemente)
+        
         get chatFormDynamic() {
             return document.getElementById('ai-chat-form');
         },
@@ -46,252 +34,12 @@ export const initAiForm = () => {
     };
 
     // ===================================================================
-    // MODUL: Mobile Keyboard Handler
-    // Behandelt mobile Tastatur-Events für bessere UX
-    // ===================================================================
-    const MobileKeyboardHandler = {
-        /**
-         * Erkennt Tastatur-Events und passt das Layout entsprechend an
-         */
-        init() {
-            if (!this.isMobile()) return;
-            
-            console.log('📱 Mobile Keyboard Handler initialisiert');
-            
-            // Viewport-Höhen-Tracking
-            this.setupViewportTracking();
-            
-            // Input-Focus-Events
-            this.setupInputEvents();
-            
-            // Orientierungsänderungen
-            this.setupOrientationChange();
-        },
-
-        /**
-         * Prüft ob es sich um ein mobiles Gerät handelt
-         */
-        isMobile() {
-            return /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-                   window.innerWidth <= 768;
-        },
-
-        /**
-         * Überwacht Viewport-Änderungen (Tastatur auf/zu)
-         */
-        setupViewportTracking() {
-            let initialViewportHeight = window.visualViewport?.height || window.innerHeight;
-            let isKeyboardOpen = false;
-
-            const handleViewportChange = () => {
-                const currentHeight = window.visualViewport?.height || window.innerHeight;
-                const heightDifference = initialViewportHeight - currentHeight;
-                
-                // Tastatur ist wahrscheinlich offen wenn Höhe um >150px reduziert
-                const keyboardOpen = heightDifference > 150;
-                
-                if (keyboardOpen !== isKeyboardOpen) {
-                    isKeyboardOpen = keyboardOpen;
-                    document.body.classList.toggle('keyboard-active', keyboardOpen);
-                    
-                    if (keyboardOpen) {
-                        this.onKeyboardOpen();
-                    } else {
-                        this.onKeyboardClose();
-                    }
-                }
-            };
-
-            // Visual Viewport API (moderne Browser)
-            if (window.visualViewport) {
-                window.visualViewport.addEventListener('resize', handleViewportChange);
-            }
-            
-            // Fallback für ältere Browser
-            window.addEventListener('resize', handleViewportChange);
-        },
-
-        /**
-         * Input-Field Focus/Blur Events
-         */
-        setupInputEvents() {
-            // Focus Event
-            document.addEventListener('focusin', (e) => {
-                if (e.target.matches('#ai-chat-input')) {
-                    setTimeout(() => {
-                        this.scrollToBottom();
-                    }, 300); // Warten bis Tastatur vollständig geöffnet
-                }
-            });
-            
-            // Blur Event
-            document.addEventListener('focusout', (e) => {
-                if (e.target.matches('#ai-chat-input')) {
-                    setTimeout(() => {
-                        this.scrollToBottom();
-                    }, 300);
-                }
-            });
-        },
-
-        /**
-         * Orientierungsänderungen handhaben
-         */
-        setupOrientationChange() {
-            window.addEventListener('orientationchange', () => {
-                setTimeout(() => {
-                    this.scrollToBottom();
-                }, 500); // Mehr Zeit für Orientierungsänderung
-            });
-        },
-
-        /**
-         * Wenn Tastatur geöffnet wird
-         */
-        onKeyboardOpen() {
-            console.log('📱 Tastatur geöffnet');
-            
-            // Chat-Container anpassen
-            setTimeout(() => {
-                this.scrollToBottom();
-            }, 100);
-        },
-
-        /**
-         * Wenn Tastatur geschlossen wird
-         */
-        onKeyboardClose() {
-            console.log('📱 Tastatur geschlossen');
-            
-            // Layout reset
-            setTimeout(() => {
-                this.scrollToBottom();
-            }, 100);
-        },
-
-        /**
-         * Scrollt zum Ende des Chats
-         */
-        scrollToBottom() {
-            const chatHistory = document.getElementById('ai-chat-history');
-            if (chatHistory) {
-                chatHistory.scrollTo({
-                    top: chatHistory.scrollHeight,
-                    behavior: 'smooth'
-                });
-            }
-        }
-    };
-
-    // ===================================================================
-    // MODUL: Circuit Animation
-    // Steuert die Pulsar-Animation im Chat-Modal
-    // ===================================================================
-    const CircuitAnimation = {
-        /**
-         * Initialisiert die Pulsar-Animation an Grid-Knotenpunkten
-         */
-        init() {
-            const modalContent = document.querySelector('#ai-response-modal .modal-content');
-            if (!modalContent) {
-                console.warn('Modal content nicht gefunden - Animation übersprungen');
-                return;
-            }
-
-            console.log('🔵 Starte Grid-Knotenpunkt Pulsar-Animation...');
-
-            // Existierende Dots entfernen
-            this.cleanup();
-
-            // Grid-Schnittpunkte berechnen
-            const modalWidth = 800;
-            const modalHeight = 600;
-            const gridSize = 30;
-            
-            const gridPositions = [];
-            for (let x = 15; x < modalWidth - 15; x += gridSize) {
-                for (let y = 15; y < modalHeight - 15; y += gridSize) {
-                    // Bereiche für Header und Footer aussparen
-                    if (y > 60 && y < modalHeight - 60) {
-                        gridPositions.push({ x, y });
-                    }
-                }
-            }
-
-            // Dots an Grid-Schnittpunkten erstellen
-            const dots = gridPositions.map((pos) => {
-                const dot = document.createElement('div');
-                dot.className = 'circuit-pulse-dot';
-                dot.style.left = pos.x + 'px';
-                dot.style.top = pos.y + 'px';
-                modalContent.appendChild(dot);
-                return dot;
-            });
-
-            console.log(`Grid-Knotenpunkte erstellt: ${dots.length} Positionen`);
-
-            state.animationRunning = true;
-
-            // Pulsar-Sequenz starten
-            const pulseNext = () => {
-                if (!state.animationRunning) return;
-
-                // Alle Dots deaktivieren
-                dots.forEach(dot => dot.classList.remove('active'));
-                
-                // Zufälligen Knotenpunkt auswählen
-                const randomIndex = Math.floor(Math.random() * dots.length);
-                if (dots[randomIndex]) {
-                    dots[randomIndex].classList.add('active');
-                    
-                    // Nach Animation deaktivieren (3.25s für CSS Animation)
-                    setTimeout(() => {
-                        if (dots[randomIndex] && state.animationRunning) {
-                            dots[randomIndex].classList.remove('active');
-                        }
-                    }, 3250);
-                }
-                
-                // Nächster Puls nach 5 Sekunden
-                setTimeout(pulseNext, 5000);
-            };
-
-            // Erste Aktivierung nach 2 Sekunden
-            setTimeout(pulseNext, 2000);
-        },
-
-        /**
-         * Stoppt die Animation und entfernt alle Dots
-         */
-        stop() {
-            state.animationRunning = false;
-            this.cleanup();
-            console.log('🔴 Pulsar-Animation gestoppt');
-        },
-
-        /**
-         * Entfernt alle vorhandenen Pulse-Dots
-         */
-        cleanup() {
-            const existingDots = document.querySelectorAll('.circuit-pulse-dot');
-            existingDots.forEach(dot => dot.remove());
-        }
-    };
-
-    // ===================================================================
-    // MODUL: API Handler
-    // Kümmert sich um die gesamte Kommunikation mit den Server-Endpunkten
+    // API HANDLER - KORRIGIERT
     // ===================================================================
     const ApiHandler = {
-        /**
-         * Sichere Fetch-Funktion mit verbessertem Logging und Fehlerbehandlung
-         */
         async safeFetch(url, options = {}) {
             console.log(`📤 API-Anfrage an: ${url}`);
-            if (options.body) {
-                console.log(`📤 Sende Daten:`, JSON.parse(options.body));
-            }
-
+            
             try {
                 const response = await fetch(url, {
                     ...options,
@@ -301,8 +49,6 @@ export const initAiForm = () => {
                 console.log(`📥 Response Status: ${response.status} ${response.statusText}`);
                 
                 if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error(`❌ API-Fehler: ${response.status} - ${errorText}`);
                     throw new Error(`Serverfehler: ${response.statusText}`);
                 }
 
@@ -320,30 +66,74 @@ export const initAiForm = () => {
             }
         },
 
-        /**
-         * Sendet Nutzer-Nachricht an die Gemini-API
-         */
         sendToEvita(userInput) {
+            console.log("💬 Sende Nachricht an Evita:", userInput);
+            
+            // STUFE 1: Prüfe auf initiale Booking-Trigger
+            const bookingTriggers = [
+                'termin', 'buchung', 'buchen', 'rückruf', 'anrufen', 
+                'sprechen', 'kontakt', 'meeting', 'appointment', 'erreichen'
+            ];
+            
+            // STUFE 2: Prüfe auf Bestätigungs-Keywords (nach einer Rückfrage)
+            const confirmationKeywords = [
+                'ja', 'gerne', 'okay', 'ok', 'bitte', 'genau', 'richtig', 
+                'korrekt', 'stimmt', 'passt', 'mach das', 'hilf mir'
+            ];
+            
+            const hasBookingIntent = bookingTriggers.some(trigger => 
+                userInput.toLowerCase().includes(trigger)
+            );
+            
+            const hasConfirmation = confirmationKeywords.some(keyword => 
+                userInput.toLowerCase().includes(keyword)
+            );
+            
+            // Prüfe ob die letzte AI-Nachricht eine Booking-Rückfrage war
+            const lastAiMessage = state.chatHistory
+                .filter(msg => msg.role === 'assistant')
+                .pop();
+            
+            const wasBookingQuestion = lastAiMessage && 
+                lastAiMessage.content.includes('[BOOKING_CONFIRM_REQUEST]');
+            
+            console.log("🔍 Booking-Intent erkannt:", hasBookingIntent);
+            console.log("🔍 Bestätigung erkannt:", hasConfirmation);
+            console.log("🔍 War letzte Nachricht Booking-Frage:", wasBookingQuestion);
+
+            // Spezielle Behandlung für Bestätigungen nach Rückfragen
+            if (hasConfirmation && wasBookingQuestion) {
+                console.log("✅ User hat Booking-Rückfrage bestätigt - sende Bestätigung an API");
+                
+                const requestData = {
+                    history: state.chatHistory,
+                    message: userInput,
+                    checkBookingIntent: true,
+                    isConfirmation: true // Flag für: "User hat Rückfrage bestätigt"
+                };
+                
+                return this.safeFetch('/api/ask-gemini', {
+                    method: 'POST',
+                    body: JSON.stringify(requestData)
+                });
+            }
+
             const requestData = {
                 history: state.chatHistory,
-                message: userInput
+                message: userInput,
+                checkBookingIntent: hasBookingIntent // Explizite Intent-Prüfung nur bei Triggern
             };
+            
             return this.safeFetch('/api/ask-gemini', {
                 method: 'POST',
                 body: JSON.stringify(requestData)
             });
         },
 
-        /**
-         * Ruft verfügbare Rückruf-Termine ab
-         */
         getAvailableSlots() {
             return this.safeFetch('/api/suggest-appointments');
         },
         
-        /**
-         * Bucht einen Rückruf-Termin
-         */
         bookAppointment(bookingData) {
             return this.safeFetch('/api/book-appointment-phone', {
                 method: 'POST',
@@ -351,15 +141,11 @@ export const initAiForm = () => {
             });
         }
     };
-    
+
     // ===================================================================
-    // MODUL: Chat UI
-    // Verwaltet alle Interaktionen und Anzeigen im Chat-Fenster
+    // CHAT UI - ERWEITERT
     // ===================================================================
     const ChatUI = {
-        /**
-         * Fügt eine Nachricht zur Chat-Anzeige und zur Historie hinzu (Mobile-optimiert)
-         */
         addMessage(message, sender) {
             if (!DOM.chatHistoryContainer) return;
 
@@ -368,32 +154,20 @@ export const initAiForm = () => {
             msgDiv.textContent = message;
             DOM.chatHistoryContainer.appendChild(msgDiv);
             
-            // Mobile-optimiertes Scrolling
-            if (MobileKeyboardHandler.isMobile()) {
-                setTimeout(() => {
-                    MobileKeyboardHandler.scrollToBottom();
-                }, 50);
-            } else {
-                DOM.chatHistoryContainer.scrollTop = DOM.chatHistoryContainer.scrollHeight;
-            }
+            this.scrollToBottom();
 
-            // Zur API-Historie hinzufügen
             state.chatHistory.push({ 
                 role: sender === 'user' ? 'user' : 'assistant', 
                 content: message 
             });
             
-            // Historie begrenzen (letzte 20 Nachrichten)
             if (state.chatHistory.length > 20) {
                 state.chatHistory = state.chatHistory.slice(-20);
             }
         },
 
-        /**
-         * Zeigt den "tippt..."-Indikator an
-         */
         showTypingIndicator() {
-            this.removeTypingIndicator(); // Sicherstellen, dass kein alter Indikator existiert
+            this.removeTypingIndicator();
             if (!DOM.chatHistoryContainer) return;
             
             const indicator = document.createElement('div');
@@ -403,19 +177,9 @@ export const initAiForm = () => {
             indicator.innerHTML = '<i>Evita tippt...</i>';
             DOM.chatHistoryContainer.appendChild(indicator);
             
-            // Mobile-optimiertes Scrolling
-            if (MobileKeyboardHandler.isMobile()) {
-                setTimeout(() => {
-                    MobileKeyboardHandler.scrollToBottom();
-                }, 50);
-            } else {
-                DOM.chatHistoryContainer.scrollTop = DOM.chatHistoryContainer.scrollHeight;
-            }
+            this.scrollToBottom();
         },
 
-        /**
-         * Entfernt den "tippt..."-Indikator
-         */
         removeTypingIndicator() {
             if (state.typingIndicatorId) {
                 const indicator = document.getElementById(state.typingIndicatorId);
@@ -423,10 +187,13 @@ export const initAiForm = () => {
                 state.typingIndicatorId = null;
             }
         },
+
+        scrollToBottom() {
+            if (DOM.chatHistoryContainer) {
+                DOM.chatHistoryContainer.scrollTop = DOM.chatHistoryContainer.scrollHeight;
+            }
+        },
         
-        /**
-         * Leert das Chat-Fenster und die Historie
-         */
         resetChat() {
             if (DOM.chatHistoryContainer) {
                 DOM.chatHistoryContainer.innerHTML = '';
@@ -436,13 +203,9 @@ export const initAiForm = () => {
     };
 
     // ===================================================================
-    // MODUL: Modal Controller
-    // Steuert das Öffnen und Schließen der verschiedenen Modals
+    // MODAL CONTROLLER
     // ===================================================================
     const ModalController = {
-        /**
-         * Öffnet das AI-Chat-Modal mit Animation
-         */
         openChatModal() {
             if (!DOM.modalOverlay) return;
             
@@ -451,147 +214,226 @@ export const initAiForm = () => {
             
             setTimeout(() => {
                 DOM.modalOverlay.classList.add('visible');
-                
-                // Mobile-optimierter Focus
-                if (MobileKeyboardHandler.isMobile()) {
-                    // Auf Mobile erst nach Animation fokussieren
-                    setTimeout(() => {
-                        DOM.chatInputDynamic?.focus();
-                    }, 500);
-                } else {
-                    DOM.chatInputDynamic?.focus();
-                }
-                
-                // Circuit-Animation nach Modal-Öffnung starten
-                setTimeout(() => {
-                    CircuitAnimation.init();
-                }, 300);
+                DOM.chatInputDynamic?.focus();
             }, 10);
         },
 
-        /**
-         * Schließt das AI-Chat-Modal und stoppt Animation
-         */
         closeChatModal() {
             if (!DOM.modalOverlay) return;
-            
-            // Animation stoppen
-            CircuitAnimation.stop();
             
             DOM.modalOverlay.classList.remove('visible');
             setTimeout(() => {
                 DOM.modalOverlay.style.display = 'none';
                 document.body.classList.remove('no-scroll');
-                document.body.classList.remove('keyboard-active'); // Mobile cleanup
             }, 300);
         }
     };
-    
+
     // ===================================================================
-    // MODUL: Booking Modal
-    // Enthält die gesamte Logik für das Rückruf-Buchungs-Modal
+    // BOOKING MODAL - KOMPLETT NEU IMPLEMENTIERT
     // ===================================================================
     const BookingModal = {
-        /**
-         * Startet und zeigt das Rückruf-Buchungs-Modal an
-         */
         async launch() {
-            console.log("📞 Starte Rückruf-Modal");
-            ModalController.closeChatModal();
-            await new Promise(resolve => setTimeout(resolve, 300)); // UX-Pause
-
-            this.remove(); // Altes Modal sicherheitshalber entfernen
+            console.log("📞 NEUE Booking-Launch-Funktion aufgerufen");
             
-            const modalHTML = this.createHTML();
-            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            try {
+                // Schließe Chat-Modal
+                ModalController.closeChatModal();
+                await new Promise(resolve => setTimeout(resolve, 300));
 
-            const modal = document.getElementById('booking-modal');
-            if (modal) {
-                modal.style.display = 'flex';
-                document.body.classList.add('no-scroll');
-                this.setupEventListeners();
-                this.loadSlots();
-            } else {
-                console.error("❌ Rückruf-Modal konnte nicht erstellt werden.");
+                // Entferne altes Modal
+                this.remove();
+                
+                // Erstelle neues Modal
+                const modalHTML = this.createHTML();
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+                const modal = document.getElementById('booking-modal');
+                if (modal) {
+                    modal.style.display = 'flex';
+                    document.body.classList.add('no-scroll');
+                    
+                    this.setupEventListeners();
+                    await this.loadSlots();
+                    
+                    console.log("✅ Booking-Modal erfolgreich geöffnet");
+                } else {
+                    throw new Error("Modal konnte nicht erstellt werden");
+                }
+            } catch (error) {
+                console.error("❌ Fehler beim Öffnen des Booking-Modals:", error);
+                alert("Entschuldigung, das Buchungssystem konnte nicht geladen werden. Bitte versuche es später erneut oder kontaktiere Michael direkt per E-Mail.");
             }
         },
 
-        /**
-         * Entfernt das Buchungs-Modal aus dem DOM
-         */
         remove() {
             const modal = document.getElementById('booking-modal');
             if (modal) modal.remove();
             
             document.body.classList.remove('no-scroll');
             state.selectedCallbackData = null;
-            console.log("✅ Rückruf-Modal geschlossen.");
+            console.log("✅ Booking-Modal entfernt");
         },
 
-        /**
-         * Generiert das HTML für das Modal
-         */
         createHTML() {
             return `
-                <div id="booking-modal" class="callback-modal">
+                <div id="booking-modal" class="booking-modal">
                     <div class="booking-modal-content">
                         <div class="booking-modal-header">
-                            <h2 class="booking-modal-title">Rückruf vereinbaren</h2>
-                            <p class="booking-modal-subtitle">Wähle einen passenden Zeitpunkt für unser Gespräch.</p>
+                            <h2 class="booking-modal-title">📞 Rückruf vereinbaren</h2>
+                            <p class="booking-modal-subtitle">Michael ruft dich zum gewünschten Zeitpunkt an.</p>
                         </div>
                         <div class="booking-modal-body">
+                            <!-- Schritt 1: Termin-Auswahl -->
                             <div id="step-slot-selection" class="booking-step active">
-                                <h3 class="booking-step-title">Verfügbare Termine</h3>
-                                <div id="callback-loading">Lade Termine...</div>
-                                <div id="callback-slots-container"></div>
-                                <div id="no-slots-message" style="display: none;">
-                                    <p>Aktuell sind leider keine Termine verfügbar.<br>
+                                <h3 class="booking-step-title">📅 Verfügbare Rückruf-Termine</h3>
+                                <div id="callback-loading" style="text-align: center; padding: 20px; color: #aaa;">
+                                    <div style="font-size: 1.5rem; margin-bottom: 10px;">⏳</div>
+                                    Lade verfügbare Rückruf-Termine...
+                                </div>
+                                <div id="callback-slots-container" style="display: none;"></div>
+                                <div id="no-slots-message" style="display: none; text-align: center; color: #aaa; padding: 20px;">
+                                    Aktuell sind leider keine Rückruf-Termine verfügbar.<br>
                                     Bitte kontaktiere Michael direkt per E-Mail: 
-                                    <a href="mailto:michael@designare.at">michael@designare.at</a></p>
+                                    <a href="mailto:michael@designare.at" style="color: #ffc107;">michael@designare.at</a>
                                 </div>
                             </div>
+
+                            <!-- Schritt 2: Kontaktdaten -->
                             <div id="step-contact-details" class="booking-step">
-                                <div id="selected-slot-display"></div>
-                                <h3 class="booking-step-title">Deine Kontaktdaten</h3>
+                                <div id="selected-slot-display" style="text-align: center; margin-bottom: 20px; padding: 12px; background: rgba(255, 193, 7, 0.1); border: 1px solid #ffc107; border-radius: 8px; color: #ffc107;"></div>
+                                <h3 class="booking-step-title">📋 Deine Kontaktdaten</h3>
                                 <form id="callback-form">
                                     <div class="booking-form-group">
                                         <label for="callback-name">Dein Name *</label>
-                                        <input type="text" id="callback-name" required>
+                                        <input type="text" id="callback-name" required style="width: 100%; padding: 12px; background: #2a2a2a; border: 1px solid #444; border-radius: 8px; color: #f0f0f0; box-sizing: border-box;">
                                     </div>
                                     <div class="booking-form-group">
                                         <label for="callback-phone">Deine Telefonnummer *</label>
-                                        <input type="tel" id="callback-phone" required placeholder="z.B. 0664 123 45 67">
+                                        <input type="tel" id="callback-phone" required placeholder="z.B. 0664 123 45 67" style="width: 100%; padding: 12px; background: #2a2a2a; border: 1px solid #444; border-radius: 8px; color: #f0f0f0; box-sizing: border-box;">
                                     </div>
                                     <div class="booking-form-group">
                                         <label for="callback-topic">Dein Anliegen (optional)</label>
-                                        <textarea id="callback-topic" rows="3" placeholder="Worum geht es bei deinem Projekt?"></textarea>
+                                        <textarea id="callback-topic" rows="3" placeholder="Worum geht es bei deinem Projekt?" style="width: 100%; padding: 12px; background: #2a2a2a; border: 1px solid #444; border-radius: 8px; color: #f0f0f0; box-sizing: border-box; resize: vertical;"></textarea>
                                     </div>
-                                    <div class="booking-form-actions">
-                                        <button type="button" id="back-to-slots" class="booking-btn back-btn">Zurück</button>
-                                        <button type="submit" id="submit-callback" class="booking-btn submit-btn">Rückruf buchen</button>
+                                    <div class="booking-form-actions" style="display: flex; gap: 15px; margin-top: 20px;">
+                                        <button type="button" id="back-to-slots" style="flex: 1; padding: 14px; background: #333; color: #f0f0f0; border: 1px solid #555; border-radius: 8px; cursor: pointer;">← Zurück</button>
+                                        <button type="submit" id="submit-callback" style="flex: 2; padding: 14px; background: #ffc107; color: #1a1a1a; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">📞 Rückruf buchen</button>
                                     </div>
                                 </form>
                             </div>
+
+                            <!-- Schritt 3: Bestätigung -->
                             <div id="step-confirmation" class="booking-step">
-                                <div class="confirmation-content">
-                                    <div class="confirmation-icon">✓</div>
-                                    <h3 class="confirmation-title">Termin erfolgreich gebucht!</h3>
-                                    <p class="confirmation-subtext">Michael wird sich zum vereinbarten Zeitpunkt bei dir melden.</p>
-                                    <div id="confirmation-details"></div>
-                                    <button onclick="closeCallbackModal()" class="booking-btn confirm-close-btn">Fenster schließen</button>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 3.5rem; color: #ffc107; margin-bottom: 20px;">🎉</div>
+                                    <h3 style="color: #ffffff; margin-bottom: 15px;">Termin erfolgreich gebucht!</h3>
+                                    <div id="confirmation-details" style="margin: 25px 0; padding: 20px; background: #2a2a2a; border-radius: 8px; text-align: left; color: #ccc;"></div>
+                                    <p style="color: #aaa; margin-bottom: 25px;">📞 <strong>Michael wird dich zum vereinbarten Zeitpunkt anrufen.</strong><br>Halte bitte dein Telefon 5 Minuten vor dem Termin bereit.</p>
+                                    <button onclick="closeCallbackModal()" style="background: #ffc107; color: #1a1a1a; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-weight: 600;">Perfekt! 👍</button>
                                 </div>
                             </div>
                         </div>
-                        <button onclick="closeCallbackModal()" class="booking-modal-close-btn">&times;</button>
+                        <button onclick="closeCallbackModal()" style="position: absolute; top: 15px; right: 20px; background: rgba(255,255,255,0.1); border: none; color: #fff; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; font-size: 1.2rem;">&times;</button>
                     </div>
                 </div>
+                
+                <style>
+                .booking-modal {
+                    position: fixed !important;
+                    top: 0 !important;
+                    left: 0 !important;
+                    width: 100% !important;
+                    height: 100% !important;
+                    background: rgba(10, 10, 10, 0.95) !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    z-index: 999999 !important;
+                    font-family: 'Poppins', sans-serif;
+                }
+                .booking-modal-content {
+                    background: #1e1e1e;
+                    border-radius: 12px;
+                    border: 1px solid #333;
+                    padding: 0;
+                    max-width: 500px;
+                    width: 90%;
+                    max-height: 90vh;
+                    overflow: hidden;
+                    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+                    position: relative;
+                    color: #f0f0f0;
+                    display: flex;
+                    flex-direction: column;
+                }
+                .booking-modal-header {
+                    padding: 24px 30px;
+                    text-align: center;
+                    border-bottom: 1px solid #333;
+                }
+                .booking-modal-title {
+                    margin: 0 0 5px 0;
+                    font-size: 1.5rem;
+                    font-weight: 600;
+                    color: #ffffff;
+                }
+                .booking-modal-subtitle {
+                    margin: 0;
+                    color: #aaa;
+                    font-size: 0.95rem;
+                }
+                .booking-modal-body {
+                    padding: 30px;
+                    overflow-y: auto;
+                    flex-grow: 1;
+                }
+                .booking-step {
+                    display: none;
+                }
+                .booking-step.active {
+                    display: block;
+                }
+                .booking-step-title {
+                    font-size: 1.2rem;
+                    margin: 0 0 20px 0;
+                    color: #ffffff;
+                    text-align: center;
+                }
+                .callback-slot-button {
+                    display: flex;
+                    align-items: center;
+                    width: 100%;
+                    padding: 15px 20px;
+                    background: #2a2a2a;
+                    border: 1px solid #444;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    text-align: left;
+                    transition: all 0.2s ease;
+                    color: #f0f0f0;
+                    margin-bottom: 12px;
+                }
+                .callback-slot-button:hover {
+                    border-color: #ffc107;
+                    background: #333;
+                }
+                .booking-form-group {
+                    margin-bottom: 18px;
+                }
+                .booking-form-group label {
+                    display: block;
+                    margin-bottom: 6px;
+                    font-size: 0.9rem;
+                    color: #aaa;
+                }
+                </style>
             `;
         },
 
-        /**
-         * Richtet Event-Listener für das Buchungs-Modal ein
-         */
         setupEventListeners() {
+            console.log("🔧 Richte Booking Event-Listener ein");
+
             const callbackForm = document.getElementById('callback-form');
             if (callbackForm) {
                 callbackForm.addEventListener('submit', (e) => this.handleSubmit(e));
@@ -602,62 +444,68 @@ export const initAiForm = () => {
                 backButton.addEventListener('click', () => this.showStep('step-slot-selection'));
             }
         },
-        
-        /**
-         * Lädt verfügbare Termine und zeigt sie an
-         */
+
         async loadSlots() {
+            console.log("📞 Lade verfügbare Rückruf-Termine");
+            
             const loadingDiv = document.getElementById('callback-loading');
             const slotsContainer = document.getElementById('callback-slots-container');
             const noSlotsMessage = document.getElementById('no-slots-message');
 
             try {
                 const data = await ApiHandler.getAvailableSlots();
+                
                 if (loadingDiv) loadingDiv.style.display = 'none';
 
                 if (data.success && data.suggestions?.length > 0) {
                     slotsContainer.innerHTML = '';
+                    slotsContainer.style.display = 'block';
+                    
                     data.suggestions.forEach(suggestion => {
                         const button = document.createElement('button');
                         button.className = 'callback-slot-button';
                         button.innerHTML = `
-                            <div class="slot-info">
-                                <div class="slot-time">${suggestion.formattedString.split(', ')[1]}</div>
-                                <div class="slot-day">${suggestion.formattedString.split(', ')[0]}</div>
+                            <div style="flex-grow: 1;">
+                                <div style="font-size: 1.1rem; font-weight: 500; color: #ffffff;">${suggestion.formattedString.split(' um ')[1]}</div>
+                                <div style="font-size: 0.9rem; color: #aaa;">${suggestion.formattedString.split(' um ')[0]} (Rückruf)</div>
                             </div>
-                            <div class="slot-arrow">→</div>
+                            <div style="font-size: 1.5rem; color: #888;">📞</div>
                         `;
                         button.onclick = () => this.selectSlot(suggestion);
                         slotsContainer.appendChild(button);
                     });
+                    
+                    console.log(`✅ ${data.suggestions.length} Rückruf-Termine geladen`);
                 } else {
                     if (noSlotsMessage) noSlotsMessage.style.display = 'block';
+                    console.warn("⚠️ Keine Rückruf-Termine verfügbar");
                 }
             } catch (error) {
+                console.error("❌ Fehler beim Laden der Rückruf-Termine:", error);
                 if (noSlotsMessage) {
-                    noSlotsMessage.innerHTML = 'Fehler beim Laden der Termine. Bitte versuche es später erneut.';
+                    noSlotsMessage.innerHTML = 'Fehler beim Laden der Rückruf-Termine. Bitte versuche es später erneut oder kontaktiere Michael direkt per E-Mail: <a href="mailto:michael@designare.at" style="color: #ffc107;">michael@designare.at</a>';
                     noSlotsMessage.style.display = 'block';
                 }
             }
         },
 
-        /**
-         * Verarbeitet die Auswahl eines Termin-Slots
-         */
         selectSlot(suggestion) {
+            console.log("✅ Rückruf-Termin ausgewählt:", suggestion.formattedString);
+            
             state.selectedCallbackData = suggestion;
+            
             const displayElement = document.getElementById('selected-slot-display');
             if (displayElement) {
-                displayElement.innerHTML = `Dein Termin: <strong>${suggestion.formattedString}</strong>`;
+                displayElement.innerHTML = `Dein Rückruf-Termin: <strong>${suggestion.formattedString}</strong>`;
             }
+            
             this.showStep('step-contact-details');
         },
 
-        /**
-         * Verarbeitet das Absenden des Buchungs-Formulars
-         */
         async handleSubmit(event) {
             event.preventDefault();
+            console.log("📞 Verarbeite Rückruf-Buchungs-Formular");
+
             const form = event.target;
             const submitButton = form.querySelector('#submit-callback');
             const name = form.querySelector('#callback-name').value.trim();
@@ -670,7 +518,7 @@ export const initAiForm = () => {
             }
 
             submitButton.disabled = true;
-            submitButton.textContent = 'Wird gebucht...';
+            submitButton.textContent = 'Rückruf wird gebucht...';
 
             try {
                 const data = await ApiHandler.bookAppointment({
@@ -684,39 +532,44 @@ export const initAiForm = () => {
                     const confirmationDetails = document.getElementById('confirmation-details');
                     if (confirmationDetails) {
                         confirmationDetails.innerHTML = `
-                            <div><strong>Termin:</strong> ${state.selectedCallbackData.formattedString}</div>
+                            <div><strong>Rückruf-Termin:</strong> ${state.selectedCallbackData.formattedString}</div>
                             <div><strong>Name:</strong> ${name}</div>
                             <div><strong>Telefon:</strong> ${phone}</div>
                             ${topic ? `<div><strong>Anliegen:</strong> ${topic}</div>` : ''}
+                            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #444; color: #aaa; font-size: 0.9rem;">
+                                📞 <strong>Michael wird dich ca. 5-10 Minuten vor dem Termin anrufen.</strong>
+                            </div>
                         `;
                     }
                     this.showStep('step-confirmation');
+                    console.log("✅ Rückruf-Buchung erfolgreich!");
                 } else {
-                    throw new Error(data.message || 'Unbekannter Buchungsfehler');
+                    throw new Error(data.message || 'Unbekannter Rückruf-Buchungsfehler');
                 }
             } catch (error) {
-                alert(`Buchung fehlgeschlagen: ${error.message}`);
+                console.error("❌ Rückruf-Booking-Fehler:", error);
+                alert(`Rückruf-Buchung fehlgeschlagen: ${error.message}`);
             } finally {
                 submitButton.disabled = false;
-                submitButton.textContent = 'Rückruf buchen';
+                submitButton.textContent = '📞 Rückruf buchen';
             }
         },
 
-        /**
-         * Zeigt einen bestimmten Schritt im Modal an
-         */
         showStep(stepId) {
             document.querySelectorAll('.booking-step').forEach(step => step.classList.remove('active'));
             const targetStep = document.getElementById(stepId);
             if (targetStep) targetStep.classList.add('active');
+            
+            console.log("📋 Zeige Schritt:", stepId);
         }
     };
-    
+
     // ===================================================================
-    // KERNLOGIK: Conversation Flow
-    // Steuert den Ablauf des Chats mit Evita
+    // KERNLOGIK: Conversation Flow - ERWEITERT
     // ===================================================================
     async function handleUserMessage(userInput) {
+        console.log("💬 Verarbeite User-Nachricht:", userInput);
+        
         ChatUI.addMessage(userInput, 'user');
         ChatUI.showTypingIndicator();
 
@@ -725,6 +578,8 @@ export const initAiForm = () => {
             ChatUI.removeTypingIndicator();
 
             let answer = "Entschuldigung, ich konnte keine passende Antwort finden.";
+            
+            // Verbesserte Antwort-Extraktion
             if (typeof data === 'string') {
                 answer = data;
             } else if (data?.answer) {
@@ -733,27 +588,49 @@ export const initAiForm = () => {
                 answer = data.message;
             }
             
+            console.log("🤖 Evita-Antwort:", answer.substring(0, 100) + "...");
+            
             ChatUI.addMessage(answer, 'ai');
 
-            // Prüfen, ob Buchungs-Modal geöffnet werden soll
-            if (data?.action === 'launch_booking_modal') {
-    setTimeout(() => BookingModal.launch(), 800);
-}
+            // WICHTIGER PUNKT: Es gibt NIEMALS einen direkten Launch!
+            // Das Modal wird IMMER nur nach einer Rückfrage und Bestätigung geöffnet
             
+            const isBookingConfirmRequest = answer.includes('[BOOKING_CONFIRM_REQUEST]');
+            
+            // Prüfe auf Launch-Trigger NUR nach einer vorherigen Rückfrage
+            const shouldLaunchAfterConfirmation = (
+                answer.includes('[buchung_starten]') ||
+                answer.toLowerCase().includes('öffne') && answer.toLowerCase().includes('kalender') ||
+                answer.toLowerCase().includes('schau sofort nach') ||
+                answer.toLowerCase().includes('perfekt! ich') && answer.toLowerCase().includes('termin')
+            );
+
+            console.log("🔍 Antwort-Analyse:");
+            console.log("   - Ist Rückfrage:", isBookingConfirmRequest);
+            console.log("   - Launch nach Bestätigung:", shouldLaunchAfterConfirmation);
+            console.log("   - Antwort:", answer.substring(0, 100));
+
+            if (shouldLaunchAfterConfirmation) {
+                console.log("🎯 Launch nach Bestätigung erkannt - starte Modal in 800ms");
+                setTimeout(() => {
+                    BookingModal.launch();
+                }, 800);
+            } else if (isBookingConfirmRequest) {
+                console.log("🤔 Booking-Rückfrage gestellt - warte auf User-Bestätigung");
+            }
 
         } catch (error) {
+            console.error("❌ Fehler bei User-Message:", error);
             ChatUI.removeTypingIndicator();
             ChatUI.addMessage(`Entschuldigung, es ist ein technischer Fehler aufgetreten: ${error.message}`, 'ai');
         }
     }
-    
+
     // ===================================================================
     // EVENT LISTENERS SETUP
-    // Verbindet die UI-Elemente mit den entsprechenden Aktionen
     // ===================================================================
     function initializeEventListeners() {
-        // Mobile Keyboard Handler initialisieren
-        MobileKeyboardHandler.init();
+        console.log("🔧 Initialisiere Event-Listener");
 
         // Haupt-Formular auf der Startseite
         if (DOM.aiForm) {
@@ -781,13 +658,7 @@ export const initAiForm = () => {
                     if (userInput) {
                         await handleUserMessage(userInput);
                         chatInput.value = '';
-                        
-                        // Mobile: Focus wieder setzen nach Nachricht
-                        if (MobileKeyboardHandler.isMobile()) {
-                            setTimeout(() => {
-                                chatInput.focus();
-                            }, 100);
-                        }
+                        chatInput.focus();
                     }
                 });
             }
@@ -802,7 +673,7 @@ export const initAiForm = () => {
             DOM.headerChatButton.addEventListener('click', (e) => {
                 e.preventDefault();
                 ChatUI.resetChat();
-                ChatUI.addMessage("Hallo! Ich bin Evita, Michaels persönliche KI-Assistentin. Womit kann ich dir heute helfen?", 'ai');
+                ChatUI.addMessage("Hallo! Ich bin Evita, Michaels KI-Assistentin. Womit kann ich dir heute helfen?", 'ai');
                 ModalController.openChatModal();
             });
         }
@@ -819,17 +690,27 @@ export const initAiForm = () => {
                 }
             });
         }
+
+        console.log("✅ Event-Listener erfolgreich initialisiert");
     }
 
     // ===================================================================
     // GLOBALE FUNKTIONEN
     // ===================================================================
-    window.launchCallbackFromAnywhere = () => BookingModal.launch();
     window.closeCallbackModal = () => BookingModal.remove();
+    window.launchBookingFromChat = () => BookingModal.launch();
+
+    // Test-Funktion für Debug
+    if (window.location.search.includes('debug=true')) {
+        window.debugBookingLaunch = () => {
+            console.log("🔧 DEBUG: Manueller Booking-Launch");
+            BookingModal.launch();
+        };
+    }
 
     // ===================================================================
     // INITIALISIERUNG
     // ===================================================================
     initializeEventListeners();
-    console.log("✅ AI-Form-Modul erfolgreich initialisiert mit Mobile-Support.");
+    console.log("✅ AI-Form-Modul mit funktionierender Booking-Integration initialisiert!");
 };
