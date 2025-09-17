@@ -579,70 +579,86 @@ export const initAiForm = () => {
     // KERNLOGIK: Conversation Flow - ERWEITERT
     // ===================================================================
 async function handleUserMessage(userInput) {
-    console.log("💬 Verarbeite User-Nachricht:", userInput);
-    
-    ChatUI.addMessage(userInput, 'user');
-    ChatUI.showTypingIndicator();
+        console.log("💬 Verarbeite User-Nachricht:", userInput);
 
-    try {
-        // ZUERST die letzte AI-Nachricht aus der Historie holen, BEVOR eine neue hinzugefügt wird.
-        const lastAiMessageBeforeReply = state.chatHistory
-            .filter(msg => msg.role === 'assistant')
-            .pop();
-        const wasBookingQuestion = lastAiMessageBeforeReply && 
-            lastAiMessageBeforeReply.content.includes('[BOOKING_CONFIRM_REQUEST]');
+        const chatInput = DOM.chatInputDynamic;
+        const submitButton = DOM.chatFormDynamic?.querySelector('button[type="submit"]');
 
-        const data = await ApiHandler.sendToEvita(userInput);
-        ChatUI.removeTypingIndicator();
+        // Deaktiviere das Formular, um doppelte Eingaben zu verhindern
+        if (chatInput) chatInput.disabled = true;
+        if (submitButton) submitButton.disabled = true;
 
-        let answer = "Entschuldigung, ich konnte keine passende Antwort finden.";
-        
-        // Verbesserte Antwort-Extraktion
-        if (typeof data === 'string') {
-            answer = data;
-        } else if (data?.answer) {
-            answer = data.answer;
-        } else if (data?.message) {
-            answer = data.message;
+        ChatUI.addMessage(userInput, 'user');
+        ChatUI.showTypingIndicator();
+
+        try {
+            // ZUERST die letzte AI-Nachricht aus der Historie holen, BEVOR eine neue hinzugefügt wird.
+            const lastAiMessageBeforeReply = state.chatHistory
+                .filter(msg => msg.role === 'assistant')
+                .pop();
+            const wasBookingQuestion = lastAiMessageBeforeReply &&
+                lastAiMessageBeforeReply.content.includes('[BOOKING_CONFIRM_REQUEST]');
+
+            const data = await ApiHandler.sendToEvita(userInput);
+            ChatUI.removeTypingIndicator();
+
+            let answer = "Entschuldigung, ich konnte keine passende Antwort finden.";
+
+            // Verbesserte Antwort-Extraktion
+            if (typeof data === 'string') {
+                answer = data;
+            } else if (data?.answer) {
+                answer = data.answer;
+            } else if (data?.message) {
+                answer = data.message;
+            }
+
+            console.log("🤖 Evita-Antwort:", answer.substring(0, 100) + "...");
+
+            // JETZT die neue Antwort hinzufügen
+            ChatUI.addMessage(answer, 'ai');
+
+            const isBookingConfirmRequest = answer.includes('[BOOKING_CONFIRM_REQUEST]');
+
+            // Die Prüfung `wasBookingQuestion` wurde bereits oben durchgeführt.
+            const shouldLaunchAfterConfirmation = wasBookingQuestion && (
+                answer.includes('[buchung_starten]') ||
+                answer.includes('[booking_starten]')
+            );
+
+            console.log("🔍 Antwort-Analyse:");
+            console.log("   - Ist Rückfrage:", isBookingConfirmRequest);
+            console.log("   - War vorher schon Rückfrage:", wasBookingQuestion);
+            console.log("   - Launch nach Bestätigung:", shouldLaunchAfterConfirmation);
+            console.log("   - Chat-Historie Länge:", state.chatHistory.length);
+
+            if (shouldLaunchAfterConfirmation) {
+                console.log("🎯 Launch nach Bestätigung erkannt - starte Modal in 800ms");
+                setTimeout(() => {
+                    BookingModal.launch();
+                }, 800);
+            } else if (isBookingConfirmRequest) {
+                console.log("🤔 Erste Booking-Rückfrage gestellt - KEIN Modal-Launch");
+                // Hier passiert NICHTS - nur die Rückfrage wird angezeigt
+            } else {
+                console.log("ℹ️ Normale Antwort ohne Booking-Bezug");
+            }
+
+        } catch (error) {
+            console.error("❌ Fehler bei User-Message:", error);
+            ChatUI.removeTypingIndicator();
+            ChatUI.addMessage(`Entschuldigung, es ist ein technischer Fehler aufgetreten: ${error.message}`, 'ai');
+        } finally {
+            // Aktiviere das Formular wieder, egal ob Erfolg oder Fehler
+            if (chatInput) {
+                chatInput.disabled = false;
+                chatInput.focus();
+            }
+            if (submitButton) {
+                submitButton.disabled = false;
+            }
         }
-        
-        console.log("🤖 Evita-Antwort:", answer.substring(0, 100) + "...");
-        
-        // JETZT die neue Antwort hinzufügen
-        ChatUI.addMessage(answer, 'ai');
-
-        const isBookingConfirmRequest = answer.includes('[BOOKING_CONFIRM_REQUEST]');
-
-        // Die Prüfung `wasBookingQuestion` wurde bereits oben durchgeführt.
-        const shouldLaunchAfterConfirmation = wasBookingQuestion && (
-            answer.includes('[buchung_starten]') ||
-            answer.includes('[booking_starten]')
-        );
-
-        console.log("🔍 Antwort-Analyse:");
-        console.log("   - Ist Rückfrage:", isBookingConfirmRequest);
-        console.log("   - War vorher schon Rückfrage:", wasBookingQuestion); // Wird jetzt korrekt sein
-        console.log("   - Launch nach Bestätigung:", shouldLaunchAfterConfirmation);
-        console.log("   - Chat-Historie Länge:", state.chatHistory.length);
-
-        if (shouldLaunchAfterConfirmation) {
-            console.log("🎯 Launch nach Bestätigung erkannt - starte Modal in 800ms");
-            setTimeout(() => {
-                BookingModal.launch();
-            }, 800);
-        } else if (isBookingConfirmRequest) {
-            console.log("🤔 Erste Booking-Rückfrage gestellt - KEIN Modal-Launch");
-            // Hier passiert NICHTS - nur die Rückfrage wird angezeigt
-        } else {
-            console.log("ℹ️ Normale Antwort ohne Booking-Bezug");
-        }
-
-    } catch (error) {
-        console.error("❌ Fehler bei User-Message:", error);
-        ChatUI.removeTypingIndicator();
-        ChatUI.addMessage(`Entschuldigung, es ist ein technischer Fehler aufgetreten: ${error.message}`, 'ai');
     }
-}
 
     // ===================================================================
     // EVENT LISTENERS SETUP
