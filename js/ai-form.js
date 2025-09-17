@@ -550,13 +550,13 @@ export const initAiForm = () => {
                     const confirmationDetails = document.getElementById('confirmation-details');
                     if (confirmationDetails) {
                         confirmationDetails.innerHTML = `
-                            <div><strong>Termin:</strong> ${state.selectedCallbackData.formattedString}</div>
-                            <div><strong>Name:</strong> ${name}</div>
-                            <div><strong>Telefon:</strong> ${phone}</div>
-                            ${topic ? `<div><strong>Anliegen:</strong> ${topic}</div>` : ''}
-                            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #444; color: #aaa; font-size: 0.9rem;">
-                                Michael wird dich ca. 5-10 Minuten vor dem Termin anrufen.
-                            </div>
+    <div><strong>Termin:</strong> ${state.selectedCallbackData.formattedString}</div>
+    <div><strong>Name:</strong> ${name}</div>
+    <div><strong>Telefon:</strong> ${phone}</div>
+    ${topic ? `<div><strong>Anliegen:</strong> ${topic}</div>` : ''}
+    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #444; color: #aaa; font-size: 0.9rem;">
+        Michael wird dich zum vereinbarten Zeitpunkt anrufen. Halte dein Telefon bitte bereit.
+    </div>
                         `;
                     }
                     this.showStep('step-confirmation');
