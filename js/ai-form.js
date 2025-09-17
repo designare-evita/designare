@@ -149,16 +149,27 @@ export const initAiForm = () => {
         addMessage(message, sender) {
             if (!DOM.chatHistoryContainer) return;
 
+            // WICHTIG: Entferne interne Tags aus der Chat-Anzeige
+            let cleanMessage = message;
+            if (sender === 'ai') {
+                cleanMessage = message
+                    .replace(/\[BOOKING_CONFIRM_REQUEST\]/g, '')
+                    .replace(/\[buchung_starten\]/g, '')
+                    .replace(/\[booking_starten\]/g, '')
+                    .trim();
+            }
+
             const msgDiv = document.createElement('div');
             msgDiv.className = `chat-message ${sender}`;
-            msgDiv.textContent = message;
+            msgDiv.textContent = cleanMessage; // Zeige nur die saubere Nachricht
             DOM.chatHistoryContainer.appendChild(msgDiv);
             
             this.scrollToBottom();
 
+            // Aber speichere die Original-Nachricht in der Historie (mit Tags)
             state.chatHistory.push({ 
                 role: sender === 'user' ? 'user' : 'assistant', 
-                content: message 
+                content: message // Original mit Tags für API-Kontext
             });
             
             if (state.chatHistory.length > 20) {
@@ -280,16 +291,16 @@ export const initAiForm = () => {
                 <div id="booking-modal" class="booking-modal">
                     <div class="booking-modal-content">
                         <div class="booking-modal-header">
-                            <h2 class="booking-modal-title">📞 Rückruf vereinbaren</h2>
+                            <h2 class="booking-modal-title">Rückruf vereinbaren</h2>
                             <p class="booking-modal-subtitle">Michael ruft dich zum gewünschten Zeitpunkt an.</p>
                         </div>
                         <div class="booking-modal-body">
                             <!-- Schritt 1: Termin-Auswahl -->
                             <div id="step-slot-selection" class="booking-step active">
-                                <h3 class="booking-step-title">📅 Verfügbare Rückruf-Termine</h3>
+                                <h3 class="booking-step-title">Verfügbare Termine</h3>
                                 <div id="callback-loading" style="text-align: center; padding: 20px; color: #aaa;">
                                     <div style="font-size: 1.5rem; margin-bottom: 10px;">⏳</div>
-                                    Lade verfügbare Rückruf-Termine...
+                                    Lade verfügbare Termine...
                                 </div>
                                 <div id="callback-slots-container" style="display: none;"></div>
                                 <div id="no-slots-message" style="display: none; text-align: center; color: #aaa; padding: 20px;">
@@ -302,7 +313,7 @@ export const initAiForm = () => {
                             <!-- Schritt 2: Kontaktdaten -->
                             <div id="step-contact-details" class="booking-step">
                                 <div id="selected-slot-display" style="text-align: center; margin-bottom: 20px; padding: 12px; background: rgba(255, 193, 7, 0.1); border: 1px solid #ffc107; border-radius: 8px; color: #ffc107;"></div>
-                                <h3 class="booking-step-title">📋 Deine Kontaktdaten</h3>
+                                <h3 class="booking-step-title">Deine Kontaktdaten</h3>
                                 <form id="callback-form">
                                     <div class="booking-form-group">
                                         <label for="callback-name">Dein Name *</label>
@@ -318,7 +329,7 @@ export const initAiForm = () => {
                                     </div>
                                     <div class="booking-form-actions" style="display: flex; gap: 15px; margin-top: 20px;">
                                         <button type="button" id="back-to-slots" style="flex: 1; padding: 14px; background: #333; color: #f0f0f0; border: 1px solid #555; border-radius: 8px; cursor: pointer;">← Zurück</button>
-                                        <button type="submit" id="submit-callback" style="flex: 2; padding: 14px; background: #ffc107; color: #1a1a1a; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">📞 Rückruf buchen</button>
+                                        <button type="submit" id="submit-callback" style="flex: 2; padding: 14px; background: #ffc107; color: #1a1a1a; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">Rückruf buchen</button>
                                     </div>
                                 </form>
                             </div>
@@ -329,8 +340,8 @@ export const initAiForm = () => {
                                     <div style="font-size: 3.5rem; color: #ffc107; margin-bottom: 20px;">🎉</div>
                                     <h3 style="color: #ffffff; margin-bottom: 15px;">Termin erfolgreich gebucht!</h3>
                                     <div id="confirmation-details" style="margin: 25px 0; padding: 20px; background: #2a2a2a; border-radius: 8px; text-align: left; color: #ccc;"></div>
-                                    <p style="color: #aaa; margin-bottom: 25px;">📞 <strong>Michael wird dich zum vereinbarten Zeitpunkt anrufen.</strong><br>Halte bitte dein Telefon 5 Minuten vor dem Termin bereit.</p>
-                                    <button onclick="closeCallbackModal()" style="background: #ffc107; color: #1a1a1a; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-weight: 600;">Perfekt! 👍</button>
+                                    <p style="color: #aaa; margin-bottom: 25px;">Michael wird dich zum vereinbarten Zeitpunkt anrufen.<br>Halte bitte dein Telefon 5 Minuten vor dem Termin bereit.</p>
+                                    <button onclick="closeCallbackModal()" style="background: #ffc107; color: #1a1a1a; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-weight: 600;">Perfekt!</button>
                                 </div>
                             </div>
                         </div>
@@ -467,9 +478,9 @@ export const initAiForm = () => {
                         button.innerHTML = `
                             <div style="flex-grow: 1;">
                                 <div style="font-size: 1.1rem; font-weight: 500; color: #ffffff;">${suggestion.formattedString.split(' um ')[1]}</div>
-                                <div style="font-size: 0.9rem; color: #aaa;">${suggestion.formattedString.split(' um ')[0]} (Rückruf)</div>
+                                <div style="font-size: 0.9rem; color: #aaa;">${suggestion.formattedString.split(' um ')[0]}</div>
                             </div>
-                            <div style="font-size: 1.5rem; color: #888;">📞</div>
+                            <div style="font-size: 1.5rem; color: #888;">→</div>
                         `;
                         button.onclick = () => this.selectSlot(suggestion);
                         slotsContainer.appendChild(button);
@@ -496,7 +507,7 @@ export const initAiForm = () => {
             
             const displayElement = document.getElementById('selected-slot-display');
             if (displayElement) {
-                displayElement.innerHTML = `Dein Rückruf-Termin: <strong>${suggestion.formattedString}</strong>`;
+                displayElement.innerHTML = `Dein Termin: <strong>${suggestion.formattedString}</strong>`;
             }
             
             this.showStep('step-contact-details');
@@ -518,7 +529,7 @@ export const initAiForm = () => {
             }
 
             submitButton.disabled = true;
-            submitButton.textContent = 'Rückruf wird gebucht...';
+            submitButton.textContent = 'Wird gebucht...';
 
             try {
                 const data = await ApiHandler.bookAppointment({
@@ -532,12 +543,12 @@ export const initAiForm = () => {
                     const confirmationDetails = document.getElementById('confirmation-details');
                     if (confirmationDetails) {
                         confirmationDetails.innerHTML = `
-                            <div><strong>Rückruf-Termin:</strong> ${state.selectedCallbackData.formattedString}</div>
+                            <div><strong>Termin:</strong> ${state.selectedCallbackData.formattedString}</div>
                             <div><strong>Name:</strong> ${name}</div>
                             <div><strong>Telefon:</strong> ${phone}</div>
                             ${topic ? `<div><strong>Anliegen:</strong> ${topic}</div>` : ''}
                             <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #444; color: #aaa; font-size: 0.9rem;">
-                                📞 <strong>Michael wird dich ca. 5-10 Minuten vor dem Termin anrufen.</strong>
+                                Michael wird dich ca. 5-10 Minuten vor dem Termin anrufen.
                             </div>
                         `;
                     }
@@ -551,7 +562,7 @@ export const initAiForm = () => {
                 alert(`Rückruf-Buchung fehlgeschlagen: ${error.message}`);
             } finally {
                 submitButton.disabled = false;
-                submitButton.textContent = '📞 Rückruf buchen';
+                submitButton.textContent = 'Rückruf buchen';
             }
         },
 
