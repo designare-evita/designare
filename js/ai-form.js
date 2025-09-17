@@ -609,9 +609,14 @@ export const initAiForm = () => {
             const isBookingConfirmRequest = answer.includes('[BOOKING_CONFIRM_REQUEST]');
             
             // Prüfe ob das eine Antwort auf eine vorherige Rückfrage ist
-            const wasBookingQuestion = state.chatHistory
-                .filter(msg => msg.role === 'assistant')
-                .some(msg => msg.content.includes('[BOOKING_CONFIRM_REQUEST]'));
+            const lastAiMessage = state.chatHistory
+    .filter(msg => msg.role === 'assistant')
+    .pop();
+
+const wasBookingQuestion = lastAiMessage && 
+    lastAiMessage.content.includes('[BOOKING_CONFIRM_REQUEST]');
+            
+            
             
             const shouldLaunchAfterConfirmation = wasBookingQuestion && (
                 answer.includes('[buchung_starten]') ||
