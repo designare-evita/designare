@@ -608,21 +608,18 @@ export const initAiForm = () => {
             
             const isBookingConfirmRequest = answer.includes('[BOOKING_CONFIRM_REQUEST]');
             
-            // Prüfe ob das eine Antwort auf eine vorherige Rückfrage ist
+             // Prüfe ob das eine Antwort auf eine vorherige Rückfrage ist
             const lastAiMessage = state.chatHistory
-    .filter(msg => msg.role === 'assistant')
-    .pop();
+                .filter(msg => msg.role === 'assistant')
+                .pop();
 
-const wasBookingQuestion = lastAiMessage && 
-    lastAiMessage.content.includes('[BOOKING_CONFIRM_REQUEST]');
+            const wasBookingQuestion = lastAiMessage && 
+                lastAiMessage.content.includes('[BOOKING_CONFIRM_REQUEST]');
             
-            
-            
+            // KORRIGIERT: Vereinfachte Erkennung für Booking-Launch
             const shouldLaunchAfterConfirmation = wasBookingQuestion && (
                 answer.includes('[buchung_starten]') ||
-                answer.toLowerCase().includes('öffne') && answer.toLowerCase().includes('kalender') ||
-                answer.toLowerCase().includes('schau sofort nach') ||
-                answer.toLowerCase().includes('perfekt! ich') && answer.toLowerCase().includes('termin')
+                answer.includes('[booking_starten]')
             );
 
             console.log("🔍 Antwort-Analyse:");
