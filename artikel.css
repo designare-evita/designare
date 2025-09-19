@@ -14,9 +14,9 @@
   content: '';
   position: absolute;
   left: 0;
-  bottom: -5px; /* Positioniere die Linie leicht unter dem Text */
+  bottom: -10px; /* Positioniere die Linie leicht unter dem Text */
   width: 100%;
-  height: 15px; /* Höhe der Linie */
+  height: 25px; /* Höhe der Linie */
   
   /* Die Farbe der Unterstreichung */
   background-color: #ffc107; 
