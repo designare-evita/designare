@@ -1034,3 +1034,19 @@ align-items: center;
         width: 100%;
     }
 }
+
+
+.performance-tip {
+  /* Startzustand: Unsichtbar und nach unten verschoben */
+  opacity: 0;
+  transform: translateY(50px);
+  
+  /* Übergang für einen weichen Effekt definieren */
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.performance-tip.is-visible {
+  /* Endzustand: Sichtbar und an der normalen Position */
+  opacity: 1;
+  transform: translateY(0);
+}
