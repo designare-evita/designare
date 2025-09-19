@@ -1315,3 +1315,18 @@
         /* Der Border wird vom Parent #ai-chat-form:focus-within gesteuert */
     }
 }
+
+@media (max-width: 768px) {
+    /* Stellt sicher, dass das Modal von oben beginnt und nicht zentriert ist */
+    .modal-overlay {
+        align-items: flex-start !important; /* Richtet das Kind-Element (modal-content) oben aus */
+        padding-top: 2vh; /* Optional: Ein kleiner Abstand zum oberen Rand */
+    }
+
+    /* Passt die Höhe des Modals an und stellt sicher, dass es oben "klebt" */
+    #ai-response-modal .modal-content {
+        height: 50vh !important; /* Setzt die Höhe auf 50% der Bildschirmhöhe */
+        max-height: 50vh !important; /* Verhindert, dass es größer wird */
+        margin-top: 0 !important; /* Entfernt eventuellen oberen Abstand */
+    }
+}
