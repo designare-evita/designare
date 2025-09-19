@@ -688,27 +688,36 @@ async function handleUserMessage(userInput) {
         }
 
         // Chat-Formular im Modal (dynamisch)
-        const setupChatFormListener = () => {
-            const chatForm = DOM.chatFormDynamic;
-            if (chatForm && !chatForm.hasAttribute('data-listener-added')) {
-                chatForm.setAttribute('data-listener-added', 'true');
-                chatForm.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    const chatInput = DOM.chatInputDynamic;
-                    const userInput = chatInput?.value.trim();
-                    if (userInput) {
-                        await handleUserMessage(userInput);
-                        chatInput.value = '';
-                        chatInput.focus();
-                    }
-                });
-            }
-        };
+      const setupChatFormListeners = () => {
+        const chatForm = DOM.chatFormDynamic;
+        const chatInput = DOM.chatInputDynamic;
 
-        // Observer für dynamisches Chat-Formular
-        const observer = new MutationObserver(setupChatFormListener);
-        observer.observe(document.body, { childList: true, subtree: true });
+        if (chatForm && !chatForm.hasAttribute('data-submit-listener-added')) {
+            chatForm.setAttribute('data-submit-listener-added', 'true');
+            chatForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const userInput = chatInput?.value.trim();
+                if (userInput) {
+                    await handleUserMessage(userInput);
+                    chatInput.value = '';
+                    chatInput.focus();
+                }
+            });
+        }
 
+        if (chatInput && !chatInput.hasAttribute('data-focus-listener-added')) {
+             chatInput.setAttribute('data-focus-listener-added', 'true');
+             // Diese neue Funktion sorgt für das zuverlässige Scrollen
+             chatInput.addEventListener('focus', () => {
+                // Kurze Verzögerung, damit die Tastatur Zeit hat, sich zu öffnen
+                setTimeout(() => {
+                    ChatUI.scrollToBottom();
+                }, 300); // 300ms ist ein guter Wert
+             });
+        }
+    };
+      
+   
         // Header-Chat-Button
         if (DOM.headerChatButton) {
             DOM.headerChatButton.addEventListener('click', (e) => {
