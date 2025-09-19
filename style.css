@@ -71,7 +71,8 @@ a {
 /* 2. Der Hover-Effekt für die drei originalen Icons (mit rundem Hintergrund) */
 #contact-button:hover, 
 #cookie-info-button:hover, 
-#about-me-button:hover {
+#about-me-button:hover,
+#evita-chat-button:hover {
     background-color: var(--accent-color);
     color: #fff;
     opacity: 1;
