@@ -1315,3 +1315,17 @@
         /* Der Border wird vom Parent #ai-chat-form:focus-within gesteuert */
     }
 }
+
+ /* Tastatur-Höhe */
+
+@media (max-width: 768px) {
+    #ai-response-modal .modal-content {
+        height: 100dvh !important; /* Dynamic Viewport Height */
+        max-height: 100dvh !important;
+    }
+    
+    #ai-chat-history {
+        height: calc(100dvh - 160px) !important;
+        max-height: calc(100dvh - 160px) !important;
+    }
+}
