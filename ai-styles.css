@@ -1315,20 +1315,3 @@
         /* Der Border wird vom Parent #ai-chat-form:focus-within gesteuert */
     }
 }
-
-x/* Einfache CSS-Only Mobile Keyboard Fix */
-@media (max-width: 768px) {
-    #ai-response-modal .modal-content {
-        height: 100vh !important;
-        height: 100dvh !important; /* Für moderne Browser */
-        max-height: 100vh !important;
-        max-height: 100dvh !important;
-    }
-    
-    #ai-chat-history {
-        height: calc(100vh - 160px) !important;
-        height: calc(100dvh - 160px) !important;
-        max-height: calc(100vh - 160px) !important;
-        max-height: calc(100dvh - 160px) !important;
-    }
-}
