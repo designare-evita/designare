@@ -1264,29 +1264,7 @@
     }
 }
 
-/* KORRIGIERTE Tastatur-Events Behandlung */
-@media (max-width: 768px) {
-    /* Wenn Tastatur aktiv ist, Chat-History anpassen */
-    body.keyboard-active #ai-chat-history {
-        max-height: 35vh !important; /* Weniger drastische Reduzierung */
-        flex: 1 1 auto !important;
-    }
-    
-    /* KORRIGIERT: Input-Container NICHT sticky, normale Position */
-    body.keyboard-active #ai-chat-form {
-        /* Entfernt: position: sticky und bottom: 0 */
-        flex: 0 0 auto !important;
-        margin: 10px 15px 20px 15px !important; /* Normale margins beibehalten */
-        
-        /* WICHTIG: Design-Eigenschaften beibehalten */
-        border-radius: 10px !important; /* Rundungen bleiben */
-        border: 1px solid var(--border-color, #444) !important; /* Vollständiger Border */
-        background-color: var(--bg-color, #1a1a1a) !important;
-        
-        /* Kein zusätzlicher border-top nötig */
-        padding: 0 !important; /* Reset padding override */
-    }
-}
+
 
 /* Verbessertes Scroll-Verhalten für Chat-Nachrichten */
 @media (max-width: 768px) {
