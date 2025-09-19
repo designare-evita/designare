@@ -335,3 +335,33 @@ if (window.location.search.includes('debug=true') || window.location.hostname.in
     console.log("   - window.debugInfo.testBookingModal()");
     console.log("   - window.debugInfo.checkEvitaButton()");
 }
+
+
+// Code am Ende von js/main.js hinzufügen
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Das Element auswählen, das animiert werden soll
+    const animatedElement = document.querySelector('.performance-tip');
+
+    // Prüfen, ob das Element auf der Seite existiert
+    if (animatedElement) {
+        // Optionen für den Observer (wann soll er auslösen?)
+        const observerOptions = {
+            root: null, // Standard: beobachtet den Viewport
+            threshold: 0.1 // Animation startet, wenn 10% des Elements sichtbar sind
+        };
+
+        // Der Observer, der die Klasse hinzufügt
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    observer.unobserve(entry.target); // Stoppt die Beobachtung nach der Animation
+                }
+            });
+        }, observerOptions);
+
+        // Den Observer starten
+        observer.observe(animatedElement);
+    }
+});
