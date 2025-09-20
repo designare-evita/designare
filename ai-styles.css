@@ -1181,103 +1181,138 @@
 /* MOBILE VIEWPORT UND TASTATUR-FIX - KORRIGIERT */
 
 @media (max-width: 768px) {
-    /* Modal nimmt vollen Bildschirm ein */
+    /* Modal Container - Vollbild */
     #ai-response-modal .modal-content {
-        width: 100vw !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
         height: 100vh !important;
+        height: 100dvh !important; /* Neue dynamische viewport height */
         max-width: none !important;
         max-height: none !important;
         border-radius: 0 !important;
+        margin: 0 !important;
         
-        /* Wichtig: Flexbox-Container für bessere Kontrolle */
+        /* Flexbox für Layout */
         display: flex !important;
         flex-direction: column !important;
         padding: 0 !important;
+        overflow: hidden !important;
     }
     
-    /* Chat-History: Flexible Höhe mit Scroll */
+    /* Chat-History - Flexibles Scrolling */
     #ai-chat-history {
         flex: 1 1 auto !important;
         overflow-y: auto !important;
+        overflow-x: hidden !important;
         
-        /* WICHTIG: Keine festen Heights! */
-        min-height: 0 !important;
+        /* ENTFERNE alle festen Höhen */
+        min-height: unset !important;
         max-height: none !important;
         height: auto !important;
         
-        /* Scroll-Verhalten optimieren */
+        /* Touch-optimiertes Scrolling */
         -webkit-overflow-scrolling: touch !important;
-        scroll-behavior: smooth !important;
+        overscroll-behavior: contain !important;
         
-        /* Padding anpassen */
+        /* Padding */
         padding: 50px 15px 15px 15px !important;
+        margin: 0 !important;
     }
     
-    /* Chat-Form: Feste Position am unteren Rand */
+    /* Chat-Form - Am unteren Rand fixiert */
     #ai-chat-form {
         flex: 0 0 auto !important;
-        margin: 10px 15px 20px 15px !important;
+        margin: 10px 15px !important;
+        margin-bottom: env(safe-area-inset-bottom, 20px) !important;
         
-        /* Mindesthöhe für Touch-Targets */
+        /* Mindesthöhe für Touch */
         min-height: 50px !important;
         
-        /* Border und Rundungen beibehalten */
+        /* Styling */
         border-radius: 10px !important;
         border: 1px solid var(--border-color, #444) !important;
     }
     
-    /* Modal Footer falls vorhanden */
-    .modal-footer {
-        flex: 0 0 auto !important;
-        display: none !important; /* Auf Mobile verstecken für mehr Platz */
+    /* Modal Footer komplett verstecken auf Mobile */
+    #ai-response-modal .modal-footer {
+        display: none !important;
     }
     
-    /* Input-Feld größer für mobile Eingabe */
+    /* Input-Feld optimiert */
     #ai-chat-form input[type="text"] {
         font-size: 16px !important; /* Verhindert Zoom auf iOS */
         padding: 15px !important;
         line-height: 1.4 !important;
+        -webkit-appearance: none !important;
     }
     
-    /* Button größer für Touch */
+    /* Send-Button optimiert */
     #ai-chat-form button {
         min-width: 60px !important;
         min-height: 50px !important;
         padding: 15px 20px !important;
     }
     
-    /* Close Button optimiert */
-    .close-button {
+    /* Close-Button fixiert */
+    #ai-response-modal .close-button {
+        position: fixed !important;
         top: 10px !important;
         right: 15px !important;
         width: 44px !important;
         height: 44px !important;
         font-size: 1.2rem !important;
-        z-index: 1000 !important;
-        position: fixed !important; /* Fixed statt absolute */
+        z-index: 1001 !important;
     }
     
     /* Chat-Nachrichten optimiert */
     .chat-message {
         font-size: 0.9rem !important;
         line-height: 1.4 !important;
-        max-width: 95% !important;
-        margin-bottom: 15px !important;
-        min-height: 40px !important;
+        max-width: 85% !important;
+        margin-bottom: 12px !important;
         padding: 10px 12px !important;
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+    }
+    
+    /* Scrollbar sichtbar machen */
+    #ai-chat-history::-webkit-scrollbar {
+        width: 4px !important;
+    }
+    
+    #ai-chat-history::-webkit-scrollbar-track {
+        background: transparent !important;
+    }
+    
+    #ai-chat-history::-webkit-scrollbar-thumb {
+        background: rgba(255, 193, 7, 0.3) !important;
+        border-radius: 2px !important;
     }
 }
 
-/* Zusätzliche iOS-spezifische Fixes */
+/* iOS-spezifische Fixes ENTFERNEN oder anpassen */
 @supports (-webkit-touch-callout: none) {
     /* iOS Safari spezifisch */
     #ai-response-modal .modal-content {
-        height: -webkit-fill-available !important;
+        height: 100vh !important;
+        /* KEINE calc() heights hier! */
     }
     
     #ai-chat-history {
-        /* Verwende calc() für iOS */
-        height: calc(100vh - 150px) !important;
-        max-height: calc(100vh - 150px) !important;
+        /* KEINE festen Heights! */
+        flex: 1 1 auto !important;
+    }
+}
+
+/* Safe Area Support für iPhone X+ */
+@supports (padding: max(0px)) {
+    @media (max-width: 768px) {
+        #ai-chat-form {
+            margin-bottom: max(20px, env(safe-area-inset-bottom)) !important;
+            padding-bottom: env(safe-area-inset-bottom) !important;
+        }
     }
 }
