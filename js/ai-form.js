@@ -225,36 +225,60 @@ export const initAiForm = () => {
     // ===================================================================
     // MODAL CONTROLLER
     // ===================================================================
-    const ModalController = {
-        openChatModal() {
-            if (!DOM.modalOverlay) return;
-            
-            DOM.modalOverlay.style.display = 'flex';
-            document.body.classList.add('no-scroll');
-            
-   setTimeout(() => {
-                DOM.modalOverlay.classList.add('visible');
-                DOM.chatInputDynamic?.focus();
-
-                // NEU: Füge einen leichten Delay hinzu, um dem Keyboard Zeit zum Erscheinen zu geben,
-                // und scrolle dann den Chat-Verlauf nach ganz unten.
-                // Das sorgt dafür, dass die erste Nachricht sichtbar bleibt.
-                setTimeout(() => {
-                    ChatUI.scrollToBottom();
-                }, 400); // 400ms ist ein guter Wert für die meisten Geräte.
-
-            }, 10);
-        },
-        closeChatModal() {
-            if (!DOM.modalOverlay) return;
-            
-            DOM.modalOverlay.classList.remove('visible');
-            setTimeout(() => {
-                DOM.modalOverlay.style.display = 'none';
-                document.body.classList.remove('no-scroll');
-            }, 300);
+   const ModalController = {
+    openChatModal() {
+        if (!DOM.modalOverlay) return;
+        
+        DOM.modalOverlay.style.display = 'flex';
+        document.body.classList.add('no-scroll');
+        
+        // --- START: NEUER CODE ---
+        // Setze die Höhe sofort beim Öffnen
+        handleKeyboardResize(); 
+        
+        // Füge den Listener hinzu, aber nur, wenn er noch nicht aktiv ist
+        if (!isKeyboardListenerActive) {
+            window.addEventListener('resize', handleKeyboardResize);
+            isKeyboardListenerActive = true;
+            console.log('Resize-Listener für Tastatur HINZUGEFÜGT.');
         }
-    };
+        // --- ENDE: NEUER CODE ---
+        
+        setTimeout(() => {
+            DOM.modalOverlay.classList.add('visible');
+            DOM.chatInputDynamic?.focus();
+            setTimeout(() => {
+                ChatUI.scrollToBottom();
+            }, 400); 
+        }, 10);
+    },
+    
+    closeChatModal() {
+        if (!DOM.modalOverlay) return;
+        
+        DOM.modalOverlay.classList.remove('visible');
+        
+        // --- START: NEUER CODE ---
+        // Entferne den Listener beim Schließen, um die Performance zu schonen
+        if (isKeyboardListenerActive) {
+            window.removeEventListener('resize', handleKeyboardResize);
+            isKeyboardListenerActive = false;
+            console.log('Resize-Listener für Tastatur ENTFERNT.');
+        }
+        
+        // Setze die Höhe im CSS zurück
+        const modalContent = document.querySelector('#ai-response-modal .modal-content');
+        if (modalContent) {
+            modalContent.style.height = ''; 
+        }
+        // --- ENDE: NEUER CODE ---
+        
+        setTimeout(() => {
+            DOM.modalOverlay.style.display = 'none';
+            document.body.classList.remove('no-scroll');
+        }, 300);
+    }
+};
 
     // ===================================================================
     // BOOKING MODAL - KOMPLETT NEU IMPLEMENTIERT
