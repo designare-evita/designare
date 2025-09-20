@@ -1,16 +1,8 @@
-// js/ai-form.js - REPARIERTE VERSION mit funktionierender Booking-Integration
+// js/ai-form.js - REPARIERTE VERSION mit funktionierender Booking-Integration und mobilem Tastatur-Fix
 let isKeyboardListenerActive = false;
-export const initAiForm = () => {
-    console.log("🚀 Initialisiere AI-Form-Modul mit Booking-Fix");
 
-    const handleKeyboardResize = () => {
-    const modalContent = document.querySelector('#ai-response-modal .modal-content');
-    if (modalContent) {
-        // Setze die Höhe auf die Höhe des inneren, sichtbaren Fensters
-        modalContent.style.height = `${window.innerHeight}px`;
-        console.log(`Tastatur-Event: Modal-Höhe auf ${window.innerHeight}px gesetzt.`);
-    }
-};
+export const initAiForm = () => {
+    console.log("🚀 Initialisiere AI-Form-Modul mit Booking-Fix und Tastatur-Fix");
 
     // ===================================================================
     // ZENTRALER ZUSTAND (State Management)
@@ -41,9 +33,22 @@ export const initAiForm = () => {
             return document.getElementById('ai-chat-input');
         }
     };
+    
+    // ===================================================================
+    // KEYBOARD RESIZE HANDLER - NEU
+    // ===================================================================
+    const handleKeyboardResize = () => {
+        const modalContent = document.querySelector('#ai-response-modal .modal-content');
+        if (modalContent) {
+            // Setze die Höhe auf die Höhe des inneren, sichtbaren Fensters
+            modalContent.style.height = `${window.innerHeight}px`;
+            console.log(`Tastatur-Event: Modal-Höhe auf ${window.innerHeight}px gesetzt.`);
+        }
+    };
+
 
     // ===================================================================
-    // API HANDLER - KORRIGIERT
+    // API HANDLER (unverändert)
     // ===================================================================
     const ApiHandler = {
         async safeFetch(url, options = {}) {
@@ -152,7 +157,7 @@ export const initAiForm = () => {
     };
 
     // ===================================================================
-    // CHAT UI - ERWEITERT
+    // CHAT UI - ERWEITERT (unverändert)
     // ===================================================================
     const ChatUI = {
         addMessage(message, sender) {
@@ -223,65 +228,61 @@ export const initAiForm = () => {
     };
 
     // ===================================================================
-    // MODAL CONTROLLER
+    // MODAL CONTROLLER - KORRIGIERT
     // ===================================================================
-   const ModalController = {
-    openChatModal() {
-        if (!DOM.modalOverlay) return;
-        
-        DOM.modalOverlay.style.display = 'flex';
-        document.body.classList.add('no-scroll');
-        
-        // --- START: NEUER CODE ---
-        // Setze die Höhe sofort beim Öffnen
-        handleKeyboardResize(); 
-        
-        // Füge den Listener hinzu, aber nur, wenn er noch nicht aktiv ist
-        if (!isKeyboardListenerActive) {
-            window.addEventListener('resize', handleKeyboardResize);
-            isKeyboardListenerActive = true;
-            console.log('Resize-Listener für Tastatur HINZUGEFÜGT.');
-        }
-        // --- ENDE: NEUER CODE ---
-        
-        setTimeout(() => {
-            DOM.modalOverlay.classList.add('visible');
-            DOM.chatInputDynamic?.focus();
+    const ModalController = {
+        openChatModal() {
+            if (!DOM.modalOverlay) return;
+            
+            DOM.modalOverlay.style.display = 'flex';
+            document.body.classList.add('no-scroll');
+            
+            // Setze die Höhe sofort beim Öffnen
+            handleKeyboardResize(); 
+            
+            // Füge den Listener hinzu, aber nur, wenn er noch nicht aktiv ist
+            if (!isKeyboardListenerActive) {
+                window.addEventListener('resize', handleKeyboardResize);
+                isKeyboardListenerActive = true;
+                console.log('Resize-Listener für Tastatur HINZUGEFÜGT.');
+            }
+            
             setTimeout(() => {
-                ChatUI.scrollToBottom();
-            }, 400); 
-        }, 10);
-    },
-    
-    closeChatModal() {
-        if (!DOM.modalOverlay) return;
+                DOM.modalOverlay.classList.add('visible');
+                DOM.chatInputDynamic?.focus();
+                setTimeout(() => {
+                    ChatUI.scrollToBottom();
+                }, 400); 
+            }, 10);
+        },
         
-        DOM.modalOverlay.classList.remove('visible');
-        
-        // --- START: NEUER CODE ---
-        // Entferne den Listener beim Schließen, um die Performance zu schonen
-        if (isKeyboardListenerActive) {
-            window.removeEventListener('resize', handleKeyboardResize);
-            isKeyboardListenerActive = false;
-            console.log('Resize-Listener für Tastatur ENTFERNT.');
+        closeChatModal() {
+            if (!DOM.modalOverlay) return;
+            
+            DOM.modalOverlay.classList.remove('visible');
+            
+            // Entferne den Listener beim Schließen, um die Performance zu schonen
+            if (isKeyboardListenerActive) {
+                window.removeEventListener('resize', handleKeyboardResize);
+                isKeyboardListenerActive = false;
+                console.log('Resize-Listener für Tastatur ENTFERNT.');
+            }
+            
+            // Setze die Höhe im CSS zurück
+            const modalContent = document.querySelector('#ai-response-modal .modal-content');
+            if (modalContent) {
+                modalContent.style.height = ''; 
+            }
+            
+            setTimeout(() => {
+                DOM.modalOverlay.style.display = 'none';
+                document.body.classList.remove('no-scroll');
+            }, 300);
         }
-        
-        // Setze die Höhe im CSS zurück
-        const modalContent = document.querySelector('#ai-response-modal .modal-content');
-        if (modalContent) {
-            modalContent.style.height = ''; 
-        }
-        // --- ENDE: NEUER CODE ---
-        
-        setTimeout(() => {
-            DOM.modalOverlay.style.display = 'none';
-            document.body.classList.remove('no-scroll');
-        }, 300);
-    }
-};
+    };
 
     // ===================================================================
-    // BOOKING MODAL - KOMPLETT NEU IMPLEMENTIERT
+    // BOOKING MODAL (unverändert)
     // ===================================================================
     const BookingModal = {
         async launch() {
@@ -335,7 +336,6 @@ export const initAiForm = () => {
                             <p class="booking-modal-subtitle">Michael ruft dich zum gewünschten Zeitpunkt an.</p>
                         </div>
                         <div class="booking-modal-body">
-                            <!-- Schritt 1: Termin-Auswahl -->
                             <div id="step-slot-selection" class="booking-step active">
                                 <h3 class="booking-step-title">Verfügbare Termine</h3>
                                 <div id="callback-loading" style="text-align: center; padding: 20px; color: #aaa;">
@@ -350,7 +350,6 @@ export const initAiForm = () => {
                                 </div>
                             </div>
 
-                            <!-- Schritt 2: Kontaktdaten -->
                             <div id="step-contact-details" class="booking-step">
                                 <div id="selected-slot-display" style="text-align: center; margin-bottom: 20px; padding: 12px; background: rgba(255, 193, 7, 0.1); border: 1px solid #ffc107; border-radius: 8px; color: #ffc107;"></div>
                                 <h3 class="booking-step-title">Deine Kontaktdaten</h3>
@@ -374,7 +373,6 @@ export const initAiForm = () => {
                                 </form>
                             </div>
 
-                            <!-- Schritt 3: Bestätigung -->
                             <div id="step-confirmation" class="booking-step">
                                 <div style="text-align: center;">
                                     <div style="font-size: 3.5rem; color: #ffc107; margin-bottom: 20px;">🎉</div>
@@ -616,9 +614,9 @@ export const initAiForm = () => {
     };
 
     // ===================================================================
-    // KERNLOGIK: Conversation Flow - ERWEITERT
+    // KERNLOGIK: Conversation Flow - ERWEITERT (unverändert)
     // ===================================================================
-async function handleUserMessage(userInput) {
+    async function handleUserMessage(userInput) {
         console.log("💬 Verarbeite User-Nachricht:", userInput);
 
         const chatInput = DOM.chatInputDynamic;
@@ -701,7 +699,7 @@ async function handleUserMessage(userInput) {
     }
 
     // ===================================================================
-    // EVENT LISTENERS SETUP
+    // EVENT LISTENERS SETUP (unverändert)
     // ===================================================================
     function initializeEventListeners() {
         console.log("🔧 Initialisiere Event-Listener");
@@ -769,7 +767,7 @@ async function handleUserMessage(userInput) {
     }
 
     // ===================================================================
-    // GLOBALE FUNKTIONEN
+    // GLOBALE FUNKTIONEN (unverändert)
     // ===================================================================
     window.closeCallbackModal = () => BookingModal.remove();
     window.launchBookingFromChat = () => BookingModal.launch();
@@ -787,4 +785,4 @@ async function handleUserMessage(userInput) {
     // ===================================================================
     initializeEventListeners();
     console.log("✅ AI-Form-Modul mit funktionierender Booking-Integration initialisiert!");
-};
+}
