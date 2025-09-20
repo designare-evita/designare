@@ -3,6 +3,15 @@ let isKeyboardListenerActive = false;
 export const initAiForm = () => {
     console.log("🚀 Initialisiere AI-Form-Modul mit Booking-Fix");
 
+    const handleKeyboardResize = () => {
+    const modalContent = document.querySelector('#ai-response-modal .modal-content');
+    if (modalContent) {
+        // Setze die Höhe auf die Höhe des inneren, sichtbaren Fensters
+        modalContent.style.height = `${window.innerHeight}px`;
+        console.log(`Tastatur-Event: Modal-Höhe auf ${window.innerHeight}px gesetzt.`);
+    }
+};
+
     // ===================================================================
     // ZENTRALER ZUSTAND (State Management)
     // ===================================================================
