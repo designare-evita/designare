@@ -1201,7 +1201,7 @@
     /* Modal nimmt vollen Bildschirm ein */
     #ai-response-modal .modal-content {
         width: 100vw !important;
-        height: 100vh !important;
+        height: 100svh !important;
         max-width: none !important;
         max-height: none !important;
         border-radius: 0 !important;
