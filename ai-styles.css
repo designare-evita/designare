@@ -1316,18 +1316,4 @@
     }
 }
 
-@media (max-width: 768px) {
-    /* Positioniert den Container des Evita-Chats am oberen Rand des Overlays */
-    #ai-response-modal {
-        align-self: flex-start !important; /* Richtet nur dieses Element oben aus */
-        margin-top: 2vh; /* Optional: Ein kleiner Abstand zum oberen Rand */
-overflow-y: hidden !important;
-    }
 
-    /* Passt die Höhe des Inhalts an, nachdem der Container oben positioniert wurde */
-    #ai-response-modal .modal-content {
-        height: 50vh !important; /* Höhe auf 50% der Bildschirmhöhe setzen */
-        max-height: 50vh !important; /* Verhindert, dass es größer wird */
-       overflow-y: hidden !important;
-    }
-}
