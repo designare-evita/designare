@@ -1,5 +1,5 @@
 // js/ai-form.js - REPARIERTE VERSION mit funktionierender Booking-Integration
-
+let isKeyboardListenerActive = false;
 export const initAiForm = () => {
     console.log("🚀 Initialisiere AI-Form-Modul mit Booking-Fix");
 
