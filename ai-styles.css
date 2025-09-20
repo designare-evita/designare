@@ -1213,10 +1213,9 @@
     
     /* Chat-History: Flexible Höhe mit Scroll */
     #ai-chat-history {
-        flex: 1 1 auto !important;
-        min-height: 150px !important;
-        height: 100% !important;
-        overflow-y: auto !important;
+        height: calc(100% - 85px) !important;
+flex: none !important;
+overflow-y: auto !important;
         
         /* Wichtig: Scroll-Verhalten optimieren */
         -webkit-overflow-scrolling: touch !important;
