@@ -37,15 +37,35 @@ export const initAiForm = () => {
     // ===================================================================
     // KEYBOARD RESIZE HANDLER - NEU
     // ===================================================================
-    const handleKeyboardResize = () => {
-        const modalContent = document.querySelector('#ai-response-modal .modal-content');
-        if (modalContent) {
-            // Setze die Höhe auf die Höhe des inneren, sichtbaren Fensters
+   const handleKeyboardResize = () => {
+    const modalContent = document.querySelector('#ai-response-modal .modal-content');
+    const chatHistory = document.getElementById('ai-chat-history');
+    
+    if (modalContent && chatHistory) {
+        // Verwende visualViewport API falls verfügbar (bessere Tastatur-Erkennung)
+        if (window.visualViewport) {
+            const viewportHeight = window.visualViewport.height;
+            modalContent.style.height = `${viewportHeight}px`;
+            
+            // Berechne verfügbare Höhe für Chat-History
+            const chatFormHeight = 70; // Geschätzte Höhe des Chat-Forms
+            const headerHeight = 50; // Geschätzte Höhe für Close-Button Bereich
+            const availableHeight = viewportHeight - chatFormHeight - headerHeight;
+            
+            chatHistory.style.maxHeight = `${availableHeight}px`;
+            console.log(`Viewport-Höhe: ${viewportHeight}px, Chat-History max: ${availableHeight}px`);
+        } else {
+            // Fallback für ältere Browser
             modalContent.style.height = `${window.innerHeight}px`;
-            console.log(`Tastatur-Event: Modal-Höhe auf ${window.innerHeight}px gesetzt.`);
+            chatHistory.style.maxHeight = `calc(${window.innerHeight}px - 120px)`;
         }
-    };
-
+        
+        // Scrolle zum Ende der Nachrichten
+        setTimeout(() => {
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }, 100);
+    }
+};
 
     // ===================================================================
     // API HANDLER (unverändert)
