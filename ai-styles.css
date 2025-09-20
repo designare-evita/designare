@@ -1215,7 +1215,7 @@
     #ai-chat-history {
         flex: 1 1 auto !important;
         min-height: 150px !important;
-        max-height: none !important;
+        height: 100% !important;
         overflow-y: auto !important;
         
         /* Wichtig: Scroll-Verhalten optimieren */
