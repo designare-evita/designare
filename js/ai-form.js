@@ -37,35 +37,33 @@ export const initAiForm = () => {
     // ===================================================================
     // KEYBOARD RESIZE HANDLER - NEU
     // ===================================================================
-   const handleKeyboardResize = () => {
+const handleKeyboardResize = () => {
+    // Nur auf Mobile-Geräten ausführen
+    if (window.innerWidth > 768) return;
+    
     const modalContent = document.querySelector('#ai-response-modal .modal-content');
     const chatHistory = document.getElementById('ai-chat-history');
+    const chatForm = document.getElementById('ai-chat-form');
     
-    if (modalContent && chatHistory) {
-        // Verwende visualViewport API falls verfügbar (bessere Tastatur-Erkennung)
+    if (modalContent && chatHistory && chatForm) {
+        // Nutze visualViewport für bessere Tastatur-Erkennung
         if (window.visualViewport) {
             const viewportHeight = window.visualViewport.height;
             modalContent.style.height = `${viewportHeight}px`;
             
-            // Berechne verfügbare Höhe für Chat-History
-            const chatFormHeight = 70; // Geschätzte Höhe des Chat-Forms
-            const headerHeight = 50; // Geschätzte Höhe für Close-Button Bereich
-            const availableHeight = viewportHeight - chatFormHeight - headerHeight;
+            // Scrolle zum Ende der Nachrichten
+            setTimeout(() => {
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+            }, 100);
             
-            chatHistory.style.maxHeight = `${availableHeight}px`;
-            console.log(`Viewport-Höhe: ${viewportHeight}px, Chat-History max: ${availableHeight}px`);
+            console.log(`Viewport angepasst: ${viewportHeight}px`);
         } else {
             // Fallback für ältere Browser
             modalContent.style.height = `${window.innerHeight}px`;
-            chatHistory.style.maxHeight = `calc(${window.innerHeight}px - 120px)`;
         }
-        
-        // Scrolle zum Ende der Nachrichten
-        setTimeout(() => {
-            chatHistory.scrollTop = chatHistory.scrollHeight;
-        }, 100);
     }
 };
+
 
     // ===================================================================
     // API HANDLER (unverändert)
