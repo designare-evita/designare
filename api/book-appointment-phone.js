@@ -1,5 +1,9 @@
 // api/book-appointment-phone.js - KORRIGIERTER DATEINAME (ohne Bindestrich am Ende!)
 import { google } from 'googleapis';
+import * as sibi from '@getbrevo/brevo';
+
+const apiInstance = new sibi.TransactionalSMSApi();
+apiInstance.authentications['apiKey'].apiKey = process.env.BREVO_API_KEY;
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
@@ -143,6 +147,34 @@ Automatisch erstellt durch Evita AI-Assistent`,
         console.log('✅ Phone booking event created:', result.data.id);
 
         // Bestätigungs-Nachricht erstellen
+
+// --- START: NEUER CODE FÜR KUNDEN-SMS ---
+
+// Schritt A: Telefonnummer formatieren
+let formattedPhone = phone.replace(/ /g, '').replace(/\(0\)/, '');
+if (formattedPhone.startsWith('0')) {
+    formattedPhone = `+43${formattedPhone.substring(1)}`;
+}
+
+// Schritt B: SMS-Objekt erstellen
+const customerSms = {
+    sender: 'designare', // Der Absendername, den du in Brevo konfiguriert hast
+    recipient: formattedPhone,
+    content: `Hallo ${name}! Dein Rückruf-Termin bei designare.at für ${startTime.toLocaleDateString('de-AT', { weekday: 'long', hour: '2-digit', minute: '2-digit' })} Uhr wurde erfolgreich gebucht.`,
+    type: 'transactional'
+};
+
+// Schritt C: SMS versenden (mit Fehlerbehandlung)
+try {
+    await apiInstance.sendTransacSms(customerSms);
+    console.log('SMS-Bestätigung an Kunden erfolgreich gesendet.');
+} catch (smsError) {
+    // Wichtig: Logge den Fehler, aber lass die Anfrage trotzdem erfolgreich sein,
+    // da die Terminbuchung selbst ja geklappt hat.
+    console.error('Fehler beim Senden der Kunden-SMS:', smsError);
+}
+
+// --- ENDE: NEUER CODE FÜR KUNDEN-SMS ---
         const confirmationMessage = `🎉 Perfekt! Dein Rückruf-Termin ist gebucht!
 
 📅 **Termin-Details:**
