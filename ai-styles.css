@@ -162,6 +162,10 @@
     margin-bottom: 15px !important;
     min-height: 200px !important;
     max-height: 400px !important;
+
+background-image: url('../images/KI-Chat-Hintergrund.webp');
+    background-position: right; /* Bild wird zentriert */
+    background-repeat: no-repeat; /* Bild wiederholt sich nicht */
 }
 
 /* CHAT-NACHRICHTEN */
