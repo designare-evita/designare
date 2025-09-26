@@ -23,7 +23,7 @@ module.exports = async function handler(req, res) {
       return res.status(400).json({ message: 'A prompt is required.' });
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     // =================================================================
     // INTENT-ERKENNUNG NUR WENN EXPLIZIT ANGEFORDERT
