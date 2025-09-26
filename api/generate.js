@@ -26,7 +26,7 @@ export default async function handler(req, res) {
       console.log(`[PROCESSING] Verarbeite Keyword: '${keyword}'`);
 
       try {
-        const usedModel = isMasterRequest ? "gemini-1.5-pro-latest" : "gemini-1.5-flash";
+      const usedModel = isMasterRequest ? "gemini-1.5-flash-latest" : "gemini-1.5-flash";
         const model = genAI.getGenerativeModel({ model: usedModel });
 
         const prompt = factChecker.generateResponsiblePrompt(keywordData);
