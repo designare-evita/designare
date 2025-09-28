@@ -5,7 +5,7 @@
 /* Der neue, verbesserte CSS-Code */
 
 h2[id] {
-  scroll-margin-top: 70px; /* Passen Sie den Wert an die Höhe Ihres Headers an */
+  scroll-margin-top: 90px; /* Passen Sie den Wert an die Höhe Ihres Headers an */
 }
 
 html {
