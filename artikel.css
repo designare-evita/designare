@@ -1,6 +1,116 @@
 /*--------------------------------------------------------------
 # Vorschau Container (Überarbeitet)
 --------------------------------------------------------------*/
+/* Comparison Cards CSS - zu artikel.css hinzufügen */
+.comparison-grid {
+    display: grid;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.comparison-item {
+    background: linear-gradient(135deg, rgba(252, 181, 0, 0.1), rgba(252, 181, 0, 0.05));
+    border: 2px solid #FCB500;
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+.comparison-category {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #FCB500;
+    margin-bottom: 1rem;
+    text-align: center;
+    border-bottom: 2px solid #FCB500;
+    padding-bottom: 0.5rem;
+}
+
+.approach-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.approach {
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+.seo-approach {
+    background: rgba(255, 255, 255, 0.03);
+    border-left: 4px solid #aaaaaa;
+}
+
+.geo-approach {
+    background: linear-gradient(135deg, rgba(252, 181, 0, 0.15), rgba(252, 181, 0, 0.08));
+    border-left: 4px solid #FCB500;
+}
+
+.approach-title {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+.seo-approach .approach-title {
+    color: #eeeeee;
+}
+
+.geo-approach .approach-title {
+    color: #FCB500;
+}
+
+.approach-content {
+    color: #eeeeee;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.legend {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+}
+
+.legend-seo {
+    background: #aaaaaa;
+}
+
+.legend-geo {
+    background: #FCB500;
+}
+
+@media (max-width: 768px) {
+    .approach-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .comparison-item {
+        padding: 1rem;
+    }
+    
+    .comparison-category {
+        font-size: 1.1rem;
+    }
+}
+
 h4 {
   font-size: 1.2rem;
   font-weight: 600;
