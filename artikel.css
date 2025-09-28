@@ -9,7 +9,7 @@
 }
 
 .comparison-item {
-    background: linear-gradient(135deg, rgba(252, 181, 0, 0.1), rgba(252, 181, 0, 0.05));
+    /*background: linear-gradient(135deg, rgba(252, 181, 0, 0.1), rgba(252, 181, 0, 0.05));*/
     border: 0px solid #FCB500;
     border-radius: 12px;
     padding: 1.5rem;
