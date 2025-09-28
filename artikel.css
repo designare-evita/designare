@@ -4,6 +4,10 @@
 
 /* Der neue, verbesserte CSS-Code */
 
+html {
+  scroll-behavior: smooth;
+}
+
 .animated-underline {
   position: relative;
   display: inline-block; /* Passt sich der Textbreite an */
