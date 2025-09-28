@@ -2,49 +2,6 @@
 # Vorschau Container (Überarbeitet)
 --------------------------------------------------------------*/
 
-/* --- Responsive Tabelle für GEO-Vergleich --- */
-
-/* Wir wenden diese Stile nur auf Bildschirmen an, die schmaler als 768px sind. */
-@media screen and (max-width: 768px) {
-
-  .responsive-geo-table {
-    border: 0; /* Entfernt den äußeren Rahmen */
-  }
-
-  .responsive-geo-table thead {
-    /* Versteckt die klassische Tabellenüberschrift, da wir sie anders anzeigen. */
-    display: none;
-  }
-
-  .responsive-geo-table tr {
-    display: block; /* Macht aus jeder Zeile einen eigenen Block. */
-    margin-bottom: 20px; /* Abstand zwischen den "Karten". */
-    border: 1px solid #555; /* Rahmen für jede Karte. */
-    border-radius: 5px; /* Abgerundete Ecken. */
-    padding: 10px;
-  }
-
-  .responsive-geo-table td {
-    display: block; /* Zellen werden ebenfalls zu Blöcken. */
-    text-align: left; /* Text linksbündig für bessere Lesbarkeit. */
-    padding: 8px 0; /* Oben/unten Abstand. */
-    border-bottom: 1px dotted #444; /* Trennlinie zwischen den Eigenschaften. */
-  }
-
-  .responsive-geo-table td:last-child {
-    border-bottom: none; /* Die letzte "Eigenschaft" braucht keine Trennlinie. */
-  }
-
-  .responsive-geo-table td::before {
-    /* Fügt die ursprüngliche Spaltenüberschrift vor jedem Wert ein. */
-    content: attr(data-label); /* Holt den Text aus dem data-label Attribut. */
-    float: left; /* Richtet die Überschrift links aus. */
-    font-weight: bold;
-    text-transform: uppercase;
-    margin-right: 15px; /* Abstand zwischen Label und Inhalt. */
-    color: #ffffff; /* Farbe für die Labels, anpassbar. */
-  }
-}
 
 h2[id] {
   scroll-margin-top: 90px; /* Passen Sie den Wert an die Höhe Ihres Headers an */
