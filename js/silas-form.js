@@ -588,7 +588,7 @@ export function initSilasForm() {
     }
 
     function downloadTxt() {
-        const headers = [keyword", "brand", "domain", "email", "phone", "address", 
+        const headers = ["keyword", "brand", "domain", "email", "phone", "address", 
         "post_title", "post_name", "meta_title", "meta_description", 
         "h1", 
         "h2_1", "h2_1_text",
