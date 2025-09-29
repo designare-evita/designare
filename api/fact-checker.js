@@ -21,7 +21,7 @@ class FactChecker {
             flaggedClaims: [],
             confidenceScore: 95,
         };
-        const fieldsToCheck = ['hero_text', 'social_proof', 'guarantee_text', 'meta_description', 'benefits_list', 'features_list', 'benefits_list_fließtext', 'features_list_fließtext', 'testimonial_1', 'testimonial_2'];
+        const fieldsToCheck = ['hero_text', 'social_proof', 'guarantee_text', 'meta_description', 'benefits_list', 'features_list', 'benefits_list_fließtext', 'features_list_fließtext', 'testimonial_1', 'testimonial_2', 'h2_1_text', 'h2_2_text', 'h2_3_text', 'h2_4_text' ];
         let penalty = 0;
 
         fieldsToCheck.forEach(field => {
@@ -66,11 +66,15 @@ class FactChecker {
               "post_name": "nachhaltige-kaffeebohnen-kaufen",
               "meta_title": "Nachhaltige Kaffeebohnen: Worauf Sie beim Kauf achten sollten",
               "meta_description": "Entdecken Sie, woran Sie hochwertige und nachhaltige Kaffeebohnen erkennen. Tipps für fairen Anbau, Bio-Qualität und besten Geschmack.",
-              "h1": "Nachhaltige Kaffeebohnen: Ihr Weg zu fairem und aromatischem Kaffee",
-              "h2_1": "Was bedeutet Nachhaltigkeit bei Kaffee wirklich?",
-              "h2_2": "Die wichtigsten Siegel für fairen Kaffee im Überblick",
-              "h2_3": "Tipps für die Zubereitung von nachhaltigem Kaffee",
-              "h2_4": "Warum sich der Umstieg auf fairen Kaffee lohnt",
+             "h1": "Nachhaltige Kaffeebohnen: Ihr Weg zu fairem und aromatischem Kaffee",
+  "h2_1": "Was bedeutet Nachhaltigkeit bei Kaffee wirklich?",
+  "h2_1_text": "Nachhaltigkeit im Kaffeeanbau umfasst weit mehr als nur Bio-Zertifikate. Es geht um faire Löhne für Bauern, umweltschonende Anbaumethoden ohne Pestizide und eine transparente Lieferkette vom Anbau bis zur Tasse. Echter nachhaltiger Kaffee berücksichtigt soziale, ökologische und ökonomische Aspekte gleichermaßen.",
+  "h2_2": "Die wichtigsten Siegel für fairen Kaffee im Überblick",
+  "h2_2_text": "Anerkannte Zertifizierungen wie Fairtrade, Bio und Rainforest Alliance garantieren bestimmte Standards. Fairtrade sichert Mindestpreise und faire Arbeitsbedingungen, Bio-Siegel stehen für ökologischen Anbau ohne Chemikalien, während Rainforest Alliance den Fokus auf Waldschutz und Biodiversität legt. Diese Siegel sind verlässliche Orientierungshilfen beim Kauf.",
+  "h2_3": "Tipps für die Zubereitung von nachhaltigem Kaffee",
+  "h2_3_text": "Die richtige Zubereitung holt das Beste aus nachhaltigen Kaffeebohnen heraus. Frisch gemahlene Bohnen entfalten ihr Aroma optimal, während die richtige Wassertemperatur zwischen 92-96°C liegt. Eine saubere Kaffeemaschine und das richtige Verhältnis von Wasser zu Kaffee (etwa 60g pro Liter) sind entscheidend für den perfekten Geschmack.",
+  "h2_4": "Warum sich der Umstieg auf fairen Kaffee lohnt",
+  "h2_4_text": "Die Entscheidung für nachhaltigen Kaffee hat direkte positive Auswirkungen. Sie unterstützen Kleinbauern in Entwicklungsländern, schützen Regenwälder vor Abholzung und genießen oft qualitativ hochwertigeren Kaffee. Der minimale Mehrpreis fließt direkt in bessere Lebensbedingungen und Umweltschutz – ein Beitrag, der messbare Veränderungen bewirkt.",
               "primary_cta": "Jetzt Sortiment entdecken",
               "secondary_cta": "Mehr über Anbau erfahren",
               "hero_text": "Immer mehr Kaffeeliebhaber legen Wert auf Nachhaltigkeit. Doch was bedeutet das genau? Es geht um faire Arbeitsbedingungen für Kaffeebauern, umweltschonenden Anbau ohne Pestizide und eine transparente Lieferkette. Guter Kaffee sollte nicht nur schmecken, sondern auch ein gutes Gefühl hinterlassen.",
@@ -118,8 +122,49 @@ class FactChecker {
             
             Das JSON-Objekt muss exakt diese Struktur haben:
             {
-              "post_title": "...", "post_name": "...", "meta_title": "...", "meta_description": "...", "h1": "...", "h2_1": "...", "h2_2": "...", "h2_3": "...", "h2_4": "...", "primary_cta": "...", "secondary_cta": "...", "hero_text": "...", "hero_subtext": "...", "benefits_list": "...", "features_list": "...", "benefits_list_fließtext": "...", "features_list_fließtext": "...", "social_proof": "...", "testimonial_1": "...", "testimonial_2": "...", "pricing_title": "...", "price_1": "...", "price_2": "...", "price_3": "...", "faq_1": "...", "faq_answer_1": "...", "faq_2": "...", "faq_answer_2": "...", "faq_3": "...", "faq_answer_3": "...", "faq_4": "...", "faq_answer_4": "...", "faq_5": "...", "faq_answer_5": "...", "contact_info": "...", "footer_cta": "...", "trust_signals": "...", "guarantee_text": "..."
-            }
+  "post_title": "...", 
+  "post_name": "...", 
+  "meta_title": "...", 
+  "meta_description": "...", 
+  "h1": "...", 
+  "h2_1": "...", 
+  "h2_1_text": "...",
+  "h2_2": "...", 
+  "h2_2_text": "...",
+  "h2_3": "...", 
+  "h2_3_text": "...",
+  "h2_4": "...",
+  "h2_4_text": "...",
+  "primary_cta": "...", 
+  "secondary_cta": "...", 
+  "hero_text": "...", 
+  "hero_subtext": "...", 
+  "benefits_list": "...", 
+  "features_list": "...", 
+  "benefits_list_fließtext": "...", 
+  "features_list_fließtext": "...", 
+  "social_proof": "...", 
+  "testimonial_1": "...", 
+  "testimonial_2": "...", 
+  "pricing_title": "...", 
+  "price_1": "...", 
+  "price_2": "...", 
+  "price_3": "...", 
+  "faq_1": "...", 
+  "faq_answer_1": "...", 
+  "faq_2": "...", 
+  "faq_answer_2": "...", 
+  "faq_3": "...", 
+  "faq_answer_3": "...", 
+  "faq_4": "...", 
+  "faq_answer_4": "...", 
+  "faq_5": "...", 
+  "faq_answer_5": "...", 
+  "contact_info": "...", 
+  "footer_cta": "...", 
+  "trust_signals": "...", 
+  "guarantee_text": "..."
+}
         `;
     }
 }
