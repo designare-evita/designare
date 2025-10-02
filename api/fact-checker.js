@@ -115,6 +115,8 @@ class FactChecker {
             ROLLE: ${roleAndTask}
             
             🚨 WICHTIGE RICHTLINIEN:
+            - Der "meta_title" darf maximal 60 Zeichen lang sein.
+            - Die "meta_description" darf maximal 160 Zeichen lang sein.
             - VERMEIDE Superlative wie "beste", "nummer 1", "marktführer".
             - VERWENDE KEINE absoluten Begriffe wie "garantiert", "100%", "immer", "nie".
             - Deine Antwort MUSS ein einziges, valides JSON-Objekt sein. Beginne direkt mit { und ende mit }.
