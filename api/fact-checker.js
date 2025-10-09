@@ -62,7 +62,7 @@ class FactChecker {
         return `
             Hier ist ein Beispiel für einen perfekten, faktenbasierten JSON-Output zum Thema "nachhaltige Kaffeebohnen":
             {
-              "post_title": "Nachhaltige Kaffeebohnen: Genuss mit gutem Gewissen",
+              "post_title": "Nachhaltige Kaffeebohnen",
               "post_name": "nachhaltige-kaffeebohnen-kaufen",
               "meta_title": "Nachhaltiger Kaffee ➤ Bio ✓ Fair ✓ Tipps zum Kauf",
               "meta_description": "Nachhaltige Kaffeebohnen ➤ Tipps für fairen Anbau 🌱 Bio-Qualität ✓ Bester Geschmack ☕ Bewusst einkaufen & genießen.",
@@ -117,7 +117,8 @@ class FactChecker {
             🚨 WICHTIGE RICHTLINIEN:
             - Der "meta_title" darf maximal 60 Zeichen lang sein.
             - Die "meta_description" darf maximal 160 Zeichen lang sein.
-            - Verwende für "meta_title" und "meta_description" Sympole als Trennzeichen.
+            - VERWENDE für "meta_title" und "meta_description" Sympole als Trennzeichen.
+            - VERWENDE für "post_title" immer das keyword.
             - VERMEIDE Superlative wie "beste", "nummer 1", "marktführer".
             - VERWENDE KEINE absoluten Begriffe wie "garantiert", "100%", "immer", "nie".
             - Deine Antwort MUSS ein einziges, valides JSON-Objekt sein. Beginne direkt mit { und ende mit }.
