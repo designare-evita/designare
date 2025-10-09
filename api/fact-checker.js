@@ -64,8 +64,8 @@ class FactChecker {
             {
               "post_title": "Nachhaltige Kaffeebohnen: Genuss mit gutem Gewissen",
               "post_name": "nachhaltige-kaffeebohnen-kaufen",
-              "meta_title": "Nachhaltige Kaffeebohnen: Worauf Sie beim Kauf achten sollten",
-              "meta_description": "Entdecken Sie, woran Sie hochwertige und nachhaltige Kaffeebohnen erkennen. Tipps für fairen Anbau, Bio-Qualität und besten Geschmack.",
+              "meta_title": "Nachhaltiger Kaffee ➤ Bio ✓ Fair ✓ Tipps zum Kauf",
+              "meta_description": "Nachhaltige Kaffeebohnen ➤ Tipps für fairen Anbau 🌱 Bio-Qualität ✓ Bester Geschmack ☕ Bewusst einkaufen & genießen.",
              "h1": "Nachhaltige Kaffeebohnen: Ihr Weg zu fairem und aromatischem Kaffee",
   "h2_1": "Was bedeutet Nachhaltigkeit bei Kaffee wirklich?",
   "h2_1_text": "Nachhaltigkeit im Kaffeeanbau umfasst weit mehr als nur Bio-Zertifikate. Es geht um faire Löhne für Bauern, umweltschonende Anbaumethoden ohne Pestizide und eine transparente Lieferkette vom Anbau bis zur Tasse. Echter nachhaltiger Kaffee berücksichtigt soziale, ökologische und ökonomische Aspekte gleichermaßen.",
@@ -117,6 +117,7 @@ class FactChecker {
             🚨 WICHTIGE RICHTLINIEN:
             - Der "meta_title" darf maximal 60 Zeichen lang sein.
             - Die "meta_description" darf maximal 160 Zeichen lang sein.
+            - Verwende für "meta_title" und "meta_description" Sympole als Trennzeichen.
             - VERMEIDE Superlative wie "beste", "nummer 1", "marktführer".
             - VERWENDE KEINE absoluten Begriffe wie "garantiert", "100%", "immer", "nie".
             - Deine Antwort MUSS ein einziges, valides JSON-Objekt sein. Beginne direkt mit { und ende mit }.
