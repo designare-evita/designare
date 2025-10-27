@@ -35,11 +35,11 @@ function cleanJsonString(str) {
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 // Modell-Hierarchie: vom besten zum Fallback
+// Stand Oktober 2025: Gemini 1.5 wurde im April 2025 eingestellt
 const MODEL_HIERARCHY = [
-    "gemini-2.0-flash-exp",
-    "gemini-1.5-pro",
-    "gemini-1.5-flash",
-    "gemini-1.0-pro"
+    "gemini-2.5-flash",           // Stabile Version, schnell und effizient
+    "gemini-2.5-flash-lite",      // Noch schneller, kosteneffizienter
+    "gemini-2.0-flash-exp"        // Experimentell
 ];
 
 /**
@@ -48,7 +48,7 @@ const MODEL_HIERARCHY = [
 async function generateContentWithRetry(prompt, preferredModel, maxRetries = 3) {
     const modelsToTry = preferredModel === "gemini-2.5-pro" 
         ? MODEL_HIERARCHY 
-        : ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-1.0-pro"];
+        : ["gemini-2.5-flash-lite", "gemini-2.5-flash", "gemini-2.0-flash-exp"];
     
     let lastError = null;
     
@@ -114,7 +114,7 @@ export default async function handler(req, res) {
       console.log(`\n[PROCESSING] Keyword: '${keyword}'`);
 
       try {
-        const preferredModel = isMasterRequest ? "gemini-2.5-pro" : "gemini-1.5-flash";
+        const preferredModel = isMasterRequest ? "gemini-2.5-pro" : "gemini-2.5-flash-lite";
         const prompt = factChecker.generateResponsiblePrompt(keywordData);
 
         // Generiere Inhalt mit Retry-Logik
