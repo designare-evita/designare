@@ -7,8 +7,32 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const factChecker = new FactChecker();
 
 function cleanJsonString(str) {
-    // Entfernt Markdown-Codeblöcke und trimmt Leerzeichen
-    return str.replace(/```json/g, '').replace(/```/g, '').trim();
+    // Entfernt alle Arten von Markdown-Codeblöcken
+    let cleaned = str
+        .replace(/```json\s*/gi, '')  // Entfernt ```json mit optionalen Leerzeichen
+        .replace(/```javascript\s*/gi, '')  // Entfernt ```javascript
+        .replace(/```\s*/g, '')  // Entfernt verbleibende ```
+        .trim();
+    
+    // Versuche, den ersten { und letzten } zu finden (JSON-Objekt)
+    const firstBrace = cleaned.indexOf('{');
+    const lastBrace = cleaned.lastIndexOf('}');
+    
+    if (firstBrace !== -1 && lastBrace !== -1 && firstBrace < lastBrace) {
+        cleaned = cleaned.substring(firstBrace, lastBrace + 1);
+    }
+    
+    // Versuche alternativ, das erste [ und letzte ] zu finden (JSON-Array)
+    if (!cleaned.startsWith('{')) {
+        const firstBracket = cleaned.indexOf('[');
+        const lastBracket = cleaned.lastIndexOf(']');
+        
+        if (firstBracket !== -1 && lastBracket !== -1 && firstBracket < lastBracket) {
+            cleaned = cleaned.substring(firstBracket, lastBracket + 1);
+        }
+    }
+    
+    return cleaned.trim();
 }
 
 // Hilfsfunktion für Verzögerungen
@@ -47,20 +71,33 @@ export default async function handler(req, res) {
 
         let jsonData = {};
         let parseError = false;
+        let originalText = text; // Speichere den Originaltext für Debugging
 
         try {
-            // Versuche, die Antwort als JSON zu parsen
-            jsonData = JSON.parse(cleanJsonString(text));
+            // Bereinige den Text und versuche zu parsen
+            const cleanedText = cleanJsonString(text);
+            
+            // Debug-Log für Entwicklung (kann später entfernt werden)
+            if (!cleanedText.startsWith('{') && !cleanedText.startsWith('[')) {
+                console.warn(`[WARN] Bereinigter Text für '${keyword}' startet nicht mit { oder [. Erste 100 Zeichen:`, cleanedText.substring(0, 100));
+            }
+            
+            jsonData = JSON.parse(cleanedText);
         } catch (e) {
-            console.warn(`[WARN] JSON-Parsing für '${keyword}' fehlgeschlagen. Versuche Fallback. Fehler:`, e.message);
+            console.warn(`[WARN] JSON-Parsing für '${keyword}' fehlgeschlagen. Fehler:`, e.message);
+            console.warn(`[DEBUG] Erste 200 Zeichen der ursprünglichen Antwort:`, originalText.substring(0, 200));
+            console.warn(`[DEBUG] Erste 200 Zeichen nach Bereinigung:`, cleanJsonString(originalText).substring(0, 200));
+            
             parseError = true;
             // Erstelle ein Fallback-Objekt im Fehlerfall
             jsonData = {
                 post_title: `Fehler bei der Inhalts-Erstellung für: ${keyword}`,
                 meta_description: "Der von der KI generierte Inhalt war kein valides JSON und konnte nicht verarbeitet werden.",
                 h1: `Verarbeitungsfehler für: ${keyword}`,
+                content: "<p>Die KI-Antwort konnte nicht korrekt verarbeitet werden. Bitte versuche es erneut.</p>",
                 _fallback_used: true,
-                _parse_error: e.message
+                _parse_error: e.message,
+                _raw_response_preview: originalText.substring(0, 500) // Erste 500 Zeichen für Debugging
             };
         }
 
@@ -77,7 +114,12 @@ export default async function handler(req, res) {
         jsonData.email = email;
         jsonData.phone = phone;
         jsonData.brand = brand;
-        jsonData._meta = { model_used: usedModel, generation_time: new Date().toISOString(), master_mode: isMasterRequest, success: !parseError };
+        jsonData._meta = { 
+            model_used: usedModel, 
+            generation_time: new Date().toISOString(), 
+            master_mode: isMasterRequest, 
+            success: !parseError 
+        };
 
         console.log(`✅ Antwort für '${keyword}' bereit.`);
         results.push(jsonData); // Füge das Ergebnis zur Liste hinzu
@@ -85,7 +127,16 @@ export default async function handler(req, res) {
       } catch (error) {
         console.error(`💥 Fehler bei der Verarbeitung von '${keyword}':`, error);
         // Füge ein Fehlerobjekt zur Ergebnisliste hinzu
-        results.push({ keyword, intent, brand, error: error.message, _meta: { success: false, master_mode: isMasterRequest } });
+        results.push({ 
+            keyword, 
+            intent, 
+            brand, 
+            error: error.message, 
+            _meta: { 
+                success: false, 
+                master_mode: isMasterRequest 
+            } 
+        });
       }
 
       // Füge eine Verzögerung ein, um das Rate Limit der API nicht zu überschreiten
