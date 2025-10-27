@@ -1,20 +1,18 @@
-// api/generate.js - Aktualisierte Version mit sequenzieller Verarbeitung und Qualitätskontrolle
+// api/generate.js - Version mit Retry-Logik und Modell-Fallback
 
 const { GoogleGenerativeAI } = require("@google/generative-ai");
-const { FactChecker } = require('./fact-checker.js'); // Stelle sicher, dass der Pfad korrekt ist
+const { FactChecker } = require('./fact-checker.js');
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const factChecker = new FactChecker();
 
 function cleanJsonString(str) {
-    // Entfernt alle Arten von Markdown-Codeblöcken
     let cleaned = str
-        .replace(/```json\s*/gi, '')  // Entfernt ```json mit optionalen Leerzeichen
-        .replace(/```javascript\s*/gi, '')  // Entfernt ```javascript
-        .replace(/```\s*/g, '')  // Entfernt verbleibende ```
+        .replace(/```json\s*/gi, '')
+        .replace(/```javascript\s*/gi, '')
+        .replace(/```\s*/g, '')
         .trim();
     
-    // Versuche, den ersten { und letzten } zu finden (JSON-Objekt)
     const firstBrace = cleaned.indexOf('{');
     const lastBrace = cleaned.lastIndexOf('}');
     
@@ -22,7 +20,6 @@ function cleanJsonString(str) {
         cleaned = cleaned.substring(firstBrace, lastBrace + 1);
     }
     
-    // Versuche alternativ, das erste [ und letzte ] zu finden (JSON-Array)
     if (!cleaned.startsWith('{')) {
         const firstBracket = cleaned.indexOf('[');
         const lastBracket = cleaned.lastIndexOf(']');
@@ -35,8 +32,69 @@ function cleanJsonString(str) {
     return cleaned.trim();
 }
 
-// Hilfsfunktion für Verzögerungen
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+// Modell-Hierarchie: vom besten zum Fallback
+const MODEL_HIERARCHY = [
+    "gemini-2.0-flash-exp",
+    "gemini-1.5-pro",
+    "gemini-1.5-flash",
+    "gemini-1.0-pro"
+];
+
+/**
+ * Generiert Inhalt mit automatischem Retry und Modell-Fallback
+ */
+async function generateContentWithRetry(prompt, preferredModel, maxRetries = 3) {
+    const modelsToTry = preferredModel === "gemini-2.5-pro" 
+        ? MODEL_HIERARCHY 
+        : ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-1.0-pro"];
+    
+    let lastError = null;
+    
+    for (const modelName of modelsToTry) {
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+                console.log(`[ATTEMPT] Modell: ${modelName}, Versuch: ${attempt}/${maxRetries}`);
+                
+                const model = genAI.getGenerativeModel({ model: modelName });
+                const result = await model.generateContent(prompt);
+                const response = await result.response;
+                const text = await response.text();
+                
+                console.log(`✅ Erfolg mit Modell: ${modelName}`);
+                return { text, modelUsed: modelName };
+                
+            } catch (error) {
+                lastError = error;
+                const errorMessage = error.message || String(error);
+                
+                console.warn(`⚠️ Fehler mit ${modelName} (Versuch ${attempt}/${maxRetries}):`, errorMessage);
+                
+                // Bei 503 (Überlastung) oder 429 (Rate Limit) -> nächstes Modell versuchen
+                if (errorMessage.includes('503') || errorMessage.includes('overloaded') || 
+                    errorMessage.includes('429') || errorMessage.includes('quota')) {
+                    
+                    if (attempt < maxRetries) {
+                        // Exponentielles Backoff: 2s, 4s, 8s
+                        const waitTime = Math.pow(2, attempt) * 1000;
+                        console.log(`⏳ Warte ${waitTime/1000}s vor erneutem Versuch...`);
+                        await delay(waitTime);
+                    } else {
+                        console.log(`⏭️ Wechsle zum nächsten Modell...`);
+                        break; // Nächstes Modell versuchen
+                    }
+                } else {
+                    // Bei anderen Fehlern (z.B. API-Key ungültig) -> sofort abbrechen
+                    throw error;
+                }
+            }
+        }
+    }
+    
+    // Wenn alle Modelle fehlschlagen
+    throw new Error(`Alle Modelle fehlgeschlagen. Letzter Fehler: ${lastError?.message || lastError}`);
+}
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -45,51 +103,42 @@ export default async function handler(req, res) {
 
   try {
     const { keywords } = req.body;
-    // Prüft, ob ein spezieller Header für den Master-Modus gesetzt ist
     const isMasterRequest = req.headers['x-silas-master'] === process.env.SILAS_MASTER_PASSWORD;
 
     console.log(`[START] Beginne Verarbeitung für ${keywords.length} Keywords. Master-Modus: ${isMasterRequest}`);
 
     const results = [];
-    // Gehe durch jedes Keyword nacheinander
+    
     for (const keywordData of keywords) {
       const { keyword, intent, domain, email, phone, brand } = keywordData;
-      console.log(`[PROCESSING] Verarbeite Keyword: '${keyword}'`);
+      console.log(`\n[PROCESSING] Keyword: '${keyword}'`);
 
       try {
-        // Wähle das Modell basierend auf dem Master-Modus
-        const usedModel = isMasterRequest ? "gemini-2.5-pro" : "gemini-2.5-flash";
-        const model = genAI.getGenerativeModel({ model: usedModel });
-
-        // Erstelle den Prompt für die KI
+        const preferredModel = isMasterRequest ? "gemini-2.5-pro" : "gemini-1.5-flash";
         const prompt = factChecker.generateResponsiblePrompt(keywordData);
 
-        // Generiere den Inhalt für das aktuelle Keyword
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        let text = await response.text();
+        // Generiere Inhalt mit Retry-Logik
+        const { text, modelUsed } = await generateContentWithRetry(prompt, preferredModel);
 
         let jsonData = {};
         let parseError = false;
-        let originalText = text; // Speichere den Originaltext für Debugging
+        let originalText = text;
 
         try {
-            // Bereinige den Text und versuche zu parsen
             const cleanedText = cleanJsonString(text);
             
-            // Debug-Log für Entwicklung (kann später entfernt werden)
             if (!cleanedText.startsWith('{') && !cleanedText.startsWith('[')) {
-                console.warn(`[WARN] Bereinigter Text für '${keyword}' startet nicht mit { oder [. Erste 100 Zeichen:`, cleanedText.substring(0, 100));
+                console.warn(`[WARN] Bereinigter Text für '${keyword}' startet nicht mit { oder [`);
+                console.warn(`[DEBUG] Erste 100 Zeichen:`, cleanedText.substring(0, 100));
             }
             
             jsonData = JSON.parse(cleanedText);
+            
         } catch (e) {
-            console.warn(`[WARN] JSON-Parsing für '${keyword}' fehlgeschlagen. Fehler:`, e.message);
-            console.warn(`[DEBUG] Erste 200 Zeichen der ursprünglichen Antwort:`, originalText.substring(0, 200));
-            console.warn(`[DEBUG] Erste 200 Zeichen nach Bereinigung:`, cleanJsonString(originalText).substring(0, 200));
+            console.warn(`[WARN] JSON-Parsing für '${keyword}' fehlgeschlagen:`, e.message);
+            console.warn(`[DEBUG] Original (erste 200 Zeichen):`, originalText.substring(0, 200));
             
             parseError = true;
-            // Erstelle ein Fallback-Objekt im Fehlerfall
             jsonData = {
                 post_title: `Fehler bei der Inhalts-Erstellung für: ${keyword}`,
                 meta_description: "Der von der KI generierte Inhalt war kein valides JSON und konnte nicht verarbeitet werden.",
@@ -97,17 +146,15 @@ export default async function handler(req, res) {
                 content: "<p>Die KI-Antwort konnte nicht korrekt verarbeitet werden. Bitte versuche es erneut.</p>",
                 _fallback_used: true,
                 _parse_error: e.message,
-                _raw_response_preview: originalText.substring(0, 500) // Erste 500 Zeichen für Debugging
+                _raw_response_preview: originalText.substring(0, 500)
             };
         }
 
-        // Führe die Qualitätskontrolle durch, wenn das Parsen erfolgreich war
         if (!parseError) {
             const factCheckResult = await factChecker.checkContent(jsonData, keyword);
             jsonData._factCheck = factCheckResult;
         }
 
-        // Füge Metadaten und ursprüngliche Keyword-Daten hinzu
         jsonData.keyword = keyword;
         jsonData.intent = intent;
         jsonData.domain = domain;
@@ -115,23 +162,24 @@ export default async function handler(req, res) {
         jsonData.phone = phone;
         jsonData.brand = brand;
         jsonData._meta = { 
-            model_used: usedModel, 
+            model_used: modelUsed,
+            model_requested: preferredModel,
             generation_time: new Date().toISOString(), 
             master_mode: isMasterRequest, 
             success: !parseError 
         };
 
-        console.log(`✅ Antwort für '${keyword}' bereit.`);
-        results.push(jsonData); // Füge das Ergebnis zur Liste hinzu
+        console.log(`✅ Antwort für '${keyword}' bereit (Modell: ${modelUsed})`);
+        results.push(jsonData);
 
       } catch (error) {
-        console.error(`💥 Fehler bei der Verarbeitung von '${keyword}':`, error);
-        // Füge ein Fehlerobjekt zur Ergebnisliste hinzu
+        console.error(`💥 Fehler bei '${keyword}':`, error.message);
         results.push({ 
             keyword, 
             intent, 
             brand, 
-            error: error.message, 
+            error: error.message,
+            error_type: error.name,
             _meta: { 
                 success: false, 
                 master_mode: isMasterRequest 
@@ -139,19 +187,19 @@ export default async function handler(req, res) {
         });
       }
 
-      // Füge eine Verzögerung ein, um das Rate Limit der API nicht zu überschreiten
-      // 1 Sekunde Verzögerung (1000ms), reduziere auf 0.1s (100ms) im Master-Modus
-      await delay(isMasterRequest ? 100 : 1000);
-    } // Ende der for...of Schleife
+      // Rate Limiting zwischen Keywords
+      await delay(isMasterRequest ? 200 : 1500);
+    }
 
-    console.log('✅ Alle Antworten bereit, sende zum Client.');
-    return res.status(200).json(results); // Sende die gesammelten Ergebnisse
+    console.log('\n✅ Alle Antworten bereit, sende zum Client.');
+    return res.status(200).json(results);
 
   } catch (error) {
-    console.error('💥 Unerwarteter, kritischer Fehler im Handler:', error);
+    console.error('💥 Kritischer Fehler im Handler:', error);
     res.status(500).json({
       error: 'Interner Server-Fehler',
-      details: 'Ein unerwarteter Fehler ist aufgetreten. Bitte überprüfe die Server-Logs.'
+      details: error.message,
+      timestamp: new Date().toISOString()
     });
   }
 }
