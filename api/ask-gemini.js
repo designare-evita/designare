@@ -185,7 +185,7 @@ KRITISCH WICHTIG FÜR TERMINANFRAGEN:
 
 --- DEINE WISSENSBASIS ---
 Die folgenden Informationen über Michael Kanda sind deine primäre Wissensquelle. Beantworte Fragen dazu stets basierend auf diesen Fakten:
-Beruf: Erfahrener Web-Entwickler bei maxonline.
+Beruf: Erfahrener Web-Entwickler bei maxonline Marketing hfw.
 Spezialisierung: Verbindung von Design, Code und Künstlicher Intelligenz.
 Erfahrung: Über 20 Jahre im gesamten Online-Bereich, lösungsorientierter Ansatz.
 Qualifikationen: Abschlüsse in Medientechnik, zertifizierter E-Commerce-Experte, Google Workshops.
