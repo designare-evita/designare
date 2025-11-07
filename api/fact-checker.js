@@ -36,7 +36,7 @@ class FactChecker {
                 });
             }
         });
-        
+
         result.confidenceScore = Math.max(30, 95 - penalty);
         console.log(`E-E-A-T Check für '${keyword}': Score ${result.confidenceScore}%, ${result.flaggedClaims.length} problematische Phrasen gefunden.`);
         return result;
@@ -45,9 +45,9 @@ class FactChecker {
     generateResponsiblePrompt(keywordData) {
         const { keyword, intent, zielgruppe, tonalitaet, usp, domain, email, phone, address, brand, grammaticalPerson } = keywordData;
 
-        const roleAndTask = intent === 'commercial' 
-            ? 'Du bist ein erstklassiger Marketing-Texter und SEO-Stratege. Dein Stil ist überzeugend, klar und auf Conversions ausgerichtet.'
-            : 'Du bist ein Fachexperte und SEO-Redakteur. Dein Stil ist informativ, klar und hilfreich.';
+        const roleAndTask = intent === 'commercial'
+            ? 'Du bist ein erstklassiger, menschenähnlicher Marketing-Texter und SEO-Stratege. Dein Stil ist überzeugend, menschlich, natürlich, klar und auf Conversions ausgerichtet.'
+            : 'Du bist ein menschenähnlicher Fachexperte und SEO-Redakteur. Dein Stil ist natürlich, informativ, klar und hilfreich. Du schreibst für Menschen, die echten Mehrwert aus deinen Texten ziehen wollen.';
 
         let kontext = "";
         if (brand) kontext += `- BRAND/ANSPRECHPARTNER: ${brand}\n`;
@@ -60,50 +60,50 @@ class FactChecker {
         if (address) kontext += `- ADRESSE FÜR CTA: ${address}\n`;
 
         return `
-            Hier ist ein Beispiel für einen perfekten, faktenbasierten JSON-Output zum Thema "nachhaltige Kaffeebohnen":
+            Hier ist ein Beispiel für einen perfekten, faktenbasierten JSON-Output zum Thema "SEO & GEO Agentur":
             {
-              "post_title": "Nachhaltige Kaffeebohnen",
-              "post_name": "nachhaltige-kaffeebohnen-kaufen",
-              "meta_title": "Nachhaltiger Kaffee ➤ Bio ✓ Fair ✓ Tipps zum Kauf",
-              "meta_description": "Nachhaltige Kaffeebohnen ➤ Tipps für fairen Anbau 🌱 Bio-Qualität ✓ Bester Geschmack ☕ Bewusst einkaufen & genießen.",
-             "h1": "Nachhaltige Kaffeebohnen: Ihr Weg zu fairem und aromatischem Kaffee",
-  "h2_1": "Was bedeutet Nachhaltigkeit bei Kaffee wirklich?",
-  "h2_1_text": "Nachhaltigkeit im Kaffeeanbau umfasst weit mehr als nur Bio-Zertifikate. Es geht um faire Löhne für Bauern, umweltschonende Anbaumethoden ohne Pestizide und eine transparente Lieferkette vom Anbau bis zur Tasse. Echter nachhaltiger Kaffee berücksichtigt soziale, ökologische und ökonomische Aspekte gleichermaßen.",
-  "h2_2": "Die wichtigsten Siegel für fairen Kaffee im Überblick",
-  "h2_2_text": "Anerkannte Zertifizierungen wie Fairtrade, Bio und Rainforest Alliance garantieren bestimmte Standards. Fairtrade sichert Mindestpreise und faire Arbeitsbedingungen, Bio-Siegel stehen für ökologischen Anbau ohne Chemikalien, während Rainforest Alliance den Fokus auf Waldschutz und Biodiversität legt. Diese Siegel sind verlässliche Orientierungshilfen beim Kauf.",
-  "h2_3": "Tipps für die Zubereitung von nachhaltigem Kaffee",
-  "h2_3_text": "Die richtige Zubereitung holt das Beste aus nachhaltigen Kaffeebohnen heraus. Frisch gemahlene Bohnen entfalten ihr Aroma optimal, während die richtige Wassertemperatur zwischen 92-96°C liegt. Eine saubere Kaffeemaschine und das richtige Verhältnis von Wasser zu Kaffee (etwa 60g pro Liter) sind entscheidend für den perfekten Geschmack.",
-  "h2_4": "Warum sich der Umstieg auf fairen Kaffee lohnt",
-  "h2_4_text": "Die Entscheidung für nachhaltigen Kaffee hat direkte positive Auswirkungen. Sie unterstützen Kleinbauern in Entwicklungsländern, schützen Regenwälder vor Abholzung und genießen oft qualitativ hochwertigeren Kaffee. Der minimale Mehrpreis fließt direkt in bessere Lebensbedingungen und Umweltschutz – ein Beitrag, der messbare Veränderungen bewirkt.",
-              "primary_cta": "Jetzt Sortiment entdecken",
-              "secondary_cta": "Mehr über Anbau erfahren",
-              "hero_text": "Immer mehr Kaffeeliebhaber legen Wert auf Nachhaltigkeit. Doch was bedeutet das genau? Es geht um faire Arbeitsbedingungen für Kaffeebauern, umweltschonenden Anbau ohne Pestizide und eine transparente Lieferkette. Guter Kaffee sollte nicht nur schmecken, sondern auch ein gutes Gefühl hinterlassen.",
-              "hero_subtext": "Erfahren Sie, wie Sie mit jeder Tasse einen Unterschied machen können.",
-              "benefits_list": "<ul><li>Faire Löhne und sichere Arbeitsbedingungen für Kaffeebauern unterstützen.</li><li>Die Umwelt durch biologischen Anbau und den Verzicht auf Monokulturen schonen.</li><li>Höhere Qualität und reineren Geschmack durch sorgfältige, traditionelle Anbaumethoden genießen.</li><li>Transparenz über die Herkunft und Verarbeitung der Bohnen erhalten.</li></ul>",
-              "features_list": "<ul><li>Zertifiziert durch anerkannte Siegel wie Fairtrade, Bio oder Rainforest Alliance.</li><li>Schonende Langzeit-Trommelröstung zur vollen Entfaltung der Aromen.</li><li>Direkter Handel (Direct Trade) mit Kaffeekooperativen vor Ort.</li><li>Verpackung aus recycelbaren Materialien.</li></ul>",
-              "benefits_list_fließtext": "Unterstützen Sie faire Löhne und sichere Arbeitsbedingungen für Kaffeebauern, schonen Sie die Umwelt durch biologischen Anbau und genießen Sie höhere Qualität durch traditionelle Methoden.",
-              "features_list_fließtext": "Unser Kaffee ist durch Siegel wie Fairtrade und Bio zertifiziert, wird schonend geröstet und direkt von Kooperativen bezogen. Zudem verwenden wir recycelbare Verpackungen.",
-              "social_proof": "Von über 3.000 zufriedenen Kunden als 'hervorragend' bewertet.",
-              "testimonial_1": "Der beste Kaffee, den ich seit langem getrunken habe. Man schmeckt die Qualität und das gute Gewissen trinkt mit. - Anna L., Wien",
-              "testimonial_2": "Endlich ein Anbieter, bei dem Transparenz wirklich gelebt wird. Die Informationen zur Herkunft sind erstklassig. - Markus T., Berlin",
-              "pricing_title": "Unsere nachhaltigen Kaffeesorten",
-              "price_1": "Mild & Ausgewogen: Ideal für den täglichen Genuss. 1kg Bohnen.",
-              "price_2": "Kräftig & Intensiv: Perfekt für Espresso und Cappuccino. 1kg Bohnen.",
-              "price_3": "Entkoffeiniert & Aromatisch: Voller Geschmack, ohne Koffein. 1kg Bohnen.",
-              "faq_1": "Ist Bio-Kaffee automatisch auch fair gehandelt?",
-              "faq_answer_1": "Nicht unbedingt. Ein Bio-Siegel bestätigt den ökologischen Anbau, während ein Fairtrade-Siegel auf soziale und ökonomische Fairness achtet. Für maximale Nachhaltigkeit ist eine Kombination beider Siegel empfehlenswert.",
-              "faq_2": "Wie erkenne ich wirklich nachhaltigen Kaffee?",
-              "faq_answer_2": "Achten Sie auf anerkannte Siegel. Informieren Sie sich zudem auf der Webseite des Anbieters über die Herkunft und die Handelsbeziehungen. Direkter Handel (Direct Trade) ist oft ein sehr gutes Zeichen für Fairness und Qualität.",
-              "faq_3": "Ist nachhaltiger Kaffee teurer?",
-              "faq_answer_3": "Nachhaltiger Kaffee ist oft etwas teurer, da faire Löhne und umweltschonende Methoden mehr Kosten verursachen. Dieser Aufpreis ist jedoch eine direkte Investition in bessere Lebensbedingungen und den Schutz der Umwelt.",
-              "faq_4": "Welche Rolle spielt die Röstung?",
-              "faq_answer_4": "Die Röstung ist entscheidend für das Aroma. Eine schonende Langzeit-Trommelröstung bei niedrigen Temperaturen sorgt dafür, dass sich die Aromen voll entfalten können und der Kaffee bekömmlicher wird.",
-              "faq_5": "Woher beziehen Sie Ihren Kaffee?",
-              "faq_answer_5": "Wir setzen auf direkten Handel mit kleinen Kaffeekooperativen in den besten Anbaugebieten der Welt. Das sichert nicht nur exzellente Qualität, sondern auch eine faire Bezahlung der Bauern.",
-              "contact_info": "Bei Fragen zu unseren Kaffeesorten stehen wir Ihnen unter beispiel@kaffee.de oder unter 0123 456789 zur Verfügung. Unsere Adresse: Kaffeestraße 1, 12345 Röststadt",
-              "footer_cta": "Entdecken Sie jetzt die Vielfalt nachhaltiger Kaffees",
-              "trust_signals": "Bio-zertifiziert | Fairtrade-Partner | CO2-neutraler Versand",
-              "guarantee_text": "Wir stehen für Qualität und Transparenz in jeder Bohne."
+              "post_title": "SEO & GEO Agentur",
+              "post_name": "seo-geo-agentur",
+              "meta_title": "SEO & GEO Agentur ➤ Mehr Sichtbarkeit auf Google und in KI",
+              "meta_description": "Jetzt mit SEO & GEO auf Platz 1 in Google & KI ✓ SEO Agentur ✓ Über 500 erfolgreiche Projekte ✓ Kostenfreies Erstgespräch.",
+             "h1": "SEO Agentur: Mehr Sichtbarkeit auf Google und in KI",
+  "h2_1": "Mehr als nur eine SEO und GEO Agentur",
+  "h2_1_text": "Auf den ersten Blick könnte man meinen, wir sind eine klassische SEO und GEO Agentur mit Sitz in Niederösterreich. Näher betrachtet sind wir aber mehr als das. Ob SEO, GEO oder LLMO – wir sorgen dafür, dass dein Unternehmen nicht nur gefunden, sondern auch verstanden wird. Wir hören zu, analysieren, recherchieren, denken mit und setzen um. Mit Leidenschaft, Struktur und dem Ziel, dein Unternehmen online maximal sichtbar zu machen.",
+  "h2_2": "Mehr Sichtbarkeit in Suchmaschinen und KI sichern",
+  "h2_2_text": "Professionelle Suchmaschinenoptimierung (SEO) bringt deine Website nachhaltig auf Top-Positionen bei Google &amp; Co. Gleichzeitig sorgt Generative Engine Optimization (GEO) bzw. LLMO (Large Language Model Optimization) dafür, dass deine Inhalte auch in den Antworten von KI-Sprachmodellen wie ChatGPT, Gemini, Perplexity oder im Google AI Mode präsent sind. Wir helfen dir und deinem Unternehmen dabei, diese Sichtbarkeit zu erreichen.",
+  "h2_3": "Mehr Reichweite bedeutet mehr Anfragen & Umsatz",
+  "h2_3_text": "Gezielte SEO-Strategien steigern deine Online-Sichtbarkeit und damit deine Reichweite. Das führt mehr potenzielle Kunden direkt auf deine Website. Durch GEO wirst du zusätzlich dort gefunden, wo Nutzer zunehmend suchen: in KI-gestützten Systemen. Wir vereinen SEO und GEO mit Conversion-Optimierung und gut gestalteten Landingpages. So generierst du konstant neue Anfragen und steigerst langfristig deinen Umsatz.",
+  "h2_4": "Nachhaltiges organisches Wachstum statt teurer Werbung",
+  "h2_4_text": "SEO und GEO wirken dauerhaft und sind deutlich nachhaltiger als kurzfristige Werbeanzeigen. Laut einer empirischen Studie der NYU Stern School of Business zeigen organische Suchergebnisse nachhaltigere Leistung im Vergleich zu bezahlter Werbung, wobei Keyword-spezifische Faktoren einen statistisch signifikant stärkeren Einfluss auf organische Suche haben als auf bezahlte Anzeigen.",
+              "primary_cta": "Jetzt beraten lassen",
+              "secondary_cta": "Mehr erfahren",
+              "hero_text": "Als Marketing-Leiter oder Geschäftsführer weißt du: Digitale Sichtbarkeit ist entscheidend. Doch mit der Entwicklung von KI-Suchmaschinen ändern sich die Regeln. Wir helfen dir, nicht nur gefunden zu werden, sondern als erste Wahl in generativen Antworten zu erscheinen. Entdecke, wie du mit einer cleveren GEO-Strategie der Konkurrenz einen Schritt voraus bist.",
+              "hero_subtext": "Wir setzen uns für deinen nachhaltigen digitalen Erfolg ein",
+              "benefits_list_fließtext": "Steigere deine Sichtbarkeit in Suchmaschinen und KI-generierten Antworten, erhöhe deine Markenautorität durch strategische PR und profitiere von einer integrierten Marketingstrategie aus einer Hand, um deine Zielgruppe präziser zu erreichen.",
+              "benefits_list": "<ul><li>Steigere deine Sichtbarkeit in herkömmlichen Suchmaschinen (SEO).</li><li>Optimiere deine Inhalte für KI-basierte Suchergebnisse (GEO).</li><li>Erhöhe deine Markenautorität durch strategische Digitale PR &amp; Backlinks.</li><li>Profitiere von einer integrierten Marketingstrategie aus einer Hand.</li><li>Erreiche deine Zielgruppe präziser und effektiver.</li></ul>",
+              "features_list_fließtext": "Wir bieten dir ganzheitliche SEO-Analysen, spezialisierte GEO-Strategien, professionelle Content-Erstellung, gezielten Backlink-Aufbau und kontinuierliches Monitoring für optimale Ergebnisse.",
+              "features_list": "<ul><li>Ganzheitliche SEO-Analyse &amp; On-Page/Off-Page Optimierung.</li><li>Spezialisierte GEO-Strategien für generative Engines.</li><li>Professionelle Content-Erstellung und -Optimierung.</li><li>Gezielter Aufbau hochwertiger Backlinks und Digitale PR.</li><li>Kontinuierliches Monitoring und Reporting der Performance.</li></ul>",
+              "social_proof": "Über 150 Unternehmen vertrauen bereits auf unsere Expertise in digitaler Sichtbarkeit.",
+              "testimonial_1": "Dank der Arbeit des gesamten maxonline Teams hat sich unsere Sichtbarkeit in kürzester Zeit enorm gesteigert, was sich natürlich auch direkt positiv auf unseren Umsatz ausgewirkt hat. - Anna L., Wien",
+              "testimonial_2": "Eine ganz klare Weiterempfehlung für alle, die wirklich Ergebnisse sehen wollen und gleichzeitig Wert auf eine persönliche, professionelle und ehrliche Zusammenarbeit legen. - Markus T., Berlin",
+              "pricing_title": "Laufende SEO & GEO Betreuung",
+              "price_1": "<strong>Starter</strong><br />Für den Einstieg in die Sichtbarkeit. Ideal für kleine Unternehmen, die ihre Online-Präsenz gezielt aufbauen wollen.<br />✅ SEO-Grundanalyse<br />✅ Keyword-Strategie<br />✅ Onpage-Optimierung<br />✅ laufende Betreuung<br /><strong>ab 790 € pro Monat</strong>",
+              "price_2": "<strong>Pro</strong><br />Für wachsende Marken mit klaren Zielen. Du willst mehr Reichweite, bessere Rankings und sichtbare Ergebnisse.<br />✅ SEO + GEO-Strategie<br />✅ Technisches SEO & Content-Optimierung<br />✅ Linkstruktur & Performance<br />✅ laufende Betreuung<br /><strong>ab 1.990 € pro Monat</strong>",
+              "price_3": "<strong>Maximal</strong><br />Für Unternehmen, die online ganz vorne stehen wollen. Hier entsteht Sichtbarkeit mit System – dauerhaft und messbar.<br />✅ SEO + GEO + LLMO-Komplettpaket<br />✅ Content- & KI-Optimierung<br />✅ Laufende Analysen & Reports<br />✅ Laufende Betreuung<br /><strong>ab 3.990 € pro Monat</strong>",
+              "faq_1": "Wie läuft eine SEO und GEO Betreuung bei [BRANDNAME] ab?",
+              "faq_answer_1": "Bei uns werden moderne SEO mit KI-gestützten Tools kombiniert, um gezielt Inhalte, Strukturen und Keywords zu optimieren. Dabei bekommst du persönliche Betreuung und regelmäßige Analysen, um Fortschritte messbar zu machen. Ziel ist nicht nur ein besseres Ranking bei Google, sondern auch langfristige Sichtbarkeit – auch in KI-Systemen wie ChatGPT.",
+              "faq_2": "Wie lange dauert es normalerweise, bis SEO-Maßnahmen Wirkung zeigen?",
+              "faq_answer_2": "SEO ist in der Regel eine mittel- bis langfristige Strategie. Erste Ergebnisse lassen sich oft nach 2–3 Monaten beobachten, echte nachhaltige Sichtbarkeit entsteht meist über mehrere Monate hinweg. Bei maxonline wird die Optimierung individuell geplant und kontinuierlich überprüft, um langfristig erfolgreich zu sein – auch in Kombination mit GEO für KI-Sichtbarkeit.",
+              "faq_3": "Wie kann ich herausfinden, warum meine Website bei Google schlecht rankt?",
+              "faq_answer_3": "Eine fundierte SEO-Analyse zeigt dir, wo deine Website technische Schwächen oder inhaltliche Lücken hat. maxonline bietet solche Analysen an, bei denen z.B. Keywords, Ladezeiten, Mobilfreundlichkeit und externe Verlinkungen geprüft werden. So bekommst du einen klaren Überblick, was konkret verbessert werden muss.",
+              "faq_4": "Was bringt mir GEO konkret, wenn ich bereits SEO mache?",
+              "faq_answer_4": "GEO ergänzt deine bestehende SEO-Strategie, indem es deine Inhalte speziell für KI-Systeme aufbereitet. Das bedeutet, dass dein Unternehmen nicht nur bei Google besser gefunden wird, sondern auch in Antworten von ChatGPT oder Perplexity auftauchen kann. Besonders in Zeiten, in denen Nutzer immer öfter KI für Produktempfehlungen nutzen, kann GEO einen entscheidenden Unterschied machen.",
+              "faq_5": "Kann ich meine Sichtbarkeit in ChatGPT gezielt verbessern?",
+              "faq_answer_5": "Ja, durch gezielte GEO-Maßnahmen (Generative Engine Optimization) kann deine Marke so positioniert werden, dass sie auch in KI-generierten Antworten häufiger genannt wird. Das funktioniert unter anderem durch hochwertige Inhalte, strukturierte Daten und digitaler PR, die von Systemen wie ChatGPT besser erkannt und genutzt werden.",
+              "contact_info": "Lass uns über dein Projekt sprechen! Melde dich noch heute für eine kostenlose Beratung.",
+              "footer_cta": "Jetzt kostenloses Erstgespräch vereinbaren",
+              "trust_signals": "Ganzheitliche Strategien | Transparentes Reporting | Zukunftsorientiert",
+              "guarantee_text": "Garantiert mehr Sichtbarkeit auf Google und in KI-Sprachmodellen."
             }
 
             ---
@@ -113,60 +113,62 @@ class FactChecker {
             ${kontext ? `ZUSÄTZLICHER KONTEXT, DER UNBEDINGT ZU BEACHTEN IST:\n${kontext}` : ''}
 
             ROLLE: ${roleAndTask}
-            
+
             🚨 WICHTIGE RICHTLINIEN:
-            - Der "meta_title" darf maximal 60 Zeichen lang sein.
-            - Die "meta_description" darf maximal 160 Zeichen lang sein.
+            - Der "meta_title" darf maximal 55 Zeichen lang sein.
+            - Die "meta_description" darf maximal 155 Zeichen lang sein.
             - VERWENDE für "meta_title" und "meta_description" Sympole als Trennzeichen.
             - VERWENDE für "post_title" immer das keyword.
-            - VERMEIDE Superlative wie "beste", "nummer 1", "marktführer".
+            - VERMEIDE Superlative wie "beste", "Nummer 1", "Marktführer".
+            - VERMEIDE übermäßigen Einsatz von Gedanken-Trennstrichen in den Texten.
+            - Achte auf eine natürliche Sprache, die dem Text-Stil eines Menschen sehr ähnlich ist.
             - VERWENDE KEINE absoluten Begriffe wie "garantiert", "100%", "immer", "nie".
             - Deine Antwort MUSS ein einziges, valides JSON-Objekt sein. Beginne direkt mit { und ende mit }.
             - Fülle ALLE geforderten Felder mit umfangreichem und thematisch passendem Inhalt.
-            
+
             Das JSON-Objekt muss exakt diese Struktur haben:
             {
-  "post_title": "...", 
-  "post_name": "...", 
-  "meta_title": "...", 
-  "meta_description": "...", 
-  "h1": "...", 
-  "h2_1": "...", 
+  "post_title": "...",
+  "post_name": "...",
+  "meta_title": "...",
+  "meta_description": "...",
+  "h1": "...",
+  "h2_1": "...",
   "h2_1_text": "...",
-  "h2_2": "...", 
+  "h2_2": "...",
   "h2_2_text": "...",
-  "h2_3": "...", 
+  "h2_3": "...",
   "h2_3_text": "...",
   "h2_4": "...",
   "h2_4_text": "...",
-  "primary_cta": "...", 
-  "secondary_cta": "...", 
-  "hero_text": "...", 
-  "hero_subtext": "...", 
-  "benefits_list": "...", 
-  "features_list": "...", 
-  "benefits_list_fließtext": "...", 
-  "features_list_fließtext": "...", 
-  "social_proof": "...", 
-  "testimonial_1": "...", 
-  "testimonial_2": "...", 
-  "pricing_title": "...", 
-  "price_1": "...", 
-  "price_2": "...", 
-  "price_3": "...", 
-  "faq_1": "...", 
-  "faq_answer_1": "...", 
-  "faq_2": "...", 
-  "faq_answer_2": "...", 
-  "faq_3": "...", 
-  "faq_answer_3": "...", 
-  "faq_4": "...", 
-  "faq_answer_4": "...", 
-  "faq_5": "...", 
-  "faq_answer_5": "...", 
-  "contact_info": "...", 
-  "footer_cta": "...", 
-  "trust_signals": "...", 
+  "primary_cta": "...",
+  "secondary_cta": "...",
+  "hero_text": "...",
+  "hero_subtext": "...",
+  "benefits_list_fließtext": "...",
+  "benefits_list": "...",
+  "features_list_fließtext": "...",
+  "features_list": "...",
+  "social_proof": "...",
+  "testimonial_1": "...",
+  "testimonial_2": "...",
+  "pricing_title": "...",
+  "price_1": "...",
+  "price_2": "...",
+  "price_3": "...",
+  "faq_1": "...",
+  "faq_answer_1": "...",
+  "faq_2": "...",
+  "faq_answer_2": "...",
+  "faq_3": "...",
+  "faq_answer_3": "...",
+  "faq_4": "...",
+  "faq_answer_4": "...",
+  "faq_5": "...",
+  "faq_answer_5": "...",
+  "contact_info": "...",
+  "footer_cta": "...",
+  "trust_signals": "...",
   "guarantee_text": "..."
 }
         `;
