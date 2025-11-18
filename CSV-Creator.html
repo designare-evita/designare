@@ -89,15 +89,7 @@
                             <option value="commercial">Kommerziell</option>
                         </select>
                     </div>
-					<div class="silas-input-container full-width">
-    <label for="custom-style-input" style="display:block; color:#ffc107; margin-bottom:5px; font-size:0.9rem;">
-        <i class="fas fa-magic"></i> Eigener Mustertext / Stil-Vorlage (optional)
-    </label>
-    <textarea id="custom-style-input" class="silas-extra-input" 
-        placeholder="Füge hier einen Text ein, dessen Schreibstil Silas imitieren soll. (z.B. ein alter Blogartikel oder ein Text der Konkurrenz)"
-        rows="4" style="width:100%; resize:vertical; min-height:80px;"></textarea>
-</div>
-<div class="input-group">
+                    <div class="input-group">
                         <label for="grammatical-person-select">Ansprache:</label>
                         <select id="grammatical-person-select" class="custom-select">
                              <option value="plural">Wir-Form (Unternehmen)</option>
@@ -105,20 +97,20 @@
                         </select>
                     </div>
                     <div class="silas-input-container">
-    <input type="text" id="text-domain-input" class="silas-extra-input" placeholder="Webseiten-Domain (optional): z.B. designare.at" autocomplete="off">
-</div>
-  <div class="silas-input-container">
-<input type="text" id="text-brand-input" class="silas-extra-input" placeholder="Brand/Ansprechpartner (optional): z.B. Michael" autocomplete="off">
-</div>
-<div class="silas-input-container">
-    <input type="email" id="text-email-input" class="silas-extra-input" placeholder="E-Mail für CTA (optional): z.B. info@deinewebseite.at" autocomplete="off">
-</div>
-<div class="silas-input-container">
-    <input type="tel" id="text-phone-input" class="silas-extra-input" placeholder="Telefonnummer für CTA (optional): z.B. +43 123 456789" autocomplete="off">
-</div>
-<div class="silas-input-container">
-    <input type="tel" id="text-adress-input" class="silas-extra-input" placeholder="Anschrift für CTA (optional): z.B. 1010 Wien, Österreich" autocomplete="off">
-</div>
+                        <input type="text" id="text-domain-input" class="silas-extra-input" placeholder="Webseiten-Domain (optional): z.B. designare.at" autocomplete="off">
+                    </div>
+                    <div class="silas-input-container">
+                        <input type="text" id="text-brand-input" class="silas-extra-input" placeholder="Brand/Ansprechpartner (optional): z.B. Michael" autocomplete="off">
+                    </div>
+                    <div class="silas-input-container">
+                        <input type="email" id="text-email-input" class="silas-extra-input" placeholder="E-Mail für CTA (optional): z.B. info@deinewebseite.at" autocomplete="off">
+                    </div>
+                    <div class="silas-input-container">
+                        <input type="tel" id="text-phone-input" class="silas-extra-input" placeholder="Telefonnummer für CTA (optional): z.B. +43 123 456789" autocomplete="off">
+                    </div>
+                    <div class="silas-input-container">
+                        <input type="tel" id="text-adress-input" class="silas-extra-input" placeholder="Anschrift für CTA (optional): z.B. 1010 Wien, Österreich" autocomplete="off">
+                    </div>
 
                     <div class="silas-input-container">
                         <input type="text" id="text-zielgruppe-input" class="silas-extra-input" placeholder="Zielgruppe (optional): z.B. Anfänger, Experten, Familien" autocomplete="off">
@@ -131,8 +123,37 @@
                     <div class="silas-input-container">
                         <input type="text" id="text-usp-input" class="silas-extra-input" placeholder="Alleinstellungsmerkmal (USP) (optional): z.B. 24/7-Support" autocomplete="off">
                     </div>
-                             
-                    <form id="silas-form">
+
+                    <div class="silas-input-container full-width" style="margin-top: 25px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+                        <h3 style="color: #ffc107; font-size: 1.1rem; margin-bottom: 10px;">
+                            <i class="fas fa-magic"></i> Style-Transfer & Mustertexte
+                        </h3>
+                        <p style="font-size: 0.85rem; color: #ccc; margin-bottom: 15px; line-height: 1.4;">
+                            Wähle eine Vorlage, um den Schreibstil festzulegen, oder kopiere einen eigenen Text hinein, den Silas imitieren soll.
+                        </p>
+
+                        <div class="input-group" style="margin-bottom: 15px;">
+                            <label for="template-selector" style="display:block; color:#fff; margin-bottom:5px; font-size:0.9rem;">Vorlage wählen:</label>
+                            <select id="template-selector" class="custom-select" style="width: 100%;">
+                                <option value="">-- Bitte wählen oder eigenen Text unten eingeben --</option>
+                                <option value="emotional">❤️ Emotional & Storytelling (B2C)</option>
+                                <option value="hard-facts">📊 Faktenorientiert & Kurz (B2B)</option>
+                                <option value="du-ansprache">👋 Locker & 'Du'-Ansprache</option>
+                                <option value="serioes">👔 Seriös & Professionell (Enterprise)</option>
+                            </select>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="custom-style-input" style="display:block; color:#fff; margin-bottom:5px; font-size:0.9rem;">
+                                Mustertext / Stil-Vorlage:
+                            </label>
+                            <textarea id="custom-style-input" class="silas-extra-input" 
+                                placeholder="Hier erscheint der Mustertext. Du kannst ihn bearbeiten oder etwas ganz Eigenes hineinkopieren (z.B. einen Text deiner Konkurrenz oder einen deiner besten Blogartikel)."
+                                rows="5" 
+                                style="width:100%; resize:vertical; min-height:100px; font-family: monospace; font-size: 0.9rem; line-height: 1.5; background-color: rgba(0,0,0,0.2);"></textarea>
+                        </div>
+                    </div>
+                    <form id="silas-form" style="margin-top: 25px;">
                         <input type="text" id="silas-keyword-input" placeholder="Gib ein oder mehrere Keywords ein (mit Komma trennen)..." autocomplete="off">
                         <button type="submit" id="add-keyword-btn" aria-label="Keyword hinzufügen">
                             <i class="fa-regular fa-square-plus"></i>
