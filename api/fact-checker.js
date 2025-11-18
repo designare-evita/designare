@@ -1,4 +1,4 @@
-// api/fact-checker.js - FINALE VERSION (Mit Style-Transfer & Dynamischen Templates)
+// api/fact-checker.js - FINALE VERSION MIT SEMANTISCHER OPTIMIERUNG
 
 class FactChecker {
     constructor() {
@@ -15,7 +15,7 @@ class FactChecker {
             'einzigartig': { severity: 'low' }
         };
 
-        // 2. Definition der Mustertexte (Templates) für verschiedene Zwecke
+        // 2. Definition der Mustertexte (Templates)
         this.templates = {
             service: {
                 description: "Beispiel für eine Dienstleistung/Agentur (Fokus: Vertrauen & Expertise)",
@@ -121,7 +121,6 @@ class FactChecker {
             confidenceScore: 95,
         };
         
-        // Felder, die auf problematische Phrasen geprüft werden
         const fieldsToCheck = ['hero_text', 'social_proof', 'guarantee_text', 'meta_description', 'benefits_list', 'features_list', 'benefits_list_fließtext', 'features_list_fließtext', 'testimonial_1', 'testimonial_2', 'h2_1_text', 'h2_2_text', 'h2_3_text', 'h2_4_text' ];
         let penalty = 0;
 
@@ -144,15 +143,14 @@ class FactChecker {
     }
 
     generateResponsiblePrompt(keywordData) {
-        // Extrahiere alle Daten inklusive des neuen 'customStyle' Feldes
-        const { keyword, intent, zielgruppe, tonalitaet, usp, domain, email, phone, address, brand, grammaticalPerson, customStyle } = keywordData;
+        // Extrahiere alle Daten inklusive 'semanticTerms'
+        const { keyword, intent, zielgruppe, tonalitaet, usp, domain, email, phone, address, brand, grammaticalPerson, customStyle, semanticTerms } = keywordData;
 
         // --- LOGIK FÜR STIL & TEMPLATE AUSWAHL ---
         let styleInstruction = "";
-        let selectedTemplateKey = 'service'; // Standard Fallback
+        let selectedTemplateKey = 'service';
 
         if (customStyle && customStyle.length > 15) {
-            // FALL A: Der User hat einen eigenen Mustertext/Stil übergeben
             console.log(`[PROMPT] Nutze Custom-Style für Keyword: ${keyword}`);
             styleInstruction = `
             --- STIL-VORLAGE (EXTREM WICHTIG!) ---
@@ -161,13 +159,12 @@ class FactChecker {
             "${customStyle}"
             
             ANWEISUNG: Analysiere den Stil dieses Mustertextes genau. 
-            1. Übernimm die Tonalität (z.B. locker, akademisch, reißerisch).
+            1. Übernimm die Tonalität.
             2. Übernimm die Ansprache (Du/Sie).
-            3. Übernimm die Satzstruktur (kurz & knapp vs. lang & erklärend).
+            3. Übernimm die Satzstruktur.
             4. Wende diesen Stil auf das neue Thema "${keyword}" an.
             `;
         } else {
-            // FALL B: Standard-Verhalten (Automatische Template-Wahl)
             const productKeywords = ['kaufen', 'shop', 'bestellen', 'preis', 'produkt', 'versand', 'lieferung', 'warenkorb'];
             const isProductContext = productKeywords.some(pk => keyword.toLowerCase().includes(pk)) || 
                                      (intent === 'commercial' && zielgruppe && zielgruppe.toLowerCase().includes('käufer'));
@@ -177,9 +174,7 @@ class FactChecker {
             }
             
             console.log(`[PROMPT] Nutze Built-in Template '${selectedTemplateKey}' für Keyword: ${keyword}`);
-            
             const selectedTemplate = this.templates[selectedTemplateKey];
-            
             styleInstruction = `
             Hier ist ein Beispiel für einen perfekten, faktenbasierten JSON-Output (${selectedTemplate.description}):
             ${selectedTemplate.json}
@@ -188,12 +183,10 @@ class FactChecker {
             `;
         }
 
-        // Definition der Rolle basierend auf dem Intent
         const roleAndTask = intent === 'commercial'
             ? 'Du bist ein erstklassiger, menschenähnlicher Marketing-Texter und Conversion-Optimierer. Dein Stil ist verkaufspsychologisch fundiert, aktiviert den Leser emotional und führt zielsicher zur Handlung.'
             : 'Du bist ein menschenähnlicher Fachexperte und objektiver Ratgeber. Dein Stil ist journalistisch sauber, tiefgehend recherchiert und bietet echten Nutzwert ohne werbliche Floskeln.';
 
-        // Kontext zusammenbauen
         let kontext = "";
         if (brand) kontext += `- BRAND/ANSPRECHPARTNER: ${brand}\n`;
         if (zielgruppe) kontext += `- ZIELGRUPPE: ${zielgruppe}\n`;
@@ -205,6 +198,17 @@ class FactChecker {
         if (address) kontext += `- ADRESSE FÜR CTA: ${address}\n`;
         if (grammaticalPerson) kontext += `- ANSPRACHE: ${grammaticalPerson === 'plural' ? 'Wir-Form (Unternehmen)' : 'Ich-Form (Einzelperson)'}\n`;
 
+        // NEU: Semantische Instruktion bauen
+        let seoInstruction = "";
+        if (semanticTerms && semanticTerms.length > 0) {
+            seoInstruction = `
+            🌟 SEO-OPTIMIERUNG (ENTITY INTEGRATION):
+            Um die thematische Tiefe (TF-IDF) zu erhöhen, integriere bitte die folgenden semantisch verwandten Begriffe NATÜRLICH in den Textverlauf (kein Keyword-Stuffing!):
+            "${semanticTerms}"
+            Nutze diese Begriffe, um Kontext herzustellen und Expertise zu beweisen.
+            `;
+        }
+
         return `
             ${styleInstruction}
 
@@ -213,6 +217,8 @@ class FactChecker {
             Erstelle jetzt einen ebenso hochwertigen und FAKTISCH VERANTWORTLICHEN JSON-Output für das Thema "${keyword}".
 
             ${kontext ? `ZUSÄTZLICHER KONTEXT, DER UNBEDINGT ZU BEACHTEN IST:\n${kontext}` : ''}
+            
+            ${seoInstruction}
 
             ROLLE: ${roleAndTask}
 
