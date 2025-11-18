@@ -1,10 +1,40 @@
-// api/generate.js - Version mit Retry-Logik und Modell-Fallback
+// api/generate.js - KORRIGIERTE VERSION MIT DATAMUSE API
 
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const { FactChecker } = require('./fact-checker.js');
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const factChecker = new FactChecker();
+
+// === NEUE HILFSFUNKTION FÜR SEMANTISCHE OPTIMIERUNG ===
+async function fetchSemanticTerms(keyword) {
+    try {
+        // Datamuse API: 'ml' steht für 'means like' (semantisch ähnlich)
+        // Wir fragen nach Begriffen, die eine ähnliche Bedeutung haben
+        const response = await fetch(`https://api.datamuse.com/words?ml=${encodeURIComponent(keyword)}&max=15`);
+        
+        if (!response.ok) {
+            console.warn(`[WARN] Datamuse API Fehler: ${response.status}`);
+            return null;
+        }
+        
+        const data = await response.json();
+        
+        if (!data || data.length === 0) {
+            console.log(`[INFO] Keine semantischen Begriffe für '${keyword}' gefunden.`);
+            return null;
+        }
+
+        // Wir nehmen die Top 15 Begriffe und machen daraus einen String
+        const terms = data.map(item => item.word).join(', ');
+        console.log(`[SEO] Semantische Begriffe für '${keyword}': ${terms}`);
+        return terms;
+    } catch (error) {
+        console.warn(`[WARN] Konnte keine semantischen Begriffe laden: ${error.message}`);
+        return null; // Fallback: Einfach weitermachen ohne Optimierung
+    }
+}
+// ========================================================
 
 function cleanJsonString(str) {
     let cleaned = str
@@ -35,7 +65,6 @@ function cleanJsonString(str) {
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 // Modell-Hierarchie: vom besten zum Fallback
-// Stand Oktober 2025: Gemini 1.5 wurde im April 2025 eingestellt
 const MODEL_HIERARCHY = [
     "gemini-2.5-flash",           // Stabile Version, schnell und effizient
     "gemini-2.5-flash-lite",      // Noch schneller, kosteneffizienter
@@ -115,9 +144,20 @@ export default async function handler(req, res) {
 
       try {
         const preferredModel = isMasterRequest ? "gemini-2.5-pro" : "gemini-2.5-flash-lite";
-        const prompt = factChecker.generateResponsiblePrompt(keywordData);
+        
+        // SCHRITT 1: Semantische Daten abrufen (Server-Side Enrichment)
+        const semanticTerms = await fetchSemanticTerms(keyword);
+        
+        // SCHRITT 2: Daten anreichern
+        const enhancedKeywordData = { 
+            ...keywordData, 
+            semanticTerms // Die neuen Begriffe werden in das Objekt gepackt
+        };
 
-        // Generiere Inhalt mit Retry-Logik
+        // SCHRITT 3: Prompt generieren (jetzt mit Semantik-Instruktion)
+        const prompt = factChecker.generateResponsiblePrompt(enhancedKeywordData);
+
+        // SCHRITT 4: Generiere Inhalt mit Retry-Logik
         const { text, modelUsed } = await generateContentWithRetry(prompt, preferredModel);
 
         let jsonData = {};
@@ -161,6 +201,10 @@ export default async function handler(req, res) {
         jsonData.email = email;
         jsonData.phone = phone;
         jsonData.brand = brand;
+        // NEU: Info über semantische Begriffe speichern (für Debugging/Transparenz)
+        jsonData._seo = {
+            semantic_terms_used: semanticTerms || "Keine gefunden"
+        };
         jsonData._meta = { 
             model_used: modelUsed,
             model_requested: preferredModel,
