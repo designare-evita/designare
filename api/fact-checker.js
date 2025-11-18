@@ -1,4 +1,4 @@
-// api/fact-checker.js - FINALE VERSION MIT SEMANTISCHER OPTIMIERUNG
+// api/fact-checker.js - FINALE VERSION MIT SEMANTISCHER OPTIMIERUNG & READABILITY
 
 class FactChecker {
     constructor() {
@@ -143,8 +143,42 @@ class FactChecker {
     }
 
     generateResponsiblePrompt(keywordData) {
-        // Extrahiere alle Daten inklusive 'semanticTerms'
-        const { keyword, intent, zielgruppe, tonalitaet, usp, domain, email, phone, address, brand, grammaticalPerson, customStyle, semanticTerms } = keywordData;
+        // Extrahiere alle Daten inklusive 'semanticTerms' und 'readability'
+        const { keyword, intent, zielgruppe, tonalitaet, usp, domain, email, phone, address, brand, grammaticalPerson, customStyle, semanticTerms, readability } = keywordData;
+
+        // --- LOGIK FÜR LESBARKEIT (FLESCH-INDEX) ---
+        let readabilityInstruction = "";
+        switch (readability) {
+            case 'simple':
+                readabilityInstruction = `
+                - **LEICHTE VERSTÄNDLICHKEIT (Priorität!):**
+                  - Nutze kurze, klare Sätze (max. 15 Wörter).
+                  - Vermeide Fremdwörter oder erkläre sie sofort.
+                  - Adressiere den Leser direkt und auf Augenhöhe.
+                  - Ziel: Flesch-Reading-Ease Score von > 60 (leicht verständlich).`;
+                break;
+            case 'expert':
+                readabilityInstruction = `
+                - **EXPERTEN-NIVEAU:**
+                  - Setze Fachwissen und Branchenkenntnisse voraus.
+                  - Nutze präzise Fachterminologie (ohne sie jedes Mal zu erklären).
+                  - Du darfst komplexe Satzstrukturen nutzen, wenn sie der Präzision dienen.
+                  - Fokussiere dich auf Tiefe und Details statt auf Oberflächlichkeit.`;
+                break;
+            case 'academic':
+                readabilityInstruction = `
+                - **AKADEMISCHER STIL:**
+                  - Schreibe objektiv, differenziert und evidenzbasiert.
+                  - Nutze ein gehobenes Vokabular und komplexe Argumentationsketten.
+                  - Vermeide Umgangssprache vollständig.`;
+                break;
+            default: // 'balanced' oder undefined
+                readabilityInstruction = `
+                - **AUSGEWOGENER STIL:**
+                  - Schreibe professionell, aber zugänglich.
+                  - Finde die Balance zwischen Fachwissen und Verständlichkeit.
+                  - Erkläre komplexe Begriffe kurz, aber behandle den Leser nicht wie ein Kind.`;
+        }
 
         // --- LOGIK FÜR STIL & TEMPLATE AUSWAHL ---
         let styleInstruction = "";
@@ -198,7 +232,7 @@ class FactChecker {
         if (address) kontext += `- ADRESSE FÜR CTA: ${address}\n`;
         if (grammaticalPerson) kontext += `- ANSPRACHE: ${grammaticalPerson === 'plural' ? 'Wir-Form (Unternehmen)' : 'Ich-Form (Einzelperson)'}\n`;
 
-        // NEU: Semantische Instruktion bauen
+        // Semantische Instruktion bauen
         let seoInstruction = "";
         if (semanticTerms && semanticTerms.length > 0) {
             seoInstruction = `
@@ -223,6 +257,8 @@ class FactChecker {
             ROLLE: ${roleAndTask}
 
             🚨 WICHTIGE RICHTLINIEN & STIL-VORGABEN:
+            ${readabilityInstruction}
+
             - **Kein KI-Geschwafel:** Vermeide leere Phrasen wie "In der heutigen digitalen Welt", "Tauchen wir ein" oder "Es ist wichtig zu beachten". Starte direkt mit dem Mehrwert.
             - **Satzstruktur:** Variiere zwischen kurzen, prägnanten Sätzen und längeren Erklärungen. Das wirkt menschlicher.
             - **Meta-Daten:** "meta_title" max. 55 Zeichen, "meta_description" max. 155 Zeichen. Nutze Symbole (➤, ✓) für höhere Klickraten.
