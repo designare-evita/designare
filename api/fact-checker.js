@@ -1,7 +1,8 @@
-// fact-checker.js - Angepasste Version
+// api/fact-checker.js - FINALE VERSION (Mit Style-Transfer & Dynamischen Templates)
 
 class FactChecker {
     constructor() {
+        // 1. Problematische Phrasen für den E-E-A-T Check
         this.problematicPhrases = {
             'garantiert': { severity: 'high' },
             '100%': { severity: 'high' },
@@ -13,6 +14,104 @@ class FactChecker {
             'revolutionär': { severity: 'medium' },
             'einzigartig': { severity: 'low' }
         };
+
+        // 2. Definition der Mustertexte (Templates) für verschiedene Zwecke
+        this.templates = {
+            service: {
+                description: "Beispiel für eine Dienstleistung/Agentur (Fokus: Vertrauen & Expertise)",
+                json: `{
+                  "post_title": "SEO & GEO Agentur",
+                  "post_name": "seo-geo-agentur",
+                  "meta_title": "SEO & GEO Agentur ➤ Sichtbarkeit in Google & KI steigern",
+                  "meta_description": "Platz 1 in Google & KI mit professioneller SEO & GEO Optimierung. ✓ 500+ Projekte ✓ Nachhaltiges Wachstum. Jetzt Erstgespräch sichern!",
+                  "h1": "SEO Agentur: Mehr Sichtbarkeit auf Google und in KI",
+                  "h2_1": "Warum klassisches SEO heute nicht mehr reicht",
+                  "h2_1_text": "Früher reichte es, Keywords zu optimieren. Heute suchen Menschen via ChatGPT und Perplexity. Als moderne Agentur verbinden wir technisches SEO mit GEO (Generative Engine Optimization), damit deine Marke überall dort stattfindet, wo deine Kunden suchen.",
+                  "h2_2": "Mehr Sichtbarkeit in Suchmaschinen und KI sichern",
+                  "h2_2_text": "Professionelle Suchmaschinenoptimierung (SEO) bringt deine Website nachhaltig auf Top-Positionen. Gleichzeitig sorgt GEO dafür, dass deine Inhalte auch in KI-Antworten präsent sind.",
+                  "h2_3": "Mehr Reichweite bedeutet mehr Umsatz",
+                  "h2_3_text": "Gezielte Strategien steigern deine Online-Sichtbarkeit. Wir vereinen SEO mit Conversion-Optimierung, damit aus Besuchern auch zahlende Kunden werden.",
+                  "h2_4": "Nachhaltiges Wachstum statt teurer Werbung",
+                  "h2_4_text": "Organische Sichtbarkeit wirkt dauerhaft. Studien zeigen, dass SEO langfristig einen höheren ROI bietet als kurzfristige Anzeigenkampagnen.",
+                  "primary_cta": "Kostenloses Audit anfordern",
+                  "secondary_cta": "Mehr erfahren",
+                  "hero_text": "Digitale Sichtbarkeit entscheidet über deinen Markterfolg. Wir sorgen dafür, dass dein Unternehmen nicht nur gefunden, sondern als erste Wahl von KI-Systemen empfohlen wird.",
+                  "hero_subtext": "Wir setzen uns für deinen nachhaltigen digitalen Erfolg ein",
+                  "benefits_list": "<ul><li>Maximale Sichtbarkeit in Google & KI-Systemen.</li><li>Nachhaltige Lead-Generierung ohne teure Ads.</li><li>Höhere Markenautorität durch Experten-Content.</li><li>Individuelle Strategien für deine Zielgruppe.</li><li>Transparente Reportings und Analysen.</li></ul>",
+                  "benefits_list_fließtext": "Profitiere von einer ganzheitlichen Strategie, die technische Exzellenz mit hochwertigem Content verbindet, um deine Marktposition dauerhaft zu stärken.",
+                  "features_list": "<ul><li>Umfassendes SEO-Audit & Keyword-Analyse.</li><li>Technische OnPage-Optimierung.</li><li>Content-Erstellung für Mensch & KI.</li><li>High-Quality Backlink-Aufbau.</li><li>Monatliche Performance-Calls.</li></ul>",
+                  "features_list_fließtext": "Unser Leistungsspektrum deckt alle Bereiche moderner Suchmaschinenoptimierung ab – von der technischen Basis bis zur inhaltlichen Kür.",
+                  "social_proof": "Über 150 Unternehmen vertrauen bereits auf unsere Expertise.",
+                  "testimonial_1": "Seit wir mit der Agentur zusammenarbeiten, haben sich unsere Anfragen verdoppelt. Absolute Empfehlung! - Sarah M., Marketing Managerin",
+                  "testimonial_2": "Endlich eine Agentur, die nicht nur verspricht, sondern liefert. Die Reportings sind transparent und die Ergebnisse sprechen für sich. - Tom K., Geschäftsführer",
+                  "pricing_title": "Unsere Pakete",
+                  "price_1": "<strong>Starter</strong><br />Ideal für lokale Unternehmen.<br />✅ SEO-Grundlagen<br />✅ Google Maps Optimierung<br /><strong>ab 990 €</strong>",
+                  "price_2": "<strong>Business</strong><br />Für ambitionierte Wachstumsziele.<br />✅ Nationale SEO-Strategie<br />✅ Content-Flatrate<br /><strong>ab 1.990 €</strong>",
+                  "price_3": "<strong>Enterprise</strong><br />Maximale Dominanz in deiner Nische.<br />✅ Full-Service Betreuung<br />✅ KI-Integration<br /><strong>auf Anfrage</strong>",
+                  "faq_1": "Wie lange dauert es, bis SEO wirkt?",
+                  "faq_answer_1": "SEO ist ein Marathon, kein Sprint. Erste Ergebnisse sieht man oft nach 3-6 Monaten, die volle Wirkung entfaltet sich langfristig.",
+                  "faq_2": "Muss ich einen laufenden Vertrag abschließen?",
+                  "faq_answer_2": "Wir bieten sowohl Projektarbeiten als auch laufende Betreuung an. Für nachhaltigen Erfolg empfehlen wir jedoch eine kontinuierliche Zusammenarbeit.",
+                  "faq_3": "Was ist der Unterschied zu Google Ads?",
+                  "faq_answer_3": "Bei Ads zahlst du für jeden Klick. Sobald das Budget leer ist, bist du unsichtbar. SEO baut organische, kostenlose Besucherströme auf, die dauerhaft bleiben.",
+                  "faq_4": "Optimiert ihr auch für KI-Suchmaschinen?",
+                  "faq_answer_4": "Ja, wir sind spezialisiert auf GEO (Generative Engine Optimization), um deine Marke auch in ChatGPT, Bing Chat und Co. sichtbar zu machen.",
+                  "faq_5": "Bekomme ich einen festen Ansprechpartner?",
+                  "faq_answer_5": "Absolut. Du hast einen persönlichen Strategen an deiner Seite, der dein Projekt von A bis Z kennt.",
+                  "contact_info": "Lass uns über dein Projekt sprechen. Buche jetzt dein unverbindliches Erstgespräch.",
+                  "footer_cta": "Termin vereinbaren",
+                  "trust_signals": "TÜV-zertifizierte Prozesse | Google Partner | 100% Transparent",
+                  "guarantee_text": "Wir garantieren transparente Arbeit und messbare Fortschritte."
+                }`
+            },
+            product: {
+                description: "Beispiel für ein physisches Produkt/Shop (Fokus: Features & Kaufanreiz)",
+                json: `{
+                  "post_title": "Ergonomischer Bürostuhl 'BackHero Pro'",
+                  "post_name": "backhero-pro-ergonomischer-buerostuhl",
+                  "meta_title": "BackHero Pro ➤ Der ergonomische Bürostuhl gegen Rückenschmerzen",
+                  "meta_description": "Schmerzfrei sitzen mit dem BackHero Pro. ✓ Lordosenstütze ✓ Atmungsaktives Mesh ✓ 30 Tage Probewohnen. Bestelle jetzt versandkostenfrei!",
+                  "h1": "BackHero Pro: Endlich schmerzfrei am Schreibtisch arbeiten",
+                  "h2_1": "Revolutionäre Ergonomie für deinen Rücken",
+                  "h2_1_text": "Der BackHero Pro passt sich deiner Wirbelsäule automatisch an. Dank der patentierten 'Dynamic-Spine'-Technologie wird dein unterer Rücken bei jeder Bewegung optimal gestützt, was Verspannungen aktiv vorbeugt.",
+                  "h2_2": "Atmungsaktivität für lange Arbeitstage",
+                  "h2_2_text": "Kein Schwitzen mehr im Sommer. Das spezielle High-Tech Mesh-Gewebe sorgt für eine optimale Luftzirkulation und hält dich auch bei langen Meetings angenehm kühl.",
+                  "h2_3": "Perfekte Anpassung an deinen Körper",
+                  "h2_3_text": "Jeder Mensch ist anders. Deshalb lässt sich der BackHero Pro in 12 Punkten individuell einstellen – von der Sitztiefe bis zur Neigung der Kopfstütze.",
+                  "h2_4": "Langlebigkeit trifft auf Design",
+                  "h2_4_text": "Wir verwenden nur hochwertige Materialien wie Flugzeug-Aluminium und abriebfesten Stoff. Das moderne, minimalistische Design wertet jedes Home-Office optisch auf.",
+                  "primary_cta": "In den Warenkorb legen",
+                  "secondary_cta": "Alle Features ansehen",
+                  "hero_text": "Vergiss Rückenschmerzen nach langen Arbeitstagen. Der BackHero Pro kombiniert medizinisches Wissen mit modernem Design, um dir den besten Sitzkomfort deines Lebens zu bieten.",
+                  "hero_subtext": "Investiere in deine Gesundheit und Produktivität.",
+                  "benefits_list": "<ul><li>Aktive Unterstützung der Lendenwirbelsäule.</li><li>Atmungsaktives Mesh-Material gegen Schwitzen.</li><li>Vollständig verstellbare 4D-Armlehnen.</li><li>Fördert eine gesunde, aufrechte Sitzhaltung.</li><li>Einfacher Aufbau in unter 10 Minuten.</li></ul>",
+                  "benefits_list_fließtext": "Der BackHero Pro ist mehr als nur ein Stuhl – er ist dein täglicher Begleiter für gesundes und produktives Arbeiten ohne Schmerzen.",
+                  "features_list": "<ul><li>Patentierte Dynamic-Spine Lordosenstütze.</li><li>Belastbar bis 150kg.</li><li>Synchronmechanik mit Gewichtsregulierung.</li><li>Weiche Rollen für Hartböden.</li><li>5 Jahre Herstellergarantie.</li></ul>",
+                  "features_list_fließtext": "Ausgestattet mit Premium-Komponenten, die normalerweise nur in Stühlen der 1000€+ Klasse zu finden sind.",
+                  "social_proof": "Testsieger im 'Büro Magazin' 2024 & über 10.000 zufriedene Kunden.",
+                  "testimonial_1": "Mein Rückenweh war nach einer Woche weg. Ich will nie wieder auf einem anderen Stuhl sitzen! - Michael B., Programmierer",
+                  "testimonial_2": "Top Qualität, super schneller Aufbau und der Sitzkomfort ist ein Traum. Klare Kaufempfehlung. - Julia S., Architektin",
+                  "pricing_title": "Wähle deine Variante",
+                  "price_1": "<strong>Standard</strong><br />Der Klassiker in Schwarz.<br />✅ Alle Ergonomie-Features<br />✅ 3 Jahre Garantie<br /><strong>399 €</strong>",
+                  "price_2": "<strong>Pro</strong><br />Mit Kopfstütze & Premium-Rollen.<br />✅ Inkl. Nackenstütze<br />✅ 5 Jahre Garantie<br /><strong>499 €</strong>",
+                  "price_3": "<strong>Leder Edition</strong><br />Echtes Nappaleder für Chefs.<br />✅ Feinste Materialien<br />✅ 10 Jahre Garantie<br /><strong>799 €</strong>",
+                  "faq_1": "Ist der Stuhl für große Menschen geeignet?",
+                  "faq_answer_1": "Ja, der BackHero Pro ist für Körpergrößen von 1,60m bis 1,95m ideal geeignet und bis 150kg belastbar.",
+                  "faq_2": "Kann ich den Stuhl testen?",
+                  "faq_answer_2": "Natürlich! Wir bieten eine 30-Tage-Probewohnen-Garantie. Wenn er dir nicht gefällt, holen wir ihn kostenlos wieder ab.",
+                  "faq_3": "Wie schwer ist der Aufbau?",
+                  "faq_answer_3": "Der Aufbau ist kinderleicht und dauert dank vormontierter Teile nur etwa 10 Minuten. Werkzeug liegt bei.",
+                  "faq_4": "Sind die Rollen für Parkett geeignet?",
+                  "faq_answer_4": "Ja, wir liefern standardmäßig Universal-Soft-Rollen mit, die deinen Parkett- oder Laminatboden schützen.",
+                  "faq_5": "Gibt es Ersatzteile?",
+                  "faq_answer_5": "Ja, wir halten alle Ersatzteile mindestens 10 Jahre lang auf Lager, damit du lange Freude an deinem Stuhl hast.",
+                  "contact_info": "Noch Fragen? Unser Kundenservice hilft dir gerne weiter.",
+                  "footer_cta": "Jetzt versandkostenfrei bestellen",
+                  "trust_signals": "30 Tage Rückgaberecht | Kostenloser Versand | Kauf auf Rechnung",
+                  "guarantee_text": "30 Tage Geld-zurück-Garantie ohne Wenn und Aber."
+                }`
+            }
+        };
     }
 
     async checkContent(contentData, keyword) {
@@ -21,6 +120,8 @@ class FactChecker {
             flaggedClaims: [],
             confidenceScore: 95,
         };
+        
+        // Felder, die auf problematische Phrasen geprüft werden
         const fieldsToCheck = ['hero_text', 'social_proof', 'guarantee_text', 'meta_description', 'benefits_list', 'features_list', 'benefits_list_fließtext', 'features_list_fließtext', 'testimonial_1', 'testimonial_2', 'h2_1_text', 'h2_2_text', 'h2_3_text', 'h2_4_text' ];
         let penalty = 0;
 
@@ -43,12 +144,56 @@ class FactChecker {
     }
 
     generateResponsiblePrompt(keywordData) {
-        const { keyword, intent, zielgruppe, tonalitaet, usp, domain, email, phone, address, brand, grammaticalPerson } = keywordData;
+        // Extrahiere alle Daten inklusive des neuen 'customStyle' Feldes
+        const { keyword, intent, zielgruppe, tonalitaet, usp, domain, email, phone, address, brand, grammaticalPerson, customStyle } = keywordData;
 
+        // --- LOGIK FÜR STIL & TEMPLATE AUSWAHL ---
+        let styleInstruction = "";
+        let selectedTemplateKey = 'service'; // Standard Fallback
+
+        if (customStyle && customStyle.length > 15) {
+            // FALL A: Der User hat einen eigenen Mustertext/Stil übergeben
+            console.log(`[PROMPT] Nutze Custom-Style für Keyword: ${keyword}`);
+            styleInstruction = `
+            --- STIL-VORLAGE (EXTREM WICHTIG!) ---
+            Der Nutzer hat folgenden Text als exakte Referenz für den gewünschten Schreibstil, Satzbau, Wortwahl und Ansprache bereitgestellt:
+            
+            "${customStyle}"
+            
+            ANWEISUNG: Analysiere den Stil dieses Mustertextes genau. 
+            1. Übernimm die Tonalität (z.B. locker, akademisch, reißerisch).
+            2. Übernimm die Ansprache (Du/Sie).
+            3. Übernimm die Satzstruktur (kurz & knapp vs. lang & erklärend).
+            4. Wende diesen Stil auf das neue Thema "${keyword}" an.
+            `;
+        } else {
+            // FALL B: Standard-Verhalten (Automatische Template-Wahl)
+            const productKeywords = ['kaufen', 'shop', 'bestellen', 'preis', 'produkt', 'versand', 'lieferung', 'warenkorb'];
+            const isProductContext = productKeywords.some(pk => keyword.toLowerCase().includes(pk)) || 
+                                     (intent === 'commercial' && zielgruppe && zielgruppe.toLowerCase().includes('käufer'));
+            
+            if (isProductContext) {
+                selectedTemplateKey = 'product';
+            }
+            
+            console.log(`[PROMPT] Nutze Built-in Template '${selectedTemplateKey}' für Keyword: ${keyword}`);
+            
+            const selectedTemplate = this.templates[selectedTemplateKey];
+            
+            styleInstruction = `
+            Hier ist ein Beispiel für einen perfekten, faktenbasierten JSON-Output (${selectedTemplate.description}):
+            ${selectedTemplate.json}
+            
+            Orientiere dich an der Struktur und Qualität dieses Beispiels, aber passe den Inhalt zu 100% auf das neue Thema "${keyword}" an.
+            `;
+        }
+
+        // Definition der Rolle basierend auf dem Intent
         const roleAndTask = intent === 'commercial'
-            ? 'Du bist ein erstklassiger, menschenähnlicher Marketing-Texter und SEO-Stratege. Dein Stil ist überzeugend, menschlich, natürlich, klar und auf Conversions ausgerichtet.'
-            : 'Du bist ein menschenähnlicher Fachexperte und SEO-Redakteur. Dein Stil ist natürlich, informativ, klar und hilfreich. Du schreibst für Menschen, die echten Mehrwert aus deinen Texten ziehen wollen.';
+            ? 'Du bist ein erstklassiger, menschenähnlicher Marketing-Texter und Conversion-Optimierer. Dein Stil ist verkaufspsychologisch fundiert, aktiviert den Leser emotional und führt zielsicher zur Handlung.'
+            : 'Du bist ein menschenähnlicher Fachexperte und objektiver Ratgeber. Dein Stil ist journalistisch sauber, tiefgehend recherchiert und bietet echten Nutzwert ohne werbliche Floskeln.';
 
+        // Kontext zusammenbauen
         let kontext = "";
         if (brand) kontext += `- BRAND/ANSPRECHPARTNER: ${brand}\n`;
         if (zielgruppe) kontext += `- ZIELGRUPPE: ${zielgruppe}\n`;
@@ -58,53 +203,10 @@ class FactChecker {
         if (email) kontext += `- E-MAIL FÜR CTA: ${email}\n`;
         if (phone) kontext += `- TELEFONNUMMER FÜR CTA: ${phone}\n`;
         if (address) kontext += `- ADRESSE FÜR CTA: ${address}\n`;
+        if (grammaticalPerson) kontext += `- ANSPRACHE: ${grammaticalPerson === 'plural' ? 'Wir-Form (Unternehmen)' : 'Ich-Form (Einzelperson)'}\n`;
 
         return `
-            Hier ist ein Beispiel für einen perfekten, faktenbasierten JSON-Output zum Thema "SEO & GEO Agentur":
-            {
-              "post_title": "SEO & GEO Agentur",
-              "post_name": "seo-geo-agentur",
-              "meta_title": "SEO & GEO Agentur ➤ Mehr Sichtbarkeit auf Google und in KI",
-              "meta_description": "Jetzt mit SEO & GEO auf Platz 1 in Google & KI ✓ SEO Agentur ✓ Über 500 erfolgreiche Projekte ✓ Kostenfreies Erstgespräch.",
-             "h1": "SEO Agentur: Mehr Sichtbarkeit auf Google und in KI",
-  "h2_1": "Mehr als nur eine SEO und GEO Agentur",
-  "h2_1_text": "Auf den ersten Blick könnte man meinen, wir sind eine klassische SEO und GEO Agentur mit Sitz in Niederösterreich. Näher betrachtet sind wir aber mehr als das. Ob SEO, GEO oder LLMO – wir sorgen dafür, dass dein Unternehmen nicht nur gefunden, sondern auch verstanden wird. Wir hören zu, analysieren, recherchieren, denken mit und setzen um. Mit Leidenschaft, Struktur und dem Ziel, dein Unternehmen online maximal sichtbar zu machen.",
-  "h2_2": "Mehr Sichtbarkeit in Suchmaschinen und KI sichern",
-  "h2_2_text": "Professionelle Suchmaschinenoptimierung (SEO) bringt deine Website nachhaltig auf Top-Positionen bei Google &amp; Co. Gleichzeitig sorgt Generative Engine Optimization (GEO) bzw. LLMO (Large Language Model Optimization) dafür, dass deine Inhalte auch in den Antworten von KI-Sprachmodellen wie ChatGPT, Gemini, Perplexity oder im Google AI Mode präsent sind. Wir helfen dir und deinem Unternehmen dabei, diese Sichtbarkeit zu erreichen.",
-  "h2_3": "Mehr Reichweite bedeutet mehr Anfragen & Umsatz",
-  "h2_3_text": "Gezielte SEO-Strategien steigern deine Online-Sichtbarkeit und damit deine Reichweite. Das führt mehr potenzielle Kunden direkt auf deine Website. Durch GEO wirst du zusätzlich dort gefunden, wo Nutzer zunehmend suchen: in KI-gestützten Systemen. Wir vereinen SEO und GEO mit Conversion-Optimierung und gut gestalteten Landingpages. So generierst du konstant neue Anfragen und steigerst langfristig deinen Umsatz.",
-  "h2_4": "Nachhaltiges organisches Wachstum statt teurer Werbung",
-  "h2_4_text": "SEO und GEO wirken dauerhaft und sind deutlich nachhaltiger als kurzfristige Werbeanzeigen. Laut einer empirischen Studie der NYU Stern School of Business zeigen organische Suchergebnisse nachhaltigere Leistung im Vergleich zu bezahlter Werbung, wobei Keyword-spezifische Faktoren einen statistisch signifikant stärkeren Einfluss auf organische Suche haben als auf bezahlte Anzeigen.",
-              "primary_cta": "Jetzt beraten lassen",
-              "secondary_cta": "Mehr erfahren",
-              "hero_text": "Als Marketing-Leiter oder Geschäftsführer weißt du: Digitale Sichtbarkeit ist entscheidend. Doch mit der Entwicklung von KI-Suchmaschinen ändern sich die Regeln. Wir helfen dir, nicht nur gefunden zu werden, sondern als erste Wahl in generativen Antworten zu erscheinen. Entdecke, wie du mit einer cleveren GEO-Strategie der Konkurrenz einen Schritt voraus bist.",
-              "hero_subtext": "Wir setzen uns für deinen nachhaltigen digitalen Erfolg ein",
-              "benefits_list_fließtext": "Steigere deine Sichtbarkeit in Suchmaschinen und KI-generierten Antworten, erhöhe deine Markenautorität durch strategische PR und profitiere von einer integrierten Marketingstrategie aus einer Hand, um deine Zielgruppe präziser zu erreichen.",
-              "benefits_list": "<ul><li>Steigere deine Sichtbarkeit in herkömmlichen Suchmaschinen (SEO).</li><li>Optimiere deine Inhalte für KI-basierte Suchergebnisse (GEO).</li><li>Erhöhe deine Markenautorität durch strategische Digitale PR &amp; Backlinks.</li><li>Profitiere von einer integrierten Marketingstrategie aus einer Hand.</li><li>Erreiche deine Zielgruppe präziser und effektiver.</li></ul>",
-              "features_list_fließtext": "Wir bieten dir ganzheitliche SEO-Analysen, spezialisierte GEO-Strategien, professionelle Content-Erstellung, gezielten Backlink-Aufbau und kontinuierliches Monitoring für optimale Ergebnisse.",
-              "features_list": "<ul><li>Ganzheitliche SEO-Analyse &amp; On-Page/Off-Page Optimierung.</li><li>Spezialisierte GEO-Strategien für generative Engines.</li><li>Professionelle Content-Erstellung und -Optimierung.</li><li>Gezielter Aufbau hochwertiger Backlinks und Digitale PR.</li><li>Kontinuierliches Monitoring und Reporting der Performance.</li></ul>",
-              "social_proof": "Über 150 Unternehmen vertrauen bereits auf unsere Expertise in digitaler Sichtbarkeit.",
-              "testimonial_1": "Dank der Arbeit des gesamten maxonline Teams hat sich unsere Sichtbarkeit in kürzester Zeit enorm gesteigert, was sich natürlich auch direkt positiv auf unseren Umsatz ausgewirkt hat. - Anna L., Wien",
-              "testimonial_2": "Eine ganz klare Weiterempfehlung für alle, die wirklich Ergebnisse sehen wollen und gleichzeitig Wert auf eine persönliche, professionelle und ehrliche Zusammenarbeit legen. - Markus T., Berlin",
-              "pricing_title": "Laufende SEO & GEO Betreuung",
-              "price_1": "<strong>Starter</strong><br />Für den Einstieg in die Sichtbarkeit. Ideal für kleine Unternehmen, die ihre Online-Präsenz gezielt aufbauen wollen.<br />✅ SEO-Grundanalyse<br />✅ Keyword-Strategie<br />✅ Onpage-Optimierung<br />✅ laufende Betreuung<br /><strong>ab 790 € pro Monat</strong>",
-              "price_2": "<strong>Pro</strong><br />Für wachsende Marken mit klaren Zielen. Du willst mehr Reichweite, bessere Rankings und sichtbare Ergebnisse.<br />✅ SEO + GEO-Strategie<br />✅ Technisches SEO & Content-Optimierung<br />✅ Linkstruktur & Performance<br />✅ laufende Betreuung<br /><strong>ab 1.990 € pro Monat</strong>",
-              "price_3": "<strong>Maximal</strong><br />Für Unternehmen, die online ganz vorne stehen wollen. Hier entsteht Sichtbarkeit mit System – dauerhaft und messbar.<br />✅ SEO + GEO + LLMO-Komplettpaket<br />✅ Content- & KI-Optimierung<br />✅ Laufende Analysen & Reports<br />✅ Laufende Betreuung<br /><strong>ab 3.990 € pro Monat</strong>",
-              "faq_1": "Wie läuft eine SEO und GEO Betreuung bei [BRANDNAME] ab?",
-              "faq_answer_1": "Bei uns werden moderne SEO mit KI-gestützten Tools kombiniert, um gezielt Inhalte, Strukturen und Keywords zu optimieren. Dabei bekommst du persönliche Betreuung und regelmäßige Analysen, um Fortschritte messbar zu machen. Ziel ist nicht nur ein besseres Ranking bei Google, sondern auch langfristige Sichtbarkeit – auch in KI-Systemen wie ChatGPT.",
-              "faq_2": "Wie lange dauert es normalerweise, bis SEO-Maßnahmen Wirkung zeigen?",
-              "faq_answer_2": "SEO ist in der Regel eine mittel- bis langfristige Strategie. Erste Ergebnisse lassen sich oft nach 2–3 Monaten beobachten, echte nachhaltige Sichtbarkeit entsteht meist über mehrere Monate hinweg. Bei maxonline wird die Optimierung individuell geplant und kontinuierlich überprüft, um langfristig erfolgreich zu sein – auch in Kombination mit GEO für KI-Sichtbarkeit.",
-              "faq_3": "Wie kann ich herausfinden, warum meine Website bei Google schlecht rankt?",
-              "faq_answer_3": "Eine fundierte SEO-Analyse zeigt dir, wo deine Website technische Schwächen oder inhaltliche Lücken hat. maxonline bietet solche Analysen an, bei denen z.B. Keywords, Ladezeiten, Mobilfreundlichkeit und externe Verlinkungen geprüft werden. So bekommst du einen klaren Überblick, was konkret verbessert werden muss.",
-              "faq_4": "Was bringt mir GEO konkret, wenn ich bereits SEO mache?",
-              "faq_answer_4": "GEO ergänzt deine bestehende SEO-Strategie, indem es deine Inhalte speziell für KI-Systeme aufbereitet. Das bedeutet, dass dein Unternehmen nicht nur bei Google besser gefunden wird, sondern auch in Antworten von ChatGPT oder Perplexity auftauchen kann. Besonders in Zeiten, in denen Nutzer immer öfter KI für Produktempfehlungen nutzen, kann GEO einen entscheidenden Unterschied machen.",
-              "faq_5": "Kann ich meine Sichtbarkeit in ChatGPT gezielt verbessern?",
-              "faq_answer_5": "Ja, durch gezielte GEO-Maßnahmen (Generative Engine Optimization) kann deine Marke so positioniert werden, dass sie auch in KI-generierten Antworten häufiger genannt wird. Das funktioniert unter anderem durch hochwertige Inhalte, strukturierte Daten und digitaler PR, die von Systemen wie ChatGPT besser erkannt und genutzt werden.",
-              "contact_info": "Lass uns über dein Projekt sprechen! Melde dich noch heute für eine kostenlose Beratung.",
-              "footer_cta": "Jetzt kostenloses Erstgespräch vereinbaren",
-              "trust_signals": "Ganzheitliche Strategien | Transparentes Reporting | Zukunftsorientiert",
-              "guarantee_text": "Garantiert mehr Sichtbarkeit auf Google und in KI-Sprachmodellen."
-            }
+            ${styleInstruction}
 
             ---
 
@@ -114,63 +216,60 @@ class FactChecker {
 
             ROLLE: ${roleAndTask}
 
-            🚨 WICHTIGE RICHTLINIEN:
-            - Der "meta_title" darf maximal 55 Zeichen lang sein.
-            - Die "meta_description" darf maximal 155 Zeichen lang sein.
-            - VERWENDE für "meta_title" und "meta_description" Sympole als Trennzeichen.
-            - VERWENDE für "post_title" immer das keyword.
-            - VERMEIDE Superlative wie "beste", "Nummer 1", "Marktführer".
-            - VERMEIDE übermäßigen Einsatz von Gedanken-Trennstrichen in den Texten.
-            - Achte auf eine natürliche Sprache, die dem Text-Stil eines Menschen sehr ähnlich ist.
-            - VERWENDE KEINE absoluten Begriffe wie "garantiert", "100%", "immer", "nie".
-            - Deine Antwort MUSS ein einziges, valides JSON-Objekt sein. Beginne direkt mit { und ende mit }.
-            - Fülle ALLE geforderten Felder mit umfangreichem und thematisch passendem Inhalt.
+            🚨 WICHTIGE RICHTLINIEN & STIL-VORGABEN:
+            - **Kein KI-Geschwafel:** Vermeide leere Phrasen wie "In der heutigen digitalen Welt", "Tauchen wir ein" oder "Es ist wichtig zu beachten". Starte direkt mit dem Mehrwert.
+            - **Satzstruktur:** Variiere zwischen kurzen, prägnanten Sätzen und längeren Erklärungen. Das wirkt menschlicher.
+            - **Meta-Daten:** "meta_title" max. 55 Zeichen, "meta_description" max. 155 Zeichen. Nutze Symbole (➤, ✓) für höhere Klickraten.
+            - **Titel:** VERWENDE für "post_title" immer das keyword.
+            - **Vermeidung:** VERMEIDE Superlative wie "beste", "Nummer 1", "Marktführer" und absolute Begriffe wie "garantiert", "100%", "immer", "nie", es sei denn, sie sind im USP explizit gefordert.
+            - **Formatierung:** Nutze HTML-Listen (<ul><li>) in den Listen-Feldern.
+            - **JSON:** Deine Antwort MUSS ein einziges, valides JSON-Objekt sein. Beginne direkt mit { und ende mit }.
 
-            Das JSON-Objekt muss exakt diese Struktur haben:
+            Das JSON-Objekt muss exakt diese Struktur haben und alle Felder müssen gefüllt sein:
             {
-  "post_title": "...",
-  "post_name": "...",
-  "meta_title": "...",
-  "meta_description": "...",
-  "h1": "...",
-  "h2_1": "...",
-  "h2_1_text": "...",
-  "h2_2": "...",
-  "h2_2_text": "...",
-  "h2_3": "...",
-  "h2_3_text": "...",
-  "h2_4": "...",
-  "h2_4_text": "...",
-  "primary_cta": "...",
-  "secondary_cta": "...",
-  "hero_text": "...",
-  "hero_subtext": "...",
-  "benefits_list_fließtext": "...",
-  "benefits_list": "...",
-  "features_list_fließtext": "...",
-  "features_list": "...",
-  "social_proof": "...",
-  "testimonial_1": "...",
-  "testimonial_2": "...",
-  "pricing_title": "...",
-  "price_1": "...",
-  "price_2": "...",
-  "price_3": "...",
-  "faq_1": "...",
-  "faq_answer_1": "...",
-  "faq_2": "...",
-  "faq_answer_2": "...",
-  "faq_3": "...",
-  "faq_answer_3": "...",
-  "faq_4": "...",
-  "faq_answer_4": "...",
-  "faq_5": "...",
-  "faq_answer_5": "...",
-  "contact_info": "...",
-  "footer_cta": "...",
-  "trust_signals": "...",
-  "guarantee_text": "..."
-}
+              "post_title": "...",
+              "post_name": "...",
+              "meta_title": "...",
+              "meta_description": "...",
+              "h1": "...",
+              "h2_1": "...",
+              "h2_1_text": "...",
+              "h2_2": "...",
+              "h2_2_text": "...",
+              "h2_3": "...",
+              "h2_3_text": "...",
+              "h2_4": "...",
+              "h2_4_text": "...",
+              "primary_cta": "...",
+              "secondary_cta": "...",
+              "hero_text": "...",
+              "hero_subtext": "...",
+              "benefits_list_fließtext": "...",
+              "benefits_list": "...",
+              "features_list_fließtext": "...",
+              "features_list": "...",
+              "social_proof": "...",
+              "testimonial_1": "...",
+              "testimonial_2": "...",
+              "pricing_title": "...",
+              "price_1": "...",
+              "price_2": "...",
+              "price_3": "...",
+              "faq_1": "...",
+              "faq_answer_1": "...",
+              "faq_2": "...",
+              "faq_answer_2": "...",
+              "faq_3": "...",
+              "faq_answer_3": "...",
+              "faq_4": "...",
+              "faq_answer_4": "...",
+              "faq_5": "...",
+              "faq_answer_5": "...",
+              "contact_info": "...",
+              "footer_cta": "...",
+              "trust_signals": "...",
+              "guarantee_text": "..."
+            }
         `;
     }
 }
