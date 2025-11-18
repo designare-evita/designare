@@ -1,4 +1,4 @@
-// js/silas-form.js - FINALE VERSION (Mit Style-Transfer & Template-Support)
+// js/silas-form.js - FINALE VERSION (Mit Style-Transfer, Templates & Lesbarkeit)
 
 export function initSilasForm() {
     const silasForm = document.getElementById('silas-form');
@@ -35,6 +35,7 @@ export function initSilasForm() {
     const phoneInput = document.getElementById('text-phone-input');
     const addressInput = document.getElementById('text-adress-input'); 
     const grammaticalPersonSelect = document.getElementById('grammatical-person-select');
+    const readabilitySelect = document.getElementById('readability-select'); // NEU: Lesbarkeit
     
     // NEU: Style-Transfer Elemente
     const customStyleInput = document.getElementById('custom-style-input');
@@ -209,7 +210,7 @@ export function initSilasForm() {
             const newKeywords = keywordInput.value.split(',').map(kw => kw.trim()).filter(Boolean);
             if (newKeywords.length === 0) return;
 
-            // Erfasse alle Formularwerte INKLUSIVE Style-Transfer
+            // Erfasse alle Formularwerte INKLUSIVE Style-Transfer & Lesbarkeit
             const formValues = {
                 zielgruppe: zielgruppeInput ? zielgruppeInput.value.trim() : '',
                 tonalitaet: tonalitaetInput ? tonalitaetInput.value.trim() : '',
@@ -221,6 +222,8 @@ export function initSilasForm() {
                 phone: phoneInput ? phoneInput.value.trim() : '',
                 address: addressInput ? addressInput.value.trim() : '', 
                 grammaticalPerson: grammaticalPersonSelect ? grammaticalPersonSelect.value : 'singular',
+                // NEU: Lesbarkeit (Readability)
+                readability: readabilitySelect ? readabilitySelect.value : 'balanced',
                 // NEU: Style-Transfer Feld
                 customStyle: customStyleInput ? customStyleInput.value.trim() : ''
             };
@@ -283,6 +286,7 @@ export function initSilasForm() {
             const badges = [
                 createBadge(item.intent === 'commercial' ? 'Kommerziell' : 'Informativ', item.intent === 'commercial' ? '#28a745' : '#17a2b8'),
                 createBadge(item.customStyle ? '🎨 Custom Style' : null, '#9c27b0'), // Lila Badge für Custom Style
+                createBadge(item.readability !== 'balanced' ? `Lvl: ${item.readability}` : null, '#00bcd4'), // Cyan für Lesbarkeit
                 createBadge(item.domain ? `Domain: ${item.domain}`: '', '#4CAF50'),
                 createBadge(item.brand ? `Brand: ${item.brand}`: '', '#fd7e14'),
                 createBadge(item.zielgruppe ? `Für: ${item.zielgruppe}`: '', '#6c757d')
@@ -304,7 +308,7 @@ export function initSilasForm() {
         clearListBtn.style.display = keywordList.length > 0 ? 'inline-block' : 'none';
     }
 
-    // === 4. TEMPLATE & MUSTERTEXT LOGIK (NEU) ===
+    // === 4. TEMPLATE & MUSTERTEXT LOGIK ===
     
     // Templates definieren
     const STYLE_TEMPLATES = {
