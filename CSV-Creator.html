@@ -82,6 +82,33 @@
                     <h2 style="text-align: center;">Deine Texte, deine Regeln: <span style="color: #ffffff;">Mehr als nur Keywords!</span></h2>
                     <p>Gib deine Keywords vor und nutze die optionalen Felder, um die Textqualität auf ein neues Level zu heben. Je mehr Details du zu <strong>Domain, Brand, Zielgruppe, Tonalität und deinem USP</strong> angibst, desto präziser und überzeugender wird der von Silas generierte Content. Das Ergebnis erhältst du als CSV, TXT oder HTML zum Download.</p>
                     
+                    <div id="style-transfer-section" style="margin-top: 25px; margin-bottom: 35px; padding-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.15);">
+                        <h3 style="color: #ffc107; font-size: 1.1rem; margin-bottom: 10px;">
+                            <i class="fas fa-magic"></i> Style-Transfer & Mustertexte
+                        </h3>
+                        <p style="font-size: 0.9rem; color: #ccc; margin-bottom: 20px; line-height: 1.5;">
+                            Wähle eine Vorlage oder füge einen eigenen Text ein, dessen Schreibstil Silas imitieren soll.
+                        </p>
+
+                        <div class="input-group" style="margin-bottom: 20px;">
+                            <label for="template-selector" style="color: #fff; font-weight: 500; margin-bottom: 8px; display: block;">Vorlage wählen:</label>
+                            <select id="template-selector" class="custom-select" style="width: 100%;">
+                                <option value="">-- Bitte wählen oder eigenen Text eingeben --</option>
+                                <option value="emotional">❤️ Emotional & Storytelling (B2C)</option>
+                                <option value="hard-facts">📊 Faktenorientiert & Kurz (B2B)</option>
+                                <option value="du-ansprache">👋 Locker & 'Du'-Ansprache</option>
+                                <option value="serioes">👔 Seriös & Professionell (Enterprise)</option>
+                            </select>
+                        </div>
+
+                        <label for="custom-style-input" style="color: #fff; font-weight: 500; margin-bottom: 8px; display: block;">Mustertext / Stil-Vorlage:</label>
+                        <div class="silas-input-container" style="height: auto; padding: 0;">
+                            <textarea id="custom-style-input" class="silas-extra-input" 
+                                placeholder="Hier erscheint der Mustertext. Du kannst ihn bearbeiten oder etwas ganz Eigenes hineinkopieren..."
+                                rows="6" 
+                                style="width:100%; min-height:120px; padding: 15px; line-height: 1.5; resize: vertical; background: transparent; border: none; color: #eee; box-sizing: border-box;"></textarea>
+                        </div>
+                    </div>
                     <div class="input-group">
                         <label for="text-intent-select">Text-Typ:</label>
                         <select id="text-intent-select" class="custom-select">
@@ -124,34 +151,7 @@
                     <div class="silas-input-container">
                         <input type="text" id="text-usp-input" class="silas-extra-input" placeholder="Alleinstellungsmerkmal (USP) (optional): z.B. 24/7-Support" autocomplete="off">
                     </div>
-
-                    <div id="style-transfer-section" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.15);">
-                        <h3 style="color: #ffc107; font-size: 1.1rem; margin-bottom: 10px;">
-                            <i class="fas fa-magic"></i> Style-Transfer & Mustertexte
-                        </h3>
-                        <p style="font-size: 0.9rem; color: #ccc; margin-bottom: 20px; line-height: 1.5;">
-                            Wähle eine Vorlage oder füge einen eigenen Text ein, dessen Schreibstil Silas imitieren soll.
-                        </p>
-
-                        <div class="input-group" style="margin-bottom: 20px;">
-                            <label for="template-selector" style="color: #fff; font-weight: 500; margin-bottom: 8px; display: block;">Vorlage wählen:</label>
-                            <select id="template-selector" class="custom-select" style="width: 100%;">
-                                <option value="">-- Bitte wählen oder eigenen Text eingeben --</option>
-                                <option value="emotional">❤️ Emotional & Storytelling (B2C)</option>
-                                <option value="hard-facts">📊 Faktenorientiert & Kurz (B2B)</option>
-                                <option value="du-ansprache">👋 Locker & 'Du'-Ansprache</option>
-                                <option value="serioes">👔 Seriös & Professionell (Enterprise)</option>
-                            </select>
-                        </div>
-
-                        <label for="custom-style-input" style="color: #fff; font-weight: 500; margin-bottom: 8px; display: block;">Mustertext / Stil-Vorlage:</label>
-                        <div class="silas-input-container" style="height: auto; padding: 0;">
-                            <textarea id="custom-style-input" class="silas-extra-input" 
-                                placeholder="Hier erscheint der Mustertext. Du kannst ihn bearbeiten oder etwas ganz Eigenes hineinkopieren..."
-                                rows="6" 
-                                style="width:100%; min-height:120px; padding: 15px; line-height: 1.5; resize: vertical; background: transparent; border: none; color: #eee; box-sizing: border-box;"></textarea>
-                        </div>
-                    </div>
+                             
                     <form id="silas-form" style="margin-top: 30px;">
                         <input type="text" id="silas-keyword-input" placeholder="Gib ein oder mehrere Keywords ein (mit Komma trennen)..." autocomplete="off">
                         <button type="submit" id="add-keyword-btn" aria-label="Keyword hinzufügen">
