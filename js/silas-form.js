@@ -1,4 +1,4 @@
-// js/silas-form.js - FINALE, VOLLSTÄNDIGE VERSION MIT ALLEN FUNKTIONEN UND KORREKTUREN
+// js/silas-form.js - FINALE VERSION (Mit Style-Transfer & Template-Support)
 
 export function initSilasForm() {
     const silasForm = document.getElementById('silas-form');
@@ -6,6 +6,7 @@ export function initSilasForm() {
         return;
     }
 
+    // KONFIGURATION & LIMITS
     const MASTER_PASSWORD = "SilasUnlimited2024!";
     let DEMO_LIMITS = { maxKeywordsPerSession: 3, maxGenerationsPerHour: 5, maxGenerationsPerDay: 10, cooldownBetweenRequests: 30000 };
     const MASTER_LIMITS = { maxKeywordsPerSession: 50, maxGenerationsPerHour: 100, maxGenerationsPerDay: 500, cooldownBetweenRequests: 1000 };
@@ -17,9 +18,13 @@ export function initSilasForm() {
     const clearListBtn = document.getElementById('clear-list-btn');
     const silasStatus = document.getElementById('silas-status');
     const silasResponseContainer = document.getElementById('silas-response-container');
+    
+    // Modal & Preview Elemente
     const previewModal = document.getElementById('silas-preview-modal');
     const closePreviewModalBtn = document.getElementById('close-preview-modal');
     const previewContentArea = document.getElementById('preview-content-area');
+    
+    // Formular-Inputs (Optionale Felder)
     const textIntentSelect = document.getElementById('text-intent-select');
     const zielgruppeInput = document.getElementById('text-zielgruppe-input');
     const tonalitaetInput = document.getElementById('text-tonalitaet-input');
@@ -30,17 +35,25 @@ export function initSilasForm() {
     const phoneInput = document.getElementById('text-phone-input');
     const addressInput = document.getElementById('text-adress-input'); 
     const grammaticalPersonSelect = document.getElementById('grammatical-person-select');
+    
+    // NEU: Style-Transfer Elemente
+    const customStyleInput = document.getElementById('custom-style-input');
+    const templateSelector = document.getElementById('template-selector');
 
     let keywordList = [];
     let allGeneratedData = [];
+
+    // === 1. MASTER MODE & LIMIT LOGIK ===
 
     function isMasterModeActive() {
         const masterMode = sessionStorage.getItem('silas_master_mode');
         const timestamp = parseInt(sessionStorage.getItem('silas_master_timestamp') || '0');
         const now = Date.now();
+        // Master Mode läuft nach 8 Stunden ab
         if (masterMode === 'true' && (now - timestamp) < (8 * 60 * 60 * 1000)) {
             return true;
         }
+        // Auto-Logout wenn abgelaufen
         if (masterMode === 'true') {
             sessionStorage.removeItem('silas_master_mode');
             sessionStorage.removeItem('silas_master_timestamp');
@@ -48,6 +61,7 @@ export function initSilasForm() {
         return false;
     }
 
+    // Limits aktualisieren falls Master Mode aktiv
     if (isMasterModeActive()) {
         DEMO_LIMITS = Object.assign({}, MASTER_LIMITS);
     }
@@ -117,6 +131,8 @@ export function initSilasForm() {
         setTimeout(() => notification.remove(), 4000);
     }
 
+    // === 2. TRACKING & LIMITS ===
+
     function initDemoTracking() {
         const now = Date.now();
         const today = new Date().toDateString();
@@ -137,6 +153,7 @@ export function initSilasForm() {
         const dailyData = JSON.parse(localStorage.getItem('silas_daily') || '{}');
         const hourlyData = JSON.parse(localStorage.getItem('silas_hourly') || '{}');
         const lastRequest = parseInt(localStorage.getItem('silas_last_request') || '0');
+        
         if (now - lastRequest < DEMO_LIMITS.cooldownBetweenRequests) throw new Error(`⏱️ Bitte warte noch ${Math.ceil((DEMO_LIMITS.cooldownBetweenRequests - (now - lastRequest)) / 1000)} Sekunden.`);
         if (dailyData.count >= DEMO_LIMITS.maxGenerationsPerDay) throw new Error(`📅 Tägliches Demo-Limit erreicht (${DEMO_LIMITS.maxGenerationsPerDay}).`);
         if (hourlyData.count >= DEMO_LIMITS.maxGenerationsPerHour) throw new Error(`⏰ Stündliches Demo-Limit erreicht (${DEMO_LIMITS.maxGenerationsPerHour}).`);
@@ -153,18 +170,6 @@ export function initSilasForm() {
         localStorage.setItem('silas_hourly', JSON.stringify(hourlyData));
         localStorage.setItem('silas_last_request', now.toString());
         showDemoStatus();
-    }
-
-    function validateKeyword(keyword) {
-        if (isMasterModeActive()) {
-            if (keyword.length > 100) throw new Error('📏 Keyword zu lang (max. 100 Zeichen).');
-            return true;
-        }
-        const forbidden = ['adult', 'porn', 'sex', 'drugs', 'illegal', 'hack', 'crack', 'bitcoin', 'crypto', 'gambling', 'casino', 'pharma'];
-        if (forbidden.some(term => keyword.toLowerCase().includes(term))) throw new Error(`🚫 Das Keyword "${keyword}" ist nicht erlaubt.`);
-        if (keyword.length > 50) throw new Error('📏 Keywords dürfen maximal 50 Zeichen lang sein.');
-        if (!/^[a-zA-ZäöüÄÖÜß\s\-_0-9]+$/.test(keyword)) throw new Error('✏️ Keywords dürfen nur Buchstaben, Zahlen, Leerzeichen und Bindestriche enthalten.');
-        return true;
     }
 
     function showDemoStatus() {
@@ -184,23 +189,40 @@ export function initSilasForm() {
             demoStatusContainer.innerHTML = `<div style="background: linear-gradient(135deg, rgba(255,193,7,0.1) 0%, rgba(255,193,7,0.05) 100%); border: 1px solid #ffc107; border-radius: 8px; padding: 15px; margin: 15px 0; text-align: center; color: #ffc107;"><strong>🎯 Demo-Modus:</strong> Heute noch <strong>${dailyRemaining}</strong> | Diese Stunde noch <strong>${hourlyRemaining}</strong> Generierungen</div>`;
         }
     }
+
+    function validateKeyword(keyword) {
+        if (isMasterModeActive()) {
+            if (keyword.length > 100) throw new Error('📏 Keyword zu lang (max. 100 Zeichen).');
+            return true;
+        }
+        const forbidden = ['adult', 'porn', 'sex', 'drugs', 'illegal', 'hack', 'crack', 'bitcoin', 'crypto', 'gambling', 'casino', 'pharma'];
+        if (forbidden.some(term => keyword.toLowerCase().includes(term))) throw new Error(`🚫 Das Keyword "${keyword}" ist nicht erlaubt.`);
+        if (keyword.length > 50) throw new Error('📏 Keywords dürfen maximal 50 Zeichen lang sein.');
+        if (!/^[a-zA-ZäöüÄÖÜß\s\-_0-9]+$/.test(keyword)) throw new Error('✏️ Keywords dürfen nur Buchstaben, Zahlen, Leerzeichen und Bindestriche enthalten.');
+        return true;
+    }
+
+    // === 3. KEYWORD MANAGEMENT ===
     
     function addKeywords() {
         try {
             const newKeywords = keywordInput.value.split(',').map(kw => kw.trim()).filter(Boolean);
             if (newKeywords.length === 0) return;
 
+            // Erfasse alle Formularwerte INKLUSIVE Style-Transfer
             const formValues = {
-                zielgruppe: zielgruppeInput.value.trim(),
-                tonalitaet: tonalitaetInput.value.trim(),
-                usp: uspInput.value.trim(),
-                intent: textIntentSelect.value,
-                domain: domainInput.value.trim(),
-                brand: brandInput.value.trim(),
-                email: emailInput.value.trim(),
-                phone: phoneInput.value.trim(),
+                zielgruppe: zielgruppeInput ? zielgruppeInput.value.trim() : '',
+                tonalitaet: tonalitaetInput ? tonalitaetInput.value.trim() : '',
+                usp: uspInput ? uspInput.value.trim() : '',
+                intent: textIntentSelect ? textIntentSelect.value : 'informational',
+                domain: domainInput ? domainInput.value.trim() : '',
+                brand: brandInput ? brandInput.value.trim() : '',
+                email: emailInput ? emailInput.value.trim() : '',
+                phone: phoneInput ? phoneInput.value.trim() : '',
                 address: addressInput ? addressInput.value.trim() : '', 
-                grammaticalPerson: grammaticalPersonSelect.value,
+                grammaticalPerson: grammaticalPersonSelect ? grammaticalPersonSelect.value : 'singular',
+                // NEU: Style-Transfer Feld
+                customStyle: customStyleInput ? customStyleInput.value.trim() : ''
             };
 
             newKeywords.forEach(validateKeyword);
@@ -211,10 +233,13 @@ export function initSilasForm() {
 
             newKeywords.forEach(keyword => {
                 const existingIndex = keywordList.findIndex(item => item.keyword === keyword);
+                // Merge keyword mit den aktuellen Formular-Settings
                 const keywordData = { keyword, ...formValues };
+                
                 if (existingIndex === -1) {
                     keywordList.push(keywordData);
                 } else {
+                    // Update existierendes Keyword mit neuen Settings
                     keywordList[existingIndex] = keywordData;
                 }
             });
@@ -257,18 +282,13 @@ export function initSilasForm() {
 
             const badges = [
                 createBadge(item.intent === 'commercial' ? 'Kommerziell' : 'Informativ', item.intent === 'commercial' ? '#28a745' : '#17a2b8'),
+                createBadge(item.customStyle ? '🎨 Custom Style' : null, '#9c27b0'), // Lila Badge für Custom Style
                 createBadge(item.domain ? `Domain: ${item.domain}`: '', '#4CAF50'),
                 createBadge(item.brand ? `Brand: ${item.brand}`: '', '#fd7e14'),
-                createBadge(item.email ? `E-Mail: ${item.email}`: '', '#007bff'),
-                createBadge(item.phone ? `Tel: ${item.phone}`: '', '#dc3545'),
-                createBadge(item.address ? `Adresse: ${item.address}`: '', '#17a2b8'),
-                createBadge(item.zielgruppe ? `Für: ${item.zielgruppe}`: '', '#6c757d'),
-                createBadge(item.tonalitaet ? `Ton: ${item.tonalitaet}`: '', '#6c757d'),
-                createBadge(item.usp ? `USP: ${item.usp}`: '', '#6c757d')
+                createBadge(item.zielgruppe ? `Für: ${item.zielgruppe}`: '', '#6c757d')
             ].filter(Boolean);
             
             badges.forEach(badge => badgesContainer.appendChild(badge));
-            
             contentDiv.appendChild(badgesContainer);
             
             const removeBtn = document.createElement('button');
@@ -283,6 +303,35 @@ export function initSilasForm() {
         });
         clearListBtn.style.display = keywordList.length > 0 ? 'inline-block' : 'none';
     }
+
+    // === 4. TEMPLATE & MUSTERTEXT LOGIK (NEU) ===
+    
+    // Templates definieren
+    const STYLE_TEMPLATES = {
+        'emotional': "Stell dir vor, du wachst morgens auf und fühlst dich endlich ausgeschlafen. Genau dieses Gefühl möchten wir dir mit [PRODUKT] zurückgeben. Es ist nicht einfach nur eine Matratze – es ist dein täglicher Rückzugsort, der dich sanft in den Schlaf begleitet.",
+        'hard-facts': "Mit [PRODUKT] steigern Sie Ihre Effizienz nachweislich um 20%. Unsere Lösung basiert auf patentierter Technologie, die Prozesse automatisiert und Fehlerquellen minimiert. Die Amortisationszeit beträgt durchschnittlich weniger als 6 Monate.",
+        'du-ansprache': "Hey! Hast du auch keine Lust mehr auf komplizierte Lösungen? Wir machen es dir einfach. Hol dir jetzt [PRODUKT] und starte direkt durch – ohne Fachchinesisch und ohne versteckte Kosten. Einfach machen!",
+        'serioes': "Die [UNTERNEHMEN] steht seit über 25 Jahren für Exzellenz und Zuverlässigkeit. Wir begleiten unsere Mandanten mit fundierter Expertise und diskreter Beratung. Unser Anspruch ist es, nachhaltige Werte zu schaffen und langfristige Partnerschaften zu pflegen."
+    };
+
+    // Event Listener für Template-Selector
+    if (templateSelector && customStyleInput) {
+        templateSelector.addEventListener('change', (e) => {
+            const selectedType = e.target.value;
+            if (STYLE_TEMPLATES[selectedType]) {
+                // Füge Template ein und animiere kurz den Fokus
+                customStyleInput.value = STYLE_TEMPLATES[selectedType];
+                customStyleInput.focus();
+                // Optional: Visuelles Feedback
+                customStyleInput.style.borderColor = '#ffc107';
+                setTimeout(() => customStyleInput.style.borderColor = '', 500);
+            } else if (selectedType === '') {
+                customStyleInput.value = '';
+            }
+        });
+    }
+
+    // === 5. GENERIERUNG STARTEN ===
 
     startGenerationBtn.addEventListener('click', async function() {
         try {
@@ -328,21 +377,14 @@ export function initSilasForm() {
             
             if (allGeneratedData.some(d => !d.error && !d._fallback_used)) {
                 const downloadContainer = document.createElement('div');
-                downloadContainer.style.marginTop = '1rem';
-                // KORREKTUR: Container nutzt Flexbox für perfekte vertikale Ausrichtung
-                downloadContainer.style.display = 'flex';
-                downloadContainer.style.flexDirection = 'column';
-                downloadContainer.style.gap = '1rem';
-                downloadContainer.style.alignItems = 'center';
+                downloadContainer.style.cssText = 'margin-top: 1rem; display: flex; flex-direction: column; gap: 1rem; align-items: center;';
 
-                // KORREKTUR: marginLeft aus der Funktion entfernt
                 const createButton = (id, text, icon, clickHandler) => {
                     const button = document.createElement('button');
                     button.id = id;
                     button.className = 'cta-button';
                     button.innerHTML = `<i class="fas ${icon}"></i> ${text}`;
-                    button.style.maxWidth = '400px'; // Buttons nicht zu breit machen
-                    button.style.width = '100%';
+                    button.style.cssText = 'max-width: 400px; width: 100%;';
                     button.addEventListener('click', clickHandler);
                     return button;
                 };
@@ -364,6 +406,8 @@ export function initSilasForm() {
             clearListBtn.disabled = false;
         }
     });
+
+    // === 6. ANZEIGE & PREVIEW FUNKTIONEN ===
 
     function displayResult(data, index, container) {
         const resultCard = document.createElement('div');
@@ -422,6 +466,7 @@ export function initSilasForm() {
         }
     });
 
+   // Hilfsfunktion für HTML-Vorschau
    function generateLandingpageHtml(data) {
     const createFaqEntry = (question, answer) => {
         if (!question || !answer) return '';
@@ -444,19 +489,16 @@ export function initSilasForm() {
             </header>
             
             <main style="max-width: 1000px; margin: 0 auto;">
-                <!-- H2_1 Section mit Fließtext -->
                 <section style="margin-bottom: 40px; padding: 25px; background-color: rgba(255,255,255,0.05); border-radius: 8px; border-left: 4px solid #ff6b6b;">
                     <h2 style="color: #ff6b6b; margin-bottom: 15px; font-size: 1.8rem;">${data.h2_1 || 'N/A'}</h2>
                     <p style="color: #ccc; font-size: 1rem; line-height: 1.7; margin-top: 15px;">${data.h2_1_text || ''}</p>
                 </section>
                 
-                <!-- H2_2 Section mit Fließtext -->
                 <section style="margin-bottom: 40px; padding: 25px; background-color: rgba(255,255,255,0.05); border-radius: 8px; border-left: 4px solid #28a745;">
                     <h2 style="color: #28a745; margin-bottom: 15px; font-size: 1.8rem;">${data.h2_2 || 'N/A'}</h2>
                     <p style="color: #ccc; font-size: 1rem; line-height: 1.7; margin-top: 15px;">${data.h2_2_text || ''}</p>
                 </section>
                 
-                <!-- Features & Benefits -->
                 <section style="margin-bottom: 40px;">
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;">
                         <div style="padding: 25px; background-color: rgba(255,255,255,0.05); border-radius: 8px;">
@@ -473,7 +515,6 @@ export function initSilasForm() {
                     </div>
                 </section>
                 
-                <!-- H2_4 Section mit Fließtext -->
                 <section style="margin-bottom: 40px; padding: 25px; background-color: rgba(255,255,255,0.05); border-radius: 8px; border-left: 4px solid #17a2b8;">
                     <h2 style="color: #17a2b8; margin-bottom: 15px; font-size: 1.8rem;">${data.h2_4 || 'Vertrauen & Qualität'}</h2>
                     <p style="color: #ccc; font-size: 1rem; line-height: 1.7; margin-bottom: 20px;">${data.h2_4_text || ''}</p>
@@ -481,7 +522,6 @@ export function initSilasForm() {
                     <p style="color: #aaa; text-align: center;">${data.trust_signals || ''}</p>
                 </section>
                 
-                <!-- Testimonials -->
                 <section style="margin-bottom: 40px;">
                     <h3 style="color: #ffc107; text-align: center; margin-bottom: 25px; font-size: 1.8rem;">Kundenstimmen</h3>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
@@ -494,7 +534,6 @@ export function initSilasForm() {
                     </div>
                 </section>
                 
-                <!-- Pricing -->
                 <section style="margin-bottom: 40px;">
                     <h3 style="color: #ffc107; text-align: center; margin-bottom: 25px; font-size: 1.8rem;">${data.pricing_title || 'Unsere Pakete'}</h3>
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
@@ -513,7 +552,6 @@ export function initSilasForm() {
                     </div>
                 </section>
                 
-                <!-- FAQ -->
                 <section style="margin-bottom: 40px;">
                     <h3 style="color: #ffc107; text-align: center; margin-bottom: 25px; font-size: 1.8rem;">Häufige Fragen</h3>
                     <div>
@@ -525,7 +563,6 @@ export function initSilasForm() {
                     </div>
                 </section>
                 
-                <!-- CTA -->
                 <section style="text-align: center; padding: 30px; background: linear-gradient(45deg, rgba(255,193,7,0.1), rgba(255,193,7,0.2)); border-radius: 10px; border: 2px solid #ffc107;">
                     <h3 style="color: #ffc107; margin-bottom: 15px;">${data.guarantee_text || 'N/A'}</h3>
                     <p style="color: #ccc; margin-bottom: 25px;">${data.contact_info || ''}</p>
@@ -533,7 +570,6 @@ export function initSilasForm() {
                 </section>
             </main>
             
-            <!-- SEO Info -->
             <aside style="margin-top: 50px; padding: 25px; background: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(45,45,45,0.7) 100%); border-radius: 12px; border: 2px solid #444;">
                 <h3 style="color: #ffc107; margin: 0 0 25px 0; text-align: center; font-size: 1.5rem; border-bottom: 2px solid #ffc107; padding-bottom: 10px;">📊 SEO & Meta-Informationen</h3>
                 <div style="display: flex; flex-direction: column; gap: 20px; max-width: 100%;">
@@ -559,7 +595,9 @@ export function initSilasForm() {
             </aside>
         </div>
     `;
-}
+    }
+
+    // === 7. DOWNLOAD FUNKTIONEN ===
 
     function downloadHtml(index) {
         const data = allGeneratedData[index];
@@ -656,6 +694,8 @@ export function initSilasForm() {
         downloadFile(csvContent, 'silas_generated_content.csv', 'text/csv;charset=utf-8;');
     }
     
+    // === 8. EVENT LISTENER & INITIALISIERUNG ===
+
     silasForm.addEventListener('submit', e => { e.preventDefault(); addKeywords(); });
     keywordInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addKeywords(); } });
     keywordDisplayList.addEventListener('click', e => {
