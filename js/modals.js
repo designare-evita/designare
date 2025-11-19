@@ -1,4 +1,4 @@
-// js/modals.js - KORRIGIERTE VERSION mit funktionierender About-Me Pagination
+// js/modals.js - PERFORMANCE OPTIMIERTE VERSION (Kein Flackern mehr)
 
 export const openModal = (modalElement) => {
     if (modalElement) {
@@ -16,7 +16,7 @@ export const closeModal = (modalElement) => {
     }
 };
 
-// Diese Funktion wird von `ai-form.js` aufgerufen, um das Modal-Fenster anzuzeigen.
+// Diese Funktion wird von `ai-form.js` aufgerufen
 export function showAIResponse(content, isHTML = false) {
     const modal = document.getElementById('ai-response-modal');
     const contentArea = document.getElementById('ai-chat-history');
@@ -40,14 +40,10 @@ function setupCookieModal() {
     const privacyPolicyLinkButton = document.getElementById('privacy-policy-link-button');
     const cookieInfoButton = document.getElementById('cookie-info-button');
 
-    console.log('🍪 Richte Cookie Modal ein...');
-
-    // Zeige Cookie Lightbox automatisch nach 2 Sekunden, falls noch nicht gesehen
     if (cookieInfoLightbox && !localStorage.getItem('hasSeenCookieInfoLightbox')) {
         setTimeout(() => openModal(cookieInfoLightbox), 2000);
     }
 
-    // Button zum Bestätigen der Cookies
     if (acknowledgeCookieLightboxBtn) {
         acknowledgeCookieLightboxBtn.addEventListener('click', () => {
             localStorage.setItem('hasSeenCookieInfoLightbox', 'true');
@@ -55,7 +51,6 @@ function setupCookieModal() {
         });
     }
 
-    // Datenschutz-Link aus der Cookie-Lightbox
     if (privacyPolicyLinkButton) {
         privacyPolicyLinkButton.addEventListener('click', (e) => {
             e.preventDefault();
@@ -64,7 +59,6 @@ function setupCookieModal() {
         });
     }
 
-    // Cookie Info Button im Header
     if (cookieInfoButton) {
         cookieInfoButton.addEventListener('click', (e) => {
             e.preventDefault();
@@ -84,15 +78,10 @@ function setupContactModal() {
     const contactSuccessMessage = document.getElementById('contact-success-message');
     const closeSuccessBtn = document.getElementById('close-success-message');
 
-    console.log('📧 Richte Kontakt Modal ein...');
-
-    // Kontakt Button im Header
     if (contactButton) {
         contactButton.addEventListener('click', (e) => {
             e.preventDefault();
-            console.log('📧 Kontakt Button geklickt');
             if (contactModal) {
-                // Stelle sicher, dass das Formular sichtbar und die Erfolgsmeldung versteckt ist
                 contactForm.style.display = 'block';
                 contactSuccessMessage.style.display = 'none';
                 openModal(contactModal);
@@ -100,14 +89,10 @@ function setupContactModal() {
         });
     }
 
-    // Schließen-Button
     if (closeModalBtn) {
-        closeModalBtn.addEventListener('click', () => {
-            closeModal(contactModal);
-        });
+        closeModalBtn.addEventListener('click', () => closeModal(contactModal));
     }
 
-    // Erfolgsmeldung schließen
     if (closeSuccessBtn) {
         closeSuccessBtn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -115,16 +100,12 @@ function setupContactModal() {
         });
     }
 
-    // Formular-Submit-Handler
     if (contactForm) {
         contactForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            console.log('📧 Kontaktformular abgesendet');
-
             const formData = new FormData(contactForm);
             const submitButton = contactForm.querySelector('button[type="submit"]');
             
-            // Button deaktivieren während des Sendens
             submitButton.disabled = true;
             submitButton.textContent = 'Wird gesendet...';
 
@@ -133,11 +114,9 @@ function setupContactModal() {
                     method: 'POST',
                     body: formData
                 });
-
                 const result = await response.json();
 
                 if (result.success) {
-                    // Erfolgreich gesendet - zeige Erfolgsmeldung
                     contactForm.style.display = 'none';
                     contactSuccessMessage.style.display = 'block';
                     contactForm.reset();
@@ -145,10 +124,9 @@ function setupContactModal() {
                     throw new Error(result.message || 'Unbekannter Fehler');
                 }
             } catch (error) {
-                console.error('Fehler beim Senden der Nachricht:', error);
-                alert('Fehler beim Senden der Nachricht. Bitte versuche es später erneut.');
+                console.error('Fehler beim Senden:', error);
+                alert('Fehler beim Senden. Bitte später erneut versuchen.');
             } finally {
-                // Button wieder aktivieren
                 submitButton.disabled = false;
                 submitButton.textContent = 'Ab die Post!';
             }
@@ -157,14 +135,12 @@ function setupContactModal() {
 }
 
 // ===================================================================
-// ABOUT ME MODAL SETUP - KORRIGIERT
+// ABOUT ME MODAL SETUP - OPTIMIERT
 // ===================================================================
 function setupAboutModal() {
     const aboutButton = document.getElementById('about-me-button');
     const legalModal = document.getElementById('legal-modal');
     const aboutContent = document.getElementById('about-me-content');
-
-    console.log('👤 Richte About Me Modal ein...');
 
     if (aboutButton) {
         aboutButton.addEventListener('click', (e) => {
@@ -174,14 +150,15 @@ function setupAboutModal() {
             if (legalModal && aboutContent) {
                 const contentArea = document.getElementById('legal-modal-content-area');
                 if (contentArea) {
+                    // 1. Inhalt einfügen
                     contentArea.innerHTML = aboutContent.innerHTML;
-                    openModal(legalModal);
                     
-                    // *** HIER IST DIE KORREKTUR ***
-                    // Starte About-Me spezifische Pagination
-                    setTimeout(() => {
-                        setupAboutMePagination(contentArea);
-                    }, 100);
+                    // 2. Paginierung anwenden BEVOR das Modal aufgeht
+                    // (Verhindert, dass man kurz den vollen Text sieht)
+                    setupAboutMePagination(contentArea); 
+                    
+                    // 3. Jetzt erst öffnen
+                    openModal(legalModal);
                 }
             }
         });
@@ -189,11 +166,9 @@ function setupAboutModal() {
 }
 
 // ===================================================================
-// SPEZIELLE ABOUT-ME PAGINATION FUNKTION - NEU HINZUGEFÜGT
+// ABOUT-ME PAGINATION
 // ===================================================================
 function setupAboutMePagination(contentArea) {
-    console.log('👤 Richte About-Me Pagination ein...');
-    
     const config = {
         totalPages: 2,
         pages: [
@@ -202,7 +177,6 @@ function setupAboutMePagination(contentArea) {
         ]
     };
     
-    // Pagination State
     const paginationState = {
         currentPage: 0,
         pages: config.pages
@@ -230,13 +204,10 @@ function setupAboutMePagination(contentArea) {
     
     function updatePagination() {
         const existingPagination = contentArea.querySelector('.legal-modal-pagination-buttons');
-        if (existingPagination) {
-            existingPagination.remove();
-        }
+        if (existingPagination) existingPagination.remove();
         
         contentArea.insertAdjacentHTML('beforeend', createPaginationHTML(paginationState.currentPage));
         
-        // Event-Listener für neue Buttons
         const prevBtn = document.getElementById('about-prev-btn');
         const nextBtn = document.getElementById('about-next-btn');
         
@@ -248,7 +219,6 @@ function setupAboutMePagination(contentArea) {
                 }
             });
         }
-        
         if (nextBtn && !nextBtn.disabled) {
             nextBtn.addEventListener('click', () => {
                 if (paginationState.currentPage < config.totalPages - 1) {
@@ -260,120 +230,79 @@ function setupAboutMePagination(contentArea) {
     }
     
     function showPage(pageIndex) {
-        console.log('👤 Zeige About-Me Seite:', pageIndex);
-        
-        // Verstecke alle Abschnitte - aber arbeite mit ALL Elementen innerhalb des .legal-container
         const legalContainer = contentArea.querySelector('.legal-container');
-        if (!legalContainer) {
-            console.error('👤 Legal Container nicht gefunden!');
-            return;
-        }
+        if (!legalContainer) return;
         
         const allElements = Array.from(legalContainer.children);
-        console.log('👤 Gefundene Elemente im Container:', allElements.length);
         
-        allElements.forEach(element => {
-            element.style.display = 'none';
-        });
+        // Alles verstecken
+        allElements.forEach(element => element.style.display = 'none');
         
-        // Zeige immer den Haupttitel
+        // Titel immer zeigen
         const title = legalContainer.querySelector('h1');
         if (title) title.style.display = 'block';
         
         if (pageIndex === 0) {
-            // Seite 1: Bis zum H2 mit "Doch Michael ist mehr als nur Code und Pixel"
-            console.log('👤 Zeige Seite 1 - bis zum H2 Breakpoint');
-            
+            // Seite 1 Logic
             let foundBreakpoint = false;
-            
             for (let i = 0; i < allElements.length; i++) {
                 const element = allElements[i];
-                
-                // SPEZIFISCHERE Breakpoint-Erkennung: Nur H2 mit exakter Klasse oder Text
-                const isBreakpoint = (
-                    element.tagName === 'H2' && 
+                const isBreakpoint = (element.tagName === 'H2' && 
                     (element.classList.contains('about-section-header') || 
-                     element.textContent.includes('Doch Michael ist mehr als nur Code und Pixel'))
-                );
+                     element.textContent.includes('Doch Michael ist mehr als nur Code und Pixel')));
                 
                 if (isBreakpoint) {
-                    console.log('👤 H2-Breakpoint gefunden bei:', element.textContent.substring(0, 50));
                     foundBreakpoint = true;
                     break;
                 }
-                
                 element.style.display = 'block';
-                console.log('👤 Zeige Element Seite 1:', element.tagName, element.textContent.substring(0, 30));
             }
-            
             if (!foundBreakpoint) {
-                console.warn('👤 H2-Breakpoint nicht gefunden! Verwende Element-basierte Aufteilung');
-                // Fallback: Zeige etwa die ersten 60% der Elemente
+                // Fallback
                 const splitIndex = Math.floor(allElements.length * 0.6);
                 for (let i = 0; i < splitIndex; i++) {
-                    if (allElements[i]) {
-                        allElements[i].style.display = 'block';
-                        console.log('👤 Fallback Seite 1:', allElements[i].tagName);
-                    }
+                    if (allElements[i]) allElements[i].style.display = 'block';
                 }
             }
-            
         } else if (pageIndex === 1) {
-            // Seite 2: Ab dem H2 Breakpoint
-            console.log('👤 Zeige Seite 2 - ab dem H2 Breakpoint');
-            
+            // Seite 2 Logic
             let foundBreakpoint = false;
             let breakpointIndex = -1;
-            
-            // Finde den Breakpoint-Index
             for (let i = 0; i < allElements.length; i++) {
                 const element = allElements[i];
-                
-                const isBreakpoint = (
-                    element.tagName === 'H2' && 
+                const isBreakpoint = (element.tagName === 'H2' && 
                     (element.classList.contains('about-section-header') || 
-                     element.textContent.includes('Doch Michael ist mehr als nur Code und Pixel'))
-                );
+                     element.textContent.includes('Doch Michael ist mehr als nur Code und Pixel')));
                 
                 if (isBreakpoint) {
                     foundBreakpoint = true;
                     breakpointIndex = i;
-                    console.log('👤 H2-Breakpoint gefunden bei Index:', i);
                     break;
                 }
             }
-            
             if (foundBreakpoint) {
-                // Zeige alle Elemente ab dem Breakpoint
                 for (let i = breakpointIndex; i < allElements.length; i++) {
                     allElements[i].style.display = 'block';
-                    console.log('👤 Zeige Element Seite 2:', allElements[i].tagName, allElements[i].textContent.substring(0, 30));
                 }
             } else {
-                console.warn('👤 H2-Breakpoint nicht gefunden! Verwende Element-basierte Aufteilung');
-                // Fallback: Zeige die letzten 40% der Elemente
+                // Fallback
                 const splitIndex = Math.floor(allElements.length * 0.6);
                 for (let i = splitIndex; i < allElements.length; i++) {
-                    if (allElements[i]) {
-                        allElements[i].style.display = 'block';
-                        console.log('👤 Fallback Seite 2:', allElements[i].tagName);
-                    }
+                    if (allElements[i]) allElements[i].style.display = 'block';
                 }
             }
         }
         
         updatePagination();
-        
-        // Scroll zum Anfang des Modal-Inhalts
         contentArea.scrollTop = 0;
     }
     
-    // Initialisiere erste Seite
-    setTimeout(() => showPage(0), 100);
+    // WICHTIG: Sofort ausführen, kein Timeout!
+    showPage(0);
 }
 
 // ===================================================================
-// LEGAL CONTENT LOADER (Impressum, Datenschutz, Disclaimer)
+// LEGAL CONTENT LOADER
 // ===================================================================
 function loadLegalContentWithPagination(page) {
     console.log('📄 Lade Legal Content:', page);
@@ -381,25 +310,18 @@ function loadLegalContentWithPagination(page) {
     const legalModal = document.getElementById('legal-modal');
     const contentArea = document.getElementById('legal-modal-content-area');
 
-    if (!legalModal || !contentArea) {
-        console.error('Legal Modal oder Content Area nicht gefunden');
-        return;
-    }
+    if (!legalModal || !contentArea) return;
 
-    // Zeige Loading-Anzeige
+    // Loading State
     contentArea.innerHTML = '<div style="text-align: center; padding: 40px;"><p>Lade Inhalt...</p></div>';
     openModal(legalModal);
 
-    // Lade den Inhalt
     fetch(page)
         .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
             return response.text();
         })
         .then(html => {
-            // Extrahiere nur den Inhalt aus dem body-Tag
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
             const mainContent = doc.querySelector('main .legal-container') || 
@@ -408,31 +330,38 @@ function loadLegalContentWithPagination(page) {
                                doc.querySelector('body');
 
             if (mainContent) {
+                // Unsichtbar machen während dem Render-Prozess um Flackern zu verhindern
+                contentArea.style.opacity = '0';
+                
                 contentArea.innerHTML = mainContent.innerHTML;
                 
-                // Füge Paginierungs-Buttons hinzu falls nötig
+                // Paginierung anwenden (synchron!)
                 addPaginationButtons(contentArea, page);
+                
+                // Inhalt sofort wieder sichtbar machen
+                requestAnimationFrame(() => {
+                    contentArea.style.opacity = '1';
+                });
             } else {
-                throw new Error('Inhalt konnte nicht extrahiert werden');
+                throw new Error('Inhalt nicht extrahierbar');
             }
         })
         .catch(error => {
-            console.error('Fehler beim Laden von', page, ':', error);
+            console.error('Fehler:', error);
             contentArea.innerHTML = `
                 <div style="text-align: center; padding: 40px;">
-                    <h3>Fehler beim Laden</h3>
-                    <p>Der Inhalt konnte nicht geladen werden.</p>
+                    <h3>Fehler</h3>
+                    <p>Konnte Inhalt nicht laden.</p>
                     <button onclick="window.location.href='${page}'" class="cta-button">Seite direkt öffnen</button>
                 </div>
             `;
         });
 }
 
-// KORRIGIERTE PAGINATION FÜR IMPRESSUM UND DISCLAIMER
-// Diese Funktion ersetzt die fehlerhafte addPaginationButtons Funktion in modals.js
-
+// ===================================================================
+// LEGAL PAGINATION
+// ===================================================================
 function addPaginationButtons(contentArea, currentPage) {
-    // Verbesserte Konfiguration für alle Seiten
     const pageConfigs = {
         'datenschutz.html': {
             totalPages: 3,
@@ -458,14 +387,9 @@ function addPaginationButtons(contentArea, currentPage) {
         }
     };
     
-    // Prüfe ob Pagination für diese Seite konfiguriert ist
     let config = pageConfigs[currentPage];
-    
     if (!config) return;
     
-    const totalPages = config.totalPages;
-    
-    // Pagination State
     const paginationState = {
         currentPage: 0,
         pages: config.pages
@@ -473,33 +397,23 @@ function addPaginationButtons(contentArea, currentPage) {
     
     function createPaginationHTML(pageIndex) {
         const isFirstPage = pageIndex === 0;
-        const isLastPage = pageIndex === totalPages - 1;
-        
+        const isLastPage = pageIndex === config.totalPages - 1;
         return `
             <div class="legal-modal-pagination-buttons">
-                <button id="legal-prev-btn" ${isFirstPage ? 'disabled' : ''}>
-                    ← ${isFirstPage ? 'Erste Seite' : 'Vorherige Seite'}
-                </button>
+                <button id="legal-prev-btn" ${isFirstPage ? 'disabled' : ''}>← ${isFirstPage ? 'Erste' : 'Vorherige'}</button>
                 <span style="color: var(--text-color); font-weight: 500; padding: 10px; text-align: center; font-size: 0.9rem;">
                     ${paginationState.pages[pageIndex].title}<br>
-                    <small style="opacity: 0.7;">(${pageIndex + 1}/${totalPages})</small>
+                    <small style="opacity: 0.7;">(${pageIndex + 1}/${config.totalPages})</small>
                 </span>
-                <button id="legal-next-btn" ${isLastPage ? 'disabled' : ''}>
-                    ${isLastPage ? 'Letzte Seite' : 'Nächste Seite'} →
-                </button>
-            </div>
-        `;
+                <button id="legal-next-btn" ${isLastPage ? 'disabled' : ''}>${isLastPage ? 'Letzte' : 'Nächste'} →</button>
+            </div>`;
     }
     
     function updatePagination() {
-        const existingPagination = contentArea.querySelector('.legal-modal-pagination-buttons');
-        if (existingPagination) {
-            existingPagination.remove();
-        }
-        
+        const existing = contentArea.querySelector('.legal-modal-pagination-buttons');
+        if (existing) existing.remove();
         contentArea.insertAdjacentHTML('beforeend', createPaginationHTML(paginationState.currentPage));
         
-        // Event-Listener für neue Buttons
         const prevBtn = document.getElementById('legal-prev-btn');
         const nextBtn = document.getElementById('legal-next-btn');
         
@@ -511,10 +425,9 @@ function addPaginationButtons(contentArea, currentPage) {
                 }
             });
         }
-        
         if (nextBtn && !nextBtn.disabled) {
             nextBtn.addEventListener('click', () => {
-                if (paginationState.currentPage < totalPages - 1) {
+                if (paginationState.currentPage < config.totalPages - 1) {
                     paginationState.currentPage++;
                     showPage(paginationState.currentPage);
                 }
@@ -523,126 +436,61 @@ function addPaginationButtons(contentArea, currentPage) {
     }
     
     function showPage(pageIndex) {
-        console.log('📄 Zeige Legal Seite:', pageIndex, 'für', currentPage);
-        
-        // KORREKTUR: Verstecke alle Abschnitte - aber spezifischere Selektion
         const allElements = contentArea.querySelectorAll('h1, h2, h3, h4, p, ul, ol, li, div:not(.legal-modal-pagination-buttons)');
-        console.log('📄 Gefundene Elemente insgesamt:', allElements.length);
+        allElements.forEach(el => el.style.display = 'none');
         
-        allElements.forEach(element => {
-            element.style.display = 'none';
-        });
-        
-        // Zeige immer den Haupttitel
         const title = contentArea.querySelector('h1');
-        if (title) {
-            title.style.display = 'block';
-            console.log('📄 Haupttitel gefunden und angezeigt:', title.textContent);
-        }
+        if (title) title.style.display = 'block';
         
-        // SPEZIELLE BEHANDLUNG FÜR IMPRESSUM UND DISCLAIMER
-        if (currentPage === 'impressum.html') {
-            handleImpressumPagination(pageIndex, allElements);
-        } else if (currentPage === 'disclaimer.html') {
-            handleDisclaimerPagination(pageIndex, allElements);
-        } else if (currentPage === 'datenschutz.html') {
-            handleDatenschutzPagination(pageIndex, allElements);
-        }
+        if (currentPage === 'impressum.html') handleImpressumPagination(pageIndex);
+        else if (currentPage === 'disclaimer.html') handleDisclaimerPagination(pageIndex);
+        else if (currentPage === 'datenschutz.html') handleDatenschutzPagination(pageIndex);
         
         updatePagination();
-        
-        // Scroll zum Anfang des Modal-Inhalts
         contentArea.scrollTop = 0;
     }
     
-    function handleImpressumPagination(pageIndex, allElements) {
-        console.log('📄 Impressum Pagination für Seite:', pageIndex);
-        
-        // Finde alle H3-Überschriften (das sind die Hauptabschnitte im Impressum)
+    function handleImpressumPagination(pageIndex) {
         const h3Elements = Array.from(contentArea.querySelectorAll('h3'));
-        console.log('📄 Impressum H3-Elemente gefunden:', h3Elements.length);
-        h3Elements.forEach((h3, index) => {
-            console.log(`📄 H3 ${index}:`, h3.textContent.substring(0, 50));
-        });
-        
-        if (pageIndex === 0) {
-            // Seite 1: Zeige die ersten 3 H3-Abschnitte (Index 0-2)
-            console.log('📄 Impressum Seite 1: Zeige H3-Abschnitte 0-2');
-            showH3SectionsRange(h3Elements, 0, 2);
-        } else if (pageIndex === 1) {
-            // Seite 2: Zeige die restlichen H3-Abschnitte (ab Index 3)
-            console.log('📄 Impressum Seite 2: Zeige H3-Abschnitte ab 3');
-            showH3SectionsRange(h3Elements, 3, h3Elements.length - 1);
-        }
+        if (pageIndex === 0) showH3SectionsRange(h3Elements, 0, 2);
+        else if (pageIndex === 1) showH3SectionsRange(h3Elements, 3, h3Elements.length - 1);
     }
     
-    function handleDisclaimerPagination(pageIndex, allElements) {
-        console.log('📄 Disclaimer Pagination für Seite:', pageIndex);
-        
-        // Für Disclaimer verwenden wir H3-Elemente als Hauptabschnitte
+    function handleDisclaimerPagination(pageIndex) {
         const h3Elements = Array.from(contentArea.querySelectorAll('h3'));
-        console.log('📄 Disclaimer H3-Elemente gefunden:', h3Elements.length);
-        h3Elements.forEach((h3, index) => {
-            console.log(`📄 H3 ${index}:`, h3.textContent.substring(0, 50));
-        });
-        
-        if (pageIndex === 0) {
-            // Seite 1: Zeige die ersten 2 H3-Abschnitte (Index 0-1)
-            console.log('📄 Disclaimer Seite 1: Zeige H3-Abschnitte 0-1');
-            showH3SectionsRange(h3Elements, 0, 1);
-        } else if (pageIndex === 1) {
-            // Seite 2: Zeige die restlichen H3-Abschnitte (ab Index 2)
-            console.log('📄 Disclaimer Seite 2: Zeige H3-Abschnitte ab 2');
-            showH3SectionsRange(h3Elements, 2, h3Elements.length - 1);
-        }
+        if (pageIndex === 0) showH3SectionsRange(h3Elements, 0, 1);
+        else if (pageIndex === 1) showH3SectionsRange(h3Elements, 2, h3Elements.length - 1);
     }
     
-    function handleDatenschutzPagination(pageIndex, allElements) {
-        console.log('📄 Datenschutz Pagination für Seite:', pageIndex);
+    function handleDatenschutzPagination(pageIndex) {
+        const standInfo = contentArea.querySelector('p');
+        if (standInfo && standInfo.textContent.includes('Stand:')) standInfo.style.display = 'block';
         
-        // Für Datenschutz: Zeige auch "Stand: ..." Info auf jeder Seite
-        const standInfo = contentArea.querySelector('p'); // "Stand: 21. Juli 2025"
-        if (standInfo && standInfo.textContent.includes('Stand:')) {
-            standInfo.style.display = 'block';
-            console.log('📄 Stand-Info angezeigt für Datenschutz');
-        }
-        
-        // Verwende H3-Elemente für Datenschutz
         const h3Elements = Array.from(contentArea.querySelectorAll('h3'));
-        console.log('📄 Datenschutz H3-Elemente gefunden:', h3Elements.length);
-        
         const pageConfig = paginationState.pages[pageIndex];
-        if (pageConfig.sections) {
-            showH3SectionsRange(h3Elements, pageConfig.sections[0], pageConfig.sections[1]);
-        }
+        if (pageConfig.sections) showH3SectionsRange(h3Elements, pageConfig.sections[0], pageConfig.sections[1]);
     }
     
     function showH3SectionsRange(h3Elements, startIndex, endIndex) {
-        console.log(`📄 Zeige H3-Abschnitte von ${startIndex} bis ${endIndex}`);
-        
         for (let i = startIndex; i <= endIndex && i < h3Elements.length; i++) {
             const h3 = h3Elements[i];
             h3.style.display = 'block';
-            console.log(`📄 Zeige H3 ${i}:`, h3.textContent.substring(0, 30));
-            
-            // Zeige alle nachfolgenden Elemente bis zum nächsten H3
             let nextElement = h3.nextElementSibling;
             while (nextElement && nextElement.tagName !== 'H3') {
-                // Überspringe Pagination-Buttons
                 if (!nextElement.classList.contains('legal-modal-pagination-buttons')) {
                     nextElement.style.display = 'block';
-                    console.log(`📄 Zeige nachfolgendes Element:`, nextElement.tagName, nextElement.textContent.substring(0, 30));
                 }
                 nextElement = nextElement.nextElementSibling;
             }
         }
     }
     
-    // Initialisiere erste Seite
-    setTimeout(() => showPage(0), 100);
+    // WICHTIG: Sofort ausführen, kein Timeout!
+    showPage(0);
 }
+
 // ===================================================================
-// AI MODAL SETUP (nur Close-Buttons)
+// AI MODAL CLOSE
 // ===================================================================
 function setupAiModal() {
     const aiResponseModal = document.getElementById('ai-response-modal');
@@ -650,65 +498,40 @@ function setupAiModal() {
         document.getElementById('close-ai-response-modal-top'),
         document.getElementById('close-ai-response-modal-bottom')
     ];
-    
-    console.log('🤖 Richte AI Modal Close-Buttons ein...');
-    
     closeButtons.forEach(btn => {
-        if (btn) {
-            btn.addEventListener('click', () => {
-                console.log('🤖 AI Modal schließen');
-                closeModal(aiResponseModal);
-            });
-        }
+        if (btn) btn.addEventListener('click', () => closeModal(aiResponseModal));
     });
 }
 
 // ===================================================================
-// ALLGEMEINE MODAL BACKGROUND & ESC CLOSE
+// UTILS
 // ===================================================================
 function setupModalBackgroundClose() {
-    console.log('🔧 Richte Modal Background Close ein...');
-    
-    // Klick auf Hintergrund schließt Modal
     document.addEventListener('click', (e) => {
-        if (e.target.classList.contains('modal-overlay')) {
-            closeModal(e.target);
-        }
+        if (e.target.classList.contains('modal-overlay')) closeModal(e.target);
     });
-
-    // ESC-Taste schließt Modal
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             const openModal = document.querySelector('.modal-overlay.visible');
-            if (openModal) {
-                closeModal(openModal);
-            }
+            if (openModal) closeModal(openModal);
         }
     });
 }
 
-// ===================================================================
-// LEGAL MODAL CLOSE BUTTON
-// ===================================================================
 function setupLegalModalCloseButton() {
     const legalModal = document.getElementById('legal-modal');
     const closeLegalModalBtn = document.getElementById('close-legal-modal');
-
     if (closeLegalModalBtn) {
-        closeLegalModalBtn.addEventListener('click', () => {
-            console.log('📄 Legal Modal schließen');
-            closeModal(legalModal);
-        });
+        closeLegalModalBtn.addEventListener('click', () => closeModal(legalModal));
     }
 }
 
 // ===================================================================
-// HAUPT-INITIALISIERUNG
+// INIT
 // ===================================================================
 export function initModals() {
-    console.log('🚀 Initialisiere alle Modals...');
+    console.log('🚀 Initialisiere Modals (Optimiert)...');
     
-    // Warte kurz bis DOM vollständig geladen ist
     setTimeout(() => {
         setupCookieModal();
         setupContactModal();
@@ -717,31 +540,25 @@ export function initModals() {
         setupLegalModalCloseButton();
         setupModalBackgroundClose();
 
-        // Event Delegation für alle Legal-Links
+        // Event Delegation für Links
         document.body.addEventListener('click', (e) => {
-            // Impressum Links
-            if (e.target.matches('#impressum-link') || e.target.matches('a[href="impressum.html"]')) {
-                e.preventDefault();
-                console.log('📄 Impressum Link geklickt');
-                loadLegalContentWithPagination('impressum.html');
-            }
+            const target = e.target;
+            const legalPages = ['impressum.html', 'datenschutz.html', 'disclaimer.html'];
             
-            // Datenschutz Links
-            if (e.target.matches('#datenschutz-link') || e.target.matches('a[href="datenschutz.html"]')) {
-                e.preventDefault();
-                console.log('📄 Datenschutz Link geklickt');
-                loadLegalContentWithPagination('datenschutz.html');
-            }
-            
-            // Disclaimer Links
-            if (e.target.matches('#disclaimer-link') || e.target.matches('a[href="disclaimer.html"]')) {
-                e.preventDefault();
-                console.log('📄 Disclaimer Link geklickt');
-                loadLegalContentWithPagination('disclaimer.html');
+            // Prüft ob Link oder Button für eine Legal-Page geklickt wurde
+            for (let page of legalPages) {
+                const linkSelector = `a[href="${page}"]`;
+                const idSelector = `#${page.replace('.html', '')}-link`;
+                
+                if (target.matches(linkSelector) || target.matches(idSelector)) {
+                    e.preventDefault(); // Verhindert das Neuladen der Seite!
+                    console.log(`📄 ${page} geklickt`);
+                    loadLegalContentWithPagination(page);
+                    return;
+                }
             }
         });
 
-        console.log('✅ Alle Modals erfolgreich initialisiert');
-        
+        console.log('✅ Modals bereit');
     }, 100);
 }
