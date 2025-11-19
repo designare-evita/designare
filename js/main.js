@@ -253,53 +253,53 @@ const enhanceHeaderAfterLoad = () => {
 
 // === 12. HAUPTEINSTIEGSPUNKT ===
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log("DOM geladen. Start der erweiterten Anwendung mit Evita Chat Support.");
+    console.log("DOM geladen. Start der erweiterten Anwendung...");
     
     // Sofort verfügbare Initialisierungen
     initializeStaticScripts();
     trackVisitor();
+
+    // Theme Check (Falls das Inline-Script im Head fehlt, hier als Fallback)
+    if (localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-mode');
+    }
     
     try {
-        // Lade externe Inhalte
+        // 1. Laden der externen Inhalte (Header/Footer)
         const headerPromise = loadContent('/header.html', 'header-placeholder');
         const modalsPromise = loadContent('/modals.html', 'modal-container');
-        const footerPromise = loadContent('/footer.html', 'footer-placeholder'); // <-- HIER IST DIE ÄNDERUNG
+        const footerPromise = loadContent('/footer.html', 'footer-placeholder'); // Footer laden
 
-        await Promise.all([headerPromise, modalsPromise, footerPromise]); // <-- HIER IST DIE ÄNDERUNG
-        console.log("✅ Header, Modals und Footer erfolgreich geladen."); // <-- HIER IST DIE ÄNDERUNG
+        // WICHTIG: Warten, bis ALLES da ist
+        await Promise.all([headerPromise, modalsPromise, footerPromise]); 
+        console.log("✅ Struktur geladen.");
         
-        // Erweitere Header nach dem Laden
+        // 2. Header Logik aktivieren (Buttons etc.)
         setTimeout(() => {
             enhanceHeaderAfterLoad();
-        }, 100);
+        }, 50); // Sehr kurzes Timeout reicht oft
         
-        // Initialisiere Modals
+        // 3. Dynamische Scripte starten
         initializeDynamicScripts();
         
-        // Warte etwas für DOM-Stabilisierung
-        await new Promise(resolve => setTimeout(resolve, 200));
+        // 4. Formulare initialisieren
+        // Wir warten hier nicht zwingend mit 'await', damit die Seite schon angezeigt wird,
+        // während die Formulare im Hintergrund startklar gemacht werden.
+        withRetry(initializeFormsWithDelay, 2, 500);
+
+        // === DAS IST DER MAGIC MOMENT ===
+        // Erst jetzt, wo Header & Footer da sind, machen wir die Seite sichtbar
+        requestAnimationFrame(() => {
+            document.body.classList.add('page-loaded');
+        });
         
-        // Initialisiere Formulare mit Retry-Mechanismus
-        await withRetry(initializeFormsWithDelay, 2, 500);
-        
-        console.log("🎉 Anwendung mit Evita Chat Support vollständig initialisiert!");
+        console.log("🎉 Seite sichtbar geschaltet!");
         
     } catch (error) {
-        console.error("❌ Kritischer Fehler beim Laden der Seitenstruktur:", error);
+        console.error("❌ Fehler beim Laden:", error);
         
-        // Fallback: Versuche zumindest die grundlegenden Funktionen zu laden
-        try {
-            console.log("🔧 Starte Fallback-Initialisierung...");
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            await initializeFormsWithDelay();
-            
-            // Versuche trotzdem den Evita Button einzurichten
-            setTimeout(() => {
-                setupEvitaChatButton();
-            }, 500);
-        } catch (fallbackError) {
-            console.error("❌ Auch Fallback-Initialisierung fehlgeschlagen:", fallbackError);
-        }
+        // Fallback: Auch bei Fehler Seite anzeigen, damit der User nicht vor einer leeren Seite sitzt
+        document.body.classList.add('page-loaded');
     }
 });
 
