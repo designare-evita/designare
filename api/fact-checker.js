@@ -1,4 +1,4 @@
-// api/fact-checker.js - FINALE VERSION MIT SEMANTISCHER OPTIMIERUNG & READABILITY
+// api/fact-checker.js - FINALE VERSION (KORRIGIERT: Du/Sie-Logik gefixt)
 
 class FactChecker {
     constructor() {
@@ -146,6 +146,18 @@ class FactChecker {
         // Extrahiere alle Daten inklusive 'semanticTerms' und 'readability'
         const { keyword, intent, zielgruppe, tonalitaet, usp, domain, email, phone, address, brand, grammaticalPerson, customStyle, semanticTerms, readability } = keywordData;
 
+        // --- LOGIK FÜR ANREDE (DU vs. SIE) ---
+        // Korrigierte Logik: Wir leiten die Anrede direkt aus der Tonalität ab
+        let anredeInstruktion = "";
+        if (tonalitaet) {
+            const t = tonalitaet.toLowerCase();
+            if (t.includes('du') || t.includes('locker') || t.includes('freundschaftlich') || t.includes('persönlich')) {
+                anredeInstruktion = "- **WICHTIG - ANREDE:** Sprich den Leser konsequent mit 'Du' an (Duzen). Nutze eine persönliche, direkte Ansprache. Vermeide das 'Sie'.";
+            } else if (t.includes('sie') || t.includes('formell') || t.includes('seriös') || t.includes('geschäftlich')) {
+                anredeInstruktion = "- **WICHTIG - ANREDE:** Sprich den Leser konsequent mit 'Sie' an (Siezen). Bleibe höflich, professionell und wahre Distanz.";
+            }
+        }
+
         // --- LOGIK FÜR LESBARKEIT (FLESCH-INDEX) ---
         let readabilityInstruction = "";
         switch (readability) {
@@ -194,7 +206,7 @@ class FactChecker {
             
             ANWEISUNG: Analysiere den Stil dieses Mustertextes genau. 
             1. Übernimm die Tonalität.
-            2. Übernimm die Ansprache (Du/Sie).
+            2. Übernimm die Ansprache (Du/Sie) aus dem Mustertext.
             3. Übernimm die Satzstruktur.
             4. Wende diesen Stil auf das neue Thema "${keyword}" an.
             `;
@@ -224,13 +236,14 @@ class FactChecker {
         let kontext = "";
         if (brand) kontext += `- BRAND/ANSPRECHPARTNER: ${brand}\n`;
         if (zielgruppe) kontext += `- ZIELGRUPPE: ${zielgruppe}\n`;
-        if (tonalitaet) kontext += `- TONALITÄT: ${tonalitaet}\n`;
+        if (tonalitaet) kontext += `- TONALITÄT (Allgemein): ${tonalitaet}\n`;
         if (usp) kontext += `- ALLEINSTELLUNGSMERKMAL (USP): ${usp}\n`;
         if (domain) kontext += `- WEBSEITE: ${domain}\n`;
         if (email) kontext += `- E-MAIL FÜR CTA: ${email}\n`;
         if (phone) kontext += `- TELEFONNUMMER FÜR CTA: ${phone}\n`;
         if (address) kontext += `- ADRESSE FÜR CTA: ${address}\n`;
-        if (grammaticalPerson) kontext += `- ANSPRACHE: ${grammaticalPerson === 'plural' ? 'Wir-Form (Unternehmen)' : 'Ich-Form (Einzelperson)'}\n`;
+        // Korrektur: Label geändert, um Verwechslung mit Kundenansprache zu vermeiden
+        if (grammaticalPerson) kontext += `- ABSENDER-PERSPEKTIVE: ${grammaticalPerson === 'plural' ? 'Wir-Form (Wir als Unternehmen bieten an)' : 'Ich-Form (Ich als Experte biete an)'}\n`;
 
         // Semantische Instruktion bauen
         let seoInstruction = "";
@@ -257,6 +270,7 @@ class FactChecker {
             ROLLE: ${roleAndTask}
 
             🚨 WICHTIGE RICHTLINIEN & STIL-VORGABEN:
+            ${anredeInstruktion}
             ${readabilityInstruction}
 
             - **Kein KI-Geschwafel:** Vermeide leere Phrasen wie "In der heutigen digitalen Welt", "Tauchen wir ein" oder "Es ist wichtig zu beachten". Starte direkt mit dem Mehrwert.
