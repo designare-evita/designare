@@ -1345,33 +1345,41 @@
 }
 
 /* ======================================== */
-/* AI-RESPONSE-MODAL: MINIMALISTISCHER PULSAR (CSS ONLY) */
+/* AI-RESPONSE-MODAL: PULSAR EFFEKT (GLOW & ATMEN) */
 /* ======================================== */
 
-/* 1. Die Animation: Verändert sanft die Größe des Lichtkegels */
-@keyframes softGlow {
-    0% { background-size: 100% 100%; }
-    50% { background-size: 140% 140%; } /* Der "Lichtfleck" wird größer */
-    100% { background-size: 100% 100%; }
+/* Die Animation: Kombiniert Hintergrund-Zoom mit sanftem Leuchten */
+@keyframes pulsarGlow {
+    0% {
+        background-size: 100% 100%;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); /* Normaler Schatten */
+    }
+    50% {
+        background-size: 135% 135%; /* Hintergrund zoomt rein */
+        box-shadow: 0 0 50px rgba(252, 181, 0, 0.15); /* Sanfter Gold-Schimmer (Akzentfarbe) */
+    }
+    100% {
+        background-size: 100% 100%;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
 }
 
 #ai-response-modal .modal-content {
-    /* HIER IST DIE ÄNDERUNG: Kein Bild, nur ein radialer Verlauf */
-    /* Ein sanftes Licht in der Mitte (#2d2d2d), das nach außen dunkel wird (#0a0a0a) */
-    background: radial-gradient(circle at center, #333333 0%, #0a0a0a 75%);
+    /* Hintergrund: Etwas hellerer Kern (#3a3a3a) für sichtbaren Effekt */
+    background: radial-gradient(circle at center, #3a3a3a 0%, #050505 85%);
     
-    /* Damit die Animation funktioniert */
     background-repeat: no-repeat;
     background-position: center center;
     
-    /* Deine Standard-Styles (unverändert) */
+    /* Standard-Styles (beibehalten) */
     color: #e0e0e0 !important;
     border-radius: 10px !important;
     width: 90vw !important;
     height: 80vh !important;
     max-width: 800px !important;
     max-height: 600px !important;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+    
+    /* Wichtig: Position relative für den Schatten */
     position: relative !important;
     display: flex !important;
     flex-direction: column !important;
@@ -1379,15 +1387,14 @@
     transition: transform 0.3s ease !important;
     overflow: hidden !important;
     
-    /* Aktivierung des Pulsars: 8 Sekunden für einen "Atemzug" */
-    animation: softGlow 8s infinite ease-in-out;
+    /* AKTIVIERUNG: 6 Sekunden pro Atemzug */
+    animation: pulsarGlow 6s infinite ease-in-out !important;
 }
 
-/* Mobile Anpassung: Statischer Verlauf, um Akku zu sparen */
+/* Mobile Anpassung */
 @media (max-width: 768px) {
     #ai-response-modal .modal-content {
-        background: radial-gradient(circle at center, #2a2a2a 0%, #111111 80%) !important;
-        background-size: 100% 100% !important;
-        animation: none !important;
+        /* Damit du es auch am Handy siehst, habe ich 'animation: none' hier entfernt */
+        /* background-size: cover !important; */
     }
 }
