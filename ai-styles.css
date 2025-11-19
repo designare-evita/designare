@@ -1345,20 +1345,18 @@
 }
 
 /* ======================================== */
-/* AI-RESPONSE-MODAL: PULSAR FIX (Pseudo-Element Methode) */
+/* AI-RESPONSE-MODAL: PULSAR EFFEKT (Optimiert) */
 /* ======================================== */
 
-/* 1. Der Container: Basis-Einstellungen */
+/* 1. Modal Container - WICHTIG: overflow visible! */
 #ai-response-modal .modal-content {
-    /* Sicherstellen, dass der Hintergrund dunkel ist (Fallback) */
     background: #050505 !important;
-    
-    /* WICHTIG: Erstellt einen Stapel-Kontext für das ::before Element */
     position: relative !important; 
     z-index: 1 !important; 
-    overflow: hidden !important; /* Damit der Zoom nicht über den Rand geht */
+    
+    /* KRITISCH: overflow visible statt hidden */
+    overflow: visible !important;
 
-    /* Standard-Styles beibehalten */
     color: #e0e0e0 !important;
     border-radius: 10px !important;
     width: 90vw !important;
@@ -1371,56 +1369,85 @@
     flex-direction: column !important;
     transform: scale(0.95) !important;
     transition: transform 0.3s ease !important;
-    
-    /* Alte Animation direkt auf dem Container entfernen */
-    animation: none !important;
 }
 
-/* 2. Der Pulsar-Hintergrund (Die Magie) */
+/* 2. Chat-History braucht EIGENES overflow */
+#ai-chat-history {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding: 60px 20px 20px 20px !important;
+    background-color: rgba(0, 0, 0, 0.1) !important;
+    border-radius: 8px !important;
+    margin-bottom: 15px !important;
+    min-height: 200px !important;
+    max-height: 400px !important;
+}
+
+/* 3. Der Pulsar-Hintergrund */
 #ai-response-modal .modal-content::before {
     content: '';
     position: absolute;
     top: 50%;
     left: 50%;
-    /* Zentrieren */
     transform: translate(-50%, -50%);
     
-    /* Größe: Startet bei 100%, wird durch Animation größer */
-    width: 100%;
-    height: 100%;
+    /* Etwas größer als Container */
+    width: 120%;
+    height: 120%;
     
-    /* Der Verlauf: Hellerer Kern (#4a4a4a) für bessere Sichtbarkeit */
-    background: radial-gradient(circle, #4a4a4a 0%, #050505 70%);
+    /* Mehrfarbiger Gradient für bessere Sichtbarkeit */
+    background: radial-gradient(
+        circle, 
+        #6a6a6a 0%,      /* Hellstes im Zentrum */
+        #4a4a4a 30%,     /* Mittlerer Ton */
+        #2a2a2a 60%,     /* Dunkler */
+        #050505 85%      /* Fast schwarz am Rand */
+    );
     
-    /* Hinter den Text legen */
-    z-index: -1;
+    /* Hinter Content, aber sichtbar */
+    z-index: 0;
     
-    /* Die Animation anwenden */
-    animation: deepBreath 8s infinite ease-in-out;
-    pointer-events: none; /* Klicks gehen durch */
+    border-radius: 12px;
+    
+    /* Die Pulsar-Animation */
+    animation: pulsarEffect 8s infinite ease-in-out;
+    
+    /* Klicks nicht blockieren */
+    pointer-events: none;
+    
+    /* Sanfter Blur-Effekt */
+    filter: blur(3px);
 }
 
-/* 3. Die Animation: Skaliert die Hintergrund-Ebene */
-@keyframes deepBreath {
+/* 4. Content muss ÜBER dem Pulsar sein */
+#ai-response-modal .modal-content > * {
+    position: relative;
+    z-index: 2;
+}
+
+/* 5. Die Animation */
+@keyframes pulsarEffect {
     0% {
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 0.6; /* Etwas dunkler */
+        transform: translate(-50%, -50%) scale(0.9);
+        opacity: 0.3;
     }
     50% {
-        transform: translate(-50%, -50%) scale(1.5); /* Zoomt stark rein (Pulsar) */
-        opacity: 1;   /* Wird heller */
+        transform: translate(-50%, -50%) scale(1.2);
+        opacity: 0.7;
     }
     100% {
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 0.6;
+        transform: translate(-50%, -50%) scale(0.9);
+        opacity: 0.3;
     }
 }
 
-/* Mobile Optimierung */
+/* 6. Mobile: Performance-optimiert */
 @media (max-width: 768px) {
     #ai-response-modal .modal-content::before {
-        /* Auf Handy Animation deaktivieren für Performance, aber Verlauf zeigen */
         animation: none;
-        opacity: 0.8;
+        opacity: 0.5;
+        transform: translate(-50%, -50%) scale(1);
+        filter: none; /* Kein Blur auf Mobile */
     }
 }
