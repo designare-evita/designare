@@ -171,6 +171,12 @@ body {
     line-height: 1.6;
     overflow-x: hidden;
     transition: background-color 0.4s ease, color 0.4s ease;
+    opacity: 0; 
+    transition: opacity 0.4s ease-in-out; /* Sanfter Übergang von 0.4 Sekunden */
+}
+
+body.page-loaded {
+    opacity: 1;
 }
 
 /* Regel, die das Scrollen nur auf der Startseite verhindert */
