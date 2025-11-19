@@ -1345,16 +1345,16 @@
 }
 
 /* ======================================== */
-/* AI-RESPONSE-MODAL: PULSAR EFFEKT (Optimiert) */
+/* AI-RESPONSE-MODAL: PULSAR EFFEKT (Sichtbar) */
 /* ======================================== */
 
-/* 1. Modal Container - WICHTIG: overflow visible! */
+/* 1. Modal Container */
 #ai-response-modal .modal-content {
-    background: #050505 !important;
+    /* DUNKLER Hintergrund als Kontrast */
+    background: #0a0a0a !important;
+    
     position: relative !important; 
     z-index: 1 !important; 
-    
-    /* KRITISCH: overflow visible statt hidden */
     overflow: visible !important;
 
     color: #e0e0e0 !important;
@@ -1371,20 +1371,20 @@
     transition: transform 0.3s ease !important;
 }
 
-/* 2. Chat-History braucht EIGENES overflow */
+/* 2. Chat-History mit eigenem overflow */
 #ai-chat-history {
     flex: 1 !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
     padding: 60px 20px 20px 20px !important;
-    background-color: rgba(0, 0, 0, 0.1) !important;
+    background-color: rgba(0, 0, 0, 0.3) !important; /* Etwas transparenter */
     border-radius: 8px !important;
     margin-bottom: 15px !important;
     min-height: 200px !important;
     max-height: 400px !important;
 }
 
-/* 3. Der Pulsar-Hintergrund */
+/* 3. Der SICHTBARE Pulsar-Hintergrund */
 #ai-response-modal .modal-content::before {
     content: '';
     position: absolute;
@@ -1392,35 +1392,30 @@
     left: 50%;
     transform: translate(-50%, -50%);
     
-    /* Etwas größer als Container */
     width: 120%;
     height: 120%;
     
-    /* Mehrfarbiger Gradient für bessere Sichtbarkeit */
+    /* HELLERE Farben mit VIEL Kontrast */
     background: radial-gradient(
         circle, 
-        #6a6a6a 0%,      /* Hellstes im Zentrum */
-        #4a4a4a 30%,     /* Mittlerer Ton */
-        #2a2a2a 60%,     /* Dunkler */
-        #050505 85%      /* Fast schwarz am Rand */
+        rgba(252, 181, 0, 0.15) 0%,     /* Dein Accent-Color mit Transparenz */
+        rgba(170, 170, 170, 0.08) 40%,  /* Helles Grau */
+        rgba(80, 80, 80, 0.05) 70%,     /* Mittleres Grau */
+        transparent 90%                  /* Ausblenden zum Rand */
     );
     
-    /* Hinter Content, aber sichtbar */
     z-index: 0;
-    
     border-radius: 12px;
     
-    /* Die Pulsar-Animation */
+    /* Die Animation */
     animation: pulsarEffect 8s infinite ease-in-out;
-    
-    /* Klicks nicht blockieren */
     pointer-events: none;
     
-    /* Sanfter Blur-Effekt */
-    filter: blur(3px);
+    /* Weichzeichner für sanfteren Effekt */
+    filter: blur(4px);
 }
 
-/* 4. Content muss ÜBER dem Pulsar sein */
+/* 4. Content über dem Pulsar */
 #ai-response-modal .modal-content > * {
     position: relative;
     z-index: 2;
@@ -1430,30 +1425,24 @@
 @keyframes pulsarEffect {
     0% {
         transform: translate(-50%, -50%) scale(0.9);
-        opacity: 0.3;
+        opacity: 0.5;
     }
     50% {
-        transform: translate(-50%, -50%) scale(1.2);
-        opacity: 0.7;
+        transform: translate(-50%, -50%) scale(1.25);
+        opacity: 1;
     }
     100% {
         transform: translate(-50%, -50%) scale(0.9);
-        opacity: 0.3;
+        opacity: 0.5;
     }
 }
 
-/* 6. Mobile: Performance-optimiert */
+/* 6. Mobile optimiert */
 @media (max-width: 768px) {
     #ai-response-modal .modal-content::before {
         animation: none;
-        opacity: 0.5;
-        transform: translate(-50%, -50%) scale(1);
-        filter: none; /* Kein Blur auf Mobile */
+        opacity: 0.6;
+        transform: translate(-50%, -50%) scale(1.05);
+        filter: blur(2px);
     }
-}
-
-/* DEBUG: Pulsar sichtbar machen */
-#ai-response-modal .modal-content::before {
-    /* Mache den Pulsar temporär ROT um zu sehen ob er funktioniert */
-    background: radial-gradient(circle, red 0%, yellow 50%, transparent 80%) !important;
 }
