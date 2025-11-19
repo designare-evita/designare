@@ -1345,56 +1345,82 @@
 }
 
 /* ======================================== */
-/* AI-RESPONSE-MODAL: PULSAR EFFEKT (GLOW & ATMEN) */
+/* AI-RESPONSE-MODAL: PULSAR FIX (Pseudo-Element Methode) */
 /* ======================================== */
 
-/* Die Animation: Kombiniert Hintergrund-Zoom mit sanftem Leuchten */
-@keyframes pulsarGlow {
-    0% {
-        background-size: 100% 100%;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); /* Normaler Schatten */
-    }
-    50% {
-        background-size: 135% 135%; /* Hintergrund zoomt rein */
-        box-shadow: 0 0 50px rgba(252, 181, 0, 0.15); /* Sanfter Gold-Schimmer (Akzentfarbe) */
-    }
-    100% {
-        background-size: 100% 100%;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    }
-}
-
+/* 1. Der Container: Basis-Einstellungen */
 #ai-response-modal .modal-content {
-    /* Hintergrund: Etwas hellerer Kern (#3a3a3a) für sichtbaren Effekt */
-    background: radial-gradient(circle at center, #3a3a3a 0%, #050505 85%);
+    /* Sicherstellen, dass der Hintergrund dunkel ist (Fallback) */
+    background: #050505 !important;
     
-    background-repeat: no-repeat;
-    background-position: center center;
-    
-    /* Standard-Styles (beibehalten) */
+    /* WICHTIG: Erstellt einen Stapel-Kontext für das ::before Element */
+    position: relative !important; 
+    z-index: 1 !important; 
+    overflow: hidden !important; /* Damit der Zoom nicht über den Rand geht */
+
+    /* Standard-Styles beibehalten */
     color: #e0e0e0 !important;
     border-radius: 10px !important;
     width: 90vw !important;
     height: 80vh !important;
     max-width: 800px !important;
     max-height: 600px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
     
-    /* Wichtig: Position relative für den Schatten */
-    position: relative !important;
     display: flex !important;
     flex-direction: column !important;
     transform: scale(0.95) !important;
     transition: transform 0.3s ease !important;
-    overflow: hidden !important;
     
-    /* AKTIVIERUNG: 6 Sekunden pro Atemzug */
-    animation: pulsarGlow 6s infinite ease-in-out !important;
+    /* Alte Animation direkt auf dem Container entfernen */
+    animation: none !important;
 }
 
-/* Mobile Anpassung */
+/* 2. Der Pulsar-Hintergrund (Die Magie) */
+#ai-response-modal .modal-content::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    /* Zentrieren */
+    transform: translate(-50%, -50%);
+    
+    /* Größe: Startet bei 100%, wird durch Animation größer */
+    width: 100%;
+    height: 100%;
+    
+    /* Der Verlauf: Hellerer Kern (#4a4a4a) für bessere Sichtbarkeit */
+    background: radial-gradient(circle, #4a4a4a 0%, #050505 70%);
+    
+    /* Hinter den Text legen */
+    z-index: -1;
+    
+    /* Die Animation anwenden */
+    animation: deepBreath 8s infinite ease-in-out;
+    pointer-events: none; /* Klicks gehen durch */
+}
+
+/* 3. Die Animation: Skaliert die Hintergrund-Ebene */
+@keyframes deepBreath {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.6; /* Etwas dunkler */
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.5); /* Zoomt stark rein (Pulsar) */
+        opacity: 1;   /* Wird heller */
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.6;
+    }
+}
+
+/* Mobile Optimierung */
 @media (max-width: 768px) {
-    #ai-response-modal .modal-content {
-        /* Damit du es auch am Handy siehst, habe ich 'animation: none' hier entfernt */
-        /* background-size: cover !important; */
+    #ai-response-modal .modal-content::before {
+        /* Auf Handy Animation deaktivieren für Performance, aber Verlauf zeigen */
+        animation: none;
+        opacity: 0.8;
     }
 }
