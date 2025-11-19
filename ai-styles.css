@@ -1451,3 +1451,9 @@
         filter: none; /* Kein Blur auf Mobile */
     }
 }
+
+/* DEBUG: Pulsar sichtbar machen */
+#ai-response-modal .modal-content::before {
+    /* Mache den Pulsar temporär ROT um zu sehen ob er funktioniert */
+    background: radial-gradient(circle, red 0%, yellow 50%, transparent 80%) !important;
+}
