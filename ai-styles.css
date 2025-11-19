@@ -1345,28 +1345,26 @@
 }
 
 /* ======================================== */
-/* AI-RESPONSE-MODAL MIT PULSAR-HINTERGRUND */
+/* AI-RESPONSE-MODAL: MINIMALISTISCHER PULSAR (CSS ONLY) */
 /* ======================================== */
 
-/* 1. Die Pulsar-Animation definieren */
-@keyframes backgroundPulse {
-    0% { background-size: 100% 100%; opacity: 0.9; }
-    50% { background-size: 105% 105%; opacity: 1; }
-    100% { background-size: 100% 100%; opacity: 0.9; }
+/* 1. Die Animation: Verändert sanft die Größe des Lichtkegels */
+@keyframes softGlow {
+    0% { background-size: 100% 100%; }
+    50% { background-size: 140% 140%; } /* Der "Lichtfleck" wird größer */
+    100% { background-size: 100% 100%; }
 }
 
 #ai-response-modal .modal-content {
-    /* Hintergrundbild laden + dunkler Schleier für Lesbarkeit */
-    background: 
-        linear-gradient(rgba(30, 30, 30, 0.85), rgba(30, 30, 30, 0.95)), 
-        url('images/KI-Chat-Hintergrund.webp');
+    /* HIER IST DIE ÄNDERUNG: Kein Bild, nur ein radialer Verlauf */
+    /* Ein sanftes Licht in der Mitte (#2d2d2d), das nach außen dunkel wird (#0a0a0a) */
+    background: radial-gradient(circle at center, #333333 0%, #0a0a0a 75%);
     
-    /* WICHTIG: Cover sorgt dafür, dass das Bild immer füllt */
-    background-size: cover !important;
-    background-position: center center !important;
-    background-repeat: no-repeat !important;
+    /* Damit die Animation funktioniert */
+    background-repeat: no-repeat;
+    background-position: center center;
     
-    /* Standard-Styles für das Modal */
+    /* Deine Standard-Styles (unverändert) */
     color: #e0e0e0 !important;
     border-radius: 10px !important;
     width: 90vw !important;
@@ -1381,15 +1379,15 @@
     transition: transform 0.3s ease !important;
     overflow: hidden !important;
     
-    /* HIER IST DIE MAGIE: Die Animation ist jetzt AKTIV */
-    /* 20s Dauer sorgt für sehr ruhiges, kaum merkliches Atmen */
-    animation: backgroundPulse 20s infinite ease-in-out;
+    /* Aktivierung des Pulsars: 8 Sekunden für einen "Atemzug" */
+    animation: softGlow 8s infinite ease-in-out;
 }
 
-/* Mobile Anpassung: Animation deaktivieren um Akku/Leistung zu sparen */
+/* Mobile Anpassung: Statischer Verlauf, um Akku zu sparen */
 @media (max-width: 768px) {
     #ai-response-modal .modal-content {
-        background-size: cover !important;
-        animation: none !important; 
+        background: radial-gradient(circle at center, #2a2a2a 0%, #111111 80%) !important;
+        background-size: 100% 100% !important;
+        animation: none !important;
     }
 }
