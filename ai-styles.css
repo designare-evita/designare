@@ -1343,3 +1343,52 @@
         padding: 0 !important;
     }
 }
+
+/* ======================================== */
+/* AI-RESPONSE-MODAL MIT PULSAR-HINTERGRUND */
+/* ======================================== */
+
+/* 1. Die Pulsar-Animation definieren */
+@keyframes backgroundPulse {
+    0% { background-size: 100% 100%; opacity: 0.9; }
+    50% { background-size: 105% 105%; opacity: 1; }
+    100% { background-size: 100% 100%; opacity: 0.9; }
+}
+
+#ai-response-modal .modal-content {
+    /* Hier aktivieren wir das Bild wieder */
+    background: 
+        linear-gradient(rgba(30, 30, 30, 0.85), rgba(30, 30, 30, 0.95)), /* Dunkler Schleier für Lesbarkeit */
+        url('images/KI-Chat-Hintergrund.webp'); /* Dein Hintergrundbild */
+    
+    background-size: cover !important;
+    background-position: center center !important;
+    background-repeat: no-repeat !important;
+    
+    /* Standard-Styles beibehalten */
+    color: #e0e0e0 !important;
+    border-radius: 10px !important;
+    width: 90vw !important;
+    height: 80vh !important;
+    max-width: 800px !important;
+    max-height: 600px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+    transform: scale(0.95) !important;
+    transition: transform 0.3s ease !important;
+    overflow: hidden !important;
+    
+    /* Optional: Sanfte Animation des Hintergrunds (der "Puls") */
+    /* Wenn du nur das Bild willst ohne Bewegung, lösche die nächste Zeile */
+    animation: none; /* Habe ich sicherheitshalber auf 'none' gesetzt. Ändere auf 'backgroundPulse 15s infinite ease-in-out' für Bewegung */
+}
+
+/* Mobile Anpassung beibehalten */
+@media (max-width: 768px) {
+    #ai-response-modal .modal-content {
+        background-size: cover !important; /* Auf Handy nicht zoomen/pulsieren, spart Akku */
+        animation: none !important;
+    }
+}
