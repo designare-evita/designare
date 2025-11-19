@@ -668,6 +668,32 @@ export function initSilasForm() {
         downloadFile(txtContent, 'silas_generated_content.txt', 'text/plain;charset=utf-8;');
     }
 
+function cleanForCsv(text) {
+        if (!text) return "";
+        let str = String(text);
+
+        // 1. Unsichtbare Steuerzeichen & Formatierungskiller entfernen
+        // \u200B = Zero Width Space
+        // \u00AD = Soft Hyphen (bedingter Trennstrich)
+        // \uFEFF = Zero Width No-Break Space / BOM
+        // \u2028 = Line Separator
+        // \u2029 = Paragraph Separator
+        str = str.replace(/[\u200B\u00AD\uFEFF\u2028\u2029]/g, '');
+
+        // 2. Non-Breaking Space (\u00A0) zu normalem Leerzeichen machen
+        str = str.replace(/\u00A0/g, ' ');
+
+        // 3. Zeilenumbrüche normalisieren (Windows/Mac/Linux) -> zu einfachem \n
+        str = str.replace(/\r\n|\r/g, '\n');
+
+        // 4. Andere ASCII-Steuerzeichen entfernen (außer \n und \t)
+        // Entfernt ASCII 0-31 (außer 9=Tab und 10=Newline)
+        str = str.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '');
+
+        // 5. Doppelte Anführungszeichen für CSV escapen (" wird zu "")
+        return str.replace(/"/g, '""');
+    }
+
     function downloadCsv() {
         const headers = ["keyword", "brand", "domain", "email", "phone", "address", 
         "post_title", "post_name", "meta_title", "meta_description", 
@@ -689,12 +715,23 @@ export function initSilasForm() {
         "faq_4", "faq_answer_4", 
         "faq_5", "faq_answer_5", 
         "contact_info", "footer_cta", "trust_signals", "guarantee_text"];
-        let csvContent = headers.join(",") + "\n";
+        
+        // BOM für Excel UTF-8 Erkennung hinzufügen (\uFEFF)
+        let csvContent = '\uFEFF' + headers.join(",") + "\n";
+        
         allGeneratedData.forEach(rowData => {
             if (rowData.error) return;
-            const values = headers.map(header => `"${String(rowData[header] || '').replace(/"/g, '""')}"`);
+            
+            const values = headers.map(header => {
+                // Nutzung der neuen cleanForCsv Funktion
+                const cleanValue = cleanForCsv(rowData[header]);
+                // In Anführungszeichen setzen, um Kommas und Umbrüche im Text zu erlauben
+                return `"${cleanValue}"`;
+            });
+            
             csvContent += values.join(",") + "\n";
         });
+        
         downloadFile(csvContent, 'silas_generated_content.csv', 'text/csv;charset=utf-8;');
     }
     
