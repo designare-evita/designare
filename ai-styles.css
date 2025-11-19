@@ -1356,16 +1356,17 @@
 }
 
 #ai-response-modal .modal-content {
-    /* Hier aktivieren wir das Bild wieder */
+    /* Hintergrundbild laden + dunkler Schleier für Lesbarkeit */
     background: 
-        linear-gradient(rgba(30, 30, 30, 0.85), rgba(30, 30, 30, 0.95)), /* Dunkler Schleier für Lesbarkeit */
-        url('images/KI-Chat-Hintergrund.webp'); /* Dein Hintergrundbild */
+        linear-gradient(rgba(30, 30, 30, 0.85), rgba(30, 30, 30, 0.95)), 
+        url('images/KI-Chat-Hintergrund.webp');
     
+    /* WICHTIG: Cover sorgt dafür, dass das Bild immer füllt */
     background-size: cover !important;
     background-position: center center !important;
     background-repeat: no-repeat !important;
     
-    /* Standard-Styles beibehalten */
+    /* Standard-Styles für das Modal */
     color: #e0e0e0 !important;
     border-radius: 10px !important;
     width: 90vw !important;
@@ -1380,15 +1381,15 @@
     transition: transform 0.3s ease !important;
     overflow: hidden !important;
     
-    /* Optional: Sanfte Animation des Hintergrunds (der "Puls") */
-    /* Wenn du nur das Bild willst ohne Bewegung, lösche die nächste Zeile */
-    animation: none; /* Habe ich sicherheitshalber auf 'none' gesetzt. Ändere auf 'backgroundPulse 15s infinite ease-in-out' für Bewegung */
+    /* HIER IST DIE MAGIE: Die Animation ist jetzt AKTIV */
+    /* 20s Dauer sorgt für sehr ruhiges, kaum merkliches Atmen */
+    animation: backgroundPulse 20s infinite ease-in-out;
 }
 
-/* Mobile Anpassung beibehalten */
+/* Mobile Anpassung: Animation deaktivieren um Akku/Leistung zu sparen */
 @media (max-width: 768px) {
     #ai-response-modal .modal-content {
-        background-size: cover !important; /* Auf Handy nicht zoomen/pulsieren, spart Akku */
-        animation: none !important;
+        background-size: cover !important;
+        animation: none !important; 
     }
 }
