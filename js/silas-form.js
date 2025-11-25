@@ -1,4 +1,4 @@
-// js/silas-form.js - FINALE VERSION (Mit Style-Transfer, Templates & Lesbarkeit)
+// js/silas-form.js - FINALE VERSION (Optimiert für WordPress Import)
 
 export function initSilasForm() {
     const silasForm = document.getElementById('silas-form');
@@ -601,7 +601,30 @@ export function initSilasForm() {
     `;
     }
 
-    // === 7. DOWNLOAD FUNKTIONEN ===
+    // === 7. DOWNLOAD FUNKTIONEN (OPTIMIERT FÜR WORDPRESS) ===
+
+    function cleanForCsv(text) {
+        // Leere Werte abfangen
+        if (text === null || text === undefined) return "";
+        
+        let str = String(text);
+
+        // 1. Unsichtbare Steuerzeichen entfernen
+        str = str.replace(/[\u200B\u00AD\uFEFF\u2028\u2029]/g, '');
+
+        // 2. Non-Breaking Space zu normalem Leerzeichen
+        str = str.replace(/\u00A0/g, ' ');
+
+        // 3. WICHTIG: Alle Zeilenumbrüche durch Leerzeichen ersetzen
+        // Das garantiert, dass jeder Datensatz in der CSV exakt eine Zeile ist.
+        str = str.replace(/(\r\n|\n|\r)/gm, ' ');
+
+        // 4. Andere ASCII-Steuerzeichen entfernen
+        str = str.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '');
+
+        // 5. Doppelte Anführungszeichen escapen (" wird zu "")
+        return str.replace(/"/g, '""');
+    }
 
     function downloadHtml(index) {
         const data = allGeneratedData[index];
@@ -668,32 +691,6 @@ export function initSilasForm() {
         downloadFile(txtContent, 'silas_generated_content.txt', 'text/plain;charset=utf-8;');
     }
 
-function cleanForCsv(text) {
-        if (!text) return "";
-        let str = String(text);
-
-        // 1. Unsichtbare Steuerzeichen & Formatierungskiller entfernen
-        // \u200B = Zero Width Space
-        // \u00AD = Soft Hyphen (bedingter Trennstrich)
-        // \uFEFF = Zero Width No-Break Space / BOM
-        // \u2028 = Line Separator
-        // \u2029 = Paragraph Separator
-        str = str.replace(/[\u200B\u00AD\uFEFF\u2028\u2029]/g, '');
-
-        // 2. Non-Breaking Space (\u00A0) zu normalem Leerzeichen machen
-        str = str.replace(/\u00A0/g, ' ');
-
-        // 3. Zeilenumbrüche normalisieren (Windows/Mac/Linux) -> zu einfachem \n
-        str = str.replace(/\r\n|\r/g, '\n');
-
-        // 4. Andere ASCII-Steuerzeichen entfernen (außer \n und \t)
-        // Entfernt ASCII 0-31 (außer 9=Tab und 10=Newline)
-        str = str.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '');
-
-        // 5. Doppelte Anführungszeichen für CSV escapen (" wird zu "")
-        return str.replace(/"/g, '""');
-    }
-
     function downloadCsv() {
         const headers = ["keyword", "brand", "domain", "email", "phone", "address", 
         "post_title", "post_name", "meta_title", "meta_description", 
@@ -716,20 +713,23 @@ function cleanForCsv(text) {
         "faq_5", "faq_answer_5", 
         "contact_info", "footer_cta", "trust_signals", "guarantee_text"];
         
-        // BOM für Excel UTF-8 Erkennung hinzufügen (\uFEFF)
-        let csvContent = '\uFEFF' + headers.join(",") + "\n";
+        // FÜR WORDPRESS: Komma als Trennzeichen ist Standard
+        const separator = ",";
+        
+        // BOM (\uFEFF) ist für WordPress oft okay
+        let csvContent = '\uFEFF' + headers.join(separator) + "\n";
         
         allGeneratedData.forEach(rowData => {
             if (rowData.error) return;
             
             const values = headers.map(header => {
-                // Nutzung der neuen cleanForCsv Funktion
+                // Nutzung der verbesserten cleanForCsv Funktion
                 const cleanValue = cleanForCsv(rowData[header]);
                 // In Anführungszeichen setzen, um Kommas und Umbrüche im Text zu erlauben
                 return `"${cleanValue}"`;
             });
             
-            csvContent += values.join(",") + "\n";
+            csvContent += values.join(separator) + "\n";
         });
         
         downloadFile(csvContent, 'silas_generated_content.csv', 'text/csv;charset=utf-8;');
