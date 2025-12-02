@@ -337,31 +337,29 @@ if (window.location.search.includes('debug=true') || window.location.hostname.in
 }
 
 
-// Code am Ende von js/main.js hinzufügen
+// Code am Ende von js/main.js
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Das Element auswählen, das animiert werden soll
-    const animatedElement = document.querySelector('.performance-tip');
+    // KORREKTUR: Alle .performance-tip Elemente auswählen (nicht nur das erste)
+    const animatedElements = document.querySelectorAll('.performance-tip');
 
-    // Prüfen, ob das Element auf der Seite existiert
-    if (animatedElement) {
-        // Optionen für den Observer (wann soll er auslösen?)
+    // Prüfen, ob Elemente auf der Seite existieren
+    if (animatedElements.length > 0) {
         const observerOptions = {
-            root: null, // Standard: beobachtet den Viewport
-            threshold: 0.1 // Animation startet, wenn 10% des Elements sichtbar sind
+            root: null,
+            threshold: 0.1
         };
 
-        // Der Observer, der die Klasse hinzufügt
         const observer = new IntersectionObserver((entries, observer) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('is-visible');
-                    observer.unobserve(entry.target); // Stoppt die Beobachtung nach der Animation
+                    observer.unobserve(entry.target);
                 }
             });
         }, observerOptions);
 
-        // Den Observer starten
-        observer.observe(animatedElement);
+        // KORREKTUR: Jeden Container beobachten
+        animatedElements.forEach(element => observer.observe(element));
     }
 });
