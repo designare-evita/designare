@@ -1,4 +1,4 @@
-// api/generate.js - KORRIGIERTE VERSION MIT DATAMUSE API
+// api/generate.js - KORRIGIERTE VERSION (Datamuse deaktiviert)
 
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const { FactChecker } = require('./fact-checker.js');
@@ -6,33 +6,25 @@ const { FactChecker } = require('./fact-checker.js');
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const factChecker = new FactChecker();
 
-// === NEUE HILFSFUNKTION FÜR SEMANTISCHE OPTIMIERUNG ===
+// === HILFSFUNKTION FÜR SEMANTISCHE OPTIMIERUNG ===
 async function fetchSemanticTerms(keyword) {
-    try {
-        // Datamuse API: 'ml' steht für 'means like' (semantisch ähnlich)
-        // Wir fragen nach Begriffen, die eine ähnliche Bedeutung haben
-        const response = await fetch(`https://api.datamuse.com/words?ml=${encodeURIComponent(keyword)}&max=15`);
-        
-        if (!response.ok) {
-            console.warn(`[WARN] Datamuse API Fehler: ${response.status}`);
-            return null;
-        }
-        
-        const data = await response.json();
-        
-        if (!data || data.length === 0) {
-            console.log(`[INFO] Keine semantischen Begriffe für '${keyword}' gefunden.`);
-            return null;
-        }
+    // FIX: Wir geben hier sofort null zurück.
+    // Grund: Die Datamuse API liefert nur englische Begriffe (z.B. "happy", "elements").
+    // Wenn wir diese in einen deutschen Prompt zwingen, entsteht "Denglisch".
+    // Solange wir keine deutsche Semantic-API haben, lassen wir das lieber weg.
+    return null;
 
-        // Wir nehmen die Top 15 Begriffe und machen daraus einen String
-        const terms = data.map(item => item.word).join(', ');
-        console.log(`[SEO] Semantische Begriffe für '${keyword}': ${terms}`);
-        return terms;
+    /* --- ALTER CODE (DEAKTIVIERT) ---
+    try {
+        const response = await fetch(`https://api.datamuse.com/words?ml=${encodeURIComponent(keyword)}&max=15`);
+        if (!response.ok) return null;
+        const data = await response.json();
+        if (!data || data.length === 0) return null;
+        return data.map(item => item.word).join(', ');
     } catch (error) {
-        console.warn(`[WARN] Konnte keine semantischen Begriffe laden: ${error.message}`);
-        return null; // Fallback: Einfach weitermachen ohne Optimierung
+        return null; 
     }
+    */
 }
 // ========================================================
 
@@ -100,28 +92,24 @@ async function generateContentWithRetry(prompt, preferredModel, maxRetries = 3) 
                 
                 console.warn(`⚠️ Fehler mit ${modelName} (Versuch ${attempt}/${maxRetries}):`, errorMessage);
                 
-                // Bei 503 (Überlastung) oder 429 (Rate Limit) -> nächstes Modell versuchen
                 if (errorMessage.includes('503') || errorMessage.includes('overloaded') || 
                     errorMessage.includes('429') || errorMessage.includes('quota')) {
                     
                     if (attempt < maxRetries) {
-                        // Exponentielles Backoff: 2s, 4s, 8s
                         const waitTime = Math.pow(2, attempt) * 1000;
                         console.log(`⏳ Warte ${waitTime/1000}s vor erneutem Versuch...`);
                         await delay(waitTime);
                     } else {
                         console.log(`⏭️ Wechsle zum nächsten Modell...`);
-                        break; // Nächstes Modell versuchen
+                        break;
                     }
                 } else {
-                    // Bei anderen Fehlern (z.B. API-Key ungültig) -> sofort abbrechen
                     throw error;
                 }
             }
         }
     }
     
-    // Wenn alle Modelle fehlschlagen
     throw new Error(`Alle Modelle fehlgeschlagen. Letzter Fehler: ${lastError?.message || lastError}`);
 }
 
@@ -145,19 +133,19 @@ export default async function handler(req, res) {
       try {
         const preferredModel = isMasterRequest ? "gemini-2.5-pro" : "gemini-2.5-flash-lite";
         
-        // SCHRITT 1: Semantische Daten abrufen (Server-Side Enrichment)
+        // SCHRITT 1: Semantische Daten (DEAKTIVIERT, gibt null zurück)
         const semanticTerms = await fetchSemanticTerms(keyword);
         
         // SCHRITT 2: Daten anreichern
         const enhancedKeywordData = { 
             ...keywordData, 
-            semanticTerms // Die neuen Begriffe werden in das Objekt gepackt
+            semanticTerms 
         };
 
-        // SCHRITT 3: Prompt generieren (jetzt mit Semantik-Instruktion)
+        // SCHRITT 3: Prompt generieren
         const prompt = factChecker.generateResponsiblePrompt(enhancedKeywordData);
 
-        // SCHRITT 4: Generiere Inhalt mit Retry-Logik
+        // SCHRITT 4: Generiere Inhalt
         const { text, modelUsed } = await generateContentWithRetry(prompt, preferredModel);
 
         let jsonData = {};
@@ -166,27 +154,17 @@ export default async function handler(req, res) {
 
         try {
             const cleanedText = cleanJsonString(text);
-            
-            if (!cleanedText.startsWith('{') && !cleanedText.startsWith('[')) {
-                console.warn(`[WARN] Bereinigter Text für '${keyword}' startet nicht mit { oder [`);
-                console.warn(`[DEBUG] Erste 100 Zeichen:`, cleanedText.substring(0, 100));
-            }
-            
             jsonData = JSON.parse(cleanedText);
-            
         } catch (e) {
             console.warn(`[WARN] JSON-Parsing für '${keyword}' fehlgeschlagen:`, e.message);
-            console.warn(`[DEBUG] Original (erste 200 Zeichen):`, originalText.substring(0, 200));
-            
             parseError = true;
             jsonData = {
                 post_title: `Fehler bei der Inhalts-Erstellung für: ${keyword}`,
-                meta_description: "Der von der KI generierte Inhalt war kein valides JSON und konnte nicht verarbeitet werden.",
+                meta_description: "Der von der KI generierte Inhalt war kein valides JSON.",
                 h1: `Verarbeitungsfehler für: ${keyword}`,
-                content: "<p>Die KI-Antwort konnte nicht korrekt verarbeitet werden. Bitte versuche es erneut.</p>",
+                content: "<p>Die KI-Antwort konnte nicht korrekt verarbeitet werden.</p>",
                 _fallback_used: true,
-                _parse_error: e.message,
-                _raw_response_preview: originalText.substring(0, 500)
+                _parse_error: e.message
             };
         }
 
@@ -201,9 +179,8 @@ export default async function handler(req, res) {
         jsonData.email = email;
         jsonData.phone = phone;
         jsonData.brand = brand;
-        // NEU: Info über semantische Begriffe speichern (für Debugging/Transparenz)
         jsonData._seo = {
-            semantic_terms_used: semanticTerms || "Keine gefunden"
+            semantic_terms_used: semanticTerms || "Deaktiviert (Sprach-Konflikt)"
         };
         jsonData._meta = { 
             model_used: modelUsed,
@@ -224,14 +201,10 @@ export default async function handler(req, res) {
             brand, 
             error: error.message,
             error_type: error.name,
-            _meta: { 
-                success: false, 
-                master_mode: isMasterRequest 
-            } 
+            _meta: { success: false } 
         });
       }
 
-      // Rate Limiting zwischen Keywords
       await delay(isMasterRequest ? 200 : 1500);
     }
 
@@ -242,8 +215,7 @@ export default async function handler(req, res) {
     console.error('💥 Kritischer Fehler im Handler:', error);
     res.status(500).json({
       error: 'Interner Server-Fehler',
-      details: error.message,
-      timestamp: new Date().toISOString()
+      details: error.message
     });
   }
 }
