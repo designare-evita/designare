@@ -1,4 +1,4 @@
-// api/fact-checker.js - FINALE VERSION (KORRIGIERT: Du/Sie-Logik gefixt)
+// api/fact-checker.js - FINALE VERSION (Mit Lektorat-Modus & Rechtschreibprüfung)
 
 class FactChecker {
     constructor() {
@@ -147,7 +147,6 @@ class FactChecker {
         const { keyword, intent, zielgruppe, tonalitaet, usp, domain, email, phone, address, brand, grammaticalPerson, customStyle, semanticTerms, readability } = keywordData;
 
         // --- LOGIK FÜR ANREDE (DU vs. SIE) ---
-        // Korrigierte Logik: Wir leiten die Anrede direkt aus der Tonalität ab
         let anredeInstruktion = "";
         if (tonalitaet) {
             const t = tonalitaet.toLowerCase();
@@ -242,7 +241,6 @@ class FactChecker {
         if (email) kontext += `- E-MAIL FÜR CTA: ${email}\n`;
         if (phone) kontext += `- TELEFONNUMMER FÜR CTA: ${phone}\n`;
         if (address) kontext += `- ADRESSE FÜR CTA: ${address}\n`;
-        // Korrektur: Label geändert, um Verwechslung mit Kundenansprache zu vermeiden
         if (grammaticalPerson) kontext += `- ABSENDER-PERSPEKTIVE: ${grammaticalPerson === 'plural' ? 'Wir-Form (Wir als Unternehmen bieten an)' : 'Ich-Form (Ich als Experte biete an)'}\n`;
 
         // Semantische Instruktion bauen
@@ -269,9 +267,15 @@ class FactChecker {
 
             ROLLE: ${roleAndTask}
 
-            🚨 WICHTIGE RICHTLINIEN & STIL-VORGABEN:
+            🚨 WICHTIGE RICHTLINIEN & QUALITÄTSSICHERUNG:
             ${anredeInstruktion}
             ${readabilityInstruction}
+            
+            👉 **ORTHOGRAFIE & GRAMMATIK (KRITISCH):**
+            - Der Text MUSS in einwandfreiem Deutsch (Neue Rechtschreibung) verfasst sein.
+            - Prüfe JEDEN Satz auf Tippfehler und grammatikalische Korrektheit.
+            - Zeichensetzung muss präzise sein (Kommasetzung!).
+            - Vermeide unnötiges "Denglisch". Nutze deutsche Begriffe, es sei denn, es handelt sich um feststehende Marketing-Fachbegriffe.
 
             - **Kein KI-Geschwafel:** Vermeide leere Phrasen wie "In der heutigen digitalen Welt", "Tauchen wir ein" oder "Es ist wichtig zu beachten". Starte direkt mit dem Mehrwert.
             - **Satzstruktur:** Variiere zwischen kurzen, prägnanten Sätzen und längeren Erklärungen. Das wirkt menschlicher.
