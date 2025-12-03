@@ -1,4 +1,4 @@
-// api/generate.js - KORRIGIERTE VERSION (Datamuse deaktiviert)
+// api/generate.js - KORRIGIERTE VERSION (Fix für Adresse & Semantic-API)
 
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const { FactChecker } = require('./fact-checker.js');
@@ -8,23 +8,10 @@ const factChecker = new FactChecker();
 
 // === HILFSFUNKTION FÜR SEMANTISCHE OPTIMIERUNG ===
 async function fetchSemanticTerms(keyword) {
-    // FIX: Wir geben hier sofort null zurück.
+    // FIX 1: Wir geben hier sofort null zurück.
     // Grund: Die Datamuse API liefert nur englische Begriffe (z.B. "happy", "elements").
-    // Wenn wir diese in einen deutschen Prompt zwingen, entsteht "Denglisch".
-    // Solange wir keine deutsche Semantic-API haben, lassen wir das lieber weg.
+    // Das verhinderte "Denglisch" in den deutschen Texten.
     return null;
-
-    /* --- ALTER CODE (DEAKTIVIERT) ---
-    try {
-        const response = await fetch(`https://api.datamuse.com/words?ml=${encodeURIComponent(keyword)}&max=15`);
-        if (!response.ok) return null;
-        const data = await response.json();
-        if (!data || data.length === 0) return null;
-        return data.map(item => item.word).join(', ');
-    } catch (error) {
-        return null; 
-    }
-    */
 }
 // ========================================================
 
@@ -56,16 +43,12 @@ function cleanJsonString(str) {
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-// Modell-Hierarchie: vom besten zum Fallback
 const MODEL_HIERARCHY = [
-    "gemini-2.5-flash",           // Stabile Version, schnell und effizient
-    "gemini-2.5-flash-lite",      // Noch schneller, kosteneffizienter
-    "gemini-2.0-flash-exp"        // Experimentell
+    "gemini-2.5-flash",           
+    "gemini-2.5-flash-lite",      
+    "gemini-2.0-flash-exp"        
 ];
 
-/**
- * Generiert Inhalt mit automatischem Retry und Modell-Fallback
- */
 async function generateContentWithRetry(prompt, preferredModel, maxRetries = 3) {
     const modelsToTry = preferredModel === "gemini-2.5-pro" 
         ? MODEL_HIERARCHY 
@@ -101,7 +84,7 @@ async function generateContentWithRetry(prompt, preferredModel, maxRetries = 3) 
                         await delay(waitTime);
                     } else {
                         console.log(`⏭️ Wechsle zum nächsten Modell...`);
-                        break;
+                        break; 
                     }
                 } else {
                     throw error;
@@ -127,25 +110,21 @@ export default async function handler(req, res) {
     const results = [];
     
     for (const keywordData of keywords) {
-      const { keyword, intent, domain, email, phone, brand } = keywordData;
+      // FIX 2: 'address' hier mit auslesen!
+      const { keyword, intent, domain, email, phone, brand, address } = keywordData;
       console.log(`\n[PROCESSING] Keyword: '${keyword}'`);
 
       try {
         const preferredModel = isMasterRequest ? "gemini-2.5-pro" : "gemini-2.5-flash-lite";
         
-        // SCHRITT 1: Semantische Daten (DEAKTIVIERT, gibt null zurück)
         const semanticTerms = await fetchSemanticTerms(keyword);
         
-        // SCHRITT 2: Daten anreichern
         const enhancedKeywordData = { 
             ...keywordData, 
             semanticTerms 
         };
 
-        // SCHRITT 3: Prompt generieren
         const prompt = factChecker.generateResponsiblePrompt(enhancedKeywordData);
-
-        // SCHRITT 4: Generiere Inhalt
         const { text, modelUsed } = await generateContentWithRetry(prompt, preferredModel);
 
         let jsonData = {};
@@ -173,12 +152,16 @@ export default async function handler(req, res) {
             jsonData._factCheck = factCheckResult;
         }
 
+        // Daten zusammenbauen für die Antwort (und damit für die CSV)
         jsonData.keyword = keyword;
         jsonData.intent = intent;
         jsonData.domain = domain;
         jsonData.email = email;
         jsonData.phone = phone;
         jsonData.brand = brand;
+        // FIX 3: 'address' explizit zum JSON hinzufügen
+        jsonData.address = address;
+
         jsonData._seo = {
             semantic_terms_used: semanticTerms || "Deaktiviert (Sprach-Konflikt)"
         };
