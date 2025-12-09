@@ -1,5 +1,5 @@
 /* ==============
-   AI-STYLES.CSS - KOMPLETT NEU UND KORRIGIERT
+   AI-STYLES.CSS - BEREINIGT
    Für Evita KI (Hauptseite) und Silas KI (CSV-Creator)
    ============== */
 
@@ -23,19 +23,6 @@
 
 #ai-question.placeholder-fade::placeholder {
     opacity: 0;
-}
-
-#ai-status {
-    background-color: rgba(255,255,255,0.03);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    font-size: 1rem;
-    margin-top: 10px;
-    min-height: 40px;
-    opacity: 0.9;
-    padding: 10px;
-    text-align: left;
-    transition: opacity 0.3s ease, border-color 0.3s ease;
 }
 
 /* ======================================== */
@@ -1341,108 +1328,5 @@
     #ai-chat-form {
         margin-bottom: 20px !important;
         padding: 0 !important;
-    }
-}
-
-/* ======================================== */
-/* AI-RESPONSE-MODAL: PULSAR EFFEKT (Sichtbar) */
-/* ======================================== */
-
-/* 1. Modal Container */
-#ai-response-modal .modal-content {
-    /* DUNKLER Hintergrund als Kontrast */
-    background: #0a0a0a !important;
-    
-    position: relative !important; 
-    z-index: 1 !important; 
-    overflow: visible !important;
-
-    color: #e0e0e0 !important;
-    border-radius: 10px !important;
-    width: 90vw !important;
-    height: 80vh !important;
-    max-width: 800px !important;
-    max-height: 600px !important;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
-    
-    display: flex !important;
-    flex-direction: column !important;
-    transform: scale(0.95) !important;
-    transition: transform 0.3s ease !important;
-}
-
-/* 2. Chat-History mit eigenem overflow */
-#ai-chat-history {
-    flex: 1 !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    padding: 60px 20px 20px 20px !important;
-    background-color: rgba(0, 0, 0, 0.3) !important; /* Etwas transparenter */
-    border-radius: 8px !important;
-    margin-bottom: 15px !important;
-    min-height: 200px !important;
-    max-height: 400px !important;
-}
-
-/* 3. Der SICHTBARE Pulsar-Hintergrund */
-#ai-response-modal .modal-content::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    
-    width: 120%;
-    height: 120%;
-    
-    /* HELLERE Farben mit VIEL Kontrast */
-    background: radial-gradient(
-        circle, 
-        rgba(252, 181, 0, 0.15) 0%,     /* Dein Accent-Color mit Transparenz */
-        rgba(170, 170, 170, 0.08) 40%,  /* Helles Grau */
-        rgba(80, 80, 80, 0.05) 70%,     /* Mittleres Grau */
-        transparent 90%                  /* Ausblenden zum Rand */
-    );
-    
-    z-index: 0;
-    border-radius: 12px;
-    
-    /* Die Animation */
-    animation: pulsarEffect 8s infinite ease-in-out;
-    pointer-events: none;
-    
-    /* Weichzeichner für sanfteren Effekt */
-    filter: blur(4px);
-}
-
-/* 4. Content über dem Pulsar */
-#ai-response-modal .modal-content > * {
-    position: relative;
-    z-index: 2;
-}
-
-/* 5. Die Animation */
-@keyframes pulsarEffect {
-    0% {
-        transform: translate(-50%, -50%) scale(0.9);
-        opacity: 0.5;
-    }
-    50% {
-        transform: translate(-50%, -50%) scale(1.25);
-        opacity: 1;
-    }
-    100% {
-        transform: translate(-50%, -50%) scale(0.9);
-        opacity: 0.5;
-    }
-}
-
-/* 6. Mobile optimiert */
-@media (max-width: 768px) {
-    #ai-response-modal .modal-content::before {
-        animation: none;
-        opacity: 0.6;
-        transform: translate(-50%, -50%) scale(1.05);
-        filter: blur(2px);
     }
 }
