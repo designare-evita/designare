@@ -1,731 +1,156 @@
-/* style.css
-  Vereinfacht: Nur noch Dark Mode & Finaler Layout-Fix
-*/
+/* --- SEARCH MODAL STYLES --- */
 
-a {
-    text-decoration: none !important;
+/* Modal Content Anpassung für Suche */
+.search-modal-content {
+    max-width: 600px !important;
+    height: auto !important;
+    max-height: 85vh !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
 }
 
-.about-me-hidden {
-    display: none;
+.search-header {
+    padding: 25px 25px 15px 25px;
+    background-color: #252525;
+    border-bottom: 1px solid #333;
 }
 
-#legal-modal .about-image-wrapper,
-#legal-modal .about-image-wrapper-bottom {
+.search-header h2 {
+    margin-bottom: 15px;
+    font-size: 1.5rem;
+    color: var(--accent-color);
     text-align: center;
 }
 
-/* --- Finale Korrektur für das Kontakt-Formular-Layout --- */
-
-/* Erzwingt die volle Breite für Input-Felder und die Textarea NUR im Kontakt-Modal. */
-#contact-modal #contact-form-inner input[type="text"],
-#contact-modal #contact-form-inner input[type="email"],
-#contact-modal #contact-form-inner textarea {
+.search-input-wrapper {
+    position: relative;
     width: 100%;
-    box-sizing: border-box; /* Stellt sicher, dass Padding die Breite nicht beeinflusst */
 }
 
-/* Stellt den korrekten Abstand für alle Elemente im Formular wieder her. */
-#contact-modal #contact-form-inner > * {
-    margin-bottom: 15px; /* Oder der gewünschte Abstand */
+.search-input-wrapper .search-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #888;
+    pointer-events: none;
 }
 
-/* Entfernt den unteren Abstand vom letzten Element (dem Button), um es sauber abzuschließen. */
-#contact-modal #contact-form-inner > *:last-child {
-    margin-bottom: 0;
+#site-search-input {
+    width: 100%;
+    padding: 15px 15px 15px 45px; /* Platz für Icon */
+    border-radius: 8px;
+    border: 1px solid #444;
+    background-color: #1a1a1a;
+    color: #fff;
+    font-size: 1.1rem;
+    outline: none;
+    transition: border-color 0.3s ease;
 }
 
-
-/* Stellt sicher, dass das Formular beim Öffnen immer sichtbar ist. */
-#contact-form-inner {
-    display: block;
+#site-search-input:focus {
+    border-color: var(--accent-color);
 }
 
-/* Stellt sicher, dass die Erfolgsmeldung anfangs immer versteckt ist. */
-#contact-success-message {
-    display: none;
+.search-body {
+    padding: 25px;
+    overflow-y: auto;
+    flex-grow: 1;
 }
 
+.search-body h3 {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #888;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #333;
+    padding-bottom: 5px;
+}
 
-/* 1. Ein gemeinsamer Grundstil für ALLE Buttons rechts im Header */
-.header-right-controls button {
-    background: none;
-    border: none;
-    padding: 0;
-    margin: 0;
-    color: var(--text-color);
-    cursor: pointer;
-    
-    /* Wichtig für die einheitliche Größe und Positionierung */
+/* SITEMAP GRID */
+.sitemap-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 10px;
+}
+
+.sitemap-item {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 40px;
-    width: 40px;
-    font-size: 1.2rem;
-    
-    opacity: 0.7;
-    transition: all 0.3s ease;
+    background-color: #2a2a2a;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 15px 10px;
+    text-decoration: none;
+    color: #ccc;
+    transition: all 0.2s ease;
+    text-align: center;
 }
 
-/* 2. Der Hover-Effekt für die drei originalen Icons (mit rundem Hintergrund) */
-#contact-button:hover, 
-#cookie-info-button:hover, 
-#about-me-button:hover,
-#evita-chat-button:hover {
-    background-color: var(--accent-color);
+.sitemap-item i {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+    color: var(--accent-color);
+    opacity: 0.8;
+}
+
+.sitemap-item span {
+    font-size: 0.85rem;
+    line-height: 1.2;
+}
+
+.sitemap-item:hover {
+    background-color: #333;
+    border-color: var(--accent-color);
+    transform: translateY(-2px);
     color: #fff;
+}
+
+.sitemap-item:hover i {
     opacity: 1;
     transform: scale(1.1);
-    border-radius: 50%; /* Nur hier die runden Ecken! */
 }
 
-/* 3. Der separate, saubere Hover-Effekt NUR für den Menü-Button */
-#menu-toggle-button:hover {
-    opacity: 1;
-    transform: scale(1.1);
-    color: var(--accent-color); /* Nur die Farbe ändern */
+/* SUCHERGEBNISSE */
+#search-results-list {
+    list-style: none;
+    padding: 0;
 }
 
-/* NEU: Angepasste Fallback-Schriftart zur Vermeidung von Layout-Shifts */
-@font-face {
-  font-family: 'Poppins Fallback';
-  src: local('Arial'); /* Nutzt die lokale Arial-Schriftart als Basis */
-  ascent-override: 90%;
-  descent-override: 22%;
-  line-gap-override: 0%;
-  size-adjust: 107%;
+#search-results-list li {
+    margin-bottom: 10px;
 }
 
+.search-result-link {
+    display: block;
+    padding: 12px 15px;
+    background-color: #2a2a2a;
+    border-radius: 6px;
+    text-decoration: none;
+    color: #eee;
+    transition: background-color 0.2s;
+    border-left: 3px solid transparent;
+}
 
-/*  Lokale Fonts laden */
-@font-face {
-    font-family: 'Poppins';
-    font-style: normal;
-    font-weight: 300;
-    src: url('Font/Poppins-Light.ttf') format('truetype');
-    font-display: swap; 
+.search-result-link:hover {
+    background-color: #333;
+    border-left-color: var(--accent-color);
 }
-@font-face {
-    font-family: 'Poppins';
-    font-style: normal;
-    font-weight: 400;
-    src: url('Font/Poppins-Regular.ttf') format('truetype');
-    font-display: swap; 
-}
-@font-face {
-    font-family: 'Poppins';
-    font-style: normal;
+
+.search-result-title {
+    display: block;
     font-weight: 600;
-    src: url('Font/Poppins-SemiBold.ttf') format('truetype');
-    font-display: swap; 
-}
-@font-face {
-    font-family: 'Poppins';
-    font-style: normal;
-    font-weight: 700;
-    src: url('Font/Poppins-Bold.ttf') format('truetype');
-    font-display: swap; 
-}
-
-/* Klasse für Akzentfarbe im Text */
-.accent-text-inline {
+    margin-bottom: 3px;
     color: var(--accent-color);
 }
 
-/* 2. Globale Einstellungen & Farbvariablen */
-:root {
-    --accent-color: #FCB500;
-    --accent-color-rgba: rgba(252, 181, 0, 0.85);
-    --bg-color: #1a1a1a;
-    --border-color: #aaaaaa;
-    --particle-color: #bbbbbb;
-    --particle-line-color: #888888;
-    --text-color: #eeeeee;
-    --header-height-desktop: 80px;
-    --header-height-mobile: 65px;
-}
-
-.legal-container h2 {
-    font-size: 2em;
-    text-align: left;
-    margin-bottom: 15px;
-    line-height: 1.3;
-}
-
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-html {
-    height: 100%;
-}
-
-body {
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    font-family: 'Poppins', 'Poppins Fallback', sans-serif;
-    height: 100%;
-    line-height: 1.6;
-    overflow-x: hidden;
-    transition: background-color 0.4s ease, color 0.4s ease;
-    opacity: 0; 
-    transition: opacity 0.4s ease-in-out; /* Sanfter Übergang von 0.4 Sekunden */
-}
-
-body.page-loaded {
-    opacity: 1;
-}
-
-/* Regel, die das Scrollen nur auf der Startseite verhindert */
-body.no-scroll {
-    overflow-y: hidden !important;
-}
-
-
-/* 3. Top-Bar Steuerungselemente */
-.main-header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px;
-    z-index: 1001;
-    box-sizing: border-box;
-    height: var(--header-height-desktop);
-}
-
-#top-left-logo-link {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 40px;
-    width: 40px;
-    opacity: 0.8;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    text-decoration: none;
-}
-
-#top-left-logo-link:hover {
-    opacity: 1;
-    transform: scale(1.1);
-}
-
-#top-left-logo-img {
-    height: 46px;
-    width: auto;
-    vertical-align: middle;
-}
-
-.header-right-controls {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-#contact-button, #cookie-info-button, #about-me-button {
-    align-items: center;
-    background: none;
-    border: none;
-    border-radius: 50%;
-    color: var(--text-color);
-    cursor: pointer;
-    display: flex;
-    font-size: 1.2rem;
-    height: 40px;
-    justify-content: center;
-    opacity: 0.7;
-    transition: all 0.3s ease;
-    width: 40px;
-    text-decoration: none;
-}
-#contact-button:hover, #cookie-info-button:hover, #about-me-button:hover {
-    background-color: var(--accent-color);
-    color: #fff;
-    opacity: 1;
-    transform: scale(1.1);
-}
-
-/* 4. Haupt-Layout & Container */
-.container {
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    margin: 0 auto;
-    max-width: 1100px;
-    padding: 0 2rem;
-}
-#hero {
-    align-items: center;
-    display: flex;
-    height: calc(100vh - var(--header-height-desktop));
-    margin-top: var(--header-height-desktop);
-    justify-content: center;
-    overflow: hidden;
-    position: relative;
-    text-align: center;
-    padding-bottom: 12vh;
-}
-#particles-js {
-    height: 100%;
-    left: 0;
-    position: absolute;
-    top: 0;
-    width: 100%;
-    z-index: 1;
-}
-#hero .container {
-    position: relative;
-    z-index: 2;
-}
-
-/* 5. Inhaltselemente */
-.profile-picture {
-    height: 200px;
-    margin-bottom: 1.5rem;
-    object-fit: cover;
-    width: 200px;
-}
-#hero h1 {
-    font-size: 3rem;
-    font-weight: 700;
-    height: 14px;
-    justify-content: center;
-    line-height: 1.2;
-    margin-bottom: 0.5rem;
-    max-width: 800px;
-    min-height: 1.2em;
-    width: 100%;
-    display: flex;
-    align-items: center;
-}
-#hero .subtitle {
-    font-size: 1.2rem;
-    font-weight: 300;
-    margin-bottom: 1.5rem;
-    padding-top: 15px;
-}
-
-
-.ai-container {
-    margin-bottom: 2.5rem;
-    width: 500px;
-}
-#ai-form {
-    background-color: var(--bg-color);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    display: flex;
-    overflow: hidden;
-    transition: border-color 0.3s ease;
-}
-
-#ai-form:focus-within {
-    border-color: var(--accent-color);
-}
-#ai-question {
-    background: none;
-    border: none;
-    color: var(--text-color);
-    flex-grow: 1;
-    font-size: 1rem;
-    outline: none;
-    padding: 12px 15px;
-}
-#ai-question::placeholder {
-    color: var(--text-color);
-    opacity: 0.5;
-    transition: opacity 0.6s ease-in-out;
-}
-#ai-question.placeholder-fade::placeholder {
-    opacity: 0;
-}
-#ai-form button {
-    background: var(--accent-color);
-    border: none;
-    color: #fff;
-    cursor: pointer;
-    font-size: 1rem;
-    padding: 0 18px;
-    transition: background-color 0.3s ease;
-}
-#ai-form button:hover {
-    background: #d39a00;
-}
-#ai-status {
-    background-color: rgba(255,255,255,0.03);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    font-size: 1rem;
-    margin-top: 10px;
-    min-height: 40px;
-    opacity: 0.9;
-    padding: 10px;
-    text-align: left;
-    transition: opacity 0.3s ease, border-color 0.3s ease;
-}
-
-/* 6. Footer & Kontakt-Modal */
-footer {
-    align-items: center;
-    bottom: 10px;
-    display: flex;
-    gap: 8px;
-    position: fixed;
-    right: 10px;
-    z-index: 1001;
-}
-footer a {
-    border: 1px solid var(--text-color);
-    border-radius: 5px;
-    color: var(--text-color);
-    font-size: 0.8rem;
-    opacity: 0.5;
-    padding: 4px 8px;
-    text-decoration: none;
-    transition: opacity 0.3s ease;
-}
-footer a:hover {
-    opacity: 1;
-}
-
-.modal-overlay {
-    align-items: center;
-    background-color: rgba(0, 0, 0, 0.7);
-    display: flex;
-    height: 100%;
-    justify-content: center;
-    left: 0;
-    opacity: 0;
-    pointer-events: none;
-    position: fixed;
-    top: 0;
-    transition: opacity 0.3s ease;
-    width: 100%;
-    z-index: 2000;
-}
-.modal-overlay.visible {
-    opacity: 1;
-    pointer-events: auto;
-}
-.modal-content {
-    background-color: var(--bg-color);
-    border-radius: 10px;
-    max-width: 700px;
-    padding: 2rem;
-    position: relative;
-    transform: scale(0.95);
-    transition: transform 0.3s ease;
-    width: 90%;
-}
-.modal-overlay.visible .modal-content {
-    transform: scale(1);
-}
-.modal-content h2 {
-    margin-bottom: 1.5rem;
-    margin-top: 0;
-    text-align: center;
-}
-.close-button {
-    background: none;
-    border: none;
-    color: var(--text-color);
-    cursor: pointer;
-    font-size: 2rem;
-    opacity: 0.5;
-    position: absolute;
-    right: 15px;
-    top: 10px;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-}
-.close-button:hover {
-    opacity: 1;
-    transform: rotate(90deg);
-}
-.modal-content form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-.modal-content .cta-button {
+.search-result-snippet {
     display: block;
-    width: 100%;
-    background: var(--accent-color);
-    border: 2px solid var(--accent-color);
-    border-radius: 5px;
-    color: #fff;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: 600;
-    padding: 12px 24px;
-    text-align: center;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    width: 100%;
-}
-.modal-content .cta-button:hover {
-    background-color: #d39a00;
-    border-color: #d39a00;
-    color: #fff;
-    transform: translateY(-3px);
-}
-.modal-content input[type="text"], .modal-content input[type="email"], .modal-content textarea {
-    font-family: 'Poppins', sans-serif; font-size: 1rem; padding: 12px;
-    border-radius: 5px; border: 1px solid var(--border-color);
-    background-color: var(--bg-color); color: var(--text-color);
-    transition: border-color 0.3s ease;
-}
-.modal-content input:focus, .modal-content textarea:focus {
-    border-color: var(--accent-color);
-    outline: none;
-}
-.privacy-checkbox {
-    align-items: center;
-    display: flex;
-    font-size: 0.8rem;
-    gap: 10px;
-}
-.privacy-checkbox input {
-    width: auto;
-}
-
-/* Styles für Cookie Lightbox Buttons */
-.cookie-lightbox-buttons {
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    margin-top: 20px;
-    width: 100%;
-    align-items: center;
-}
-
-.lightbox-button {
-    background: none;
-    border: 2px solid var(--text-color);
-    border-radius: 5px;
-    color: var(--text-color);
-    cursor: pointer;
-    display: block;
-    font-size: 1rem;
-    font-weight: 600;
-    padding: 10px 15px;
-    text-align: center;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    width: 100%;
-}
-
-#acknowledge-cookie-lightbox {
-    background-color: var(--accent-color);
-    color: #fff;
-    border: 2px solid var(--accent-color);
-}
-
-#acknowledge-cookie-lightbox:hover {
-    background-color: #d39a00;
-    border-color: #d39a00;
-    transform: translateY(-2px);
-}
-
-#privacy-policy-link-button {
-    background: none;
-    border: 2px solid var(--text-color);
-    color: var(--text-color);
-}
-
-#privacy-policy-link-button:hover {
-    background-color: var(--accent-color);
-    border-color: var(--accent-color);
-    color: #fff;
-    transform: translateY(-2px);
-}
-
-/* Styles für die Paginierungs-Buttons im Legal-Modal */
-.legal-modal-pagination-buttons {
-    border-top: 1px solid var(--border-color);
-    display: flex;
-    gap: 20px;
-    justify-content: center;
-    margin-top: 25px;
-    padding-top: 15px;
-}
-
-.legal-modal-pagination-buttons button {
-    background-color: var(--accent-color);
-    color: #fff;
-    padding: 10px 20px;
-    border: 2px solid var(--accent-color);
-    border-radius: 5px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.legal-modal-pagination-buttons button:hover {
-    background-color: #d39a00;
-    border-color: #d39a00;
-    transform: translateY(-2px);
-}
-
-.legal-modal-pagination-buttons button:disabled {
-    background-color: #555555;
-    border-color: #555555;
-    cursor: not-allowed;
-    opacity: 0.7;
-    transform: none;
-}
-
-
-/* 7. Responsive Design */
-@media (max-width: 768px) {
-    body.no-scroll {
-        overflow: hidden;
-    }
-
-    .main-header {
-        padding: 15px 10px;
-        height: var(--header-height-mobile);
-    }
-    #top-left-logo-link {
-        left: 10px;
-        height: 35px;
-        width: 35px;
-    }
-    #top-left-logo-img {
-        height: 30px;
-    }
-    .header-right-controls {
-        right: 10px;
-        gap: 10px;
-    }
-    #contact-button, #cookie-info-button, #magazine-button {
-        font-size: 1rem;
-        height: 35px;
-        width: 35px;
-    }
-
-    .article-page-main-content {
-        padding-top: var(--header-height-mobile);
-        padding-bottom: 80px;
-    }
-    .article-container {
-        padding: 1rem;
-        margin: 1rem auto;
-    }
-    .article-content h1 {
-        font-size: 1.8rem;
-    }
-    .article-content h2 {
-        font-size: 1.4rem;
-    }
-    .article-content h3 {
-        font-size: 1.1rem;
-    }
-    .article-content h4 {
-        font-size: 0.95rem;
-    }
-    .article-content p,
-    .article-content ul,
-    .article-content ol,
-    .article-content li {
-        font-size: 0.9rem;
-    }
-    .article-content img {
-        margin: 1rem auto;
-    }
-
-    footer {
-        right: 10px;
-        bottom: 10px;
-        gap: 5px;
-    }
-    footer a {
-        font-size: 0.7rem;
-        padding: 3px 6px;
-    }
-
-    .cookie-lightbox-buttons {
-        gap: 10px;
-    }
-    .lightbox-button {
-        font-size: 0.9rem;
-    }
-
-    .modal-content {
-        max-height: 90vh;
-        max-width: 90%;
-        overflow-y: auto;
-        padding: 1.5rem;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .legal-container h1 {
-        font-size: 1.6rem;
-    }
-    .legal-container h2 {
-        font-size: 1.2rem;
-        line-height: 1.3;
-        margin-bottom: 10px;
-    }
-    .legal-container h3 {
-        font-size: 1.0rem;
-    }
-    .legal-container p,
-    .legal-container ul,
-    .legal-container ol,
-    .legal-container li {
-        font-size: 0.85rem;
-    }
-    .legal-container .back-link {
-        font-size: 0.8rem;
-        margin-bottom: 2rem;
-        padding: 6px 12px;
-    }
-    .legal-modal-pagination-buttons {
-        flex-direction: column;
-        gap: 10px;
-        padding-top: 10px;
-    }
-    .legal-modal-pagination-buttons button {
-        font-size: 0.9rem;
-        width: 100%;
-    }
-
-    #hero {
-        height: calc(100vh - var(--header-height-mobile));
-        margin-top: var(--header-height-mobile);
-        padding-bottom: 18vh;
-    }
-
-    #hero h1 {
-        font-size: 2rem;
-        height: auto;
-        min-height: 1.2em;
-    }
-
-    #hero .subtitle {
-        font-size: 1.1rem;
-        margin-bottom: 1.1rem;
-    }
-
-    .ai-container {
-        width: 100%;
-        max-width: 500px;
-        margin-bottom: 2rem;
-    }
-
-    .profile-picture {
-        width: 160px;
-        height: 160px;
-        margin-bottom: 1rem;
-    }
-
+    font-size: 0.85rem;
+    color: #aaa;
 }
