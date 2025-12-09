@@ -1,4 +1,4 @@
-// js/modals.js - PERFORMANCE OPTIMIERTE VERSION (Kein Flackern mehr)
+// js/modals.js - PERFORMANCE OPTIMIERTE VERSION (INKLUSIVE SUCHE)
 
 export const openModal = (modalElement) => {
     if (modalElement) {
@@ -135,7 +135,7 @@ function setupContactModal() {
 }
 
 // ===================================================================
-// ABOUT ME MODAL SETUP - OPTIMIERT
+// ABOUT ME MODAL SETUP
 // ===================================================================
 function setupAboutModal() {
     const aboutButton = document.getElementById('about-me-button');
@@ -150,19 +150,133 @@ function setupAboutModal() {
             if (legalModal && aboutContent) {
                 const contentArea = document.getElementById('legal-modal-content-area');
                 if (contentArea) {
-                    // 1. Inhalt einfügen
                     contentArea.innerHTML = aboutContent.innerHTML;
-                    
-                    // 2. Paginierung anwenden BEVOR das Modal aufgeht
-                    // (Verhindert, dass man kurz den vollen Text sieht)
                     setupAboutMePagination(contentArea); 
-                    
-                    // 3. Jetzt erst öffnen
                     openModal(legalModal);
                 }
             }
         });
     }
+}
+
+// ===================================================================
+// SEARCH MODAL SETUP (NEU!)
+// ===================================================================
+
+const siteContentIndex = [
+    { 
+        title: "Startseite - Michael Kanda", 
+        url: "index.html", 
+        keywords: "home startseite michael kanda webentwickler wien",
+        desc: "Willkommen auf meiner Portfolio-Seite. Webentwicklung & KI."
+    },
+    { 
+        title: "KI-Integration auf Webseiten", 
+        url: "KI-Integration-auf-Webseiten.html", 
+        keywords: "ki integration künstliche intelligenz chatbot automatisierung",
+        desc: "Wie KI moderne Webseiten interaktiver und effizienter macht."
+    },
+    { 
+        title: "KI für Unternehmenswebseiten", 
+        url: "ki-fuer-unternehmenswebseiten.html", 
+        keywords: "unternehmen business b2b lösungen",
+        desc: "Maßgeschneiderte KI-Lösungen für dein Unternehmen."
+    },
+    { 
+        title: "SEO & GEO", 
+        url: "geo-seo.html", 
+        keywords: "seo suchmaschinenoptimierung google ranking geo lokal",
+        desc: "Optimiere deine Seite für lokale Suchanfragen und Google."
+    },
+    { 
+        title: "Silas AI Creator", 
+        url: "silas.html", 
+        keywords: "silas ai creator tool generator content",
+        desc: "Der KI-gestützte Content Creator für schnelle Ergebnisse."
+    },
+    { 
+        title: "CSV Importer PRO", 
+        url: "CSV-Importer-PRO.html", 
+        keywords: "csv import tool daten management pro",
+        desc: "Professionelles Tool zum Importieren großer Datensätze."
+    },
+     { 
+        title: "Impressum", 
+        url: "impressum.html", 
+        keywords: "rechtliches kontakt adresse",
+        desc: "Rechtliche Informationen und Kontakt."
+    }
+];
+
+function setupSearchModal() {
+    const searchModal = document.getElementById('search-modal');
+    const searchButton = document.getElementById('search-button');
+    const closeSearchBtn = document.getElementById('close-search-modal');
+    const searchInput = document.getElementById('site-search-input');
+    const resultsContainer = document.getElementById('search-results-container');
+    const resultsList = document.getElementById('search-results-list');
+    const sitemapContainer = document.getElementById('sitemap-container');
+
+    if (searchButton) {
+        searchButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (searchModal) {
+                openModal(searchModal);
+                setTimeout(() => searchInput.focus(), 100);
+            }
+        });
+    }
+
+    if (closeSearchBtn) {
+        closeSearchBtn.addEventListener('click', () => {
+            if (searchModal) closeModal(searchModal);
+        });
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
+
+            if (query.length === 0) {
+                sitemapContainer.style.display = 'block';
+                resultsContainer.style.display = 'none';
+            } else {
+                sitemapContainer.style.display = 'none';
+                resultsContainer.style.display = 'block';
+
+                const results = siteContentIndex.filter(page => 
+                    page.title.toLowerCase().includes(query) || 
+                    page.keywords.includes(query) ||
+                    page.desc.toLowerCase().includes(query)
+                );
+                renderSearchResults(results, resultsList);
+            }
+        });
+    }
+}
+
+function renderSearchResults(results, listElement) {
+    listElement.innerHTML = ''; 
+
+    if (results.length === 0) {
+        listElement.innerHTML = '<li style="color: #888; text-align: center; padding: 20px;">Keine Ergebnisse gefunden.</li>';
+        return;
+    }
+
+    results.forEach(page => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+            <a href="${page.url}" class="search-result-link">
+                <span class="search-result-title">${page.title}</span>
+                <span class="search-result-snippet">${page.desc}</span>
+            </a>
+        `;
+        li.querySelector('a').addEventListener('click', () => {
+             const searchModal = document.getElementById('search-modal');
+             closeModal(searchModal);
+        });
+        listElement.appendChild(li);
+    });
 }
 
 // ===================================================================
@@ -234,16 +348,12 @@ function setupAboutMePagination(contentArea) {
         if (!legalContainer) return;
         
         const allElements = Array.from(legalContainer.children);
-        
-        // Alles verstecken
         allElements.forEach(element => element.style.display = 'none');
         
-        // Titel immer zeigen
         const title = legalContainer.querySelector('h1');
         if (title) title.style.display = 'block';
         
         if (pageIndex === 0) {
-            // Seite 1 Logic
             let foundBreakpoint = false;
             for (let i = 0; i < allElements.length; i++) {
                 const element = allElements[i];
@@ -258,14 +368,12 @@ function setupAboutMePagination(contentArea) {
                 element.style.display = 'block';
             }
             if (!foundBreakpoint) {
-                // Fallback
                 const splitIndex = Math.floor(allElements.length * 0.6);
                 for (let i = 0; i < splitIndex; i++) {
                     if (allElements[i]) allElements[i].style.display = 'block';
                 }
             }
         } else if (pageIndex === 1) {
-            // Seite 2 Logic
             let foundBreakpoint = false;
             let breakpointIndex = -1;
             for (let i = 0; i < allElements.length; i++) {
@@ -285,19 +393,15 @@ function setupAboutMePagination(contentArea) {
                     allElements[i].style.display = 'block';
                 }
             } else {
-                // Fallback
                 const splitIndex = Math.floor(allElements.length * 0.6);
                 for (let i = splitIndex; i < allElements.length; i++) {
                     if (allElements[i]) allElements[i].style.display = 'block';
                 }
             }
         }
-        
         updatePagination();
         contentArea.scrollTop = 0;
     }
-    
-    // WICHTIG: Sofort ausführen, kein Timeout!
     showPage(0);
 }
 
@@ -312,7 +416,6 @@ function loadLegalContentWithPagination(page) {
 
     if (!legalModal || !contentArea) return;
 
-    // Loading State
     contentArea.innerHTML = '<div style="text-align: center; padding: 40px;"><p>Lade Inhalt...</p></div>';
     openModal(legalModal);
 
@@ -330,15 +433,9 @@ function loadLegalContentWithPagination(page) {
                                doc.querySelector('body');
 
             if (mainContent) {
-                // Unsichtbar machen während dem Render-Prozess um Flackern zu verhindern
                 contentArea.style.opacity = '0';
-                
                 contentArea.innerHTML = mainContent.innerHTML;
-                
-                // Paginierung anwenden (synchron!)
                 addPaginationButtons(contentArea, page);
-                
-                // Inhalt sofort wieder sichtbar machen
                 requestAnimationFrame(() => {
                     contentArea.style.opacity = '1';
                 });
@@ -484,8 +581,6 @@ function addPaginationButtons(contentArea, currentPage) {
             }
         }
     }
-    
-    // WICHTIG: Sofort ausführen, kein Timeout!
     showPage(0);
 }
 
@@ -537,6 +632,7 @@ export function initModals() {
         setupContactModal();
         setupAboutModal();
         setupAiModal();
+        setupSearchModal(); // <--- HIER WIRD DIE SUCHE INITIALISIERT
         setupLegalModalCloseButton();
         setupModalBackgroundClose();
 
@@ -545,13 +641,12 @@ export function initModals() {
             const target = e.target;
             const legalPages = ['impressum.html', 'datenschutz.html', 'disclaimer.html'];
             
-            // Prüft ob Link oder Button für eine Legal-Page geklickt wurde
             for (let page of legalPages) {
                 const linkSelector = `a[href="${page}"]`;
                 const idSelector = `#${page.replace('.html', '')}-link`;
                 
                 if (target.matches(linkSelector) || target.matches(idSelector)) {
-                    e.preventDefault(); // Verhindert das Neuladen der Seite!
+                    e.preventDefault(); 
                     console.log(`📄 ${page} geklickt`);
                     loadLegalContentWithPagination(page);
                     return;
