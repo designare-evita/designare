@@ -31,7 +31,7 @@ const trackVisitor = () => {
         .catch(error => console.error('Netzwerkfehler beim Tracking:', error));
 };
 
-// === 4. SETUP: SIDE MENU (DAS HAT GEFEHLT) ===
+// === 4. SETUP: SIDE MENU ===
 const setupSideMenu = () => {
     const menuButton = document.getElementById('menu-toggle-button');
     const sideMenu = document.getElementById('side-menu-panel');
@@ -43,30 +43,48 @@ const setupSideMenu = () => {
         // Öffnen
         menuButton.addEventListener('click', (e) => {
             e.preventDefault();
+            e.stopPropagation();
             sideMenu.classList.add('visible');
             document.body.classList.add('no-scroll');
+            console.log("🍔 Side-Menu geöffnet");
         });
 
         // Schließen (X-Button)
         if (closeMenuButton) {
-            closeMenuButton.addEventListener('click', () => {
+            closeMenuButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 sideMenu.classList.remove('visible');
                 document.body.classList.remove('no-scroll');
+                console.log("🍔 Side-Menu geschlossen (X-Button)");
             });
         }
 
         // Schließen (Klick außerhalb)
         document.addEventListener('click', (e) => {
-            // Wenn Menü offen ist UND Klick NICHT im Menü UND NICHT auf dem Button war
             if (sideMenu.classList.contains('visible') && 
                 !sideMenu.contains(e.target) && 
                 !menuButton.contains(e.target)) {
                 sideMenu.classList.remove('visible');
                 document.body.classList.remove('no-scroll');
+                console.log("🍔 Side-Menu geschlossen (Klick außerhalb)");
             }
         });
+
+        // Schließen mit Escape-Taste
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && sideMenu.classList.contains('visible')) {
+                sideMenu.classList.remove('visible');
+                document.body.classList.remove('no-scroll');
+                console.log("🍔 Side-Menu geschlossen (Escape)");
+            }
+        });
+
+        console.log("✅ Side-Menu erfolgreich eingerichtet");
     } else {
-        console.warn("⚠️ Side-Menu Elemente nicht gefunden (Button oder Panel fehlt)");
+        console.warn("⚠️ Side-Menu Elemente nicht gefunden:");
+        console.warn("   - menuButton:", !!menuButton);
+        console.warn("   - sideMenu:", !!sideMenu);
     }
 };
 
@@ -77,7 +95,6 @@ const setupEvitaChatButton = () => {
     const evitaChatButton = document.getElementById('evita-chat-button');
     if (!evitaChatButton) return;
 
-    // Event Listener für den Evita Chat Button
     evitaChatButton.addEventListener('click', async (e) => {
         e.preventDefault();
         console.log("🤖 Evita Chat Button geklickt");
@@ -141,7 +158,7 @@ const ensureAiFormAvailable = async () => {
 // === 8. INITIALISIERUNGS-FUNKTIONEN ===
 const initializeDynamicScripts = () => {
     console.log("🔧 Initialisiere dynamische Scripts...");
-    initModals(); // Startet auch die Suche!
+    initModals();
     
     // Wichtig: Side Menu einrichten
     setupSideMenu();
@@ -195,11 +212,9 @@ const withRetry = async (fn, retries = 3, delay = 1000) => {
 };
 
 const enhanceHeaderAfterLoad = () => {
-    // Hier können wir nochmals prüfen, ob Buttons da sind
     const menuBtn = document.getElementById('menu-toggle-button');
     if (menuBtn) {
         console.log("✅ Menü-Button gefunden");
-        // Sicherheits-Check: Falls setupSideMenu noch nicht lief
         if (!menuBtn.hasAttribute('data-initialized')) {
             setupSideMenu();
             menuBtn.setAttribute('data-initialized', 'true');
@@ -219,11 +234,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     
     try {
+        // WICHTIG: Lade auch das Side-Menu!
         const headerPromise = loadContent('/header.html', 'header-placeholder');
         const modalsPromise = loadContent('/modals.html', 'modal-container');
         const footerPromise = loadContent('/footer.html', 'footer-placeholder');
+        const sideMenuPromise = loadContent('/side-menu.html', 'side-menu-placeholder').catch(err => {
+            console.warn("⚠️ Side-Menu konnte nicht geladen werden:", err);
+            return null; // Nicht kritisch - Seite soll trotzdem laden
+        });
 
-        await Promise.all([headerPromise, modalsPromise, footerPromise]); 
+        await Promise.all([headerPromise, modalsPromise, footerPromise, sideMenuPromise]); 
         console.log("✅ Struktur geladen.");
         
         setTimeout(() => enhanceHeaderAfterLoad(), 50);
