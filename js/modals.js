@@ -1,4 +1,4 @@
-// js/modals.js - PERFORMANCE OPTIMIERTE VERSION (INKLUSIVE SUCHE)
+// js/modals.js - FINAL (Inkl. Suche & Über Mich Logik)
 
 export const openModal = (modalElement) => {
     if (modalElement) {
@@ -28,6 +28,24 @@ export function showAIResponse(content, isHTML = false) {
             contentArea.textContent = content;
         }
         openModal(modal);
+    }
+}
+
+// ===================================================================
+// HILFSFUNKTION: ÜBER MICH MODAL ÖFFNEN (Zentralisiert)
+// ===================================================================
+function openAboutMeModal() {
+    const legalModal = document.getElementById('legal-modal');
+    const aboutContent = document.getElementById('about-me-content');
+    const contentArea = document.getElementById('legal-modal-content-area');
+
+    if (legalModal && aboutContent && contentArea) {
+        console.log('👤 Öffne Über Mich Modal');
+        contentArea.innerHTML = aboutContent.innerHTML;
+        setupAboutMePagination(contentArea); 
+        openModal(legalModal);
+    } else {
+        console.error("Fehler: Elemente für Über Mich Modal nicht gefunden.");
     }
 }
 
@@ -138,37 +156,43 @@ function setupContactModal() {
 // ABOUT ME MODAL SETUP
 // ===================================================================
 function setupAboutModal() {
+    // Button im Header
     const aboutButton = document.getElementById('about-me-button');
-    const legalModal = document.getElementById('legal-modal');
-    const aboutContent = document.getElementById('about-me-content');
-
     if (aboutButton) {
         aboutButton.addEventListener('click', (e) => {
             e.preventDefault();
-            console.log('👤 About Me Button geklickt');
-            
-            if (legalModal && aboutContent) {
-                const contentArea = document.getElementById('legal-modal-content-area');
-                if (contentArea) {
-                    contentArea.innerHTML = aboutContent.innerHTML;
-                    setupAboutMePagination(contentArea); 
-                    openModal(legalModal);
-                }
-            }
+            openAboutMeModal();
+        });
+    }
+
+    // Button in der Sitemap (falls vorhanden)
+    const sitemapAboutButton = document.getElementById('sitemap-about-button');
+    if (sitemapAboutButton) {
+        sitemapAboutButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            const searchModal = document.getElementById('search-modal');
+            if (searchModal) closeModal(searchModal); // Suche schließen
+            openAboutMeModal(); // About öffnen
         });
     }
 }
 
 // ===================================================================
-// SEARCH MODAL SETUP (NEU!)
+// SEARCH MODAL SETUP
 // ===================================================================
 
 const siteContentIndex = [
     { 
+        title: "Über Michael Kanda", 
+        url: "#open-about",  // Spezial-URL zur Erkennung
+        keywords: "über mich wer bin ich profil michael kanda lebenslauf",
+        desc: "Erfahre mehr über den Mann hinter den Pixeln (und Evita)."
+    },
+    { 
         title: "Startseite - Michael Kanda", 
         url: "index.html", 
-        keywords: "home startseite michael kanda webentwickler wien",
-        desc: "Willkommen auf meiner Portfolio-Seite. Webentwicklung & KI."
+        keywords: "home startseite",
+        desc: "Willkommen auf meiner Spielwiese! Hier tobe ich mich aus Liebe zu Code und KI privat aus. Hauptberuflich sorge ich als Web-Entwickler bei maxonline für digitale Präsenz.."
     },
     { 
         title: "KI-Integration auf Webseiten", 
@@ -200,12 +224,7 @@ const siteContentIndex = [
         keywords: "csv import tool daten management pro",
         desc: "Professionelles Tool zum Importieren großer Datensätze."
     },
-     { 
-        title: "Impressum", 
-        url: "impressum.html", 
-        keywords: "rechtliches kontakt adresse",
-        desc: "Rechtliche Informationen und Kontakt."
-    }
+   
 ];
 
 function setupSearchModal() {
@@ -271,10 +290,22 @@ function renderSearchResults(results, listElement) {
                 <span class="search-result-snippet">${page.desc}</span>
             </a>
         `;
-        li.querySelector('a').addEventListener('click', () => {
+        
+        // Klick-Handler hinzufügen
+        li.querySelector('a').addEventListener('click', (e) => {
              const searchModal = document.getElementById('search-modal');
-             closeModal(searchModal);
+             
+             // Spezialfall: Über mich Modal
+             if (page.url === '#open-about') {
+                 e.preventDefault();
+                 if (searchModal) closeModal(searchModal);
+                 openAboutMeModal();
+             } else {
+                 // Normaler Link: Suche schließen und Link folgen lassen
+                 if (searchModal) closeModal(searchModal);
+             }
         });
+        
         listElement.appendChild(li);
     });
 }
@@ -632,7 +663,7 @@ export function initModals() {
         setupContactModal();
         setupAboutModal();
         setupAiModal();
-        setupSearchModal(); // <--- HIER WIRD DIE SUCHE INITIALISIERT
+        setupSearchModal();
         setupLegalModalCloseButton();
         setupModalBackgroundClose();
 
