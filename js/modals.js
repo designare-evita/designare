@@ -1,4 +1,4 @@
-// js/modals.js - FINAL (Inkl. Suche & Über Mich Logik)
+// js/modals.js - FINAL (Inkl. Suche, Über Mich & Evita)
 
 export const openModal = (modalElement) => {
     if (modalElement) {
@@ -32,7 +32,7 @@ export function showAIResponse(content, isHTML = false) {
 }
 
 // ===================================================================
-// HILFSFUNKTION: ÜBER MICH MODAL ÖFFNEN (Zentralisiert)
+// HILFSFUNKTION: ÜBER MICH MODAL ÖFFNEN
 // ===================================================================
 function openAboutMeModal() {
     const legalModal = document.getElementById('legal-modal');
@@ -44,8 +44,6 @@ function openAboutMeModal() {
         contentArea.innerHTML = aboutContent.innerHTML;
         setupAboutMePagination(contentArea); 
         openModal(legalModal);
-    } else {
-        console.error("Fehler: Elemente für Über Mich Modal nicht gefunden.");
     }
 }
 
@@ -165,34 +163,40 @@ function setupAboutModal() {
         });
     }
 
-    // Button in der Sitemap (falls vorhanden)
+    // Button in der Sitemap
     const sitemapAboutButton = document.getElementById('sitemap-about-button');
     if (sitemapAboutButton) {
         sitemapAboutButton.addEventListener('click', (e) => {
             e.preventDefault();
             const searchModal = document.getElementById('search-modal');
-            if (searchModal) closeModal(searchModal); // Suche schließen
-            openAboutMeModal(); // About öffnen
+            if (searchModal) closeModal(searchModal);
+            openAboutMeModal();
         });
     }
 }
 
 // ===================================================================
-// SEARCH MODAL SETUP
+// SEARCH MODAL SETUP (Inkl. Evita)
 // ===================================================================
 
 const siteContentIndex = [
     { 
+        title: "Chat mit Evita (KI)", 
+        url: "#open-evita",  // Spezial-URL für Evita
+        keywords: "evita ai ki chat assistent frage hilfe künstliche intelligenz",
+        desc: "Starte den Chat mit meiner KI-Assistentin Evita."
+    },
+    { 
         title: "Über Michael Kanda", 
-        url: "#open-about",  // Spezial-URL zur Erkennung
+        url: "#open-about",
         keywords: "über mich wer bin ich profil michael kanda lebenslauf",
         desc: "Erfahre mehr über den Mann hinter den Pixeln (und Evita)."
     },
     { 
         title: "Startseite - Michael Kanda", 
         url: "index.html", 
-        keywords: "home startseite",
-        desc: "Willkommen auf meiner Spielwiese! Hier tobe ich mich aus Liebe zu Code und KI privat aus. Hauptberuflich sorge ich als Web-Entwickler bei maxonline für digitale Präsenz.."
+        keywords: "home startseite michael kanda webentwickler wien",
+        desc: "Willkommen auf meiner Portfolio-Seite. Webentwicklung & KI."
     },
     { 
         title: "KI-Integration auf Webseiten", 
@@ -224,7 +228,12 @@ const siteContentIndex = [
         keywords: "csv import tool daten management pro",
         desc: "Professionelles Tool zum Importieren großer Datensätze."
     },
-   
+     { 
+        title: "Impressum", 
+        url: "impressum.html", 
+        keywords: "rechtliches kontakt adresse",
+        desc: "Rechtliche Informationen und Kontakt."
+    }
 ];
 
 function setupSearchModal() {
@@ -235,7 +244,11 @@ function setupSearchModal() {
     const resultsContainer = document.getElementById('search-results-container');
     const resultsList = document.getElementById('search-results-list');
     const sitemapContainer = document.getElementById('sitemap-container');
+    
+    // Neuer Evita Sitemap Button
+    const sitemapEvitaButton = document.getElementById('sitemap-evita-button');
 
+    // Öffnen
     if (searchButton) {
         searchButton.addEventListener('click', (e) => {
             e.preventDefault();
@@ -246,12 +259,26 @@ function setupSearchModal() {
         });
     }
 
+    // Schließen
     if (closeSearchBtn) {
         closeSearchBtn.addEventListener('click', () => {
             if (searchModal) closeModal(searchModal);
         });
     }
 
+    // Evita Sitemap Button Handler
+    if (sitemapEvitaButton) {
+        sitemapEvitaButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (searchModal) closeModal(searchModal); // Suche schließen
+            
+            // Simuliere Klick auf den Header-Button, um Evita zu starten
+            const evitaHeaderBtn = document.getElementById('evita-chat-button');
+            if (evitaHeaderBtn) evitaHeaderBtn.click();
+        });
+    }
+
+    // Suchlogik
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
             const query = e.target.value.toLowerCase().trim();
@@ -291,17 +318,24 @@ function renderSearchResults(results, listElement) {
             </a>
         `;
         
-        // Klick-Handler hinzufügen
         li.querySelector('a').addEventListener('click', (e) => {
              const searchModal = document.getElementById('search-modal');
              
-             // Spezialfall: Über mich Modal
              if (page.url === '#open-about') {
+                 // Über mich
                  e.preventDefault();
                  if (searchModal) closeModal(searchModal);
                  openAboutMeModal();
+                 
+             } else if (page.url === '#open-evita') {
+                 // Evita Chat
+                 e.preventDefault();
+                 if (searchModal) closeModal(searchModal);
+                 const evitaHeaderBtn = document.getElementById('evita-chat-button');
+                 if (evitaHeaderBtn) evitaHeaderBtn.click();
+                 
              } else {
-                 // Normaler Link: Suche schließen und Link folgen lassen
+                 // Normale Links
                  if (searchModal) closeModal(searchModal);
              }
         });
