@@ -1,4 +1,4 @@
-// js/main.js (FINALE VERSION mit vollständiger Evita Chat Button Integration)
+// js/main.js (FIX: Side-Menu wiederhergestellt + Evita Chat & Suche)
 
 // === 1. IMPORTE ===
 import { initEffects } from './effects.js';
@@ -31,15 +31,51 @@ const trackVisitor = () => {
         .catch(error => console.error('Netzwerkfehler beim Tracking:', error));
 };
 
-// === 4. EVITA CHAT BUTTON INTEGRATION ===
+// === 4. SETUP: SIDE MENU (DAS HAT GEFEHLT) ===
+const setupSideMenu = () => {
+    const menuButton = document.getElementById('menu-toggle-button');
+    const sideMenu = document.getElementById('side-menu-panel');
+    const closeMenuButton = document.getElementById('close-menu-button');
+
+    if (menuButton && sideMenu) {
+        console.log("🍔 Side-Menu wird eingerichtet...");
+        
+        // Öffnen
+        menuButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            sideMenu.classList.add('visible');
+            document.body.classList.add('no-scroll');
+        });
+
+        // Schließen (X-Button)
+        if (closeMenuButton) {
+            closeMenuButton.addEventListener('click', () => {
+                sideMenu.classList.remove('visible');
+                document.body.classList.remove('no-scroll');
+            });
+        }
+
+        // Schließen (Klick außerhalb)
+        document.addEventListener('click', (e) => {
+            // Wenn Menü offen ist UND Klick NICHT im Menü UND NICHT auf dem Button war
+            if (sideMenu.classList.contains('visible') && 
+                !sideMenu.contains(e.target) && 
+                !menuButton.contains(e.target)) {
+                sideMenu.classList.remove('visible');
+                document.body.classList.remove('no-scroll');
+            }
+        });
+    } else {
+        console.warn("⚠️ Side-Menu Elemente nicht gefunden (Button oder Panel fehlt)");
+    }
+};
+
+// === 5. EVITA CHAT BUTTON INTEGRATION ===
 const setupEvitaChatButton = () => {
     console.log("🤖 Richte Evita Chat Button ein...");
     
     const evitaChatButton = document.getElementById('evita-chat-button');
-    if (!evitaChatButton) {
-        console.warn("⚠️ Evita Chat Button nicht gefunden");
-        return;
-    }
+    if (!evitaChatButton) return;
 
     // Event Listener für den Evita Chat Button
     evitaChatButton.addEventListener('click', async (e) => {
@@ -50,53 +86,36 @@ const setupEvitaChatButton = () => {
             await launchEvitaChat();
         } catch (error) {
             console.error("❌ Fehler beim Öffnen des Evita Chats:", error);
-            alert("Entschuldigung, der Chat konnte nicht geöffnet werden. Bitte versuche es später noch einmal.");
+            alert("Entschuldigung, der Chat konnte nicht geöffnet werden.");
         }
     });
-
-    console.log("✅ Evita Chat Button erfolgreich eingerichtet");
 };
 
-// === 5. EVITA CHAT LAUNCH FUNKTION ===
+// === 6. EVITA CHAT LAUNCH FUNKTION ===
 const launchEvitaChat = async () => {
     console.log("🚀 Starte Evita Chat...");
     
-    // Stelle sicher, dass AI-Form Funktionalität verfügbar ist
     await ensureAiFormAvailable();
     
-    // Chat Modal öffnen
     const aiResponseModal = document.getElementById('ai-response-modal');
     if (aiResponseModal) {
-        // Chat History leeren für neuen Chat
         const chatHistory = document.getElementById('ai-chat-history');
-        if (chatHistory) {
-            chatHistory.innerHTML = '';
-        }
+        if (chatHistory) chatHistory.innerHTML = '';
         
-        // Begrüßungsnachricht hinzufügen
-        const welcomeMessage = "Hallo! Ich bin Evita, Michaels KI-Assistentin. Wie kann ich dir heute helfen?";
-        addWelcomeMessage(welcomeMessage);
+        addWelcomeMessage("Hallo! Ich bin Evita, Michaels KI-Assistentin. Wie kann ich dir heute helfen?");
         
-        // Modal öffnen
         aiResponseModal.classList.add('visible');
         document.body.style.overflow = 'hidden';
         document.body.classList.add('no-scroll');
         
-        // Fokus auf Chat Input setzen
         setTimeout(() => {
             const chatInput = document.getElementById('ai-chat-input');
-            if (chatInput) {
-                chatInput.focus();
-            }
+            if (chatInput) chatInput.focus();
         }, 300);
-        
-        console.log("✅ Evita Chat erfolgreich geöffnet");
-    } else {
-        throw new Error("Chat Modal nicht gefunden");
     }
 };
 
-// === 6. HILFSFUNKTIONEN FÜR CHAT ===
+// === 7. HILFSFUNKTIONEN FÜR CHAT ===
 const addWelcomeMessage = (message) => {
     const chatHistory = document.getElementById('ai-chat-history');
     if (!chatHistory) return;
@@ -110,256 +129,131 @@ const addWelcomeMessage = (message) => {
 };
 
 const ensureAiFormAvailable = async () => {
-    console.log("🔍 Überprüfe AI-Form Verfügbarkeit...");
-    
-    // Prüfe ob AI-Form bereits initialisiert ist
-    if (globalAiFormInstance || document.getElementById('ai-chat-form')) {
-        console.log("✅ AI-Form bereits verfügbar");
-        return;
-    }
-    
-    // Initialisiere AI-Form falls noch nicht geschehen
+    if (globalAiFormInstance || document.getElementById('ai-chat-form')) return;
     try {
         await initAiForm();
         globalAiFormInstance = true;
-        console.log("✅ AI-Form nachträglich initialisiert");
     } catch (error) {
         console.error("❌ Fehler bei der AI-Form Initialisierung:", error);
-        throw error;
     }
 };
 
-// === 7. ERWEITERTE INITIALISIERUNGS-FUNKTIONEN ===
+// === 8. INITIALISIERUNGS-FUNKTIONEN ===
 const initializeDynamicScripts = () => {
     console.log("🔧 Initialisiere dynamische Scripts...");
-    initModals();
+    initModals(); // Startet auch die Suche!
     
-    // Warte kurz und richte dann den Evita Button ein
+    // Wichtig: Side Menu einrichten
+    setupSideMenu();
+    
     setTimeout(() => {
         setupEvitaChatButton();
     }, 200);
 };
 
 const initializeStaticScripts = () => {
-    console.log("🔧 Initialisiere statische Scripts...");
     initEffects();
     initTypewriters();
 };
 
-// === 8. STUFENWEISE FORM-INITIALISIERUNG ===
 const initializeFormsWithDelay = async () => {
-    console.log("📝 Beginne stufenweise Form-Initialisierung...");
-    
-    // Schritt 1: AI-Form zuerst initialisieren
     try {
-        console.log("📝 Initialisiere AI-Form...");
         await initAiForm();
         globalAiFormInstance = true;
-        console.log("✅ AI-Form erfolgreich initialisiert");
-    } catch (error) {
-        console.error("❌ Fehler bei AI-Form Initialisierung:", error);
-    }
+    } catch (error) { console.error(error); }
     
-    // Schritt 2: Kurze Pause für DOM-Stabilisierung
     await new Promise(resolve => setTimeout(resolve, 200));
     
-    // Schritt 3: Silas-Form initialisieren (falls vorhanden)
-    try {
-        console.log("📝 Initialisiere Silas-Form...");
-        initSilasForm();
-        console.log("✅ Silas-Form erfolgreich initialisiert");
-    } catch (error) {
-        console.error("❌ Fehler bei Silas-Form Initialisierung:", error);
-    }
+    try { initSilasForm(); } catch (error) { console.error(error); }
     
-    // Schritt 4: Zusätzliche Chat-Unterstützung einrichten
     setupChatIntegration();
-    
-    console.log("✅ Alle Formulare erfolgreich initialisiert");
 };
 
-// === 9. CHAT-INTEGRATION SETUP ===
 const setupChatIntegration = () => {
-    console.log("💬 Richte erweiterte Chat-Integration ein...");
-    
-    // Globale Hilfsfunktion für Booking-Launch
     window.launchBookingFromAnywhere = async () => {
-        console.log("🚀 Globaler Booking-Launch aufgerufen");
-        
         if (typeof window.debugBookingLaunch === 'function') {
             await window.debugBookingLaunch();
-        } else {
-            console.warn("⚠️ Debug-Booking-Launch nicht verfügbar. Das alte Booking-Modal ist deaktiviert.");
         }
     };
-    
-    // Globale Evita Chat Funktion
     window.launchEvitaChatFromAnywhere = launchEvitaChat;
     
-    // Event-Listener für Chat-spezifische Booking-Requests
-    document.addEventListener('booking-request', (event) => {
-        console.log("📅 Booking-Request Event empfangen:", event.detail);
+    document.addEventListener('booking-request', () => {
         window.launchBookingFromAnywhere();
     });
-    
-    console.log("✅ Chat-Integration erfolgreich eingerichtet");
 };
 
-// === 10. FEHLERBEHANDLUNG UND RETRY-MECHANISMUS ===
 const withRetry = async (fn, retries = 3, delay = 1000) => {
     for (let i = 0; i < retries; i++) {
         try {
             await fn();
             return;
         } catch (error) {
-            console.warn(`⚠️ Versuch ${i + 1} fehlgeschlagen:`, error);
-            if (i < retries - 1) {
-                await new Promise(resolve => setTimeout(resolve, delay));
-            } else {
-                throw error;
-            }
+            if (i < retries - 1) await new Promise(resolve => setTimeout(resolve, delay));
+            else throw error;
         }
     }
 };
 
-// === 11. HEADER CONTENT ERWEITERTE BEHANDLUNG ===
 const enhanceHeaderAfterLoad = () => {
-    console.log("🔧 Erweitere Header nach dem Laden...");
-    
-    // Stelle sicher, dass alle Header-Buttons funktionsfähig sind
-    const headerButtons = [
-        'about-me-button',
-        'evita-chat-button', 
-        'contact-button',
-        'cookie-info-button',
-        'menu-toggle-button'
-    ];
-    
-    headerButtons.forEach(buttonId => {
-        const button = document.getElementById(buttonId);
-        if (button) {
-            console.log(`✅ ${buttonId} gefunden und bereit`);
-            
-            // Spezielle Behandlung für Evita Chat Button
-            if (buttonId === 'evita-chat-button' && !button.hasAttribute('data-evita-ready')) {
-                button.setAttribute('data-evita-ready', 'true');
-                setupEvitaChatButton();
-            }
-        } else {
-            console.warn(`⚠️ ${buttonId} nicht gefunden`);
+    // Hier können wir nochmals prüfen, ob Buttons da sind
+    const menuBtn = document.getElementById('menu-toggle-button');
+    if (menuBtn) {
+        console.log("✅ Menü-Button gefunden");
+        // Sicherheits-Check: Falls setupSideMenu noch nicht lief
+        if (!menuBtn.hasAttribute('data-initialized')) {
+            setupSideMenu();
+            menuBtn.setAttribute('data-initialized', 'true');
         }
-    });
+    }
 };
 
-// === 12. HAUPTEINSTIEGSPUNKT ===
+// === 9. HAUPTEINSTIEGSPUNKT ===
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log("DOM geladen. Start der erweiterten Anwendung...");
+    console.log("DOM geladen. Start...");
     
-    // Sofort verfügbare Initialisierungen
     initializeStaticScripts();
     trackVisitor();
 
-    // Theme Check (Falls das Inline-Script im Head fehlt, hier als Fallback)
     if (localStorage.getItem('theme') === 'dark') {
         document.body.classList.add('dark-mode');
     }
     
     try {
-        // 1. Laden der externen Inhalte (Header/Footer)
         const headerPromise = loadContent('/header.html', 'header-placeholder');
         const modalsPromise = loadContent('/modals.html', 'modal-container');
-        const footerPromise = loadContent('/footer.html', 'footer-placeholder'); // Footer laden
+        const footerPromise = loadContent('/footer.html', 'footer-placeholder');
 
-        // WICHTIG: Warten, bis ALLES da ist
         await Promise.all([headerPromise, modalsPromise, footerPromise]); 
         console.log("✅ Struktur geladen.");
         
-        // 2. Header Logik aktivieren (Buttons etc.)
-        setTimeout(() => {
-            enhanceHeaderAfterLoad();
-        }, 50); // Sehr kurzes Timeout reicht oft
+        setTimeout(() => enhanceHeaderAfterLoad(), 50);
         
-        // 3. Dynamische Scripte starten
         initializeDynamicScripts();
         
-        // 4. Formulare initialisieren
-        // Wir warten hier nicht zwingend mit 'await', damit die Seite schon angezeigt wird,
-        // während die Formulare im Hintergrund startklar gemacht werden.
         withRetry(initializeFormsWithDelay, 2, 500);
 
-        // === DAS IST DER MAGIC MOMENT ===
-        // Erst jetzt, wo Header & Footer da sind, machen wir die Seite sichtbar
         requestAnimationFrame(() => {
             document.body.classList.add('page-loaded');
         });
         
-        console.log("🎉 Seite sichtbar geschaltet!");
-        
     } catch (error) {
         console.error("❌ Fehler beim Laden:", error);
-        
-        // Fallback: Auch bei Fehler Seite anzeigen, damit der User nicht vor einer leeren Seite sitzt
         document.body.classList.add('page-loaded');
     }
 });
 
-// === 13. ZUSÄTZLICHE DEBUGGING-HILFEN ===
-if (window.location.search.includes('debug=true') || window.location.hostname.includes('localhost')) {
-    window.debugInfo = {
-        launchBooking: () => window.launchBookingFromAnywhere(),
-        launchEvitaChat: () => window.launchEvitaChatFromAnywhere(),
-        checkChatInput: () => {
-            const chatInput = document.getElementById('ai-chat-input');
-            console.log("Chat Input Element:", chatInput);
-            console.log("Chat Form Element:", document.getElementById('ai-chat-form'));
-        },
-        testBookingModal: () => {
-            const modal = document.getElementById('booking-modal');
-            console.log("Booking Modal:", modal);
-            if (modal) {
-                console.log("Modal Style:", modal.style);
-                console.log("Modal Classes:", modal.classList);
-            }
-        },
-        checkEvitaButton: () => {
-            const button = document.getElementById('evita-chat-button');
-            console.log("Evita Chat Button:", button);
-            console.log("Button Ready:", button?.hasAttribute('data-evita-ready'));
-        }
-    };
-    
-    console.log("🔧 Debug-Modus aktiviert. Verfügbare Funktionen:");
-    console.log("   - window.debugInfo.launchBooking()");
-    console.log("   - window.debugInfo.launchEvitaChat()");
-    console.log("   - window.debugInfo.checkChatInput()");
-    console.log("   - window.debugInfo.testBookingModal()");
-    console.log("   - window.debugInfo.checkEvitaButton()");
-}
-
-
-// Code am Ende von js/main.js
-
+// Scroll Animation Observer
 document.addEventListener('DOMContentLoaded', () => {
-    // KORREKTUR: Alle .performance-tip Elemente auswählen (nicht nur das erste)
     const animatedElements = document.querySelectorAll('.performance-tip');
-
-    // Prüfen, ob Elemente auf der Seite existieren
     if (animatedElements.length > 0) {
-        const observerOptions = {
-            root: null,
-            threshold: 0.1
-        };
-
-        const observer = new IntersectionObserver((entries, observer) => {
+        const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('is-visible');
                     observer.unobserve(entry.target);
                 }
             });
-        }, observerOptions);
-
-        // KORREKTUR: Jeden Container beobachten
+        }, { threshold: 0.1 });
         animatedElements.forEach(element => observer.observe(element));
     }
 });
