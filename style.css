@@ -882,126 +882,109 @@ footer a:hover {
     color: #aaa;
 }
 
-/* --- FLIP CARD STYLES (NEU) --- */
 
+/* --- FLIP CARD DESIGN UPDATE --- */
 
-/* 1. Die Bühne (Container) */
+/* 1. Haupt-Container Logik (Bleibt gleich) */
 .flip-container {
-    perspective: 1200px; /* Tiefe für den 3D-Effekt */
+    perspective: 1200px;
     position: relative;
     z-index: 10;
-    /* Behält die originalen Flex-Eigenschaften von .container bei */
 }
 
-/* 2. Das drehbare Element */
 .flipper {
     width: 100%;
     transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     transform-style: preserve-3d;
     position: relative;
-    
-    /* Grid-Trick: Vorder- & Rückseite liegen übereinander */
     display: grid;
     grid-template-columns: 1fr;
 }
 
-/* Wenn gedreht wird */
 .flip-container.flipped .flipper {
     transform: rotateY(180deg);
 }
 
-/* 3. Gemeinsames für beide Seiten */
 .front-face, .back-face {
-    grid-area: 1 / 1 / 2 / 2; /* Beide belegen denselben Platz */
-    backface-visibility: hidden; /* Rückseite ausblenden */
+    grid-area: 1 / 1 / 2 / 2;
+    backface-visibility: hidden;
     width: 100%;
-    
-    /* Damit der Inhalt zentriert bleibt wie früher */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
 }
 
-/* --- VORDERSEITE --- */
 .front-face {
     z-index: 2;
     transform: rotateY(0deg);
 }
 
-/* Style für den neuen Info-Button unter dem Suchfeld */
+/* 2. Vorderseite: Button volle Breite */
 .info-btn-wrapper {
-    display: flex;
-    justify-content: flex-end; /* Button rechtsbündig unter Input */
-    padding-top: 8px;
+    width: 100%;
+    margin-top: 15px; /* Kleiner Abstand zum Suchfeld */
 }
 
 #flip-info-btn {
+    width: 100%; /* Volle Breite wie das Input-Feld */
     background: transparent;
     border: 1px solid #D39A00;
     color: #D39A00;
-    border-radius: 15px;
-    padding: 4px 12px;
-    font-size: 0.8rem;
+    border-radius: 7px; /* Deine gewünschte Rundung */
+    padding: 12px;
+    font-size: 1rem;
+    font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
-    gap: 5px;
-    opacity: 0.8;
+    justify-content: center; /* Text zentriert */
+    outline: none;
 }
 
 #flip-info-btn:hover {
     background-color: #D39A00;
     color: #fff;
-    opacity: 1;
+    box-shadow: 0 5px 15px rgba(211, 154, 0, 0.3);
     transform: translateY(-2px);
 }
 
-/* --- RÜCKSEITE --- */
+/* 3. Rückseite: Dark Mode Style */
 .back-face {
     transform: rotateY(180deg);
-    background: rgba(26, 26, 26, 0.95); /* Dunkler Hintergrund */
+    background: rgba(26, 26, 26, 0.95);
     border: 1px solid var(--border-color);
-    border-radius: 15px;
+    border-radius: 15px; /* Container Ecken */
     padding: 40px;
     text-align: center;
     box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-    min-height: 400px; /* Mindesthöhe damit es nicht zu klein wirkt */
+    min-height: 400px;
 }
 
-.seo-content {
-    max-width: 700px;
-}
+.seo-content { max-width: 700px; }
+.seo-content h2 { color: var(--accent-color); margin-bottom: 20px; font-size: 2rem; }
+.seo-content p { font-size: 1rem; line-height: 1.7; margin-bottom: 20px; color: #e0e0e0; }
 
-.seo-content h2 {
-    color: var(--accent-color);
-    margin-bottom: 20px;
-    font-size: 2rem;
-}
-
-.seo-content p {
-    font-size: 1rem;
-    line-height: 1.7;
-    margin-bottom: 20px;
-    color: #e0e0e0;
-}
-
-/* Zurück-Button auf der Rückseite */
+/* 4. Rückseite: Button mit Roboter */
 #flip-back-btn {
     margin-top: 20px;
     background: transparent;
     border: 2px solid var(--accent-color);
     color: var(--accent-color);
     padding: 10px 30px;
-    border-radius: 50px;
+    border-radius: 7px; /* Deine gewünschte Rundung */
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px; /* Platz zwischen Icon und Text */
+}
+
+#flip-back-btn i {
+    font-size: 1.2rem; /* Icon etwas größer */
 }
 
 #flip-back-btn:hover {
