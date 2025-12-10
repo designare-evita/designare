@@ -881,3 +881,116 @@ footer a:hover {
     font-size: 0.85rem;
     color: #aaa;
 }
+
+/* --- FLIP CARD STYLES (NEU) --- */
+
+/* Der Hauptcontainer erbt die Breite von .ai-container, bekommt aber 3D-Tiefe */
+.flip-container {
+    perspective: 1000px;
+    position: relative;
+    z-index: 10;
+}
+
+/* Der innere Container, der sich dreht */
+.flipper {
+    transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Schönerer Schwung */
+    transform-style: preserve-3d;
+    position: relative;
+    width: 100%;
+    /* Grid sorgt dafür, dass Vorder- & Rückseite exakt übereinander liegen */
+    display: grid;
+    grid-template-columns: 1fr;
+}
+
+/* Trigger-Klasse für die Drehung */
+.flip-container.flipped .flipper {
+    transform: rotateY(180deg);
+}
+
+/* Gemeinsame Styles für Vorder- und Rückseite */
+.front, .back {
+    grid-area: 1 / 1 / 2 / 2; /* Beide liegen im gleichen Rasterfeld */
+    backface-visibility: hidden; /* Rückseite ausblenden, wenn wegedreht */
+    width: 100%;
+}
+
+/* --- VORDERSEITE --- */
+.front {
+    z-index: 2;
+    transform: rotateY(0deg);
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Zentriert den Info-Button */
+}
+
+/* Minimaler Info-Button Styles */
+#flip-info-btn {
+    margin-top: 15px;
+    background: transparent;
+    border: 1px solid #D39A00; /* Deine Wunschfarbe */
+    color: #D39A00;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    outline: none;
+}
+
+#flip-info-btn:hover {
+    background-color: rgba(211, 154, 0, 0.1); /* Zarter Hover-Hintergrund */
+    transform: translateY(2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* --- RÜCKSEITE --- */
+.back {
+    transform: rotateY(180deg);
+    background-color: #1a1a1a; /* Hintergrund passend zum Dark Mode */
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    min-height: 100%; /* Passt sich der Höhe an */
+}
+
+.back-content h3 {
+    color: var(--accent-color);
+    margin-bottom: 15px;
+    font-size: 1.3rem;
+    margin-top: 0;
+}
+
+.back-content p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    color: #ddd;
+}
+
+/* Zurück-Button */
+#flip-back-btn {
+    background: transparent;
+    border: 1px solid var(--text-color);
+    color: var(--text-color);
+    padding: 8px 24px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+#flip-back-btn:hover {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    color: #fff;
+}
