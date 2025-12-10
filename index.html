@@ -58,16 +58,49 @@
 
     <main id="hero">
         <div id="particles-js"></div>
-        <div class="container">
+        <div class="container flip-container" id="hero-flip-wrapper">
+    <div class="flipper">
+        
+        <div class="front-face">
             <img fetchpriority="high" src="images/Michael.webp" alt="Illustration Michael und Evita" class="profile-picture">
             <h1 id="typewriter-h1"></h1>
             <p class="subtitle">Michael Kanda <span class="accent-text-inline">&lt;/&gt;</span> Komplize für Web & KI aus Wien </p>
+            
             <div class="ai-container">
                 <form id="ai-form">
                     <input type="text" id="ai-question" placeholder="Hallo, ich bin Evita, Michaels KI-Assistentin." autocomplete="off" required>
                     <button type="submit" aria-label="Frage senden"><i class="fa-regular fa-paper-plane"></i></button>
                 </form>
+                
+                <div class="info-btn-wrapper">
+                    <button id="flip-info-btn" type="button" aria-label="Mehr Informationen">
+                        <i class="fa-solid fa-chevron-right"></i> Info
+                    </button>
+                </div>
             </div>
+        </div>
+
+        <div class="back-face">
+            <div class="seo-content">
+                <h2>Webentwicklung & KI aus Wien</h2>
+                <p>
+                    <strong>Willkommen hinter den Kulissen!</strong><br>
+                    Ich bin Michael Kanda, spezialisiert auf maßgeschneiderte Webseiten und die Integration intelligenter KI-Lösungen. 
+                    Dieser Text ist für Suchmaschinen optimiert und hilft dabei, dass meine Dienstleistungen in Wien und darüber hinaus gefunden werden.
+                </p>
+                <p>
+                    Ob WordPress, individuelle Web-Apps oder KI-Automatisierung – ich verbinde technisches Know-how mit kreativen Lösungen.
+                    Und Evita? Sie ist meine digitale Assistentin, die nie müde wird, Fragen zu beantworten.
+                </p>
+                
+                <button id="flip-back-btn" type="button">
+                    <i class="fa-solid fa-rotate-left"></i> Zurück
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
         </div>
     </main>
 
