@@ -993,8 +993,44 @@ footer a:hover {
     transform: scale(1.05);
 }
 
-/* Mobile Anpassung */
+/* Mobile Anpassung: Scrollbar für die Rückseite */
 @media (max-width: 768px) {
-    .seo-content h2 { font-size: 1.5rem; }
-    .back-face { padding: 20px; }
+    /* Schriftgröße für Überschriften anpassen */
+    .seo-content h2 { 
+        font-size: 1.5rem; 
+    }
+
+    /* Anpassungen für die Rückseite der Karte */
+    .back-face { 
+        padding: 20px 15px; /* Etwas weniger Padding seitlich für mehr Platz */
+        
+        /* --- SCROLL-LOGIK --- */
+        max-height: 65vh; /* Die Karte darf maximal 65% der Bildschirmhöhe einnehmen */
+        overflow-y: auto; /* Zeigt Scrollbalken, wenn der Text länger ist */
+        
+        /* Wichtig: Damit der Text oben beginnt und nicht zentriert wird beim Scrollen */
+        justify-content: flex-start; 
+        
+        /* Optional: Scrollverhalten weicher machen */
+        scroll-behavior: smooth;
+    }
+
+    /* Damit der Scrollbalken hübsch aussieht (Firefox) */
+    .back-face {
+        scrollbar-width: thin;
+        scrollbar-color: var(--accent-color) rgba(255, 255, 255, 0.1);
+    }
+
+    /* Damit der Scrollbalken hübsch aussieht (Chrome/Safari/Edge) */
+    .back-face::-webkit-scrollbar {
+        width: 6px;
+    }
+    .back-face::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 3px;
+    }
+    .back-face::-webkit-scrollbar-thumb {
+        background-color: var(--accent-color);
+        border-radius: 3px;
+    }
 }
