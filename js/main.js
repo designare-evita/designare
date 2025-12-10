@@ -1,4 +1,4 @@
-// js/main.js (FIX: Side-Menu wiederhergestellt + Evita Chat & Suche)
+// js/main.js
 
 // === 1. IMPORTE ===
 import { initEffects } from './effects.js';
@@ -38,15 +38,12 @@ const setupSideMenu = () => {
     const closeMenuButton = document.getElementById('close-menu-button');
 
     if (menuButton && sideMenu) {
-        console.log("🍔 Side-Menu wird eingerichtet...");
-        
         // Öffnen
         menuButton.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
             sideMenu.classList.add('visible');
             document.body.classList.add('no-scroll');
-            console.log("🍔 Side-Menu geöffnet");
         });
 
         // Schließen (X-Button)
@@ -56,7 +53,6 @@ const setupSideMenu = () => {
                 e.stopPropagation();
                 sideMenu.classList.remove('visible');
                 document.body.classList.remove('no-scroll');
-                console.log("🍔 Side-Menu geschlossen (X-Button)");
             });
         }
 
@@ -67,7 +63,6 @@ const setupSideMenu = () => {
                 !menuButton.contains(e.target)) {
                 sideMenu.classList.remove('visible');
                 document.body.classList.remove('no-scroll');
-                console.log("🍔 Side-Menu geschlossen (Klick außerhalb)");
             }
         });
 
@@ -76,42 +71,28 @@ const setupSideMenu = () => {
             if (e.key === 'Escape' && sideMenu.classList.contains('visible')) {
                 sideMenu.classList.remove('visible');
                 document.body.classList.remove('no-scroll');
-                console.log("🍔 Side-Menu geschlossen (Escape)");
             }
         });
-
-        console.log("✅ Side-Menu erfolgreich eingerichtet");
-    } else {
-        console.warn("⚠️ Side-Menu Elemente nicht gefunden:");
-        console.warn("   - menuButton:", !!menuButton);
-        console.warn("   - sideMenu:", !!sideMenu);
     }
 };
 
 // === 5. EVITA CHAT BUTTON INTEGRATION ===
 const setupEvitaChatButton = () => {
-    console.log("🤖 Richte Evita Chat Button ein...");
-    
     const evitaChatButton = document.getElementById('evita-chat-button');
     if (!evitaChatButton) return;
 
     evitaChatButton.addEventListener('click', async (e) => {
         e.preventDefault();
-        console.log("🤖 Evita Chat Button geklickt");
-        
         try {
             await launchEvitaChat();
         } catch (error) {
             console.error("❌ Fehler beim Öffnen des Evita Chats:", error);
-            alert("Entschuldigung, der Chat konnte nicht geöffnet werden.");
         }
     });
 };
 
 // === 6. EVITA CHAT LAUNCH FUNKTION ===
 const launchEvitaChat = async () => {
-    console.log("🚀 Starte Evita Chat...");
-    
     await ensureAiFormAvailable();
     
     const aiResponseModal = document.getElementById('ai-response-modal');
@@ -157,12 +138,8 @@ const ensureAiFormAvailable = async () => {
 
 // === 8. INITIALISIERUNGS-FUNKTIONEN ===
 const initializeDynamicScripts = () => {
-    console.log("🔧 Initialisiere dynamische Scripts...");
     initModals();
-    
-    // Wichtig: Side Menu einrichten
     setupSideMenu();
-    
     setTimeout(() => {
         setupEvitaChatButton();
     }, 200);
@@ -214,7 +191,6 @@ const withRetry = async (fn, retries = 3, delay = 1000) => {
 const enhanceHeaderAfterLoad = () => {
     const menuBtn = document.getElementById('menu-toggle-button');
     if (menuBtn) {
-        console.log("✅ Menü-Button gefunden");
         if (!menuBtn.hasAttribute('data-initialized')) {
             setupSideMenu();
             menuBtn.setAttribute('data-initialized', 'true');
@@ -224,8 +200,6 @@ const enhanceHeaderAfterLoad = () => {
 
 // === 9. HAUPTEINSTIEGSPUNKT ===
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log("DOM geladen. Start...");
-    
     initializeStaticScripts();
     trackVisitor();
 
@@ -234,22 +208,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     
     try {
-        // WICHTIG: Lade auch das Side-Menu!
         const headerPromise = loadContent('/header.html', 'header-placeholder');
         const modalsPromise = loadContent('/modals.html', 'modal-container');
         const footerPromise = loadContent('/footer.html', 'footer-placeholder');
         const sideMenuPromise = loadContent('/side-menu.html', 'side-menu-placeholder').catch(err => {
             console.warn("⚠️ Side-Menu konnte nicht geladen werden:", err);
-            return null; // Nicht kritisch - Seite soll trotzdem laden
+            return null;
         });
 
         await Promise.all([headerPromise, modalsPromise, footerPromise, sideMenuPromise]); 
         console.log("✅ Struktur geladen.");
         
         setTimeout(() => enhanceHeaderAfterLoad(), 50);
-        
         initializeDynamicScripts();
-        
         withRetry(initializeFormsWithDelay, 2, 500);
 
         requestAnimationFrame(() => {
@@ -262,7 +233,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-// Scroll Animation Observer
+// === 10. SCROLL ANIMATION OBSERVER ===
 document.addEventListener('DOMContentLoaded', () => {
     const animatedElements = document.querySelectorAll('.performance-tip');
     if (animatedElements.length > 0) {
@@ -279,7 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* =========================================
-   HERO FLIP ANIMATION (SEO TEXT)
+   11. HERO FLIP ANIMATION (SEO TEXT)
    ========================================= */
 document.addEventListener('DOMContentLoaded', () => {
     const heroFlipWrapper = document.getElementById('hero-flip-wrapper');
@@ -300,5 +271,4 @@ document.addEventListener('DOMContentLoaded', () => {
             heroFlipWrapper.classList.remove('flipped');
         });
     }
-});
 });
