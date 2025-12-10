@@ -5,7 +5,7 @@
 // 1. Definiere deine Inhalte (Index)
 const siteContentIndex = [
     { 
-        title: "Startseite - Michael Kanda", 
+        title: "Michael Kanda & Evita - ganz privat.", 
         url: "index.html", 
         keywords: "home startseite michael kanda webentwickler wien",
         desc: "Willkommen im privaten Code-Labor von Michael & Evita. Webentwicklung, KI-Experimente und digitale Abenteuer."
