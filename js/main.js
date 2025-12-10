@@ -279,34 +279,26 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* =========================================
-   FLIP CARD LOGIK (SEO TEXT TOGGLE)
+   HERO FLIP ANIMATION (SEO TEXT)
    ========================================= */
 document.addEventListener('DOMContentLoaded', () => {
-    const flipWrapper = document.getElementById('ai-flip-wrapper');
+    const heroFlipWrapper = document.getElementById('hero-flip-wrapper');
     const infoBtn = document.getElementById('flip-info-btn');
     const backBtn = document.getElementById('flip-back-btn');
-    const aiQuestionInput = document.getElementById('ai-question');
 
-    if (flipWrapper && infoBtn && backBtn) {
+    if (heroFlipWrapper && infoBtn && backBtn) {
         
-        // Funktion: Zur Rückseite (Info) drehen
+        // Klick auf "Info": Container drehen
         infoBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            flipWrapper.classList.add('flipped');
+            heroFlipWrapper.classList.add('flipped');
         });
 
-        // Funktion: Zurück zur Vorderseite (Suche) drehen
+        // Klick auf "Zurück": Wieder nach vorne drehen
         backBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            flipWrapper.classList.remove('flipped');
+            heroFlipWrapper.classList.remove('flipped');
         });
-
-        // Optional: Wenn man in das Suchfeld klickt, sicherstellen, dass wir vorne sind
-        // (Falls durch Tab-Navigation die Seite gedreht wurde)
-        if (aiQuestionInput) {
-            aiQuestionInput.addEventListener('focus', () => {
-                flipWrapper.classList.remove('flipped');
-            });
-        }
     }
+});
 });
