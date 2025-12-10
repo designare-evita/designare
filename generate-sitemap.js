@@ -1,45 +1,33 @@
 /* generate-sitemap.js 
    Führt autom. Scans durch und generiert die sitemap.xml im public Ordner
+   INKLUSIVE: Schutz vor kaputten CSV-Zeilen (HTML-Code)
 */
 
 const fs = require('fs');
 const path = require('path');
 
 // 1. EINSTELLUNGEN
-const BASE_URL = 'https://designare.at'; // Deine Domain
-
-// WICHTIG: Speicherort in den 'public' Ordner ändern
+const BASE_URL = 'https://designare.at'; 
 const OUTPUT_FILE = path.join(__dirname, 'public', 'sitemap.xml');
 const CSV_FILE = path.join(__dirname, 'content.csv');
 
 // Seiten, die NICHT in die Sitemap sollen
 const EXCLUDE_FILES = [
-    '404.html',
-    'google', 
-    'side-menu.html',
-    'header.html',
-    'footer.html',
-    'modals.html',
-    'CSV-Creator.html',
-    'CSV-Importer-PRO.html'
+    '404.html', 'google', 'side-menu.html', 'header.html', 'footer.html', 'modals.html', 
+    'CSV-Creator.html', 'CSV-Importer-PRO.html', 'silas.html', 'impressum.html', 'datenschutz.html', 'disclaimer.html'
 ];
 
-// Hilfsfunktion: Datum im Format YYYY-MM-DD
 const getDate = () => new Date().toISOString().split('T')[0];
 
 console.log('🤖 Starte Sitemap-Generierung...');
 
 // 2. STATISCHE HTML-DATEIEN FINDEN
 let urls = [];
-
-// Wir lesen die Dateien weiterhin aus dem Hauptverzeichnis (__dirname)
 const files = fs.readdirSync(__dirname);
 
 files.forEach(file => {
     if (file.endsWith('.html') && !EXCLUDE_FILES.includes(file)) {
-        // "index.html" wird zu "/"
         let urlPath = file === 'index.html' ? '' : file;
-        
         urls.push({
             loc: `${BASE_URL}/${urlPath}`,
             lastmod: getDate(),
@@ -54,17 +42,32 @@ console.log(`✅ ${urls.length} statische Seiten gefunden.`);
 // 3. DYNAMISCHE INHALTE AUS CSV LESEN
 if (fs.existsSync(CSV_FILE)) {
     const csvContent = fs.readFileSync(CSV_FILE, 'utf8');
-    const rows = csvContent.split('\n').slice(1); // Header überspringen
+    const rows = csvContent.split('\n').slice(1); 
 
-    rows.forEach(row => {
-        const columns = row.split(','); 
+    let skippedCount = 0;
+
+    rows.forEach((row, index) => {
+        // Versuche Komma oder Semikolon als Trenner
+        const delimiter = row.includes(';') ? ';' : ',';
+        const columns = row.split(delimiter); 
         
-        if (columns.length > 1) {
-            const slug = columns[0].trim();
+        if (columns.length > 0) {
+            // Wir nehmen an, der Slug steht in Spalte 1 (Index 0). 
+            // Falls er woanders steht, ändere die 0 hier:
+            const rawSlug = columns[0].trim(); 
+
+            // --- SICHERHEITS-CHECK ---
+            // Wenn der Slug wie HTML aussieht (<...) oder zu lang ist (>100 Zeichen), überspringen wir ihn.
+            if (rawSlug.includes('<') || rawSlug.length > 100 || rawSlug.includes('>')) {
+                skippedCount++;
+                // Nur die ersten paar Fehler ausgeben, um die Konsole nicht zu fluten
+                if (skippedCount <= 3) console.log(`⚠️ Überspringe Zeile ${index + 2}: Sieht nach HTML/Text aus ("${rawSlug.substring(0, 30)}...")`);
+                return; 
+            }
             
-            if (slug) {
+            if (rawSlug) {
                 urls.push({
-                    loc: `${BASE_URL}/artikel.html?topic=${encodeURIComponent(slug)}`,
+                    loc: `${BASE_URL}/artikel.html?topic=${encodeURIComponent(rawSlug)}`,
                     lastmod: getDate(),
                     changefreq: 'monthly',
                     priority: '0.6'
@@ -72,7 +75,7 @@ if (fs.existsSync(CSV_FILE)) {
             }
         }
     });
-    console.log(`✅ CSV verarbeitet. Total URLs: ${urls.length}`);
+    console.log(`✅ CSV verarbeitet. URLs: ${urls.length} (Übersprungen: ${skippedCount} fehlerhafte Zeilen)`);
 }
 
 // 4. XML ZUSAMMENBAUEN
@@ -87,7 +90,6 @@ ${urls.map(u => `  <url>
 </urlset>`;
 
 // 5. DATEI SCHREIBEN
-// Stellen sicher, dass der Ordner existiert (sollte er durch 'build' aber schon)
 if (!fs.existsSync(path.dirname(OUTPUT_FILE))) {
     fs.mkdirSync(path.dirname(OUTPUT_FILE), { recursive: true });
 }
