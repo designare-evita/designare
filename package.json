@@ -13,7 +13,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "echo 'Building...' ",
+    "build": "mkdir -p public && cp -r *.html *.css *.svg *.csv js images Font public/ || echo 'Some assets missing, continuing...'",
     "postbuild": "node generate-sitemap.js"
   }
 }
