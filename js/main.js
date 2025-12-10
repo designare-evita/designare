@@ -277,3 +277,36 @@ document.addEventListener('DOMContentLoaded', () => {
         animatedElements.forEach(element => observer.observe(element));
     }
 });
+
+/* =========================================
+   FLIP CARD LOGIK (SEO TEXT TOGGLE)
+   ========================================= */
+document.addEventListener('DOMContentLoaded', () => {
+    const flipWrapper = document.getElementById('ai-flip-wrapper');
+    const infoBtn = document.getElementById('flip-info-btn');
+    const backBtn = document.getElementById('flip-back-btn');
+    const aiQuestionInput = document.getElementById('ai-question');
+
+    if (flipWrapper && infoBtn && backBtn) {
+        
+        // Funktion: Zur Rückseite (Info) drehen
+        infoBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            flipWrapper.classList.add('flipped');
+        });
+
+        // Funktion: Zurück zur Vorderseite (Suche) drehen
+        backBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            flipWrapper.classList.remove('flipped');
+        });
+
+        // Optional: Wenn man in das Suchfeld klickt, sicherstellen, dass wir vorne sind
+        // (Falls durch Tab-Navigation die Seite gedreht wurde)
+        if (aiQuestionInput) {
+            aiQuestionInput.addEventListener('focus', () => {
+                flipWrapper.classList.remove('flipped');
+            });
+        }
+    }
+});
