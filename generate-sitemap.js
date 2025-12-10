@@ -1,5 +1,5 @@
 /* generate-sitemap.js 
-   Führt autom. Scans durch und generiert die sitemap.xml
+   Führt autom. Scans durch und generiert die sitemap.xml im public Ordner
 */
 
 const fs = require('fs');
@@ -7,18 +7,20 @@ const path = require('path');
 
 // 1. EINSTELLUNGEN
 const BASE_URL = 'https://designare.at'; // Deine Domain
-const OUTPUT_FILE = path.join(__dirname, 'sitemap.xml');
+
+// WICHTIG: Speicherort in den 'public' Ordner ändern
+const OUTPUT_FILE = path.join(__dirname, 'public', 'sitemap.xml');
 const CSV_FILE = path.join(__dirname, 'content.csv');
 
 // Seiten, die NICHT in die Sitemap sollen
 const EXCLUDE_FILES = [
     '404.html',
-    'google', // falls google verification files existieren
+    'google', 
     'side-menu.html',
     'header.html',
     'footer.html',
     'modals.html',
-    'CSV-Creator.html', // Interne Tools evtl. ausschließen?
+    'CSV-Creator.html',
     'CSV-Importer-PRO.html'
 ];
 
@@ -30,6 +32,7 @@ console.log('🤖 Starte Sitemap-Generierung...');
 // 2. STATISCHE HTML-DATEIEN FINDEN
 let urls = [];
 
+// Wir lesen die Dateien weiterhin aus dem Hauptverzeichnis (__dirname)
 const files = fs.readdirSync(__dirname);
 
 files.forEach(file => {
@@ -48,21 +51,17 @@ files.forEach(file => {
 
 console.log(`✅ ${urls.length} statische Seiten gefunden.`);
 
-// 3. DYNAMISCHE INHALTE AUS CSV LESEN (Optional)
-// Falls du Artikel hast, die per Parameter geladen werden (z.B. artikel.html?id=...)
+// 3. DYNAMISCHE INHALTE AUS CSV LESEN
 if (fs.existsSync(CSV_FILE)) {
     const csvContent = fs.readFileSync(CSV_FILE, 'utf8');
     const rows = csvContent.split('\n').slice(1); // Header überspringen
 
     rows.forEach(row => {
-        // Annahme: CSV Spalten sind "ID, Title, Slug, ..." (Passe den Index an!)
-        // Wenn deine CSV Semikolon getrennt ist, nutze split(';')
         const columns = row.split(','); 
         
         if (columns.length > 1) {
-            const slug = columns[0].trim(); // Oder welche Spalte den Link definiert
+            const slug = columns[0].trim();
             
-            // BEISPIEL: Wenn deine Artikel so aufgerufen werden: designare.at/artikel.html?topic=slug
             if (slug) {
                 urls.push({
                     loc: `${BASE_URL}/artikel.html?topic=${encodeURIComponent(slug)}`,
@@ -88,5 +87,10 @@ ${urls.map(u => `  <url>
 </urlset>`;
 
 // 5. DATEI SCHREIBEN
+// Stellen sicher, dass der Ordner existiert (sollte er durch 'build' aber schon)
+if (!fs.existsSync(path.dirname(OUTPUT_FILE))) {
+    fs.mkdirSync(path.dirname(OUTPUT_FILE), { recursive: true });
+}
+
 fs.writeFileSync(OUTPUT_FILE, xmlContent);
 console.log(`🎉 sitemap.xml erfolgreich erstellt unter: ${OUTPUT_FILE}`);
