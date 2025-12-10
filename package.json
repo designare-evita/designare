@@ -12,3 +12,9 @@
     "googleapis": "^142.0.0"
   }
 }
+
+"scripts": {
+  "test": "echo \"Error: no test specified\" && exit 1",
+  "build": "echo 'Building...' ",
+  "postbuild": "node generate-sitemap.js"
+}
