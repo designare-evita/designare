@@ -884,113 +884,134 @@ footer a:hover {
 
 /* --- FLIP CARD STYLES (NEU) --- */
 
-/* Der Hauptcontainer erbt die Breite von .ai-container, bekommt aber 3D-Tiefe */
+
+/* 1. Die Bühne (Container) */
 .flip-container {
-    perspective: 1000px;
+    perspective: 1200px; /* Tiefe für den 3D-Effekt */
     position: relative;
     z-index: 10;
+    /* Behält die originalen Flex-Eigenschaften von .container bei */
 }
 
-/* Der innere Container, der sich dreht */
+/* 2. Das drehbare Element */
 .flipper {
-    transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Schönerer Schwung */
+    width: 100%;
+    transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     transform-style: preserve-3d;
     position: relative;
-    width: 100%;
-    /* Grid sorgt dafür, dass Vorder- & Rückseite exakt übereinander liegen */
+    
+    /* Grid-Trick: Vorder- & Rückseite liegen übereinander */
     display: grid;
     grid-template-columns: 1fr;
 }
 
-/* Trigger-Klasse für die Drehung */
+/* Wenn gedreht wird */
 .flip-container.flipped .flipper {
     transform: rotateY(180deg);
 }
 
-/* Gemeinsame Styles für Vorder- und Rückseite */
-.front, .back {
-    grid-area: 1 / 1 / 2 / 2; /* Beide liegen im gleichen Rasterfeld */
-    backface-visibility: hidden; /* Rückseite ausblenden, wenn wegedreht */
+/* 3. Gemeinsames für beide Seiten */
+.front-face, .back-face {
+    grid-area: 1 / 1 / 2 / 2; /* Beide belegen denselben Platz */
+    backface-visibility: hidden; /* Rückseite ausblenden */
     width: 100%;
+    
+    /* Damit der Inhalt zentriert bleibt wie früher */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 /* --- VORDERSEITE --- */
-.front {
+.front-face {
     z-index: 2;
     transform: rotateY(0deg);
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* Zentriert den Info-Button */
 }
 
-/* Minimaler Info-Button Styles */
+/* Style für den neuen Info-Button unter dem Suchfeld */
+.info-btn-wrapper {
+    display: flex;
+    justify-content: flex-end; /* Button rechtsbündig unter Input */
+    padding-top: 8px;
+}
+
 #flip-info-btn {
-    margin-top: 15px;
     background: transparent;
-    border: 1px solid #D39A00; /* Deine Wunschfarbe */
+    border: 1px solid #D39A00;
     color: #D39A00;
-    padding: 6px 16px;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 500;
+    border-radius: 15px;
+    padding: 4px 12px;
+    font-size: 0.8rem;
     cursor: pointer;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
-    gap: 8px;
-    outline: none;
+    gap: 5px;
+    opacity: 0.8;
 }
 
 #flip-info-btn:hover {
-    background-color: rgba(211, 154, 0, 0.1); /* Zarter Hover-Hintergrund */
-    transform: translateY(2px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    background-color: #D39A00;
+    color: #fff;
+    opacity: 1;
+    transform: translateY(-2px);
 }
 
 /* --- RÜCKSEITE --- */
-.back {
+.back-face {
     transform: rotateY(180deg);
-    background-color: #1a1a1a; /* Hintergrund passend zum Dark Mode */
+    background: rgba(26, 26, 26, 0.95); /* Dunkler Hintergrund */
     border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 25px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    border-radius: 15px;
+    padding: 40px;
     text-align: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    min-height: 100%; /* Passt sich der Höhe an */
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    min-height: 400px; /* Mindesthöhe damit es nicht zu klein wirkt */
 }
 
-.back-content h3 {
+.seo-content {
+    max-width: 700px;
+}
+
+.seo-content h2 {
     color: var(--accent-color);
-    margin-bottom: 15px;
-    font-size: 1.3rem;
-    margin-top: 0;
-}
-
-.back-content p {
-    font-size: 0.95rem;
-    line-height: 1.6;
     margin-bottom: 20px;
-    color: #ddd;
+    font-size: 2rem;
 }
 
-/* Zurück-Button */
+.seo-content p {
+    font-size: 1rem;
+    line-height: 1.7;
+    margin-bottom: 20px;
+    color: #e0e0e0;
+}
+
+/* Zurück-Button auf der Rückseite */
 #flip-back-btn {
+    margin-top: 20px;
     background: transparent;
-    border: 1px solid var(--text-color);
-    color: var(--text-color);
-    padding: 8px 24px;
-    border-radius: 5px;
+    border: 2px solid var(--accent-color);
+    color: var(--accent-color);
+    padding: 10px 30px;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 600;
     cursor: pointer;
-    font-size: 0.9rem;
     transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
 }
 
 #flip-back-btn:hover {
     background-color: var(--accent-color);
-    border-color: var(--accent-color);
     color: #fff;
+    transform: scale(1.05);
+}
+
+/* Mobile Anpassung */
+@media (max-width: 768px) {
+    .seo-content h2 { font-size: 1.5rem; }
+    .back-face { padding: 20px; }
 }
