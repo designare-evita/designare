@@ -260,6 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnBackToStart = document.getElementById('flip-back-btn'); // Rückseite -> Start
     const btnToThird = document.getElementById('flip-to-third-btn'); // Rückseite -> Seite 3
     const btnThirdToBack = document.getElementById('flip-third-back-btn'); // Seite 3 -> Rückseite
+    const btnThirdToStart = document.getElementById('flip-third-to-start-btn'); // Seite 3 -> Start (NEU)
 
     // Views (Inhalte der Vorderseite)
     const viewMain = document.getElementById('view-main');
@@ -314,6 +315,20 @@ if (btnToThird) {
             btnThirdToBack.addEventListener('click', (e) => {
                 e.preventDefault();
                 heroFlipWrapper.classList.add('flipped');
+            });
+        }
+
+        // 5. Von Seite 3 direkt zur Startseite (NEU)
+        if (btnThirdToStart) {
+            btnThirdToStart.addEventListener('click', (e) => {
+                e.preventDefault();
+                // Inhalt zurück auf Hauptansicht setzen
+                if (viewMain && viewThird) {
+                    viewMain.style.display = 'block';
+                    viewThird.style.display = 'none';
+                }
+                // Karte ist bereits nicht geflippt, also bleibt sie so
+                heroFlipWrapper.classList.remove('flipped');
             });
         }
     }
