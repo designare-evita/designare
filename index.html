@@ -9,6 +9,16 @@
     <link rel="icon" href="images/favicon.webp" type="image/webp">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"></noscript>
+    <style>
+        /* Anti-FOUC: H1 initial versteckt */
+        #typewriter-h1 { 
+            opacity: 0; 
+            transition: opacity 0.3s ease; 
+        }
+        #typewriter-h1.ready { 
+            opacity: 1; 
+        }
+    </style>
     <link rel="stylesheet" href="side-menu.css">
     <link rel="stylesheet" href="ai-styles.css">
     <link rel="stylesheet" href="style.css">
