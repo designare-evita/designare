@@ -187,16 +187,16 @@ const siteContentIndex = [
         desc: "Starte den Chat mit meiner KI-Assistentin Evita."
     },
     { 
-        title: "Über Michael Kanda", 
+        title: "Erfahre mehr über den Mann hinter den Pixeln (und Evita)", 
         url: "#open-about",
         keywords: "über mich wer bin ich profil michael kanda lebenslauf",
-        desc: "Erfahre mehr über den Mann hinter den Pixeln (und Evita)."
+        desc: "Michael mag Tierschutz, Sport, sauberen Code und guten Cafe.."
     },
     { 
-        title: "Startseite - Michael Kanda", 
+        title: "Michael Kanda - Komplize für Web & KI aus Wien", 
         url: "index.html", 
         keywords: "home startseite michael kanda webentwickler wien",
-        desc: "Willkommen auf meiner Portfolio-Seite. Webentwicklung & KI."
+        desc: "Willkommen im privaten Code-Labor von Michael & Evita. Webentwicklung, KI-Experimente und digitale Abenteuer."
     },
     { 
         title: "KI-Integration auf Webseiten", 
@@ -214,7 +214,7 @@ const siteContentIndex = [
         title: "SEO & GEO", 
         url: "geo-seo.html", 
         keywords: "seo suchmaschinenoptimierung google ranking geo lokal",
-        desc: "Optimiere deine Seite für lokale Suchanfragen und Google."
+        desc: "Optimiere deine Seite für lokale Suchanfragen, Google und KI-Bots."
     },
     { 
         title: "Silas AI Creator", 
