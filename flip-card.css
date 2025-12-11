@@ -1,0 +1,364 @@
+/* --- FLIP CARD DESIGN UPDATE --- */
+
+/* 1. Haupt-Container Logik (Bleibt gleich) */
+.flip-container {
+    perspective: 1200px;
+    position: relative;
+    z-index: 10;
+}
+
+.flipper {
+    width: 100%;
+    transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform-style: preserve-3d;
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr;
+}
+
+.flip-container.flipped .flipper {
+    transform: rotateY(180deg);
+}
+
+.front-face, .back-face {
+    grid-area: 1 / 1 / 2 / 2;
+    backface-visibility: hidden;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.front-face {
+    z-index: 2;
+    transform: rotateY(0deg);
+}
+
+/* 2. Vorderseite: Button volle Breite */
+.info-btn-wrapper {
+    width: 100%;
+    margin-top: 15px;
+}
+
+#flip-info-btn {
+    width: 100%;
+    background: transparent;
+    border: 1px solid #D39A00;
+    color: #D39A00;
+    border-radius: 7px;
+    padding: 12px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    outline: none;
+}
+
+#flip-info-btn:hover {
+    background-color: #D39A00;
+    color: #fff;
+    box-shadow: 0 5px 15px rgba(211, 154, 0, 0.3);
+    transform: translateY(-2px);
+}
+
+/* 3. Rückseite: Dark Mode Style */
+.back-face {
+    transform: rotateY(180deg);
+    background: rgba(26, 26, 26, 0.95);
+    border: 1px solid var(--border-color);
+    border-radius: 15px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    min-height: 400px;
+}
+
+.seo-content { 
+    max-width: 700px; 
+    width: 100%;
+}
+.seo-content h2 { color: var(--accent-color); margin-bottom: 20px; font-size: 2rem; }
+.seo-content p { font-size: 1rem; line-height: 1.7; margin-bottom: 20px; color: #e0e0e0; }
+
+/* Legacy Button Style - nur für Kompatibilität */
+#flip-back-btn {
+    margin: 0;
+}
+
+/* Mobile Anpassung: Scrollbar für die Rückseite */
+@media (max-width: 768px) {
+    .seo-content h2 { 
+        font-size: 1.5rem; 
+    }
+
+    .back-face { 
+        padding: 20px 15px;
+        max-height: 65vh;
+        overflow-y: auto;
+        justify-content: flex-start; 
+        scroll-behavior: smooth;
+        scrollbar-width: thin;
+        scrollbar-color: var(--accent-color) rgba(255, 255, 255, 0.1);
+    }
+
+    .back-face::-webkit-scrollbar {
+        width: 6px;
+    }
+    .back-face::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 3px;
+    }
+    .back-face::-webkit-scrollbar-thumb {
+        background-color: var(--accent-color);
+        border-radius: 3px;
+    }
+}
+
+
+/* --- EVITA LAYOUT LOGIC (DESKTOP & MOBILE) --- */
+
+.evita-layout-container {
+    text-align: left;
+    width: 100%;
+}
+
+.evita-image-block img {
+    height: auto;
+    border-radius: 8px;
+    display: block;
+    width: 100%;
+}
+
+/* DESKTOP: Grid Layout */
+@media (min-width: 769px) {
+    .evita-grid-wrapper {
+        display: grid;
+        grid-template-columns: 1fr 280px;
+        grid-template-rows: auto auto;
+        gap: 20px;
+        align-items: start;
+    }
+
+    .evita-desktop-group {
+        grid-column: 1 / 2;
+        grid-row: 1 / 2;
+        display: block;
+    }
+
+    .evita-desktop-group .evita-text-top {
+        margin-bottom: 20px; 
+    }
+    .evita-text-top p, 
+    .evita-text-middle p {
+        margin: 0;
+    }
+
+    .evita-image-block {
+         grid-column: 2 / 3;
+         grid-row: 1 / 2; 
+         display: flex;
+         justify-content: flex-end;
+    }
+
+    .evita-text-bottom {
+        grid-column: 1 / 3;
+        grid-row: 2 / 3;
+    }
+}
+
+/* =============================================
+   STYLING FÜR DIE 3. SEITE (#view-third)
+   IDENTISCH zur Rückseite (.back-face)
+   ============================================= */
+
+#view-third {
+    width: 100%;
+    text-align: center;
+    animation: fadeIn 0.5s ease-in-out;
+    
+    /* === GLEICHE STYLES WIE .back-face === */
+    background: rgba(26, 26, 26, 0.95);
+    border: 1px solid var(--border-color);
+    border-radius: 15px;
+    padding: 40px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    min-height: 400px;
+    
+    /* Flexbox für Zentrierung */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* WICHTIG: Wenn JS display:block setzt, überschreiben wir es zurück zu flex */
+#view-third[style*="display: block"],
+#view-third[style*="display:block"] {
+    display: flex !important;
+}
+
+#view-third h2 {
+    color: var(--accent-color);
+    margin-bottom: 20px;
+    font-size: 2rem;
+}
+
+#view-third p {
+    font-size: 1rem;
+    line-height: 1.7;
+    margin-bottom: 20px;
+    color: #e0e0e0;
+}
+
+#view-third .evita-layout-container {
+    max-width: 700px;
+    width: 100%;
+}
+
+/* Verhindert Layout-Verschiebungen beim Wechsel */
+.face-content-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* === FLIP CONTROLS: Buttons links/rechts ausgerichtet === */
+.flip-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-top: 25px;
+    margin-bottom: 0;
+    width: 100%;
+}
+
+/* Mobile: Buttons untereinander, volle Breite */
+@media (max-width: 768px) {
+    .flip-controls {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .flip-controls button,
+    .flip-controls .flip-btn-style {
+        width: 100%;
+        min-width: unset;
+    }
+}
+
+/* Mobile Anpassung für #view-third - IDENTISCH zu .back-face */
+@media (max-width: 768px) {
+    #view-third {
+        padding: 20px 15px;
+        max-height: 65vh;
+        overflow-y: auto;
+        justify-content: flex-start;
+        scroll-behavior: smooth;
+        scrollbar-width: thin;
+        scrollbar-color: var(--accent-color) rgba(255, 255, 255, 0.1);
+    }
+    
+    #view-third h2 {
+        font-size: 1.5rem;
+    }
+    
+    #view-third::-webkit-scrollbar {
+        width: 6px;
+    }
+    #view-third::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 3px;
+    }
+    #view-third::-webkit-scrollbar-thumb {
+        background-color: var(--accent-color);
+        border-radius: 3px;
+    }
+}
+
+/* MOBILE: Flex Layout mit Order */
+@media (max-width: 768px) {
+    .evita-grid-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 15px; 
+    }
+
+    .evita-desktop-group {
+        display: contents;
+    }
+
+    .evita-text-top {
+        order: 1;
+    }
+    .evita-text-top p { margin: 0; }
+
+    .evita-image-block {
+        order: 2;
+        text-align: center;
+        margin: 0; 
+    }
+    .evita-image-block img {
+        width: 80%;
+        margin: 0 auto;
+    }
+
+    .evita-text-middle {
+        order: 3;
+    }
+    .evita-text-middle p { margin: 0; }
+
+    .evita-text-bottom {
+        order: 4;
+    }
+}
+
+/* --- FINALE ANPASSUNG: Buttons --- */
+
+.flip-btn-style {
+    background: transparent;
+    border: 2px solid var(--accent-color) !important;
+    color: var(--accent-color) !important;
+    border-radius: 7px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    margin: 0;
+    
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    
+    box-sizing: border-box;
+    min-width: 240px;
+    height: 54px;
+    padding: 0 20px;
+    white-space: nowrap;      
+}
+
+.flip-btn-style:hover {
+    background-color: var(--accent-color) !important;
+    color: #fff !important;
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(252, 181, 0, 0.3);
+}
+
+@media (max-width: 380px) {
+    .flip-btn-style {
+        min-width: 100%;
+        height: 50px;
+    }
+}
