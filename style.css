@@ -1170,25 +1170,32 @@ footer a:hover {
 
 /* 1. Einheitlicher Stil & GLEICHE GRÖSSE für alle Flip-Buttons */
 .flip-btn-style {
+    /* Grund-Styling */
     background: transparent;
     border: 2px solid var(--accent-color) !important;
     color: var(--accent-color) !important;
-    padding: 10px 20px;
     border-radius: 7px;
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center; /* Text/Icon zentrieren */
-    gap: 10px;
     text-decoration: none;
     margin-top: 10px;
     
-    /* HIER IST DER TRICK FÜR GLEICHE GRÖSSE: */
-    min-width: 240px; /* Alle Buttons sind mindestens so breit */
+    /* Layout & Zentrierung */
+    display: inline-flex;     /* Flexbox für perfekte Zentrierung */
+    align-items: center;      /* Vertikal zentrieren */
+    justify-content: center;  /* Horizontal zentrieren */
+    gap: 10px;                /* Abstand zwischen Text und Icon */
+    
+    /* GRÖSSEN-FIX (Hier liegt die Lösung) */
     box-sizing: border-box;
+    min-width: 240px;         /* Alle Buttons mindestens so breit */
+    height: 54px;             /* Alle Buttons EXAKT so hoch */
+    padding: 0 20px;          /* Nur seitliches Padding, Höhe kommt von 'height' */
+    
+    /* Verhindert, dass der Button durch Zeilenumbruch höher wird */
+    white-space: nowrap;      
 }
 
 .flip-btn-style:hover {
@@ -1198,28 +1205,10 @@ footer a:hover {
     box-shadow: 0 5px 15px rgba(252, 181, 0, 0.3);
 }
 
-/* 2. Container für "Meine Expertise" (Kopie des Rückseiten-Stils) */
-#view-third {
-    /* Damit es wie eine Karte aussieht (Background von back-face kopiert) */
-    background: rgba(26, 26, 26, 0.95);
-    border: 1px solid var(--border-color);
-    border-radius: 15px;
-    padding: 40px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-    
-    /* Layout */
-    width: 100%;
-    height: auto; /* Passt sich dem Inhalt an */
-    min-height: 400px; /* Mindesthöhe wie Rückseite */
-    text-align: left;
-    
-    /* Animation beim Einblenden */
-    animation: fadeIn 0.5s ease-in-out;
-}
-
-/* Kleine Korrektur für Mobile, damit die Karte nicht zu breit wird */
-@media (max-width: 768px) {
-    #view-third {
-        padding: 20px;
+/* Optional: Mobile Anpassung, falls 240px zu breit für kleine Handys sind */
+@media (max-width: 380px) {
+    .flip-btn-style {
+        min-width: 100%; /* Auf sehr kleinen Screens volle Breite nutzen */
+        height: 50px;    /* Etwas kompakter */
     }
 }
