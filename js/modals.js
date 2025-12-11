@@ -226,14 +226,8 @@ const siteContentIndex = [
         title: "CSV Importer PRO", 
         url: "CSV-Importer-PRO.html", 
         keywords: "csv import tool daten management pro",
-        desc: "Professionelles Tool zum Importieren großer Datensätze."
+        desc: "Professionelles WordPress Tool zum Importieren großer Datensätze."
     },
-     { 
-        title: "Impressum", 
-        url: "impressum.html", 
-        keywords: "rechtliches kontakt adresse",
-        desc: "Rechtliche Informationen und Kontakt."
-    }
 ];
 
 function setupSearchModal() {
