@@ -1,7 +1,13 @@
 /* style.css
   Vereinfacht: Nur noch Dark Mode & Finaler Layout-Fix
 */
+#typewriter-h1 {
+    visibility: hidden !important;
 
+/* Fallback: Falls JS deaktiviert ist, soll der Text trotzdem zu sehen sein! */
+noscript #typewriter-h1 {
+    visibility: visible !important;
+}
 
 a {
     text-decoration: none !important;
