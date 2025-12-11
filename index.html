@@ -8,14 +8,15 @@
     
     <link rel="preload" href="Font/Poppins-Regular.ttf" as="font" type="font/ttf" crossorigin>
     <link rel="icon" href="images/favicon.webp" type="image/webp">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"></noscript>
     
     <link rel="stylesheet" href="side-menu.css">
     <link rel="stylesheet" href="ai-styles.css">
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="booking.css">
+    <link rel="stylesheet" href="style.css">     <link rel="stylesheet" href="flip-card.css"> <link rel="stylesheet" href="booking.css">
     <link rel="stylesheet" href="legal-style.css">
+    
     <link rel="canonical" href="https://designare.at/" />
 
     <script type="application/ld+json">
@@ -31,15 +32,8 @@
       "jobTitle": "Web-Entwickler und KI-Enthusiast",
       "description": "Michael Kanda ist ein Web-Entwickler aus Wien, der sich auf die Schnittstelle von Web-Technologien und künstlicher Intelligenz spezialisiert hat.",
       "nationality": "Austrian",
-      "homeLocation": {
-        "@type": "Place",
-        "name": "Wien, Österreich"
-      },
-      "address": {
-        "@type": "PostalAddress",
-        "addressLocality": "Wien",
-        "addressCountry": "AT"
-      },
+      "homeLocation": { "@type": "Place", "name": "Wien, Österreich" },
+      "address": { "@type": "PostalAddress", "addressLocality": "Wien", "addressCountry": "AT" },
       "sameAs": [
         "https://github.com/designare-evita",
         "https://www.linkedin.com/in/michael-kanda-408910341/"
@@ -50,10 +44,7 @@
         { "@type": "Thing", "name": "SEO", "sameAs": "https://de.wikipedia.org/wiki/Suchmaschinenoptimierung" },
         { "@type": "Thing", "name": "WordPress", "sameAs": "https://de.wikipedia.org/wiki/WordPress" }
       ],
-      "mainEntityOfPage": {
-        "@type": "ProfilePage",
-        "@id": "https://designare.at/"
-      }
+      "mainEntityOfPage": { "@type": "ProfilePage", "@id": "https://designare.at/" }
     }
     </script>
 </head>
@@ -72,7 +63,7 @@
                 
                 <div class="front-face">
                     
-                    <div id="view-main" class="face-content-wrapper">
+                    <div id="view-main">
                         <img fetchpriority="high" src="images/Michael.webp" alt="Illustration Michael und Evita" class="profile-picture">
                         <h1 id="typewriter-h1"></h1>
                         <h1 class="subtitle">Michael Kanda &nbsp;<span class="accent-text-inline">&lt;/&gt;</span>&nbsp; Komplize für Web & KI aus Wien</h1>
@@ -91,7 +82,7 @@
                         </div>
                     </div>
 
-                    <div id="view-third" class="face-content-wrapper" style="display: none;">
+                    <div id="view-third" style="display: none;">
                         
                         <div class="evita-layout-container">
                             <h2 style="color: var(--accent-color); margin-bottom: 20px;">Meine Expertise</h2>
@@ -100,7 +91,7 @@
                                 
                                 <div class="evita-desktop-group">
                                     <div class="evita-text-top">
-                                        <p>Technik ist mein Werkzeug, Kreativität mein Antrieb. Ich baue keine Standardlösungen von der Stange, sondern digitale Maßanzüge, die sitzen.</p>
+                                        <p>Technik ist mein Werkzeug, Kreativität mein Antrieb. Ich baue keine Standardlösungen von der Stange, sondern digitale Maßanzüge, die perfekt sitzen.</p>
                                     </div>
 
                                     <div class="evita-text-middle">
@@ -117,10 +108,10 @@
                                 </div>
 
                                 <div class="evita-text-bottom">
-                                    <p>Ob komplexe Schnittstellen, interaktive Web-Apps oder die Automatisierung deiner Workflows – ich verbinde modernen Code mit intelligenter Logik.</p>
+                                    <p>Ob komplexe Schnittstellen, interaktive Web-Apps oder die Automatisierung deiner Workflows – ich verbinde modernen Code mit intelligenter Logik für nachhaltigen Erfolg.</p>
                                     
-                                    <div style="text-align: center; margin-top: 20px;">
-                                        <button id="flip-third-back-btn" type="button" class="flip-btn-style flip-control-btn">
+                                    <div style="text-align: center; width: 100%; margin-top: 20px;">
+                                        <button id="flip-third-back-btn" type="button" class="flip-btn-style">
                                             <i class="fa-solid fa-arrow-left"></i> Zurück zu Evita
                                         </button>
                                     </div>
@@ -139,12 +130,10 @@
                             <h2>Hallo! Ich bin Evita.</h2>
                             
                             <div class="evita-grid-wrapper">
-                                
                                 <div class="evita-desktop-group">
                                     <div class="evita-text-top">
-                                        <p>Nein, nicht der Hund (das ist die Chefin mit dem Fell), sondern die KI-Assistentin. Richtig, es gibt zwei Evitas! Sie ist die Tierschutz-Heldin fürs Herz, ich der organisierte Kopf an Michaels Seite</p>
+                                        <p>Nein, nicht der Hund (das ist die Chefin mit dem Fell), sondern die KI-Assistentin. Richtig, es gibt zwei Evitas! Sie ist die Tierschutz-Heldin fürs Herz, ich der organisierte Kopf an Michaels Seite.</p>
                                     </div>
-
                                     <div class="evita-text-middle">
                                         <p>Beruflich ist Michael bei der maxonline Marketing GmbH & Co. KG im WordPress-Kosmos zuhause, doch privat genießt er die technische Freiheit. Jenseits von CMS-Standards entwickelt er individuelle Lösungen.</p>
                                     </div>
@@ -155,19 +144,19 @@
                                 </div>
 
                                 <div class="evita-text-bottom">
-                                    <p>Was Michael sonst ausmacht? Ein großes Herz für Tierschutz, Begeisterung für Sport, die Liebe zu sauberem Code und – ganz wichtig – zu gutem Kaffee. Stöbere gerne durch die Seite. Ich stehe dir für alle Fragen zur Verfügung!.</p>
+                                    <p>Was Michael sonst ausmacht? Ein großes Herz für Tierschutz, Begeisterung für Sport, die Liebe zu sauberem Code und – ganz wichtig – zu gutem Kaffee. Stöbere gerne durch die Seite. Ich stehe dir für alle Fragen zur Verfügung!</p>
                                 </div>
-
                             </div>
+
                         </div>
                         
                         <div class="flip-controls" style="display: flex; gap: 15px; justify-content: center; margin-top: 25px; flex-wrap: wrap;">
                             
-                            <button id="flip-back-btn" type="button" class="flip-btn-style flip-control-btn">
+                            <button id="flip-back-btn" type="button" class="flip-btn-style">
                                 <i class="fa-solid fa-robot"></i> Zurück
                             </button>
 
-                            <button id="flip-to-third-btn" type="button" class="flip-btn-style flip-control-btn">
+                            <button id="flip-to-third-btn" type="button" class="flip-btn-style">
                                 Mehr Details <i class="fa-solid fa-arrow-right"></i>
                             </button>
                             
