@@ -260,7 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnBackToStart = document.getElementById('flip-back-btn'); // Rückseite -> Start
     const btnToThird = document.getElementById('flip-to-third-btn'); // Rückseite -> Seite 3
     const btnThirdToBack = document.getElementById('flip-third-back-btn'); // Seite 3 -> Rückseite
-    const btnThirdToStart = document.getElementById('flip-third-to-start-btn'); // Seite 3 -> Start (NEU)
+    const btnThirdToStart = document.getElementById('flip-third-to-start-btn'); // Seite 3 -> Start
 
     // Views (Inhalte der Vorderseite)
     const viewMain = document.getElementById('view-main');
@@ -280,7 +280,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (btnBackToStart) {
             btnBackToStart.addEventListener('click', (e) => {
                 e.preventDefault();
-                // Wir stellen sicher, dass wir den Haupt-Inhalt sehen
                 if (viewMain && viewThird) {
                     viewMain.style.display = 'block';
                     viewThird.style.display = 'none';
@@ -290,22 +289,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // 3. Von Rückseite zu Seite 3 (Expertise)
-        // TRICK: Wir tauschen den Inhalt der Vorderseite aus, während der User die Rückseite sieht.
-if (btnToThird) {
+        if (btnToThird) {
             btnToThird.addEventListener('click', (e) => {
                 e.preventDefault();
                 
-                // Inhalt auf Seite 3 umschalten
                 if (viewMain && viewThird) {
                     viewMain.style.display = 'none';
-                    
-                    // WICHTIG: Hier 'block' verwenden, damit das innere Grid funktioniert!
-                    viewThird.style.display = 'block'; 
-                    
-                    // KEINE weiteren Flex-Styles hier setzen!
+                    // WICHTIG: 'flex' statt 'block' für korrektes Layout!
+                    viewThird.style.display = 'flex';
                 }
 
-                // Karte wieder "nach vorne" drehen (dort ist jetzt Seite 3)
                 heroFlipWrapper.classList.remove('flipped');
             });
         }
@@ -318,16 +311,14 @@ if (btnToThird) {
             });
         }
 
-        // 5. Von Seite 3 direkt zur Startseite (NEU)
+        // 5. Von Seite 3 direkt zur Startseite
         if (btnThirdToStart) {
             btnThirdToStart.addEventListener('click', (e) => {
                 e.preventDefault();
-                // Inhalt zurück auf Hauptansicht setzen
                 if (viewMain && viewThird) {
                     viewMain.style.display = 'block';
                     viewThird.style.display = 'none';
                 }
-                // Karte ist bereits nicht geflippt, also bleibt sie so
                 heroFlipWrapper.classList.remove('flipped');
             });
         }
