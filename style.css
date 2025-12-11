@@ -1165,3 +1165,47 @@ footer a:hover {
         order: 4;
     }
 }
+
+/* style.css - Am Ende einfügen */
+
+/* 1. Einheitlicher Stil für alle Flip-Buttons (Referenz: Zurück mit KI Icon) */
+.flip-btn-style {
+    background: transparent;
+    border: 2px solid var(--accent-color) !important; /* Erzwingt den Rahmen */
+    color: var(--accent-color) !important;
+    padding: 10px 30px;
+    border-radius: 7px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    text-decoration: none;
+    margin-top: 10px; /* Einheitlicher Abstand */
+}
+
+.flip-btn-style:hover {
+    background-color: var(--accent-color) !important;
+    color: #fff !important;
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(252, 181, 0, 0.3);
+}
+
+/* 2. Anpassung für das Grid auf der Vorderseite (Damit das kopierte Layout passt) */
+#view-third {
+    width: 100%;
+    height: 100%;
+    /* Wir entfernen die Zentrierung, da das Grid das Layout übernimmt */
+    display: block; 
+    text-align: left;
+    padding: 20px 0; /* Etwas Luft oben/unten */
+}
+
+/* Container-Anpassung damit es nicht zu breit wird auf der Vorderseite */
+#view-third .evita-layout-container {
+    max-width: 100%;
+    margin: 0 auto;
+}
