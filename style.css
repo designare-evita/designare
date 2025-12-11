@@ -1050,10 +1050,13 @@ footer a:hover {
     width: 100%;
 }
 
-/* WICHTIG: Margins der Absätze im Grid entfernen, damit nur GAP den Abstand macht */
-.evita-grid-wrapper p {
-    margin-bottom: 0;
-    margin-top: 0;
+/* WICHTIG: Margins der Absätze im Grid gnadenlos entfernen */
+.evita-grid-wrapper div p {
+    margin-bottom: 0 !important;
+    margin-top: 0 !important;
+    padding-bottom: 0 !important;
+    padding-top: 0 !important;
+    line-height: 1.5 !important; /* Etwas kompakter */
 }
 
 /* DESKTOP: Grid Layout (Bild rechts neben den ersten beiden Absätzen) */
@@ -1062,7 +1065,7 @@ footer a:hover {
         display: grid;
         grid-template-columns: 1fr 280px;
         grid-template-rows: auto auto auto;
-        gap: 20px; /* Dieser Abstand gilt jetzt sauber */
+        gap: 15px; /* Auch am Desktop etwas enger */
         align-items: start;
     }
 
@@ -1095,7 +1098,7 @@ footer a:hover {
     .evita-grid-wrapper {
         display: flex;
         flex-direction: column;
-        gap: 15px; /* Sauberer Abstand auf Mobile */
+        gap: 10px !important; /* SEHR KOMPAKT! */
     }
 
     /* 1. "Nein, nicht der Hund..." */
@@ -1107,11 +1110,10 @@ footer a:hover {
     .evita-image-block {
         order: 2;
         text-align: center;
-        /* Etwas extra Luft um das Bild herum, falls gewünscht, sonst reicht das gap */
-        margin: 5px 0; 
+        margin: 0 !important; /* KEIN EXTRA ABSTAND */
     }
     .evita-image-block img {
-        width: 80%; /* Nicht zu wuchtig auf Mobile */
+        width: 80%;
         margin: 0 auto;
     }
 
