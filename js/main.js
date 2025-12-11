@@ -147,18 +147,6 @@ const initializeDynamicScripts = () => {
 
 const initializeStaticScripts = () => {
     initEffects();
-
-    // --- FIX FÜR SEO TEXT FLACKERN (FOUC) ---
-    // Dies verhindert, dass der statische Text kurz zu sehen ist, bevor der Typewriter startet.
-    const typeWriterElement = document.getElementById('typewriter-h1');
-    if (typeWriterElement) {
-        // 1. Den statischen SEO-Text löschen
-        typeWriterElement.textContent = ''; 
-        // 2. Das Element sichtbar machen (jetzt ist es leer und bereit fürs Tippen)
-        typeWriterElement.style.visibility = 'visible';
-    }
-    // ----------------------------------------
-
     initTypewriters();
 };
 
