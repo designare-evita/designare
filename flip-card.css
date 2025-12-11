@@ -1,11 +1,10 @@
-/* flip-card.css */
+/* --- FLIP CARD DESIGN UPDATE --- */
 
-/* --- 1. Der Haupt-Container der Karte --- */
+/* 1. Haupt-Container Logik (Bleibt gleich) */
 .flip-container {
     perspective: 1200px;
     position: relative;
     z-index: 10;
-    margin-bottom: 50px; /* Abstand nach unten */
 }
 
 .flipper {
@@ -13,138 +12,318 @@
     transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     transform-style: preserve-3d;
     position: relative;
-    /* Wichtig: Grid sorgt dafür, dass Vorder- und Rückseite übereinander liegen */
-    display: grid; 
+    display: grid;
     grid-template-columns: 1fr;
 }
 
-/* Wenn die Klasse .flipped drauf ist -> drehen */
 .flip-container.flipped .flipper {
     transform: rotateY(180deg);
 }
 
-/* --- 2. Vorder- und Rückseiten Logik --- */
 .front-face, .back-face {
-    grid-area: 1 / 1 / 2 / 2; /* Beide liegen im gleichen Grid-Feld */
-    backface-visibility: hidden; /* Rückseite unsichtbar machen wenn gedreht */
-    width: 100%;
-    
-    /* Karten-Look: Dunkler Hintergrund, Rahmen, Schatten */
-    background: rgba(26, 26, 26, 0.95);
-    border: 1px solid var(--border-color, #444);
-    border-radius: 15px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-    
-    /* Innenabstand */
-    padding: 40px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center; /* Vertikal zentrieren */
-    min-height: 450px; /* Mindesthöhe für beide Seiten gleich */
-}
-
-/* Die Vorderseite ist initial sichtbar */
-.front-face {
-    transform: rotateY(0deg);
-    z-index: 2;
-    /* Optional: Vorderseite kann transparent sein, wenn nur der Inhalt zählt */
-    background: transparent; 
-    border: none; 
-    box-shadow: none;
-    padding: 0;
-}
-
-/* Die Rückseite ist gedreht */
-.back-face {
-    transform: rotateY(180deg);
-}
-
-/* --- 3. Spezielle Inhalte auf der Vorderseite --- */
-
-/* #view-main ist die Standardansicht (Michael) */
-#view-main {
+    grid-area: 1 / 1 / 2 / 2;
+    backface-visibility: hidden;
     width: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    animation: fadeIn 0.5s ease-in-out;
-}
-
-/* #view-third ist die Expertise-Ansicht */
-#view-third {
-    width: 100%;
-    /* WICHTIG: Muss wie die Rückseite aussehen! */
-    background: rgba(26, 26, 26, 0.95);
-    border: 1px solid var(--border-color, #aaaaaa);
-    border-radius: 15px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-    padding: 40px;
-    text-align: left; /* Text linksbündig für Layout */
-    animation: fadeIn 0.5s ease-in-out;
-}
-
-/* Animation für weiches Einblenden beim Wechsel */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* --- 4. Die Buttons (Pixelgenau gleich) --- */
-.flip-btn-style {
-    /* 1. Box-Modell */
-    box-sizing: border-box;
-    display: inline-flex;
     align-items: center;
     justify-content: center;
-    
-    /* 2. Größe erzwingen */
-    width: 260px;   /* FESTE Breite statt min-width */
-    height: 55px;   /* FESTE Höhe */
-    padding: 0;     /* Kein Padding, da Flexbox zentriert */
-    margin-top: 15px;
-    
-    /* 3. Optik */
+}
+
+.front-face {
+    z-index: 2;
+    transform: rotateY(0deg);
+}
+
+/* 2. Vorderseite: Button volle Breite */
+.info-btn-wrapper {
+    width: 100%;
+    margin-top: 15px; /* Kleiner Abstand zum Suchfeld */
+}
+
+#flip-info-btn {
+    width: 100%; /* Volle Breite wie das Input-Feld */
     background: transparent;
-    border: 2px solid var(--accent-color, #FCB500) !important;
-    color: var(--accent-color, #FCB500) !important;
-    border-radius: 8px;
+    border: 1px solid #D39A00;
+    color: #D39A00;
+    border-radius: 7px; /* Deine gewünschte Rundung */
+    padding: 12px;
     font-size: 1rem;
-    font-weight: 600;
-    text-decoration: none;
+    font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
-    
-    /* 4. Text-Sicherheit */
-    white-space: nowrap; /* Kein Umbruch erlaubt */
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Text zentriert */
+    outline: none;
 }
 
-.flip-btn-style i {
-    margin: 0 10px; /* Abstand Icon zum Text */
-}
-
-/* Hover-Effekt */
-.flip-btn-style:hover {
-    background-color: var(--accent-color, #FCB500) !important;
-    color: #fff !important;
+#flip-info-btn:hover {
+    background-color: #D39A00;
+    color: #fff;
+    box-shadow: 0 5px 15px rgba(211, 154, 0, 0.3);
     transform: translateY(-2px);
+}
+
+/* 3. Rückseite: Dark Mode Style */
+.back-face {
+    transform: rotateY(180deg);
+    background: rgba(26, 26, 26, 0.95);
+    border: 1px solid var(--border-color);
+    border-radius: 15px; /* Container Ecken */
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    min-height: 400px;
+}
+
+.seo-content { max-width: 700px; }
+.seo-content h2 { color: var(--accent-color); margin-bottom: 20px; font-size: 2rem; }
+.seo-content p { font-size: 1rem; line-height: 1.7; margin-bottom: 20px; color: #e0e0e0; }
+
+/* 4. Rückseite: Button mit Roboter */
+#flip-back-btn {
+    margin-top: 20px;
+    background: transparent;
+    border: 2px solid var(--accent-color);
+    color: var(--accent-color);
+    padding: 10px 30px;
+    border-radius: 7px; /* Deine gewünschte Rundung */
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px; /* Platz zwischen Icon und Text */
+}
+
+#flip-back-btn i {
+    font-size: 1.2rem; /* Icon etwas größer */
+}
+
+#flip-back-btn:hover {
+    background-color: var(--accent-color);
+    color: #fff;
+    transform: scale(1.05);
+}
+
+/* Mobile Anpassung: Scrollbar für die Rückseite */
+@media (max-width: 768px) {
+    /* Schriftgröße für Überschriften anpassen */
+    .seo-content h2 { 
+        font-size: 1.5rem; 
+    }
+
+    /* Anpassungen für die Rückseite der Karte */
+    .back-face { 
+        padding: 20px 15px; /* Etwas weniger Padding seitlich für mehr Platz */
+        
+        /* --- SCROLL-LOGIK --- */
+        max-height: 65vh; /* Die Karte darf maximal 65% der Bildschirmhöhe einnehmen */
+        overflow-y: auto; /* Zeigt Scrollbalken, wenn der Text länger ist */
+        
+        /* Wichtig: Damit der Text oben beginnt und nicht zentriert wird beim Scrollen */
+        justify-content: flex-start; 
+        
+        /* Optional: Scrollverhalten weicher machen */
+        scroll-behavior: smooth;
+    }
+
+    /* Damit der Scrollbalken hübsch aussieht (Firefox) */
+    .back-face {
+        scrollbar-width: thin;
+        scrollbar-color: var(--accent-color) rgba(255, 255, 255, 0.1);
+    }
+
+    /* Damit der Scrollbalken hübsch aussieht (Chrome/Safari/Edge) */
+    .back-face::-webkit-scrollbar {
+        width: 6px;
+    }
+    .back-face::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 3px;
+    }
+    .back-face::-webkit-scrollbar-thumb {
+        background-color: var(--accent-color);
+        border-radius: 3px;
+    }
+}
+
+
+/* --- EVITA LAYOUT LOGIC (DESKTOP & MOBILE) --- */
+
+.evita-layout-container {
+    text-align: left;
+    width: 100%;
+}
+
+.evita-image-block img {
+    height: auto;
+    border-radius: 8px;
+    display: block;
+    width: 100%;
+}
+
+/* DESKTOP: Grid Layout */
+/* Text 1 und 2 sind in einer Gruppe links, Bild rechts, Text 3 unten */
+@media (min-width: 769px) {
+    .evita-grid-wrapper {
+        display: grid;
+        grid-template-columns: 1fr 280px;
+        grid-template-rows: auto auto; /* Reihe 1: Inhalt, Reihe 2: Unten */
+        gap: 20px;
+        align-items: start;
+    }
+
+    /* Gruppe mit Text 1 & 2 */
+    .evita-desktop-group {
+        grid-column: 1 / 2;
+        grid-row: 1 / 2;
+        display: block; /* Normales Blockverhalten */
+    }
+    /* Abstand zwischen den Texten innerhalb der Gruppe */
+    .evita-desktop-group .evita-text-top {
+        margin-bottom: 20px; 
+    }
+    .evita-text-top p, 
+    .evita-text-middle p {
+        margin: 0; /* Sauberer Reset */
+    }
+
+    /* Bild rechts */
+    .evita-image-block {
+         grid-column: 2 / 3;
+         grid-row: 1 / 2; 
+         display: flex;
+         justify-content: flex-end;
+    }
+
+    /* Unterer Text über volle Breite */
+    .evita-text-bottom {
+        grid-column: 1 / 3;
+        grid-row: 2 / 3;
+    }
+}
+
+/* Styling für die 3. Seite */
+#view-third {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Verhindert Layout-Verschiebungen beim Wechsel */
+.face-content-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Mobile Anpassung für die Buttons auf der Rückseite */
+@media (max-width: 480px) {
+    .flip-controls {
+        flex-direction: column;
+    }
+    .flip-controls button {
+        width: 100%;
+    }
+}
+
+/* MOBILE: Flex Layout mit Order */
+/* TRICK: display: contents löst die Desktop-Gruppe auf, damit wir sortieren können */
+@media (max-width: 768px) {
+    .evita-grid-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 15px; 
+    }
+
+    /* Die Gruppe existiert für Flexbox nicht mehr */
+    .evita-desktop-group {
+        display: contents;
+    }
+
+    /* 1. "Nein, nicht der Hund..." */
+    .evita-text-top {
+        order: 1;
+    }
+    .evita-text-top p { margin: 0; }
+
+    /* 2. DAS BILD (wird hier eingeschoben) */
+    .evita-image-block {
+        order: 2;
+        text-align: center;
+        margin: 0; 
+    }
+    .evita-image-block img {
+        width: 80%;
+        margin: 0 auto;
+    }
+
+    /* 3. "Du bist hier auf..." */
+    .evita-text-middle {
+        order: 3;
+    }
+    .evita-text-middle p { margin: 0; }
+
+    /* 4. "Michael mag..." */
+    .evita-text-bottom {
+        order: 4;
+    }
+}
+
+/* --- FINALE ANPASSUNG: Buttons & Expertise-Container --- */
+
+/* 1. Einheitlicher Stil & GLEICHE GRÖSSE für alle Flip-Buttons */
+.flip-btn-style {
+    /* Grund-Styling */
+    background: transparent;
+    border: 2px solid var(--accent-color) !important;
+    color: var(--accent-color) !important;
+    border-radius: 7px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    margin-top: 10px;
+    
+    /* Layout & Zentrierung */
+    display: inline-flex;     /* Flexbox für perfekte Zentrierung */
+    align-items: center;      /* Vertikal zentrieren */
+    justify-content: center;  /* Horizontal zentrieren */
+    gap: 10px;                /* Abstand zwischen Text und Icon */
+    
+    /* GRÖSSEN-FIX (Hier liegt die Lösung) */
+    box-sizing: border-box;
+    min-width: 240px;         /* Alle Buttons mindestens so breit */
+    height: 54px;             /* Alle Buttons EXAKT so hoch */
+    padding: 0 20px;          /* Nur seitliches Padding, Höhe kommt von 'height' */
+    
+    /* Verhindert, dass der Button durch Zeilenumbruch höher wird */
+    white-space: nowrap;      
+}
+
+.flip-btn-style:hover {
+    background-color: var(--accent-color) !important;
+    color: #fff !important;
+    transform: scale(1.05);
     box-shadow: 0 5px 15px rgba(252, 181, 0, 0.3);
 }
 
-/* Mobile Anpassung */
-@media (max-width: 768px) {
-    .front-face, .back-face, #view-third {
-        padding: 20px;
-        min-height: auto;
-    }
-    
+/* Optional: Mobile Anpassung, falls 240px zu breit für kleine Handys sind */
+@media (max-width: 380px) {
     .flip-btn-style {
-        width: 100%; /* Auf Handy volle Breite */
-        max-width: 300px;
-    }
-    
-    .flip-controls {
-        flex-direction: column;
-        align-items: center;
-        gap: 10px;
+        min-width: 100%; /* Auf sehr kleinen Screens volle Breite nutzen */
+        height: 50px;    /* Etwas kompakter */
     }
 }
