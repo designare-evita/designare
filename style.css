@@ -1166,14 +1166,14 @@ footer a:hover {
     }
 }
 
-/* style.css - Am Ende einfügen */
+/* --- FINALE ANPASSUNG: Buttons & Expertise-Container --- */
 
-/* 1. Einheitlicher Stil für alle Flip-Buttons (Referenz: Zurück mit KI Icon) */
+/* 1. Einheitlicher Stil & GLEICHE GRÖSSE für alle Flip-Buttons */
 .flip-btn-style {
     background: transparent;
-    border: 2px solid var(--accent-color) !important; /* Erzwingt den Rahmen */
+    border: 2px solid var(--accent-color) !important;
     color: var(--accent-color) !important;
-    padding: 10px 30px;
+    padding: 10px 20px;
     border-radius: 7px;
     font-size: 1rem;
     font-weight: 600;
@@ -1181,10 +1181,14 @@ footer a:hover {
     transition: all 0.3s ease;
     display: inline-flex;
     align-items: center;
-    justify-content: center;
+    justify-content: center; /* Text/Icon zentrieren */
     gap: 10px;
     text-decoration: none;
-    margin-top: 10px; /* Einheitlicher Abstand */
+    margin-top: 10px;
+    
+    /* HIER IST DER TRICK FÜR GLEICHE GRÖSSE: */
+    min-width: 240px; /* Alle Buttons sind mindestens so breit */
+    box-sizing: border-box;
 }
 
 .flip-btn-style:hover {
@@ -1194,18 +1198,28 @@ footer a:hover {
     box-shadow: 0 5px 15px rgba(252, 181, 0, 0.3);
 }
 
-/* 2. Anpassung für das Grid auf der Vorderseite (Damit das kopierte Layout passt) */
+/* 2. Container für "Meine Expertise" (Kopie des Rückseiten-Stils) */
 #view-third {
+    /* Damit es wie eine Karte aussieht (Background von back-face kopiert) */
+    background: rgba(26, 26, 26, 0.95);
+    border: 1px solid var(--border-color);
+    border-radius: 15px;
+    padding: 40px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    
+    /* Layout */
     width: 100%;
-    height: 100%;
-    /* Wir entfernen die Zentrierung, da das Grid das Layout übernimmt */
-    display: block; 
+    height: auto; /* Passt sich dem Inhalt an */
+    min-height: 400px; /* Mindesthöhe wie Rückseite */
     text-align: left;
-    padding: 20px 0; /* Etwas Luft oben/unten */
+    
+    /* Animation beim Einblenden */
+    animation: fadeIn 0.5s ease-in-out;
 }
 
-/* Container-Anpassung damit es nicht zu breit wird auf der Vorderseite */
-#view-third .evita-layout-container {
-    max-width: 100%;
-    margin: 0 auto;
+/* Kleine Korrektur für Mobile, damit die Karte nicht zu breit wird */
+@media (max-width: 768px) {
+    #view-third {
+        padding: 20px;
+    }
 }
