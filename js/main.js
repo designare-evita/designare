@@ -250,25 +250,72 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* =========================================
-   11. HERO FLIP ANIMATION (SEO TEXT)
+   11. HERO FLIP ANIMATION (3-SEITEN LOGIK)
    ========================================= */
 document.addEventListener('DOMContentLoaded', () => {
     const heroFlipWrapper = document.getElementById('hero-flip-wrapper');
-    const infoBtn = document.getElementById('flip-info-btn');
-    const backBtn = document.getElementById('flip-back-btn');
+    
+    // Buttons
+    const btnToBack = document.getElementById('flip-info-btn');      // Start -> Rückseite
+    const btnBackToStart = document.getElementById('flip-back-btn'); // Rückseite -> Start
+    const btnToThird = document.getElementById('flip-to-third-btn'); // Rückseite -> Seite 3
+    const btnThirdToBack = document.getElementById('flip-third-back-btn'); // Seite 3 -> Rückseite
 
-    if (heroFlipWrapper && infoBtn && backBtn) {
+    // Views (Inhalte der Vorderseite)
+    const viewMain = document.getElementById('view-main');
+    const viewThird = document.getElementById('view-third');
+
+    if (heroFlipWrapper) {
         
-        // Klick auf "Info": Container drehen
-        infoBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            heroFlipWrapper.classList.add('flipped');
-        });
+        // 1. Von Startseite zu Rückseite (Evita)
+        if (btnToBack) {
+            btnToBack.addEventListener('click', (e) => {
+                e.preventDefault();
+                heroFlipWrapper.classList.add('flipped');
+            });
+        }
 
-        // Klick auf "Zurück": Wieder nach vorne drehen
-        backBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            heroFlipWrapper.classList.remove('flipped');
-        });
+        // 2. Von Rückseite zurück zur Startseite (Michael)
+        if (btnBackToStart) {
+            btnBackToStart.addEventListener('click', (e) => {
+                e.preventDefault();
+                // Wir stellen sicher, dass wir den Haupt-Inhalt sehen
+                if (viewMain && viewThird) {
+                    viewMain.style.display = 'block';
+                    viewThird.style.display = 'none';
+                }
+                heroFlipWrapper.classList.remove('flipped');
+            });
+        }
+
+        // 3. Von Rückseite zu Seite 3 (Expertise)
+        // TRICK: Wir tauschen den Inhalt der Vorderseite aus, während der User die Rückseite sieht.
+        if (btnToThird) {
+            btnToThird.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                // Inhalt auf Seite 3 umschalten
+                if (viewMain && viewThird) {
+                    viewMain.style.display = 'none';
+                    viewThird.style.display = 'block'; // Seite 3 sichtbar machen
+                    // Wichtig: Flexbox-Zentrierung sicherstellen, falls nötig
+                    viewThird.style.display = 'flex'; 
+                    viewThird.style.flexDirection = 'column';
+                    viewThird.style.alignItems = 'center';
+                    viewThird.style.justifyContent = 'center';
+                }
+
+                // Karte wieder "nach vorne" drehen (dort ist jetzt Seite 3)
+                heroFlipWrapper.classList.remove('flipped');
+            });
+        }
+
+        // 4. Von Seite 3 zurück zur Rückseite
+        if (btnThirdToBack) {
+            btnThirdToBack.addEventListener('click', (e) => {
+                e.preventDefault();
+                heroFlipWrapper.classList.add('flipped');
+            });
+        }
     }
 });
