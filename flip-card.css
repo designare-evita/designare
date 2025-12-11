@@ -1,0 +1,150 @@
+/* flip-card.css */
+
+/* --- 1. Der Haupt-Container der Karte --- */
+.flip-container {
+    perspective: 1200px;
+    position: relative;
+    z-index: 10;
+    margin-bottom: 50px; /* Abstand nach unten */
+}
+
+.flipper {
+    width: 100%;
+    transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform-style: preserve-3d;
+    position: relative;
+    /* Wichtig: Grid sorgt dafür, dass Vorder- und Rückseite übereinander liegen */
+    display: grid; 
+    grid-template-columns: 1fr;
+}
+
+/* Wenn die Klasse .flipped drauf ist -> drehen */
+.flip-container.flipped .flipper {
+    transform: rotateY(180deg);
+}
+
+/* --- 2. Vorder- und Rückseiten Logik --- */
+.front-face, .back-face {
+    grid-area: 1 / 1 / 2 / 2; /* Beide liegen im gleichen Grid-Feld */
+    backface-visibility: hidden; /* Rückseite unsichtbar machen wenn gedreht */
+    width: 100%;
+    
+    /* Karten-Look: Dunkler Hintergrund, Rahmen, Schatten */
+    background: rgba(26, 26, 26, 0.95);
+    border: 1px solid var(--border-color, #444);
+    border-radius: 15px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    
+    /* Innenabstand */
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Vertikal zentrieren */
+    min-height: 450px; /* Mindesthöhe für beide Seiten gleich */
+}
+
+/* Die Vorderseite ist initial sichtbar */
+.front-face {
+    transform: rotateY(0deg);
+    z-index: 2;
+    /* Optional: Vorderseite kann transparent sein, wenn nur der Inhalt zählt */
+    background: transparent; 
+    border: none; 
+    box-shadow: none;
+    padding: 0;
+}
+
+/* Die Rückseite ist gedreht */
+.back-face {
+    transform: rotateY(180deg);
+}
+
+/* --- 3. Spezielle Inhalte auf der Vorderseite --- */
+
+/* #view-main ist die Standardansicht (Michael) */
+#view-main {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* #view-third ist die Expertise-Ansicht */
+#view-third {
+    width: 100%;
+    /* WICHTIG: Muss wie die Rückseite aussehen! */
+    background: rgba(26, 26, 26, 0.95);
+    border: 1px solid var(--border-color, #aaaaaa);
+    border-radius: 15px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    padding: 40px;
+    text-align: left; /* Text linksbündig für Layout */
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Animation für weiches Einblenden beim Wechsel */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- 4. Die Buttons (Pixelgenau gleich) --- */
+.flip-btn-style {
+    /* 1. Box-Modell */
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* 2. Größe erzwingen */
+    width: 260px;   /* FESTE Breite statt min-width */
+    height: 55px;   /* FESTE Höhe */
+    padding: 0;     /* Kein Padding, da Flexbox zentriert */
+    margin-top: 15px;
+    
+    /* 3. Optik */
+    background: transparent;
+    border: 2px solid var(--accent-color, #FCB500) !important;
+    color: var(--accent-color, #FCB500) !important;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    
+    /* 4. Text-Sicherheit */
+    white-space: nowrap; /* Kein Umbruch erlaubt */
+}
+
+.flip-btn-style i {
+    margin: 0 10px; /* Abstand Icon zum Text */
+}
+
+/* Hover-Effekt */
+.flip-btn-style:hover {
+    background-color: var(--accent-color, #FCB500) !important;
+    color: #fff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(252, 181, 0, 0.3);
+}
+
+/* Mobile Anpassung */
+@media (max-width: 768px) {
+    .front-face, .back-face, #view-third {
+        padding: 20px;
+        min-height: auto;
+    }
+    
+    .flip-btn-style {
+        width: 100%; /* Auf Handy volle Breite */
+        max-width: 300px;
+    }
+    
+    .flip-controls {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+}
