@@ -290,19 +290,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 3. Von Rückseite zu Seite 3 (Expertise)
         // TRICK: Wir tauschen den Inhalt der Vorderseite aus, während der User die Rückseite sieht.
-        if (btnToThird) {
+if (btnToThird) {
             btnToThird.addEventListener('click', (e) => {
                 e.preventDefault();
                 
                 // Inhalt auf Seite 3 umschalten
                 if (viewMain && viewThird) {
                     viewMain.style.display = 'none';
-                    viewThird.style.display = 'block'; // Seite 3 sichtbar machen
-                    // Wichtig: Flexbox-Zentrierung sicherstellen, falls nötig
-                    viewThird.style.display = 'flex'; 
-                    viewThird.style.flexDirection = 'column';
-                    viewThird.style.alignItems = 'center';
-                    viewThird.style.justifyContent = 'center';
+                    
+                    // WICHTIG: Hier 'block' verwenden, damit das innere Grid funktioniert!
+                    viewThird.style.display = 'block'; 
+                    
+                    // KEINE weiteren Flex-Styles hier setzen!
                 }
 
                 // Karte wieder "nach vorne" drehen (dort ist jetzt Seite 3)
