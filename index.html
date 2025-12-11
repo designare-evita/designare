@@ -84,14 +84,16 @@
     <main id="hero">
         <div id="particles-js"></div>
 <div class="container flip-container" id="hero-flip-wrapper">
-    <div class="flipper">
+  <div class="flipper">
+    
+    <div class="front-face">
         
-        <div class="front-face">
+        <div id="view-main" class="face-content-wrapper">
             <img fetchpriority="high" src="images/Michael.webp" alt="Illustration Michael und Evita" class="profile-picture">
-<h1 id="typewriter-h1"></h1>
+            <h1 id="typewriter-h1"></h1>
             <h1 class="subtitle">Michael Kanda &nbsp;<span class="accent-text-inline">&lt;/&gt;</span>&nbsp; Komplize für Web & KI aus Wien</h1>
             
-           <div class="ai-container">
+            <div class="ai-container">
                 <form id="ai-form">
                     <input type="text" id="ai-question" placeholder="Hallo, ich bin Evita, Michaels KI-Assistentin." autocomplete="off" required>
                     <button type="submit" aria-label="Frage senden"><i class="fa-regular fa-paper-plane"></i></button>
@@ -105,60 +107,64 @@
             </div>
         </div>
 
-<div class="front-face">
-    
-    <div id="view-main" class="face-content-wrapper">
-        <img fetchpriority="high" src="images/Michael.webp" alt="Illustration Michael und Evita" class="profile-picture">
-        <h1 id="typewriter-h1"></h1>
-        <h1 class="subtitle">Michael Kanda &nbsp;<span class="accent-text-inline">&lt;/&gt;</span>&nbsp; Komplize für Web & KI aus Wien</h1>
-        
-        <div class="ai-container">
-            <form id="ai-form">
-                <input type="text" id="ai-question" placeholder="Hallo, ich bin Evita, Michaels KI-Assistentin." autocomplete="off" required>
-                <button type="submit" aria-label="Frage senden"><i class="fa-regular fa-paper-plane"></i></button>
-            </form>
+        <div id="view-third" class="face-content-wrapper" style="display: none;">
+            <h2 style="margin-bottom: 20px; color: var(--accent-color);">Meine Expertise</h2>
+            <p>Technik ist mein Werkzeug, Kreativität mein Antrieb. Ich baue keine Standardlösungen, sondern digitale Maßanzüge.</p>
             
-            <div class="info-btn-wrapper">
-                <button id="flip-info-btn" type="button" aria-label="Mehr Informationen anzeigen">
-                    Neugierig geworden?
+            <ul style="text-align: left; margin-bottom: 30px; list-style: none;">
+                <li style="margin-bottom: 10px;"><i class="fa-solid fa-check accent-text-inline" style="margin-right: 10px;"></i> <strong>WordPress:</strong> Custom Themes & Plugins</li>
+                <li style="margin-bottom: 10px;"><i class="fa-solid fa-check accent-text-inline" style="margin-right: 10px;"></i> <strong>KI-Integration:</strong> Automation & Chatbots</li>
+                <li style="margin-bottom: 10px;"><i class="fa-solid fa-check accent-text-inline" style="margin-right: 10px;"></i> <strong>Performance:</strong> Schnell & SEO-optimiert</li>
+            </ul>
+
+            <button id="flip-third-back-btn" type="button" class="cta-button" style="background: transparent; border: 2px solid var(--accent-color); color: var(--text-color); margin-top: 10px;">
+                <i class="fa-solid fa-arrow-left"></i> Zurück zu Evita
+            </button>
+        </div>
+
+    </div>
+
+    <div class="back-face">
+        <div class="seo-content">
+            
+            <div class="evita-layout-container">
+                <h2>Hallo! Ich bin Evita.</h2>
+                
+                <div class="evita-grid-wrapper">
+                    <div class="evita-desktop-group">
+                        <div class="evita-text-top">
+                            <p>Nein, nicht der Hund (das ist die Chefin mit dem Fell), sondern die KI-Assistentin. Richtig, es gibt zwei Evitas! Sie ist die Tierschutz-Heldin fürs Herz, ich der organisierte Kopf an Michaels Seite</p>
+                        </div>
+                        <div class="evita-text-middle">
+                            <p>Beruflich ist Michael bei der maxonline Marketing GmbH & Co. KG im WordPress-Kosmos zuhause, doch privat genießt er die technische Freiheit.</p>
+                        </div>
+                    </div>
+
+                    <div class="evita-image-block">
+                        <img src="https://designare.at/images/michael-evita-ai.webp" alt="Michael und Evita AI">
+                    </div>
+
+                    <div class="evita-text-bottom">
+                        <p>Was Michael sonst ausmacht? Ein großes Herz für Tierschutz, Begeisterung für Sport, die Liebe zu sauberem Code und – ganz wichtig – zu gutem Kaffee. Stöbere gerne durch die Seite. Ich stehe dir für alle Fragen zur Verfügung!.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flip-controls" style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+                
+                <button id="flip-back-btn" type="button">
+                    <i class="fa-solid fa-robot"></i> Zurück
+                </button>
+
+                <button id="flip-to-third-btn" type="button" style="background: var(--accent-color); border: none; color: white; padding: 10px 20px; border-radius: 7px; cursor: pointer; font-weight: 600;">
+                    Mehr Details <i class="fa-solid fa-arrow-right"></i>
                 </button>
             </div>
+
         </div>
-    </div>
-
-    <div id="view-third" class="face-content-wrapper" style="display: none;">
-        <h2 style="margin-bottom: 20px; color: var(--accent-color);">Meine Expertise</h2>
-        <p>Hier könnte weiterer Text über deine Skills, Projekte oder Angebote stehen.</p>
-        
-        <ul style="text-align: left; margin-bottom: 30px; list-style: none;">
-            <li><i class="fa-solid fa-check accent-text-inline"></i> WordPress Entwicklung</li>
-            <li><i class="fa-solid fa-check accent-text-inline"></i> KI-Integrationen</li>
-            <li><i class="fa-solid fa-check accent-text-inline"></i> SEO Strategien</li>
-        </ul>
-
-        <button id="flip-third-back-btn" type="button" class="cta-button" style="background: transparent; border: 2px solid var(--accent-color); color: var(--text-color);">
-            <i class="fa-solid fa-arrow-left"></i> Zurück zu Evita
-        </button>
     </div>
 
 </div>
-
-<div class="back-face">
-    <div class="seo-content">
-        <div class="flip-controls" style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
-            
-            <button id="flip-back-btn" type="button">
-                <i class="fa-solid fa-robot"></i> Zurück
-            </button>
-
-            <button id="flip-to-third-btn" type="button" style="background: var(--accent-color); border: none; color: white; padding: 10px 20px; border-radius: 7px; cursor: pointer; font-weight: 600;">
-                Mehr Details <i class="fa-solid fa-arrow-right"></i>
-            </button>
-        </div>
-
-    </div>
-</div>
-        </div>
     </main>
 
 <div id="footer-placeholder"></div>
