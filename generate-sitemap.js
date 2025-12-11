@@ -4,8 +4,13 @@
    content.csv wird IGNORIERT (enthält nur Silas-Vorschau/Testdaten)
 */
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// __dirname Workaround für ES-Module (da es __dirname dort nicht automatisch gibt)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // 1. EINSTELLUNGEN
 const BASE_URL = 'https://designare.at'; 
@@ -33,25 +38,27 @@ console.log('🤖 Starte Sitemap-Generierung...');
 
 // 2. NUR STATISCHE HTML-DATEIEN FINDEN
 let urls = [];
-const files = fs.readdirSync(__dirname);
+// Hinweis: Wir nutzen try-catch, falls das Verzeichnis beim Testen lokal anders aussieht
+try {
+    const files = fs.readdirSync(__dirname);
 
-files.forEach(file => {
-    if (file.endsWith('.html') && !EXCLUDE_FILES.includes(file)) {
-        // Clean URL ohne .html (dank vercel.json cleanUrls: true)
-        let urlPath = file === 'index.html' ? '' : file.replace(/\.html$/, '');
-        urls.push({
-            loc: `${BASE_URL}/${urlPath}`,
-            lastmod: getDate(),
-            changefreq: 'weekly',
-            priority: file === 'index.html' ? '1.0' : '0.8'
-        });
-    }
-});
+    files.forEach(file => {
+        if (file.endsWith('.html') && !EXCLUDE_FILES.includes(file)) {
+            // Clean URL ohne .html (dank vercel.json cleanUrls: true)
+            let urlPath = file === 'index.html' ? '' : file.replace(/\.html$/, '');
+            urls.push({
+                loc: `${BASE_URL}/${urlPath}`,
+                lastmod: getDate(),
+                changefreq: 'weekly',
+                priority: file === 'index.html' ? '1.0' : '0.8'
+            });
+        }
+    });
 
-console.log(`✅ ${urls.length} statische Seiten gefunden.`);
+    console.log(`✅ ${urls.length} statische Seiten gefunden.`);
 
-// 3. XML ZUSAMMENBAUEN
-const xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
+    // 3. XML ZUSAMMENBAUEN
+    const xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls.map(u => `  <url>
     <loc>${u.loc}</loc>
@@ -61,11 +68,16 @@ ${urls.map(u => `  <url>
   </url>`).join('\n')}
 </urlset>`;
 
-// 4. DATEI SCHREIBEN
-if (!fs.existsSync(path.dirname(OUTPUT_FILE))) {
-    fs.mkdirSync(path.dirname(OUTPUT_FILE), { recursive: true });
-}
+    // 4. DATEI SCHREIBEN
+    if (!fs.existsSync(path.dirname(OUTPUT_FILE))) {
+        fs.mkdirSync(path.dirname(OUTPUT_FILE), { recursive: true });
+    }
 
-fs.writeFileSync(OUTPUT_FILE, xmlContent);
-console.log(`🎉 sitemap.xml erfolgreich erstellt unter: ${OUTPUT_FILE}`);
-console.log(`📊 Enthält ${urls.length} URLs`);
+    fs.writeFileSync(OUTPUT_FILE, xmlContent);
+    console.log(`🎉 sitemap.xml erfolgreich erstellt unter: ${OUTPUT_FILE}`);
+    console.log(`📊 Enthält ${urls.length} URLs`);
+
+} catch (error) {
+    console.error("❌ Fehler bei der Sitemap-Generierung:", error);
+    process.exit(1); // Build als fehlgeschlagen markieren bei Fehler
+}
