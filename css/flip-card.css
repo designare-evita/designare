@@ -81,31 +81,9 @@
 .seo-content h2 { color: var(--accent-color); margin-bottom: 20px; font-size: 2rem; }
 .seo-content p { font-size: 1rem; line-height: 1.7; margin-bottom: 20px; color: #e0e0e0; }
 
-/* 4. Rückseite: Button mit Roboter */
+/* Legacy Button Style - nur für Kompatibilität (wird von .flip-btn-style überschrieben) */
 #flip-back-btn {
-    margin-top: 20px;
-    background: transparent;
-    border: 2px solid var(--accent-color);
-    color: var(--accent-color);
-    padding: 10px 30px;
-    border-radius: 7px; /* Deine gewünschte Rundung */
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 10px; /* Platz zwischen Icon und Text */
-}
-
-#flip-back-btn i {
-    font-size: 1.2rem; /* Icon etwas größer */
-}
-
-#flip-back-btn:hover {
-    background-color: var(--accent-color);
-    color: #fff;
-    transform: scale(1.05);
+    margin: 0; /* Reset - margin wird durch .flip-controls gesteuert */
 }
 
 /* Mobile Anpassung: Scrollbar für die Rückseite */
@@ -260,16 +238,6 @@
     to { opacity: 1; }
 }
 
-/* Mobile Anpassung für die Buttons auf der Rückseite */
-@media (max-width: 480px) {
-    .flip-controls {
-        flex-direction: column;
-    }
-    .flip-controls button {
-        width: 100%;
-    }
-}
-
 /* === FLIP CONTROLS: Buttons links/rechts ausgerichtet === */
 .flip-controls {
     display: flex;
@@ -277,6 +245,7 @@
     align-items: center;
     gap: 15px;
     margin-top: 25px;
+    margin-bottom: 0; /* Kein Abstand nach unten */
     width: 100%;
 }
 
@@ -379,7 +348,7 @@
     cursor: pointer;
     transition: all 0.3s ease;
     text-decoration: none;
-    margin-top: 10px;
+    margin: 0; /* KEIN margin - wird durch .flip-controls gesteuert */
     
     /* Layout & Zentrierung */
     display: inline-flex;     /* Flexbox für perfekte Zentrierung */
