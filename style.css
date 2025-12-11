@@ -1,27 +1,7 @@
 /* style.css
   Vereinfacht: Nur noch Dark Mode & Finaler Layout-Fix
 */
-/* Standard-Klasse um Elemente visuell zu verstecken, aber für SEO/Screenreader lesbar zu halten */
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border-width: 0;
-}
 
-/* Damit das DIV genauso aussieht wie deine ursprüngliche H1 */
-.h1-like {
-  /* Hier die Styles deiner H1 übernehmen, falls sie nicht global definiert sind */
-  font-size: 2em; /* Beispiel - passend zu deinem Design */
-  font-weight: bold;
-  margin: 0.67em 0;
-  min-height: 1.2em; /* Verhindert Layout-Springen beim Tippen */
-}
 
 a {
     text-decoration: none !important;
