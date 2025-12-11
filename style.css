@@ -1050,67 +1050,72 @@ footer a:hover {
     width: 100%;
 }
 
-/* WICHTIG: Margins der Absätze im Grid gnadenlos entfernen */
-.evita-grid-wrapper div p {
-    margin-bottom: 0 !important;
-    margin-top: 0 !important;
-    padding-bottom: 0 !important;
-    padding-top: 0 !important;
-    line-height: 1.5 !important; /* Etwas kompakter */
-}
-
-/* DESKTOP: Grid Layout (Bild rechts neben den ersten beiden Absätzen) */
+/* DESKTOP: Grid Layout */
+/* Text 1 und 2 sind in einer Gruppe links, Bild rechts, Text 3 unten */
 @media (min-width: 769px) {
     .evita-grid-wrapper {
         display: grid;
         grid-template-columns: 1fr 280px;
-        grid-template-rows: auto auto auto;
-        gap: 15px; /* Auch am Desktop etwas enger */
+        grid-template-rows: auto auto; /* Reihe 1: Inhalt, Reihe 2: Unten */
+        gap: 20px;
         align-items: start;
     }
 
-    .evita-text-top {
+    /* Gruppe mit Text 1 & 2 */
+    .evita-desktop-group {
         grid-column: 1 / 2;
         grid-row: 1 / 2;
-        margin-top: 0;
+        display: block; /* Normales Blockverhalten */
+    }
+    /* Abstand zwischen den Texten innerhalb der Gruppe */
+    .evita-desktop-group .evita-text-top {
+        margin-bottom: 20px; 
+    }
+    .evita-text-top p, 
+    .evita-text-middle p {
+        margin: 0; /* Sauberer Reset */
     }
 
+    /* Bild rechts */
     .evita-image-block {
          grid-column: 2 / 3;
-         grid-row: 1 / 3; /* Spannt über zwei Zeilen */
+         grid-row: 1 / 2; 
          display: flex;
          justify-content: flex-end;
     }
 
-    .evita-text-middle {
-        grid-column: 1 / 2;
-        grid-row: 2 / 3;
-    }
-
+    /* Unterer Text über volle Breite */
     .evita-text-bottom {
-        grid-column: 1 / 3; /* Volle Breite unten */
-        grid-row: 3 / 4;
+        grid-column: 1 / 3;
+        grid-row: 2 / 3;
     }
 }
 
-/* MOBILE: Flex Layout mit Order (Bild rutscht zwischen Absatz 1 und 2) */
+/* MOBILE: Flex Layout mit Order */
+/* TRICK: display: contents löst die Desktop-Gruppe auf, damit wir sortieren können */
 @media (max-width: 768px) {
     .evita-grid-wrapper {
         display: flex;
         flex-direction: column;
-        gap: 10px !important; /* SEHR KOMPAKT! */
+        gap: 15px; 
+    }
+
+    /* Die Gruppe existiert für Flexbox nicht mehr */
+    .evita-desktop-group {
+        display: contents;
     }
 
     /* 1. "Nein, nicht der Hund..." */
     .evita-text-top {
         order: 1;
     }
+    .evita-text-top p { margin: 0; }
 
     /* 2. DAS BILD (wird hier eingeschoben) */
     .evita-image-block {
         order: 2;
         text-align: center;
-        margin: 0 !important; /* KEIN EXTRA ABSTAND */
+        margin: 0; 
     }
     .evita-image-block img {
         width: 80%;
@@ -1121,6 +1126,7 @@ footer a:hover {
     .evita-text-middle {
         order: 3;
     }
+    .evita-text-middle p { margin: 0; }
 
     /* 4. "Michael mag..." */
     .evita-text-bottom {
