@@ -1091,6 +1091,38 @@ footer a:hover {
     }
 }
 
+/* Styling für die 3. Seite */
+#view-third {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Verhindert Layout-Verschiebungen beim Wechsel */
+.face-content-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Mobile Anpassung für die Buttons auf der Rückseite */
+@media (max-width: 480px) {
+    .flip-controls {
+        flex-direction: column;
+    }
+    .flip-controls button {
+        width: 100%;
+    }
+}
+
 /* MOBILE: Flex Layout mit Order */
 /* TRICK: display: contents löst die Desktop-Gruppe auf, damit wir sortieren können */
 @media (max-width: 768px) {
