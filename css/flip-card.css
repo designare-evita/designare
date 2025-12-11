@@ -38,15 +38,15 @@
 /* 2. Vorderseite: Button volle Breite */
 .info-btn-wrapper {
     width: 100%;
-    margin-top: 15px; /* Kleiner Abstand zum Suchfeld */
+    margin-top: 15px;
 }
 
 #flip-info-btn {
-    width: 100%; /* Volle Breite wie das Input-Feld */
+    width: 100%;
     background: transparent;
     border: 1px solid #D39A00;
     color: #D39A00;
-    border-radius: 7px; /* Deine gewünschte Rundung */
+    border-radius: 7px;
     padding: 12px;
     font-size: 1rem;
     font-weight: 500;
@@ -54,7 +54,7 @@
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
-    justify-content: center; /* Text zentriert */
+    justify-content: center;
     outline: none;
 }
 
@@ -70,51 +70,41 @@
     transform: rotateY(180deg);
     background: rgba(26, 26, 26, 0.95);
     border: 1px solid var(--border-color);
-    border-radius: 15px; /* Container Ecken */
+    border-radius: 15px;
     padding: 40px;
     text-align: center;
     box-shadow: 0 20px 50px rgba(0,0,0,0.5);
     min-height: 400px;
 }
 
-.seo-content { max-width: 700px; }
+.seo-content { 
+    max-width: 700px; 
+    width: 100%;
+}
 .seo-content h2 { color: var(--accent-color); margin-bottom: 20px; font-size: 2rem; }
 .seo-content p { font-size: 1rem; line-height: 1.7; margin-bottom: 20px; color: #e0e0e0; }
 
-/* Legacy Button Style - nur für Kompatibilität (wird von .flip-btn-style überschrieben) */
+/* Legacy Button Style - nur für Kompatibilität */
 #flip-back-btn {
-    margin: 0; /* Reset - margin wird durch .flip-controls gesteuert */
+    margin: 0;
 }
 
 /* Mobile Anpassung: Scrollbar für die Rückseite */
 @media (max-width: 768px) {
-    /* Schriftgröße für Überschriften anpassen */
     .seo-content h2 { 
         font-size: 1.5rem; 
     }
 
-    /* Anpassungen für die Rückseite der Karte */
     .back-face { 
-        padding: 20px 15px; /* Etwas weniger Padding seitlich für mehr Platz */
-        
-        /* --- SCROLL-LOGIK --- */
-        max-height: 65vh; /* Die Karte darf maximal 65% der Bildschirmhöhe einnehmen */
-        overflow-y: auto; /* Zeigt Scrollbalken, wenn der Text länger ist */
-        
-        /* Wichtig: Damit der Text oben beginnt und nicht zentriert wird beim Scrollen */
+        padding: 20px 15px;
+        max-height: 65vh;
+        overflow-y: auto;
         justify-content: flex-start; 
-        
-        /* Optional: Scrollverhalten weicher machen */
         scroll-behavior: smooth;
-    }
-
-    /* Damit der Scrollbalken hübsch aussieht (Firefox) */
-    .back-face {
         scrollbar-width: thin;
         scrollbar-color: var(--accent-color) rgba(255, 255, 255, 0.1);
     }
 
-    /* Damit der Scrollbalken hübsch aussieht (Chrome/Safari/Edge) */
     .back-face::-webkit-scrollbar {
         width: 6px;
     }
@@ -144,32 +134,29 @@
 }
 
 /* DESKTOP: Grid Layout */
-/* Text 1 und 2 sind in einer Gruppe links, Bild rechts, Text 3 unten */
 @media (min-width: 769px) {
     .evita-grid-wrapper {
         display: grid;
         grid-template-columns: 1fr 280px;
-        grid-template-rows: auto auto; /* Reihe 1: Inhalt, Reihe 2: Unten */
+        grid-template-rows: auto auto;
         gap: 20px;
         align-items: start;
     }
 
-    /* Gruppe mit Text 1 & 2 */
     .evita-desktop-group {
         grid-column: 1 / 2;
         grid-row: 1 / 2;
-        display: block; /* Normales Blockverhalten */
+        display: block;
     }
-    /* Abstand zwischen den Texten innerhalb der Gruppe */
+
     .evita-desktop-group .evita-text-top {
         margin-bottom: 20px; 
     }
     .evita-text-top p, 
     .evita-text-middle p {
-        margin: 0; /* Sauberer Reset */
+        margin: 0;
     }
 
-    /* Bild rechts */
     .evita-image-block {
          grid-column: 2 / 3;
          grid-row: 1 / 2; 
@@ -177,17 +164,19 @@
          justify-content: flex-end;
     }
 
-    /* Unterer Text über volle Breite */
     .evita-text-bottom {
         grid-column: 1 / 3;
         grid-row: 2 / 3;
     }
 }
 
-/* Styling für die 3. Seite - IDENTISCH zur Rückseite */
+/* =============================================
+   STYLING FÜR DIE 3. SEITE (#view-third)
+   IDENTISCH zur Rückseite (.back-face)
+   ============================================= */
+
 #view-third {
     width: 100%;
-    height: 100%;
     text-align: center;
     animation: fadeIn 0.5s ease-in-out;
     
@@ -199,14 +188,19 @@
     box-shadow: 0 20px 50px rgba(0,0,0,0.5);
     min-height: 400px;
     
-    /* Flexbox für Zentrierung wie bei .back-face */
+    /* Flexbox für Zentrierung */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
 }
 
-/* Gleiche Textfarben für #view-third wie bei .seo-content */
+/* WICHTIG: Wenn JS display:block setzt, überschreiben wir es zurück zu flex */
+#view-third[style*="display: block"],
+#view-third[style*="display:block"] {
+    display: flex !important;
+}
+
 #view-third h2 {
     color: var(--accent-color);
     margin-bottom: 20px;
@@ -222,6 +216,7 @@
 
 #view-third .evita-layout-container {
     max-width: 700px;
+    width: 100%;
 }
 
 /* Verhindert Layout-Verschiebungen beim Wechsel */
@@ -241,11 +236,11 @@
 /* === FLIP CONTROLS: Buttons links/rechts ausgerichtet === */
 .flip-controls {
     display: flex;
-    justify-content: space-between; /* Links & Rechts */
+    justify-content: space-between;
     align-items: center;
     gap: 15px;
     margin-top: 25px;
-    margin-bottom: 0; /* Kein Abstand nach unten */
+    margin-bottom: 0;
     width: 100%;
 }
 
@@ -292,7 +287,6 @@
 }
 
 /* MOBILE: Flex Layout mit Order */
-/* TRICK: display: contents löst die Desktop-Gruppe auf, damit wir sortieren können */
 @media (max-width: 768px) {
     .evita-grid-wrapper {
         display: flex;
@@ -300,18 +294,15 @@
         gap: 15px; 
     }
 
-    /* Die Gruppe existiert für Flexbox nicht mehr */
     .evita-desktop-group {
         display: contents;
     }
 
-    /* 1. "Nein, nicht der Hund..." */
     .evita-text-top {
         order: 1;
     }
     .evita-text-top p { margin: 0; }
 
-    /* 2. DAS BILD (wird hier eingeschoben) */
     .evita-image-block {
         order: 2;
         text-align: center;
@@ -322,23 +313,19 @@
         margin: 0 auto;
     }
 
-    /* 3. "Du bist hier auf..." */
     .evita-text-middle {
         order: 3;
     }
     .evita-text-middle p { margin: 0; }
 
-    /* 4. "Michael mag..." */
     .evita-text-bottom {
         order: 4;
     }
 }
 
-/* --- FINALE ANPASSUNG: Buttons & Expertise-Container --- */
+/* --- FINALE ANPASSUNG: Buttons --- */
 
-/* 1. Einheitlicher Stil & GLEICHE GRÖSSE für alle Flip-Buttons */
 .flip-btn-style {
-    /* Grund-Styling */
     background: transparent;
     border: 2px solid var(--accent-color) !important;
     color: var(--accent-color) !important;
@@ -348,21 +335,17 @@
     cursor: pointer;
     transition: all 0.3s ease;
     text-decoration: none;
-    margin: 0; /* KEIN margin - wird durch .flip-controls gesteuert */
+    margin: 0;
     
-    /* Layout & Zentrierung */
-    display: inline-flex;     /* Flexbox für perfekte Zentrierung */
-    align-items: center;      /* Vertikal zentrieren */
-    justify-content: center;  /* Horizontal zentrieren */
-    gap: 10px;                /* Abstand zwischen Text und Icon */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
     
-    /* GRÖSSEN-FIX (Hier liegt die Lösung) */
     box-sizing: border-box;
-    min-width: 240px;         /* Alle Buttons mindestens so breit */
-    height: 54px;             /* Alle Buttons EXAKT so hoch */
-    padding: 0 20px;          /* Nur seitliches Padding, Höhe kommt von 'height' */
-    
-    /* Verhindert, dass der Button durch Zeilenumbruch höher wird */
+    min-width: 240px;
+    height: 54px;
+    padding: 0 20px;
     white-space: nowrap;      
 }
 
@@ -373,10 +356,9 @@
     box-shadow: 0 5px 15px rgba(252, 181, 0, 0.3);
 }
 
-/* Optional: Mobile Anpassung, falls 240px zu breit für kleine Handys sind */
 @media (max-width: 380px) {
     .flip-btn-style {
-        min-width: 100%; /* Auf sehr kleinen Screens volle Breite nutzen */
-        height: 50px;    /* Etwas kompakter */
+        min-width: 100%;
+        height: 50px;
     }
 }
