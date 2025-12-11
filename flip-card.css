@@ -270,6 +270,29 @@
     }
 }
 
+/* === FLIP CONTROLS: Buttons links/rechts ausgerichtet === */
+.flip-controls {
+    display: flex;
+    justify-content: space-between; /* Links & Rechts */
+    align-items: center;
+    gap: 15px;
+    margin-top: 25px;
+    width: 100%;
+}
+
+/* Mobile: Buttons untereinander, volle Breite */
+@media (max-width: 768px) {
+    .flip-controls {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .flip-controls button,
+    .flip-controls .flip-btn-style {
+        width: 100%;
+        min-width: unset;
+    }
+}
+
 /* Mobile Anpassung für #view-third - IDENTISCH zu .back-face */
 @media (max-width: 768px) {
     #view-third {
