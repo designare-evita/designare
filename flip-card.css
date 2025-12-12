@@ -391,7 +391,7 @@
 @media (max-width: 768px) {
     .seo-content h2,
     #view-third h2 {
-        font-size: 1.5rem; /* Beide jetzt gleich groß */
+        font-size: 1.5rem  !important;
     }
 }
 }
