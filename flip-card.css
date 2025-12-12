@@ -395,3 +395,19 @@
     }
 }
 }
+
+
+/* 1. Container: Erlaubt Scrollen, richtet aber erst mal oben aus (wichtig!) */
+.back-face,
+#view-third {
+    justify-content: flex-start !important; /* Verhindert Abschneiden oben */
+    overflow-y: auto;
+    max-height: 80vh; /* Oder dein gewünschter Wert */
+}
+
+/* 2. Inhalt: Zentriert sich automatisch selbst */
+.back-face .seo-content,
+#view-third .evita-layout-container {
+    margin: auto; /* DAS ist der Trick für vertikale Mitte + Scroll-Sicherheit */
+    width: 100%;  /* Behält die volle Breite bei */
+}
