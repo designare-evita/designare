@@ -1,66 +1,104 @@
 /* ============================================================
-   FLIP CARD MASTER STYLESHEET (KOMPLETT ÜBERARBEITET)
-   Enthält: Animationen, Layouts für Michael & Evita,
-   Scroll-Logik und perfekte Zentrierung
+   FLIP CARD MASTER STYLESHEET (FIXED & OPTIMIZED)
+   Korrigiert: Größenlogik, Zentrierung und 3D-Achse
    ============================================================ */
 
-/* --- 1. HAUPT-CONTAINER & 3D ANIMATION --- */
+/* --- 1. HERO & CONTAINER ADJUSTMENTS --- */
 
-/* WICHTIG: Überschreibe globale Hero/Container-Styles für Flip-Container */
+/* Verhindert doppeltes Padding im Hero, wenn Flip-Card aktiv ist */
 #hero:has(.flip-container) {
-    padding-bottom: 0 !important; /* Entferne das padding-bottom wenn Flip-Container vorhanden! */
+    padding-bottom: 0 !important;
 }
 
+/* Zentriert den Flip-Container im Hero-Bereich */
 #hero .container.flip-container {
-    justify-content: center !important;
-    align-items: center !important;
-    height: 100%;
     display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100%; /* Erlaubt vertikale Zentrierung */
+    height: auto;     /* WICHTIG: Keine fixen 100% erzwingen */
+    padding: 20px;    /* Etwas Abstand zum Rand */
+    pointer-events: none; /* Klicks im leeren Bereich durchlassen */
 }
 
+/* --- 2. FLIP KARTEN STRUKTUR --- */
+
+/* Der äußere Rahmen der Karte */
 .flip-container {
-    perspective: 1200px;
+    perspective: 1200px; /* 3D-Tiefe */
     position: relative;
     z-index: 10;
     width: 100%;
-    height: 100%;
+    max-width: 850px; /* Begrenzt die Breite der Karte angenehm */
+    margin: 0 auto;   /* Zentriert horizontal */
+    pointer-events: auto; /* Karte selbst wieder klickbar machen */
 }
 
+/* Das bewegliche Element (die eigentliche Karte) */
 .flipper {
     width: 100%;
-    height: 100%;
-    transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    transform-style: preserve-3d;
+    /* WICHTIG: Definiert die physische Größe der Karte für BEIDE Seiten */
+    min-height: 550px; 
     position: relative;
+    transform-style: preserve-3d; /* Wichtig für 3D-Effekt */
+    transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    
+    /* Grid-Stacking: Legt Vorder- und Rückseite exakt übereinander */
     display: grid;
     grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
 }
 
+/* Der Flip-Trigger (durch JS gesteuert) */
 .flip-container.flipped .flipper {
     transform: rotateY(180deg);
 }
 
-.front-face, .back-face {
-    grid-area: 1 / 1 / 2 / 2;
-    backface-visibility: hidden;
+/* --- 3. VORDER- & RÜCKSEITEN (GEMEINSAME STYLES) --- */
+
+.front-face, 
+.back-face {
+    grid-area: 1 / 1 / 2 / 2; /* Beide belegen dieselbe Zelle */
     width: 100%;
-    height: 100%;
+    height: 100%;             /* Füllen den .flipper komplett aus */
+    
+    backface-visibility: hidden;         /* Versteckt die Rückseite */
+    -webkit-backface-visibility: hidden; /* Safari Fix */
+    
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    
+    border-radius: 15px; /* Rundungen für die Karte */
 }
 
+/* Spezifisch: Vorderseite */
 .front-face {
     z-index: 2;
     transform: rotateY(0deg);
+    /* Die Vorderseite ist transparent, nutzt aber den Raum des .flipper */
 }
 
+/* Spezifisch: Rückseite */
+.back-face {
+    transform: rotateY(180deg);
+    background: rgba(26, 26, 26, 0.95);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    
+    /* Scroll-Verhalten für langen Inhalt innerhalb der Karte */
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent-color) rgba(255, 255, 255, 0.1);
+}
 
-/* --- 2. VORDERSEITE: BUTTON STYLES --- */
+/* --- 4. INHALTS-STYLES (Front) --- */
 
 .info-btn-wrapper {
     width: 100%;
+    max-width: 400px; /* Button nicht zu breit werden lassen */
     margin-top: 15px;
 }
 
@@ -88,11 +126,29 @@
     transform: translateY(-2px);
 }
 
+/* --- 5. INHALTS-STYLES (Back - Michael & Evita) --- */
 
-/* --- 3. RÜCKSEITEN (MICHAEL & EVITA) - LAYOUT & SCROLLING --- */
+/* Container innerhalb der Rückseite */
+#view-second,
+#view-third {
+    width: 100%;
+    max-width: 800px;
+    padding: 40px 30px;
+    box-sizing: border-box;
+    /* Vertikale Zentrierung im Flex-Container */
+    margin-top: auto;
+    margin-bottom: auto;
+}
 
-.back-face {
-    transform: rotateY(180deg);
+/* Animation */
+#view-third {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Wenn view-third via JS eingeblendet wird, muss es Flex bleiben/werden */
+#view-third[style*="display: block"] {
+    display: flex !important;
+    flex-direction: column;
 }
 
 @keyframes fadeIn {
@@ -100,96 +156,15 @@
     to { opacity: 1; }
 }
 
-/* GLOBALE SCROLL- & ZENTRIERUNGS-LOGIK 
-   Container: .back-face UND #view-third (beide sind Container!)
-*/
-.back-face,
-#view-third {
-    /* Design Basics */
-    background: rgba(26, 26, 26, 0.95);
-    border: 1px solid var(--border-color);
-    border-radius: 15px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-    text-align: center;
-    
-    /* Größe & Scrolling */
-    width: 100%;
-    min-height: 400px;
-    max-height: 80vh;
-    overflow-y: auto;
-    overflow-x: hidden;
-    
-    /* Flexbox mit CENTER für Zentrierung */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    
-    /* KEIN padding hier! */
-    padding: 0;
-    
-    /* Scrollbar Styling */
-    scrollbar-width: thin;
-    scrollbar-color: var(--accent-color) rgba(255, 255, 255, 0.1);
-    scroll-behavior: smooth;
-}
-
-/* Die INNEREN Content-Wrapper bekommen padding und margin:auto */
-#view-second,
-#view-third > .evita-layout-container {
-    width: 100%;
-    max-width: 750px;
-    padding: 40px 20px;
-    box-sizing: border-box;
-    margin-top: auto;
-    margin-bottom: auto;
-}
-
-/* Animation für view-third bleibt */
-#view-third {
-    animation: fadeIn 0.5s ease-in-out;
-}
-
-/* Alle evita-layout-container haben kein padding */
-.evita-layout-container {
-    width: 100%;
-}
-
-/* Webkit Scrollbar Design (Chrome, Safari, Edge) */
-.back-face::-webkit-scrollbar,
-#view-third::-webkit-scrollbar {
-    width: 6px;
-}
-
-.back-face::-webkit-scrollbar-track,
-#view-third::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 3px;
-    margin: 10px 0;
-}
-
-.back-face::-webkit-scrollbar-thumb,
-#view-third::-webkit-scrollbar-thumb {
-    background-color: var(--accent-color);
-    border-radius: 3px;
-}
-
-.back-face::-webkit-scrollbar-thumb:hover,
-#view-third::-webkit-scrollbar-thumb:hover {
-    background-color: #e5a500;
-}
-
-
-/* --- 4. TYPOGRAPHIE & INHALTE --- */
-
-#view-second h2,
+/* Typografie */
+#view-second h2, 
 #view-third h2 {
     color: var(--accent-color);
     margin-bottom: 20px;
     font-size: 2rem;
 }
 
-#view-second p,
+#view-second p, 
 #view-third p {
     font-size: 1rem;
     line-height: 1.7;
@@ -197,12 +172,10 @@
     color: #e0e0e0;
 }
 
-
-/* --- 5. GRID LAYOUT (EVITA & MICHAEL INHALT) --- */
-
+/* Grid Layout für Inhalte */
 .evita-layout-container {
-    text-align: left;
     width: 100%;
+    text-align: left;
 }
 
 .evita-image-block img {
@@ -210,31 +183,23 @@
     border-radius: 8px;
     display: block;
     width: 100%;
+    max-width: 250px; /* Bildgröße begrenzen */
+    margin-left: auto; /* Rechtsbündig im Grid */
 }
 
-/* Desktop Grid Logic */
+/* Desktop Grid (ab 769px) */
 @media (min-width: 769px) {
     .evita-grid-wrapper {
         display: grid;
-        grid-template-columns: 1fr 280px;
+        grid-template-columns: 1fr 260px; /* Text links, Bild rechts */
         grid-template-rows: auto auto;
-        gap: 20px;
+        gap: 30px;
         align-items: start;
     }
 
     .evita-desktop-group {
         grid-column: 1 / 2;
         grid-row: 1 / 2;
-        display: block;
-    }
-
-    .evita-desktop-group .evita-text-top {
-        margin-bottom: 20px; 
-    }
-    
-    .evita-text-top p, 
-    .evita-text-middle p {
-        margin: 0;
     }
 
     .evita-image-block {
@@ -250,16 +215,13 @@
     }
 }
 
-
-/* --- 6. NAVIGATION BUTTONS (UNTEN) --- */
-
+/* Buttons unten */
 .flip-controls {
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 15px;
-    margin-top: 25px;
-    margin-bottom: 0;
+    margin-top: 30px;
     width: 100%;
 }
 
@@ -272,19 +234,14 @@
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    text-decoration: none;
-    margin: 0;
-    
+    padding: 0 25px;
+    height: 50px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
-    
-    box-sizing: border-box;
-    min-width: 240px;
-    height: 54px;
-    padding: 0 20px;
-    white-space: nowrap;      
+    min-width: 160px;
+    text-decoration: none;
 }
 
 .flip-btn-style:hover {
@@ -294,80 +251,87 @@
     box-shadow: 0 5px 15px rgba(252, 181, 0, 0.3);
 }
 
+/* --- 6. SCROLLBAR STYLING (Webkit) --- */
+.back-face::-webkit-scrollbar,
+#view-third::-webkit-scrollbar { 
+    width: 6px; 
+}
+.back-face::-webkit-scrollbar-track,
+#view-third::-webkit-scrollbar-track { 
+    background: rgba(255, 255, 255, 0.05); 
+}
+.back-face::-webkit-scrollbar-thumb,
+#view-third::-webkit-scrollbar-thumb { 
+    background-color: var(--accent-color); 
+    border-radius: 3px; 
+}
 
-/* --- 7. MOBILE ANPASSUNGEN (RESPONSIVE) --- */
+
+/* --- 7. RESPONSIVE / MOBILE --- */
 
 @media (max-width: 768px) {
     
-    /* 1. Schriftgrößen angleichen */
-    #view-second h2,
-    #view-third h2 {
-        font-size: 1.5rem;
-    }
-
-    /* 2. Content-Wrapper Mobile Padding */
-    #view-second,
-    #view-third > .evita-layout-container {
-        padding: 25px 15px;
+    /* Container passt sich an */
+    .flipper {
+        min-height: auto; /* Höhe flexibel machen auf Mobile */
+        height: auto;     
     }
     
-    /* 3. Container Höhe anpassen */
+    /* Rückseite bekommt max-height und Scroll */
     .back-face,
     #view-third {
-        max-height: 70vh;
+        /* WICHTIG: Auf Mobile definierte Höhe, damit gescrollt werden kann */
+        height: 75vh; 
+        max-height: 75vh;
+        min-height: unset;
+        padding: 0; /* Padding liegt im inneren Wrapper */
     }
 
-    /* 4. Grid zu Flex (Reihenfolge ändern) */
+    /* Innerer Wrapper Padding */
+    #view-second, 
+    #view-third {
+        padding: 25px 20px;
+        width: 100%;
+    }
+
+    /* Grid auflösen -> Alles untereinander */
     .evita-grid-wrapper {
         display: flex;
         flex-direction: column;
-        gap: 15px; 
+        gap: 20px;
     }
-
-    .evita-desktop-group {
-        display: contents;
-    }
-
-    .evita-text-top {
-        order: 1;
-    }
-    .evita-text-top p { margin: 0; }
-
-    .evita-image-block {
-        order: 2;
-        text-align: center;
-        margin: 0; 
+    
+    /* Reihenfolge ändern: Text oben, Bild mitte, Text unten */
+    .evita-desktop-group { display: contents; }
+    .evita-text-top { order: 1; }
+    
+    .evita-image-block { 
+        order: 2; 
+        width: 100%; 
+        display: flex; 
+        justify-content: center; 
+        margin-bottom: 5px;
     }
     .evita-image-block img {
-        width: 80%;
-        margin: 0 auto;
+        margin: 0;
+        width: 70%; 
+        max-width: 250px;
     }
+    
+    .evita-text-middle { order: 3; }
+    .evita-text-bottom { order: 4; }
 
-    .evita-text-middle {
-        order: 3;
-    }
-    .evita-text-middle p { margin: 0; }
-
-    .evita-text-bottom {
-        order: 4;
-    }
-
-    /* 5. Buttons untereinander */
+    /* Buttons untereinander */
     .flip-controls {
         flex-direction: column;
-        gap: 10px;
     }
-    .flip-controls button,
-    .flip-controls .flip-btn-style {
-        width: 100%;
-        min-width: unset;
-    }
-}
-
-/* Winzige Screens (iPhone SE etc.) */
-@media (max-width: 380px) {
     .flip-btn-style {
-        min-width: 100%;
-        height: 50px;
+        width: 100%;
+    }
+    
+    /* Schriftgröße anpassen */
+    #view-second h2, 
+    #view-third h2 {
+        font-size: 1.6rem;
     }
 }
