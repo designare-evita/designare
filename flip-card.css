@@ -1,6 +1,11 @@
-/* --- FLIP CARD DESIGN UPDATE --- */
+/* ============================================================
+   FLIP CARD MASTER STYLESheet (NEU & BEREINIGT)
+   Enthält: Animationen, Layouts für Michael & Evita,
+   Scroll-Logik und Responsive-Anpassungen.
+   ============================================================ */
 
-/* 1. Haupt-Container Logik (Bleibt gleich) */
+/* --- 1. HAUPT-CONTAINER & 3D ANIMATION --- */
+
 .flip-container {
     perspective: 1200px;
     position: relative;
@@ -24,6 +29,7 @@
     grid-area: 1 / 1 / 2 / 2;
     backface-visibility: hidden;
     width: 100%;
+    /* Flexbox-Grundlage für Zentrierung */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -35,7 +41,9 @@
     transform: rotateY(0deg);
 }
 
-/* 2. Vorderseite: Button volle Breite */
+
+/* --- 2. VORDERSEITE: BUTTON STYLES --- */
+
 .info-btn-wrapper {
     width: 100%;
     margin-top: 15px;
@@ -65,86 +73,114 @@
     transform: translateY(-2px);
 }
 
-/* 3. Rückseite: Dark Mode Style */
+
+/* --- 3. RÜCKSEITEN (MICHAEL & EVITA) - LAYOUT & SCROLLING --- */
+
 .back-face {
     transform: rotateY(180deg);
+}
+
+#view-third {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* WICHTIG: Wenn JS display:block setzt, erzwingen wir flex zurück */
+#view-third[style*="display: block"],
+#view-third[style*="display:block"] {
+    display: flex !important;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* GLOBALE SCROLL- & ZENTRIERUNGS-LOGIK 
+   Gilt für .back-face (Evita) und #view-third (Michael) 
+*/
+.back-face,
+#view-third {
+    /* Design Basics */
     background: rgba(26, 26, 26, 0.95);
     border: 1px solid var(--border-color);
     border-radius: 15px;
-    padding: 40px;
-    text-align: center;
     box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    text-align: center;
+    
+    /* Größe & Scrolling */
+    height: 100%; 
     min-height: 400px;
-}
-
-.seo-content { 
-    max-width: 750px; 
-    width: 100%;
-}
-.seo-content h2 { color: var(--accent-color); margin-bottom: 20px; font-size: 2rem; }
-.seo-content p { font-size: 1rem; line-height: 1.7; margin-bottom: 20px; color: #e0e0e0; }
-
-/* Legacy Button Style - nur für Kompatibilität */
-#flip-back-btn {
-    margin: 0;
-}
-
-/* =========================================
-   GLOBALER SCROLLBAR-STYLE (.back-face & #view-third)
-   Aktiviert den dezenten Scrollbalken für alle Geräte
-   ========================================= */
-
-.back-face,
-#view-third {
-    /* 1. Scroll-Verhalten aktivieren */
-    max-height: 80vh;  /* Begrenzt die Höhe auf 80% des Viewports, damit Scrollen möglich ist */
-    overflow-y: auto;  /* Aktiviert das vertikale Scrollen bei Bedarf */
+    max-height: 80vh; /* Begrenzung auf 80% des Viewports */
+    overflow-y: auto; /* Scrollen erlauben */
     
-    /* WICHTIG für Flexbox-Scrolling: 
-       'flex-start' verhindert, dass Inhalte oben abgeschnitten werden, wenn gescrollt wird.
-       Falls du kurze Inhalte vertikal zentriert haben willst, nutze 'safe center' (wenn unterstützt) oder margin-auto im Child.
-    */
-    justify-content: flex-start !important; 
+    /* Flexbox Layout für internen Content */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start !important; /* Wichtig: Startet oben, damit Scrollen geht */
     
-    /* 2. Firefox Scrollbar Design */
+    /* KEIN padding hier - wird auf Content verschoben! */
+    padding: 0;
+    
+    /* Firefox Scrollbar Style */
     scrollbar-width: thin;
     scrollbar-color: var(--accent-color) rgba(255, 255, 255, 0.1);
-    
-    /* 3. Weiches Scrollen */
     scroll-behavior: smooth;
 }
 
-/* 4. Webkit Scrollbar Design (Chrome, Safari, Edge, Opera) */
+/* DER TRICK FÜR ZENTRIERUNG:
+   Der innere Content-Wrapper bekommt margin: auto.
+   - Kurzer Text -> Automatisch vertikal zentriert
+   - Langer Text -> Scrollbar erscheint, Text startet oben
+*/
+.seo-content,
+#view-third .evita-layout-container {
+    margin: auto; /* Magie: Zentriert in alle Richtungen wenn Platz da ist */
+    width: 100%;
+    max-width:750px; /* Deine gewünschte Breite (+100px) */
+    padding: 40px 20px; /* Padding HIER statt am Container - wichtig für Zentrierung! */
+}
 
-/* Breite des Scrollbalkens */
+/* Webkit Scrollbar Design (Chrome, Safari, Edge) */
 .back-face::-webkit-scrollbar,
 #view-third::-webkit-scrollbar {
     width: 6px;
 }
-
-/* Hintergrund der Scrollleiste */
 .back-face::-webkit-scrollbar-track,
 #view-third::-webkit-scrollbar-track {
     background: rgba(255, 255, 255, 0.05);
     border-radius: 3px;
-    margin: 10px 0; /* Etwas Abstand oben/unten */
+    margin: 10px 0;
 }
-
-/* Der schiebbare Balken (Daumen) */
 .back-face::-webkit-scrollbar-thumb,
 #view-third::-webkit-scrollbar-thumb {
     background-color: var(--accent-color);
     border-radius: 3px;
 }
-
-/* Hover-Effekt für den Balken */
 .back-face::-webkit-scrollbar-thumb:hover,
 #view-third::-webkit-scrollbar-thumb:hover {
-    background-color: #e5a500; /* Etwas heller/dunkler beim Drüberfahren */
+    background-color: #e5a500;
 }
 
 
-/* --- EVITA LAYOUT LOGIC (DESKTOP & MOBILE) --- */
+/* --- 4. TYPOGRAPHIE & INHALTE --- */
+
+.seo-content h2,
+#view-third h2 {
+    color: var(--accent-color);
+    margin-bottom: 20px;
+    font-size: 2rem;
+}
+
+.seo-content p,
+#view-third p {
+    font-size: 1rem;
+    line-height: 1.7;
+    margin-bottom: 20px;
+    color: #e0e0e0;
+}
+
+
+/* --- 5. GRID LAYOUT (EVITA & MICHAEL INHALT) --- */
 
 .evita-layout-container {
     text-align: left;
@@ -158,7 +194,7 @@
     width: 100%;
 }
 
-/* DESKTOP: Grid Layout */
+/* Desktop Grid Logic */
 @media (min-width: 769px) {
     .evita-grid-wrapper {
         display: grid;
@@ -177,6 +213,7 @@
     .evita-desktop-group .evita-text-top {
         margin-bottom: 20px; 
     }
+    
     .evita-text-top p, 
     .evita-text-middle p {
         margin: 0;
@@ -195,70 +232,9 @@
     }
 }
 
-/* =============================================
-   STYLING FÜR DIE 3. SEITE (#view-third)
-   IDENTISCH zur Rückseite (.back-face)
-   ============================================= */
 
-#view-third {
-    width: 100%;
-    text-align: center;
-    animation: fadeIn 0.5s ease-in-out;
-    
-    /* === GLEICHE STYLES WIE .back-face === */
-    background: rgba(26, 26, 26, 0.95);
-    border: 1px solid var(--border-color);
-    border-radius: 15px;
-    padding: 40px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-    min-height: 400px;
-    
-    /* Flexbox für Zentrierung */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
+/* --- 6. NAVIGATION BUTTONS (UNTEN) --- */
 
-/* WICHTIG: Wenn JS display:block setzt, überschreiben wir es zurück zu flex */
-#view-third[style*="display: block"],
-#view-third[style*="display:block"] {
-    display: flex !important;
-}
-
-#view-third h2 {
-    color: var(--accent-color);
-    margin-bottom: 20px;
-    font-size: 2rem;
-}
-
-#view-third p {
-    font-size: 1rem;
-    line-height: 1.7;
-    margin-bottom: 20px;
-    color: #e0e0e0;
-}
-
-#view-third .evita-layout-container {
-    max-width: 750px;
-    width: 100%;
-}
-
-/* Verhindert Layout-Verschiebungen beim Wechsel */
-.face-content-wrapper {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-/* === FLIP CONTROLS: Buttons links/rechts ausgerichtet === */
 .flip-controls {
     display: flex;
     justify-content: space-between;
@@ -269,50 +245,55 @@
     width: 100%;
 }
 
-/* Mobile: Buttons untereinander, volle Breite */
-@media (max-width: 768px) {
-    .flip-controls {
-        flex-direction: column;
-        gap: 10px;
-    }
-    .flip-controls button,
-    .flip-controls .flip-btn-style {
-        width: 100%;
-        min-width: unset;
-    }
+.flip-btn-style {
+    background: transparent;
+    border: 2px solid var(--accent-color) !important;
+    color: var(--accent-color) !important;
+    border-radius: 7px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    margin: 0;
+    
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    
+    box-sizing: border-box;
+    min-width: 240px;
+    height: 54px;
+    padding: 0 20px;
+    white-space: nowrap;      
 }
 
-/* Mobile Anpassung für #view-third - IDENTISCH zu .back-face */
+.flip-btn-style:hover {
+    background-color: var(--accent-color) !important;
+    color: #fff !important;
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(252, 181, 0, 0.3);
+}
+
+
+/* --- 7. MOBILE ANPASSUNGEN (RESPONSIVE) --- */
+
 @media (max-width: 768px) {
-    #view-third {
-        padding: 20px 15px;
-        max-height: 65vh;
-        overflow-y: auto;
-        justify-content: flex-start;
-        scroll-behavior: smooth;
-        scrollbar-width: thin;
-        scrollbar-color: var(--accent-color) rgba(255, 255, 255, 0.1);
-    }
     
+    /* 1. Schriftgrößen angleichen */
+    .seo-content h2,
     #view-third h2 {
-        font-size: 1.5rem;
+        font-size: 1.5rem; /* Beide jetzt gleich groß */
     }
-    
-    #view-third::-webkit-scrollbar {
-        width: 6px;
-    }
-    #view-third::-webkit-scrollbar-track {
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 3px;
-    }
-    #view-third::-webkit-scrollbar-thumb {
-        background-color: var(--accent-color);
-        border-radius: 3px;
-    }
-}
 
-/* MOBILE: Flex Layout mit Order */
-@media (max-width: 768px) {
+    /* 2. Content-Wrapper Mobile Padding - NICHT am Container! */
+    .seo-content,
+    #view-third .evita-layout-container {
+        padding: 20px 15px; /* Etwas mehr Rand auf Mobile */
+    }
+
+    /* 3. Grid zu Flex (Reihenfolge ändern) */
     .evita-grid-wrapper {
         display: flex;
         flex-direction: column;
@@ -320,7 +301,7 @@
     }
 
     .evita-desktop-group {
-        display: contents;
+        display: contents; /* Löst den Gruppen-Div auf */
     }
 
     .evita-text-top {
@@ -334,7 +315,7 @@
         margin: 0; 
     }
     .evita-image-block img {
-        width: 80%;
+        width: 80%; /* Bild nicht ganz so riesig auf Mobile */
         margin: 0 auto;
     }
 
@@ -346,68 +327,23 @@
     .evita-text-bottom {
         order: 4;
     }
+
+    /* 4. Buttons untereinander */
+    .flip-controls {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .flip-controls button,
+    .flip-controls .flip-btn-style {
+        width: 100%;
+        min-width: unset;
+    }
 }
 
-/* --- FINALE ANPASSUNG: Buttons --- */
-
-.flip-btn-style {
-    background: transparent;
-    border: 1.5px solid var(--accent-color) !important;
-    color: var(--accent-color) !important;
-    border-radius: 7px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    margin: 0;
-    
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    
-    box-sizing: border-box;
-    min-width: 240px;
-    height: 50px;
-    padding: 0 20px;
-    white-space: nowrap;      
-}
-
-.flip-btn-style:hover {
-    background-color: var(--accent-color) !important;
-    color: #fff !important;
-    transform: scale(1.05);
-    box-shadow: 0 5px 15px rgba(252, 181, 0, 0.3);
-}
-
+/* Winzige Screens (iPhone SE etc.) */
 @media (max-width: 380px) {
     .flip-btn-style {
         min-width: 100%;
         height: 50px;
     }
-
-    /* Einheitliche Schriftgröße für h2 auf Mobilgeräten */
-@media (max-width: 768px) {
-    .seo-content h2,
-    #view-third h2 {
-        font-size: 1.5rem  !important;
-    }
-}
-}
-
-
-/* 1. Container: Erlaubt Scrollen, richtet aber erst mal oben aus (wichtig!) */
-.back-face,
-#view-third {
-    justify-content: flex-start !important; /* Verhindert Abschneiden oben */
-    overflow-y: auto;
-    max-height: 80vh; /* Oder dein gewünschter Wert */
-}
-
-/* 2. Inhalt: Zentriert sich automatisch selbst */
-.back-face .seo-content,
-#view-third .evita-layout-container {
-    margin: auto; /* DAS ist der Trick für vertikale Mitte + Scroll-Sicherheit */
-    width: 100%;  /* Behält die volle Breite bei */
 }
