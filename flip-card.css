@@ -150,6 +150,8 @@
     max-width: 750px;
     padding: 40px 20px;
     box-sizing: border-box;
+    margin-top: auto;
+    margin-bottom: auto;
 }
 
 /* #view-third IST selbst der Container, sein direktes Kind bekommt das padding */
@@ -158,6 +160,8 @@
     max-width: 750px;
     padding: 40px 20px;
     box-sizing: border-box;
+    margin-top: auto;
+    margin-bottom: auto;
 }
 
 /* Alle anderen evita-layout-container haben kein padding */
