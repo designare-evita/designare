@@ -881,3 +881,29 @@ footer a:hover {
     font-size: 0.85rem;
     color: #aaa;
 }
+
+/* --- TRANSPARENTER HEADER & HERO FIX --- */
+
+/* 1. Header durchsichtig machen */
+.main-header {
+    background-color: transparent !important; /* Entfernt die Farbe */
+    background: none !important;
+    box-shadow: none; /* Entfernt eventuelle Schattenkanten */
+}
+
+/* 2. Hero-Bereich nach oben schieben, damit er hinter dem Header liegt */
+#hero {
+    margin-top: 0 !important; /* WICHTIG: Schiebt den Bereich unter den Header */
+    height: 100vh !important; /* Nutzt jetzt die volle Bildschirmhöhe */
+    
+    /* Damit der Inhalt nicht zu weit oben klebt (falls nötig, anpassen) */
+    /* padding-top: var(--header-height-desktop); */ 
+}
+
+/* Mobile Anpassung: Auch hier volle Höhe und kein Abstand */
+@media (max-width: 768px) {
+    #hero {
+        margin-top: 0 !important;
+        height: 100vh !important;
+    }
+}
