@@ -149,13 +149,6 @@
     animation: fadeIn 0.5s ease-in-out;
 }
 
-/* WICHTIG: Wenn JS display:block setzt */
-#view-third[style*="display: block"],
-#view-third[style*="display:block"] {
-    display: flex !important;
-    flex-direction: column;
-}
-
 /* Alle evita-layout-container haben kein padding */
 .evita-layout-container {
     width: 100%;
