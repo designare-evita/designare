@@ -78,7 +78,7 @@
 }
 
 .seo-content { 
-    max-width: 800px; 
+    max-width: 750px; 
     width: 100%;
 }
 .seo-content h2 { color: var(--accent-color); margin-bottom: 20px; font-size: 2rem; }
@@ -240,7 +240,7 @@
 }
 
 #view-third .evita-layout-container {
-    max-width: 800px;
+    max-width: 750px;
     width: 100%;
 }
 
@@ -352,10 +352,10 @@
 
 .flip-btn-style {
     background: transparent;
-    border: 2px solid var(--accent-color) !important;
+    border: 1.5px solid var(--accent-color) !important;
     color: var(--accent-color) !important;
     border-radius: 7px;
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
