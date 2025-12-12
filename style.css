@@ -897,7 +897,6 @@ footer a:hover {
     height: 100vh !important; /* Nutzt jetzt die volle Bildschirmhöhe */
     
     /* Damit der Inhalt nicht zu weit oben klebt (falls nötig, anpassen) */
-    /* padding-top: var(--header-height-desktop); */ 
 }
 
 /* Mobile Anpassung: Auch hier volle Höhe und kein Abstand */
