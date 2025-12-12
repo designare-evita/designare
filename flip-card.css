@@ -386,4 +386,12 @@
         min-width: 100%;
         height: 50px;
     }
+
+    /* Einheitliche Schriftgröße für h2 auf Mobilgeräten */
+@media (max-width: 768px) {
+    .seo-content h2,
+    #view-third h2 {
+        font-size: 1.5rem; /* Beide jetzt gleich groß */
+    }
+}
 }
