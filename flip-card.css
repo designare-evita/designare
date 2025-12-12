@@ -1,5 +1,6 @@
 /* ============================================================
-   FLIP CARD MASTER STYLESHEET (FIXED - NO POINTER EVENTS)
+   FLIP CARD MASTER STYLESHEET (FINAL POLISH)
+   Michael höher gesetzt, Button 100%, Klickbar & Zentriert
    ============================================================ */
 
 /* --- 1. HERO & CONTAINER ADJUSTMENTS --- */
@@ -27,7 +28,7 @@
     position: relative;
     z-index: 10;
     width: 100%;
-    max-width: 850px; /* Begrenzt die Breite */
+    max-width: 850px; /* Begrenzt die Breite der Karte */
     margin: 0 auto;
 }
 
@@ -97,7 +98,7 @@
 
 .info-btn-wrapper {
     width: 100%;
-    max-width: 400px;
+    /* Button volle Breite */
     margin-top: 15px;
     position: relative;
     z-index: 10; /* Extra Sicherheit für Klickbarkeit */
@@ -130,19 +131,25 @@
 
 /* --- 5. RÜCKSEITE INHALTE (MICHAEL & EVITA) --- */
 
-/* Content Container */
+/* Gemeinsame Basis-Styles */
 #view-second,
 #view-third {
     width: 100%;
     max-width: 800px;
-    padding: 40px 30px;
     box-sizing: border-box;
     margin-top: auto;
     margin-bottom: auto;
 }
 
-/* Animation */
+/* EVITA (View Second) - Standard Padding */
+#view-second {
+    padding: 40px 30px;
+}
+
+/* MICHAEL (View Third) - Angepasstes Padding (weniger oben) */
 #view-third {
+    /* Oben nur 15px statt 40px, damit Michael höher rutscht */
+    padding: 15px 30px 40px 30px; 
     animation: fadeIn 0.5s ease-in-out;
 }
 
