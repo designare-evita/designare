@@ -111,7 +111,7 @@
 }
 
 /* GLOBALE SCROLL- & ZENTRIERUNGS-LOGIK 
-   Gilt für .back-face (Evita) und #view-third (Michael) 
+   Container: .back-face und #view-third
 */
 .back-face,
 #view-third {
@@ -129,11 +129,11 @@
     overflow-y: auto;
     overflow-x: hidden;
     
-    /* WICHTIG: Flexbox mit CENTER für Zentrierung */
+    /* Flexbox mit CENTER für Zentrierung */
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center; /* CENTER statt flex-start! */
+    justify-content: center;
     
     /* KEIN padding hier! */
     padding: 0;
@@ -144,17 +144,23 @@
     scroll-behavior: smooth;
 }
 
-/* ÄUSSERE WRAPPER - beide bekommen margin:auto + padding */
-.seo-content,
-#view-third {
-    margin: auto;
+/* INNERE WRAPPER - bekommen das padding und max-width */
+.seo-content {
     width: 100%;
     max-width: 750px;
     padding: 40px 20px;
     box-sizing: border-box;
 }
 
-/* INNERE Container - kein zusätzliches padding */
+/* #view-third IST selbst der Container, sein direktes Kind bekommt das padding */
+#view-third > .evita-layout-container {
+    width: 100%;
+    max-width: 750px;
+    padding: 40px 20px;
+    box-sizing: border-box;
+}
+
+/* Alle anderen evita-layout-container haben kein padding */
 .evita-layout-container {
     width: 100%;
 }
@@ -309,9 +315,9 @@
         font-size: 1.5rem;
     }
 
-    /* 2. Content-Wrapper Mobile Padding - ÄUẞERE Wrapper */
+    /* 2. Content-Wrapper Mobile Padding */
     .seo-content,
-    #view-third {
+    #view-third > .evita-layout-container {
         padding: 25px 15px;
     }
     
