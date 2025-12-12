@@ -6,7 +6,11 @@
 
 /* --- 1. HAUPT-CONTAINER & 3D ANIMATION --- */
 
-/* WICHTIG: Überschreibe globale Container-Styles für Flip-Container */
+/* WICHTIG: Überschreibe globale Hero/Container-Styles für Flip-Container */
+#hero:has(.flip-container) {
+    padding-bottom: 0 !important; /* Entferne das padding-bottom wenn Flip-Container vorhanden! */
+}
+
 #hero .container.flip-container {
     justify-content: center !important;
     align-items: center !important;
