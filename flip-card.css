@@ -144,29 +144,19 @@
     scroll-behavior: smooth;
 }
 
-/* Content-Wrapper ohne margin-auto, da Container bereits zentriert */
-.seo-content {
-    margin: auto; /* WICHTIG: seo-content braucht auch margin: auto! */
-    width: 100%;
-    max-width: 750px;
-    padding: 0; /* Kein Padding hier - wird im inneren Container gesetzt */
-    box-sizing: border-box;
-    flex-shrink: 0;
-}
-
-#view-third .evita-layout-container {
+/* ÄUSSERE WRAPPER - beide bekommen margin:auto + padding */
+.seo-content,
+#view-third {
+    margin: auto;
     width: 100%;
     max-width: 750px;
     padding: 40px 20px;
     box-sizing: border-box;
-    flex-shrink: 0;
 }
 
-/* WICHTIG: Der innere Container in .seo-content bekommt das Padding! */
-.seo-content .evita-layout-container {
+/* INNERE Container - kein zusätzliches padding */
+.evita-layout-container {
     width: 100%;
-    padding: 40px 20px;
-    box-sizing: border-box;
 }
 
 /* Webkit Scrollbar Design (Chrome, Safari, Edge) */
@@ -319,9 +309,9 @@
         font-size: 1.5rem;
     }
 
-    /* 2. Content-Wrapper Mobile Padding */
-    .seo-content .evita-layout-container,
-    #view-third .evita-layout-container {
+    /* 2. Content-Wrapper Mobile Padding - ÄUẞERE Wrapper */
+    .seo-content,
+    #view-third {
         padding: 25px 15px;
     }
     
