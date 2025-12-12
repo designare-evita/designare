@@ -123,12 +123,13 @@
     min-height: 400px;
     max-height: 80vh;
     overflow-y: auto;
+    overflow-x: hidden;
     
-    /* WICHTIG: Flexbox mit flex-start für Scroll-Funktionalität */
+    /* WICHTIG: Flexbox mit CENTER für Zentrierung */
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center; /* CENTER statt flex-start! */
     
     /* KEIN padding hier! */
     padding: 0;
@@ -139,17 +140,14 @@
     scroll-behavior: smooth;
 }
 
-/* DER TRICK FÜR PERFEKTE ZENTRIERUNG:
-   Der innere Content-Wrapper bekommt margin: auto
-   Das zentriert den Content vertikal UND ermöglicht Scrollen wenn nötig
-*/
+/* Content-Wrapper ohne margin-auto, da Container bereits zentriert */
 .seo-content,
 #view-third .evita-layout-container {
-    margin: auto 0; /* Nur vertikal auto, horizontal 0 */
     width: 100%;
     max-width: 750px;
     padding: 40px 20px;
     box-sizing: border-box;
+    flex-shrink: 0; /* Verhindert dass Content schrumpft */
 }
 
 /* Webkit Scrollbar Design (Chrome, Safari, Edge) */
