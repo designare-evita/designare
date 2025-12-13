@@ -293,7 +293,8 @@
     /* Header-Abstand für Mobile & Fix der Zentrierung */
     #hero:has(.flip-container) {
         align-items: flex-start !important; /* Auch hier wichtig */
-        padding-top: 30px !important;       /* Abstand Mobile */
+        padding-top: 20px !important; 
+        padding-bottom: 20px !important;
         min-height: calc(100vh - 65px);
     }
     
