@@ -1,67 +1,68 @@
 /* ============================================================
-   FLIP CARD MASTER STYLESHEET (FINAL POLISH)
-   Michael höher gesetzt, Button 100%, Klickbar & Zentriert
+   FLIP CARD MASTER STYLESHEET (FINAL FIXED VERSION)
+   Status: Klickbar, Zentriert, Symmetrisch, Layout-Safe
    ============================================================ */
 
-/* --- 1. HERO & CONTAINER ADJUSTMENTS --- */
+/* --- 1. HERO & CONTAINER FIXES --- */
 
-/* Verhindert doppeltes Padding im Hero */
+/* Verhindert Layout-Verschiebungen im Hero-Bereich */
 #hero:has(.flip-container) {
     padding-bottom: 0 !important;
+    overflow: visible !important; /* Wichtig für 3D-Effekte */
 }
 
-/* Zentriert den Flip-Container im Hero-Bereich */
+/* Zentriert die Karte perfekt, ohne die Seite zu sprengen */
 #hero .container.flip-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    /* WICHTIG: Erlaubt dem Container zu wachsen, aber zentriert ihn */
-    min-height: 100%; 
-    height: auto;     
+    min-height: 600px; /* Mindesthöhe für Desktop */
+    height: auto;
     padding: 20px;
+    box-sizing: border-box;
 }
 
 /* --- 2. FLIP KARTEN STRUKTUR --- */
 
 .flip-container {
-    perspective: 1200px; /* 3D-Tiefe */
+    perspective: 1200px; /* Die 3D-Tiefe */
     position: relative;
     z-index: 10;
     width: 100%;
-    max-width: 850px; /* Begrenzt die Breite der Karte */
+    max-width: 850px;
     margin: 0 auto;
 }
 
-/* Die bewegliche Karte */
+/* Die bewegliche Karte - definiert die Größe für BEIDE Seiten */
 .flipper {
     width: 100%;
-    /* WICHTIG: Hier die Mindesthöhe der Karte definieren */
-    min-height: 550px; 
+    min-height: 550px; /* Fixe Mindesthöhe verhindert Springen */
     position: relative;
     transform-style: preserve-3d;
     transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     
-    /* Grid: Legt Vorder- und Rückseite exakt übereinander */
+    /* Grid sorgt dafür, dass Front & Back exakt übereinander liegen */
     display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: 1fr;
 }
 
-/* Der Flip-Status (durch JS gesteuert) */
+/* Der Flip-Status (wird per JS getoggelt) */
 .flip-container.flipped .flipper {
     transform: rotateY(180deg);
 }
 
-/* --- 3. VORDER- & RÜCKSEITEN (Allgemein) --- */
+/* --- 3. VORDER- & RÜCKSEITEN (GEMEINSAME LOGIK) --- */
 
 .front-face, 
 .back-face {
-    grid-area: 1 / 1 / 2 / 2; /* Stapeln */
+    grid-area: 1 / 1 / 2 / 2; /* Beide belegen denselben Platz */
     width: 100%;
-    height: 100%;             /* Füllen den Flipper aus */
+    height: 100%;
     
-    backface-visibility: hidden;         /* Versteckt Rückseite beim Drehen */
-    -webkit-backface-visibility: hidden; /* Safari Fix */
+    /* WICHTIG: Versteckt die Rückseite beim Drehen */
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
     
     display: flex;
     flex-direction: column;
@@ -74,34 +75,36 @@
 
 /* Spezifisch: Vorderseite */
 .front-face {
-    z-index: 2; /* Sicherstellen, dass die Front oben liegt */
+    z-index: 2;
     transform: rotateY(0deg);
+    pointer-events: none; /* Lässt Klicks durch leere Bereiche durch */
 }
 
 /* Spezifisch: Rückseite */
 .back-face {
-    z-index: 1;
     transform: rotateY(180deg);
-    
     background: rgba(26, 26, 26, 0.95);
     border: 1px solid var(--border-color);
     box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-    
-    /* Scrollen erlauben */
-    overflow-y: auto;
+    overflow-y: auto; /* Scrollbar falls Inhalt zu lang */
     overflow-x: hidden;
-    scrollbar-width: thin;
-    scrollbar-color: var(--accent-color) rgba(255, 255, 255, 0.1);
+    z-index: 1;
+    pointer-events: auto; /* Rückseite muss interagierbar sein */
 }
 
-/* --- 4. BUTTONS AUF DER VORDERSEITE --- */
+/* --- 4. INTERAKTIVE ELEMENTE (VORDERSEITE) --- */
+
+/* Damit der Button und das Formular klickbar bleiben */
+.ai-container, 
+.info-btn-wrapper {
+    pointer-events: auto; /* Re-aktiviert Klicks */
+    position: relative;
+    z-index: 10;
+    width: 100%;
+}
 
 .info-btn-wrapper {
-    width: 100%;
-    /* Button volle Breite */
     margin-top: 15px;
-    position: relative;
-    z-index: 10; /* Extra Sicherheit für Klickbarkeit */
 }
 
 #flip-info-btn {
@@ -118,8 +121,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    outline: none;
-    pointer-events: auto; /* Explizit aktivieren */
 }
 
 #flip-info-btn:hover {
@@ -129,30 +130,25 @@
     transform: translateY(-2px);
 }
 
-/* --- 5. RÜCKSEITE INHALTE (MICHAEL & EVITA) --- */
+/* --- 5. INHALTE DER RÜCKSEITE (MICHAEL & EVITA) --- */
 
-/* Gemeinsame Basis-Styles */
 #view-second,
 #view-third {
     width: 100%;
     max-width: 800px;
     box-sizing: border-box;
-    margin-top: auto;
-    margin-bottom: auto;
+    margin: auto 0; /* Vertikal zentriert */
 }
 
-/* EVITA (View Second) - Standard Padding */
-#view-second {
-    padding: 40px 30px;
-}
+/* Padding-Anpassung: Michael etwas höher */
+#view-second { padding: 40px 30px; }
+#view-third  { padding: 20px 30px 40px 30px; }
 
-/* MICHAEL (View Third) - Angepasstes Padding (weniger oben) */
 #view-third {
-    /* Oben nur 15px statt 40px, damit Michael höher rutscht */
-    padding: 15px 30px 40px 30px; 
     animation: fadeIn 0.5s ease-in-out;
 }
 
+/* Stellt sicher, dass JS-Display-Wechsel das Flex-Layout nicht brechen */
 #view-third[style*="display: block"] {
     display: flex !important;
     flex-direction: column;
@@ -164,33 +160,27 @@
 }
 
 /* Typografie */
-#view-second h2, 
-#view-third h2 {
+#view-second h2, #view-third h2 {
     color: var(--accent-color);
     margin-bottom: 20px;
     font-size: 2rem;
 }
 
-#view-second p, 
-#view-third p {
+#view-second p, #view-third p {
     font-size: 1rem;
     line-height: 1.7;
-    margin-bottom: 20px;
     color: #e0e0e0;
+    margin-bottom: 20px;
 }
 
-/* Grid Layout */
-.evita-layout-container {
-    width: 100%;
-    text-align: left;
-}
-
+/* Grid Layout für Desktop */
+.evita-layout-container { width: 100%; text-align: left; }
 .evita-image-block img {
+    width: 100%;
+    max-width: 250px;
     height: auto;
     border-radius: 8px;
     display: block;
-    width: 100%;
-    max-width: 250px;
     margin-left: auto;
 }
 
@@ -202,24 +192,15 @@
         gap: 30px;
         align-items: start;
     }
-
     .evita-desktop-group { grid-column: 1 / 2; grid-row: 1 / 2; }
-    
-    .evita-image-block {
-         grid-column: 2 / 3;
-         grid-row: 1 / 2; 
-         display: flex;
-         justify-content: flex-end;
-    }
-
-    .evita-text-bottom { grid-column: 1 / 3; grid-row: 2 / 3; }
+    .evita-image-block   { grid-column: 2 / 3; grid-row: 1 / 2; display: flex; justify-content: flex-end; }
+    .evita-text-bottom   { grid-column: 1 / 3; grid-row: 2 / 3; }
 }
 
 /* Footer Buttons */
 .flip-controls {
     display: flex;
     justify-content: space-between;
-    align-items: center;
     gap: 15px;
     margin-top: 30px;
     width: 100%;
@@ -233,74 +214,62 @@
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
     padding: 0 25px;
     height: 50px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
-    min-width: 160px;
     text-decoration: none;
-    pointer-events: auto;
+    transition: all 0.3s ease;
 }
 
 .flip-btn-style:hover {
     background-color: var(--accent-color) !important;
     color: #fff !important;
     transform: scale(1.05);
-    box-shadow: 0 5px 15px rgba(252, 181, 0, 0.3);
 }
-
-/* Scrollbars */
-.back-face::-webkit-scrollbar, #view-third::-webkit-scrollbar { width: 6px; }
-.back-face::-webkit-scrollbar-track, #view-third::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); }
-.back-face::-webkit-scrollbar-thumb, #view-third::-webkit-scrollbar-thumb { background-color: var(--accent-color); border-radius: 3px; }
-
 
 /* --- 6. MOBILE RESPONSIVE --- */
 
 @media (max-width: 768px) {
-    .flipper {
-        min-height: auto; 
-        height: auto;     
-    }
+    .flipper { min-height: auto; }
     
-    .back-face, #view-third {
-        height: 75vh; 
+    .back-face {
+        height: 75vh;
         max-height: 75vh;
-        min-height: unset;
-        padding: 0; 
+        padding: 0;
     }
 
-    #view-second, #view-third {
-        padding: 25px 20px;
-        width: 100%;
-    }
-
-    .evita-grid-wrapper {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-    }
+    #view-second, #view-third { padding: 25px 20px; }
+    
+    .evita-grid-wrapper { display: flex; flex-direction: column; gap: 20px; }
     
     .evita-desktop-group { display: contents; }
     .evita-text-top { order: 1; }
-    
-    .evita-image-block { 
-        order: 2; 
-        width: 100%; 
-        display: flex; 
-        justify-content: center; 
-        margin-bottom: 5px;
-    }
-    .evita-image-block img { width: 70%; max-width: 250px; margin: 0; }
-    
+    .evita-image-block { order: 2; margin: 0 auto; }
     .evita-text-middle { order: 3; }
     .evita-text-bottom { order: 4; }
-
+    
     .flip-controls { flex-direction: column; }
     .flip-btn-style { width: 100%; }
-    
-    #view-second h2, #view-third h2 { font-size: 1.6rem; }
+}
+
+/* LIGHTBOX SAFETY FIX */
+#modal-container, 
+.modal-overlay {
+    z-index: 9999 !important; /* Muss höher sein als alles 3D */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transform: translateZ(0); /* Fix für manche Browser Rendering-Fehler */
+}
+
+/* Verhindert, dass !important Regeln der Suche andere Modals zerstören */
+.modal-content:not(.search-modal-content) {
+    height: auto !important;
+    display: block !important;
+    overflow: visible !important;
 }
