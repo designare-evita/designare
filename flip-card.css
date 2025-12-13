@@ -5,20 +5,20 @@
 
 /* --- 1. HERO & CONTAINER --- */
 
-/* WICHTIG: Wir müssen die Zentrierung aus der style.css aufheben! */
+/* Zentrierung aus style.css aufheben & Abstand setzen */
 #hero:has(.flip-container) {
-    align-items: flex-start !important; /* Schiebt den Inhalt nach oben statt in die Mitte */
-    padding-top: 60px !important;       /* Der neue Abstand nach oben (Desktop) */
+    align-items: flex-start !important; /* Wichtig: Oben anfangen, nicht mittig */
+    padding-top: 60px !important;       /* Abstand Desktop */
     padding-bottom: 40px !important;    
-    height: auto !important;            /* Wichtig für Mobile: Container darf wachsen */
-    min-height: calc(100vh - 80px);     /* Füllt mindestens den Screen */
+    height: auto !important;            
+    min-height: calc(100vh - 80px);     /* Mindestens Screen-Höhe */
 }
 
 #hero .container.flip-container {
     display: flex;
     justify-content: center;
-    align-items: center; /* Zentriert die Karte horizontal */
-    min-height: unset;   /* Reset alter Styles */
+    align-items: center;
+    min-height: unset;
     height: auto;     
     padding: 0 20px; 
 }
@@ -162,6 +162,11 @@
     text-align: left;
 }
 
+/* NEU: Klasse für die weißen Textteile */
+.flip-header-white {
+    color: #ffffff !important;
+}
+
 .flip-panel p {
     font-size: 1rem;
     line-height: 1.7;
@@ -285,9 +290,10 @@
 
 @media (max-width: 768px) {
     
-    
+    /* Header-Abstand für Mobile & Fix der Zentrierung */
     #hero:has(.flip-container) {
-        padding-top: 30px !important;   /* Der neue Abstand nach oben (Mobile) */
+        align-items: flex-start !important; /* Auch hier wichtig */
+        padding-top: 30px !important;       /* Abstand Mobile */
         min-height: calc(100vh - 65px);
     }
     
@@ -303,19 +309,19 @@
     
     /* WICHTIG: Keine fixe Höhe mehr - Content bestimmt Höhe */
     .flip-panel {
-        height: auto;          /* Statt 75vh */
-        max-height: 80vh;      /* Aber maximal 80% vom Viewport */
+        height: auto;          
+        max-height: 80vh;      
         min-height: unset;
     }
 
     .flip-panel-content {
-        padding: 20px 15px 25px 15px; /* Etwas kompakter */
+        padding: 20px 15px 25px 15px; 
     }
 
     .evita-grid-wrapper {
         display: flex;
         flex-direction: column;
-        gap: 15px; /* Etwas weniger Gap */
+        gap: 15px; 
     }
     
     .evita-desktop-group { 
@@ -333,7 +339,7 @@
     }
     
     .evita-image-block img { 
-        width: 60%;  /* Etwas kleiner auf Mobile */
+        width: 60%;  
         max-width: 200px; 
         margin: 0; 
     }
@@ -343,12 +349,12 @@
 
     .flip-controls { 
         flex-direction: column;
-        margin-top: 20px; /* Weniger Abstand */
+        margin-top: 20px; 
     }
     
     .flip-btn-style { 
         width: 100%;
-        height: 45px; /* Etwas kleiner */
+        height: 45px; 
         font-size: 0.95rem;
     }
     
