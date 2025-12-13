@@ -398,21 +398,14 @@
 }
 
 /* ============================================================
-   FIX FÜR MICHAEL (Desktop): Loch unter dem Bild entfernen
+   KORREKTUR MICHAEL (Desktop): Bild zentrieren
    ============================================================ */
 @media (min-width: 769px) {
-    /* Wir zielen nur auf die Rückseite (.back-face), damit Evita unverändert bleibt */
+    /* Nur auf der Rückseite (Michael) das Grid anpassen */
+    .back-face .evita-grid-wrapper {
+        align-items: center !important; /* Zentriert Bild vertikal zum Text */
+    }
     
-    /* 1. Das Bild darf sich über 2 Zeilen strecken */
-    .back-face .evita-image-block {
-        grid-row: 1 / 3 !important; 
-        align-self: start; /* Klebt oben */
-    }
-
-    /* 2. Der untere Text rutscht in die linke Spalte (unter die Liste) */
-    .back-face .evita-text-bottom {
-        grid-column: 1 / 2 !important; 
-        grid-row: 2 / 3 !important;
-        margin-top: -10px; /* Optional: Zieht den Text optisch noch etwas näher ran */
-    }
+    /* Falls du das Bild lieber am unteren Rand kleben haben willst (kein Loch unten),
+       nutze stattdessen: align-items: end !important; */
 }
