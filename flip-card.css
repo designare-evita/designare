@@ -7,8 +7,8 @@
 
 #hero:has(.flip-container) {
     padding-bottom: 0 !important;
-    /* Abstand zum Header halbiert */
-    padding-top: 20px !important;
+    /* Abstand zum Header NOCHMAL halbiert (von 20px auf 10px) */
+    padding-top: 10px !important;
 }
 
 #hero .container.flip-container {
@@ -282,14 +282,19 @@
 
 @media (max-width: 768px) {
     
-    /* Header-Abstand halbiert für Mobile */
+    /* Header-Abstand NOCHMAL halbiert für Mobile (von 10px auf 5px) */
     #hero:has(.flip-container) {
-        padding-top: 10px !important;
+        padding-top: 5px !important;
     }
     
     .flipper {
         min-height: auto; 
         height: auto;     
+    }
+    
+    /* FIX: Verhindert, dass die Überschrift abgeschnitten wird */
+    .back-face {
+        justify-content: flex-start !important;
     }
     
     /* WICHTIG: Keine fixe Höhe mehr - Content bestimmt Höhe */
