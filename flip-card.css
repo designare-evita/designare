@@ -396,3 +396,23 @@
         max-width: 150px;
     }
 }
+
+/* ============================================================
+   FIX FÜR MICHAEL (Desktop): Loch unter dem Bild entfernen
+   ============================================================ */
+@media (min-width: 769px) {
+    /* Wir zielen nur auf die Rückseite (.back-face), damit Evita unverändert bleibt */
+    
+    /* 1. Das Bild darf sich über 2 Zeilen strecken */
+    .back-face .evita-image-block {
+        grid-row: 1 / 3 !important; 
+        align-self: start; /* Klebt oben */
+    }
+
+    /* 2. Der untere Text rutscht in die linke Spalte (unter die Liste) */
+    .back-face .evita-text-bottom {
+        grid-column: 1 / 2 !important; 
+        grid-row: 2 / 3 !important;
+        margin-top: -10px; /* Optional: Zieht den Text optisch noch etwas näher ran */
+    }
+}
