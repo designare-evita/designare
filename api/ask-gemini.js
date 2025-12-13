@@ -1,10 +1,10 @@
-// api/ask-gemini.js - KORRIGIERTE VERSION mit verpflichtender Rückfrage
+// api/ask-gemini.js - KORRIGIERTE VERSION mit ES-Module Syntax
 
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });
   }
@@ -270,4 +270,4 @@ ${conversationHistoryText}
     console.error("Error calling Gemini API:", error);
     res.status(500).json({ answer: 'Da ist wohl ein Pixelfehler im System! Michael ist sicher schon dran. Bitte versuch\'s gleich noch mal.' });
   }
-};
+}
