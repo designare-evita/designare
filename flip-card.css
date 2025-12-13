@@ -295,7 +295,7 @@
         align-items: flex-start !important; /* Auch hier wichtig */
         padding-top: 15px !important; 
         padding-bottom: 30px !important;
-        min-height: calc(100vh - 65px);
+        min-height: calc(100vh - 60px);
     }
     
     .flipper {
