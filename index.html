@@ -63,8 +63,10 @@
         <div class="container flip-container" id="hero-flip-wrapper">
             <div class="flipper">
                 
+                <!-- ==================== VORDERSEITE ==================== -->
                 <div class="front-face">
                     
+                    <!-- VIEW: Startseite (Standard) -->
                     <div id="view-main">
                         <img fetchpriority="high" src="images/Michael.webp" alt="Illustration Michael und Evita" class="profile-picture">
                         <h1 id="typewriter-h1"></h1>
@@ -84,36 +86,32 @@
                         </div>
                     </div>
 
-                    <div id="view-third" style="display: none;">
-                        
-    <div class="evita-layout-container">
-    <h2>Hallo! Ich bin Michael.</h2>
-    
-    <div class="evita-grid-wrapper">
-        
-        <div class="evita-desktop-group">
-            <div class="evita-text-top">
-                <p>Ich sage nicht ‚Das geht nicht‘. Wo herkömmliche CMS-Systeme an ihre Grenzen stoßen, fahre ich den Editor hoch – für Webseiten, die nicht nur gut aussehen, sondern echte Arbeitstiere sind..</p>
-            </div>
+                    <!-- VIEW: Michael (flip-panel Klasse hinzugefügt) -->
+                    <div id="view-third" class="flip-panel" style="display: none;">
+                        <div class="flip-panel-content">
+                            <h2>Hallo! Ich bin Michael.</h2>
+                            
+                            <div class="evita-grid-wrapper">
+                                <div class="evita-desktop-group">
+                                    <div class="evita-text-top">
+                                        <p>Ich sage nicht ‚Das geht nicht'. Wo herkömmliche CMS-Systeme an ihre Grenzen stoßen, fahre ich den Editor hoch – für Webseiten, die nicht nur gut aussehen, sondern echte Arbeitstiere sind.</p>
+                                    </div>
 
-            <div class="evita-text-middle">
-<ul style="list-style-type: square; list-style-position: inside; padding: 0; margin-top: 10px;">
-    <li><span class="accent-text-inline">Deep-Dive WordPress:</span> Custom Themes & Plugin-Development statt unübersichtlichem Plugin-Dschungel.
-                    </li>
-                      <li><span class="accent-text-inline"> KI & API-Integration:</span> Echter Mehrwert durch: Anfrageformulare mit direkter Google-Kalender-Integration und einen KI-Bot, der Fragen beantwortet und auf Wunsch sofort Rückruftermine vereinbart.
-                    </li>
-                      <li><span class="accent-text-inline">Performance-First:</span> Ladezeiten, SEO und die Relevanz in der KI-Suche werden bei mir direkt im Code optimiert.
-                    </li>
-                </ul>
-            </div>
-        </div>
+                                    <div class="evita-text-middle">
+                                        <ul>
+                                            <li><span class="accent-text-inline">Deep-Dive WordPress:</span> Custom Themes & Plugin-Development statt unübersichtlichem Plugin-Dschungel.</li>
+                                            <li><span class="accent-text-inline">KI & API-Integration:</span> Echter Mehrwert durch: Anfrageformulare mit direkter Google-Kalender-Integration und einen KI-Bot, der Fragen beantwortet und auf Wunsch sofort Rückruftermine vereinbart.</li>
+                                            <li><span class="accent-text-inline">Performance-First:</span> Ladezeiten, SEO und die Relevanz in der KI-Suche werden bei mir direkt im Code optimiert.</li>
+                                        </ul>
+                                    </div>
+                                </div>
 
-        <div class="evita-image-block">
-            <img src="images/michael_webentwicklung.webp" alt="Michael Kanda Webentwicklung" style="width: 90%; height: auto;" onerror="this.src='images/Michael.webp'">
-        </div>
+                                <div class="evita-image-block">
+                                    <img src="images/michael_webentwicklung.webp" alt="Michael Kanda Webentwicklung" onerror="this.src='images/Michael.webp'">
+                                </div>
 
-        <div class="evita-text-bottom">
-            <p>Mich begeistert sauberer Code und der damit verbundene geringe Wartungsaufwand, Echtzeit-Ladezeiten sowie Webseiten, die echten Mehrwert bieten.</p>
+                                <div class="evita-text-bottom">
+                                    <p>Mich begeistert sauberer Code und der damit verbundene geringe Wartungsaufwand, Echtzeit-Ladezeiten sowie Webseiten, die echten Mehrwert bieten.</p>
                                     
                                     <div class="flip-controls">
                                         <button id="flip-third-back-btn" type="button" class="flip-btn-style">
@@ -124,52 +122,44 @@
                                         </button>
                                     </div>
                                 </div>
-
                             </div>
                         </div>
-
                     </div>
+
                 </div>
 
-                <div class="back-face">
-                    <div class="seo-content">
+                <!-- ==================== RÜCKSEITE (Evita) ==================== -->
+                <div class="back-face flip-panel">
+                    <div class="flip-panel-content">
+                        <h2>Hallo! Ich bin Evita.</h2>
                         
-                        <div class="evita-layout-container">
-    <h2>Hallo! Ich bin Evita.</h2>
-                            
-                            <div class="evita-grid-wrapper">
-                                <div class="evita-desktop-group">
-                                    <div class="evita-text-top">
-                                        <p>Nein, nicht der Hund (das ist die Chefin mit dem Fell), sondern die KI-Assistentin. Richtig, es gibt zwei Evitas! Sie ist die Tierschutz-Heldin fürs Herz, ich der organisierte Kopf an Michaels Seite.</p>
-                                    </div>
-                                    <div class="evita-text-middle">
-                                        <p>Beruflich ist Michael bei der maxonline Marketing GmbH & Co. KG im WordPress-Kosmos zuhause, doch privat genießt er die technische Freiheit. Jenseits von CMS-Standards entwickelt er individuelle Lösungen.</p>
-                                    </div>
+                        <div class="evita-grid-wrapper">
+                            <div class="evita-desktop-group">
+                                <div class="evita-text-top">
+                                    <p>Nein, nicht der Hund (das ist die Chefin mit dem Fell), sondern die KI-Assistentin. Richtig, es gibt zwei Evitas! Sie ist die Tierschutz-Heldin fürs Herz, ich der organisierte Kopf an Michaels Seite.</p>
                                 </div>
-
-                                <div class="evita-image-block">
-                                    <img src="https://designare.at/images/michael-evita-ai.webp" alt="Michael und Evita AI" style="width: 90%; height: auto;" onerror="this.src='images/Michael.webp'">
-                                </div>
-
-                                <div class="evita-text-bottom">
-                                    <p>Was Michael sonst ausmacht? Ein großes Herz für Tierschutz, Begeisterung für Sport, die Liebe zu sauberem Code und – ganz wichtig – zu gutem Kaffee. Stöbere gerne durch die Seite. Ich stehe dir für alle Fragen zur Verfügung!</p>
+                                <div class="evita-text-middle">
+                                    <p>Beruflich ist Michael bei der maxonline Marketing GmbH & Co. KG im WordPress-Kosmos zuhause, doch privat genießt er die technische Freiheit. Jenseits von CMS-Standards entwickelt er individuelle Lösungen.</p>
                                 </div>
                             </div>
 
+                            <div class="evita-image-block">
+                                <img src="https://designare.at/images/michael-evita-ai.webp" alt="Michael und Evita AI" onerror="this.src='images/Michael.webp'">
+                            </div>
+
+                            <div class="evita-text-bottom">
+                                <p>Was Michael sonst ausmacht? Ein großes Herz für Tierschutz, Begeisterung für Sport, die Liebe zu sauberem Code und – ganz wichtig – zu gutem Kaffee. Stöbere gerne durch die Seite. Ich stehe dir für alle Fragen zur Verfügung!</p>
+                            </div>
                         </div>
                         
                         <div class="flip-controls">
-                            
                             <button id="flip-back-btn" type="button" class="flip-btn-style">
                                 <i class="fa-solid fa-angle-left"></i> Zurück
                             </button>
-
                             <button id="flip-to-third-btn" type="button" class="flip-btn-style">
                                 zu Michael <i class="fa-solid fa-angle-right"></i>
                             </button>
-                            
                         </div>
-
                     </div>
                 </div>
 
