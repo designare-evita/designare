@@ -5,19 +5,22 @@
 
 /* --- 1. HERO & CONTAINER --- */
 
+/* WICHTIG: Wir müssen die Zentrierung aus der style.css aufheben! */
 #hero:has(.flip-container) {
-    padding-bottom: 0 !important;
-    /* Abstand zum Header NOCHMAL halbiert (von 20px auf 10px) */
-    padding-top: 10px !important;
+    align-items: flex-start !important; /* Schiebt den Inhalt nach oben statt in die Mitte */
+    padding-top: 60px !important;       /* Der neue Abstand nach oben (Desktop) */
+    padding-bottom: 40px !important;    
+    height: auto !important;            /* Wichtig für Mobile: Container darf wachsen */
+    min-height: calc(100vh - 80px);     /* Füllt mindestens den Screen */
 }
 
 #hero .container.flip-container {
     display: flex;
     justify-content: center;
-    align-items: center;
-    min-height: 100%; 
+    align-items: center; /* Zentriert die Karte horizontal */
+    min-height: unset;   /* Reset alter Styles */
     height: auto;     
-    padding: 10px 20px; /* Oben/Unten reduziert */
+    padding: 0 20px; 
 }
 
 /* --- 2. FLIP KARTEN STRUKTUR --- */
@@ -282,9 +285,10 @@
 
 @media (max-width: 768px) {
     
-    /* Header-Abstand NOCHMAL halbiert für Mobile (von 10px auf 5px) */
+    
     #hero:has(.flip-container) {
-        padding-top: 5px !important;
+        padding-top: 30px !important;   /* Der neue Abstand nach oben (Mobile) */
+        min-height: calc(100vh - 65px);
     }
     
     .flipper {
