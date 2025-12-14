@@ -141,8 +141,8 @@ a {
     --bg-color: #1a1a1a;
     --border-color: #aaaaaa;
     --particle-color: #bbbbbb;
-    --particle-line-color: #888888;
-    --text-color: #eeeeee;
+    --particle-line-color: #555555;
+    --text-color: #333333;
     --header-height-desktop: 80px;
     --header-height-mobile: 65px;
 }
@@ -274,6 +274,7 @@ body.no-scroll {
     top: 0;
     width: 100%;
     z-index: 1;
+    opacity: 0.4;
 }
 #hero .container {
     position: relative;
