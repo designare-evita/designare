@@ -69,6 +69,8 @@
 .front-face {
     z-index: 2;
     transform: rotateY(0deg);
+     justify-content: flex-start !important;
+    padding-top: 50px; 
 }
 
 .back-face {
