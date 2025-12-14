@@ -255,60 +255,81 @@
     box-shadow: 0 5px 15px rgba(252, 181, 0, 0.3);
 }
 
-/* ============================================================
-   8. MOBILE RESPONSIVE FIXES (SCROLLING & POSITION)
+============================================================
+   8. MOBILE RESPONSIVE FIX (KORRIGIERT)
    ============================================================ */
 
 @media (max-width: 768px) {
     
-    /* 1. SCROLLEN AUF DEM HANDY ERLAUBEN! */
+    /* 1. SCROLLEN FIXIEREN */
+    /* Wir erlauben KEINEN globalen Scroll, aber sorgen dafür, dass 
+       der Container richtig sitzt */
     body.no-scroll {
-        overflow-y: auto !important; /* Überschreibt die Sperre */
-        height: auto !important;
+        overflow: hidden !important; 
     }
 
-    /* 2. HERO CONTAINER ÖFFNEN */
+    /* 2. HEADER ABSTAND & CONTAINER HÖHE */
     #hero:has(.flip-container) {
         align-items: flex-start !important; 
         
-        /* Massiver Abstand, damit der Header nichts verdeckt */
-        padding-top: 100px !important; 
-        padding-bottom: 60px !important;
+        /* 85px Abstand von oben -> Profilbild klebt nicht mehr am Header */
+        padding-top: 85px !important; 
+        padding-bottom: 20px !important;
         
-        height: auto !important;
-        min-height: 100vh !important;
-        overflow: visible !important; /* Lässt Inhalt überlaufen */
+        /* Fixe Höhe erzwingen, damit nichts ausbricht */
+        height: 100vh !important;
+        min-height: unset !important;
+        overflow: hidden !important; 
     }
     
     .flipper {
-        min-height: auto; 
-        height: auto;     
+        height: 100%; /* Füllt den Hero-Bereich */
+        min-height: unset;
     }
     
-    /* 3. ALLES NACH OBEN AUSRICHTEN (Verhindert Abschneiden) */
+    /* 3. INHALTE AUSRICHTEN */
     .front-face, 
     .back-face {
         justify-content: flex-start !important;
-        height: auto !important; /* Darf wachsen */
-        min-height: unset !important;
+        height: 100%;
+        padding-top: 0 !important;
+    }
+
+    /* Startseite darf scrollen, wenn Inhalt zu lang ist (innerhalb des Containers) */
+    #view-main {
+        height: 100%;
+        overflow-y: auto; 
+        padding-bottom: 40px; /* Platz für Footer/Buttons */
+    }
+
+    /* 4. FLIP KARTEN (SCROLLBAR & MAXIMALE HÖHE) */
+    /* Das hier repariert die Flip-Karten */
+    .flip-panel {
+        height: auto;
+        /* Begrenzt die Höhe der Karte, damit sie auf den Screen passt */
+        max-height: 75vh; 
+        
+        /* Erlaubt Scrollen INNERHALB der Karte */
+        overflow-y: auto !important;
+        
+        /* Abstand zum Header/Start der Karte */
+        margin-top: 0; 
+    }
+
+    /* Evita View spezifisch */
+    #view-third,
+    #view-third[style*="display: flex"] {
+        height: auto !important;
+        max-height: 75vh !important;
+        overflow-y: auto !important;
+        justify-content: flex-start !important;
     }
     
-    /* 4. EVITA & MICHAEL FIXEN */
-    #view-third,
-    #view-third[style*="display: flex"],
-    .flip-panel {
-        height: auto !important;       /* Muss wachsen können */
-        min-height: unset !important;
-        justify-content: flex-start !important; /* Nicht zentrieren, sonst wird oben abgeschnitten */
-        overflow: visible !important;
-    }
-
-    /* Inhalt darf nicht oben kleben */
     .flip-panel-content {
-        padding: 0 15px 40px 15px; /* Oben 0, da Hero padding hat */
+        padding: 20px 15px 25px 15px; 
     }
 
-    /* 5. RESTLICHES DESIGN */
+    /* 5. RESTLICHES DESIGN (Grid auflösen) */
     .evita-grid-wrapper {
         display: flex;
         flex-direction: column;
@@ -316,6 +337,7 @@
     }
     .evita-desktop-group { display: contents; }
     .evita-text-top { order: 1; }
+    
     .evita-image-block { 
         order: 2; 
         width: 100%; 
@@ -325,6 +347,7 @@
     .evita-image-block img { 
         width: 60%; max-width: 200px; margin: 0; 
     }
+    
     .evita-text-middle { order: 3; }
     .evita-text-bottom { order: 4; }
 
