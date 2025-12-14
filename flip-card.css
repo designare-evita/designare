@@ -266,7 +266,7 @@
         align-items: flex-start !important; 
         padding-top: 40px !important; 
         padding-bottom: 30px !important;
-        min-height: calc(100vh - 60px);
+        min-height: calc(100vh - 80px);
     }
     
     .flipper {
