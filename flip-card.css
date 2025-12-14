@@ -132,13 +132,7 @@
    ============================================================ */
 
 .flip-panel {
-    /* HINTERGRUND & RAHMEN AUSKOMMENTIERT (Transparent-Look) */
-    /* background: rgba(26, 26, 26, 0.95); */
-    /* border: 1px solid var(--border-color); */
-    
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-    border-radius: 15px;
-    overflow-y: auto;
+   overflow-y: auto;
     overflow-x: hidden;
     scrollbar-width: thin;
     scrollbar-color: var(--accent-color) rgba(255, 255, 255, 0.1);
@@ -178,7 +172,7 @@
     width: 100%;
     max-width: 800px;
     box-sizing: border-box;
-    padding: 30px 30px 40px 30px;
+    padding: 0px 0px 40px 0px;
     margin: auto;
     text-align: left; 
 }
