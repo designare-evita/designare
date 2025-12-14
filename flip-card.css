@@ -8,7 +8,7 @@
 /* Zentrierung aus style.css aufheben & Abstand setzen */
 #hero:has(.flip-container) {
     align-items: flex-start !important; /* Wichtig: Oben anfangen, nicht mittig */
-    padding-top: 10% !important;       /* Abstand Desktop */
+    padding-top: 30px !important;       /* Abstand Desktop */
     padding-bottom: 40px !important;    
     height: auto !important;            
     min-height: calc(100vh - 80px);     /* Mindestens Screen-Höhe */
