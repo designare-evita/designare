@@ -320,8 +320,8 @@
     /* FIX: Abstand massiv erhöht (von 5px auf 40px), damit nichts am Header klebt */
     #hero:has(.flip-container) {
         align-items: flex-start !important; 
-        padding-top: 60px !important; 
-        padding-bottom: 30px !important;
+        margin-top: 60px !important; 
+        margin-bottom: 30px !important;
         min-height: calc(100vh - 60px);
     }
     
@@ -348,7 +348,7 @@
     }
 
     .flip-panel-content {
-        padding: 80px 15px 30px 15px; 
+        margin: 80px 15px 30px 15px; 
     }
 
     .evita-grid-wrapper {
