@@ -1,17 +1,16 @@
 /* ============================================================
-   FLIP CARD MASTER STYLESHEET
-   Unified mit .flip-panel Klasse
+   FLIP CARD MASTER STYLESHEET (NEU & KORRIGIERT)
    ============================================================ */
 
-/* --- 1. HERO & CONTAINER --- */
+/* --- 1. HERO & CONTAINER (Abstände minimiert) --- */
 
-/* Zentrierung aus style.css aufheben & Abstand setzen */
+/* Wir entfernen das Padding oben, damit die Startseite hochrutschen kann */
 #hero:has(.flip-container) {
-    align-items: flex-start !important; /* Wichtig: Oben anfangen, nicht mittig */
-    padding-top: 15px !important;       /* Abstand Desktop */
+    align-items: flex-start !important; 
+    padding-top: 0px !important;        /* WICHTIG: Abstand auf 0 gesetzt */
     padding-bottom: 40px !important;    
     height: auto !important;            
-    min-height: calc(100vh - 80px);     /* Mindestens Screen-Höhe */
+    min-height: calc(100vh - 80px);     
 }
 
 #hero .container.flip-container {
@@ -49,7 +48,7 @@
     transform: rotateY(180deg);
 }
 
-/* --- 3. VORDER- & RÜCKSEITEN (Container) --- */
+/* --- 3. VORDER- & RÜCKSEITEN (Basis-Layout) --- */
 
 .front-face, 
 .back-face {
@@ -61,24 +60,37 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
     border-radius: 15px;
     transform-style: preserve-3d;
 }
 
+/* SPEZIFISCH: VORDERSEITE */
 .front-face {
     z-index: 2;
     transform: rotateY(0deg);
-     justify-content: flex-start !important;
-    padding-top: 50px; 
-}
+    justify-content: flex-start !important;
+    padding-top: 40px !important; 
 
+/* SPEZIFISCH: RÜCKSEITE (Michael) */
 .back-face {
     z-index: 1;
     transform: rotateY(180deg);
+    
+    /* WICHTIG: Inhalt zentriert lassen (für Michael) */
+    justify-content: center;
 }
 
-/* --- 4. BUTTONS AUF DER STARTSEITE --- */
+/* --- 4. STARTSEITEN CONTENT (#view-main) --- */
+
+/* Hier geben wir der Startseite ihren eigenen Abstand */
+#view-main {
+    width: 100%;
+    padding-top: 20px; /* Hier den Abstand zum Header feinjustieren (z.B. 10px - 30px) */
+    
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 
 .info-btn-wrapper {
     width: 100%;
@@ -113,30 +125,42 @@
 }
 
 /* ============================================================
-   5. FLIP PANEL - Einheitliche Styles für Evita & Michael
+   5. FLIP PANEL - Gemeinsame Styles (Evita & Michael)
    ============================================================ */
 
 .flip-panel {
-    /* background: rgba(26, 26, 26, 0.95); */ /* HINTERGRUND AUSKOMMENTIERT */
-    /* border: 1px solid var(--border-color); */ /* RAHMEN AUSKOMMENTIERT */
-     /*box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);*/ 
-    /* border-radius: 15px;*/ 
+    /* HINTERGRUND & RAHMEN AUSKOMMENTIERT (Transparent-Look) */
+    /* background: rgba(26, 26, 26, 0.95); */
+    /* border: 1px solid var(--border-color); */
+    /*box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5); */
+    /*border-radius: 15px; */
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-width: thin;
     scrollbar-color: var(--accent-color) rgba(255, 255, 255, 0.1);
 }
 
-/* view-third ist standardmäßig hidden */
+/* --- EVITA VIEW (#view-third) - SYNCHRONISATION MIT MICHAEL --- */
+
 #view-third {
     display: none;
+    
+    /* WICHTIG: Damit Evita trotz "oben"-Ausrichtung der Front-Face mittig sitzt */
+    height: 100% !important;            /* Nimmt volle Höhe ein */
+    margin: 0 !important;               /* Resettet Margins */
+    justify-content: center !important; /* Zentriert Inhalt vertikal */
 }
 
+/* Sicherstellen, dass JS-Styles überschrieben werden */
 #view-third[style*="display: flex"],
 #view-third[style*="display: block"] {
     display: flex !important;
     flex-direction: column;
     animation: fadeIn 0.5s ease-in-out;
+    
+    /* Wiederholung der Zentrierung */
+    height: 100% !important;
+    justify-content: center !important;
 }
 
 @keyframes fadeIn {
@@ -148,14 +172,14 @@
 
 .flip-panel-content {
     width: 100%;
-    max-width: 900px;
+    max-width: 800px;
     box-sizing: border-box;
-    padding: 20px 20px 20px 20px;
+    padding: 20px 20px 40px 20px;
     margin: auto;
-    text-align: left; /* Überschrift linksbündig */
+    text-align: left; 
 }
 
-/* --- 7. TYPOGRAFIE --- */
+/* --- 7. TYPOGRAFIE & LAYOUT INHALT --- */
 
 .flip-panel h2 {
     color: var(--accent-color);
@@ -164,7 +188,6 @@
     text-align: left;
 }
 
-/* NEU: Klasse für die weißen Textteile */
 .flip-header-white {
     color: #ffffff !important;
 }
@@ -190,8 +213,7 @@
     color: #e0e0e0;
 }
 
-/* --- 8. GRID LAYOUT (Bild + Text) --- */
-
+/* GRID LAYOUT (Bild + Text) */
 .evita-grid-wrapper {
     width: 100%;
     text-align: left;
@@ -199,7 +221,6 @@
 
 .evita-image-block img {
     height: auto;
-    border-radius: 8px;
     display: block;
     width: 100%;
     max-width: 250px;
@@ -226,6 +247,11 @@
         display: flex;
         justify-content: flex-end;
     }
+    
+    /* Michael-Seite: Bild vertikal zentrieren */
+    .back-face .evita-grid-wrapper {
+        align-items: center; 
+    }
 
     .evita-text-bottom { 
         grid-column: 1 / 3; 
@@ -233,7 +259,7 @@
     }
 }
 
-/* --- 9. NAVIGATION BUTTONS --- */
+/* --- 8. NAVIGATION BUTTONS --- */
 
 .flip-controls {
     display: flex;
@@ -271,7 +297,7 @@
     box-shadow: 0 5px 15px rgba(252, 181, 0, 0.3);
 }
 
-/* --- 10. SCROLLBARS --- */
+/* --- 9. SCROLLBARS --- */
 
 .flip-panel::-webkit-scrollbar { 
     width: 6px; 
@@ -287,15 +313,14 @@
 }
 
 /* ============================================================
-   11. MOBILE RESPONSIVE
+   10. MOBILE RESPONSIVE
    ============================================================ */
 
 @media (max-width: 768px) {
     
-    /* Header-Abstand für Mobile & Fix der Zentrierung */
     #hero:has(.flip-container) {
-        align-items: flex-start !important; /* Auch hier wichtig */
-        padding-top: 15px !important; 
+        align-items: flex-start !important; 
+        padding-top: 5px !important; /* Minimaler Abstand Mobile */
         padding-bottom: 30px !important;
         min-height: calc(100vh - 60px);
     }
@@ -305,16 +330,21 @@
         height: auto;     
     }
     
-    /* FIX: Verhindert, dass die Überschrift abgeschnitten wird */
-    .back-face {
+    /* Mobile: Auch hier Startseite oben, Rest zentriert */
+    .front-face {
         justify-content: flex-start !important;
     }
     
-    /* WICHTIG: Keine fixe Höhe mehr - Content bestimmt Höhe */
     .flip-panel {
         height: auto;          
         max-height: 80vh;      
         min-height: unset;
+    }
+
+    /* Evita muss auch auf Mobile resetten */
+    #view-third {
+        height: auto !important;
+        min-height: 400px; /* Mindesthöhe für Zentrierung */
     }
 
     .flip-panel-content {
@@ -398,17 +428,4 @@
         width: 50%;
         max-width: 150px;
     }
-}
-
-/* ============================================================
-   KORREKTUR MICHAEL (Desktop): Bild zentrieren
-   ============================================================ */
-@media (min-width: 769px) {
-    /* Nur auf der Rückseite (Michael) das Grid anpassen */
-    .back-face .evita-grid-wrapper {
-        align-items: center !important; /* Zentriert Bild vertikal zum Text */
-    }
-    
-    /* Falls du das Bild lieber am unteren Rand kleben haben willst (kein Loch unten),
-       nutze stattdessen: align-items: end !important; */
 }
