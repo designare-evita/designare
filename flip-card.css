@@ -68,8 +68,11 @@
 .front-face {
     z-index: 2;
     transform: rotateY(0deg);
+    
+    /* WICHTIG: Inhalt oben ausrichten (für Startseite) */
     justify-content: flex-start !important;
-    padding-top: 40px !important; 
+    padding-top: 0 !important; /* Kein Padding im Container, steuern wir im Content */
+}
 
 /* SPEZIFISCH: RÜCKSEITE (Michael) */
 .back-face {
@@ -132,8 +135,9 @@
     /* HINTERGRUND & RAHMEN AUSKOMMENTIERT (Transparent-Look) */
     /* background: rgba(26, 26, 26, 0.95); */
     /* border: 1px solid var(--border-color); */
-    /*box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5); */
-    /*border-radius: 15px; */
+    
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    border-radius: 15px;
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-width: thin;
@@ -174,7 +178,7 @@
     width: 100%;
     max-width: 800px;
     box-sizing: border-box;
-    padding: 20px 20px 40px 20px;
+    padding: 30px 30px 40px 30px;
     margin: auto;
     text-align: left; 
 }
@@ -221,6 +225,7 @@
 
 .evita-image-block img {
     height: auto;
+    border-radius: 8px;
     display: block;
     width: 100%;
     max-width: 250px;
