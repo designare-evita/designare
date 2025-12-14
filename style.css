@@ -283,6 +283,7 @@ body.no-scroll {
 
 /* 5. Inhaltselemente */
 .profile-picture {
+  margin.top:25px;
     height: 200px;
     margin-bottom: 1.5rem;
     object-fit: cover;
