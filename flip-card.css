@@ -255,97 +255,70 @@
     box-shadow: 0 5px 15px rgba(252, 181, 0, 0.3);
 }
 
-============================================================
-   8. MOBILE RESPONSIVE FIX (KORRIGIERT)
+/* ============================================================
+   10. MOBILE RESPONSIVE (HIER WURDE DER FEHLER BEHOBEN)
    ============================================================ */
 
 @media (max-width: 768px) {
     
-    /* 1. SCROLLEN FIXIEREN */
-    /* Wir erlauben KEINEN globalen Scroll, aber sorgen dafür, dass 
-       der Container richtig sitzt */
-    body.no-scroll {
-        overflow: hidden !important; 
-    }
-
-    /* 2. HEADER ABSTAND & CONTAINER HÖHE */
+    /* FIX: Abstand massiv erhöht (von 5px auf 40px), damit nichts am Header klebt */
     #hero:has(.flip-container) {
         align-items: flex-start !important; 
-        
-        /* 85px Abstand von oben -> Profilbild klebt nicht mehr am Header */
-        padding-top: 85px !important; 
-        padding-bottom: 20px !important;
-        
-        /* Fixe Höhe erzwingen, damit nichts ausbricht */
-        height: 100vh !important;
-        min-height: unset !important;
-        overflow: hidden !important; 
+        padding-top: 40px !important; 
+        padding-bottom: 30px !important;
+        min-height: calc(100vh - 60px);
     }
     
     .flipper {
-        height: 100%; /* Füllt den Hero-Bereich */
+        min-height: auto; 
+        height: auto;     
+    }
+    
+    /* Mobile: Startseite oben ausgerichtet */
+    .front-face {
+        justify-content: flex-start !important;
+    }
+    
+    .flip-panel {
+        height: auto;          
+        max-height: 80vh;      
         min-height: unset;
     }
-    
-    /* 3. INHALTE AUSRICHTEN */
-    .front-face, 
-    .back-face {
-        justify-content: flex-start !important;
-        height: 100%;
-        padding-top: 0 !important;
-    }
 
-    /* Startseite darf scrollen, wenn Inhalt zu lang ist (innerhalb des Containers) */
-    #view-main {
-        height: 100%;
-        overflow-y: auto; 
-        padding-bottom: 40px; /* Platz für Footer/Buttons */
-    }
-
-    /* 4. FLIP KARTEN (SCROLLBAR & MAXIMALE HÖHE) */
-    /* Das hier repariert die Flip-Karten */
-    .flip-panel {
-        height: auto;
-        /* Begrenzt die Höhe der Karte, damit sie auf den Screen passt */
-        max-height: 75vh; 
-        
-        /* Erlaubt Scrollen INNERHALB der Karte */
-        overflow-y: auto !important;
-        
-        /* Abstand zum Header/Start der Karte */
-        margin-top: 0; 
-    }
-
-    /* Evita View spezifisch */
-    #view-third,
-    #view-third[style*="display: flex"] {
+    /* Evita auf Mobile: Muss sich anpassen */
+    #view-third {
         height: auto !important;
-        max-height: 75vh !important;
-        overflow-y: auto !important;
-        justify-content: flex-start !important;
+        min-height: 400px; 
     }
-    
+
     .flip-panel-content {
         padding: 20px 15px 25px 15px; 
     }
 
-    /* 5. RESTLICHES DESIGN (Grid auflösen) */
     .evita-grid-wrapper {
         display: flex;
         flex-direction: column;
         gap: 15px; 
     }
-    .evita-desktop-group { display: contents; }
+    
+    .evita-desktop-group { 
+        display: contents; 
+    }
+    
     .evita-text-top { order: 1; }
     
     .evita-image-block { 
         order: 2; 
         width: 100%; 
-        display: flex; justify-content: center; 
+        display: flex; 
+        justify-content: center; 
         margin-bottom: 5px;
     }
+    
     .evita-image-block img { 
-        width: 60%; max-width: 200px; margin: 0; 
+        width: 60%;  
+        max-width: 200px; 
+        margin: 0; 
     }
     
     .evita-text-middle { order: 3; }
@@ -355,19 +328,48 @@
         flex-direction: column;
         margin-top: 20px; 
     }
+    
     .flip-btn-style { 
-        width: 100%; height: 45px; font-size: 0.95rem;
+        width: 100%;
+        height: 45px; 
+        font-size: 0.95rem;
     }
+    
     .flip-panel h2 { 
-        font-size: 1.5rem; margin-bottom: 15px;
+        font-size: 1.5rem;
+        margin-bottom: 15px;
     }
-    .flip-panel p, .flip-panel ul li {
-        font-size: 0.95rem; margin-bottom: 15px; line-height: 1.6;
+    
+    .flip-panel p {
+        font-size: 0.95rem;
+        margin-bottom: 15px;
+        line-height: 1.6;
+    }
+    
+    .flip-panel ul li {
+        font-size: 0.95rem;
+        margin-bottom: 8px;
+        line-height: 1.6;
     }
 }
 
+/* Extra kleine Screens */
 @media (max-width: 400px) {
-    .flip-panel h2 { font-size: 1.4rem; }
-    .flip-panel p, .flip-panel ul li { font-size: 0.9rem; }
-    .evita-image-block img { width: 50%; max-width: 150px; }
+    .flip-panel-content {
+        padding: 15px 12px 20px 12px;
+    }
+    
+    .flip-panel h2 {
+        font-size: 1.4rem;
+    }
+    
+    .flip-panel p,
+    .flip-panel ul li {
+        font-size: 0.9rem;
+    }
+    
+    .evita-image-block img {
+        width: 50%;
+        max-width: 150px;
+    }
 }
