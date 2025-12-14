@@ -9,7 +9,7 @@
     padding-top: 0px !important;        
     padding-bottom: 40px !important;    
     height: auto !important;            
-    min-height: calc(100vh - 80px);     
+    min-height: calc(100vh - 60px);     
 }
 
 #hero .container.flip-container {
@@ -266,6 +266,7 @@
         align-items: flex-start !important; 
         padding-top: 40px !important; 
         padding-bottom: 30px !important;
+       height: auto !important;            
         min-height: calc(100vh - 80px);
     }
     
