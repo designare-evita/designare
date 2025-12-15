@@ -254,27 +254,32 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 15px;
+    gap: 15px; /* Abstand zwischen den Buttons */
     margin-top: 30px;
     width: 100%;
 }
 
 .flip-btn-style {
     background: transparent;
-    border: 2px solid var(--accent-color) !important;
+    border: 1px solid var(--accent-color) !important; /* ÄNDERUNG: 1px Rahmen */
     color: var(--accent-color) !important;
     border-radius: 7px;
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: 400; /* ÄNDERUNG: Schriftstärke normal */
     cursor: pointer;
     transition: all 0.3s ease;
-    padding: 0 25px;
+    padding: 0 10px; /* Etwas weniger Padding, damit Text auf Mobile Platz hat */
     height: 50px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    min-width: 160px;
+    gap: 8px;
+    
+    /* ÄNDERUNG: 50/50 Aufteilung */
+    flex: 1;       /* Nimmt sich den verfügbaren Platz (50% bei 2 Buttons) */
+    width: auto;   /* Breite passt sich an */
+    min-width: 0;  /* Verhindert Overflow auf sehr kleinen Screens */
+    
     text-decoration: none;
     pointer-events: auto;
 }
@@ -392,8 +397,15 @@
     .evita-text-bottom { order: 4; }
 
     .flip-controls {
-        flex-direction: column;
+        flex-direction: row; /* WICHTIG: Bleibt nebeneinander, nicht column */
         margin-top: 20px;
+    }
+
+    .flip-btn-style {
+        width: auto; /* Nicht 100%, da flex:1 oben schon regelt */
+        height: 45px;
+        font-size: 0.9rem; /* Schrift etwas kleiner damit sie nebeneinander passen */
+        padding: 0 5px;    /* Engeres Padding für Mobile */
     }
 
     .flip-btn-style {
