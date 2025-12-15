@@ -157,7 +157,7 @@
     
     /* HIER DIE ÄNDERUNG: */
     position: relative; /* Damit 'top' funktioniert */
-    top: 0;             /* Setzt den Startpunkt oben */
+    top: -15px;             /* Setzt den Startpunkt oben */
     
     padding: 20px;
     margin: 0 auto;     /* Zentriert den Container horizontal */
