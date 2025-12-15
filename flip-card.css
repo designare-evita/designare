@@ -85,7 +85,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 8vh;  /* Flexibler Abstand - passt sich der Viewport-Höhe an */
+    margin-top: 9vh;  /* Flexibler Abstand - passt sich der Viewport-Höhe an */
 }
 
 .info-btn-wrapper {
