@@ -4,18 +4,10 @@
 
 /* --- 1. HERO & CONTAINER (Desktop) --- */
 
-/* Standard: Hero zentriert Content (für Startseite) */
-#hero {
-    align-items: center !important;
-    justify-content: center !important;
-}
-
-/* Wenn Flip-Card aktiv ist: Content oben ausrichten */
-#hero:has(.flip-container.flipped),
-#hero:has(#view-third[style*="display: flex"]),
-#hero:has(#view-third[style*="display: block"]) {
+/* Hero immer oben ausgerichtet - gleich wie bei Flip-Cards */
+#hero:has(.flip-container) {
     align-items: flex-start !important; 
-    padding-top: 20px !important;        
+    padding-top: 0px !important;        
     padding-bottom: 40px !important;    
     height: auto !important;            
     min-height: calc(100vh - 60px);     
@@ -93,7 +85,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    /* Kein padding-top - wird durch Hero-Zentrierung gehandhabt */
+    margin-top: 8vh;  /* Flexibler Abstand - passt sich der Viewport-Höhe an */
 }
 
 .info-btn-wrapper {
