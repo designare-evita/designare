@@ -10,11 +10,14 @@
    =================== */
 
 #hero:has(.flip-container) {
-    align-items: flex-start !important; /* Startet oben, damit langes Scrollen möglich ist */
-    padding-top: 40px !important;       /* Abstand nach oben */
-    padding-bottom: 60px !important;    /* Platz für Footer unten */
-    height: auto !important;            /* WICHTIG: Keine feste Höhe */
-    min-height: 100vh;                  /* Mindestens Bildschirmhöhe */
+    align-items: flex-start !important;
+    /* Hier steuerst du, wie weit oben die Karte anfängt. 
+       120px ist meist gut für Header + etwas Luft. 
+       Probier hier Werte zwischen 80px und 140px aus. */
+    padding-top: 120px !important; 
+    padding-bottom: 60px !important;
+    height: auto !important;
+    min-height: 100vh;
     overflow: visible !important;
 }
 
@@ -42,18 +45,19 @@
 
 .flipper {
     width: 100%;
-    /* Mindesthöhe für die Startseite, damit es optisch wirkt */
-    min-height: 60vh; 
+    min-height: 50vh; /* Etwas weniger Mindesthöhe */
     position: relative;
     transform-style: preserve-3d;
     transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     
-    /* GRID TRICK: Beide Seiten liegen übereinander */
     display: grid;
     grid-template-columns: 1fr;
-    /* Der Container wird so hoch wie der höchste Inhalt (die Rückseite) */
     grid-template-rows: 1fr; 
-    align-items: center; /* Zentriert die (kürzere) Vorderseite vertikal */
+    
+    /* ÄNDERUNG: Nicht mehr 'center', sondern 'start'.
+       Damit orientiert sich alles an der Oberkante. */
+    align-items: start; 
+    justify-items: center;
 }
 
 .flip-container.flipped .flipper {
@@ -66,13 +70,9 @@
 
 .front-face,
 .back-face {
-    /* Beide liegen in derselben Grid-Zelle */
     grid-area: 1 / 1 / 2 / 2;
     width: 100%;
-    
-    /* WICHTIG: Height auto damit Text fließen kann */
-    height: auto; 
-    
+    height: auto;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
     display: flex;
@@ -84,8 +84,9 @@
 .front-face {
     z-index: 2;
     transform: rotateY(0deg);
-    justify-content: center; /* Inhalt zentriert */
-    align-self: center;      /* Die Karte selbst zentriert im Grid */
+    /* ÄNDERUNG: Oben beginnen */
+    justify-content: flex-start; 
+    align-self: start;
 }
 
 .back-face {
@@ -104,8 +105,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    /* Margin nur noch minimal nötig, da Grid zentriert */
-    margin-top: 20px; 
+    /* ÄNDERUNG: Margin auf 0, da wir den Abstand jetzt global im #hero steuern */
+    margin-top: 0; 
     margin-bottom: 20px;
 }
 
