@@ -257,10 +257,10 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Buttons
     const btnToBack = document.getElementById('flip-info-btn');      // Start -> Rückseite
-    const btnBackToStart = document.getElementById('flip-back-btn'); // Rückseite -> Start
-    const btnToThird = document.getElementById('flip-to-third-btn'); // Rückseite -> Seite 3
-    const btnThirdToBack = document.getElementById('flip-third-back-btn'); // Seite 3 -> Rückseite
-    const btnThirdToStart = document.getElementById('flip-third-to-start-btn'); // Seite 3 -> Start
+    const btnBackToStart = document.getElementById('flip-back-btn'); // Rückseite -> Start (jetzt Home)
+    const btnToThird = document.getElementById('flip-to-third-btn'); // Rückseite -> Seite 3 (Evita)
+    const btnThirdToBack = document.getElementById('flip-third-back-btn'); // Seite 3 -> Rückseite (Michael)
+    const btnThirdToStart = document.getElementById('flip-third-to-start-btn'); // Seite 3 -> Chat mit Evita
 
     // Views (Inhalte der Vorderseite)
     const viewMain = document.getElementById('view-main');
@@ -268,7 +268,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (heroFlipWrapper) {
         
-        // 1. Von Startseite zu Rückseite (Evita)
+        // 1. Von Startseite zu Rückseite (Michael)
         if (btnToBack) {
             btnToBack.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -276,7 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // 2. Von Rückseite zurück zur Startseite (Michael)
+        // 2. Von Rückseite zurück zur Startseite (Home)
         if (btnBackToStart) {
             btnBackToStart.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -288,14 +288,13 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // 3. Von Rückseite zu Seite 3 (Expertise)
+        // 3. Von Rückseite zu Seite 3 (Evita)
         if (btnToThird) {
             btnToThird.addEventListener('click', (e) => {
                 e.preventDefault();
                 
                 if (viewMain && viewThird) {
                     viewMain.style.display = 'none';
-                    // WICHTIG: 'flex' statt 'block' für korrektes Layout!
                     viewThird.style.display = 'flex';
                 }
 
@@ -303,7 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // 4. Von Seite 3 zurück zur Rückseite
+        // 4. Von Seite 3 zurück zur Rückseite (Michael)
         if (btnThirdToBack) {
             btnThirdToBack.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -311,15 +310,30 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // 5. Von Seite 3 direkt zur Startseite
+        // 5. NEU: Von Seite 3 -> Chat mit Evita öffnen (statt Home)
         if (btnThirdToStart) {
-            btnThirdToStart.addEventListener('click', (e) => {
+            btnThirdToStart.addEventListener('click', async (e) => {
                 e.preventDefault();
-                if (viewMain && viewThird) {
-                    viewMain.style.display = 'block';
-                    viewThird.style.display = 'none';
+                
+                // Prüfe ob der Button das data-action Attribut hat
+                if (btnThirdToStart.dataset.action === 'open-evita-chat') {
+                    // Öffne Evita Chat Lightbox
+                    try {
+                        await window.launchEvitaChatFromAnywhere();
+                    } catch (error) {
+                        console.error("Fehler beim Öffnen des Evita Chats:", error);
+                        // Fallback: Header-Button klicken
+                        const evitaHeaderBtn = document.getElementById('evita-chat-button');
+                        if (evitaHeaderBtn) evitaHeaderBtn.click();
+                    }
+                } else {
+                    // Fallback: Zurück zur Startseite
+                    if (viewMain && viewThird) {
+                        viewMain.style.display = 'block';
+                        viewThird.style.display = 'none';
+                    }
+                    heroFlipWrapper.classList.remove('flipped');
                 }
-                heroFlipWrapper.classList.remove('flipped');
             });
         }
     }
