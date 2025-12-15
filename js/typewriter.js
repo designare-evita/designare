@@ -5,7 +5,7 @@ function initH1Typewriter() {
     if (!typewriterElement) return;
 
     const H1_TYPING_SPEED = 120, H1_DELETING_SPEED = 70, H1_DELAY_BETWEEN_TEXTS = 2200;
-    const textsToType = ["Michael Kanda", "Web-Magier", "KI-Therapeut"];
+    const textsToType = ["Michael Kanda", "Web-Purist", "KI-Komplize"];
     let textIndex = 0, charIndex = 0, isDeleting = false;
 
     function typeWriter() {
@@ -31,7 +31,7 @@ function initH1Typewriter() {
 // Die Steuerungslogik für den AI-Platzhalter
 let aiQuestionInput, typeInterval, deleteInterval;
 let placeholderIndex = 0, charPlaceholderIndex = 0;
-const AI_TYPING_SPEED = 120, AI_DELETING_SPEED = 50, AI_DELAY_AFTER_TYPING = 5000;
+const AI_TYPING_SPEED = 120, AI_DELETING_SPEED = 60, AI_DELAY_AFTER_TYPING = 4000;
 const placeholderTexts = ["Hallo! Evita hier...", "Michaels KI-Joker...", "Frag mich etwas..."];
 
 // Diese Funktionen werden jetzt korrekt exportiert und greifen auf die oben deklarierten Variablen zu
