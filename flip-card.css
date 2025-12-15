@@ -125,8 +125,6 @@
 
 .flip-panel {
     /* Hintergrund & Rahmen entfernt */
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-    border-radius: 15px;
     overflow-y: visible; /* Wichtig: Visible, damit nichts abgeschnitten wird */
     overflow-x: hidden;
 }
@@ -260,26 +258,36 @@
    ============================================================ */
 
 /* Webkit Browsers (Chrome, Safari, Edge) */
-.flip-panel::-webkit-scrollbar {
+.flip-panel::-webkit-scrollbar,
+.flip-panel-content::-webkit-scrollbar,
+#view-third::-webkit-scrollbar {
     width: 8px;
 }
 
-.flip-panel::-webkit-scrollbar-track {
+.flip-panel::-webkit-scrollbar-track,
+.flip-panel-content::-webkit-scrollbar-track,
+#view-third::-webkit-scrollbar-track {
     background: rgba(0, 0, 0, 0.3);
     border-radius: 10px;
 }
 
-.flip-panel::-webkit-scrollbar-thumb {
+.flip-panel::-webkit-scrollbar-thumb,
+.flip-panel-content::-webkit-scrollbar-thumb,
+#view-third::-webkit-scrollbar-thumb {
     background: #FCB500;
     border-radius: 10px;
 }
 
-.flip-panel::-webkit-scrollbar-thumb:hover {
+.flip-panel::-webkit-scrollbar-thumb:hover,
+.flip-panel-content::-webkit-scrollbar-thumb:hover,
+#view-third::-webkit-scrollbar-thumb:hover {
     background: #D39A00;
 }
 
 /* Firefox */
-.flip-panel {
+.flip-panel,
+.flip-panel-content,
+#view-third {
     scrollbar-width: thin;
     scrollbar-color: #FCB500 rgba(0, 0, 0, 0.3);
 }
@@ -322,10 +330,17 @@
         -webkit-overflow-scrolling: touch;  /* Smooth Scroll auf iOS */
     }
 
-    /* Evita auf Mobile */
+    /* Evita auf Mobile - FIX: auch scrollbar machen */
     #view-third {
         height: auto !important;
-        min-height: 400px; 
+        min-height: unset;
+        max-height: calc(100vh - 120px);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    #view-third .flip-panel-content {
+        overflow-y: visible; /* Content selbst nicht scrollen, nur Container */
     }
 
     /* FIX: Weniger Padding oben für mehr Platz */
