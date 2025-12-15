@@ -154,11 +154,15 @@
     width: 100%;
     max-width: 1000px;
     box-sizing: border-box;
-   top: 0;
+    
+    /* HIER DIE ÄNDERUNG: */
+    position: relative; /* Damit 'top' funktioniert */
+    top: 0;             /* Setzt den Startpunkt oben */
+    
     padding: 20px;
-    margin: 0 auto;
+    margin: 0 auto;     /* Zentriert den Container horizontal */
     text-align: left;
-    background: transparent; /* Kein Hintergrund, da Design-Vorgabe */
+    background: transparent; 
 }
 
 /* ===================
