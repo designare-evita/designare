@@ -4,9 +4,18 @@
 
 /* --- 1. HERO & CONTAINER (Desktop) --- */
 
-#hero:has(.flip-container) {
+/* Standard: Hero zentriert Content (für Startseite) */
+#hero {
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* Wenn Flip-Card aktiv ist: Content oben ausrichten */
+#hero:has(.flip-container.flipped),
+#hero:has(#view-third[style*="display: flex"]),
+#hero:has(#view-third[style*="display: block"]) {
     align-items: flex-start !important; 
-    padding-top: 0px !important;        
+    padding-top: 20px !important;        
     padding-bottom: 40px !important;    
     height: auto !important;            
     min-height: calc(100vh - 60px);     
@@ -74,17 +83,17 @@
 .back-face {
     z-index: 1;
     transform: rotateY(180deg);
-    justify-content: flex-start; /* Desktop: Oben ausrichten wie front-face */
+    justify-content: flex-start; /* Oben ausrichten für gleiche H2-Höhe */
 }
 
 /* --- 4. STARTSEITE (#view-main) --- */
 
 #view-main {
     width: 100%;
-    padding-top: 20px; 
     display: flex;
     flex-direction: column;
     align-items: center;
+    /* Kein padding-top - wird durch Hero-Zentrierung gehandhabt */
 }
 
 .info-btn-wrapper {
@@ -153,7 +162,7 @@
     max-width: 800px;
     box-sizing: border-box;
     padding: 30px 30px 40px 30px;
-    margin: 0 auto;  /* Nur horizontal zentrieren, nicht vertikal */
+    margin: 0 auto;  /* Nur horizontal zentrieren */
     text-align: left; 
 }
 
