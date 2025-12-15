@@ -14,7 +14,7 @@
     /* Hier steuerst du, wie weit oben die Karte anfängt. 
        120px ist meist gut für Header + etwas Luft. 
        Probier hier Werte zwischen 80px und 140px aus. */
-    padding-top: 120px !important; 
+    padding-top: 60px !important; 
     padding-bottom: 60px !important;
     height: auto !important;
     min-height: 100vh;
@@ -154,7 +154,7 @@
     width: 100%;
     max-width: 1000px;
     box-sizing: border-box;
-    padding: 30px;
+    padding: 20px;
     margin: 0 auto;
     text-align: left;
     background: transparent; /* Kein Hintergrund, da Design-Vorgabe */
@@ -208,7 +208,7 @@
     list-style-type: square;
     list-style-position: inside;
     padding: 0;
-    margin: 10px 0 20px 0;
+    margin: 10px 0 15px 0;
 }
 
 .evita-grid-wrapper {
