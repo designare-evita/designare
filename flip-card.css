@@ -269,6 +269,10 @@
        height: auto !important;            
         min-height: calc(100vh - 80px);
     }
+
+   .back-face {
+        justify-content: flex-start !important;
+    }
     
     .flipper {
         min-height: auto; 
@@ -280,12 +284,12 @@
         justify-content: flex-start !important;
     }
     
-    .flip-panel {
-        height: auto;          
-        max-height: 80vh;      
+   .flip-panel {
+        max-height: none;      /* Limit entfernen */
         min-height: unset;
+        overflow-y: auto;      /* Bei Bedarf scrollen */
     }
-
+   
     /* Evita auf Mobile: Muss sich anpassen */
     #view-third {
         height: auto !important;
@@ -293,7 +297,7 @@
     }
 
     .flip-panel-content {
-        padding: 20px 15px 25px 15px; 
+        padding: 15px 15px 25px 15px; 
     }
 
     .evita-grid-wrapper {
