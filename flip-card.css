@@ -368,7 +368,7 @@
         padding: 10px 15px 40px 15px; /* Unten Platz lassen */
     }
 
-    .flip-panel h2 { font-size: 1.5rem; margin-bottom: 15px; }
+    .flip-panel h2 { font-size: 1.6rem; margin-bottom: 15px; }
 }
 
 /* ===================
@@ -377,6 +377,6 @@
 
 @media (max-width: 400px) {
     .flip-panel-content { padding: 12px; }
-    .flip-panel h2 { font-size: 1.4rem; }
+    .flip-panel h2 { font-size: 1.5rem; }
     .evita-image-block img { width: 50%; max-width: 150px; }
 }
