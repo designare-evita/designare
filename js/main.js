@@ -52,7 +52,15 @@ const setupSideMenu = () => {
                 e.preventDefault();
                 e.stopPropagation();
                 sideMenu.classList.remove('visible');
-                document.body.classList.remove('no-scroll');
+                // Nur entfernen, wenn wir nicht gerade auf der Rückseite der Flipcard sind
+                // (Einfache Prüfung: Hat der Body noch die Initial-Sperre oder wurde sie durch Flip entfernt?)
+                const heroFlipped = document.querySelector('.flip-container.flipped');
+                if (!heroFlipped) {
+                    document.body.classList.remove('no-scroll');
+                } else {
+                    // Wenn wir geflippt sind, wollen wir scrollen können, also auch entfernen
+                    document.body.classList.remove('no-scroll'); 
+                }
             });
         }
 
@@ -256,8 +264,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const heroFlipWrapper = document.getElementById('hero-flip-wrapper');
     
     // Buttons
-    const btnToBack = document.getElementById('flip-info-btn');      // Start -> Rückseite
-    const btnBackToStart = document.getElementById('flip-back-btn'); // Rückseite -> Start (jetzt Home)
+    const btnToBack = document.getElementById('flip-info-btn');      // Start -> Rückseite ("Neugierig geworden")
+    const btnBackToStart = document.getElementById('flip-back-btn'); // Rückseite -> Start (Home)
     const btnToThird = document.getElementById('flip-to-third-btn'); // Rückseite -> Seite 3 (Evita)
     const btnThirdToBack = document.getElementById('flip-third-back-btn'); // Seite 3 -> Rückseite (Michael)
     const btnThirdToStart = document.getElementById('flip-third-to-start-btn'); // Seite 3 -> Chat mit Evita
@@ -269,10 +277,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (heroFlipWrapper) {
         
         // 1. Von Startseite zu Rückseite (Michael)
+        // HIER IST DIE ÄNDERUNG: no-scroll wird entfernt
         if (btnToBack) {
             btnToBack.addEventListener('click', (e) => {
                 e.preventDefault();
                 heroFlipWrapper.classList.add('flipped');
+                // Scrollen erlauben, da Rückseite länger sein kann
+                document.body.classList.remove('no-scroll');
             });
         }
 
@@ -285,6 +296,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     viewThird.style.display = 'none';
                 }
                 heroFlipWrapper.classList.remove('flipped');
+                // Optional: Scrollen wieder sperren für den "Hero-Look" auf der Startseite
+                // Falls gewünscht, Zeile einkommentieren:
+                document.body.classList.add('no-scroll'); 
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             });
         }
 
@@ -299,6 +314,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 heroFlipWrapper.classList.remove('flipped');
+                // Hier bleiben wir im "Content-Modus", also kein no-scroll hinzufügen
+                // Aber wir sollten nach oben scrollen, damit der User den Anfang sieht
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             });
         }
 
@@ -307,32 +325,31 @@ document.addEventListener('DOMContentLoaded', () => {
             btnThirdToBack.addEventListener('click', (e) => {
                 e.preventDefault();
                 heroFlipWrapper.classList.add('flipped');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             });
         }
 
-        // 5. NEU: Von Seite 3 -> Chat mit Evita öffnen (statt Home)
+        // 5. Von Seite 3 -> Chat mit Evita öffnen
         if (btnThirdToStart) {
             btnThirdToStart.addEventListener('click', async (e) => {
                 e.preventDefault();
                 
-                // Prüfe ob der Button das data-action Attribut hat
                 if (btnThirdToStart.dataset.action === 'open-evita-chat') {
-                    // Öffne Evita Chat Lightbox
                     try {
                         await window.launchEvitaChatFromAnywhere();
                     } catch (error) {
                         console.error("Fehler beim Öffnen des Evita Chats:", error);
-                        // Fallback: Header-Button klicken
                         const evitaHeaderBtn = document.getElementById('evita-chat-button');
                         if (evitaHeaderBtn) evitaHeaderBtn.click();
                     }
                 } else {
-                    // Fallback: Zurück zur Startseite
+                    // Fallback zu Start
                     if (viewMain && viewThird) {
                         viewMain.style.display = 'block';
                         viewThird.style.display = 'none';
                     }
                     heroFlipWrapper.classList.remove('flipped');
+                    document.body.classList.add('no-scroll');
                 }
             });
         }
