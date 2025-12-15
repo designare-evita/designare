@@ -292,7 +292,7 @@
     scrollbar-color: #FCB500 rgba(0, 0, 0, 0.3);
 }
 
-/* ============================================================
+* ============================================================
    10. MOBILE RESPONSIVE (FIXED)
    ============================================================ */
 
@@ -312,12 +312,8 @@
         height: auto;     
     }
     
-    /* Mobile: Startseite oben ausgerichtet */
-    .front-face {
-        justify-content: flex-start !important;
-    }
-    
-    /* FIX: Rückseite auch oben ausrichten, damit Überschrift sichtbar ist */
+    /* Mobile: Vorder- und Rückseite oben ausrichten */
+    .front-face,
     .back-face {
         justify-content: flex-start !important;
     }
@@ -329,18 +325,22 @@
         overflow-y: auto;                   /* Scrollbar aktivieren */
         -webkit-overflow-scrolling: touch;  /* Smooth Scroll auf iOS */
     }
-
-    /* Evita auf Mobile - FIX: auch scrollbar machen */
-    #view-third {
-        height: auto !important;
-        min-height: unset;
-        max-height: calc(100vh - 120px);
-        overflow-y: auto;
+    
+    /* FIX: Evita Panel (#view-third) - explizite Scroll-Einstellungen */
+    #view-third.flip-panel {
+        max-height: calc(100vh - 140px);
+        overflow-y: auto !important;
         -webkit-overflow-scrolling: touch;
     }
-    
-    #view-third .flip-panel-content {
-        overflow-y: visible; /* Content selbst nicht scrollen, nur Container */
+
+    /* Evita auf Mobile - FIX: scrollbar mit Inhalt oben */
+    #view-third {
+        height: auto !important;
+        min-height: unset !important;
+        max-height: calc(100vh - 140px) !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
+        justify-content: flex-start !important;
     }
 
     /* FIX: Weniger Padding oben für mehr Platz */
