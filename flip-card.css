@@ -1,16 +1,18 @@
 /* ============================================================
-   FLIP CARD MASTER STYLESHEET (MOBILE SCROLL FIX)
+   FLIP CARD STYLESHEET - OPTIMIERT
+   Flip-Card-Logik für Startseite (Michael & Evita)
    ============================================================ */
 
-/* --- 1. HERO & CONTAINER (Desktop) --- */
+/* ===================
+   1. HERO OVERRIDE (für Flip-Cards)
+   =================== */
 
-/* Hero immer oben ausgerichtet - gleich wie bei Flip-Cards */
 #hero:has(.flip-container) {
-    align-items: flex-start !important; 
-    padding-top: 0px !important;        
-    padding-bottom: 40px !important;    
-    height: auto !important;            
-    min-height: calc(100vh - 60px);     
+    align-items: flex-start !important;
+    padding-top: 0 !important;
+    padding-bottom: 40px !important;
+    height: auto !important;
+    min-height: calc(100vh - 60px);
 }
 
 #hero .container.flip-container {
@@ -18,11 +20,13 @@
     justify-content: center;
     align-items: center;
     min-height: unset;
-    height: auto;     
-    padding: 0 20px; 
+    height: auto;
+    padding: 0 20px;
 }
 
-/* --- 2. FLIP KARTEN STRUKTUR --- */
+/* ===================
+   2. FLIP CONTAINER & FLIPPER
+   =================== */
 
 .flip-container {
     perspective: 1400px;
@@ -35,7 +39,7 @@
 
 .flipper {
     width: 100%;
-    min-height: 550px; 
+    min-height: 550px;
     position: relative;
     transform-style: preserve-3d;
     transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -48,9 +52,11 @@
     transform: rotateY(180deg);
 }
 
-/* --- 3. VORDER- & RÜCKSEITEN (Basis) --- */
+/* ===================
+   3. CARD FACES
+   =================== */
 
-.front-face, 
+.front-face,
 .back-face {
     grid-area: 1 / 1 / 2 / 2;
     width: 100%;
@@ -64,28 +70,29 @@
     transform-style: preserve-3d;
 }
 
-/* Desktop Einstellungen */
 .front-face {
     z-index: 2;
     transform: rotateY(0deg);
     justify-content: flex-start !important;
-    padding-top: 0 !important; 
+    padding-top: 0 !important;
 }
 
 .back-face {
     z-index: 1;
     transform: rotateY(180deg);
-    justify-content: flex-start; /* Oben ausrichten für gleiche H2-Höhe */
+    justify-content: flex-start;
 }
 
-/* --- 4. STARTSEITE (#view-main) --- */
+/* ===================
+   4. STARTSEITE (#view-main)
+   =================== */
 
 #view-main {
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 9vh;  /* Flexibler Abstand - passt sich der Viewport-Höhe an */
+    margin-top: 9vh;
 }
 
 .info-btn-wrapper {
@@ -120,20 +127,31 @@
     transform: translateY(-2px);
 }
 
-/* ============================================================
-   5. FLIP PANEL (Evita & Michael)
-   ============================================================ */
+/* ===================
+   5. FLIP PANEL (Shared Styles)
+   =================== */
 
 .flip-panel {
     overflow-x: hidden;
 }
 
-/* --- EVITA VIEW (#view-third) Desktop --- */
+.flip-panel-content {
+    width: 100%;
+    max-width: 800px;
+    box-sizing: border-box;
+    padding: 30px 30px 40px 30px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+/* ===================
+   6. EVITA VIEW (#view-third)
+   =================== */
 
 #view-third {
     display: none;
-    height: 100% !important;            
-    margin: 0 !important;               
+    height: 100% !important;
+    margin: 0 !important;
 }
 
 #view-third[style*="display: flex"],
@@ -149,16 +167,9 @@
     to { opacity: 1; }
 }
 
-.flip-panel-content {
-    width: 100%;
-    max-width: 800px;
-    box-sizing: border-box;
-    padding: 30px 30px 40px 30px;
-    margin: 0 auto;  /* Nur horizontal zentrieren */
-    text-align: left; 
-}
-
-/* --- 6. TYPO & BILDER --- */
+/* ===================
+   7. TYPOGRAPHY & IMAGES
+   =================== */
 
 .flip-panel h2 {
     color: var(--accent-color);
@@ -167,9 +178,12 @@
     text-align: left;
 }
 
-.flip-header-white { color: #ffffff !important; }
+.flip-header-white {
+    color: #ffffff !important;
+}
 
-.flip-panel p, .flip-panel ul li {
+.flip-panel p,
+.flip-panel ul li {
     font-size: 1rem;
     line-height: 1.7;
     margin-bottom: 20px;
@@ -183,7 +197,10 @@
     margin: 10px 0 20px 0;
 }
 
-.evita-grid-wrapper { width: 100%; text-align: left; }
+.evita-grid-wrapper {
+    width: 100%;
+    text-align: left;
+}
 
 .evita-image-block img {
     height: auto;
@@ -194,7 +211,10 @@
     margin-left: auto;
 }
 
-/* Desktop Grid Layout */
+/* ===================
+   8. DESKTOP GRID LAYOUT
+   =================== */
+
 @media (min-width: 769px) {
     .evita-grid-wrapper {
         display: grid;
@@ -203,16 +223,32 @@
         gap: 30px;
         align-items: start;
     }
-    .evita-desktop-group { grid-column: 1 / 2; grid-row: 1 / 2; }
-    .evita-image-block {
-        grid-column: 2 / 3; grid-row: 1 / 2; 
-        display: flex; justify-content: flex-end;
+
+    .evita-desktop-group {
+        grid-column: 1 / 2;
+        grid-row: 1 / 2;
     }
-    .back-face .evita-grid-wrapper { align-items: center; }
-    .evita-text-bottom { grid-column: 1 / 3; grid-row: 2 / 3; }
+
+    .evita-image-block {
+        grid-column: 2 / 3;
+        grid-row: 1 / 2;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .back-face .evita-grid-wrapper {
+        align-items: center;
+    }
+
+    .evita-text-bottom {
+        grid-column: 1 / 3;
+        grid-row: 2 / 3;
+    }
 }
 
-/* --- 7. BUTTONS --- */
+/* ===================
+   9. BUTTONS
+   =================== */
 
 .flip-controls {
     display: flex;
@@ -250,11 +286,10 @@
     box-shadow: 0 5px 15px rgba(252, 181, 0, 0.3);
 }
 
-/* ============================================================
-   8. CUSTOM SCROLLBAR (Gold #FCB500) - GLOBAL
-   ============================================================ */
+/* ===================
+   10. CUSTOM SCROLLBAR (Gold)
+   =================== */
 
-/* Webkit Browsers (Chrome, Safari, Edge) */
 .flip-panel::-webkit-scrollbar,
 #view-third::-webkit-scrollbar {
     width: 8px;
@@ -284,106 +319,100 @@
     scrollbar-color: #FCB500 rgba(0, 0, 0, 0.3);
 }
 
-/* ============================================================
-   10. MOBILE RESPONSIVE
-   ============================================================ */
+/* ===================
+   11. MOBILE RESPONSIVE
+   =================== */
 
 @media (max-width: 768px) {
-    
-    /* Hero-Bereich auf Mobile */
     #hero:has(.flip-container) {
-        align-items: flex-start !important; 
-        padding-top: 40px !important; 
+        align-items: flex-start !important;
+        padding-top: 40px !important;
         padding-bottom: 30px !important;
-        height: auto !important;            
+        height: auto !important;
         min-height: calc(100vh - 80px);
     }
-    
+
     .flipper {
-        min-height: auto; 
-        height: auto;     
+        min-height: auto;
+        height: auto;
     }
-    
-    /* Mobile: Vorder- und Rückseite oben ausrichten */
+
     .front-face,
     .back-face {
         justify-content: flex-start !important;
     }
-    
-    /* ============================================
-       MICHAEL (back-face .flip-panel) - Mobile
-       ============================================ */
+
     .back-face.flip-panel {
         max-height: calc(100vh - 120px);
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
     }
-    
-    /* ============================================
-       EVITA (#view-third) - Mobile
-       ============================================ */
+
     #view-third {
         max-height: calc(100vh - 120px);
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
     }
 
-    /* Weniger Padding oben für mehr Platz */
+    #view-main {
+        margin-top: 0;
+    }
+
     .flip-panel-content {
-        padding: 15px 15px 25px 15px; 
+        padding: 15px 15px 25px 15px;
     }
 
     .evita-grid-wrapper {
         display: flex;
         flex-direction: column;
-        gap: 15px; 
+        gap: 15px;
     }
-    
-    .evita-desktop-group { 
-        display: contents; 
+
+    .evita-desktop-group {
+        display: contents;
     }
-    
+
     .evita-text-top { order: 1; }
-    
-    .evita-image-block { 
-        order: 2; 
-        width: 100%; 
-        display: flex; 
-        justify-content: center; 
+
+    .evita-image-block {
+        order: 2;
+        width: 100%;
+        display: flex;
+        justify-content: center;
         margin-bottom: 5px;
     }
-    
-    .evita-image-block img { 
-        width: 60%;  
-        max-width: 200px; 
-        margin: 0; 
+
+    .evita-image-block img {
+        width: 60%;
+        max-width: 200px;
+        margin: 0;
     }
-    
+
     .evita-text-middle { order: 3; }
     .evita-text-bottom { order: 4; }
 
-    .flip-controls { 
+    .flip-controls {
         flex-direction: column;
-        margin-top: 20px; 
+        margin-top: 20px;
     }
-    
-    .flip-btn-style { 
+
+    .flip-btn-style {
         width: 100%;
-        height: 45px; 
+        height: 45px;
         font-size: 0.95rem;
     }
-    
-    .flip-panel h2 { 
+
+    .flip-panel h2 {
         font-size: 1.5rem;
         margin-bottom: 15px;
     }
-    
+
     .flip-panel p {
         font-size: 0.95rem;
         margin-bottom: 15px;
         line-height: 1.6;
     }
-    
+
     .flip-panel ul li {
         font-size: 0.95rem;
         margin-bottom: 8px;
@@ -391,21 +420,24 @@
     }
 }
 
-/* Extra kleine Screens */
+/* ===================
+   12. EXTRA SMALL SCREENS
+   =================== */
+
 @media (max-width: 400px) {
     .flip-panel-content {
         padding: 12px 12px 20px 12px;
     }
-    
+
     .flip-panel h2 {
         font-size: 1.4rem;
     }
-    
+
     .flip-panel p,
     .flip-panel ul li {
         font-size: 0.9rem;
     }
-    
+
     .evita-image-block img {
         width: 50%;
         max-width: 150px;
