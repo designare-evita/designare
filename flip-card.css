@@ -1,24 +1,27 @@
 /* ============================================================
-   FLIP CARD STYLESHEET - OPTIMIERT
-   Flip-Card-Logik für Startseite (Michael & Evita)
+   FLIP CARD STYLESHEET - FINAL
+   Logik: Grid-Overlay (Auto-Höhe basierend auf Inhalt)
+   Keine internen Scrollbalken mehr.
    ============================================================ */
 
 /* ===================
-   1. HERO OVERRIDE (für Flip-Cards)
+   1. HERO OVERRIDE
+   Damit der Hero mit der Flip-Card wachsen kann
    =================== */
 
 #hero:has(.flip-container) {
-    align-items: flex-start !important;
-    padding-top: 0 !important;
-    padding-bottom: 40px !important;
-    height: auto !important;
-    min-height: calc(100vh - 60px);
+    align-items: flex-start !important; /* Startet oben, damit langes Scrollen möglich ist */
+    padding-top: 40px !important;       /* Abstand nach oben */
+    padding-bottom: 60px !important;    /* Platz für Footer unten */
+    height: auto !important;            /* WICHTIG: Keine feste Höhe */
+    min-height: 100vh;                  /* Mindestens Bildschirmhöhe */
+    overflow: visible !important;
 }
 
 #hero .container.flip-container {
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start; /* Oben ausrichten */
     min-height: unset;
     height: auto;
     padding: 0 20px;
@@ -39,13 +42,18 @@
 
 .flipper {
     width: 100%;
-    min-height: 550px;
+    /* Mindesthöhe für die Startseite, damit es optisch wirkt */
+    min-height: 60vh; 
     position: relative;
     transform-style: preserve-3d;
     transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    
+    /* GRID TRICK: Beide Seiten liegen übereinander */
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: 1fr;
+    /* Der Container wird so hoch wie der höchste Inhalt (die Rückseite) */
+    grid-template-rows: 1fr; 
+    align-items: center; /* Zentriert die (kürzere) Vorderseite vertikal */
 }
 
 .flip-container.flipped .flipper {
@@ -58,14 +66,17 @@
 
 .front-face,
 .back-face {
+    /* Beide liegen in derselben Grid-Zelle */
     grid-area: 1 / 1 / 2 / 2;
     width: 100%;
-    height: 100%;
+    
+    /* WICHTIG: Height auto damit Text fließen kann */
+    height: auto; 
+    
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
     display: flex;
     flex-direction: column;
-    align-items: center;
     border-radius: 15px;
     transform-style: preserve-3d;
 }
@@ -73,14 +84,15 @@
 .front-face {
     z-index: 2;
     transform: rotateY(0deg);
-    justify-content: flex-start !important;
-    padding-top: 0 !important;
+    justify-content: center; /* Inhalt zentriert */
+    align-self: center;      /* Die Karte selbst zentriert im Grid */
 }
 
 .back-face {
     z-index: 1;
     transform: rotateY(180deg);
     justify-content: flex-start;
+    /* Hier kein overflow:hidden, damit man scrollen kann */
 }
 
 /* ===================
@@ -92,7 +104,9 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 9vh;
+    /* Margin nur noch minimal nötig, da Grid zentriert */
+    margin-top: 20px; 
+    margin-bottom: 20px;
 }
 
 .info-btn-wrapper {
@@ -117,7 +131,6 @@
     align-items: center;
     justify-content: center;
     outline: none;
-    pointer-events: auto;
 }
 
 #flip-info-btn:hover {
@@ -128,20 +141,22 @@
 }
 
 /* ===================
-   5. FLIP PANEL (Shared Styles)
+   5. FLIP PANEL CONTENT
    =================== */
 
 .flip-panel {
-    overflow-x: hidden;
+    /* WICHTIG: Sichtbar lassen für Body-Scroll */
+    overflow: visible !important; 
 }
 
 .flip-panel-content {
     width: 100%;
     max-width: 1000px;
     box-sizing: border-box;
-    padding: 30px 30px 40px 30px;
+    padding: 30px;
     margin: 0 auto;
     text-align: left;
+    background: transparent; /* Kein Hintergrund, da Design-Vorgabe */
 }
 
 /* ===================
@@ -150,16 +165,14 @@
 
 #view-third {
     display: none;
-    height: 100% !important;
-    margin: 0 !important;
+    width: 100%;
+    height: auto !important; /* Wächst mit Inhalt */
 }
 
 #view-third[style*="display: flex"],
 #view-third[style*="display: block"] {
-    display: flex !important;
-    flex-direction: column;
+    display: block !important; /* Block damit Grid funktioniert */
     animation: fadeIn 0.5s ease-in-out;
-    height: 100% !important;
 }
 
 @keyframes fadeIn {
@@ -212,7 +225,7 @@
 }
 
 /* ===================
-   8. DESKTOP GRID LAYOUT
+   8. DESKTOP GRID LAYOUT (Inhalt)
    =================== */
 
 @media (min-width: 769px) {
@@ -236,10 +249,6 @@
         justify-content: flex-end;
     }
 
-    .back-face .evita-grid-wrapper {
-        align-items: center;
-    }
-
     .evita-text-bottom {
         grid-column: 1 / 3;
         grid-row: 2 / 3;
@@ -247,38 +256,39 @@
 }
 
 /* ===================
-   9. BUTTONS
+   9. BUTTONS (Navigation Back/Evita)
    =================== */
 
 .flip-controls {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 15px; /* Abstand zwischen den Buttons */
+    gap: 15px;
     margin-top: 30px;
     width: 100%;
+    flex-direction: row !important; /* Immer nebeneinander */
 }
 
 .flip-btn-style {
     background: transparent;
-    border: 1px solid var(--accent-color) !important; /* ÄNDERUNG: 1px Rahmen */
+    border: 1px solid var(--accent-color) !important; /* 1px Rahmen */
     color: var(--accent-color) !important;
     border-radius: 7px;
     font-size: 1rem;
-    font-weight: 400; /* ÄNDERUNG: Schriftstärke normal */
+    font-weight: 400; /* Dünnere Schrift */
     cursor: pointer;
     transition: all 0.3s ease;
-    padding: 0 10px; /* Etwas weniger Padding, damit Text auf Mobile Platz hat */
+    padding: 0 10px;
     height: 50px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
     
-    /* ÄNDERUNG: 50/50 Aufteilung */
-    flex: 1;       /* Nimmt sich den verfügbaren Platz (50% bei 2 Buttons) */
-    width: auto;   /* Breite passt sich an */
-    min-width: 0;  /* Verhindert Overflow auf sehr kleinen Screens */
+    /* Layout: 50/50 Aufteilung */
+    flex: 1; 
+    width: auto;
+    min-width: 0;
     
     text-decoration: none;
     pointer-events: auto;
@@ -292,93 +302,33 @@
 }
 
 /* ===================
-   10. CUSTOM SCROLLBAR (Gold)
-   =================== */
-
-.flip-panel::-webkit-scrollbar,
-#view-third::-webkit-scrollbar {
-    width: 8px;
-}
-
-.flip-panel::-webkit-scrollbar-track,
-#view-third::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 10px;
-}
-
-.flip-panel::-webkit-scrollbar-thumb,
-#view-third::-webkit-scrollbar-thumb {
-    background: #FCB500;
-    border-radius: 10px;
-}
-
-.flip-panel::-webkit-scrollbar-thumb:hover,
-#view-third::-webkit-scrollbar-thumb:hover {
-    background: #D39A00;
-}
-
-/* Firefox */
-.flip-panel,
-#view-third {
-    scrollbar-width: thin;
-    scrollbar-color: #FCB500 rgba(0, 0, 0, 0.3);
-}
-
-/* ===================
-   11. MOBILE RESPONSIVE
+   10. MOBILE RESPONSIVE
    =================== */
 
 @media (max-width: 768px) {
+    
+    /* Hero muss wachsen können */
     #hero:has(.flip-container) {
-        align-items: flex-start !important;
-        padding-top: 40px !important;
-        padding-bottom: 30px !important;
+        padding-top: 20px !important;
         height: auto !important;
-        min-height: calc(100vh - 80px);
+        min-height: 100vh;
     }
 
+    /* Flipper darf nicht zu klein sein, aber muss wachsen */
     .flipper {
-        min-height: auto;
-        height: auto;
+        min-height: 50vh; 
     }
 
-    .front-face,
-    .back-face {
-        justify-content: flex-start !important;
-    }
-
-    .back-face.flip-panel {
-        max-height: calc(100vh - 120px);
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    #view-third {
-        max-height: calc(100vh - 120px);
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    #view-main {
-        margin-top: 0;
-    }
-
-    .flip-panel-content {
-        padding: 15px 15px 25px 15px;
-    }
-
+    /* Content Layout Mobile */
     .evita-grid-wrapper {
         display: flex;
         flex-direction: column;
         gap: 15px;
     }
 
-    .evita-desktop-group {
-        display: contents;
-    }
-
+    .evita-desktop-group { display: contents; }
     .evita-text-top { order: 1; }
-
+    
     .evita-image-block {
         order: 2;
         width: 100%;
@@ -396,62 +346,31 @@
     .evita-text-middle { order: 3; }
     .evita-text-bottom { order: 4; }
 
+    /* Buttons Mobile: Bleiben nebeneinander */
     .flip-controls {
-        flex-direction: row; /* WICHTIG: Bleibt nebeneinander, nicht column */
+        flex-direction: row !important;
         margin-top: 20px;
     }
 
     .flip-btn-style {
-        width: auto; /* Nicht 100%, da flex:1 oben schon regelt */
         height: 45px;
-        font-size: 0.9rem; /* Schrift etwas kleiner damit sie nebeneinander passen */
-        padding: 0 5px;    /* Engeres Padding für Mobile */
+        font-size: 0.9rem;
+        padding: 0 5px;
+    }
+    
+    .flip-panel-content {
+        padding: 15px 15px 40px 15px; /* Unten Platz lassen */
     }
 
-    .flip-btn-style {
-        width: 100%;
-        height: 45px;
-        font-size: 0.95rem;
-    }
-
-    .flip-panel h2 {
-        font-size: 1.5rem;
-        margin-bottom: 15px;
-    }
-
-    .flip-panel p {
-        font-size: 0.95rem;
-        margin-bottom: 15px;
-        line-height: 1.6;
-    }
-
-    .flip-panel ul li {
-        font-size: 0.95rem;
-        margin-bottom: 8px;
-        line-height: 1.6;
-    }
+    .flip-panel h2 { font-size: 1.5rem; margin-bottom: 15px; }
 }
 
 /* ===================
-   12. EXTRA SMALL SCREENS
+   11. EXTRA SMALL SCREENS
    =================== */
 
 @media (max-width: 400px) {
-    .flip-panel-content {
-        padding: 12px 12px 20px 12px;
-    }
-
-    .flip-panel h2 {
-        font-size: 1.4rem;
-    }
-
-    .flip-panel p,
-    .flip-panel ul li {
-        font-size: 0.9rem;
-    }
-
-    .evita-image-block img {
-        width: 50%;
-        max-width: 150px;
-    }
+    .flip-panel-content { padding: 12px; }
+    .flip-panel h2 { font-size: 1.4rem; }
+    .evita-image-block img { width: 50%; max-width: 150px; }
 }
