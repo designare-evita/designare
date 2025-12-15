@@ -1,0 +1,180 @@
+/* ============================================================
+   BLOG-STYLE.CSS - Modernes Blog Layout
+   Erweitert die globale style.css
+   ============================================================ */
+
+/* Container für den Blog-Inhalt - schmaler für bessere Lesbarkeit */
+.blog-main {
+    padding-top: calc(var(--header-height-desktop) + 40px);
+    padding-bottom: 60px;
+    min-height: 100vh;
+}
+
+.blog-article {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* --- Artikel Header (Titel & Meta) --- */
+.article-header {
+    margin-bottom: 3rem;
+    text-align: center;
+}
+
+.article-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+    color: var(--accent-color);
+}
+
+.article-meta {
+    font-size: 0.9rem;
+    color: var(--particle-color);
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 2rem;
+}
+
+.article-meta i {
+    margin-right: 5px;
+    color: var(--accent-color);
+}
+
+/* --- Artikel Inhalt Typografie --- */
+.article-content {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #e0e0e0;
+}
+
+.article-content h2 {
+    font-size: 1.8rem;
+    color: #fff;
+    margin-top: 3rem;
+    margin-bottom: 1.5rem;
+    border-left: 4px solid var(--accent-color);
+    padding-left: 15px;
+}
+
+.article-content h3 {
+    font-size: 1.4rem;
+    color: #fff;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.article-content p {
+    margin-bottom: 1.5rem;
+}
+
+.article-content ul, 
+.article-content ol {
+    margin-bottom: 1.5rem;
+    padding-left: 20px;
+}
+
+.article-content li {
+    margin-bottom: 0.8rem;
+}
+
+.article-content strong {
+    color: #fff;
+    font-weight: 600;
+}
+
+/* --- Highlights & Zitate --- */
+.highlight-box {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+    margin: 2rem 0;
+}
+
+.highlight-box h3 {
+    margin-top: 0;
+    color: var(--accent-color);
+    font-size: 1.2rem;
+}
+
+blockquote {
+    border-left: 4px solid var(--accent-color);
+    background: linear-gradient(90deg, rgba(252, 181, 0, 0.1) 0%, transparent 100%);
+    margin: 2rem 0;
+    padding: 1.5rem 2rem;
+    font-style: italic;
+    font-size: 1.15rem;
+    border-radius: 0 8px 8px 0;
+}
+
+/* --- Code Blöcke --- */
+code {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9em;
+    color: var(--accent-color);
+}
+
+pre {
+    background-color: #111;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 20px;
+    overflow-x: auto;
+    margin: 2rem 0;
+}
+
+pre code {
+    background-color: transparent;
+    padding: 0;
+    color: #ccc;
+    font-size: 0.95rem;
+}
+
+/* --- CTA Bereich am Ende --- */
+.article-cta {
+    margin-top: 4rem;
+    padding: 3rem;
+    background-color: #222;
+    border-radius: 12px;
+    text-align: center;
+    border: 1px solid var(--border-color);
+}
+
+.cta-button {
+    display: inline-block;
+    background-color: var(--accent-color);
+    color: #fff;
+    padding: 12px 30px;
+    border-radius: 50px;
+    font-weight: 600;
+    margin-top: 1.5rem;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.cta-button:hover {
+    background-color: #d39a00;
+    transform: translateY(-3px);
+    color: #fff;
+}
+
+/* --- Mobile Anpassungen --- */
+@media (max-width: 768px) {
+    .blog-main {
+        padding-top: calc(var(--header-height-mobile) + 30px);
+    }
+    
+    .article-header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .article-content {
+        font-size: 1rem;
+    }
+}
