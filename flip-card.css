@@ -14,7 +14,7 @@
     /* Hier steuerst du, wie weit oben die Karte anfängt. 
        120px ist meist gut für Header + etwas Luft. 
        Probier hier Werte zwischen 80px und 140px aus. */
-    padding-top: 60px !important; 
+    padding-top: 40px !important; 
     padding-bottom: 60px !important;
     height: auto !important;
     min-height: 100vh;
