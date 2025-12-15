@@ -74,7 +74,7 @@
 .back-face {
     z-index: 1;
     transform: rotateY(180deg);
-    justify-content: center; /* Desktop: Zentriert ist okay */
+    justify-content: flex-start; /* Desktop: Oben ausrichten wie front-face */
 }
 
 /* --- 4. STARTSEITE (#view-main) --- */
@@ -153,7 +153,7 @@
     max-width: 800px;
     box-sizing: border-box;
     padding: 30px 30px 40px 30px;
-    margin: auto;
+    margin: 0 auto;  /* Nur horizontal zentrieren, nicht vertikal */
     text-align: left; 
 }
 
