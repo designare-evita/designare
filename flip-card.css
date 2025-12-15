@@ -256,22 +256,47 @@
 }
 
 /* ============================================================
-   10. MOBILE RESPONSIVE (HIER WURDE DER FEHLER BEHOBEN)
+   8. CUSTOM SCROLLBAR (Gold #FCB500)
+   ============================================================ */
+
+/* Webkit Browsers (Chrome, Safari, Edge) */
+.flip-panel::-webkit-scrollbar {
+    width: 8px;
+}
+
+.flip-panel::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+}
+
+.flip-panel::-webkit-scrollbar-thumb {
+    background: #FCB500;
+    border-radius: 10px;
+}
+
+.flip-panel::-webkit-scrollbar-thumb:hover {
+    background: #D39A00;
+}
+
+/* Firefox */
+.flip-panel {
+    scrollbar-width: thin;
+    scrollbar-color: #FCB500 rgba(0, 0, 0, 0.3);
+}
+
+/* ============================================================
+   10. MOBILE RESPONSIVE (FIXED)
    ============================================================ */
 
 @media (max-width: 768px) {
     
-    /* FIX: Abstand massiv erhöht (von 5px auf 40px), damit nichts am Header klebt */
+    /* Hero-Bereich auf Mobile */
     #hero:has(.flip-container) {
         align-items: flex-start !important; 
         padding-top: 40px !important; 
         padding-bottom: 30px !important;
-       height: auto !important;            
+        height: auto !important;            
         min-height: calc(100vh - 80px);
-    }
-
-   .back-face {
-        justify-content: flex-start !important;
     }
     
     .flipper {
@@ -284,18 +309,26 @@
         justify-content: flex-start !important;
     }
     
-   .flip-panel {
-        max-height: none;      /* Limit entfernen */
-        min-height: unset;
-        overflow-y: auto;      /* Bei Bedarf scrollen */
+    /* FIX: Rückseite auch oben ausrichten, damit Überschrift sichtbar ist */
+    .back-face {
+        justify-content: flex-start !important;
     }
-   
-    /* Evita auf Mobile: Muss sich anpassen */
+    
+    /* FIX: Panel mit kontrollierter Höhe und Scrollbar */
+    .flip-panel {
+        max-height: calc(100vh - 120px);   /* Viewport minus Header/Padding */
+        min-height: unset;
+        overflow-y: auto;                   /* Scrollbar aktivieren */
+        -webkit-overflow-scrolling: touch;  /* Smooth Scroll auf iOS */
+    }
+
+    /* Evita auf Mobile */
     #view-third {
         height: auto !important;
         min-height: 400px; 
     }
 
+    /* FIX: Weniger Padding oben für mehr Platz */
     .flip-panel-content {
         padding: 15px 15px 25px 15px; 
     }
@@ -361,7 +394,7 @@
 /* Extra kleine Screens */
 @media (max-width: 400px) {
     .flip-panel-content {
-        padding: 15px 12px 20px 12px;
+        padding: 12px 12px 20px 12px;
     }
     
     .flip-panel h2 {
