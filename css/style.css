@@ -226,14 +226,16 @@ a {
     z-index: 2;
 }
 
+
 #particles-js {
     height: 100%;
     left: 0;
-    position: absolute;
+    position: fixed; /* ÄNDERUNG: Von 'absolute' zu 'fixed' */
     top: 0;
     width: 100%;
     z-index: 1;
     opacity: 0.4;
+    pointer-events: none; /* EMPFOHLEN: Damit Klicks durchgehen */
 }
 
 /* ===================
