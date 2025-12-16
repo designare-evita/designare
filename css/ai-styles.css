@@ -1,0 +1,1332 @@
+/* ==============
+   AI-STYLES.CSS - BEREINIGT
+   Für Evita KI (Hauptseite) und Silas KI (CSV-Creator)
+   ============== */
+
+/* ======================================== */
+/* EVITA KI - HAUPTSEITEN-FORMULAR         */
+/* ======================================== */
+
+/* Das Haupt-AI-Formular auf der Startseite verwendet die Stile aus style.css */
+/* Hier nur spezielle Ergänzungen falls nötig */
+
+#ai-chat-form button .fa-paper-plane {
+    color: white;
+   font-size: 16px;
+}
+
+#ai-question::placeholder {
+    color: var(--text-color);
+    opacity: 0.5;
+    transition: opacity 0.6s ease-in-out;
+}
+
+#ai-question.placeholder-fade::placeholder {
+    opacity: 0;
+}
+
+/* ======================================== */
+/* MODAL GRUNDLAGEN - EVITA CHAT           */
+/* ======================================== */
+
+/* GRUND-MODAL OVERLAY */
+
+  .modal-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 9999 !important;
+    background-color: rgba(10, 10, 10, 0.9) !important;
+    
+    display: none !important; /* Standardmäßig versteckt */
+    align-items: center !important;
+    justify-content: center !important;
+    
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transition: opacity 0.3s ease, visibility 0.3s ease !important;
+  }
+
+
+   
+/* MODAL SICHTBAR MACHEN */
+.modal-overlay.visible {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
+
+/* ALTERNATIVE: Direkte Display-Steuerung */
+.modal-overlay[style*="display: flex"] {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
+
+/* FALLBACK: Falls .visible nicht funktioniert */
+.modal-overlay.show,
+.modal-overlay.open {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
+
+/* DEBUG: Zum Testen sichtbar machen */
+.modal-overlay[data-debug="true"] {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    background-color: rgba(255, 0, 0, 0.3) !important; /* Rote Farbe zum Debuggen */
+}
+
+/* ======================================== */
+/* AI-RESPONSE-MODAL SPEZIFISCH            */
+/* ======================================== */
+
+#ai-response-modal .modal-content {
+    background-color: #1e1e1e !important;
+    color: #e0e0e0 !important;
+    border-radius: 10px !important;
+    width: 90vw !important;
+    height: 80vh !important;
+    max-width: 800px !important;
+    max-height: 600px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+    transform: scale(0.95) !important;
+    transition: transform 0.3s ease !important;
+    overflow: hidden !important;
+}
+
+.modal-overlay.visible #ai-response-modal .modal-content,
+.modal-overlay[style*="display: flex"] #ai-response-modal .modal-content {
+    transform: scale(1) !important;
+}
+
+/* CLOSE BUTTON */
+.close-button {
+    position: absolute !important;
+    top: 15px !important;
+    right: 20px !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: none !important;
+    color: #fff !important;
+    border-radius: 50% !important;
+    width: 35px !important;
+    height: 35px !important;
+    cursor: pointer !important;
+    font-size: 1.2rem !important;
+    z-index: 10 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: background-color 0.3s ease !important;
+}
+
+.close-button:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* ======================================== */
+/* AI-CHAT-HISTORY - CHAT-VERLAUF          */
+/* ======================================== */
+
+#ai-chat-history {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    padding: 60px 20px 20px 20px !important; /* Top-Padding für Close-Button */
+    background-color: rgba(0, 0, 0, 0.1) !important;
+    border-radius: 8px !important;
+    margin-bottom: 15px !important;
+    min-height: 200px !important;
+    max-height: 400px !important;
+
+}
+
+/* CHAT-NACHRICHTEN */
+.chat-message {
+    padding: 12px 16px !important;
+    border-radius: 12px !important;
+    margin-bottom: 12px !important;
+    max-width: 85% !important;
+    line-height: 1.5 !important;
+    word-wrap: break-word !important;
+    position: relative !important;
+    clear: both !important;
+    animation: fadeIn 0.3s ease !important;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.chat-message.user {
+    background-color: var(--accent-color, #ffc107) !important;
+    color: #1a1a1a !important;
+    margin-left: auto !important;
+    margin-right: 0 !important;
+    border-bottom-right-radius: 4px !important;
+    float: right !important;
+}
+
+.chat-message.ai {
+    background-color: #2a2a2a !important;
+    color: var(--text-color, #e0e0e0) !important;
+    margin-left: 0 !important;
+    margin-right: auto !important;
+    border-bottom-left-radius: 4px !important;
+    float: left !important;
+}
+
+/* ======================================== */
+/* AI-CHAT-FORM - MODAL FORMULAR           */
+/* ======================================== */
+
+#ai-chat-form {
+    flex-shrink: 0 !important;
+    background-color: var(--bg-color, #1a1a1a) !important;
+    border: 1px solid var(--border-color, #444) !important;
+    border-radius: 10px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: stretch !important;
+    overflow: hidden !important;
+    margin-bottom: 15px !important;
+}
+
+#ai-chat-form:focus-within {
+    border-color: var(--accent-color) !important;
+}
+
+#ai-chat-form input[type="text"] {
+    flex: 1 1 auto !important;
+    background: none !important;
+    border: none !important;
+    color: var(--text-color, #e0e0e0) !important;
+    font-size: 1rem !important;
+    outline: none !important;
+    padding: 12px 15px !important;
+    box-sizing: border-box !important;
+}
+
+#ai-chat-form input[type="text"]::placeholder {
+    color: var(--text-color, #e0e0e0) !important;
+    opacity: 0.5 !important;
+    transition: opacity 0.6s ease-in-out !important;
+}
+
+#ai-chat-form input[type="text"].placeholder-fade::placeholder {
+    opacity: 0 !important;
+}
+
+#ai-chat-form button,
+#ai-response-modal #ai-chat-form button {
+    background: var(--accent-color, #ffc107) !important;
+    color: #1a1a1a !important;
+    border: none !important;
+    padding: 12px 18px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: background-color 0.3s ease !important;
+    margin: 0 !important;
+    line-height: 1 !important;
+    box-sizing: border-box !important;
+    flex: 0 0 auto !important;
+}
+
+#ai-chat-form button:hover,
+#ai-response-modal #ai-chat-form button:hover {
+    background: #d39a00 !important;
+}
+
+/* ======================================== */
+/* MODAL FOOTER                             */
+/* ======================================== */
+
+.modal-footer {
+    flex-shrink: 0 !important;
+    text-align: center !important;
+    padding: 15px 20px !important;
+    border-top: 1px solid var(--border-color, #444) !important;
+    background-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+.modal-footer .button {
+    background-color: var(--accent-color, #ffc107) !important;
+    color: #1a1a1a !important;
+    cursor: pointer !important;
+    padding: 0.75rem 1.5rem !important;
+    transition: all 0.3s ease !important;
+    border: 2px solid var(--accent-color, #ffc107) !important;
+    font-size: 1rem !important;
+    border-radius: 5px !important;
+    text-decoration: none !important;
+    display: inline-block !important;
+}
+
+.modal-footer .button:hover {
+    background-color: #ffca2c !important;
+    border-color: #ffca2c !important;
+    transform: translateY(-1px) !important;
+}
+
+/* ======================================== */
+/* SILAS KI - CSV-CREATOR FORMULAR         */
+/* ======================================== */
+
+.ai-container {
+    width: 100%;
+    margin: 0 auto;
+    position: relative; /* Notwendig, damit z-index funktioniert */
+    z-index: 10;      /* Ein hoher Wert stellt sicher, dass es über anderen Elementen liegt */
+}
+
+.ai-container h3 {
+    color: #ffc107;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.ai-container p {
+    color: #ccc;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+#silas-form,
+.silas-input-container {
+    display: flex;
+    flex-direction: row;
+    border-radius: 7px;
+    overflow: hidden;
+    border: 1px solid #444;
+    background-color: #2d2d2d;
+    transition: all 0.3s ease-in-out;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+#silas-form {
+    align-items: stretch;
+}
+
+#silas-form:hover,
+#silas-form:focus-within,
+.silas-input-container:hover,
+.silas-input-container:focus-within {
+    border-color: #ffc107;
+    box-shadow: 0 0 15px rgba(255, 193, 7, 0.2);
+}
+
+#silas-keyword-input,
+.silas-extra-input {
+    flex-grow: 1;
+    background: none;
+    border: none;
+    outline: none;
+    padding: 15px 20px;
+    font-size: 1rem;
+    color: #eee;
+    font-family: 'Poppins', sans-serif;
+    width: 100%;
+}
+
+#silas-keyword-input::placeholder,
+.silas-extra-input::placeholder {
+    color: #888;
+    opacity: 1;
+}
+
+#silas-form button {
+    background: #ffc107;
+    border: none;
+    color: #1a1a1a;
+    padding: 0 20px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: background-color 0.3s ease;
+}
+
+#silas-form button:hover {
+    background: #e0a800;
+}
+
+#add-keyword-btn {
+    background: transparent;
+    border: none;
+    color: #ffc107;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+#add-keyword-btn:hover {
+    color: #fff;
+    background-color: rgba(255, 193, 7, 0.1);
+}
+
+/* ======================================== */
+/* SILAS SELECT-BOX (TEXT-INTENT)          */
+/* ======================================== */
+
+.ai-container .input-group {
+    display: flex;
+    align-items: center;
+    margin-top: 15px;
+    gap: 15px;
+    width: 100%;
+    background-color: rgba(45, 45, 45, 0.3);
+    padding: 12px 15px;
+    border-radius: 7px;
+    border: 1px solid #444;
+    transition: all 0.3s ease-in-out;
+}
+
+.ai-container .input-group:hover {
+    border-color: #ffc107;
+    box-shadow: 0 0 5px rgba(255, 193, 7, 0.3);
+}
+
+.ai-container .input-group label {
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+    white-space: nowrap;
+    color: #f0f0f0;
+    min-width: 80px;
+    margin-right: 15px;
+}
+
+.ai-container .custom-select {
+    flex-grow: 1;
+    background-color: #2d2d2d;
+    border: 1px solid #444;
+    border-radius: 7px;
+    color: #fff;
+    padding: 10px 15px;
+    font-size: 1rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffc107' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 40px;
+}
+
+.ai-container .custom-select:hover,
+.ai-container .custom-select:focus {
+    border-color: #ffc107;
+    box-shadow: 0 0 10px rgba(255, 193, 7, 0.3);
+    outline: none;
+}
+
+.ai-container .custom-select option {
+    background-color: #2d2d2d;
+    color: #fff;
+    padding: 10px;
+}
+
+/* ======================================== */
+/* SILAS KEYWORD-LISTE                     */
+/* ======================================== */
+
+.keyword-list-container {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    border: 1px solid #444;
+    border-radius: 10px;
+    background-color: rgba(45, 45, 45, 0.5);
+}
+
+.keyword-list-container h4 {
+    margin-top: 0;
+    color: #ffc107;
+    text-align: center;
+}
+
+#keyword-display-list {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0;
+    max-height: 200px;
+    overflow-y: auto;
+    background-color: rgba(0,0,0,0.2);
+    border-radius: 5px;
+    padding: 0.5rem;
+}
+
+#keyword-display-list li {
+    background-color: rgba(255, 255, 255, 0.05);
+    margin-bottom: 12px;
+    padding: 15px;
+    border-radius: 8px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    font-size: 0.95rem;
+    color: #fff;
+    min-height: 50px;
+    gap: 10px;
+    transition: background-color 0.3s ease;
+}
+
+#keyword-display-list li:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+#keyword-display-list li button {
+    background-color: #ff6b6b;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    min-width: 36px;
+    height: 36px;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+    flex-shrink: 0;
+}
+
+#keyword-display-list li button:hover {
+    background-color: #ff5252;
+}
+
+/* ======================================== */
+/* SILAS BUTTON-CONTROLS                   */
+/* ======================================== */
+
+.keyword-list-controls {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.cta-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 7px;
+    cursor: pointer;
+    border: 2px solid;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.cta-button .fas {
+    margin-right: 10px;
+}
+
+.cta-button:not(.secondary) {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: #1a1a1a;
+}
+
+.cta-button:not(.secondary):hover {
+    background-color: #ffca2c;
+    border-color: #ffca2c;
+    color: #000;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 193, 7, 0.2);
+}
+
+.cta-button.secondary {
+    background-color: transparent;
+    border-color: #555;
+    color: #aaa;
+}
+
+.cta-button.secondary:hover {
+    background-color: #333;
+    border-color: #777;
+    color: #fff;
+    transform: none;
+    box-shadow: none;
+}
+
+/* ======================================== */
+/* SILAS ERGEBNIS-ANZEIGE                  */
+/* ======================================== */
+
+#silas-response-container {
+    margin-top: 1rem;
+    text-align: left;
+}
+
+#silas-response-container h3 {
+    color: #ffc107;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+#silas-response-content {
+    background-color: rgba(255,255,255,0.05);
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 1rem;
+}
+
+.result-card {
+    background-color: rgba(255,255,255,0.05);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-left: 4px solid #ffc107;
+}
+
+.result-card h4 {
+    color: #fff;
+    margin: 0 0 10px 0;
+}
+
+.result-card p {
+    margin: 5px 0;
+    color: #ccc;
+}
+
+.result-card .error {
+    color: #ff6b6b;
+}
+
+.preview-btn {
+    background-color: #007cba;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.preview-btn:hover {
+    background-color: #005f8a;
+}
+
+/* ======================================== */
+/* SILAS PREVIEW MODAL                     */
+/* ======================================== */
+
+#silas-preview-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    background-color: rgba(10, 10, 10, 0.9);
+    
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    overflow-y: hidden;
+}
+
+#silas-preview-modal.visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+#silas-preview-modal .modal-content {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+    border-radius: 10px;
+    width: 90vw;
+    height: 90vh;
+    max-width: 1200px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+}
+
+#silas-preview-modal.visible .modal-content {
+    transform: scale(1);
+}
+
+#preview-content-area {
+    overflow-y: auto;
+    padding: 20px;
+    flex-grow: 1;
+    background: #2a2a2a;
+    border-radius: 5px;
+}
+
+#download-csv,
+#download-csv-dynamic,
+#download-txt,
+#download-txt-dynamic {
+    width: 100%;
+    text-align: center;
+    border: 2px solid #ffc107;
+    background-color: transparent;
+    color: #ffc107;
+    padding: 12px 20px;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    margin-top: 1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#download-csv:hover,
+#download-csv-dynamic:hover,
+#download-txt:hover,
+#download-txt-dynamic:hover {
+    background-color: #ffc107;
+    color: #2d2d2d;
+    box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
+}
+
+#download-csv .fas,
+#download-csv-dynamic .fas,
+#download-txt .fas,
+#download-txt-dynamic .fas {
+    margin-right: 10px;
+}
+
+/* Status-Text */
+#silas-status {
+    text-align: center;
+    width: 100%;
+    margin-top: 1rem;
+    color: #ffc107;
+    font-weight: 500;
+}
+
+/* ======================================== */
+/* RESPONSIVE DESIGN                       */
+/* ======================================== */
+
+@media (max-width: 768px) {
+    /* AI Modal Responsive */
+    #ai-response-modal .modal-content {
+        width: 95vw !important;
+        height: 90vh !important;
+        max-height: none !important;
+        border-radius: 5px !important;
+    }
+    
+    #ai-chat-history {
+        padding: 50px 15px 15px 15px !important;
+        max-height: none !important;
+        flex: 1 !important;
+    }
+    
+    .chat-message {
+        max-width: 90% !important;
+        padding: 10px 12px !important;
+    }
+    
+    .close-button {
+        top: 10px !important;
+        right: 15px !important;
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 1.1rem !important;
+    }
+
+    /* Silas Responsive */
+    #silas-form {
+        flex-direction: column;
+        gap: 10px;
+        padding: 15px;
+    }
+    
+    #silas-keyword-input {
+        width: 100%;
+        margin-bottom: 10px;
+        border: 1px solid #444;
+        border-radius: 7px;
+        padding: 15px;
+        font-size: 16px;
+    }
+    
+    #add-keyword-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 15px;
+        border: 1px solid #ffc107;
+        border-radius: 7px;
+        font-size: 1.1rem;
+        min-height: 50px;
+    }
+
+    .ai-container .input-group {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        padding: 20px;
+        margin-top: 20px;
+    }
+    
+    .ai-container .input-group label {
+        text-align: center;
+        min-width: auto;
+        margin-right: 0;
+        margin-bottom: 0;
+        font-size: 1rem;
+    }
+    
+    .ai-container .custom-select {
+        width: 100%;
+        padding: 15px;
+        font-size: 16px;
+        min-height: 50px;
+    }
+
+    .keyword-list-container {
+        padding: 20px;
+        margin-top: 25px;
+    }
+    
+    .keyword-list-container h4 {
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+    }
+    
+    #keyword-display-list {
+        padding: 10px;
+        max-height: 300px;
+    }
+    
+    #keyword-display-list li {
+        padding: 20px 15px;
+        margin-bottom: 15px;
+        min-height: 70px;
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    #keyword-display-list li > div {
+        flex-direction: column !important;
+        gap: 8px !important;
+        align-items: flex-start !important;
+    }
+    
+    #keyword-display-list li button {
+        min-width: 44px !important;
+        height: 44px !important;
+        font-size: 20px !important;
+        border-radius: 8px !important;
+        margin-left: 0 !important;
+    }
+
+    .keyword-list-controls {
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 25px;
+    }
+
+    .cta-button {
+        width: 100%;
+        justify-content: center;
+        padding: 18px 25px;
+        font-size: 1.1rem;
+        min-height: 55px;
+    }
+
+    .result-card {
+        padding: 20px !important;
+        margin-bottom: 20px !important;
+    }
+    
+    .result-card h4 {
+        font-size: 1.1rem !important;
+        margin-bottom: 15px !important;
+    }
+    
+    .preview-btn {
+        width: 100% !important;
+        padding: 15px !important;
+        font-size: 1rem !important;
+        margin-top: 15px !important;
+        min-height: 50px !important;
+    }
+
+    #download-csv,
+    #download-csv-dynamic,
+    #download-txt,
+    #download-txt-dynamic {
+        padding: 18px 20px !important;
+        font-size: 1.1rem !important;
+        min-height: 55px !important;
+    }
+
+    body #silas-preview-modal .modal-content {
+        width: 95vw !important;
+        height: 95vh !important;
+        border-radius: 5px !important;
+    }
+    
+    body #silas-preview-modal #preview-content-area {
+        padding: 15px !important;
+    }
+    
+    body #silas-preview-modal .close-button {
+        top: 10px !important;
+        right: 15px !important;
+        width: 38px !important;
+        height: 38px !important;
+        font-size: 1.3rem !important;
+    }
+}
+
+/* ======================================== */
+/* UTILITY CLASSES                         */
+/* ======================================== */
+
+.performance-tip .ai-container,
+.performance-tip .keyword-list-container {
+    max-width: none !important;
+    width: 100% !important;
+}
+
+
+
+/* ======================================== */
+/* BOOKING MODAL STYLES                   */
+/* ======================================== */
+
+#booking-modal {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 10000 !important;
+    background-color: rgba(10, 10, 10, 0.95) !important;
+    
+    display: none !important;
+    align-items: center !important;
+    justify-content: center !important;
+    
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transition: opacity 0.3s ease, visibility 0.3s ease !important;
+}
+
+#booking-modal[style*="display: flex"] {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
+
+#booking-modal .modal-content {
+    background-color: #1e1e1e !important;
+    color: #e0e0e0 !important;
+    border-radius: 10px !important;
+    width: 90vw !important;
+    max-width: 600px !important;
+    max-height: 80vh !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+    position: relative !important;
+    padding: 30px !important;
+    overflow-y: auto !important;
+}
+
+.booking-step {
+    display: none !important;
+}
+
+.booking-step.active {
+    display: block !important;
+}
+
+.day-selection-container {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)) !important;
+    gap: 15px !important;
+    margin: 20px 0 !important;
+}
+
+.day-button {
+    background: var(--accent-color, #ffc107) !important;
+    color: #1a1a1a !important;
+    border: none !important;
+    padding: 15px 20px !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+}
+
+.day-button:hover {
+    background: #ffca2c !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3) !important;
+}
+
+#slots-container {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)) !important;
+    gap: 10px !important;
+    margin: 20px 0 !important;
+}
+
+.slot-button {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: var(--text-color, #e0e0e0) !important;
+    border: 1px solid var(--border-color, #444) !important;
+    padding: 12px 16px !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+    font-size: 0.9rem !important;
+    transition: all 0.3s ease !important;
+}
+
+.slot-button:hover {
+    background: var(--accent-color, #ffc107) !important;
+    color: #1a1a1a !important;
+    border-color: var(--accent-color, #ffc107) !important;
+}
+
+.form-group {
+    margin-bottom: 20px !important;
+}
+
+.form-group label {
+    display: block !important;
+    color: var(--text-color, #e0e0e0) !important;
+    margin-bottom: 8px !important;
+    font-weight: 500 !important;
+}
+
+.form-group input {
+    width: 100% !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid var(--border-color, #444) !important;
+    border-radius: 6px !important;
+    padding: 12px 15px !important;
+    color: var(--text-color, #e0e0e0) !important;
+    font-size: 1rem !important;
+    box-sizing: border-box !important;
+}
+
+.form-group input:focus {
+    outline: none !important;
+    border-color: var(--accent-color, #ffc107) !important;
+    box-shadow: 0 0 10px rgba(255, 193, 7, 0.3) !important;
+}
+
+.back-button {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: var(--text-color, #e0e0e0) !important;
+    border: 1px solid var(--border-color, #444) !important;
+    padding: 10px 15px !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+    font-size: 0.9rem !important;
+    margin-bottom: 20px !important;
+    transition: all 0.3s ease !important;
+}
+
+.back-button:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+}
+
+#submit-booking-button {
+    width: 100% !important;
+    background: var(--accent-color, #ffc107) !important;
+    color: #1a1a1a !important;
+    border: none !important;
+    padding: 15px 20px !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    font-size: 1.1rem !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+}
+
+#submit-booking-button:hover {
+    background: #ffca2c !important;
+    transform: translateY(-1px) !important;
+}
+
+#submit-booking-button:disabled {
+    background: #666 !important;
+    color: #999 !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+}
+
+.loader {
+    border: 3px solid rgba(255, 193, 7, 0.3) !important;
+    border-top: 3px solid var(--accent-color, #ffc107) !important;
+    border-radius: 50% !important;
+    width: 30px !important;
+    height: 30px !important;
+    animation: spin 1s linear infinite !important;
+    margin: 20px auto !important;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.error-message {
+    background: rgba(244, 67, 54, 0.1) !important;
+    border: 1px solid #f44336 !important;
+    color: #f44336 !important;
+    padding: 15px !important;
+    border-radius: 6px !important;
+    margin: 15px 0 !important;
+    text-align: center !important;
+}
+
+#step-confirmation {
+    text-align: center !important;
+}
+
+#step-confirmation h2 {
+    color: var(--accent-color, #ffc107) !important;
+    margin-bottom: 20px !important;
+}
+
+#close-confirmation-button {
+    background: var(--accent-color, #ffc107) !important;
+    color: #1a1a1a !important;
+    border: none !important;
+    padding: 12px 25px !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    margin-top: 20px !important;
+}
+
+#close-booking-modal {
+    position: absolute !important;
+    top: 15px !important;
+    right: 20px !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: none !important;
+    color: #fff !important;
+    border-radius: 50% !important;
+    width: 35px !important;
+    height: 35px !important;
+    cursor: pointer !important;
+    font-size: 1.2rem !important;
+    z-index: 10 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: background-color 0.3s ease !important;
+}
+
+#close-booking-modal:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* MOBILE VIEWPORT UND TASTATUR-FIX - KORRIGIERT */
+
+@media (max-width: 768px) {
+    /* Modal Container - Vollbild */
+    #ai-response-modal .modal-content {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        height: 100vh !important;
+        height: 100dvh !important; /* Neue dynamische viewport height */
+        max-width: none !important;
+        max-height: none !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        
+        /* Flexbox für Layout */
+        display: flex !important;
+        flex-direction: column !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+    }
+    
+    /* Chat-History - Flexibles Scrolling */
+    #ai-chat-history {
+        flex: 1 1 auto !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        
+        /* ENTFERNE alle festen Höhen */
+        min-height: unset !important;
+        max-height: none !important;
+        height: auto !important;
+        
+        /* Touch-optimiertes Scrolling */
+        -webkit-overflow-scrolling: touch !important;
+        overscroll-behavior: contain !important;
+        
+        /* Padding */
+        padding: 50px 15px 15px 15px !important;
+        margin: 0 !important;
+    }
+    
+    /* Chat-Form - Am unteren Rand fixiert */
+    #ai-chat-form {
+        flex: 0 0 auto !important;
+        margin: 10px 15px !important;
+        margin-bottom: env(safe-area-inset-bottom, 20px) !important;
+        
+        /* Mindesthöhe für Touch */
+        min-height: 50px !important;
+        
+        /* Styling */
+        border-radius: 10px !important;
+        border: 1px solid var(--border-color, #444) !important;
+    }
+    
+    /* Modal Footer komplett verstecken auf Mobile */
+    #ai-response-modal .modal-footer {
+        display: none !important;
+    }
+    
+    /* Input-Feld optimiert */
+    #ai-chat-form input[type="text"] {
+        font-size: 16px !important; /* Verhindert Zoom auf iOS */
+        padding: 15px !important;
+        line-height: 1.4 !important;
+        -webkit-appearance: none !important;
+    }
+    
+    /* Send-Button optimiert */
+    #ai-chat-form button {
+        min-width: 60px !important;
+        min-height: 50px !important;
+        padding: 15px 20px !important;
+    }
+    
+    /* Close-Button fixiert */
+    #ai-response-modal .close-button {
+        position: fixed !important;
+        top: 10px !important;
+        right: 15px !important;
+        width: 44px !important;
+        height: 44px !important;
+        font-size: 1.2rem !important;
+        z-index: 1001 !important;
+    }
+    
+    /* Chat-Nachrichten optimiert */
+    .chat-message {
+        font-size: 0.9rem !important;
+        line-height: 1.4 !important;
+        max-width: 85% !important;
+        margin-bottom: 12px !important;
+        padding: 10px 12px !important;
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+    }
+    
+    /* Scrollbar sichtbar machen */
+    #ai-chat-history::-webkit-scrollbar {
+        width: 4px !important;
+    }
+    
+    #ai-chat-history::-webkit-scrollbar-track {
+        background: transparent !important;
+    }
+    
+    #ai-chat-history::-webkit-scrollbar-thumb {
+        background: rgba(255, 193, 7, 0.3) !important;
+        border-radius: 2px !important;
+    }
+}
+
+/* iOS-spezifische Fixes ENTFERNEN oder anpassen */
+@supports (-webkit-touch-callout: none) {
+    /* iOS Safari spezifisch */
+    #ai-response-modal .modal-content {
+        height: 100vh !important;
+        /* KEINE calc() heights hier! */
+    }
+    
+    #ai-chat-history {
+        /* KEINE festen Heights! */
+        flex: 1 1 auto !important;
+    }
+}
+
+/* Safe Area Support für iPhone X+ */
+@supports (padding: max(0px)) {
+    @media (max-width: 768px) {
+        #ai-chat-form {
+            margin-bottom: max(20px, env(safe-area-inset-bottom)) !important;
+            padding-bottom: env(safe-area-inset-bottom) !important;
+        }
+    }
+}
+
+/* MOBILE: BUTTON VERSTECKEN, RETURN-TASTE NUTZEN */
+
+@media (max-width: 768px) {
+    /* Senden-Button auf Mobile komplett verstecken */
+    #ai-chat-form button {
+        display: none !important;
+    }
+    
+    /* Input-Feld nimmt die ganze Breite */
+    #ai-chat-form input[type="text"] {
+        width: 100% !important;
+        padding: 18px 20px !important;
+        font-size: 16px !important; /* Verhindert Zoom */
+        border-radius: 10px !important;
+        
+        /* Zeige "Senden" auf der Tastatur */
+        -webkit-appearance: none !important;
+    }
+    
+    /* Formular-Container anpassen */
+    #ai-chat-form {
+        margin-bottom: 20px !important;
+        padding: 0 !important;
+    }
+}
