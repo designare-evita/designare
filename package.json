@@ -11,7 +11,8 @@
     "@google/generative-ai": "^0.12.0",
     "@supabase/supabase-js": "^2.43.5",
     "@vercel/kv": "^3.0.0",
-    "googleapis": "^142.0.0"
+    "googleapis": "^142.0.0",
+    "redis": "^5.10.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
