@@ -27,6 +27,7 @@
 
 html {
     height: 100%;
+    scroll-behavior: smooth;
 }
 
 body {
@@ -110,93 +111,7 @@ a {
 }
 
 /* ===================
-   4. HEADER
-   =================== */
-
-.main-header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: var(--header-height-desktop);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px;
-    z-index: 1001;
-    box-sizing: border-box;
-}
-
-#top-left-logo-link {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 40px;
-    width: 40px;
-    opacity: 0.8;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-#top-left-logo-link:hover {
-    opacity: 1;
-    transform: scale(1.1);
-}
-
-#top-left-logo-img {
-    height: 46px;
-    width: auto;
-    vertical-align: middle;
-}
-
-.header-right-controls {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-/* Header Buttons - Zusammengeführt */
-.header-right-controls button,
-#contact-button,
-#cookie-info-button,
-#about-me-button,
-#evita-chat-button,
-#search-button {
-    background: none;
-    border: none;
-    border-radius: 50%;
-    color: var(--text-color);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 40px;
-    width: 40px;
-    font-size: 1.2rem;
-    padding: 0;
-    margin: 0;
-    opacity: 0.7;
-    transition: all 0.3s ease;
-}
-
-#contact-button:hover,
-#cookie-info-button:hover,
-#about-me-button:hover,
-#evita-chat-button:hover,
-#search-button:hover {
-    background-color: var(--accent-color);
-    color: #fff;
-    opacity: 1;
-    transform: scale(1.1);
-}
-
-#menu-toggle-button:hover {
-    opacity: 1;
-    transform: scale(1.1);
-    color: var(--accent-color);
-}
-
-/* ===================
-   5. HERO & LAYOUT
+   4. HERO & LAYOUT
    =================== */
 
 .container {
@@ -226,20 +141,19 @@ a {
     z-index: 2;
 }
 
-
 #particles-js {
     height: 100%;
     left: 0;
-    position: fixed; /* ÄNDERUNG: Von 'absolute' zu 'fixed' */
+    position: fixed; /* Geändert auf fixed für Parallax-Effekt auf allen Seiten */
     top: 0;
     width: 100%;
     z-index: 1;
     opacity: 0.4;
-    pointer-events: none; /* EMPFOHLEN: Damit Klicks durchgehen */
+    pointer-events: none;
 }
 
 /* ===================
-   6. HERO CONTENT
+   5. HERO CONTENT
    =================== */
 
 .profile-picture {
@@ -272,7 +186,7 @@ a {
 }
 
 /* ===================
-   7. AI FORM (Startseite)
+   6. AI FORM (Startseite)
    =================== */
 
 .ai-container {
@@ -341,35 +255,7 @@ a {
 }
 
 /* ===================
-   8. FOOTER
-   =================== */
-
-footer {
-    align-items: center;
-    bottom: 10px;
-    display: flex;
-    gap: 8px;
-    position: fixed;
-    right: 10px;
-    z-index: 1001;
-}
-
-footer a {
-    border: 1px solid var(--text-color);
-    border-radius: 5px;
-    color: var(--text-color);
-    font-size: 0.8rem;
-    opacity: 0.5;
-    padding: 4px 8px;
-    transition: opacity 0.3s ease;
-}
-
-footer a:hover {
-    opacity: 1;
-}
-
-/* ===================
-   9. MODALS (Basis)
+   7. MODALS (Basis)
    =================== */
 
 .modal-overlay {
@@ -433,7 +319,7 @@ footer a:hover {
 }
 
 /* ===================
-   10. CONTACT MODAL
+   8. CONTACT MODAL
    =================== */
 
 .modal-content form {
@@ -517,7 +403,7 @@ footer a:hover {
 }
 
 /* ===================
-   11. COOKIE LIGHTBOX
+   9. COOKIE LIGHTBOX
    =================== */
 
 .cookie-lightbox-buttons {
@@ -564,7 +450,7 @@ footer a:hover {
 }
 
 /* ===================
-   12. LEGAL MODAL
+   10. LEGAL MODAL
    =================== */
 
 #legal-modal .about-image-wrapper,
@@ -615,7 +501,7 @@ footer a:hover {
 }
 
 /* ===================
-   13. SEARCH MODAL
+   11. SEARCH MODAL
    =================== */
 
 .search-modal-content {
@@ -769,37 +655,10 @@ footer a:hover {
 }
 
 /* ===================
-   14. MOBILE RESPONSIVE
+   12. MOBILE RESPONSIVE
    =================== */
 
 @media (max-width: 768px) {
-    .main-header {
-        padding: 15px 10px;
-        height: var(--header-height-mobile);
-    }
-
-    #top-left-logo-link {
-        height: 35px;
-        width: 35px;
-    }
-
-    #top-left-logo-img {
-        height: 30px;
-    }
-
-    .header-right-controls {
-        gap: 10px;
-    }
-
-    .header-right-controls button,
-    #contact-button,
-    #cookie-info-button,
-    #search-button {
-        font-size: 1rem;
-        height: 35px;
-        width: 35px;
-    }
-
     #hero {
         height: calc(100vh - var(--header-height-mobile));
         margin-top: var(--header-height-mobile);
@@ -827,15 +686,6 @@ footer a:hover {
         width: 160px;
         height: 160px;
         margin-bottom: 1rem;
-    }
-
-    footer {
-        gap: 5px;
-    }
-
-    footer a {
-        font-size: 0.7rem;
-        padding: 3px 6px;
     }
 
     .cookie-lightbox-buttons {
