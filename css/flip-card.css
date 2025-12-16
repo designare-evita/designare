@@ -352,25 +352,29 @@
     .evita-text-middle { order: 3; }
     .evita-text-bottom { order: 4; }
 
-    /* Buttons Mobile: HIER DIE ÄNDERUNG */
+    /* Buttons Mobile: Untereinander aber gleiches Padding wie Desktop */
     .flip-controls {
-        flex-direction: column !important; /* Untereinander anordnen */
+        flex-direction: column !important;
         margin-top: 20px;
-        gap: 12px; /* Abstand zwischen den Buttons */
+        gap: 12px;
     }
 
     .flip-btn-style {
-        width: 100%; /* Volle Breite */
-        height: 50px; /* Gute Höhe für Touch-Bedienung */
+        width: 100%;
+        /* GLEICHES PADDING WIE DESKTOP */
+        padding: 12px 20px;
+        min-height: 50px;
+        height: auto;
         font-size: 1rem;
     }
     
     .flip-panel-content {
-        padding: 10px 15px 40px 15px; /* Unten Platz lassen */
+        padding: 10px 15px 40px 15px;
     }
 
     .flip-panel h2 { font-size: 1.6rem; margin-bottom: 15px; }
 }
+
 /* ===================
    11. EXTRA SMALL SCREENS
    =================== */
