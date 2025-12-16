@@ -47,31 +47,45 @@ const loadFeedback = async () => {
 
 const initHeaderScrollEffect = () => {
     const header = document.querySelector('.main-header');
+    const footer = document.querySelector('footer'); // Footer holen
+    
     if (!header) return;
 
     let lastScrollY = window.scrollY;
 
     const handleScroll = () => {
         const currentScrollY = window.scrollY;
-
-        // 1. "Scrolled"-Look (Dunkel/Blur) aktivieren, wenn wir nicht ganz oben sind
+        
+        // --- HEADER LOGIK ---
         if (currentScrollY > 50) {
             header.classList.add('scrolled');
         } else {
             header.classList.remove('scrolled');
-            // Wenn wir ganz oben sind, muss der Header immer sichtbar sein
             header.classList.remove('hide-up'); 
         }
 
-        // 2. Smart Hide Logik (Nur wenn wir weiter unten sind > 100px)
-        if (currentScrollY > 100) {
+        // --- SMART HIDE LOGIK (Header & Footer) ---
+        // Prüfen, ob wir ganz unten auf der Seite sind
+        const isAtBottom = (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 50;
+
+        if (currentScrollY > 100 && !isAtBottom) {
             if (currentScrollY > lastScrollY) {
-                // RUNTER scrollen -> Header verstecken
+                // RUNTER scrollen -> Alles verstecken
                 header.classList.add('hide-up');
+                if(footer) footer.classList.add('hide-down');
             } else {
-                // HOCH scrollen -> Header zeigen
+                // HOCH scrollen -> Alles zeigen
                 header.classList.remove('hide-up');
+                if(footer) footer.classList.remove('hide-down');
             }
+        } else if (isAtBottom) {
+            // GANZ UNTEN -> Footer ZWINGEND zeigen (Header kann weg bleiben oder auch kommen)
+            if(footer) footer.classList.remove('hide-down');
+            // Optional: Header auch zeigen am Ende? 
+            // header.classList.remove('hide-up'); 
+        } else {
+            // GANZ OBEN (< 100px) -> Footer zeigen
+             if(footer) footer.classList.remove('hide-down');
         }
 
         lastScrollY = currentScrollY;
@@ -79,6 +93,7 @@ const initHeaderScrollEffect = () => {
 
     window.addEventListener('scroll', handleScroll, { passive: true });
 };
+
 
 const setupSideMenu = () => {
     const menuButton = document.getElementById('menu-toggle-button');
