@@ -8,7 +8,7 @@
    =================== */
 
 #blog-main {
-    max-width: 1200px; /* 20% breiter als vorher (1000px) */
+    max-width: 1200px; 
     margin: 0 auto;
     padding: 120px 2rem 4rem;
     min-height: 100vh;
@@ -58,7 +58,7 @@
     color: var(--text-color);
 }
 
-/* Breadcrumb Anpassung falls nötig */
+/* Breadcrumb Anpassung */
 .breadcrumb ol {
     display: flex;
     flex-wrap: wrap;
@@ -121,12 +121,11 @@
     padding: 0 1rem;
     
     font-size: 1.2rem;
-    opacity: 1; /* Immer sichtbar */
-    color: var(--accent-color); /* Immer Akzentfarbe */
+    opacity: 1; 
+    color: var(--accent-color); 
     transition: transform 0.3s ease;
 }
 
-/* Hover Effekt: Nur leichte Bewegung */
 .blog-article section:hover::after {
     transform: translateX(-50%) scale(1.2);
 }
@@ -169,7 +168,7 @@ html {
     color: var(--accent-color);
 }
 
-/* Lists - Würfel statt Punkte (NUR FÜR ARTIKEL-TEXT) */
+/* Lists */
 .blog-article ul {
     margin-bottom: 1.5rem;
     padding-left: 1.5rem;
@@ -203,34 +202,43 @@ html {
 }
 
 /* ===================
-   5. SPECIAL BOXES (TOC KORREKTUR)
+   5. SPECIAL BOXES (TOC - GLASS DESIGN)
    =================== */
 
 .toc-container {
     position: -webkit-sticky;
     position: sticky;
-    top: 10px; 
-    z-index: 90;
+    
+    /* Da der Header wegfährt, kleben wir nah am oberen Rand */
+    top: 20px; 
+    z-index: 900;
     
     display: flex;
-    justify-content: flex-start; /* Linksbündig */
-    
-    background: transparent;
-    pointer-events: none;
-    padding: 1rem 0;
-    margin-bottom: 3rem;
+    justify-content: flex-start;
     width: 100%;
+    
+    /* KORREKTUR: Hintergrund für Lesbarkeit */
+    padding: 12px 20px;
+    margin-bottom: 3rem;
+    
+    /* Glassmorphism Background */
+    background-color: rgba(18, 18, 18, 0.85); /* Dunkel & Halbtransparent */
+    backdrop-filter: blur(12px);             /* Weichzeichner für Text dahinter */
+    -webkit-backdrop-filter: blur(12px);
+    
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
-/* WICHTIG: Spezifischer Selektor um globale Listen-Styles zu überschreiben */
+/* Liste resetten */
 .blog-article .toc-container ul,
 .toc-container ul {
     display: flex;
-    flex-wrap: wrap; /* Zeilenumbruch erlauben = Horizontal */
+    flex-wrap: wrap;
     justify-content: flex-start;
     gap: 0.8rem;
     
-    /* Listen-Style KILLEN */
     list-style: none !important;
     list-style-type: none !important;
     padding-left: 0 !important;
@@ -242,18 +250,16 @@ html {
 .toc-container li {
     margin: 0;
     padding: 0;
-    list-style: none !important; /* Sicherheitshalber auch hier */
+    list-style: none !important;
     pointer-events: none;
 }
 
 /* Mini-Buttons (Badges) */
 .toc-container a {
     pointer-events: auto; 
-    
     display: inline-block;
     padding: 0.4rem 1rem;
     
-    /* DEINE ANPASSUNGEN */
     font-size: 12px;
     border-radius: 8px;
     
@@ -261,15 +267,11 @@ html {
     text-decoration: none;
     color: var(--text-color);
     
-    /* Badge Look */
-    background-color: rgba(255, 255, 255, 0.08);
+    /* Button Hintergrund etwas heller als der Container */
+    background-color: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.1);
     
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    
     transition: all 0.3s ease;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 .toc-container a:hover {
@@ -284,8 +286,9 @@ html {
 /* Mobile Anpassung */
 @media (max-width: 768px) {
     .toc-container {
+        /* Mobile Header ist da, also etwas Abstand */
         top: 80px; 
-        padding-bottom: 1rem;
+        padding: 10px;
         justify-content: center;
     }
     
@@ -295,6 +298,10 @@ html {
     }
 }
 
+
+/* ===================
+   6. CONTENT BOXES
+   =================== */
 
 /* Summary Box */
 .summary-box {
@@ -314,11 +321,11 @@ html {
 
 .summary-box ul {
     margin-bottom: 0;
-    list-style-type: square; /* Hier sind Würfel okay */
+    list-style-type: square;
     padding-left: 1.5rem;
 }
 
-/* Info Box */
+/* Info & Tech Box */
 .info-box,
 .tech-box {
     background-color: rgba(255, 255, 255, 0.03);
@@ -350,7 +357,7 @@ html {
     margin-bottom: 0;
 }
 
-/* Expert Tip (Aside) */
+/* Expert Tip */
 .expert-tip {
     background-color: rgba(252, 181, 0, 0.1);
     border: 2px solid var(--accent-color);
@@ -372,10 +379,7 @@ html {
     font-size: 1.1rem;
 }
 
-/* ===================
-   6. STEP GUIDE
-   =================== */
-
+/* Step Guide */
 .step-guide {
     margin-bottom: 2rem;
     padding-left: 1rem;
@@ -387,10 +391,7 @@ html {
     margin-bottom: 0.8rem;
 }
 
-/* ===================
-   7. FEATURE LIST (Definition List)
-   =================== */
-
+/* Feature List */
 .feature-list {
     background-color: rgba(255, 255, 255, 0.02);
     padding: 1.5rem;
@@ -415,10 +416,7 @@ html {
     border-left: 2px solid var(--border-color);
 }
 
-/* ===================
-   8. COMPARISON TABLE
-   =================== */
-
+/* Comparison Table */
 .comparison-table {
     width: 100%;
     border-collapse: collapse;
@@ -438,16 +436,8 @@ html {
     border-bottom: 2px solid var(--accent-color);
 }
 
-/* Icons Styling in der Tabelle */
-.th-wrong i {
-    color: #ff6b6b;
-    margin-left: 8px;
-}
-
-.th-correct i {
-    color: #51cf66;
-    margin-left: 8px;
-}
+.th-wrong i { color: #ff6b6b; margin-left: 8px; }
+.th-correct i { color: #51cf66; margin-left: 8px; }
 
 .comparison-table td {
     padding: 1rem;
@@ -459,10 +449,7 @@ html {
     white-space: nowrap;
 }
 
-/* ===================
-   9. FAQ SECTION (Akkordeon)
-   =================== */
-
+/* FAQ Accordion */
 .faq-accordion {
     margin: 2rem 0;
 }
@@ -491,7 +478,6 @@ html {
     outline: none;
 }
 
-/* Custom Marker */
 .faq-accordion summary::after {
     content: '+';
     position: absolute;
@@ -523,21 +509,11 @@ html {
     border-top: 1px solid rgba(255,255,255,0.05);
 }
 
-.faq-content p {
-    margin-bottom: 0;
-}
-
-.faq-content ol {
-    margin-top: 1rem;
-    margin-bottom: 0;
-    padding-left: 1.2rem;
-}
+.faq-content p { margin-bottom: 0; }
+.faq-content ol { margin-top: 1rem; margin-bottom: 0; padding-left: 1.2rem; }
 
 
-/* ===================
-   10. KEY POINTS BOX
-   =================== */
-
+/* Key Points */
 .key-points {
     background: linear-gradient(135deg, rgba(252, 181, 0, 0.08) 0%, rgba(252, 181, 0, 0.03) 100%);
     border: 1px solid var(--accent-color);
@@ -553,20 +529,10 @@ html {
     font-size: 1.3rem;
 }
 
-.key-points ul {
-    list-style: none;
-    padding-left: 0;
-}
+.key-points ul { list-style: none; padding-left: 0; }
+.key-points li { margin-bottom: 1rem; line-height: 1.7; }
 
-.key-points li {
-    margin-bottom: 1rem;
-    line-height: 1.7;
-}
-
-/* ===================
-   11. CTA SECTION
-   =================== */
-
+/* CTA Section */
 .cta-section {
     background: linear-gradient(135deg, rgba(252, 181, 0, 0.15) 0%, rgba(252, 181, 0, 0.05) 100%);
     border: 2px solid var(--accent-color);
@@ -583,10 +549,7 @@ html {
     font-size: 1.5rem;
 }
 
-.cta-section p {
-    margin-bottom: 1.5rem;
-    font-size: 1.05rem;
-}
+.cta-section p { margin-bottom: 1.5rem; font-size: 1.05rem; }
 
 .cta-button {
     display: inline-block;
@@ -607,10 +570,7 @@ html {
     box-shadow: 0 10px 20px rgba(252, 181, 0, 0.3);
 }
 
-/* ===================
-   12. ARTICLE FOOTER
-   =================== */
-
+/* Article Footer */
 .article-footer {
     margin-top: 4rem;
     padding-top: 2rem;
@@ -634,7 +594,7 @@ html {
 }
 
 /* ===================
-   13. RESPONSIVE DESIGN
+   7. RESPONSIVE DESIGN
    =================== */
 
 @media (max-width: 768px) {
@@ -642,73 +602,26 @@ html {
         padding: 85px 1.5rem 3rem;
     }
 
-    .article-header h1 {
-        font-size: 1.8rem;
-    }
+    .article-header h1 { font-size: 1.8rem; }
+    .article-meta { gap: 1rem; font-size: 0.85rem; }
+    .blog-article h2 { font-size: 1.5rem; margin: 2rem 0 1rem; padding-top: 30px; }
+    .blog-article h3 { font-size: 1.2rem; }
 
-    .article-meta {
-        gap: 1rem;
-        font-size: 0.85rem;
-    }
-
-    .blog-article h2 {
-        font-size: 1.5rem;
-        margin: 2rem 0 1rem;
-        padding-top: 30px; 
-    }
-
-    .blog-article h3 {
-        font-size: 1.2rem;
-    }
-
-    /* ToC Mobile */
-    .toc-container {
-        width: 100%;
-        min-width: 100%;
-        padding-bottom: 1.5rem;
-        justify-content: center;
-    }
-    
-    .toc-container ul {
-         gap: 0.5rem;
-    }
-
-    .summary-box,
-    .info-box,
-    .tech-box,
-    .expert-tip,
-    .key-points,
-    .cta-section {
+    /* Container Padding Mobile */
+    .summary-box, .info-box, .tech-box, .expert-tip, .key-points, .cta-section {
         padding: 1.2rem;
     }
 
-    .info-box,
-    .tech-box,
-    .expert-tip {
+    .info-box, .tech-box, .expert-tip {
         flex-direction: column;
         gap: 0.8rem;
     }
 
-    .info-box i,
-    .tech-box i,
-    .expert-tip i {
-        font-size: 1.3rem;
-    }
-
     /* Table Responsive */
-    .comparison-table {
-        font-size: 0.85rem;
-    }
-
-    .comparison-table th,
-    .comparison-table td {
-        padding: 0.7rem;
-    }
-
-    .comparison-table thead {
-        display: none;
-    }
-
+    .comparison-table { font-size: 0.85rem; }
+    .comparison-table th, .comparison-table td { padding: 0.7rem; }
+    .comparison-table thead { display: none; }
+    
     .comparison-table tr {
         display: block;
         margin-bottom: 1.5rem;
@@ -728,86 +641,31 @@ html {
         background-color: rgba(255, 0, 0, 0.1);
         border-bottom: 1px solid var(--border-color);
     }
-
-    .comparison-table td:first-child::before {
-        content: "Falsch: ";
-        font-weight: 600;
-        color: #ff6b6b;
-    }
-
-    .comparison-table td:last-child::before {
-        content: "Richtig: ";
-        font-weight: 600;
-        color: #51cf66;
-    }
+    .comparison-table td:first-child::before { content: "Falsch: "; font-weight: 600; color: #ff6b6b; }
+    .comparison-table td:last-child::before { content: "Richtig: "; font-weight: 600; color: #51cf66; }
 
     /* CTA Mobile */
-    .cta-section h2 {
-        font-size: 1.3rem;
-    }
-
-    .cta-button {
-        display: block;
-        width: 100%;
-        padding: 0.9rem 1.5rem;
-    }
+    .cta-section h2 { font-size: 1.3rem; }
+    .cta-button { display: block; width: 100%; padding: 0.9rem 1.5rem; }
 }
 
 @media (max-width: 480px) {
-    #blog-main {
-        padding: 75px 1rem 2rem;
-    }
-
-    .article-header h1 {
-        font-size: 1.5rem;
-    }
-
-    .blog-article h2 {
-        font-size: 1.3rem;
-    }
-
-    .breadcrumb ol {
-        font-size: 0.8rem;
-    }
+    #blog-main { padding: 75px 1rem 2rem; }
+    .article-header h1 { font-size: 1.5rem; }
+    .blog-article h2 { font-size: 1.3rem; }
+    .breadcrumb ol { font-size: 0.8rem; }
 }
 
 /* ===================
-   14. PRINT STYLES
+   8. PRINT STYLES
    =================== */
 
 @media print {
-    #blog-main {
-        padding: 0;
-        max-width: 100%;
-    }
-
-    .breadcrumb,
-    .cta-section,
-    .article-footer {
-        display: none;
-    }
-
-    .article-header {
-        border-bottom: 2px solid #000;
-    }
-
-    .blog-article h1,
-    .blog-article h2,
-    .blog-article h3 {
-        color: #000;
-        page-break-after: avoid;
-    }
-
-    .blog-article section {
-        page-break-inside: avoid;
-    }
-
-    .blog-article a {
-        color: #000;
-        text-decoration: underline;
-    }
-
-    .blog-article code {
-        border: 1px solid #000;
-    }
+    #blog-main { padding: 0; max-width: 100%; }
+    .breadcrumb, .cta-section, .article-footer { display: none; }
+    .article-header { border-bottom: 2px solid #000; }
+    .blog-article h1, .blog-article h2, .blog-article h3 { color: #000; page-break-after: avoid; }
+    .blog-article section { page-break-inside: avoid; }
+    .blog-article a { color: #000; text-decoration: underline; }
+    .blog-article code { border: 1px solid #000; }
 }
