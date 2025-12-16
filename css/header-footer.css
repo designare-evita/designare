@@ -129,31 +129,56 @@
    4. FOOTER
    =================== */
 
-footer {
+.footer {
     position: fixed;
-    bottom: 10px;
-    right: 10px;
-    z-index: 1001; /* Gleiche Ebene wie Header */
+    bottom: 20px; /* Etwas Abstand vom Rand sieht edler aus */
+    right: 20px;  /* Rechtsbündig wie gehabt */
+    z-index: 1001; 
     
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
+    padding: 8px 12px;
+    
+    /* Glassmorphism Design */
+    background-color: rgba(18, 18, 18, 0.65); /* Leicht transparent */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 50px; /* Pill-Shape (Kapselform) */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    
+    /* Animation für das Ausblenden */
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease;
 }
 
-footer a:not(.footer-btn) { /* Standard Text-Links im Footer */
-    border: 1px solid var(--text-color);
-    border-radius: 5px;
+/* Zustand: Versteckt (Nach UNTEN geschoben) */
+footer.hide-down {
+    transform: translateY(200%); /* Schiebt ihn komplett nach unten raus */
+    opacity: 0; /* Zusätzlich ausblenden für weicheren Effekt */
+}
+
+/* Links im Footer styling */
+footer a:not(.footer-btn) { 
     color: var(--text-color);
     font-size: 0.8rem;
-    opacity: 0.5;
+    opacity: 0.6;
     padding: 4px 8px;
     text-decoration: none;
-    transition: opacity 0.3s ease, background-color 0.3s ease;
+    transition: all 0.2s ease;
+    border-radius: 4px;
 }
 
 footer a:not(.footer-btn):hover {
     opacity: 1;
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Trennlinie zwischen Links (optional, falls du | nutzt) */
+footer span.separator {
+    opacity: 0.3;
+    font-size: 0.8rem;
 }
 
 /* Back-to-Top Button */
@@ -161,30 +186,42 @@ footer a:not(.footer-btn):hover {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    margin-left: 0.5rem; 
     
-    width: 35px;
-    height: 35px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     
-    background-color: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: var(--accent-color);
-    font-size: 1.1rem;
+    background-color: var(--accent-color); /* Akzentfarbe für Sichtbarkeit */
+    color: #1a1a1a; /* Dunkles Icon */
+    font-size: 1rem;
     
     text-decoration: none;
     transition: all 0.3s ease;
-    opacity: 0.8;
+    box-shadow: 0 2px 10px rgba(252, 181, 0, 0.3); /* Leucht-Effekt */
+    margin-left: 5px;
 }
 
 #back-to-top:hover {
-    background-color: var(--accent-color);
-    color: #1a1a1a; /* Dunkles Icon auf gelbem Grund */
-    border-color: var(--accent-color);
-    transform: translateY(-3px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    opacity: 1;
+    transform: translateY(-2px) scale(1.1);
+    box-shadow: 0 5px 15px rgba(252, 181, 0, 0.5);
     cursor: pointer;
+}
+
+/* Mobile Anpassung */
+@media (max-width: 768px) {
+    footer {
+        bottom: 15px;
+        right: 15px;
+        padding: 6px 10px;
+        /* Auf Mobile evtl. etwas kleiner */
+        transform: scale(0.95); 
+        transform-origin: bottom right;
+    }
+    
+    /* WICHTIG: Die hide-down Klasse muss das scale überschreiben/beibehalten */
+    footer.hide-down {
+        transform: translateY(200%) scale(0.95);
+    }
 }
 
 /* ===================
