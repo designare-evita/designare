@@ -15,6 +15,8 @@ let globalAiFormInstance = null;
 const loadContent = (url, elementId) => {
     const placeholder = document.getElementById(elementId);
     if (!placeholder) {
+        // Wir geben ein rejected Promise zurück, damit der Aufrufer weiß, dass das Element fehlt
+        // Das ist okay, solange wir den Fehler später fangen oder tolerieren
         return Promise.reject(`Platzhalter-Element '${elementId}' nicht gefunden.`);
     }
     return fetch(url).then(response => {
@@ -23,6 +25,26 @@ const loadContent = (url, elementId) => {
     }).then(data => {
         placeholder.innerHTML = data;
     });
+};
+
+// NEU: Feedback-Bereich laden (Fehlertolerant)
+const loadFeedback = () => {
+    const placeholder = document.getElementById('feedback-placeholder');
+    if (placeholder) {
+        // Wir gehen davon aus, dass die Datei im Root liegt, wie header.html
+        return fetch('blog-feedback.html')
+            .then(response => {
+                if (!response.ok) throw new Error('Feedback-Template konnte nicht geladen werden');
+                return response.text();
+            })
+            .then(data => {
+                placeholder.innerHTML = data;
+            })
+            .catch(err => {
+                console.warn('Hinweis: Feedback-Sektion wurde nicht geladen (ggf. Datei nicht gefunden).', err);
+            });
+    }
+    return Promise.resolve(); // Nichts tun, wenn kein Placeholder da ist
 };
 
 // === 4. SETUP: SIDE MENU ===
@@ -46,13 +68,16 @@ const setupSideMenu = () => {
                 e.preventDefault();
                 e.stopPropagation();
                 sideMenu.classList.remove('visible');
-                // Nur entfernen, wenn wir nicht gerade auf der Rückseite der Flipcard sind
-                // (Einfache Prüfung: Hat der Body noch die Initial-Sperre oder wurde sie durch Flip entfernt?)
-                const heroFlipped = document.querySelector('.flip-container.flipped');
+                
+                // Prüfen ob wir im Flip-Modus sind (dort soll Scrollen erlaubt bleiben)
+                const heroFlipped = document.querySelector('.hero-flip-wrapper.flipped'); 
+                // Anmerkung: In deinem Code war es '.flip-container.flipped', ich habe es an deine Flip-Logik angepasst, 
+                // falls du die Klasse 'hero-flip-wrapper' nutzt. Wenn nicht, greift der Fallback.
+                
                 if (!heroFlipped) {
                     document.body.classList.remove('no-scroll');
                 } else {
-                    // Wenn wir geflippt sind, wollen wir scrollen können, also auch entfernen
+                    // Auch im Flip-Modus wollen wir scrollen, wenn das Menü zugeht
                     document.body.classList.remove('no-scroll'); 
                 }
             });
@@ -209,10 +234,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     
     try {
-        const headerPromise = loadContent('/header.html', 'header-placeholder');
-        const modalsPromise = loadContent('/modals.html', 'modal-container');
-        const footerPromise = loadContent('/footer.html', 'footer-placeholder');
-        const sideMenuPromise = loadContent('/side-menu.html', 'side-menu-placeholder').catch(err => {
+        const headerPromise = loadContent('header.html', 'header-placeholder');
+        const modalsPromise = loadContent('modals.html', 'modal-container');
+        const footerPromise = loadContent('footer.html', 'footer-placeholder');
+        
+        // NEU: Feedback Bereich laden (parallel)
+        loadFeedback();
+
+        const sideMenuPromise = loadContent('side-menu.html', 'side-menu-placeholder').catch(err => {
             console.warn("⚠️ Side-Menu konnte nicht geladen werden:", err);
             return null;
         });
@@ -230,7 +259,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         
     } catch (error) {
         console.error("❌ Fehler beim Laden:", error);
-        document.body.classList.add('page-loaded');
+        document.body.classList.add('page-loaded'); // Trotzdem anzeigen
     }
 });
 
