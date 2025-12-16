@@ -102,6 +102,19 @@ a {
    3. UTILITY CLASSES
    =================== */
 
+/* Strong-Tag: font-weight 600 als Standard */
+strong,
+b {
+    font-weight: 600;
+}
+
+/* Ausnahme: In h1 bleibt strong bei 700 */
+h1 strong,
+h1 b {
+    font-weight: 700;
+}
+
+
 .accent-text-inline {
     color: var(--accent-color);
 }
