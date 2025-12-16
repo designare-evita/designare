@@ -6,6 +6,7 @@
     <title>Semantisches Markup: Warum sauberer Code das Fundament für SEO und KI-Suche ist | Michael Kanda</title>
     <meta name="description" content="Semantisches Markup ist die harte Währung für moderne Suchmaschinen und KI-Modelle. Erfahre, warum sauberes HTML der Schlüssel für GEO und SEO ist.">
     <meta name="robots" content="noindex">
+    
     <link rel="preload" href="Font/Poppins-Regular.ttf" as="font" type="font/ttf" crossorigin>
     <link rel="icon" href="images/favicon.webp" type="image/webp">
     
@@ -14,11 +15,9 @@
     
     <link rel="stylesheet" href="css/side-menu.css">
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/blog-style.css">
     <link rel="stylesheet" href="css/header-footer.css">
-    <link rel="stylesheet" href="css/feedback-style.css">
-    
-    <link rel="canonical" href="https://designare.at/semantisches-markup.html" />
+    <link rel="stylesheet" href="css/blog-style.css">
+    <link rel="stylesheet" href="css/feedback-style.css"> <link rel="canonical" href="https://designare.at/semantisches-markup.html" />
 
     <script type="application/ld+json">
     {
@@ -65,14 +64,6 @@
         <article class="blog-article">
             
             <header class="article-header">
-                <nav class="breadcrumb" aria-label="Breadcrumb">
-                    <ol>
-                        <li><a href="index.html">Home</a></li>
-                        <li><a href="blog.html">Blog</a></li>
-                        <li aria-current="page">Semantisches Markup</li>
-                    </ol>
-                </nav>
-                
                 <h1>Semantisches Markup: Warum sauberer Code das Fundament für SEO und KI-Suche ist</h1>
                 
                 <div class="article-meta">
@@ -329,15 +320,46 @@
                 <p>Lass dich nicht von der Bequemlichkeit generischer Container täuschen. Ja, es erfordert anfangs etwas mehr Hirnschmalz und Disziplin, das exakt passende Tag für den jeweiligen Inhalt zu wählen, aber dieser Invest zahlt sich exponentiell aus. Du baust damit nicht nur für den Browser von heute, sondern fütterst die KI-Assistenten von morgen mit hochwertigen, verständlichen Daten. Wenn du deinen Code liebst und willst, dass deine Projekte auch in einer Ära jenseits der klassischen 10 blauen Links relevant bleiben, ist semantisches Markup deine Pflicht als Entwickler. Zeig der Welt (und den Bots), dass du dein Handwerk verstehst: Weg vom Code-Chaos, hin zur klaren Struktur.</p>
             </section>
 
-            <aside class="cta-section" aria-labelledby="cta-heading">
-                <h2 id="cta-heading">Fandest du diesen Deep-Dive hilfreich?</h2>
-                <p>Guter Code ist Handarbeit. Wenn du sichergehen willst, dass deine Webseite nicht nur gut aussieht, sondern auch unter der Haube "AI-Ready" ist, dann lass uns einen Blick darauf werfen. Wir analysieren deine Struktur und finden das Potenzial, das im Quellcode schlummert.</p>
-                <a href="#" class="cta-button" id="code-check-cta">Jetzt unverbindlichen Code-Check anfragen</a>
+            <aside class="feedback-section" aria-labelledby="feedback-heading">
+                <h2 id="feedback-heading" class="visually-hidden">Feedback geben</h2>
+                
+                <div class="feedback-container">
+                    <p class="feedback-title">War dieser Artikel hilfreich?</p>
+                    
+                    <div class="rating-buttons">
+                        <button class="rating-btn positive" aria-label="Sehr informativ">
+                            <i class="fa-solid fa-plus"></i> Sehr informativ
+                        </button>
+                        <button class="rating-btn neutral" aria-label="Neutral">
+                            <i class="fa-solid fa-minus"></i> Neutral
+                        </button>
+                        <button class="rating-btn negative" aria-label="Unbrauchbar">
+                            <i class="fa-solid fa-xmark"></i> Unbrauchbar
+                        </button>
+                    </div>
+
+                    <div class="rating-ratio-bar" role="progressbar" aria-label="Bewertungsverhältnis">
+                        <div class="ratio-segment pos" style="width: 70%;"></div>
+                        <div class="ratio-segment neu" style="width: 20%;"></div>
+                        <div class="ratio-segment neg" style="width: 10%;"></div>
+                    </div>
+                    <div class="rating-labels">
+                        <span>70%</span>
+                        <span>Hilfreich</span>
+                    </div>
+                </div>
+
+                <div class="share-container">
+                    <span class="share-label">Teilen:</span>
+                    <a href="#" aria-label="Auf WhatsApp teilen" class="share-icon"><i class="fa-brands fa-whatsapp"></i></a>
+                    <a href="#" aria-label="Auf LinkedIn teilen" class="share-icon"><i class="fa-brands fa-linkedin-in"></i></a>
+                    <a href="#" aria-label="Auf Reddit teilen" class="share-icon"><i class="fa-brands fa-reddit-alien"></i></a>
+                    <a href="#" aria-label="Auf X teilen" class="share-icon"><i class="fa-brands fa-x-twitter"></i></a>
+                </div>
             </aside>
 
             <footer class="article-footer">
-              
-            </footer>
+              </footer>
 
         </article>
 
