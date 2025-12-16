@@ -208,8 +208,9 @@ html {
 
 /* KORREKTUR: Inhaltsverzeichnis (ToC) Styles - Rahmen weg, keine Animation */
 .toc-container {
-    padding: 1.5rem 0; /* Nur vertikales Padding */
-    margin-bottom: 3rem;
+    padding: 1.5rem 0; /* Nur vertikales Padding, kein Rahmen */
+    /* KORREKTUR: Margin-bottom auf 24px reduziert */
+    margin-bottom: 24px;
     display: inline-block;
     min-width: 50%;
     /* border entfernt */
@@ -221,7 +222,8 @@ html {
     margin-top: 0;
     margin-bottom: 1rem;
     color: var(--accent-color);
-    border-bottom: 1px solid var(--border-color);
+    /* KORREKTUR: Unterstreichung entfernt */
+    border-bottom: none;
     padding-bottom: 0.5rem;
     padding-top: 0; /* Override padding-top 40px rule from h2 */
 }
@@ -422,7 +424,8 @@ html {
     background-color: rgba(255, 255, 255, 0.02);
     border-radius: 8px;
     margin-bottom: 1rem;
-    border-left: 3px solid var(--accent-color);
+    /* KORREKTUR: Rahmen Farbe weg (border-left entfernt) */
+    border-left: none;
     transition: background-color 0.3s ease;
     overflow: hidden;
 }
