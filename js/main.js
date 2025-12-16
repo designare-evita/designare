@@ -25,12 +25,6 @@ const loadContent = (url, elementId) => {
     });
 };
 
-const trackVisitor = () => {
-    fetch('/api/track-visitor')
-        .then(response => response.ok ? console.log('Besucher erfasst.') : console.error('Fehler bei der Erfassung des Besuchers.'))
-        .catch(error => console.error('Netzwerkfehler beim Tracking:', error));
-};
-
 // === 4. SETUP: SIDE MENU ===
 const setupSideMenu = () => {
     const menuButton = document.getElementById('menu-toggle-button');
@@ -209,7 +203,6 @@ const enhanceHeaderAfterLoad = () => {
 // === 9. HAUPTEINSTIEGSPUNKT ===
 document.addEventListener('DOMContentLoaded', async () => {
     initializeStaticScripts();
-    trackVisitor();
 
     if (localStorage.getItem('theme') === 'dark') {
         document.body.classList.add('dark-mode');
@@ -277,7 +270,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (heroFlipWrapper) {
         
         // 1. Von Startseite zu Rückseite (Michael)
-        // HIER IST DIE ÄNDERUNG: no-scroll wird entfernt
         if (btnToBack) {
             btnToBack.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -297,7 +289,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 heroFlipWrapper.classList.remove('flipped');
                 // Optional: Scrollen wieder sperren für den "Hero-Look" auf der Startseite
-                // Falls gewünscht, Zeile einkommentieren:
                 document.body.classList.add('no-scroll'); 
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             });
