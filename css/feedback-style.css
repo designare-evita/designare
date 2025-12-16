@@ -54,6 +54,11 @@
 .rating-btn.neutral:hover { color: var(--accent-color); border-color: var(--accent-color); background: rgba(252, 181, 0, 0.1); }
 .rating-btn.negative:hover { color: #ff6b6b; border-color: #ff6b6b; background: rgba(255, 107, 107, 0.1); }
 
+/* Aktiver Zustand nach Klick */
+.rating-btn:disabled {
+    cursor: default;
+}
+
 /* Ratio Bar (Visualisierung) */
 .rating-ratio-bar {
     height: 4px;
@@ -82,6 +87,16 @@
     margin-right: auto;
 }
 
+/* Feedback Message Animation */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.feedback-message {
+    animation: fadeIn 0.3s ease;
+}
+
 /* Share Section */
 .share-container {
     display: flex;
@@ -104,6 +119,10 @@
     opacity: 0.6;
     transition: all 0.3s ease;
     padding: 5px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .share-icon:hover {
