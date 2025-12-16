@@ -1,37 +1,627 @@
-<aside class="feedback-section" aria-labelledby="feedback-heading">
-    <h2 id="feedback-heading" class="visually-hidden">Feedback geben</h2>
-    
+<!-- ============================================================
+     BLOG-FEEDBACK.HTML
+     Bewertungs- und Social Share Komponente
+     ============================================================ -->
+
+<section class="feedback-section" id="feedback-section">
     <div class="feedback-container">
-        <p class="feedback-title">War dieser Artikel hilfreich?</p>
         
+        <!-- Titel -->
+        <h3 class="feedback-title">War dieser Artikel hilfreich?</h3>
+        
+        <!-- Rating Buttons -->
         <div class="rating-buttons">
-            <button class="rating-btn positive" aria-label="Sehr informativ">
-                <i class="fa-solid fa-plus"></i> Sehr informativ
+            <button class="rating-btn positive" data-vote="positive">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>
+                </svg>
+                Hilfreich
             </button>
-            <button class="rating-btn neutral" aria-label="Neutral">
-                <i class="fa-solid fa-minus"></i> Neutral
+            <button class="rating-btn neutral" data-vote="neutral">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="8" y1="12" x2="16" y2="12"/>
+                </svg>
+                Geht so
             </button>
-            <button class="rating-btn negative" aria-label="Unbrauchbar">
-                <i class="fa-solid fa-xmark"></i> Unbrauchbar
+            <button class="rating-btn negative" data-vote="negative">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/>
+                </svg>
+                Nicht hilfreich
             </button>
         </div>
-
-        <div class="rating-ratio-bar" role="progressbar" aria-label="Bewertungsverhältnis">
+        
+        <!-- Ratio Bar (zeigt Verteilung) -->
+        <div class="rating-ratio-bar">
             <div class="ratio-segment pos" style="width: 70%;"></div>
             <div class="ratio-segment neu" style="width: 20%;"></div>
             <div class="ratio-segment neg" style="width: 10%;"></div>
         </div>
         <div class="rating-labels">
-            <span>70%</span>
-            <span>Hilfreich</span>
+            <span>👍 Hilfreich</span>
+            <span>👎 Nicht hilfreich</span>
         </div>
+        
+        <!-- Share Section -->
+        <div class="share-container">
+            <span class="share-label">Teilen:</span>
+            
+            <!-- WhatsApp -->
+            <a href="#" class="share-icon" data-platform="whatsapp" title="Auf WhatsApp teilen">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                </svg>
+            </a>
+            
+            <!-- LinkedIn -->
+            <a href="#" class="share-icon" data-platform="linkedin" title="Auf LinkedIn teilen">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                </svg>
+            </a>
+            
+            <!-- Reddit -->
+            <a href="#" class="share-icon" data-platform="reddit" title="Auf Reddit teilen">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/>
+                </svg>
+            </a>
+            
+            <!-- X (Twitter) -->
+            <a href="#" class="share-icon" data-platform="twitter" title="Auf X teilen">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                </svg>
+            </a>
+            
+            <!-- Copy Link -->
+            <a href="#" class="share-icon" data-platform="copy" title="Link kopieren">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                </svg>
+            </a>
+        </div>
+        
     </div>
+</section>
 
-    <div class="share-container">
-        <span class="share-label">Teilen:</span>
-        <a href="#" aria-label="Auf WhatsApp teilen" class="share-icon"><i class="fa-brands fa-whatsapp"></i></a>
-        <a href="#" aria-label="Auf LinkedIn teilen" class="share-icon"><i class="fa-brands fa-linkedin-in"></i></a>
-        <a href="#" aria-label="Auf Reddit teilen" class="share-icon"><i class="fa-brands fa-reddit-alien"></i></a>
-        <a href="#" aria-label="Auf X teilen" class="share-icon"><i class="fa-brands fa-x-twitter"></i></a>
-    </div>
-</aside>
+<!-- Eingebettete Styles -->
+<style>
+/* ============================================================
+   FEEDBACK SECTION STYLES
+   ============================================================ */
+
+.feedback-section {
+    --accent-color: #FCB500;
+    --text-color: #e8e8e8;
+    --border-color: rgba(255, 255, 255, 0.1);
+    --bg-dark: #1a1a1a;
+    
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 2.5rem 2rem;
+    margin: 4rem 0 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    font-family: inherit;
+}
+
+/* Subtiler Glow-Effekt */
+.feedback-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
+    opacity: 0.5;
+}
+
+.feedback-container {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.feedback-title {
+    font-size: 1.15rem;
+    margin-bottom: 1.75rem;
+    color: var(--text-color);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+}
+
+/* Rating Buttons */
+.rating-buttons {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1.75rem;
+}
+
+.rating-btn {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 50px;
+    padding: 0.6rem 1.25rem;
+    color: var(--text-color);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: inherit;
+    font-weight: 400;
+}
+
+.rating-btn svg {
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+}
+
+.rating-btn:hover {
+    transform: translateY(-2px);
+}
+
+.rating-btn:hover svg {
+    transform: scale(1.1);
+}
+
+.rating-btn.positive:hover { 
+    color: #51cf66; 
+    border-color: #51cf66; 
+    background: rgba(81, 207, 102, 0.1);
+    box-shadow: 0 4px 15px rgba(81, 207, 102, 0.2);
+}
+
+.rating-btn.neutral:hover { 
+    color: var(--accent-color); 
+    border-color: var(--accent-color); 
+    background: rgba(252, 181, 0, 0.1);
+    box-shadow: 0 4px 15px rgba(252, 181, 0, 0.2);
+}
+
+.rating-btn.negative:hover { 
+    color: #ff6b6b; 
+    border-color: #ff6b6b; 
+    background: rgba(255, 107, 107, 0.1);
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.2);
+}
+
+.rating-btn:disabled {
+    cursor: default;
+    pointer-events: none;
+}
+
+/* Ratio Bar */
+.rating-ratio-bar {
+    height: 4px;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto 0.6rem;
+    background-color: rgba(255, 255, 255, 0.08);
+    border-radius: 2px;
+    display: flex;
+    overflow: hidden;
+}
+
+.ratio-segment { 
+    height: 100%; 
+    transition: width 0.5s ease;
+}
+
+.ratio-segment.pos { background: linear-gradient(90deg, #51cf66, #40c057); }
+.ratio-segment.neu { background: linear-gradient(90deg, var(--accent-color), #e5a400); opacity: 0.8; }
+.ratio-segment.neg { background: linear-gradient(90deg, #ff6b6b, #fa5252); }
+
+.rating-labels {
+    font-size: 0.75rem;
+    color: #666;
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Feedback Message Animation */
+@keyframes feedbackFadeIn {
+    from { 
+        opacity: 0; 
+        transform: translateY(-10px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+.feedback-message {
+    animation: feedbackFadeIn 0.3s ease;
+    text-align: center;
+    padding: 12px 18px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+}
+
+.feedback-message.feedback-success {
+    background: rgba(81, 207, 102, 0.1);
+    color: #51cf66;
+    border: 1px solid rgba(81, 207, 102, 0.25);
+}
+
+.feedback-message.feedback-info {
+    background: rgba(252, 181, 0, 0.1);
+    color: #FCB500;
+    border: 1px solid rgba(252, 181, 0, 0.25);
+}
+
+/* Share Section */
+.share-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding-top: 1.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.share-label {
+    font-size: 0.85rem;
+    color: #777;
+    margin-right: 6px;
+}
+
+.share-icon {
+    color: var(--text-color);
+    opacity: 0.5;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 8px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    text-decoration: none;
+}
+
+.share-icon:hover {
+    opacity: 1;
+    transform: scale(1.2);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.share-icon[data-platform="whatsapp"]:hover { color: #25D366; }
+.share-icon[data-platform="linkedin"]:hover { color: #0A66C2; }
+.share-icon[data-platform="reddit"]:hover { color: #FF4500; }
+.share-icon[data-platform="twitter"]:hover { color: #fff; }
+.share-icon[data-platform="copy"]:hover { color: var(--accent-color); }
+
+/* Copy Success Tooltip */
+.copy-tooltip {
+    position: absolute;
+    background: var(--accent-color);
+    color: #000;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    transform: translateX(-50%) translateY(-120%);
+    white-space: nowrap;
+    animation: tooltipPop 0.3s ease;
+    z-index: 100;
+}
+
+@keyframes tooltipPop {
+    0% { opacity: 0; transform: translateX(-50%) translateY(-100%) scale(0.8); }
+    100% { opacity: 1; transform: translateX(-50%) translateY(-120%) scale(1); }
+}
+
+/* Mobile Anpassung */
+@media (max-width: 480px) {
+    .feedback-section {
+        padding: 2rem 1.25rem;
+        margin: 3rem 0 1.5rem;
+    }
+    
+    .rating-buttons {
+        flex-direction: column;
+        gap: 0.6rem;
+    }
+    
+    .rating-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 0.7rem 1rem;
+    }
+    
+    .share-container {
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+    
+    .share-label {
+        width: 100%;
+        margin-bottom: 8px;
+        margin-right: 0;
+    }
+}
+
+/* Light Mode Support (optional) */
+@media (prefers-color-scheme: light) {
+    .feedback-section:not(.dark-mode *) {
+        --text-color: #333;
+        --border-color: rgba(0, 0, 0, 0.1);
+        background: linear-gradient(135deg, rgba(0, 0, 0, 0.02) 0%, rgba(0, 0, 0, 0.01) 100%);
+    }
+}
+</style>
+
+<!-- Eingebettetes JavaScript -->
+<script>
+(function() {
+    'use strict';
+    
+    // Warte bis DOM bereit ist (oder führe sofort aus wenn bereits geladen)
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initFeedback);
+    } else {
+        // Kurze Verzögerung für dynamisch geladenen Content
+        setTimeout(initFeedback, 10);
+    }
+    
+    function initFeedback() {
+        const feedbackSection = document.getElementById('feedback-section');
+        if (!feedbackSection) return;
+        
+        initRatingButtons(feedbackSection);
+        initShareButtons(feedbackSection);
+    }
+    
+    // === RATING BUTTONS ===
+    function initRatingButtons(container) {
+        const ratingButtons = container.querySelectorAll('.rating-btn');
+        if (ratingButtons.length === 0) return;
+        
+        // LocalStorage Key basierend auf der aktuellen Seite
+        const storageKey = 'feedback_' + window.location.pathname;
+        
+        // Prüfen ob bereits abgestimmt wurde
+        const existingVote = localStorage.getItem(storageKey);
+        if (existingVote) {
+            markVotedState(container, existingVote);
+        }
+        
+        ratingButtons.forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Bereits abgestimmt?
+                if (localStorage.getItem(storageKey)) {
+                    showFeedbackMessage(container, 'Du hast bereits abgestimmt. Danke!', 'info');
+                    return;
+                }
+                
+                // Vote-Typ ermitteln
+                var voteType = btn.dataset.vote || 'neutral';
+                if (btn.classList.contains('positive')) voteType = 'positive';
+                if (btn.classList.contains('negative')) voteType = 'negative';
+                
+                // Vote speichern
+                localStorage.setItem(storageKey, voteType);
+                
+                // UI aktualisieren
+                markVotedState(container, voteType);
+                showFeedbackMessage(container, 'Danke für dein Feedback!', 'success');
+                
+                // Optional: Analytics-Event senden (falls vorhanden)
+                if (typeof gtag === 'function') {
+                    gtag('event', 'feedback_vote', {
+                        'event_category': 'engagement',
+                        'event_label': voteType,
+                        'value': voteType === 'positive' ? 1 : (voteType === 'negative' ? -1 : 0)
+                    });
+                }
+            });
+        });
+    }
+    
+    function markVotedState(container, voteType) {
+        var buttons = container.querySelectorAll('.rating-btn');
+        
+        buttons.forEach(function(btn) {
+            btn.disabled = true;
+            btn.style.cursor = 'default';
+            btn.style.opacity = '0.4';
+            btn.style.transform = 'none';
+            
+            // Den gewählten Button hervorheben
+            var isSelected = btn.classList.contains(voteType) || btn.dataset.vote === voteType;
+            
+            if (isSelected) {
+                btn.style.opacity = '1';
+                btn.style.transform = 'scale(1.05)';
+                
+                if (voteType === 'positive') {
+                    btn.style.backgroundColor = 'rgba(81, 207, 102, 0.15)';
+                    btn.style.borderColor = '#51cf66';
+                    btn.style.color = '#51cf66';
+                    btn.style.boxShadow = '0 4px 20px rgba(81, 207, 102, 0.25)';
+                } else if (voteType === 'negative') {
+                    btn.style.backgroundColor = 'rgba(255, 107, 107, 0.15)';
+                    btn.style.borderColor = '#ff6b6b';
+                    btn.style.color = '#ff6b6b';
+                    btn.style.boxShadow = '0 4px 20px rgba(255, 107, 107, 0.25)';
+                } else {
+                    btn.style.backgroundColor = 'rgba(252, 181, 0, 0.15)';
+                    btn.style.borderColor = '#FCB500';
+                    btn.style.color = '#FCB500';
+                    btn.style.boxShadow = '0 4px 20px rgba(252, 181, 0, 0.25)';
+                }
+            }
+        });
+    }
+    
+    function showFeedbackMessage(container, message, type) {
+        // Existierende Nachricht entfernen
+        var existingMsg = container.querySelector('.feedback-message');
+        if (existingMsg) existingMsg.remove();
+        
+        var msgDiv = document.createElement('div');
+        msgDiv.className = 'feedback-message feedback-' + type;
+        msgDiv.textContent = message;
+        
+        // Nach den Rating-Buttons einfügen
+        var ratioBar = container.querySelector('.rating-ratio-bar');
+        if (ratioBar) {
+            ratioBar.parentNode.insertBefore(msgDiv, ratioBar);
+        } else {
+            var feedbackContainer = container.querySelector('.feedback-container');
+            if (feedbackContainer) {
+                feedbackContainer.appendChild(msgDiv);
+            }
+        }
+        
+        // Nach 3 Sekunden ausblenden
+        setTimeout(function() {
+            msgDiv.style.opacity = '0';
+            msgDiv.style.transition = 'opacity 0.3s ease';
+            setTimeout(function() {
+                if (msgDiv.parentNode) {
+                    msgDiv.remove();
+                }
+            }, 300);
+        }, 3000);
+    }
+    
+    // === SHARE BUTTONS ===
+    function initShareButtons(container) {
+        var shareLinks = container.querySelectorAll('.share-icon');
+        if (shareLinks.length === 0) return;
+        
+        var pageUrl = encodeURIComponent(window.location.href);
+        var pageTitle = encodeURIComponent(document.title);
+        
+        shareLinks.forEach(function(link) {
+            link.style.cursor = 'pointer';
+            
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                var platform = link.dataset.platform;
+                var shareUrl = '';
+                
+                switch (platform) {
+                    case 'whatsapp':
+                        shareUrl = 'https://wa.me/?text=' + pageTitle + '%20' + pageUrl;
+                        break;
+                    case 'linkedin':
+                        shareUrl = 'https://www.linkedin.com/sharing/share-offsite/?url=' + pageUrl;
+                        break;
+                    case 'reddit':
+                        shareUrl = 'https://www.reddit.com/submit?url=' + pageUrl + '&title=' + pageTitle;
+                        break;
+                    case 'twitter':
+                        shareUrl = 'https://twitter.com/intent/tweet?url=' + pageUrl + '&text=' + pageTitle;
+                        break;
+                    case 'copy':
+                        copyToClipboard(window.location.href, link);
+                        return;
+                }
+                
+                if (shareUrl) {
+                    // Popup öffnen
+                    window.open(shareUrl, '_blank', 'width=600,height=500,menubar=no,toolbar=no,scrollbars=yes');
+                    
+                    // Optional: Analytics
+                    if (typeof gtag === 'function') {
+                        gtag('event', 'share', {
+                            'event_category': 'engagement',
+                            'event_label': platform
+                        });
+                    }
+                }
+            });
+        });
+    }
+    
+    // Copy to Clipboard Funktion
+    function copyToClipboard(text, element) {
+        // Modern Clipboard API
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(function() {
+                showCopyTooltip(element, 'Link kopiert!');
+            }).catch(function() {
+                fallbackCopy(text, element);
+            });
+        } else {
+            fallbackCopy(text, element);
+        }
+    }
+    
+    // Fallback für ältere Browser
+    function fallbackCopy(text, element) {
+        var textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-9999px';
+        textArea.style.top = '0';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        
+        try {
+            document.execCommand('copy');
+            showCopyTooltip(element, 'Link kopiert!');
+        } catch (err) {
+            showCopyTooltip(element, 'Fehler beim Kopieren');
+        }
+        
+        document.body.removeChild(textArea);
+    }
+    
+    // Tooltip anzeigen
+    function showCopyTooltip(element, message) {
+        // Existierenden Tooltip entfernen
+        var existingTooltip = document.querySelector('.copy-tooltip');
+        if (existingTooltip) existingTooltip.remove();
+        
+        var tooltip = document.createElement('span');
+        tooltip.className = 'copy-tooltip';
+        tooltip.textContent = message;
+        
+        element.style.position = 'relative';
+        element.appendChild(tooltip);
+        
+        // Nach 2 Sekunden entfernen
+        setTimeout(function() {
+            tooltip.style.opacity = '0';
+            tooltip.style.transition = 'opacity 0.2s ease';
+            setTimeout(function() {
+                if (tooltip.parentNode) {
+                    tooltip.remove();
+                }
+            }, 200);
+        }, 2000);
+        
+        // Analytics
+        if (typeof gtag === 'function') {
+            gtag('event', 'share', {
+                'event_category': 'engagement',
+                'event_label': 'copy_link'
+            });
+        }
+    }
+    
+})();
+</script>
