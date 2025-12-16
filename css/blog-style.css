@@ -44,10 +44,7 @@
    =================== */
 
 .article-header {
-    /* border-bottom: 1px solid var(--border-color);  <-- ENTFERNT */
     border-bottom: none; 
-    
-    /* Optional: Padding reduzieren, da die Trennlinie weg ist */
     margin-bottom: 1rem; 
     padding-bottom: 1rem;
 }
@@ -59,6 +56,16 @@
     line-height: 1.2;
     margin-bottom: 1rem;
     color: var(--text-color);
+}
+
+/* Breadcrumb Anpassung falls nötig */
+.breadcrumb ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
 /* Article Meta Info */
@@ -92,43 +99,36 @@
    =================== */
 
 .blog-article section {
-    margin-bottom: 6rem; /* Viel Platz zum nächsten Abschnitt */
-    position: relative;  /* Wichtig für die Positionierung des Pfeils */
+    margin-bottom: 6rem;
+    position: relative;
     padding-top: 3rem;
-    
-    /* Die dezente Trennlinie */
     border-top: 1px solid rgba(255, 255, 255, 0.05); 
-    
-    scroll-margin-top: 100px; /* Für Smooth-Scroll */
+    scroll-margin-top: 100px;
 }
 
-/* NEU: Der Pfeil (Dreieck) mittig auf der Linie */
+/* Der Pfeil (Dreieck) mittig auf der Linie - IMMER SICHTBAR */
 .blog-article section::after {
-    content: "\f107"; /* FontAwesome Unicode für 'Angle Down' */
+    content: "\f107"; /* FontAwesome Unicode */
     font-family: "Font Awesome 6 Free";
-    font-weight: 900; /* Nötig für Solid Icons */
+    font-weight: 900;
     
     position: absolute;
-    top: -0.9rem; /* Zieht das Icon nach oben, damit es genau mittig auf der Linie sitzt */
+    top: -0.9rem;
     left: 50%;
-    transform: translateX(-50%); /* Zentriert es horizontal exakt */
+    transform: translateX(-50%);
     
-    /* Hintergrundfarbe der Seite, um die Linie optisch zu "schneiden" */
     background-color: var(--bg-color); 
-    padding: 0 1rem; /* Abstand links und rechts, damit die Linie nicht am Pfeil klebt */
+    padding: 0 1rem;
     
-    /* Dezent stylen */
     font-size: 1.2rem;
-    opacity: 1; 
-    color: var(--accent-color);
-    transition: opacity 0.3s ease, color 0.3s ease;
+    opacity: 1; /* Immer sichtbar */
+    color: var(--accent-color); /* Immer Akzentfarbe */
+    transition: transform 0.3s ease;
 }
 
-/* Optional: Netter Effekt beim Drüberfahren */
+/* Hover Effekt: Nur leichte Bewegung */
 .blog-article section:hover::after {
-    opacity: 1;
-    color: var(--accent-color);
-   transform: translateX(-50%) scale(1.2);
+    transform: translateX(-50%) scale(1.2);
 }
 
 /* Smooth Scrolling */
@@ -140,10 +140,10 @@ html {
     font-size: 1.8rem;
     font-weight: 600;
     margin: 2.5rem 0 1.2rem;
-    padding-top: 40px; /* Explizit gewünschtes Padding */
+    padding-top: 40px;
     color: var(--text-color);
     line-height: 1.3;
-    scroll-margin-top: 100px; /* Für Anker-Links */
+    scroll-margin-top: 100px;
 }
 
 .blog-article h3 {
@@ -169,7 +169,7 @@ html {
     color: var(--accent-color);
 }
 
-/* Lists - Würfel statt Punkte */
+/* Lists - Würfel statt Punkte (NUR FÜR ARTIKEL-TEXT) */
 .blog-article ul {
     margin-bottom: 1.5rem;
     padding-left: 1.5rem;
@@ -203,40 +203,60 @@ html {
 }
 
 /* ===================
-   5. SPECIAL BOXES
+   5. SPECIAL BOXES (TOC KORREKTUR)
    =================== */
 
 .toc-container {
-    /* justify-content: center; <-- ENTFERNT */
-    justify-content: flex-start; /* Jetzt linksbündig */
-    
-    /* Sticky so weit oben wie möglich (unter Berücksichtigung eines evtl. Headers) */
-    /* War vorher 100px. 0px wäre ganz oben am Bildschirmrand. 
-       Wir nehmen 10px als Puffer oder 0px für maximal "oben". */
+    position: -webkit-sticky;
+    position: sticky;
     top: 10px; 
+    z-index: 90;
+    
+    display: flex;
+    justify-content: flex-start; /* Linksbündig */
+    
+    background: transparent;
+    pointer-events: none;
+    padding: 1rem 0;
+    margin-bottom: 3rem;
+    width: 100%;
 }
 
+/* WICHTIG: Spezifischer Selektor um globale Listen-Styles zu überschreiben */
+.blog-article .toc-container ul,
 .toc-container ul {
-    /* justify-content: center; <-- ENTFERNT */
-    justify-content: flex-start; /* Listen-Elemente linksbündig */
+    display: flex;
+    flex-wrap: wrap; /* Zeilenumbruch erlauben = Horizontal */
+    justify-content: flex-start;
+    gap: 0.8rem;
     
-    /* Padding links entfernen, damit es bündig mit dem Text darüber ist */
-    padding-left: 0; 
+    /* Listen-Style KILLEN */
+    list-style: none !important;
+    list-style-type: none !important;
+    padding-left: 0 !important;
+    margin: 0;
+    
+    pointer-events: none;
 }
 
 .toc-container li {
     margin: 0;
+    padding: 0;
+    list-style: none !important; /* Sicherheitshalber auch hier */
     pointer-events: none;
 }
 
 /* Mini-Buttons (Badges) */
 .toc-container a {
-    /* WICHTIG: Die Buttons selbst müssen klickbar sein! */
     pointer-events: auto; 
     
     display: inline-block;
     padding: 0.4rem 1rem;
-    font-size: 0.85rem;
+    
+    /* DEINE ANPASSUNGEN */
+    font-size: 12px;
+    border-radius: 8px;
+    
     font-weight: 500;
     text-decoration: none;
     color: var(--text-color);
@@ -244,9 +264,7 @@ html {
     /* Badge Look */
     background-color: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 25px; /* Pill Shape */
     
-    /* Glas-Effekt */
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     
@@ -266,9 +284,14 @@ html {
 /* Mobile Anpassung */
 @media (max-width: 768px) {
     .toc-container {
-        /* Auf Mobile ist der Header oft kleiner, evtl. top anpassen */
         top: 80px; 
         padding-bottom: 1rem;
+        justify-content: center;
+    }
+    
+    .toc-container ul {
+         justify-content: center;
+         gap: 0.5rem;
     }
 }
 
@@ -291,6 +314,8 @@ html {
 
 .summary-box ul {
     margin-bottom: 0;
+    list-style-type: square; /* Hier sind Würfel okay */
+    padding-left: 1.5rem;
 }
 
 /* Info Box */
@@ -446,7 +471,6 @@ html {
     background-color: rgba(255, 255, 255, 0.02);
     border-radius: 8px;
     margin-bottom: 1rem;
-    /* KORREKTUR: Rahmen Farbe weg */
     border-left: none;
     transition: background-color 0.3s ease;
     overflow: hidden;
@@ -460,14 +484,14 @@ html {
     padding: 1.2rem 1.5rem;
     font-weight: 600;
     cursor: pointer;
-    list-style: none; /* Standard-Dreieck entfernen */
+    list-style: none;
     position: relative;
     color: var(--accent-color);
     font-size: 1.1rem;
     outline: none;
 }
 
-/* Custom Marker (Pfeil oder Plus/Minus) */
+/* Custom Marker */
 .faq-accordion summary::after {
     content: '+';
     position: absolute;
@@ -488,7 +512,6 @@ html {
     opacity: 1;
 }
 
-/* Webkit specific marker removal */
 .faq-accordion summary::-webkit-details-marker {
     display: none;
 }
@@ -631,7 +654,7 @@ html {
     .blog-article h2 {
         font-size: 1.5rem;
         margin: 2rem 0 1rem;
-        padding-top: 30px; /* Etwas weniger Padding Mobile */
+        padding-top: 30px; 
     }
 
     .blog-article h3 {
@@ -643,7 +666,6 @@ html {
         width: 100%;
         min-width: 100%;
         padding-bottom: 1.5rem;
-        /* Mobile auch Flex-Center */
         justify-content: center;
     }
     
