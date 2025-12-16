@@ -56,7 +56,8 @@
     <div id="header-placeholder"></div>
     <div id="side-menu-placeholder"></div>
     <div id="modal-container"></div>
- <div id="particles-js"></div>
+    <div id="particles-js"></div>
+    
     <main id="blog-main">
         
         <article class="blog-article">
@@ -80,6 +81,20 @@
                     </address>
                 </div>
             </header>
+
+            <nav class="toc-container" aria-labelledby="toc-heading">
+                <h2 id="toc-heading">Übersicht:</h2>
+                <ul>
+                    <li><a href="#summary-heading">1. Das Wichtigste in Kürze</a></li>
+                    <li><a href="#definition-heading">2. Was ist semantisches Markup?</a></li>
+                    <li><a href="#importance-heading">3. Warum ist das wichtig? (SEO & GEO)</a></li>
+                    <li><a href="#guide-heading">4. Schritt-für-Schritt Anleitung</a></li>
+                    <li><a href="#mistakes-heading">5. Häufige Fehler vermeiden</a></li>
+                    <li><a href="#advanced-heading">6. Fortgeschrittene Tipps</a></li>
+                    <li><a href="#faq-heading">7. Häufig gestellte Fragen</a></li>
+                    <li><a href="#conclusion-heading">8. Fazit</a></li>
+                </ul>
+            </nav>
 
             <section class="article-summary" aria-labelledby="summary-heading">
                 <h2 id="summary-heading" class="visually-hidden">Das Wichtigste in Kürze</h2>
@@ -207,8 +222,8 @@
                 <table class="comparison-table">
                     <thead>
                         <tr>
-                            <th scope="col">Falsch ❌</th>
-                            <th scope="col">Richtig ✅</th>
+                            <th scope="col" class="th-wrong">Falsch <i class="fa-solid fa-xmark"></i></th>
+                            <th scope="col" class="th-correct">Richtig <i class="fa-solid fa-check"></i></th>
                         </tr>
                     </thead>
                     <tbody>
