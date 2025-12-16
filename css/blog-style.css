@@ -214,43 +214,78 @@ html {
 
 /* Inhaltsverzeichnis (ToC) Styles */
 .toc-container {
-    padding: 1.5rem 0; /* Nur vertikales Padding, kein Rahmen */
-    margin-bottom: 24px; /* Gewünschter Abstand */
-    display: inline-block;
-    min-width: 50%;
-    background: transparent;
+    /* Sticky Positionierung */
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    z-index: 100; /* Damit es über dem Text schwebt */
+    
+    /* Hintergrund & Optik */
+    background: rgba(18, 18, 18, 0.9); /* Dunkler Hintergrund, leicht transparent */
+    backdrop-filter: blur(10px); /* Modernes "Frosted Glass" */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    width: 100%; /* Volle Breite */
+    
+    /* Layout: Flexbox für horizontale Ausrichtung */
+    display: flex;
+    align-items: center; /* Vertikal zentrieren */
+    flex-wrap: wrap; /* Umbruch erlauben, wenn Platz fehlt */
+    gap: 1.5rem; /* Abstand zwischen Titel und Liste */
+    
+    padding: 1rem 0;
+    margin-bottom: 4rem; /* Abstand zum Inhalt danach */
 }
 
 .toc-container h2 {
-    font-size: 1.2rem;
-    margin-top: 0;
-    margin-bottom: 1rem;
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
     color: var(--accent-color);
-    border-bottom: none; /* Keine Unterstreichung */
-    padding-bottom: 0.5rem;
-    padding-top: 0; 
+    margin: 0;
+    padding: 0;
+    border: none;
+    white-space: nowrap; /* Kein Umbruch im Titel */
 }
 
 .toc-container ul {
-    list-style-type: none; /* Im ToC keine Punkte */
+    display: flex; /* Liste horizontal */
+    flex-wrap: wrap; /* Umbruch der Items erlauben */
+    gap: 1.5rem; /* Abstand zwischen den Links */
+    list-style-type: none;
     padding-left: 0;
-    margin-bottom: 0;
+    margin: 0;
 }
 
 .toc-container li {
-    margin-bottom: 0.5rem;
+    margin: 0;
 }
 
 .toc-container a {
     color: var(--text-color);
     text-decoration: none;
     transition: color 0.3s ease;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
+    opacity: 0.8;
 }
 
 .toc-container a:hover {
     color: var(--accent-color);
-    /* Keine Animation */
+    opacity: 1;
+}
+
+/* Mobile Anpassung: Falls es zu eng wird */
+@media (max-width: 768px) {
+    .toc-container {
+        flex-direction: column; /* Untereinander auf Handy */
+        align-items: flex-start;
+        gap: 0.5rem;
+        padding: 1rem;
+    }
+    
+    .toc-container ul {
+        gap: 1rem;
+    }
 }
 
 
