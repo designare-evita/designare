@@ -1,0 +1,131 @@
+/* ============================================================
+   FEEDBACK-STYLE.CSS
+   Styles für Bewertungen und Social Share
+   ============================================================ */
+
+.feedback-section {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 2rem;
+    margin: 4rem 0 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.feedback-title {
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+/* Rating Buttons */
+.rating-buttons {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.rating-btn {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50px;
+    padding: 0.5rem 1.2rem;
+    color: var(--text-color);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: inherit; /* Erbt Font vom Body */
+}
+
+.rating-btn:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent-color);
+}
+
+.rating-btn.positive:hover { color: #51cf66; border-color: #51cf66; background: rgba(81, 207, 102, 0.1); }
+.rating-btn.neutral:hover { color: var(--accent-color); border-color: var(--accent-color); background: rgba(252, 181, 0, 0.1); }
+.rating-btn.negative:hover { color: #ff6b6b; border-color: #ff6b6b; background: rgba(255, 107, 107, 0.1); }
+
+/* Ratio Bar (Visualisierung) */
+.rating-ratio-bar {
+    height: 4px;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto 0.5rem;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    display: flex;
+    overflow: hidden;
+}
+
+.ratio-segment { height: 100%; }
+.ratio-segment.pos { background-color: #51cf66; }
+.ratio-segment.neu { background-color: var(--accent-color); opacity: 0.7; }
+.ratio-segment.neg { background-color: #ff6b6b; }
+
+.rating-labels {
+    font-size: 0.75rem;
+    color: #888;
+    margin-bottom: 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Share Section */
+.share-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.share-label {
+    font-size: 0.9rem;
+    color: #888;
+    margin-right: 5px;
+}
+
+.share-icon {
+    color: var(--text-color);
+    font-size: 1.1rem;
+    opacity: 0.6;
+    transition: all 0.3s ease;
+    padding: 5px;
+}
+
+.share-icon:hover {
+    opacity: 1;
+    transform: scale(1.15);
+    color: var(--accent-color);
+}
+
+/* Mobile Anpassung */
+@media (max-width: 480px) {
+    .rating-buttons {
+        gap: 0.5rem;
+    }
+    
+    .rating-btn {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.8rem;
+        width: 100%; /* Untereinander auf sehr kleinen Screens */
+        justify-content: center;
+    }
+    
+    .share-container {
+        gap: 10px;
+    }
+}
