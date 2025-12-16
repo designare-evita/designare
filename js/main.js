@@ -1,53 +1,67 @@
 // js/main.js
 
 // === 1. IMPORTE ===
+// Stellen Sie sicher, dass diese Pfade in Ihrer Ordnerstruktur korrekt sind
 import { initEffects } from './effects.js';
 import { initTypewriters } from './typewriter.js';
 import { initModals } from './modals.js';
 import { initAiForm } from './ai-form.js';
 import { initSilasForm } from './silas-form.js';
 
-// === 2. GLOBALE VARIABLEN ===
-let evitaChatInitialized = false;
+// === 2. GLOBALE STATES ===
 let globalAiFormInstance = null;
 
-// === 3. HELFERFUNKTIONEN ===
-const loadContent = (url, elementId) => {
+// === 3. CONTENT LOADING HELPER ===
+const loadContent = async (url, elementId) => {
     const placeholder = document.getElementById(elementId);
     if (!placeholder) {
-        // Wir geben ein rejected Promise zurück, damit der Aufrufer weiß, dass das Element fehlt
-        // Das ist okay, solange wir den Fehler später fangen oder tolerieren
-        return Promise.reject(`Platzhalter-Element '${elementId}' nicht gefunden.`);
+        // Nicht kritisch, wenn z.B. side-menu-placeholder auf manchen Seiten fehlt
+        return Promise.resolve(); 
     }
-    return fetch(url).then(response => {
-        if (!response.ok) throw new Error(`Fehler beim Laden von ${url}`);
-        return response.text();
-    }).then(data => {
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`HTTP Error ${response.status} bei ${url}`);
+        const data = await response.text();
         placeholder.innerHTML = data;
-    });
-};
-
-// NEU: Feedback-Bereich laden (Fehlertolerant)
-const loadFeedback = () => {
-    const placeholder = document.getElementById('feedback-placeholder');
-    if (placeholder) {
-        // Wir gehen davon aus, dass die Datei im Root liegt, wie header.html
-        return fetch('blog-feedback.html')
-            .then(response => {
-                if (!response.ok) throw new Error('Feedback-Template konnte nicht geladen werden');
-                return response.text();
-            })
-            .then(data => {
-                placeholder.innerHTML = data;
-            })
-            .catch(err => {
-                console.warn('Hinweis: Feedback-Sektion wurde nicht geladen (ggf. Datei nicht gefunden).', err);
-            });
+    } catch (error) {
+        console.warn(`⚠️ Konnte ${url} nicht in #${elementId} laden:`, error);
     }
-    return Promise.resolve(); // Nichts tun, wenn kein Placeholder da ist
 };
 
-// === 4. SETUP: SIDE MENU ===
+// Spezifisch für Feedback (fehlertolerant)
+const loadFeedback = async () => {
+    const placeholder = document.getElementById('feedback-placeholder');
+    if (!placeholder) return;
+    
+    try {
+        const response = await fetch('blog-feedback.html');
+        if (response.ok) {
+            placeholder.innerHTML = await response.text();
+        }
+    } catch (e) {
+        console.log("Info: Feedback-Sektion nicht geladen (optional).");
+    }
+};
+
+// === 4. HEADER LOGIK (SCROLL EFFECT & SIDE MENU) ===
+
+const initHeaderScrollEffect = () => {
+    const header = document.querySelector('.main-header');
+    if (!header) return;
+
+    const handleScroll = () => {
+        if (window.scrollY > 50) {
+            header.classList.add('scrolled');
+        } else {
+            header.classList.remove('scrolled');
+        }
+    };
+
+    // Initial check und Listener
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+};
+
 const setupSideMenu = () => {
     const menuButton = document.getElementById('menu-toggle-button');
     const sideMenu = document.getElementById('side-menu-panel');
@@ -62,95 +76,82 @@ const setupSideMenu = () => {
             document.body.classList.add('no-scroll');
         });
 
-        // Schließen (X-Button)
+        // Schließen Funktion
+        const closeMenu = () => {
+            sideMenu.classList.remove('visible');
+            
+            // Checken ob wir im Flip-Modus sind
+            const heroFlipped = document.querySelector('.hero-flip-wrapper.flipped'); 
+            if (!heroFlipped) {
+                document.body.classList.remove('no-scroll');
+            }
+        };
+
         if (closeMenuButton) {
             closeMenuButton.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                sideMenu.classList.remove('visible');
-                
-                // Prüfen ob wir im Flip-Modus sind (dort soll Scrollen erlaubt bleiben)
-                const heroFlipped = document.querySelector('.hero-flip-wrapper.flipped'); 
-                // Anmerkung: In deinem Code war es '.flip-container.flipped', ich habe es an deine Flip-Logik angepasst, 
-                // falls du die Klasse 'hero-flip-wrapper' nutzt. Wenn nicht, greift der Fallback.
-                
-                if (!heroFlipped) {
-                    document.body.classList.remove('no-scroll');
-                } else {
-                    // Auch im Flip-Modus wollen wir scrollen, wenn das Menü zugeht
-                    document.body.classList.remove('no-scroll'); 
-                }
+                closeMenu();
             });
         }
 
-        // Schließen (Klick außerhalb)
+        // Klick außerhalb und Escape
         document.addEventListener('click', (e) => {
             if (sideMenu.classList.contains('visible') && 
                 !sideMenu.contains(e.target) && 
                 !menuButton.contains(e.target)) {
-                sideMenu.classList.remove('visible');
-                document.body.classList.remove('no-scroll');
+                closeMenu();
             }
         });
 
-        // Schließen mit Escape-Taste
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && sideMenu.classList.contains('visible')) {
-                sideMenu.classList.remove('visible');
-                document.body.classList.remove('no-scroll');
+                closeMenu();
             }
         });
     }
 };
 
-// === 5. EVITA CHAT BUTTON INTEGRATION ===
-const setupEvitaChatButton = () => {
-    const evitaChatButton = document.getElementById('evita-chat-button');
-    if (!evitaChatButton) return;
+// === 5. EVITA CHAT LOGIK ===
 
-    evitaChatButton.addEventListener('click', async (e) => {
-        e.preventDefault();
-        try {
+const setupEvitaChatButton = () => {
+    // Header Button
+    const evitaChatButton = document.getElementById('evita-chat-button');
+    if (evitaChatButton) {
+        evitaChatButton.addEventListener('click', async (e) => {
+            e.preventDefault();
             await launchEvitaChat();
-        } catch (error) {
-            console.error("❌ Fehler beim Öffnen des Evita Chats:", error);
-        }
-    });
+        });
+    }
 };
 
-// === 6. EVITA CHAT LAUNCH FUNKTION ===
+// Global aufrufbar machen
+window.launchEvitaChatFromAnywhere = async () => {
+    await launchEvitaChat();
+};
+
 const launchEvitaChat = async () => {
+    // 1. Sicherstellen, dass Formular initialisiert ist
     await ensureAiFormAvailable();
     
+    // 2. Modal öffnen
     const aiResponseModal = document.getElementById('ai-response-modal');
     if (aiResponseModal) {
         const chatHistory = document.getElementById('ai-chat-history');
-        if (chatHistory) chatHistory.innerHTML = '';
-        
-        addWelcomeMessage("Hallo! Ich bin Evita, Michaels KI-Assistentin. Wie kann ich dir heute helfen?");
+        // Reset Chat History bei Neuöffnung (optional)
+        if (chatHistory && chatHistory.children.length === 0) {
+             addWelcomeMessage("Hallo! Ich bin Evita, Michaels KI-Assistentin. Wie kann ich dir heute helfen?");
+        }
         
         aiResponseModal.classList.add('visible');
-        document.body.style.overflow = 'hidden';
         document.body.classList.add('no-scroll');
         
+        // Fokus auf Input
         setTimeout(() => {
             const chatInput = document.getElementById('ai-chat-input');
             if (chatInput) chatInput.focus();
         }, 300);
     }
-};
-
-// === 7. HILFSFUNKTIONEN FÜR CHAT ===
-const addWelcomeMessage = (message) => {
-    const chatHistory = document.getElementById('ai-chat-history');
-    if (!chatHistory) return;
-    
-    const messageDiv = document.createElement('div');
-    messageDiv.className = 'chat-message ai';
-    messageDiv.textContent = message;
-    
-    chatHistory.appendChild(messageDiv);
-    chatHistory.scrollTop = chatHistory.scrollHeight;
 };
 
 const ensureAiFormAvailable = async () => {
@@ -159,17 +160,110 @@ const ensureAiFormAvailable = async () => {
         await initAiForm();
         globalAiFormInstance = true;
     } catch (error) {
-        console.error("❌ Fehler bei der AI-Form Initialisierung:", error);
+        console.warn("Konnte AI-Form nicht vorladen:", error);
     }
 };
 
-// === 8. INITIALISIERUNGS-FUNKTIONEN ===
+const addWelcomeMessage = (message) => {
+    const chatHistory = document.getElementById('ai-chat-history');
+    if (!chatHistory) return;
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'chat-message ai';
+    messageDiv.innerHTML = `<div class="message-content">${message}</div>`;
+    chatHistory.appendChild(messageDiv);
+};
+
+// === 6. HERO FLIP LOGIK (3-SEITEN SYSTEM) ===
+// Diese Logik greift nur, wenn die Elemente tatsächlich da sind (Startseite)
+
+const initHeroFlip = () => {
+    const heroFlipWrapper = document.getElementById('hero-flip-wrapper');
+    if (!heroFlipWrapper) return; // Abbruch auf Blogseiten etc.
+
+    // Elemente
+    const btnToBack = document.getElementById('flip-info-btn');
+    const btnBackToStart = document.getElementById('flip-back-btn');
+    const btnToThird = document.getElementById('flip-to-third-btn');
+    const btnThirdToBack = document.getElementById('flip-third-back-btn');
+    const btnThirdToStart = document.getElementById('flip-third-to-start-btn');
+    
+    const viewMain = document.getElementById('view-main');
+    const viewThird = document.getElementById('view-third');
+
+    // 1. Start -> Rückseite (Michael)
+    if (btnToBack) {
+        btnToBack.addEventListener('click', (e) => {
+            e.preventDefault();
+            heroFlipWrapper.classList.add('flipped');
+            document.body.classList.remove('no-scroll'); // Scrollen auf Rückseite erlaubt
+        });
+    }
+
+    // 2. Rückseite -> Start
+    if (btnBackToStart) {
+        btnBackToStart.addEventListener('click', (e) => {
+            e.preventDefault();
+            // Reset Views
+            if(viewMain) viewMain.style.display = 'block';
+            if(viewThird) viewThird.style.display = 'none';
+            
+            heroFlipWrapper.classList.remove('flipped');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            // Kurze Verzögerung bis Animation fertig ist, dann Scroll lock (optional für Hero Feeling)
+            // document.body.classList.add('no-scroll'); 
+        });
+    }
+
+    // 3. Rückseite -> Seite 3 (Evita)
+    if (btnToThird) {
+        btnToThird.addEventListener('click', (e) => {
+            e.preventDefault();
+            // View Switch
+            if (viewMain) viewMain.style.display = 'none';
+            if (viewThird) viewThird.style.display = 'flex';
+            
+            // Flip zurückdrehen (aber Inhalt ist jetzt Evita)
+            heroFlipWrapper.classList.remove('flipped');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+
+    // 4. Seite 3 -> Rückseite
+    if (btnThirdToBack) {
+        btnThirdToBack.addEventListener('click', (e) => {
+            e.preventDefault();
+            heroFlipWrapper.classList.add('flipped');
+            // View Switch passiert erst wenn flipped ist, oder wir lassen es so
+            // Hier muss man aufpassen: Wenn wir flippen, sieht man die Rückseite (Michael)
+            // Das passt so.
+        });
+    }
+
+    // 5. Seite 3 -> Aktion (Chat oder Start)
+    if (btnThirdToStart) {
+        btnThirdToStart.addEventListener('click', async (e) => {
+            e.preventDefault();
+            if (btnThirdToStart.dataset.action === 'open-evita-chat') {
+                await launchEvitaChat();
+            } else {
+                // Fallback: Zurück zur Startseite
+                if(viewMain) viewMain.style.display = 'block';
+                if(viewThird) viewThird.style.display = 'none';
+                heroFlipWrapper.classList.remove('flipped');
+            }
+        });
+    }
+};
+
+// === 7. INITIALISIERUNG ===
+
 const initializeDynamicScripts = () => {
     initModals();
+    initHeaderScrollEffect(); // NEU: Scroll Effekt aktivieren
     setupSideMenu();
-    setTimeout(() => {
-        setupEvitaChatButton();
-    }, 200);
+    setupEvitaChatButton();
+    initHeroFlip(); // NEU: Flip Logik sicher aufrufen
 };
 
 const initializeStaticScripts = () => {
@@ -177,201 +271,58 @@ const initializeStaticScripts = () => {
     initTypewriters();
 };
 
-const initializeFormsWithDelay = async () => {
-    try {
-        await initAiForm();
-        globalAiFormInstance = true;
-    } catch (error) { console.error(error); }
-    
-    await new Promise(resolve => setTimeout(resolve, 200));
-    
-    try { initSilasForm(); } catch (error) { console.error(error); }
-    
-    setupChatIntegration();
+const initializeForms = async () => {
+    try { await initAiForm(); } catch (e) { console.warn(e); }
+    try { initSilasForm(); } catch (e) { console.warn(e); }
 };
 
-const setupChatIntegration = () => {
-    window.launchBookingFromAnywhere = async () => {
-        if (typeof window.debugBookingLaunch === 'function') {
-            await window.debugBookingLaunch();
-        }
-    };
-    window.launchEvitaChatFromAnywhere = launchEvitaChat;
-    
-    document.addEventListener('booking-request', () => {
-        window.launchBookingFromAnywhere();
-    });
-};
-
-const withRetry = async (fn, retries = 3, delay = 1000) => {
-    for (let i = 0; i < retries; i++) {
-        try {
-            await fn();
-            return;
-        } catch (error) {
-            if (i < retries - 1) await new Promise(resolve => setTimeout(resolve, delay));
-            else throw error;
-        }
-    }
-};
-
-const enhanceHeaderAfterLoad = () => {
-    const menuBtn = document.getElementById('menu-toggle-button');
-    if (menuBtn) {
-        if (!menuBtn.hasAttribute('data-initialized')) {
-            setupSideMenu();
-            menuBtn.setAttribute('data-initialized', 'true');
-        }
-    }
-};
-
-// === 9. HAUPTEINSTIEGSPUNKT ===
+// MAIN EVENT LISTENER
 document.addEventListener('DOMContentLoaded', async () => {
+    
+    // 1. Statische Skripte sofort
     initializeStaticScripts();
 
+    // 2. Dark Mode Check
     if (localStorage.getItem('theme') === 'dark') {
         document.body.classList.add('dark-mode');
     }
-    
+
+    // 3. Asynchrones Laden der HTML-Teile
     try {
-        const headerPromise = loadContent('header.html', 'header-placeholder');
-        const modalsPromise = loadContent('modals.html', 'modal-container');
-        const footerPromise = loadContent('footer.html', 'footer-placeholder');
-        
-        // NEU: Feedback Bereich laden (parallel)
-        loadFeedback();
+        await Promise.all([
+            loadContent('header.html', 'header-placeholder'),
+            loadContent('modals.html', 'modal-container'),
+            loadContent('footer.html', 'footer-placeholder'),
+            loadContent('side-menu.html', 'side-menu-placeholder'),
+            loadFeedback() // Parallel, aber Fehler werden ignoriert
+        ]);
 
-        const sideMenuPromise = loadContent('side-menu.html', 'side-menu-placeholder').catch(err => {
-            console.warn("⚠️ Side-Menu konnte nicht geladen werden:", err);
-            return null;
-        });
-
-        await Promise.all([headerPromise, modalsPromise, footerPromise, sideMenuPromise]); 
-        console.log("✅ Struktur geladen.");
+        console.log("✅ Core-Layout geladen.");
         
-        setTimeout(() => enhanceHeaderAfterLoad(), 50);
+        // 4. Events binden, nachdem HTML da ist
         initializeDynamicScripts();
-        withRetry(initializeFormsWithDelay, 2, 500);
-
-        requestAnimationFrame(() => {
-            document.body.classList.add('page-loaded');
-        });
         
+        // 5. Forms laden (mit leichter Verzögerung für Performance)
+        setTimeout(initializeForms, 200);
+
+        // 6. Seite sichtbar machen
+        document.body.classList.add('page-loaded');
+
     } catch (error) {
-        console.error("❌ Fehler beim Laden:", error);
-        document.body.classList.add('page-loaded'); // Trotzdem anzeigen
+        console.error("❌ Kritischer Fehler beim Laden:", error);
+        // Notfall-Anzeige
+        document.body.classList.add('page-loaded');
     }
 });
 
-// === 10. SCROLL ANIMATION OBSERVER ===
-document.addEventListener('DOMContentLoaded', () => {
-    const animatedElements = document.querySelectorAll('.performance-tip');
-    if (animatedElements.length > 0) {
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('is-visible');
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.1 });
-        animatedElements.forEach(element => observer.observe(element));
-    }
-});
-
-/* =========================================
-   11. HERO FLIP ANIMATION (3-SEITEN LOGIK)
-   ========================================= */
-document.addEventListener('DOMContentLoaded', () => {
-    const heroFlipWrapper = document.getElementById('hero-flip-wrapper');
-    
-    // Buttons
-    const btnToBack = document.getElementById('flip-info-btn');      // Start -> Rückseite ("Neugierig geworden")
-    const btnBackToStart = document.getElementById('flip-back-btn'); // Rückseite -> Start (Home)
-    const btnToThird = document.getElementById('flip-to-third-btn'); // Rückseite -> Seite 3 (Evita)
-    const btnThirdToBack = document.getElementById('flip-third-back-btn'); // Seite 3 -> Rückseite (Michael)
-    const btnThirdToStart = document.getElementById('flip-third-to-start-btn'); // Seite 3 -> Chat mit Evita
-
-    // Views (Inhalte der Vorderseite)
-    const viewMain = document.getElementById('view-main');
-    const viewThird = document.getElementById('view-third');
-
-    if (heroFlipWrapper) {
-        
-        // 1. Von Startseite zu Rückseite (Michael)
-        if (btnToBack) {
-            btnToBack.addEventListener('click', (e) => {
-                e.preventDefault();
-                heroFlipWrapper.classList.add('flipped');
-                // Scrollen erlauben, da Rückseite länger sein kann
-                document.body.classList.remove('no-scroll');
-            });
+// Scroll Observer für Performance-Tipps (Blog etc.)
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
         }
+    });
+}, { threshold: 0.1 });
 
-        // 2. Von Rückseite zurück zur Startseite (Home)
-        if (btnBackToStart) {
-            btnBackToStart.addEventListener('click', (e) => {
-                e.preventDefault();
-                if (viewMain && viewThird) {
-                    viewMain.style.display = 'block';
-                    viewThird.style.display = 'none';
-                }
-                heroFlipWrapper.classList.remove('flipped');
-                // Optional: Scrollen wieder sperren für den "Hero-Look" auf der Startseite
-                document.body.classList.add('no-scroll'); 
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
-        }
-
-        // 3. Von Rückseite zu Seite 3 (Evita)
-        if (btnToThird) {
-            btnToThird.addEventListener('click', (e) => {
-                e.preventDefault();
-                
-                if (viewMain && viewThird) {
-                    viewMain.style.display = 'none';
-                    viewThird.style.display = 'flex';
-                }
-
-                heroFlipWrapper.classList.remove('flipped');
-                // Hier bleiben wir im "Content-Modus", also kein no-scroll hinzufügen
-                // Aber wir sollten nach oben scrollen, damit der User den Anfang sieht
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
-        }
-
-        // 4. Von Seite 3 zurück zur Rückseite (Michael)
-        if (btnThirdToBack) {
-            btnThirdToBack.addEventListener('click', (e) => {
-                e.preventDefault();
-                heroFlipWrapper.classList.add('flipped');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
-        }
-
-        // 5. Von Seite 3 -> Chat mit Evita öffnen
-        if (btnThirdToStart) {
-            btnThirdToStart.addEventListener('click', async (e) => {
-                e.preventDefault();
-                
-                if (btnThirdToStart.dataset.action === 'open-evita-chat') {
-                    try {
-                        await window.launchEvitaChatFromAnywhere();
-                    } catch (error) {
-                        console.error("Fehler beim Öffnen des Evita Chats:", error);
-                        const evitaHeaderBtn = document.getElementById('evita-chat-button');
-                        if (evitaHeaderBtn) evitaHeaderBtn.click();
-                    }
-                } else {
-                    // Fallback zu Start
-                    if (viewMain && viewThird) {
-                        viewMain.style.display = 'block';
-                        viewThird.style.display = 'none';
-                    }
-                    heroFlipWrapper.classList.remove('flipped');
-                    document.body.classList.add('no-scroll');
-                }
-            });
-        }
-    }
-});
+document.querySelectorAll('.performance-tip').forEach(el => observer.observe(el));
