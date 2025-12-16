@@ -12,45 +12,54 @@
     --header-height-mobile: 60px;
 }
 
+/* ===================
+   1. HEADER (SMART HIDE)
+   =================== */
+
 .main-header {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    height: var(--header-height-desktop); /* Start-Höhe */
+    height: 80px; /* Desktop Standard */
     
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 40px; /* Links/Rechts Padding */
+    padding: 0 40px;
     
-    z-index: 1001; /* Hoch genug, aber unter Modals */
-    box-sizing: border-box;
+    z-index: 1001; 
     
-    /* INITIAL: Transparent */
+    /* Standard-Zustand: Transparent */
     background-color: transparent;
     
-    /* ANIMATION: Weicher Übergang für Hintergrund und Höhe */
-    transition: all 0.4s ease;
+    /* WICHTIG: Transition für transform (Bewegung) und background */
+    transition: transform 0.3s ease-in-out, background-color 0.3s ease, padding 0.3s ease, height 0.3s ease;
 }
 
-/* --- SCROLLED STATE (Glassmorphism) --- */
-/* Diese Klasse wird per JS hinzugefügt */
+/* Zustand: Gescrollt (Dunkel & Blur) */
 .main-header.scrolled {
-    /* Dunkler, halb-transparenter Hintergrund */
     background-color: rgba(18, 18, 18, 0.85);
-    
-    /* Der Weichzeichner-Effekt (Milchglas) */
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    
-    /* Etwas kompakter werden */
-    height: 70px; 
-    padding: 0 30px;
-    
-    /* Dezenter Schatten und Rand unten */
+    height: 70px;
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* NEU: Zustand: Versteckt (Nach oben geschoben) */
+.main-header.hide-up {
+    transform: translateY(-100%); /* Schiebt den Header komplett aus dem Bild */
+}
+
+/* Mobile Anpassungen */
+@media (max-width: 768px) {
+    .main-header {
+        height: 60px;
+        padding: 0 15px;
+    }
+    .main-header.scrolled {
+        height: 60px;
+    }
 }
 
 /* ===================
