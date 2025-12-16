@@ -1,7 +1,6 @@
 // js/main.js
 
 // === 1. IMPORTE ===
-// Stellen Sie sicher, dass diese Pfade in Ihrer Ordnerstruktur korrekt sind
 import { initEffects } from './effects.js';
 import { initTypewriters } from './typewriter.js';
 import { initModals } from './modals.js';
@@ -15,7 +14,6 @@ let globalAiFormInstance = null;
 const loadContent = async (url, elementId) => {
     const placeholder = document.getElementById(elementId);
     if (!placeholder) {
-        // Nicht kritisch, wenn z.B. side-menu-placeholder auf manchen Seiten fehlt
         return Promise.resolve(); 
     }
     try {
@@ -28,7 +26,6 @@ const loadContent = async (url, elementId) => {
     }
 };
 
-// Spezifisch für Feedback (fehlertolerant)
 const loadFeedback = async () => {
     const placeholder = document.getElementById('feedback-placeholder');
     if (!placeholder) return;
@@ -43,11 +40,12 @@ const loadFeedback = async () => {
     }
 };
 
-// === 4. HEADER LOGIK (SCROLL EFFECT & SIDE MENU) ===
+// === 4. SMART HEADER & FOOTER LOGIK ===
 
 const initHeaderScrollEffect = () => {
     const header = document.querySelector('.main-header');
-    const footer = document.querySelector('footer'); // Footer holen
+    // WICHTIG: Wir holen den Footer später im Loop oder prüfen auf Existenz, 
+    // da er dynamisch geladen wird.
     
     if (!header) return;
 
@@ -55,43 +53,48 @@ const initHeaderScrollEffect = () => {
 
     const handleScroll = () => {
         const currentScrollY = window.scrollY;
+        const footer = document.querySelector('footer'); // Immer aktuell holen
         
-        // --- HEADER LOGIK ---
+        // --- 1. GLASSMORPHISM EFFEKT (Dunkel werden) ---
         if (currentScrollY > 50) {
             header.classList.add('scrolled');
         } else {
             header.classList.remove('scrolled');
+            // Wenn ganz oben: Header immer zeigen
             header.classList.remove('hide-up'); 
         }
 
-        // --- SMART HIDE LOGIK (Header & Footer) ---
-        // Prüfen, ob wir ganz unten auf der Seite sind
-        const isAtBottom = (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 50;
+        // --- 2. SMART HIDE LOGIK ---
+        
+        // Berechnung: Sind wir am Ende der Seite?
+        // (ScrollPosition + Fensterhöhe >= Gesamthöhe - kleiner Puffer)
+        const isAtBottom = (window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 50;
 
         if (currentScrollY > 100 && !isAtBottom) {
             if (currentScrollY > lastScrollY) {
-                // RUNTER scrollen -> Alles verstecken
+                // SCROLL DOWN -> Verstecken
                 header.classList.add('hide-up');
-                if(footer) footer.classList.add('hide-down');
+                if (footer) footer.classList.add('hide-down');
             } else {
-                // HOCH scrollen -> Alles zeigen
+                // SCROLL UP -> Zeigen
                 header.classList.remove('hide-up');
-                if(footer) footer.classList.remove('hide-down');
+                if (footer) footer.classList.remove('hide-down');
             }
         } else if (isAtBottom) {
-            // GANZ UNTEN -> Footer ZWINGEND zeigen (Header kann weg bleiben oder auch kommen)
-            if(footer) footer.classList.remove('hide-down');
-            // Optional: Header auch zeigen am Ende? 
-            // header.classList.remove('hide-up'); 
+            // ENDE DER SEITE -> Footer zwingend zeigen
+            if (footer) footer.classList.remove('hide-down');
         } else {
-            // GANZ OBEN (< 100px) -> Footer zeigen
-             if(footer) footer.classList.remove('hide-down');
+            // ANFANG DER SEITE (< 100px) -> Footer zwingend zeigen
+            if (footer) footer.classList.remove('hide-down');
         }
 
         lastScrollY = currentScrollY;
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    // Initial einmal ausführen
+    handleScroll();
 };
 
 
@@ -112,8 +115,6 @@ const setupSideMenu = () => {
         // Schließen Funktion
         const closeMenu = () => {
             sideMenu.classList.remove('visible');
-            
-            // Checken ob wir im Flip-Modus sind
             const heroFlipped = document.querySelector('.hero-flip-wrapper.flipped'); 
             if (!heroFlipped) {
                 document.body.classList.remove('no-scroll');
@@ -128,7 +129,6 @@ const setupSideMenu = () => {
             });
         }
 
-        // Klick außerhalb und Escape
         document.addEventListener('click', (e) => {
             if (sideMenu.classList.contains('visible') && 
                 !sideMenu.contains(e.target) && 
@@ -148,7 +148,6 @@ const setupSideMenu = () => {
 // === 5. EVITA CHAT LOGIK ===
 
 const setupEvitaChatButton = () => {
-    // Header Button
     const evitaChatButton = document.getElementById('evita-chat-button');
     if (evitaChatButton) {
         evitaChatButton.addEventListener('click', async (e) => {
@@ -158,20 +157,16 @@ const setupEvitaChatButton = () => {
     }
 };
 
-// Global aufrufbar machen
 window.launchEvitaChatFromAnywhere = async () => {
     await launchEvitaChat();
 };
 
 const launchEvitaChat = async () => {
-    // 1. Sicherstellen, dass Formular initialisiert ist
     await ensureAiFormAvailable();
     
-    // 2. Modal öffnen
     const aiResponseModal = document.getElementById('ai-response-modal');
     if (aiResponseModal) {
         const chatHistory = document.getElementById('ai-chat-history');
-        // Reset Chat History bei Neuöffnung (optional)
         if (chatHistory && chatHistory.children.length === 0) {
              addWelcomeMessage("Hallo! Ich bin Evita, Michaels KI-Assistentin. Wie kann ich dir heute helfen?");
         }
@@ -179,7 +174,6 @@ const launchEvitaChat = async () => {
         aiResponseModal.classList.add('visible');
         document.body.classList.add('no-scroll');
         
-        // Fokus auf Input
         setTimeout(() => {
             const chatInput = document.getElementById('ai-chat-input');
             if (chatInput) chatInput.focus();
@@ -207,14 +201,12 @@ const addWelcomeMessage = (message) => {
     chatHistory.appendChild(messageDiv);
 };
 
-// === 6. HERO FLIP LOGIK (3-SEITEN SYSTEM) ===
-// Diese Logik greift nur, wenn die Elemente tatsächlich da sind (Startseite)
+// === 6. HERO FLIP LOGIK ===
 
 const initHeroFlip = () => {
     const heroFlipWrapper = document.getElementById('hero-flip-wrapper');
-    if (!heroFlipWrapper) return; // Abbruch auf Blogseiten etc.
+    if (!heroFlipWrapper) return;
 
-    // Elemente
     const btnToBack = document.getElementById('flip-info-btn');
     const btnBackToStart = document.getElementById('flip-back-btn');
     const btnToThird = document.getElementById('flip-to-third-btn');
@@ -224,63 +216,47 @@ const initHeroFlip = () => {
     const viewMain = document.getElementById('view-main');
     const viewThird = document.getElementById('view-third');
 
-    // 1. Start -> Rückseite (Michael)
     if (btnToBack) {
         btnToBack.addEventListener('click', (e) => {
             e.preventDefault();
             heroFlipWrapper.classList.add('flipped');
-            document.body.classList.remove('no-scroll'); // Scrollen auf Rückseite erlaubt
+            document.body.classList.remove('no-scroll');
         });
     }
 
-    // 2. Rückseite -> Start
     if (btnBackToStart) {
         btnBackToStart.addEventListener('click', (e) => {
             e.preventDefault();
-            // Reset Views
             if(viewMain) viewMain.style.display = 'block';
             if(viewThird) viewThird.style.display = 'none';
-            
             heroFlipWrapper.classList.remove('flipped');
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            // Kurze Verzögerung bis Animation fertig ist, dann Scroll lock (optional für Hero Feeling)
-            // document.body.classList.add('no-scroll'); 
         });
     }
 
-    // 3. Rückseite -> Seite 3 (Evita)
     if (btnToThird) {
         btnToThird.addEventListener('click', (e) => {
             e.preventDefault();
-            // View Switch
             if (viewMain) viewMain.style.display = 'none';
             if (viewThird) viewThird.style.display = 'flex';
-            
-            // Flip zurückdrehen (aber Inhalt ist jetzt Evita)
             heroFlipWrapper.classList.remove('flipped');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     }
 
-    // 4. Seite 3 -> Rückseite
     if (btnThirdToBack) {
         btnThirdToBack.addEventListener('click', (e) => {
             e.preventDefault();
             heroFlipWrapper.classList.add('flipped');
-            // View Switch passiert erst wenn flipped ist, oder wir lassen es so
-            // Hier muss man aufpassen: Wenn wir flippen, sieht man die Rückseite (Michael)
-            // Das passt so.
         });
     }
 
-    // 5. Seite 3 -> Aktion (Chat oder Start)
     if (btnThirdToStart) {
         btnThirdToStart.addEventListener('click', async (e) => {
             e.preventDefault();
             if (btnThirdToStart.dataset.action === 'open-evita-chat') {
                 await launchEvitaChat();
             } else {
-                // Fallback: Zurück zur Startseite
                 if(viewMain) viewMain.style.display = 'block';
                 if(viewThird) viewThird.style.display = 'none';
                 heroFlipWrapper.classList.remove('flipped');
@@ -293,10 +269,10 @@ const initHeroFlip = () => {
 
 const initializeDynamicScripts = () => {
     initModals();
-    initHeaderScrollEffect(); // NEU: Scroll Effekt aktivieren
+    initHeaderScrollEffect(); // Startet Smart Header/Footer
     setupSideMenu();
     setupEvitaChatButton();
-    initHeroFlip(); // NEU: Flip Logik sicher aufrufen
+    initHeroFlip();
 };
 
 const initializeStaticScripts = () => {
@@ -312,43 +288,37 @@ const initializeForms = async () => {
 // MAIN EVENT LISTENER
 document.addEventListener('DOMContentLoaded', async () => {
     
-    // 1. Statische Skripte sofort
     initializeStaticScripts();
 
-    // 2. Dark Mode Check
     if (localStorage.getItem('theme') === 'dark') {
         document.body.classList.add('dark-mode');
     }
 
-    // 3. Asynchrones Laden der HTML-Teile
     try {
         await Promise.all([
             loadContent('header.html', 'header-placeholder'),
             loadContent('modals.html', 'modal-container'),
             loadContent('footer.html', 'footer-placeholder'),
             loadContent('side-menu.html', 'side-menu-placeholder'),
-            loadFeedback() // Parallel, aber Fehler werden ignoriert
+            loadFeedback()
         ]);
 
-        console.log("✅ Core-Layout geladen.");
+        console.log("✅ Layout geladen.");
         
-        // 4. Events binden, nachdem HTML da ist
-        initializeDynamicScripts();
-        
-        // 5. Forms laden (mit leichter Verzögerung für Performance)
-        setTimeout(initializeForms, 200);
+        // Timeout gibt dem Browser kurz Zeit, das DOM zu rendern
+        setTimeout(() => {
+            initializeDynamicScripts();
+            initializeForms();
+        }, 50);
 
-        // 6. Seite sichtbar machen
         document.body.classList.add('page-loaded');
 
     } catch (error) {
-        console.error("❌ Kritischer Fehler beim Laden:", error);
-        // Notfall-Anzeige
+        console.error("❌ Fehler:", error);
         document.body.classList.add('page-loaded');
     }
 });
 
-// Scroll Observer für Performance-Tipps (Blog etc.)
 const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
