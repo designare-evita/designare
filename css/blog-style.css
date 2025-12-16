@@ -44,45 +44,12 @@
    =================== */
 
 .article-header {
-    margin-bottom: 2rem;
-    padding-bottom: 2rem;
-    border-bottom: 1px solid var(--border-color);
-}
-
-/* Breadcrumb ohne Einzug, nah an H1 */
-.breadcrumb {
-    margin-bottom: 0.5rem;
-    padding-left: 0;
-}
-
-.breadcrumb ol {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    font-size: 0.9rem;
-    opacity: 0.7;
-}
-
-.breadcrumb li:not(:last-child)::after {
-    content: "›";
-    margin-left: 0.5rem;
-    color: var(--accent-color);
-}
-
-.breadcrumb a {
-    color: var(--text-color);
-    transition: color 0.3s ease;
-}
-
-.breadcrumb a:hover {
-    color: var(--accent-color);
-}
-
-.breadcrumb li[aria-current="page"] {
-    color: var(--accent-color);
+    /* border-bottom: 1px solid var(--border-color);  <-- ENTFERNT */
+    border-bottom: none; 
+    
+    /* Optional: Padding reduzieren, da die Trennlinie weg ist */
+    margin-bottom: 1rem; 
+    padding-bottom: 1rem;
 }
 
 /* Main Heading */
@@ -151,9 +118,9 @@
     padding: 0 1rem; /* Abstand links und rechts, damit die Linie nicht am Pfeil klebt */
     
     /* Dezent stylen */
-    color: var(--text-color);
     font-size: 1.2rem;
-    opacity: 0.3; /* Sehr dezent, passend zur Linie */
+    opacity: 1; 
+    color: var(--accent-color);
     transition: opacity 0.3s ease, color 0.3s ease;
 }
 
@@ -161,6 +128,7 @@
 .blog-article section:hover::after {
     opacity: 1;
     color: var(--accent-color);
+   transform: translateX(-50%) scale(1.2);
 }
 
 /* Smooth Scrolling */
@@ -239,42 +207,21 @@ html {
    =================== */
 
 .toc-container {
-    /* Sticky Positionierung */
-    position: -webkit-sticky;
-    position: sticky;
+    /* justify-content: center; <-- ENTFERNT */
+    justify-content: flex-start; /* Jetzt linksbündig */
     
-    /* ÄNDERUNG: Abstand von oben, damit es nicht unter dem Header verschwindet */
-    /* Passen Sie diesen Wert an die Höhe Ihres Headers an (meist 80px - 120px) */
-    top: 100px; 
-    
-    z-index: 90; /* Hoch genug, aber unter dem Modal/Header (meist 1000+) */
-    
-    /* Layout: Flexbox für zentrierte Ausrichtung */
-    display: flex;
-    justify-content: center;
-    
-    /* Kein fester Hintergrund für Container */
-    background: transparent;
-    
-    /* WICHTIG: Container lässt Klicks durch (damit Text darunter scrollbar bleibt) */
-    pointer-events: none;
-    
-    padding: 1rem 0;
-    margin-bottom: 3rem;
-    width: 100%;
+    /* Sticky so weit oben wie möglich (unter Berücksichtigung eines evtl. Headers) */
+    /* War vorher 100px. 0px wäre ganz oben am Bildschirmrand. 
+       Wir nehmen 10px als Puffer oder 0px für maximal "oben". */
+    top: 10px; 
 }
 
 .toc-container ul {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.8rem;
-    list-style-type: none;
-    padding-left: 0;
-    margin: 0;
+    /* justify-content: center; <-- ENTFERNT */
+    justify-content: flex-start; /* Listen-Elemente linksbündig */
     
-    /* WICHTIG: Auch die Liste lässt Klicks durch */
-    pointer-events: none;
+    /* Padding links entfernen, damit es bündig mit dem Text darüber ist */
+    padding-left: 0; 
 }
 
 .toc-container li {
@@ -297,7 +244,7 @@ html {
     /* Badge Look */
     background-color: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 50px; /* Pill Shape */
+    border-radius: 25px; /* Pill Shape */
     
     /* Glas-Effekt */
     backdrop-filter: blur(8px);
