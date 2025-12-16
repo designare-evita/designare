@@ -123,11 +123,11 @@
                     <i class="fa-solid fa-circle-info"></i>
                     <div>
                         <strong>Übersicht:</strong>
-                        <p>Semantisches Markup ist das Fundament für echte Web-Handwerkskunst. Es bedeutet, HTML-Tags so zu verwenden, dass sie die <strong>Bedeutung</strong> des Inhalts beschreiben, nicht dessen Aussehen. Während ein <code>&lt;div&gt;</code> ein inhaltsleerer Container ist, kommunizieren Tags wie <code>&lt;article&gt;</code>, <code>&lt;nav&gt;</code> oder <code>&lt;aside&gt;</code> dem Browser (und Crawlern), worum es sich bei den Daten handelt.</p>
+                        <p>Semantisches Markup ist das Fundament für echte Web-Handwerkskunst. Es bedeutet, HTML-Tags so zu verwenden, dass sie die <strong>Bedeutung</strong> des Inhalts beschreiben, nicht dessen Aussehen. Während ein <code>&lt;div&gt;</code> ein inhaltsleerer Container ist, kommunizieren Tags wie <code>&lt;article&gt;</code>, <code>&lt;nav&gt;</code> oder <code>&lt;aside&gt;</code> dem Browser und Crawlern, worum es sich bei den Daten handelt.</p>
                     </div>
                 </div>
 
-                <p>Stell dir vor, du servierst Google oder einer KI wie ChatGPT deinen Content. Ohne Semantik ist das wie eine Suppe, in der alle Zutaten püriert sind ("Div-Soup"). Mit <strong>semantischem Markup</strong> servierst du ein fein angerichtetes Menü, bei dem klar ist: Das ist die Hauptspeise (<code>&lt;main&gt;</code>), das ist die Beilage (<code>&lt;aside&gt;</code>) und hier ist die Rechnung (<code>&lt;footer&gt;</code>).</p>
+                <p>Stell dir vor, du servierst Google oder einer KI wie ChatGPT deinen Content. Ohne Semantik ist das wie eine Suppe, in der alle Zutaten püriert sind ("Div-Soup"). Mit <strong>semantischem Markup</strong> servierst du ein fein angerichtetes Menü, bei dem klar ist: Das ist die Hauptspeise <code>&lt;main&gt;</code>, das ist die Beilage <code>&lt;aside&gt;</code> und hier ist die Rechnung <code>&lt;footer&gt;</code>.</p>
 
                 <p>Für Maschinen – seien es klassische Suchmaschinen-Crawler oder moderne Large Language Models (LLMs) – ist dies der einzige Weg, den Kontext deiner Daten korrekt zu interpretieren. Es geht weg vom bloßen Anzeigen hin zum echten "Verstehen" der Struktur.</p>
             </section>
@@ -147,13 +147,13 @@
 
                 <dl class="feature-list">
                     <dt>Verständnis für KI & LLMs</dt>
-                    <dd>KIs lesen keinen visuellen Screen, sie lesen Code. Semantisches HTML hilft Maschinen, Mehrdeutigkeiten aufzulösen. Ein Wort wie "Apple" wird durch den Kontext (z.B. innerhalb eines <code>&lt;product&gt;</code> Schemas oder eines <code>&lt;article&gt;</code> über Tech) klar als Firma und nicht als Obst identifiziert.</dd>
+                    <dd>KIs lesen keinen visuellen Screen, sie lesen Code. Semantisches HTML hilft Maschinen, Mehrdeutigkeiten aufzulösen. Ein Wort wie "Apple" wird durch den Kontext z.B. innerhalb eines <code>&lt;product&gt;</code> Schemas oder eines <code>&lt;article&gt;</code> über Tech klar als Firma und nicht als Obst identifiziert.</dd>
                     
                     <dt>Accessibility als Standard</dt>
                     <dd>Was gut für den Crawler ist, ist gut für Screenreader. Semantik verbessert automatisch die Zugänglichkeit (A11y), da die Hierarchie der Seite ohne visuelle Hilfe navigierbar wird.</dd>
                     
                     <dt>SEO-Ranking</dt>
-                    <dd>Google belohnt Strukturen. Eine klare Heading-Hierarchie (<code>h1</code> bis <code>h6</code>) und korrekte Landmarks (<code>nav</code>, <code>main</code>) signalisieren Qualität.</dd>
+                    <dd>Google belohnt Strukturen. Eine klare Heading-Hierarchie <code>h1</code> bis <code>h6</code> und korrekte Landmarks <code>nav</code>, <code>main</code> signalisieren Qualität.</dd>
                     
                     <dt>Performance</dt>
                     <dd>Semantischer Code ist oft schlanker. Weniger verschachtelte <code>div</code>-Konstrukte bedeuten eine geringere Dateigröße (oft nur wenige KB), was zu blitzschnellen Ladezeiten führt – genau wie bei einem performanten Portfolio ohne schweres CMS.</dd>
@@ -171,7 +171,7 @@
                     <ul>
                         <li>Nutze <code>&lt;header&gt;</code> für den Kopfbereich (Logo, Intro).</li>
                         <li>Verwende <code>&lt;nav&gt;</code> exklusiv für die Hauptnavigation.</li>
-                        <li>Packe den eigentlichen Inhalt zwingend in <code>&lt;main&gt;</code> (darf nur einmal pro Seite vorkommen!).</li>
+                        <li>Packe den eigentlichen Inhalt zwingend in <code>&lt;main&gt;</code> darf nur einmal pro Seite vorkommen!.</li>
                         <li>Schließe mit <code>&lt;footer&gt;</code> ab.</li>
                     </ul>
                 </article>
@@ -180,7 +180,7 @@
                     <h3>Schritt 2: Content-Container wählen</h3>
                     <p>Jetzt geht es ans Eingemachte. Statt alles in <code>div class="content"</code> zu werfen, nutze HTML5-Tags:</p>
                     <ul>
-                        <li><strong><code>&lt;article&gt;</code>:</strong> Für in sich geschlossene Inhalte (z.B. ein Blogpost oder eine News-Card), die auch alleine stehen könnten.</li>
+                        <li><strong><code>&lt;article&gt;</code>:</strong> Für in sich geschlossene Inhalte z.B. ein Blogpost oder eine News-Card, die auch alleine stehen könnten.</li>
                         <li><strong><code>&lt;section&gt;</code>:</strong> Um thematische Abschnitte innerhalb eines Artikels zu gruppieren (braucht meist eine eigene Überschrift).</li>
                         <li><strong><code>&lt;aside&gt;</code>:</strong> Für Inhalte, die nur indirekt mit dem Haupttext zu tun haben (Sidebar, Call-to-Action Boxen).</li>
                     </ul>
@@ -209,7 +209,7 @@
                     <i class="fa-solid fa-lightbulb"></i>
                     <div>
                         <strong>Experten-Tipp:</strong>
-                        <p><strong>Schema.org Integration:</strong> Semantisches HTML ist die Pflicht, strukturierte Daten (JSON-LD) sind die Kür. Wenn du deine semantischen Tags zusätzlich mit Schema.org Markup anreicherst (z.B. <code>Article</code>, <code>Breadcrumb</code>, <code>FAQPage</code>), lieferst du den Suchmaschinen das Datenfutter auf dem Silbertablett. Das erhöht die Chance auf Rich Snippets massiv.</p>
+                        <p><strong>Schema.org Integration:</strong> Semantisches HTML ist die Pflicht, strukturierte Daten (JSON-LD) sind die Kür. Wenn du deine semantischen Tags zusätzlich mit Schema.org Markup anreicherst z.B. <code>Article</code>, <code>Breadcrumb</code>, <code>FAQPage</code>, lieferst du den Suchmaschinen das Datenfutter auf dem Silbertablett. Das erhöht die Chance auf Rich Snippets massiv.</p>
                     </div>
                 </aside>
             </section>
@@ -236,7 +236,7 @@
                             <td>Pro Seite gibt es genau eine <code>&lt;h1&gt;</code>. Sie beschreibt das Hauptthema der URL. Das Logo gehört in ein <code>&lt;div&gt;</code> oder <code>&lt;span&gt;</code> innerhalb des Headers</td>
                         </tr>
                         <tr>
-                            <td>"Div-Soup" für Layouts nutzen (z.B. <code>&lt;div class="nav"&gt;</code>)</td>
+                            <td>"Div-Soup" für Layouts nutzen z.B. <code>&lt;div class="nav"&gt;</code></td>
                             <td>Nutze das native <code>&lt;nav&gt;</code> Element. Es sagt dem Browser explizit: "Hier geht's lang"</td>
                         </tr>
                     </tbody>
@@ -268,38 +268,46 @@
             <section aria-labelledby="faq-heading">
                 <h2 id="faq-heading">Häufig gestellte Fragen zu semantisches Markup</h2>
                 
-                <dl class="faq-list">
-                    <div class="faq-item">
-                        <dt>Was ist semantisches Markup?</dt>
-                        <dd>Semantisches Markup bedeutet, HTML-Code so zu schreiben, dass er den <strong>Inhalt und die Bedeutung</strong> der Elemente beschreibt, nicht nur deren Aussehen. Anstatt alles in generische <code>&lt;div&gt;</code>-Container zu packen (die berüchtigte "Div-Suppe"), nutzen wir spezifische Tags wie <code>&lt;article&gt;</code>, <code>&lt;nav&gt;</code> oder <code>&lt;footer&gt;</code>. Das liefert Suchmaschinen und KIs den nötigen Kontext, um deine Inhalte wirklich zu <em>verstehen</em>.</dd>
-                    </div>
+                <div class="faq-accordion">
+                    <details name="faq-group" open>
+                        <summary>Was ist semantisches Markup?</summary>
+                        <div class="faq-content">
+                            <p>Semantisches Markup bedeutet, HTML-Code so zu schreiben, dass er den <strong>Inhalt und die Bedeutung</strong> der Elemente beschreibt, nicht nur deren Aussehen. Anstatt alles in generische <code>&lt;div&gt;</code>-Container zu packen (die berüchtigte "Div-Suppe"), nutzen wir spezifische Tags wie <code>&lt;article&gt;</code>, <code>&lt;nav&gt;</code> oder <code>&lt;footer&gt;</code>. Das liefert Suchmaschinen und KIs den nötigen Kontext, um deine Inhalte wirklich zu <em>verstehen</em>.</p>
+                        </div>
+                    </details>
 
-                    <div class="faq-item">
-                        <dt>Wie funktioniert semantisches Markup?</dt>
-                        <dd>Es funktioniert wie eine Übersetzungshilfe für Maschinen. Während wir Menschen visuell erkennen, was eine Überschrift oder ein Menü ist, braucht der Crawler klare Anweisungen im Code. Durch die saubere Trennung von Struktur (HTML) und Design (CSS) sagen wir dem Browser und LLMs exakt: "Das hier ist wichtig", "Das ist eine Zeitangabe" oder "Das ist der Autor". So werden Mehrdeutigkeiten (z.B. "Apple" als Frucht vs. Firma) aufgelöst.</dd>
-                    </div>
+                    <details name="faq-group">
+                        <summary>Wie funktioniert semantisches Markup?</summary>
+                        <div class="faq-content">
+                            <p>Es funktioniert wie eine Übersetzungshilfe für Maschinen. Während wir Menschen visuell erkennen, was eine Überschrift oder ein Menü ist, braucht der Crawler klare Anweisungen im Code. Durch die saubere Trennung von Struktur (HTML) und Design (CSS) sagen wir dem Browser und LLMs exakt: "Das hier ist wichtig", "Das ist eine Zeitangabe" oder "Das ist der Autor". So werden Mehrdeutigkeiten z.B. "Apple" als Frucht vs. Firma aufgelöst.</p>
+                        </div>
+                    </details>
 
-                    <div class="faq-item">
-                        <dt>Lohnt sich semantisches Markup?</dt>
-                        <dd>Absolut. Zwar ist es ein oft "unsichtbarer" Ranking-Faktor, aber er bildet das technische Fundament deiner SEO-Strategie. Sauberes Markup sorgt für Barrierefreiheit, blitzschnelle Ladezeiten (da der Code schlanker ist, ähnlich wie bei meinem "Hand-Code"-Ansatz) und macht deine Seite fit für die KI-Suche (GEO). Es ist keine Ausgabe, sondern ein Investment in die Zukunftsfähigkeit deiner Domain.</dd>
-                    </div>
+                    <details name="faq-group">
+                        <summary>Lohnt sich semantisches Markup?</summary>
+                        <div class="faq-content">
+                            <p>Absolut. Zwar ist es ein oft "unsichtbarer" Ranking-Faktor, aber er bildet das technische Fundament deiner SEO-Strategie. Sauberes Markup sorgt für Barrierefreiheit, blitzschnelle Ladezeiten (da der Code schlanker ist, ähnlich wie bei meinem "Hand-Code"-Ansatz) und macht deine Seite fit für die KI-Suche (GEO). Es ist keine Ausgabe, sondern ein Investment in die Zukunftsfähigkeit deiner Domain.</p>
+                        </div>
+                    </details>
 
-                    <div class="faq-item">
-                        <dt>Für wen eignet sich semantisches Markup?</dt>
-                        <dd>Eigentlich für jeden Web-Puristen und jedes Unternehmen, das nicht nur "online sein", sondern auch <em>gefunden</em> werden will. Besonders kritisch ist es für Seiten mit vielen Inhalten (Blogs, News), E-Commerce und alle, die wollen, dass ihre Daten von KI-Systemen wie ChatGPT oder Google Gemini korrekt interpretiert und als Quelle genutzt werden.</dd>
-                    </div>
+                    <details name="faq-group">
+                        <summary>Für wen eignet sich semantisches Markup?</summary>
+                        <div class="faq-content">
+                            <p>Eigentlich für jeden Web-Puristen und jedes Unternehmen, das nicht nur "online sein", sondern auch <em>gefunden</em> werden will. Besonders kritisch ist es für Seiten mit vielen Inhalten (Blogs, News), E-Commerce und alle, die wollen, dass ihre Daten von KI-Systemen wie ChatGPT oder Google Gemini korrekt interpretiert und als Quelle genutzt werden.</p>
+                        </div>
+                    </details>
 
-                    <div class="faq-item">
-                        <dt>Was sind die häufigsten Fehler bei semantisches Markup?</dt>
-                        <dd>
+                    <details name="faq-group">
+                        <summary>Was sind die häufigsten Fehler bei semantisches Markup?</summary>
+                        <div class="faq-content">
                             <ol>
                                 <li><strong>Falsche Tag-Nutzung:</strong> Ein <code>&lt;article&gt;</code> Tag für etwas nutzen, das eigentlich eine <code>&lt;section&gt;</code> ist.</li>
                                 <li><strong>Struktur-Chaos:</strong> Mehrere <code>&lt;h1&gt;</code> Tags wild durcheinander gewürfelt (die Hierarchie muss stimmen!).</li>
                                 <li><strong>Thin Content:</strong> Das schönste Markup bringt nichts, wenn der Inhalt selbst zu dünn ist und keinen Mehrwert bietet.</li>
                             </ol>
-                        </dd>
-                    </div>
-                </dl>
+                        </div>
+                    </details>
+                </div>
             </section>
 
             <section aria-labelledby="conclusion-heading">
