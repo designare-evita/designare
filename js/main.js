@@ -49,16 +49,34 @@ const initHeaderScrollEffect = () => {
     const header = document.querySelector('.main-header');
     if (!header) return;
 
+    let lastScrollY = window.scrollY;
+
     const handleScroll = () => {
-        if (window.scrollY > 50) {
+        const currentScrollY = window.scrollY;
+
+        // 1. "Scrolled"-Look (Dunkel/Blur) aktivieren, wenn wir nicht ganz oben sind
+        if (currentScrollY > 50) {
             header.classList.add('scrolled');
         } else {
             header.classList.remove('scrolled');
+            // Wenn wir ganz oben sind, muss der Header immer sichtbar sein
+            header.classList.remove('hide-up'); 
         }
+
+        // 2. Smart Hide Logik (Nur wenn wir weiter unten sind > 100px)
+        if (currentScrollY > 100) {
+            if (currentScrollY > lastScrollY) {
+                // RUNTER scrollen -> Header verstecken
+                header.classList.add('hide-up');
+            } else {
+                // HOCH scrollen -> Header zeigen
+                header.classList.remove('hide-up');
+            }
+        }
+
+        lastScrollY = currentScrollY;
     };
 
-    // Initial check und Listener
-    handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
 };
 
