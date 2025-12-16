@@ -125,13 +125,42 @@
    =================== */
 
 .blog-article section {
-    margin-bottom: 6rem; /* Mehr Platz zwischen Sektionen */
-    position: relative;
-    padding-top: 3rem;   /* Platz für die Trennlinie */
-    /* Minimalistische Trennlinie */
+    margin-bottom: 6rem; /* Viel Platz zum nächsten Abschnitt */
+    position: relative;  /* Wichtig für die Positionierung des Pfeils */
+    padding-top: 3rem;
+    
+    /* Die dezente Trennlinie */
     border-top: 1px solid rgba(255, 255, 255, 0.05); 
-    /* Smooth scroll Ziel-Offset */
-    scroll-margin-top: 100px;
+    
+    scroll-margin-top: 100px; /* Für Smooth-Scroll */
+}
+
+/* NEU: Der Pfeil (Dreieck) mittig auf der Linie */
+.blog-article section::after {
+    content: "\f107"; /* FontAwesome Unicode für 'Angle Down' */
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900; /* Nötig für Solid Icons */
+    
+    position: absolute;
+    top: -0.9rem; /* Zieht das Icon nach oben, damit es genau mittig auf der Linie sitzt */
+    left: 50%;
+    transform: translateX(-50%); /* Zentriert es horizontal exakt */
+    
+    /* Hintergrundfarbe der Seite, um die Linie optisch zu "schneiden" */
+    background-color: var(--bg-color); 
+    padding: 0 1rem; /* Abstand links und rechts, damit die Linie nicht am Pfeil klebt */
+    
+    /* Dezent stylen */
+    color: var(--text-color);
+    font-size: 1.2rem;
+    opacity: 0.3; /* Sehr dezent, passend zur Linie */
+    transition: opacity 0.3s ease, color 0.3s ease;
+}
+
+/* Optional: Netter Effekt beim Drüberfahren */
+.blog-article section:hover::after {
+    opacity: 1;
+    color: var(--accent-color);
 }
 
 /* Smooth Scrolling */
