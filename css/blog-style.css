@@ -12,7 +12,9 @@
     margin: 0 auto;
     padding: 120px 2rem 4rem;
     min-height: 100vh;
-   position: relative;
+    
+    /* KORREKTUR: Z-Index damit Inhalt über den Partikeln liegt */
+    position: relative;
     z-index: 2; 
 }
 
@@ -38,18 +40,19 @@
 }
 
 /* ===================
-   3. ARTICLE HEADER
+   3. ARTICLE HEADER & META
    =================== */
 
 .article-header {
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
     padding-bottom: 2rem;
     border-bottom: 1px solid var(--border-color);
 }
 
-/* Breadcrumb Navigation */
+/* KORREKTUR: Breadcrumb optimiert (Abstand, Padding) */
 .breadcrumb {
-    margin-bottom: 1.5rem;
+    margin-bottom: 0.5rem;
+    padding-left: 0;
 }
 
 .breadcrumb ol {
@@ -123,6 +126,13 @@
 
 .blog-article section {
     margin-bottom: 3rem;
+    /* Smooth scroll ziel-offset für fixed header berücksichtigen */
+    scroll-margin-top: 100px;
+}
+
+/* NEU: Smooth Scrolling */
+html {
+    scroll-behavior: smooth;
 }
 
 .blog-article h2 {
@@ -131,6 +141,7 @@
     margin: 2.5rem 0 1.2rem;
     color: var(--text-color);
     line-height: 1.3;
+    scroll-margin-top: 100px; /* Für Anker-Links */
 }
 
 .blog-article h3 {
@@ -156,8 +167,13 @@
     color: var(--accent-color);
 }
 
-/* Lists */
-.blog-article ul,
+/* Lists - KORREKTUR: Würfel statt Punkte */
+.blog-article ul {
+    margin-bottom: 1.5rem;
+    padding-left: 1.5rem;
+    list-style-type: square; /* Eckige Bulletpoints */
+}
+
 .blog-article ol {
     margin-bottom: 1.5rem;
     padding-left: 1.5rem;
@@ -187,6 +203,49 @@
 /* ===================
    5. SPECIAL BOXES
    =================== */
+
+/* NEU: Inhaltsverzeichnis (ToC) Styles */
+.toc-container {
+    background-color: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 3rem;
+    display: inline-block;
+    min-width: 50%;
+}
+
+.toc-container h2 {
+    font-size: 1.2rem;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: var(--accent-color);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.5rem;
+}
+
+.toc-container ul {
+    list-style-type: none; /* Im ToC keine Punkte */
+    padding-left: 0;
+    margin-bottom: 0;
+}
+
+.toc-container li {
+    margin-bottom: 0.5rem;
+}
+
+.toc-container a {
+    color: var(--text-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+    font-size: 0.95rem;
+}
+
+.toc-container a:hover {
+    color: var(--accent-color);
+    padding-left: 5px; /* Kleiner Hover-Effekt */
+}
+
 
 /* Summary Box */
 .summary-box {
@@ -328,6 +387,17 @@
     border-bottom: 2px solid var(--accent-color);
 }
 
+/* KORREKTUR: Icons Styling in der Tabelle */
+.th-wrong i {
+    color: #ff6b6b;
+    margin-left: 8px;
+}
+
+.th-correct i {
+    color: #51cf66;
+    margin-left: 8px;
+}
+
 .comparison-table td {
     padding: 1rem;
     border-bottom: 1px solid var(--border-color);
@@ -390,7 +460,7 @@
 }
 
 .key-points ul {
-    list-style: none;
+    list-style: none; /* Hier manuell none, weil eigene Haken verwendet werden */
     padding-left: 0;
 }
 
@@ -496,6 +566,13 @@
         font-size: 1.2rem;
     }
 
+    /* ToC Mobile */
+    .toc-container {
+        width: 100%;
+        min-width: 100%;
+        padding: 1.2rem;
+    }
+
     .summary-box,
     .info-box,
     .tech-box,
@@ -518,7 +595,7 @@
         font-size: 1.3rem;
     }
 
-    /* Table Responsive */
+    /* Table Responsive - KORREKTUR für Emojis/Icons */
     .comparison-table {
         font-size: 0.85rem;
     }
@@ -552,14 +629,15 @@
         border-bottom: 1px solid var(--border-color);
     }
 
+    /* Inhalt angepasst: Nur Text, keine Emojis via CSS content */
     .comparison-table td:first-child::before {
-        content: "❌ Falsch: ";
+        content: "Falsch: ";
         font-weight: 600;
         color: #ff6b6b;
     }
 
     .comparison-table td:last-child::before {
-        content: "✅ Richtig: ";
+        content: "Richtig: ";
         font-weight: 600;
         color: #51cf66;
     }
