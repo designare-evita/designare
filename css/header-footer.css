@@ -4,7 +4,7 @@
    ============================================================ */
 
 /* ===================
-   1. HEADER (BASE & SCROLL EFFECT)
+   1. GLOBAL VARIABLES
    =================== */
 
 :root {
@@ -13,7 +13,7 @@
 }
 
 /* ===================
-   1. HEADER (SMART HIDE)
+   2. HEADER (SMART HIDE & GLASS)
    =================== */
 
 .main-header {
@@ -21,7 +21,7 @@
     top: 0;
     left: 0;
     width: 100%;
-    height: 80px; /* Desktop Standard */
+    height: var(--header-height-desktop);
     
     display: flex;
     justify-content: space-between;
@@ -34,7 +34,9 @@
     background-color: transparent;
     
     /* WICHTIG: Transition für transform (Bewegung) und background */
-    transition: transform 0.3s ease-in-out, background-color 0.3s ease, padding 0.3s ease, height 0.3s ease;
+    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), 
+                background-color 0.4s ease, 
+                height 0.4s ease;
 }
 
 /* Zustand: Gescrollt (Dunkel & Blur) */
@@ -44,26 +46,16 @@
     -webkit-backdrop-filter: blur(12px);
     height: 70px;
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* NEU: Zustand: Versteckt (Nach oben geschoben) */
+/* Zustand: Versteckt (Nach oben geschoben) */
 .main-header.hide-up {
-    transform: translateY(-100%); /* Schiebt den Header komplett aus dem Bild */
-}
-
-/* Mobile Anpassungen */
-@media (max-width: 768px) {
-    .main-header {
-        height: 60px;
-        padding: 0 15px;
-    }
-    .main-header.scrolled {
-        height: 60px;
-    }
+    transform: translateY(-100%);
 }
 
 /* ===================
-   2. LOGO
+   3. LOGO
    =================== */
 
 #top-left-logo-link {
@@ -82,13 +74,13 @@
 }
 
 #top-left-logo-img {
-    height: 100%; /* Passt sich dem Container an */
+    height: 100%;
     width: auto;
     object-fit: contain;
 }
 
 /* ===================
-   3. HEADER CONTROLS (ICONS)
+   4. HEADER CONTROLS (ICONS)
    =================== */
 
 .header-right-controls {
@@ -120,65 +112,67 @@
 
 .header-right-controls button:hover {
     background-color: var(--accent-color);
-    color: #fff; /* Icon wird weiß im Hover */
+    color: #fff;
     opacity: 1;
     transform: scale(1.1);
 }
 
 /* ===================
-   4. FOOTER
+   5. FOOTER (SMART GLASS CAPSULE)
    =================== */
 
-.footer {
+/* KORREKTUR: Element-Selektor 'footer' statt Klasse '.footer' */
+footer {
     position: fixed;
-    bottom: 20px; /* Etwas Abstand vom Rand sieht edler aus */
-    right: 20px;  /* Rechtsbündig wie gehabt */
+    bottom: 20px;
+    right: 20px;
     z-index: 1001; 
     
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 8px 12px;
+    padding: 8px 15px; /* Etwas breiteres Padding für Kapsel-Look */
     
     /* Glassmorphism Design */
-    background-color: rgba(18, 18, 18, 0.65); /* Leicht transparent */
+    background-color: rgba(18, 18, 18, 0.75);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 50px; /* Pill-Shape (Kapselform) */
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50px; /* Pill-Shape */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     
-    /* Animation für das Ausblenden */
-    transition: transform 0.3s ease-in-out, opacity 0.3s ease;
+    /* Weiche Animation für das Ein-/Ausblenden */
+    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), 
+                opacity 0.4s ease;
+    
+    /* Transform Origin für skalierung auf Mobile */
+    transform-origin: bottom right;
 }
 
 /* Zustand: Versteckt (Nach UNTEN geschoben) */
 footer.hide-down {
-    transform: translateY(200%); /* Schiebt ihn komplett nach unten raus */
-    opacity: 0; /* Zusätzlich ausblenden für weicheren Effekt */
+    transform: translateY(200%); 
+    opacity: 0;
+    pointer-events: none; /* Verhindert Klicks wenn unsichtbar */
 }
 
 /* Links im Footer styling */
 footer a:not(.footer-btn) { 
     color: var(--text-color);
-    font-size: 0.8rem;
-    opacity: 0.6;
-    padding: 4px 8px;
+    font-size: 0.85rem;
+    opacity: 0.7;
+    padding: 5px 8px;
     text-decoration: none;
     transition: all 0.2s ease;
     border-radius: 4px;
+    font-weight: 500;
 }
 
 footer a:not(.footer-btn):hover {
     opacity: 1;
-    background-color: rgba(255, 255, 255, 0.1);
-}
-
-/* Trennlinie zwischen Links (optional, falls du | nutzt) */
-footer span.separator {
-    opacity: 0.3;
-    font-size: 0.8rem;
+    color: var(--accent-color);
+    background-color: rgba(255, 255, 255, 0.05);
 }
 
 /* Back-to-Top Button */
@@ -187,45 +181,29 @@ footer span.separator {
     align-items: center;
     justify-content: center;
     
-    width: 32px;
-    height: 32px;
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
     
-    background-color: var(--accent-color); /* Akzentfarbe für Sichtbarkeit */
-    color: #1a1a1a; /* Dunkles Icon */
+    background-color: var(--accent-color);
+    color: #1a1a1a;
     font-size: 1rem;
     
     text-decoration: none;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 10px rgba(252, 181, 0, 0.3); /* Leucht-Effekt */
-    margin-left: 5px;
+    box-shadow: 0 0 15px rgba(252, 181, 0, 0.4);
+    margin-left: 8px;
 }
 
 #back-to-top:hover {
     transform: translateY(-2px) scale(1.1);
-    box-shadow: 0 5px 15px rgba(252, 181, 0, 0.5);
+    box-shadow: 0 0 20px rgba(252, 181, 0, 0.6);
+    background-color: #fff; /* Hover Effekt: Weiß */
     cursor: pointer;
 }
 
-/* Mobile Anpassung */
-@media (max-width: 768px) {
-    footer {
-        bottom: 15px;
-        right: 15px;
-        padding: 6px 10px;
-        /* Auf Mobile evtl. etwas kleiner */
-        transform: scale(0.95); 
-        transform-origin: bottom right;
-    }
-    
-    /* WICHTIG: Die hide-down Klasse muss das scale überschreiben/beibehalten */
-    footer.hide-down {
-        transform: translateY(200%) scale(0.95);
-    }
-}
-
 /* ===================
-   5. MOBILE RESPONSIVE
+   6. MOBILE RESPONSIVE
    =================== */
 
 @media (max-width: 768px) {
@@ -235,7 +213,6 @@ footer span.separator {
         padding: 0 15px;
     }
     
-    /* Auch im gescrollten Zustand anpassen */
     .main-header.scrolled {
         height: 60px;
         padding: 0 15px;
@@ -258,13 +235,21 @@ footer span.separator {
 
     /* Footer Mobile */
     footer {
-        gap: 5px;
-        bottom: 5px;
-        right: 5px;
+        bottom: 15px;
+        right: 15px;
+        padding: 6px 12px;
+        
+        /* Footer etwas kleiner skalieren auf Mobile */
+        transform: scale(0.9); 
     }
-
+    
+    /* WICHTIG: Die hide-down Klasse muss das scale überschreiben/beibehalten */
+    footer.hide-down {
+        transform: translateY(200%) scale(0.9);
+    }
+    
     footer a:not(.footer-btn) {
-        font-size: 0.7rem;
+        font-size: 0.75rem;
         padding: 3px 6px;
     }
     
