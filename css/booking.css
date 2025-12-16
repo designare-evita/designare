@@ -1,0 +1,270 @@
+/* booking.css - Modern & Clean Redesign */
+
+/* ------------------------- */
+/* 1. Modal Grundstruktur    */
+/* ------------------------- */
+
+#booking-modal {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: rgba(10, 10, 10, 0.85) !important; /* Dunklerer Hintergrund */
+    backdrop-filter: blur(5px); /* Moderner Blur-Effekt */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 999999 !important;
+    opacity: 1 !important;
+    font-family: 'Poppins', sans-serif;
+}
+
+.booking-modal-content {
+    background: #1e1e1e; /* Passend zum Dark-Mode */
+    border-radius: 12px;
+    border: 1px solid #333;
+    padding: 0;
+    max-width: 480px;
+    width: 90%;
+    max-height: 90vh;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    position: relative;
+    color: #f0f0f0; /* Hellere Schriftfarbe */
+    display: flex;
+    flex-direction: column;
+}
+
+.booking-modal-header {
+    padding: 24px 30px;
+    text-align: center;
+    border-bottom: 1px solid #333;
+}
+
+.booking-modal-title {
+    margin: 0 0 5px 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.booking-modal-subtitle {
+    margin: 0;
+    color: #aaa;
+    font-size: 0.95rem;
+}
+
+.booking-modal-body {
+    padding: 30px;
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+.booking-modal-close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: #888;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.2s;
+}
+.booking-modal-close-btn:hover {
+    color: #ffc107;
+}
+
+
+/* ------------------------- */
+/* 2. Schritte & Navigation  */
+/* ------------------------- */
+
+.booking-step {
+    display: none;
+}
+.booking-step.active {
+    display: block;
+}
+.booking-step-title {
+    font-size: 1.2rem;
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #ffffff;
+    text-align: center;
+}
+
+/* ------------------------- */
+/* 3. Slot-Auswahl           */
+/* ------------------------- */
+
+#callback-loading, #no-slots-message {
+    text-align: center;
+    padding: 40px 20px;
+    color: #aaa;
+}
+#no-slots-message a {
+    color: #ffc107;
+}
+
+#callback-slots-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.callback-slot-button {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 15px 20px;
+    background: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s ease;
+    color: #f0f0f0;
+}
+.callback-slot-button:hover {
+    border-color: #ffc107;
+    background: #333;
+}
+
+.slot-info {
+    flex-grow: 1;
+}
+.slot-time {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #ffffff;
+}
+.slot-day {
+    font-size: 0.9rem;
+    color: #aaa;
+}
+.slot-arrow {
+    font-size: 1.5rem;
+    color: #888;
+    transition: transform 0.2s;
+}
+.callback-slot-button:hover .slot-arrow {
+    transform: translateX(5px);
+    color: #ffc107;
+}
+
+
+/* ------------------------- */
+/* 4. Kontaktdaten-Formular  */
+/* ------------------------- */
+#selected-slot-display {
+    text-align: center;
+    margin-bottom: 25px;
+    padding: 12px;
+    background: rgba(255, 193, 7, 0.1);
+    border: 1px solid #ffc107;
+    border-radius: 8px;
+    color: #ffc107;
+}
+.booking-form-group {
+    margin-bottom: 18px;
+}
+.booking-form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+    color: #aaa;
+}
+.booking-form-group input,
+.booking-form-group textarea {
+    width: 100%;
+    padding: 12px 15px;
+    background: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 8px;
+    color: #f0f0f0;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+.booking-form-group input:focus,
+.booking-form-group textarea:focus {
+    outline: none;
+    border-color: #ffc107;
+}
+.booking-form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+}
+.booking-btn {
+    flex-grow: 1;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.booking-btn.back-btn {
+    background: #333;
+    color: #f0f0f0;
+    border: 1px solid #555;
+}
+.booking-btn.back-btn:hover {
+    background: #444;
+}
+.booking-btn.submit-btn {
+    background: #ffc107;
+    color: #1a1a1a;
+    border: 1px solid #ffc107;
+}
+.booking-btn.submit-btn:hover {
+    background: #ffca2c;
+}
+.booking-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ------------------------- */
+/* 5. Bestätigung            */
+/* ------------------------- */
+
+.confirmation-content {
+    text-align: center;
+}
+.confirmation-icon {
+    font-size: 3.5rem;
+    color: #ffc107;
+    margin-bottom: 20px;
+}
+.confirmation-title {
+    font-size: 1.4rem;
+    color: #ffffff;
+    margin-bottom: 15px;
+}
+#confirmation-details {
+    margin: 25px 0;
+    padding: 20px;
+    background: #2a2a2a;
+    border-radius: 8px;
+    text-align: left;
+    color: #ccc;
+    line-height: 1.7;
+}
+#confirmation-details strong {
+    color: #fff;
+}
+.confirmation-subtext {
+    color: #aaa;
+    margin-bottom: 25px;
+}
+.booking-btn.confirm-close-btn {
+    background: #ffc107;
+    color: #1a1a1a;
+    width: 100%;
+}
