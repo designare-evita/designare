@@ -12,6 +12,8 @@
     margin: 0 auto;
     padding: 120px 2rem 4rem;
     min-height: 100vh;
+   position: relative;
+    z-index: 2; /* Content liegt nun sicher über den Partikeln (z-index 1) */
 }
 
 /* ===================
