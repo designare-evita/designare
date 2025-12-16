@@ -209,41 +209,55 @@ html {
    5. SPECIAL BOXES
    =================== */
 
-/* NEU: Inhaltsverzeichnis (ToC) Styles - Sticky Badges ohne Hintergrundbalken */
 .toc-container {
     /* Sticky Positionierung */
     position: -webkit-sticky;
     position: sticky;
-    top: 0;
-    z-index: 100;
+    
+    /* ÄNDERUNG: Abstand von oben, damit es nicht unter dem Header verschwindet */
+    /* Passen Sie diesen Wert an die Höhe Ihres Headers an (meist 80px - 120px) */
+    top: 100px; 
+    
+    z-index: 90; /* Hoch genug, aber unter dem Modal/Header (meist 1000+) */
     
     /* Layout: Flexbox für zentrierte Ausrichtung */
     display: flex;
-    justify-content: center; /* Mittig zentriert */
+    justify-content: center;
     
     /* Kein fester Hintergrund für Container */
     background: transparent;
+    
+    /* WICHTIG: Container lässt Klicks durch (damit Text darunter scrollbar bleibt) */
+    pointer-events: none;
+    
     padding: 1rem 0;
     margin-bottom: 3rem;
     width: 100%;
 }
 
 .toc-container ul {
-    display: flex; /* Liste horizontal */
-    flex-wrap: wrap; /* Umbruch erlauben */
-    justify-content: center; /* Mittig */
-    gap: 0.8rem; /* Abstand zwischen Badges */
-    list-style-type: none; /* Keine Punkte */
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.8rem;
+    list-style-type: none;
     padding-left: 0;
     margin: 0;
+    
+    /* WICHTIG: Auch die Liste lässt Klicks durch */
+    pointer-events: none;
 }
 
 .toc-container li {
     margin: 0;
+    pointer-events: none;
 }
 
 /* Mini-Buttons (Badges) */
 .toc-container a {
+    /* WICHTIG: Die Buttons selbst müssen klickbar sein! */
+    pointer-events: auto; 
+    
     display: inline-block;
     padding: 0.4rem 1rem;
     font-size: 0.85rem;
@@ -252,23 +266,34 @@ html {
     color: var(--text-color);
     
     /* Badge Look */
-    background-color: rgba(255, 255, 255, 0.08); /* Leicht sichtbar */
+    background-color: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 50px; /* Pill Shape */
     
-    /* Effekt damit man sie über Text lesen kann */
+    /* Glas-Effekt */
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     
     transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 .toc-container a:hover {
     background-color: var(--accent-color);
-    color: #1a1a1a; /* Kontrast bei Hover */
+    color: #1a1a1a;
     border-color: var(--accent-color);
     transform: translateY(-2px);
     box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    cursor: pointer;
+}
+
+/* Mobile Anpassung */
+@media (max-width: 768px) {
+    .toc-container {
+        /* Auf Mobile ist der Header oft kleiner, evtl. top anpassen */
+        top: 80px; 
+        padding-bottom: 1rem;
+    }
 }
 
 
