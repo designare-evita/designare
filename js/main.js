@@ -1,6 +1,7 @@
 // js/main.js
 
 // === 1. IMPORTE ===
+import { initTheme } from './theme.js';
 import { initEffects } from './effects.js';
 import { initTypewriters } from './typewriter.js';
 import { initModals } from './modals.js';
