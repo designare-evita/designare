@@ -1,131 +1,133 @@
 // js/effects.js
 
-// Make this function "exportable" so other modules can import and use it.
+/**
+ * Aktualisiert die Farben der Partikel basierend auf den aktuellen CSS-Variablen.
+ * Wird beim Theme-Wechsel von der theme.js aufgerufen.
+ */
 export function updateParticleColors() {
+    // Hole die aktuellen Werte der CSS-Variablen vom Root-Element
     const rootStyles = getComputedStyle(document.documentElement);
-    const particleColor = rootStyles.getPropertyValue('--accent-color').trim();
+    const particleColor = rootStyles.getPropertyValue('--particle-color').trim() || '#bbbbbb';
+    const lineColor = rootStyles.getPropertyValue('--particle-line-color').trim() || '#555555';
 
-    // This part assumes you are using the particles.js library
-    // and that the 'pJSDom' object is available globally.
+    // Prüfen, ob particles.js geladen und initialisiert ist
     if (window.pJSDom && window.pJSDom[0] && window.pJSDom[0].pJS) {
         const pJS = window.pJSDom[0].pJS;
 
-        // Update the color of the particles
+        // Farben im Partikel-Objekt aktualisieren
         pJS.particles.color.value = particleColor;
-        pJS.particles.line_linked.color = particleColor;
+        if (pJS.particles.line_linked) {
+            pJS.particles.line_linked.color = lineColor;
+        }
 
-        // Refresh the canvas to apply the new colors
+        // Canvas erneuern, um Änderungen sofort sichtbar zu machen
         pJS.fn.particlesRefresh();
     }
 }
 
-// Export the initEffects function that main.js is expecting
+/**
+ * Initialisiert den Partikel-Effekt mit Basiseinstellungen.
+ */
 export function initEffects() {
-    // Initialize particles.js
-    particlesJS("particles-js", {
-        "particles": {
-            "number": {
-                "value": 80,
-                "density": {
+    // Initialisiere particles.js
+    // Die Farben werden hier zunächst gesetzt, aber durch updateParticleColors() verfeinert
+    if (typeof particlesJS !== 'undefined') {
+        particlesJS("particles-js", {
+            "particles": {
+                "number": {
+                    "value": 80,
+                    "density": {
+                        "enable": true,
+                        "value_area": 800
+                    }
+                },
+                "color": {
+                    "value": "#bbbbbb" // Fallback-Farbe
+                },
+                "shape": {
+                    "type": "circle",
+                    "stroke": {
+                        "width": 0,
+                        "color": "#000000"
+                    }
+                },
+                "opacity": {
+                    "value": 0.4,
+                    "random": false,
+                    "anim": {
+                        "enable": false
+                    }
+                },
+                "size": {
+                    "value": 3,
+                    "random": true,
+                    "anim": {
+                        "enable": false
+                    }
+                },
+                "line_linked": {
                     "enable": true,
-                    "value_area": 800
-                }
-            },
-            "color": {
-                "value": "#ffffff" // This initial value will be overwritten
-            },
-            "shape": {
-                "type": "circle",
-                "stroke": {
-                    "width": 0,
-                    "color": "#000000"
+                    "distance": 150,
+                    "color": "#555555", // Fallback-Farbe
+                    "opacity": 0.4,
+                    "width": 1
                 },
-                "polygon": {
-                    "nb_sides": 5
-                },
-            },
-            "opacity": {
-                "value": 0.5,
-                "random": false,
-                "anim": {
-                    "enable": false,
-                    "speed": 1,
-                    "opacity_min": 0.1,
-                    "sync": false
-                }
-            },
-            "size": {
-                "value": 3,
-                "random": true,
-                "anim": {
-                    "enable": false,
-                    "speed": 40,
-                    "size_min": 0.1,
-                    "sync": false
-                }
-            },
-            "line_linked": {
-                "enable": true,
-                "distance": 150,
-                "color": "#ffffff", // This will also be overwritten
-                "opacity": 0.4,
-                "width": 1
-            },
-            "move": {
-                "enable": true,
-                "speed": 6,
-                "direction": "none",
-                "random": false,
-                "straight": false,
-                "out_mode": "out",
-                "bounce": false,
-                "attract": {
-                    "enable": false,
-                    "rotateX": 600,
-                    "rotateY": 1200
-                }
-            }
-        },
-        "interactivity": {
-            "detect_on": "canvas",
-            "events": {
-                "onhover": {
+                "move": {
                     "enable": true,
-                    "mode": "repulse"
-                },
-                "onclick": {
-                    "enable": true,
-                    "mode": "push"
-                },
-                "resize": true
-            },
-            "modes": {
-                "grab": {
-                    "distance": 400,
-                    "line_opacity": 1
-                },
-                "bubble": {
-                    "distance": 400,
-                    "size": 40,
-                    "duration": 2,
-                    "opacity": 8,
-                    "speed": 3
-                },
-                "repulse": {
-                    "distance": 200,
-                    "duration": 0.4
-                },
-                "push": {
-                    "particles_nb": 4
-                },
-                "remove": {
-                    "particles_nb": 2
+                    "speed": 2,
+                    "direction": "none",
+                    "random": false,
+                    "straight": false,
+                    "out_mode": "out",
+                    "bounce": false,
+                    "attract": {
+                        "enable": false,
+                        "rotateX": 600,
+                        "rotateY": 1200
+                    }
                 }
-            }
-        },
-        "retina_detect": true
-    });
+            },
+            "interactivity": {
+                "detect_on": "canvas",
+                "events": {
+                    "onhover": {
+                        "enable": true,
+                        "mode": "repulse"
+                    },
+                    "onclick": {
+                        "enable": true,
+                        "mode": "push"
+                    },
+                    "resize": true
+                },
+                "modes": {
+                    "grab": {
+                        "distance": 400,
+                        "line_opacity": 1
+                    },
+                    "bubble": {
+                        "distance": 400,
+                        "size": 40,
+                        "duration": 2,
+                        "opacity": 8,
+                        "speed": 3
+                    },
+                    "repulse": {
+                        "distance": 200,
+                        "duration": 0.4
+                    },
+                    "push": {
+                        "particles_nb": 4
+                    },
+                    "remove": {
+                        "particles_nb": 2
+                    }
+                }
+            },
+            "retina_detect": true
+        });
 
-    // You can also call updateParticleColors here if needed initially
-    // updateParticleColors();
+        // Nach der Initialisierung sofort die korrekten Farben aus dem CSS laden
+        updateParticleColors();
+    }
 }
