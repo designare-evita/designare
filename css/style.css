@@ -8,6 +8,7 @@
    =================== */
 
 :root {
+   /* NIGHT MODE (Standard) */
     --accent-color: #FCB500;
     --accent-color-rgba: rgba(252, 181, 0, 0.85);
     --bg-color: #1a1a1a;
@@ -15,8 +16,22 @@
     --particle-color: #bbbbbb;
     --particle-line-color: #555555;
     --text-color: #eeeeee;
+    --card-bg: #2a2a2a; 
+    --modal-bg: #1e1e1e;
     --header-height-desktop: 80px;
     --header-height-mobile: 65px;
+}
+
+/* DAY MODE (Überschreibt nur die Farben) */
+body.light-mode {
+    --bg-color: #ffffff;      /* Heller Hintergrund */
+    --text-color: #1a1a1a;    /* Dunkler Text */
+    --border-color: #dddddd;
+    --card-bg: #f0f0f0;
+    --modal-bg: #ffffff;
+    --particle-color: #555555; /* Dunklere Partikel für hellen Hintergrund */
+    --particle-line-color: #cccccc;  
+    --accent-color: #e6a600;     /* Optional: Akzentfarbe für besseren Kontrast auf Weiß leicht anpassen */
 }
 
 * {
