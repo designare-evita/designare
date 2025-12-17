@@ -237,7 +237,7 @@
 @media (min-width: 769px) {
     .evita-grid-wrapper {
         display: grid;
-        grid-template-columns: 1fr 260px;
+        grid-template-columns: 1fr 300px;
         grid-template-rows: auto auto;
         gap: 30px;
         align-items: start;
