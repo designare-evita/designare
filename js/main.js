@@ -42,50 +42,36 @@ const loadFeedback = async () => {
 };
 
 // === 4. SMART HEADER & FOOTER LOGIK ===
-
 const initHeaderScrollEffect = () => {
     const header = document.querySelector('.main-header');
-    // WICHTIG: Wir holen den Footer später im Loop oder prüfen auf Existenz, 
-    // da er dynamisch geladen wird.
-    
     if (!header) return;
 
     let lastScrollY = window.scrollY;
 
     const handleScroll = () => {
         const currentScrollY = window.scrollY;
-        const footer = document.querySelector('footer'); // Immer aktuell holen
+        const footer = document.querySelector('footer'); 
         
-        // --- 1. GLASSMORPHISM EFFEKT (Dunkel werden) ---
         if (currentScrollY > 50) {
             header.classList.add('scrolled');
         } else {
             header.classList.remove('scrolled');
-            // Wenn ganz oben: Header immer zeigen
             header.classList.remove('hide-up'); 
         }
 
-        // --- 2. SMART HIDE LOGIK ---
-        
-        // Berechnung: Sind wir am Ende der Seite?
-        // (ScrollPosition + Fensterhöhe >= Gesamthöhe - kleiner Puffer)
         const isAtBottom = (window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 50;
 
         if (currentScrollY > 100 && !isAtBottom) {
             if (currentScrollY > lastScrollY) {
-                // SCROLL DOWN -> Verstecken
                 header.classList.add('hide-up');
                 if (footer) footer.classList.add('hide-down');
             } else {
-                // SCROLL UP -> Zeigen
                 header.classList.remove('hide-up');
                 if (footer) footer.classList.remove('hide-down');
             }
         } else if (isAtBottom) {
-            // ENDE DER SEITE -> Footer zwingend zeigen
             if (footer) footer.classList.remove('hide-down');
         } else {
-            // ANFANG DER SEITE (< 100px) -> Footer zwingend zeigen
             if (footer) footer.classList.remove('hide-down');
         }
 
@@ -93,11 +79,8 @@ const initHeaderScrollEffect = () => {
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    
-    // Initial einmal ausführen
     handleScroll();
 };
-
 
 const setupSideMenu = () => {
     const menuButton = document.getElementById('menu-toggle-button');
@@ -105,7 +88,6 @@ const setupSideMenu = () => {
     const closeMenuButton = document.getElementById('close-menu-button');
 
     if (menuButton && sideMenu) {
-        // Öffnen
         menuButton.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -113,7 +95,6 @@ const setupSideMenu = () => {
             document.body.classList.add('no-scroll');
         });
 
-        // Schließen Funktion
         const closeMenu = () => {
             sideMenu.classList.remove('visible');
             const heroFlipped = document.querySelector('.hero-flip-wrapper.flipped'); 
@@ -147,7 +128,6 @@ const setupSideMenu = () => {
 };
 
 // === 5. EVITA CHAT LOGIK ===
-
 const setupEvitaChatButton = () => {
     const evitaChatButton = document.getElementById('evita-chat-button');
     if (evitaChatButton) {
@@ -203,7 +183,6 @@ const addWelcomeMessage = (message) => {
 };
 
 // === 6. HERO FLIP LOGIK ===
-
 const initHeroFlip = () => {
     const heroFlipWrapper = document.getElementById('hero-flip-wrapper');
     if (!heroFlipWrapper) return;
@@ -270,10 +249,13 @@ const initHeroFlip = () => {
 
 const initializeDynamicScripts = () => {
     initModals();
-    initHeaderScrollEffect(); // Startet Smart Header/Footer
+    initHeaderScrollEffect(); 
     setupSideMenu();
     setupEvitaChatButton();
     initHeroFlip();
+    
+    // NEU: Initialisierung der Tag/Nacht Umschalt-Logik
+    initTheme(); 
 };
 
 const initializeStaticScripts = () => {
@@ -289,11 +271,12 @@ const initializeForms = async () => {
 // MAIN EVENT LISTENER
 document.addEventListener('DOMContentLoaded', async () => {
     
-    initializeStaticScripts();
-
+    // Vorab-Check für den Theme-Status, um Flackern zu vermeiden
     if (localStorage.getItem('theme') === 'dark') {
         document.body.classList.add('dark-mode');
     }
+
+    initializeStaticScripts();
 
     try {
         await Promise.all([
@@ -306,7 +289,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         console.log("✅ Layout geladen.");
         
-        // Timeout gibt dem Browser kurz Zeit, das DOM zu rendern
         setTimeout(() => {
             initializeDynamicScripts();
             initializeForms();
