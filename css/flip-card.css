@@ -251,6 +251,7 @@
         grid-row: 1 / 2;
         display: flex;
         justify-content: flex-end;
+       align-self: center;
     }
 
     .evita-text-bottom {
