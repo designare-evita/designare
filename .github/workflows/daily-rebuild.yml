@@ -1,0 +1,13 @@
+name: Daily Rating Update
+on:
+  schedule:
+    # Läuft jeden Tag um 04:00 Uhr morgens (UTC)
+    - cron: '0 4 * * *'
+  workflow_dispatch: # Erlaubt dir, es auch manuell zu testen
+
+jobs:
+  trigger-vercel:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Vercel Rebuild
+        run: curl -X POST ${{ secrets.VERCEL_DEPLOY_HOOK }}
