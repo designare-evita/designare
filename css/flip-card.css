@@ -398,7 +398,7 @@ body.light-mode .evita-text-middle,
 body.light-mode .evita-text-bottom,
 body.light-mode .flipper h2,
 body.light-mode .flipper h3,
-body.light-mode .flipper li,
+body.light-mode .flipper h1,
 body.light-mode .flipper p {
     color: ##293133; !important;
 }
