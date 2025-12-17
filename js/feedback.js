@@ -1,5 +1,6 @@
 // js/feedback.js
 // Frontend Feedback-Funktionalität mit Vercel KV Backend
+// + Schema.org AggregateRating Integration
 
 (function() {
     'use strict';
@@ -14,6 +15,75 @@
             .replace(/\//g, '-')
             .replace(/\.html?$/, '')
             || 'home';
+    }
+
+    // === SCHEMA.ORG INTEGRATION ===
+    function updateSchemaOrg(stats, total) {
+        // Bei 0 Bewertungen nichts tun, um leere Schema-Einträge zu vermeiden
+        if (!total || total === 0) return;
+        
+        // 1. Durchschnitt berechnen (positive=5, neutral=3, negative=1)
+        var scoreSum = (stats.positive * 5) + (stats.neutral * 4) + (stats.negative * 2);
+        var average = (scoreSum / total).toFixed(1);
+        
+        // Das Rating-Objekt
+        var aggregateRating = {
+            "@type": "AggregateRating",
+            "ratingValue": average,
+            "bestRating": "5",
+            "worstRating": "1",
+            "ratingCount": total.toString()
+        };
+        
+        // 2. Suche das existierende JSON-LD Script im Head
+        var scripts = document.querySelectorAll('script[type="application/ld+json"]');
+        var updated = false;
+        
+        scripts.forEach(function(script) {
+            if (updated) return; // Wenn schon gefunden, abbrechen
+            
+            try {
+                var json = JSON.parse(script.textContent);
+                
+                // Prüfen ob es dein Haupt-Artikel-Schema ist
+                if (json['@type'] === 'BlogPosting' || json['@type'] === 'Article' || json['@type'] === 'NewsArticle') {
+                    
+                    // Rating hinzufügen oder überschreiben
+                    json.aggregateRating = aggregateRating;
+                    
+                    // Zurück in den Tag schreiben
+                    script.textContent = JSON.stringify(json, null, 2);
+                    updated = true;
+                    console.log('🌟 Existierendes Schema.org erweitert:', average, 'Sterne bei', total, 'Bewertungen');
+                }
+            } catch (e) {
+                // Fehler beim Parsen ignorieren (falls mal ungültiges JSON drin ist)
+            }
+        });
+        
+        // 3. Fallback: Wenn KEIN passendes Script gefunden wurde, erstellen wir ein neues
+        if (!updated) {
+            var scriptId = 'json-ld-feedback-rating-fallback';
+            var newScript = document.getElementById(scriptId);
+            
+            if (!newScript) {
+                newScript = document.createElement('script');
+                newScript.id = scriptId;
+                newScript.type = 'application/ld+json';
+                document.head.appendChild(newScript);
+            }
+            
+            var fallbackData = {
+                "@context": "https://schema.org/",
+                "@type": "Article",
+                "headline": document.title,
+                "url": window.location.href,
+                "aggregateRating": aggregateRating
+            };
+            
+            newScript.textContent = JSON.stringify(fallbackData);
+            console.log('🌟 Neues Schema.org Element erstellt (Fallback):', average, 'Sterne');
+        }
     }
 
     // === INITIALISIERUNG ===
@@ -70,6 +140,10 @@
             .then(function(data) {
                 if (data.success) {
                     updateRatioBar(container, data.percentages, data.total);
+                    
+                    // Schema.org Update aufrufen
+                    updateSchemaOrg(data.stats, data.total);
+                    
                     console.log('📊 Statistiken geladen:', data);
                 }
             })
@@ -164,6 +238,10 @@
                         btn.innerHTML = originalText;
                         markVotedState(container, voteType);
                         updateRatioBar(container, data.percentages, data.total);
+                        
+                        // Schema.org Update nach Abstimmung
+                        updateSchemaOrg(data.stats, data.total);
+                        
                         showFeedbackMessage(container, 'Danke für dein Feedback!', 'success');
                         
                         console.log('✅ Vote gespeichert:', voteType);
