@@ -388,7 +388,6 @@
    LIGHT MODE ANPASSUNGEN FÜR FLIP CARDS
    ============================================================ */
 
-/* Wenn der body die Klasse .light-mode hat, ändern wir die Farben in der Karte */
 body.light-mode .flipper {
     color: #293133; /* Ein dunkles Anthrazit für bessere Lesbarkeit */
 }
@@ -398,9 +397,8 @@ body.light-mode .evita-text-middle,
 body.light-mode .evita-text-bottom,
 body.light-mode .flipper h2,
 body.light-mode .flipper h3,
-body.light-mode .flipper h1,
 body.light-mode .flipper p {
-    color: ##293133; !important;
+    color: #293133 !important;
 }
 
 
