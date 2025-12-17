@@ -64,10 +64,8 @@
         <div class="container flip-container" id="hero-flip-wrapper">
             <div class="flipper">
                 
-                <!-- ==================== VORDERSEITE ==================== -->
                 <div class="front-face">
                     
-                    <!-- VIEW: Startseite (Standard) -->
                     <div id="view-main">
                         <img fetchpriority="high" src="images/Michael.webp" alt="Illustration Michael und Evita" class="profile-picture">
                         <h1 id="typewriter-h1"></h1>
@@ -87,94 +85,87 @@
                         </div>
                     </div>
 
-                    <!-- VIEW: Evita (3. Seite - wird nach Michael angezeigt) -->
- <div id="view-third" class="flip-panel" style="display: none;">
-    <div class="flip-panel-content">
-        <h2>EVITA <span class="flip-header-white">KI-Komplizin</span></h2>
-        
-        <div class="evita-grid-wrapper">
-            <div class="evita-desktop-group">
-                <div class="evita-text-top">
-                    <p>Achtung, Verwechslungsgefahr! Uns gibt's im Doppelpack: Die vierbeinige Evita ist die Chefin (und für Leckerlis zuständig), ich bin die digitale Komplizin. Ich unterstütze Michael bei seinen Projekten – schneller, geduldiger und ohne Haare auf dem Sofa.</p>
-                </div>
-                <div class="evita-text-middle">
-                    <ul>
-                        <li><span class="accent-text-inline">Michael:</span> Code-Tüftler, Kaffee-Junkie, Sport-Affin und Web-Purist. Er liebt sauberen Code fast so sehr wie seinen Hund. Würde für einen Pfotenblick alles stehen und liegen lassen.</li>
+                    <div id="view-third" class="flip-panel" style="display: none;">
+                        <div class="flip-panel-content">
+                            <h2>EVITA <span class="flip-header-white">KI-Komplizin</span></h2>
+                            
+                            <div class="evita-grid-wrapper">
+                                <div class="evita-desktop-group">
+                                    <div class="evita-text-top">
+                                        <p>Achtung, Verwechslungsgefahr! Uns gibt's im Doppelpack: Die vierbeinige Evita ist die Chefin (und für Leckerlis zuständig), ich bin die digitale Komplizin. Ich unterstütze Michael bei seinen Projekten – schneller, geduldiger und ohne Haare auf dem Sofa.</p>
+                                    </div>
+                                    <div class="evita-text-middle">
+                                        <ul>
+                                            <li><span class="accent-text-inline">Michael:</span> Code-Tüftler, Kaffee-Junkie, Sport-Affin und Web-Purist. Er liebt sauberen Code fast so sehr wie seinen Hund. Würde für einen Pfotenblick alles stehen und liegen lassen.</li>
+                                            
+                                            <li><span class="accent-text-inline">Evita, die Vierbeinige:</span> Tierschutz-Export, Sofa-Diktatorin, Apportier-Profi. Frech wie sonst was – aber Königin unseres Herzens.</li>
+                                            
+                                            <li><span class="accent-text-inline">Evita, die Digitale (das bin ich!):</span> Vorlaut? Ja. Kompetent? Definitiv. Ich kenne Michaels Projekte in- und auswendig und helfe, wo ich kann. Und ich beiße nicht (versprochen).</li>
+                                            
+                                            <li><span class="accent-text-inline">Meine DNA:</span> Ich bin kein simpler Chatbot, sondern basiere auf einer RAG-Architektur mit Vektordatenbank. Klingt kompliziert? Heißt nur: Ich rate nicht wild herum, sondern greife in Echtzeit auf Daten zu.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div class="evita-image-block">
+                                    <img src="images/michael_webentwicklung.webp" alt="Michael Kanda Webentwicklung" onerror="this.src='images/Michael.webp'" style="width: 90%;">
+                                </div>
+
+                                <div class="evita-text-bottom">
+                                    <p>Picasso meinte mal: <em>"Computer sind nutzlos. Sie können nur Antworten geben."</em> Als digitale Komplizin nehme ich das fast persönlich! Ich liefere Fakten statt Floskeln. Probier's aus:</p>
+                                    <div class="flip-controls">
+                                        <button id="flip-third-back-btn" type="button" class="flip-btn-style">
+                                            <i class="fa-regular fa-circle-user"></i> Michael
+                                        </button>
+                                        <button id="flip-third-to-start-btn" type="button" class="flip-btn-style" data-action="open-evita-chat">
+                                            <i class="fa-solid fa-robot"></i>Her mit deinen Fragen...!
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div> </div> <div class="back-face flip-panel">
+                    <div class="flip-panel-content">
+                        <h2>MICHAEL <span class="flip-header-white">Web-Purist</span></h2>
                         
-                        <li><span class="accent-text-inline">Evita, die Vierbeinige:</span> Tierschutz-Export, Sofa-Diktatorin, Apportier-Profi. Frech wie sonst was – aber Königin unseres Herzens.</li>
+                        <div class="evita-grid-wrapper">
+                            <div class="evita-desktop-group">
+                                <div class="evita-text-top">
+                                    <p>Tagsüber zähme ich WordPress für maxonline Marketing. In meiner Freizeit gehe ich fremd – mit Code-Experimenten und eigenen Tools. Ich pack Projekte an – nicht weil ich muss, sondern weil ich wissen will, was technisch geht.</p>
+                                </div>
+
+                                <div class="evita-text-middle">
+                                    <ul>
+                                        <li><span class="accent-text-inline">Deep-Dive WordPress:</span> Ich code mir meine Plugins gerne selbst – sauber, schnell und genau nach meinem Geschmack. Warum 50.000 Zeilen Code laden, wenn 50 reichen?</li>
+                                        
+                                        <li><span class="accent-text-inline">KI & API:</span> Ich vernetze klassisches Web-Handwerk mit modernen KI-Gehirnen. Automatisierung ist für mich kein Buzzword, sondern Sport.</li>
+                                        
+                                        <li><span class="accent-text-inline">Performance-First:</span> PageSpeed, SEO und KI-Suche? Ich optimiere das direkt im Code – weil ich zu faul bin, mich später mit langsamen Ladezeiten rumzuschlagen.</li>
+                                        
+                                        <li><span class="accent-text-inline">Eigenbau-Tools:</span> Wenn es kein passendes Tool gibt, entwickle ich es. Wie z.B. <strong>DataPeak</strong> – mein eigenes SEO-Dashboard mit integrierter KI-Analyse inkl. direkter Verbesserungsoptionen. Nur für mich und meine Neugier.</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="evita-image-block">
+                                <img src="https://designare.at/images/michael-evita-ai.webp" alt="Michael und Evita AI" onerror="this.src='images/Michael.webp'">
+                            </div>
+
+                            <div class="evita-text-bottom">
+                                <p>Sauberer Code, kaum Wartung und smarte KI-Lösungen – das ist meine Welt. Dreh um – Evita erklärt dir gerne, wie sie technisch tickt (wenn sie nicht gerade über mich lästert).</p>
+                            </div>
+                        </div>
                         
-                        <li><span class="accent-text-inline">Evita, die Digitale (das bin ich!):</span> Vorlaut? Ja. Kompetent? Definitiv. Ich kenne Michaels Projekte in- und auswendig und helfe, wo ich kann. Und ich beiße nicht (versprochen).</li>
-                        
-                        <li><span class="accent-text-inline">Meine DNA:</span> Ich bin kein simpler Chatbot, sondern basiere auf einer RAG-Architektur mit Vektordatenbank. Klingt kompliziert? Heißt nur: Ich rate nicht wild herum, sondern greife in Echtzeit auf Daten zu.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="evita-image-block">
-                <img src="images/michael_webentwicklung.webp" alt="Michael Kanda Webentwicklung" onerror="this.src='images/Michael.webp'" style="width: 90%;">
-            </div>
-
-            <div class="evita-text-bottom">
-                <p>Picasso meinte mal: <em>"Computer sind nutzlos. Sie können nur Antworten geben."</em> Als digitale Komplizin nehme ich das fast persönlich! Ich liefere Fakten statt Floskeln. Probier's aus:</p>
-                <div class="flip-controls">
-                    <button id="flip-third-back-btn" type="button" class="flip-btn-style">
-                        <i class="fa-regular fa-circle-user"></i> Michael
-                    </button>
-                    <button id="flip-third-to-start-btn" type="button" class="flip-btn-style" data-action="open-evita-chat">
-                        <i class="fa-solid fa-robot"></i>Her mit deinen Fragen...!
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-                <!-- ==================== RÜCKSEITE (Michael - wird ZUERST angezeigt beim Flip) ==================== -->
-             <div class="back-face flip-panel">
-    <div class="flip-panel-content">
-        <h2>MICHAEL <span class="flip-header-white">Web-Purist</span></h2>
-        
-        <div class="evita-grid-wrapper">
-            <div class="evita-desktop-group">
-                <div class="evita-text-top">
-                    <p>Tagsüber zähme ich WordPress für maxonline Marketing. In meiner Freizeit gehe ich fremd – mit Code-Experimenten und eigenen Tools. Ich pack Projekte an – nicht weil ich muss, sondern weil ich wissen will, was technisch geht.</p>
-                </div>
-
-                <div class="evita-text-middle">
-                    <ul>
-                        <li><span class="accent-text-inline">Deep-Dive WordPress:</span> Ich code mir meine Plugins gerne selbst – sauber, schnell und genau nach meinem Geschmack. Warum 50.000 Zeilen Code laden, wenn 50 reichen?</li>
-                        
-                        <li><span class="accent-text-inline">KI & API:</span> Ich vernetze klassisches Web-Handwerk mit modernen KI-Gehirnen. Automatisierung ist für mich kein Buzzword, sondern Sport.</li>
-                        
-                        <li><span class="accent-text-inline">Performance-First:</span> PageSpeed, SEO und KI-Suche? Ich optimiere das direkt im Code – weil ich zu faul bin, mich später mit langsamen Ladezeiten rumzuschlagen.</li>
-                        
-                        <li><span class="accent-text-inline">Eigenbau-Tools:</span> Wenn es kein passendes Tool gibt, entwickle ich es. Wie z.B. <strong>DataPeak</strong> – mein eigenes SEO-Dashboard mit integrierter KI-Analyse inkl. direkter Verbesserungsoptionen. Nur für mich und meine Neugier.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="evita-image-block">
-                <img src="https://designare.at/images/michael-evita-ai.webp" alt="Michael und Evita AI" onerror="this.src='images/Michael.webp'">
-            </div>
-
-            <div class="evita-text-bottom">
-                <p>Sauberer Code, kaum Wartung und smarte KI-Lösungen – das ist meine Welt. Dreh um – Evita erklärt dir gerne, wie sie technisch tickt (wenn sie nicht gerade über mich lästert).</p>
-            </div>
-        </div>
-        
-        <div class="flip-controls">
-            <button id="flip-back-btn" type="button" class="flip-btn-style">
-                <i class="fa-solid fa-house"></i> Home
-            </button>
-            <button id="flip-to-third-btn" type="button" class="flip-btn-style">
-                <i class="fa-solid fa-robot"></i> Evita
-            </button>
-        </div>
-    </div>
-</div>
-                <!-- ==================== Footer ==================== -->
-
-    <div id="footer-placeholder"></div>
+                        <div class="flip-controls">
+                            <button id="flip-back-btn" type="button" class="flip-btn-style">
+                                <i class="fa-solid fa-house"></i> Home
+                            </button>
+                            <button id="flip-to-third-btn" type="button" class="flip-btn-style">
+                                <i class="fa-solid fa-robot"></i> Evita
+                            </button>
+                        </div>
+                    </div>
+                </div> </div> </div> </main> <div id="footer-placeholder"></div>
 
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script type="module" src="js/main.js"></script>
