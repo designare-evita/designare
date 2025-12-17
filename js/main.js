@@ -254,7 +254,7 @@ const initializeDynamicScripts = () => {
     setupEvitaChatButton();
     initHeroFlip();
     
-    // NEU: Initialisierung der Tag/Nacht Umschalt-Logik
+    // Initialisierung des Themes (Dark/Light Mode)
     initTheme(); 
 };
 
@@ -271,7 +271,7 @@ const initializeForms = async () => {
 // MAIN EVENT LISTENER
 document.addEventListener('DOMContentLoaded', async () => {
     
-    // Vorab-Check für den Theme-Status, um Flackern zu vermeiden
+    // Vorab-Check für den Theme-Status
     if (localStorage.getItem('theme') === 'dark') {
         document.body.classList.add('dark-mode');
     }
@@ -279,25 +279,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     initializeStaticScripts();
 
     try {
-        await Promise.all([
-            loadContent('header.html', 'header-placeholder'),
-            loadContent('modals.html', 'modal-container'),
-            loadContent('footer.html', 'footer-placeholder'),
-            loadContent('side-menu.html', 'side-menu-placeholder'),
-            loadFeedback()
-        ]);
+        // Sequentielles Laden, um sicherzustellen, dass DOM-Elemente vorhanden sind
+        await loadContent('header.html', 'header-placeholder');
+        await loadContent('modals.html', 'modal-container');
+        await loadContent('footer.html', 'footer-placeholder');
+        await loadContent('side-menu.html', 'side-menu-placeholder');
+        await loadFeedback();
 
         console.log("✅ Layout geladen.");
         
+        // Kleine Verzögerung, um sicherzugehen, dass die innerHTML-Inhalte verarbeitet wurden
         setTimeout(() => {
             initializeDynamicScripts();
             initializeForms();
-        }, 50);
+        }, 100);
 
         document.body.classList.add('page-loaded');
 
     } catch (error) {
-        console.error("❌ Fehler:", error);
+        console.error("❌ Fehler beim Laden der Komponenten:", error);
         document.body.classList.add('page-loaded');
     }
 });
