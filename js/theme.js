@@ -1,29 +1,29 @@
 // js/theme.js
-
 import { updateParticleColors } from './effects.js';
 
 const body = document.body;
 const themeToggle = document.getElementById('theme-toggle');
 
 function applyTheme(theme) {
-    if (theme === 'dark') {
-        body.classList.add('dark-mode');
+    if (theme === 'light') {
+        body.classList.add('light-mode');
     } else {
-        body.classList.remove('dark-mode');
+        body.classList.remove('light-mode');
     }
-    // Nach jeder Theme-Änderung die Partikelfarben aktualisieren
+    // Wichtig: Partikel-Farben anpassen, damit sie auf hellem Grund sichtbar sind
     updateParticleColors();
 }
 
 function handleThemeToggle() {
-    const newTheme = body.classList.contains('dark-mode') ? 'light' : 'dark';
+    // Wenn light-mode aktiv ist, wechsle zu dark (Standard), sonst zu light
+    const newTheme = body.classList.contains('light-mode') ? 'dark' : 'light';
     localStorage.setItem('theme', newTheme);
     applyTheme(newTheme);
 }
 
-// Exportiert eine Haupt-Initialisierungsfunktion für das Theme
 export function initTheme() {
     if (themeToggle) {
+        // Holen des gespeicherten Themes oder Standard "dark"
         const savedTheme = localStorage.getItem('theme') || 'dark';
         applyTheme(savedTheme);
         themeToggle.addEventListener('click', handleThemeToggle);
