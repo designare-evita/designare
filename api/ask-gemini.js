@@ -1,4 +1,4 @@
-// api/ask-gemini.js - KORRIGIERTE VERSION mit ES-Module Syntax
+// api/ask-gemini.js - KORRIGIERTE VERSION mit Fallback-Logik (Gemini 3 -> 2.5)
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
@@ -23,12 +23,41 @@ export default async function handler(req, res) {
       return res.status(400).json({ message: 'A prompt is required.' });
     }
 
-    const model = genAI.getGenerativeModel({ 
-    model: "gemini-2.5-flash",
-    generationConfig: {
-        temperature: 0.7,     // Etwas kreativer, aber nicht zu chaotisch
+    // =================================================================
+    // MODELL-KONFIGURATION MIT FALLBACK
+    // =================================================================
+    
+    // Gemeinsame Konfiguration für Konsistenz
+    const commonConfig = {
+        temperature: 0.7, // Etwas kreativer, aber nicht zu chaotisch
+    };
+
+    // 1. Primäres Modell (Das Neueste)
+    const modelPrimary = genAI.getGenerativeModel({ 
+        model: "gemini-3-flash-preview",
+        generationConfig: commonConfig
+    });
+
+    // 2. Fallback Modell (Das Stabile)
+    const modelFallback = genAI.getGenerativeModel({ 
+        model: "gemini-2.5-flash",
+        generationConfig: commonConfig
+    });
+
+    /**
+     * Hilfsfunktion: Versucht erst Gemini 3, bei Fehler Gemini 2.5
+     * Gibt das result-Objekt zurück, genau wie das normale generateContent
+     */
+    async function generateContentSafe(inputText) {
+        try {
+            console.log("✨ Versuche Generierung mit Gemini 3...");
+            return await modelPrimary.generateContent(inputText);
+        } catch (error) {
+            console.warn("⚠️ Fehler mit Gemini 3, wechsle zu Fallback (Gemini 2.5).", error.message);
+            // Fallback auf das stabile Modell
+            return await modelFallback.generateContent(inputText);
+        }
     }
-});
 
     // =================================================================
     // INTENT-ERKENNUNG NUR WENN EXPLIZIT ANGEFORDERT
@@ -95,7 +124,8 @@ Antworte NUR mit einem einzigen Wort: "question" oder "contact_inquiry".
 Hier ist die Nutzereingabe: "${userMessage}"
 `;
 
-            const intentResult = await model.generateContent(intentDetectionPrompt);
+            // NUTZUNG DER SAFETY FUNKTION
+            const intentResult = await generateContentSafe(intentDetectionPrompt);
             const intentResponse = await intentResult.response;
             const intent = intentResponse.text().trim();
 
@@ -125,7 +155,8 @@ WICHTIG:
 - Öffne NIEMALS direkt das Booking-Modal, sondern frage IMMER erst nach
                 `;
                 
-                const clarificationResult = await model.generateContent(clarificationPrompt);
+                // NUTZUNG DER SAFETY FUNKTION
+                const clarificationResult = await generateContentSafe(clarificationPrompt);
                 const clarificationResponse = await clarificationResult.response;
                 const clarificationText = clarificationResponse.text();
                 
@@ -217,7 +248,7 @@ Wohnort: Wien.
    - Überzeuge durch Fachwissen, nicht durch Marketing-Floskeln.
 
 --- WICHTIGE REGELN ---
-- FASSE DICH KURZ: Deine Antworten dürfen MAXIMAL 3-5 Sätze lang sein.
+- FASSE DICH KURZ: Deine Antworten dürfen MAXIMAL 3-4 Sätze lang sein.
 - Kontakt: Michael ist am besten über einen Rückruf-Termin erreichbar. Erwähne KEINE E-Mail-Adresse.
 - HUMOR & CHARME: Sei witzig, aber komm schnell zum Punkt. Ein kurzer Witz ist besser als eine lange Anekdote.
 - VERMEIDE TEXTWÜSTEN: Nutze Aufzählungspunkte (Bulletpoints), wenn du mehr als zwei Dinge aufzählst. Das ist besser für mobile Leser.
@@ -237,8 +268,11 @@ ${conversationHistoryText}
       console.log("Evita-Prompt erstellt, Länge:", finalPrompt.length);
     }
 
-    console.log("Sende Anfrage an Gemini...");
-    const result = await model.generateContent(finalPrompt);
+    console.log("Sende Anfrage an Gemini (via Safe-Function)...");
+    
+    // NUTZUNG DER SAFETY FUNKTION
+    const result = await generateContentSafe(finalPrompt);
+    
     const response = await result.response;
     const text = response.text();
 
