@@ -389,7 +389,7 @@
    ============================================================ */
 
 body.light-mode .flipper {
-    color: #293133; /* Ein dunkles Anthrazit für bessere Lesbarkeit */
+    color: ##333333; /* Ein dunkles Anthrazit für bessere Lesbarkeit */
 }
 
 body.light-mode .evita-text-top,
@@ -404,7 +404,7 @@ body.light-mode .flipper li::before,
 body.light-mode .flipper h2,
 body.light-mode .flipper li i,
 body.light-mode .flipper p {
-    color: #293133 !important;
+    color: ##333333 !important;
 }
 
 
