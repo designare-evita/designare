@@ -50,3 +50,26 @@
     box-shadow: 0 0 15px #00ffcc;
     transform: scale(1.05);
 }
+
+
+/* Spezifische Styles für das Inhaltsverzeichnis */
+#toc-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.topic-btn.toc-mini {
+    font-size: 0.7rem;
+    padding: 4px 10px;
+    background: rgba(255, 255, 255, 0.04);
+    border-style: dashed; /* Kleiner optischer Unterschied */
+    opacity: 0.8;
+}
+
+.topic-btn.toc-mini:hover {
+    opacity: 1;
+    background: rgba(0, 255, 204, 0.1);
+    border-style: solid;
+}
