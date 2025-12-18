@@ -7,6 +7,7 @@ import { initTypewriters } from './typewriter.js';
 import { initModals } from './modals.js';
 import { initAiForm } from './ai-form.js';
 import { initSilasForm } from './silas-form.js';
+import { initMenuInteractions } from './menu-logic.js'; // NEU: Import der interaktiven Menü-Logik
 
 // === 2. GLOBALE STATES ===
 let globalAiFormInstance = null;
@@ -253,9 +254,8 @@ const initializeDynamicScripts = () => {
     setupSideMenu();
     setupEvitaChatButton();
     initHeroFlip();
-    
-    // Initialisierung des Themes (Dark/Light Mode)
     initTheme(); 
+    initMenuInteractions(); // NEU: Initialisierung der Themen-Suche im Menü
 };
 
 const initializeStaticScripts = () => {
