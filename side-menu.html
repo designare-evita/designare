@@ -1,6 +1,4 @@
 <nav id="side-menu-panel" class="side-menu">
-    <canvas id="matrix-canvas"></canvas>
-    
     <button id="close-menu-button" class="close-button" aria-label="Menü schließen">
         &times;
     </button>
@@ -8,8 +6,9 @@
     <div class="side-menu-content">
         <div class="menu-search-container">
             <input type="text" id="menu-topic-search" placeholder="Thema suchen..." aria-label="Themen suchen">
-            <i class="fa-solid fa-magnifying-glass search-icon"></i>
-        </div>
+            </div>
+
+        <div class="menu-divider"></div>
 
         <div class="topic-grid" id="menu-topic-grid">
             <button class="topic-btn" data-keywords="michael kanda webdesign" onclick="location.href='index.html'">Michael</button>
@@ -21,9 +20,8 @@
         </div>
 
         <div id="dynamic-toc-container" class="toc-container hidden">
-            <div class="toc-divider"></div>
-            <p class="toc-title">Inhalt des Artikels</p>
-            <div id="toc-list"></div>
+            <div class="menu-divider"></div>
+            <p class="toc-title">Inhaltsverzeichnis</p> <div id="toc-list"></div>
         </div>
     </div>
 </nav>
