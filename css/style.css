@@ -24,7 +24,7 @@
 
 /* DAY MODE (Überschreibt nur die Farben) */
 body.light-mode {
-    --bg-color: ##F0F0EC;      /* Heller Hintergrund */
+    --bg-color: #FFFDF7;      /* Heller Hintergrund */
     --text-color: ##333333;   /* Dunkler Text */
     --border-color: #dddddd;
     --card-bg: #f0f0f0;
