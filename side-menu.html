@@ -1,20 +1,21 @@
-<!-- Side Menu Panel -->
-<nav id="side-menu-panel" class="side-menu">
-    <canvas id="matrix-canvas"></canvas>
-    
-    <button id="close-menu-button" class="close-button" aria-label="Menü schließen">
-        &times;
-    </button>
-    
-    <div class="side-menu-content">
-        <ul>
-            <li><a href="index.html">Home</a></li>
-            <li class="multi-line"><a href="KI-Integration-auf-Webseiten.html">KI-Integration auf Webseiten</a></li>
-            <li class="multi-line"><a href="ki-fuer-unternehmenswebseiten.html">KI für Unternehmen</a></li>
-            <li><a href="geo-seo.html">SEO &amp; GEO</a></li>
-            <li><a href="silas.html">Silas AI Creator</a></li>
-            <li><a href="CSV-Importer-PRO.html">CSV Importer PRO</a></li>
-            
-        </ul>
+<div class="side-menu-content">
+    <div class="menu-search-container">
+        <input type="text" id="menu-topic-search" placeholder="Thema suchen..." aria-label="Themen suchen">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
     </div>
-</nav>
+
+    <div class="topic-grid" id="menu-topic-grid">
+        <button class="topic-btn" data-keywords="michael kanda webdesign entwicklung" onclick="location.href='index.html'">Michael</button>
+        <button class="topic-btn" data-keywords="evita hund ki assistent chat" onclick="launchEvitaChatFromAnywhere()">Evita</button>
+        <button class="topic-btn" data-keywords="silas ai creator content magie" onclick="location.href='silas.html'">Silas</button>
+        <button class="topic-btn" data-keywords="seo geo ranking optimierung" onclick="location.href='geo-seo.html'">SEO & GEO</button>
+        <button class="topic-btn" data-keywords="markup semantik struktur code" onclick="location.href='semantisches-markup.html'">Markup</button>
+        <button class="topic-btn" data-keywords="csv importer pro excel daten" onclick="location.href='CSV-Importer-PRO.html'">CSV Pro</button>
+    </div>
+
+    <div id="dynamic-toc-container" class="toc-container hidden">
+        <div class="toc-divider"></div>
+        <p class="toc-title">Inhalt des Artikels</p>
+        <div id="toc-list"></div>
+    </div>
+</div>
