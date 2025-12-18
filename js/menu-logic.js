@@ -45,7 +45,9 @@ function generateDynamicTOC() {
             // Mini-Button für das TOC erstellen
             const tocBtn = document.createElement('button');
             tocBtn.className = 'topic-btn toc-mini';
-            tocBtn.innerText = heading.innerText.replace(/[^\w\säöüÄÖÜß]/g, ''); // Text reinigen
+            
+            // KORREKTUR: Bindestrich (-) wurde zur Regex hinzugefügt
+            tocBtn.innerText = heading.innerText.replace(/[^\w\säöüÄÖÜß-]/g, ''); 
             
             // Klick-Event: Zum Anker springen und Menü schließen
             tocBtn.onclick = () => {
