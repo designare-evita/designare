@@ -1,75 +1,72 @@
 /* menu-interactive.css */
 
-/* Fix für den Container-Abstand */
 .side-menu-content {
-    padding: 80px 20px 20px 20px !important;
-    position: relative;
-    z-index: 5;
+    padding: 60px 20px 20px 20px !important; /* Etwas weniger Padding oben ohne Matrix */
     display: flex;
     flex-direction: column;
 }
 
+/* Trennlinie */
+.menu-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 15px 0 25px 0;
+    width: 100%;
+}
+
 .menu-search-container {
-    position: relative;
-    margin-bottom: 25px;
+    margin-bottom: 5px; /* Abstand zur Linie */
 }
 
 #menu-topic-search {
     width: 100%;
-    padding: 12px 15px;
-    background: rgba(255, 255, 255, 0.07);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 8px;
+    padding: 10px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px; /* Rundung stark reduziert */
     color: #fff;
+    font-size: 14px; /* Font Größe 14px */
 }
 
-/* Button Anordnung fixen */
-.topic-grid {
+.topic-grid, #toc-list {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    justify-content: flex-start;
 }
 
 .topic-btn {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     color: #eee;
-    padding: 8px 15px;
-    border-radius: 20px;
-    font-size: 0.8rem;
+    padding: 8px 14px;
+    border-radius: 4px; /* Rundung stark reduziert */
+    font-size: 14px; /* Font Größe 14px */
     cursor: pointer;
-    white-space: nowrap;
     transition: all 0.3s ease;
 }
 
-/* Der Glow-Effekt aus deiner Logik */
+/* Inhaltsverzeichnis Buttons im gleichen Stil */
+.topic-btn.toc-mini {
+    font-size: 14px; /* Gleiche Größe wie andere Buttons */
+    border-style: solid; /* Gleicher Stil */
+    opacity: 1;
+}
+
+.toc-title {
+    font-size: 12px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.4);
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+}
+
+.topic-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: #00ffcc;
+}
+
 .topic-btn.highlight-active {
     background: #00ffcc !important;
     color: #000 !important;
-    box-shadow: 0 0 15px #00ffcc;
-    transform: scale(1.05);
-}
-
-
-/* Spezifische Styles für das Inhaltsverzeichnis */
-#toc-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 10px;
-}
-
-.topic-btn.toc-mini {
-    font-size: 0.7rem;
-    padding: 4px 10px;
-    background: rgba(255, 255, 255, 0.04);
-    border-style: dashed; /* Kleiner optischer Unterschied */
-    opacity: 0.8;
-}
-
-.topic-btn.toc-mini:hover {
-    opacity: 1;
-    background: rgba(0, 255, 204, 0.1);
-    border-style: solid;
+    box-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
 }
