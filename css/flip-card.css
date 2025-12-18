@@ -397,6 +397,12 @@ body.light-mode .evita-text-middle,
 body.light-mode .evita-text-bottom,
 body.light-mode .flipper h2,
 body.light-mode .flipper h3,
+body.light-mode .flipper ul,
+body.light-mode .flipper li,
+body.light-mode .flip-header-white,
+body.light-mode .flipper li::before,
+body.light-mode .flipper h2,
+body.light-mode .flipper li i,
 body.light-mode .flipper p {
     color: #293133 !important;
 }
