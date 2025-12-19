@@ -33,15 +33,14 @@
     /* Standard-Zustand: Transparent */
     background-color: transparent;
     
-    /* WICHTIG: Transition für transform (Bewegung) und background */
     transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), 
                 background-color 0.4s ease, 
                 height 0.4s ease;
 }
 
-/* Zustand: Gescrollt (Dunkel & Blur) */
+/* Zustand: Gescrollt (Dunkel & Blur) - DARK MODE DEFAULT */
 .main-header.scrolled {
-   background-color: rgba(10, 10, 10, 0.95);
+    background-color: rgba(10, 10, 10, 0.95);
     border-bottom: 1px solid var(--border-color-subtle);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(12px);
@@ -131,7 +130,6 @@
    5. FOOTER (SMART GLASS CAPSULE)
    =================== */
 
-/* KORREKTUR: Element-Selektor 'footer' statt Klasse '.footer' */
 footer {
     position: fixed;
     bottom: 20px;
@@ -141,30 +139,27 @@ footer {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 8px 15px; /* Etwas breiteres Padding für Kapsel-Look */
+    padding: 8px 15px; 
     
-    /* Glassmorphism Design */
+    /* Glassmorphism Design - DARK MODE DEFAULT */
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     
-border: 1px solid var(--border-color-subtle);
-   border-radius: 0 !important; /* Eckiger Kapsel-Look */
-   background-color: rgba(10, 10, 10, 0.9);
+    border: 1px solid var(--border-color-subtle);
+    border-radius: 0 !important; 
+    background-color: rgba(10, 10, 10, 0.9);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     
-    /* Weiche Animation für das Ein-/Ausblenden */
     transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), 
                 opacity 0.4s ease;
     
-    /* Transform Origin für skalierung auf Mobile */
     transform-origin: bottom right;
 }
 
-/* Zustand: Versteckt (Nach UNTEN geschoben) */
 footer.hide-down {
     transform: translateY(200%); 
     opacity: 0;
-    pointer-events: none; /* Verhindert Klicks wenn unsichtbar */
+    pointer-events: none; 
 }
 
 /* Links im Footer styling */
@@ -182,7 +177,7 @@ footer a:not(.footer-btn) {
 footer a:not(.footer-btn):hover {
     opacity: 1;
     color: var(--accent-color);
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: rgba(255, 255, 255, 0.05); /* Heller Hover für Dark Mode */
 }
 
 /* Back-to-Top Button */
@@ -208,8 +203,43 @@ footer a:not(.footer-btn):hover {
 #back-to-top:hover {
     transform: translateY(-2px) scale(1.1);
     box-shadow: 0 0 20px rgba(252, 181, 0, 0.6);
-    background-color: #fff; /* Hover Effekt: Weiß */
+    background-color: #fff; 
     cursor: pointer;
+}
+
+/* ============================
+   LIGHT MODE SPECIFICS (HEADER/FOOTER)
+   ============================ */
+
+body.light-mode .main-header.scrolled {
+    /* Weißer transparenter Hintergrund statt Schwarz */
+    background-color: rgba(255, 255, 255, 0.9); 
+    border-bottom-color: var(--border-color);
+}
+
+body.light-mode footer {
+    /* Weißer Kapsel-Hintergrund */
+    background-color: rgba(255, 255, 255, 0.9);
+    border-color: var(--border-color);
+    /* Weicherer Schatten für hellen Hintergrund */
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1); 
+}
+
+body.light-mode footer a:not(.footer-btn):hover {
+    /* Dunklerer Hover-Hintergrund, da Footer jetzt weiß ist */
+    background-color: rgba(0, 0, 0, 0.05); 
+}
+
+body.light-mode #back-to-top {
+    /* Text im Button darf im Light Mode nicht zu dunkel sein auf Gold */
+    color: #fff; 
+    box-shadow: 0 0 15px rgba(211, 154, 0, 0.4);
+}
+
+body.light-mode #back-to-top:hover {
+    /* Im Light Mode: Dunkles Grau beim Hover für Kontrast, statt Weiß auf Weiß */
+    background-color: #333; 
+    color: #fff;
 }
 
 /* ===================
@@ -217,7 +247,6 @@ footer a:not(.footer-btn):hover {
    =================== */
 
 @media (max-width: 768px) {
-    /* Header Mobile */
     .main-header {
         height: var(--header-height-mobile);
         padding: 0 15px;
@@ -243,17 +272,13 @@ footer a:not(.footer-btn):hover {
         width: 35px;
     }
 
-    /* Footer Mobile */
     footer {
         bottom: 15px;
         right: 15px;
         padding: 6px 12px;
-        
-        /* Footer etwas kleiner skalieren auf Mobile */
         transform: scale(0.9); 
     }
     
-    /* WICHTIG: Die hide-down Klasse muss das scale überschreiben/beibehalten */
     footer.hide-down {
         transform: translateY(200%) scale(0.9);
     }
