@@ -219,7 +219,7 @@ h1 b {
     font-size: 1.15rem;                      /* Etwas kleiner */
     text-transform: uppercase;               /* Wirkt oft hochwertiger/minimalistischer */
     color: var(--text-color-muted);          /* Das dezentere Grau aus deiner style.css */                   
-    margin-bottom: 2.5rem;
+    margin-bottom: 2rem;
 }
 
 /* ===================
@@ -266,7 +266,7 @@ h1 b {
 }
 
 #ai-form button {
-    background: transparent;
+    background: var(--accent-color);
     border: 1px;
     border-color: var(--accent-color);
     color: var(--text-color);
