@@ -197,6 +197,30 @@ const initHeroFlip = () => {
     const viewMain = document.getElementById('view-main');
     const viewThird = document.getElementById('view-third');
 
+    // --- NEU: Hash-Check Funktion ---
+    const checkHashAndFlip = () => {
+        const hash = window.location.hash;
+        
+        if (hash === '#michael') {
+            // Zeige die Rückseite der Karte
+            if(viewMain) viewMain.style.display = 'block';
+            if(viewThird) viewThird.style.display = 'none';
+            heroFlipWrapper.classList.add('flipped');
+        } 
+        else if (hash === '#evita') {
+            // Zeige die dritte Ansicht (Evita Info)
+            if (viewMain) viewMain.style.display = 'none';
+            if (viewThird) viewThird.style.display = 'flex';
+            heroFlipWrapper.classList.remove('flipped');
+        }
+    };
+
+    // Führe den Check sofort aus (beim Initialisieren)
+    checkHashAndFlip();
+
+    // Reagiere auf Änderungen des Hashes (wenn man im Menü klickt)
+    window.addEventListener('hashchange', checkHashAndFlip);
+
     if (btnToBack) {
         btnToBack.addEventListener('click', (e) => {
             e.preventDefault();
