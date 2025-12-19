@@ -62,14 +62,12 @@ body {
     color: var(--text-color);
     font-family: 'Poppins', 'Poppins Fallback', sans-serif;
     line-height: 1.7;
-    margin: 0;
-    /* padding: 2rem; */ /* Padding wird von anderen Containern gesteuert */
     transition: background-color 0.4s ease, color 0.4s ease;
 }
 
 /* 3. Container & Inhalt */
 .legal-container {
-    margin: 35px 5%;
+    padding: 2rem;
 }
 
 /* Schriftgrößen und Stile bleiben gleich */
