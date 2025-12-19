@@ -69,8 +69,7 @@ body {
 
 /* 3. Container & Inhalt */
 .legal-container {
-    margin: 0 auto;
-    max-width: 800px;
+    margin: 35px 5%;
 }
 
 /* Schriftgrößen und Stile bleiben gleich */
