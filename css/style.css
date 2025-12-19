@@ -781,3 +781,14 @@ h1 b {
         width: 100%;
     }
 }
+
+/* Verhindert, dass Anker-Überschriften hinter dem Header verschwinden */
+h2[id] {
+    scroll-margin-top: calc(var(--header-height-desktop) + 40px);
+}
+
+@media (max-width: 768px) {
+    h2[id] {
+        scroll-margin-top: calc(var(--header-height-mobile) + 20px);
+    }
+}
