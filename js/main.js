@@ -7,7 +7,7 @@ import { initTypewriters } from './typewriter.js';
 import { initModals } from './modals.js';
 import { initAiForm } from './ai-form.js';
 import { initSilasForm } from './silas-form.js';
-import { initMenuInteractions } from './menu-logic.js'; // NEU: Import der interaktiven Menü-Logik
+import { initMenuInteractions } from './menu-logic.js';
 
 // === 2. GLOBALE STATES ===
 let globalAiFormInstance = null;
@@ -98,10 +98,7 @@ const setupSideMenu = () => {
 
         const closeMenu = () => {
             sideMenu.classList.remove('visible');
-            const heroFlipped = document.querySelector('.hero-flip-wrapper.flipped'); 
-            if (!heroFlipped) {
-                document.body.classList.remove('no-scroll');
-            }
+            document.body.classList.remove('no-scroll');
         };
 
         if (closeMenuButton) {
@@ -183,65 +180,69 @@ const addWelcomeMessage = (message) => {
     chatHistory.appendChild(messageDiv);
 };
 
-// === 6. HERO FLIP LOGIK ===
-const initHeroFlip = () => {
-    const heroFlipWrapper = document.getElementById('hero-flip-wrapper');
-    if (!heroFlipWrapper) return;
-
-    const btnToBack = document.getElementById('flip-info-btn');
-    const btnBackToStart = document.getElementById('flip-back-btn');
-    const btnToThird = document.getElementById('flip-to-third-btn');
-    const btnThirdToBack = document.getElementById('flip-third-back-btn');
-    const btnThirdToStart = document.getElementById('flip-third-to-start-btn');
-    
+// === 6. HERO VIEW SWITCHING LOGIK (Neu: Alle Views im Front-Face) ===
+const initHeroViews = () => {
+    // Views
     const viewMain = document.getElementById('view-main');
-    const viewThird = document.getElementById('view-third');
+    const viewMichael = document.getElementById('view-michael');
+    const viewEvita = document.getElementById('view-evita');
+    
+    // Buttons
+    const btnToMichael = document.getElementById('flip-info-btn'); // "Neugierig geworden?" -> Michael
+    const btnMichaelHome = document.getElementById('flip-michael-home-btn');
+    const btnMichaelToEvita = document.getElementById('flip-michael-to-evita-btn');
+    const btnEvitaToMichael = document.getElementById('flip-evita-to-michael-btn');
+    const btnEvitaChat = document.getElementById('flip-evita-chat-btn');
 
-    if (btnToBack) {
-        btnToBack.addEventListener('click', (e) => {
+    // Helper: View wechseln
+    const showView = (viewToShow) => {
+        if (viewMain) viewMain.style.display = 'none';
+        if (viewMichael) viewMichael.style.display = 'none';
+        if (viewEvita) viewEvita.style.display = 'none';
+        
+        if (viewToShow) viewToShow.style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    // Event Listeners
+    
+    // "Neugierig geworden?" -> zeigt Michael
+    if (btnToMichael) {
+        btnToMichael.addEventListener('click', (e) => {
             e.preventDefault();
-            heroFlipWrapper.classList.add('flipped');
-            document.body.classList.remove('no-scroll');
+            showView(viewMichael);
         });
     }
 
-    if (btnBackToStart) {
-        btnBackToStart.addEventListener('click', (e) => {
+    // Michael -> Home
+    if (btnMichaelHome) {
+        btnMichaelHome.addEventListener('click', (e) => {
             e.preventDefault();
-            if(viewMain) viewMain.style.display = 'block';
-            if(viewThird) viewThird.style.display = 'none';
-            heroFlipWrapper.classList.remove('flipped');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            showView(viewMain);
         });
     }
 
-    if (btnToThird) {
-        btnToThird.addEventListener('click', (e) => {
+    // Michael -> Evita
+    if (btnMichaelToEvita) {
+        btnMichaelToEvita.addEventListener('click', (e) => {
             e.preventDefault();
-            if (viewMain) viewMain.style.display = 'none';
-            if (viewThird) viewThird.style.display = 'flex';
-            heroFlipWrapper.classList.remove('flipped');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            showView(viewEvita);
         });
     }
 
-    if (btnThirdToBack) {
-        btnThirdToBack.addEventListener('click', (e) => {
+    // Evita -> Michael
+    if (btnEvitaToMichael) {
+        btnEvitaToMichael.addEventListener('click', (e) => {
             e.preventDefault();
-            heroFlipWrapper.classList.add('flipped');
+            showView(viewMichael);
         });
     }
 
-    if (btnThirdToStart) {
-        btnThirdToStart.addEventListener('click', async (e) => {
+    // Evita -> Chat öffnen
+    if (btnEvitaChat) {
+        btnEvitaChat.addEventListener('click', async (e) => {
             e.preventDefault();
-            if (btnThirdToStart.dataset.action === 'open-evita-chat') {
-                await launchEvitaChat();
-            } else {
-                if(viewMain) viewMain.style.display = 'block';
-                if(viewThird) viewThird.style.display = 'none';
-                heroFlipWrapper.classList.remove('flipped');
-            }
+            await launchEvitaChat();
         });
     }
 };
@@ -253,9 +254,9 @@ const initializeDynamicScripts = () => {
     initHeaderScrollEffect(); 
     setupSideMenu();
     setupEvitaChatButton();
-    initHeroFlip();
+    initHeroViews(); // Geändert von initHeroFlip
     initTheme(); 
-    initMenuInteractions(); // NEU: Initialisierung der Themen-Suche im Menü
+    initMenuInteractions();
 };
 
 const initializeStaticScripts = () => {
