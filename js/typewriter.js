@@ -4,6 +4,10 @@ function initH1Typewriter() {
     const typewriterElement = document.getElementById('typewriter-h1');
     if (!typewriterElement) return;
 
+    // SEO-Fallback entfernen, da JS aktiv ist
+    const seoFallback = typewriterElement.querySelector('.seo-fallback');
+    if (seoFallback) seoFallback.remove();
+
     const H1_TYPING_SPEED = 120, H1_DELETING_SPEED = 70, H1_DELAY_BETWEEN_TEXTS = 2200;
     const textsToType = ["Michael Kanda", "Web-Purist", "KI-Komplize"];
     let textIndex = 0, charIndex = 0, isDeleting = false;
