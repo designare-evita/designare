@@ -354,7 +354,7 @@ color: var(--text-color);
     padding: 1rem;
     border-bottom: 1px solid var(--border-color);
     vertical-align: top;
-    color: var(--text-color-muted);
+    color: var(--text-color);
 }
 
 .comparison-table code {
