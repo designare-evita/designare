@@ -24,9 +24,9 @@
 
 /* DAY MODE (Überschreibt die Farben) */
 body.light-mode {
-    --bg-color: #e0e0e0;      
+    --bg-color: #d6d6d6;      
     --text-color: #333333; 
-    --border-color: #cccccc;
+    --border-color: #bbbbbb;
     --card-bg: #ffffff; /* Empfehlung: Karten reinweiß für "Pop"-Effekt */
     --modal-bg: #ffffff; /* Modals bleiben weiß */
     --particle-color: #555555;
