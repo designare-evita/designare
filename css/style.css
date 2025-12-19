@@ -31,7 +31,7 @@ body.light-mode {
     --modal-bg: #ffffff;
     --particle-color: #555555; /* Dunklere Partikel für hellen Hintergrund */
     --particle-line-color: #cccccc;  
-    --accent-color: #996f00;     /* Optional: Akzentfarbe für besseren Kontrast auf Weiß leicht anpassen */
+    --accent-color: #b38100;     /* Optional: Akzentfarbe für besseren Kontrast auf Weiß leicht anpassen */
 }
 
 * {
