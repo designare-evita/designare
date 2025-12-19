@@ -217,7 +217,6 @@ h1 b {
 
 #hero .subtitle {
     font-size: 1.15rem;                      /* Etwas kleiner */
-    letter-spacing: 0.05em;                  /* Mehr Luft zwischen den Buchstaben */
     text-transform: uppercase;               /* Wirkt oft hochwertiger/minimalistischer */
     color: var(--text-color-muted);          /* Das dezentere Grau aus deiner style.css */                   
     margin-bottom: 2.5rem;
