@@ -69,8 +69,8 @@ body {
 .legal-container {
     width: 90%;           /* Breite für mobile Geräte */
     max-width: 800px;     /* Maximale Breite für PC (Lesbarkeit) */
-    margin: 35px auto;    /* Außen: 35px oben/unten, horizontal mittig */
-    padding: 25px 0;      /* Innen: 25px oben/unten, 0 links/rechts */
+    margin: 40px auto;    /* Außen: 35px oben/unten, horizontal mittig */
+    padding: 30px 0;      /* Innen: 25px oben/unten, 0 links/rechts */
 }
 
 /* Schriftgrößen und Stile bleiben gleich */
