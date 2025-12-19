@@ -220,24 +220,18 @@
     margin: 10px 0 15px 0;
 }
 
-/* evita-grid-wrapper ist jetzt <figure> */
+/* Grid-Wrapper für Content-Layout */
 .evita-grid-wrapper {
     width: 100%;
     text-align: left;
-    margin: 0; /* Reset figure margin */
 }
 
-/* evita-image-block ist jetzt <aside> */
+/* Image Block - jetzt <aside> für semantische Korrektheit */
 .evita-image-block img {
     height: auto;
     display: block;
     width: 100%;
     margin-left: auto;
-}
-
-/* evita-text-bottom ist jetzt <footer> */
-.evita-text-bottom {
-    margin: 0;
 }
 
 /* ===================
