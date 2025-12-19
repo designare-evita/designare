@@ -9,15 +9,20 @@
 
 :root {
    /* NIGHT MODE (Standard) */
-    --accent-color: #FCB500;
-    --accent-color-rgba: rgba(252, 181, 0, 0.85);
-    --bg-color: #1a1a1a;
+    --accent-color: #c4a35a;
+    --accent-color-rgba: rgba(196, 163, 90, 0.85);
+    --bg-color: #0a0a0a;
+   --bg-color-secondary: #111111;
     --border-color: #aaaaaa;
     --particle-color: #e0e0e0;
     --particle-line-color: #555555;
-    --text-color: #eeeeee;
-    --card-bg: #2a2a2a; 
-    --modal-bg: #1e1e1e;
+    --text-color: #e8e8e8;
+   --text-color-muted: #888888;
+    --text-color-subtle: #555555;
+   --border-color: #333333;           /* Subtile Trennung */
+    --border-color-subtle: #222222;
+    --card-bg: #0f0f0f;
+    --modal-bg: #0d0d0d;
     --header-height-desktop: 80px;
     --header-height-mobile: 65px;
 }
