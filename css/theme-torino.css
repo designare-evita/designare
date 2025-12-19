@@ -1,0 +1,377 @@
+/* ============================================================
+   THEME-TORINO.CSS
+   Inspiriert von torinodesign.info - Minimalistisch & Typografisch
+   ============================================================ */
+
+:root {
+    /* NIGHT MODE - Torino Style */
+    --accent-color: #c4a35a;           /* Gedämpftes Gold/Messing */
+    --accent-color-rgba: rgba(196, 163, 90, 0.85);
+    --accent-color-hover: #d4b76a;     /* Helleres Gold für Hover */
+    
+    --bg-color: #0a0a0a;               /* Tiefes Schwarz */
+    --bg-color-secondary: #111111;      /* Leicht helleres Schwarz */
+    
+    --text-color: #e8e8e8;             /* Helles Grau für Haupttext */
+    --text-color-muted: #888888;       /* Mittleres Grau für Sekundärtext */
+    --text-color-subtle: #555555;      /* Dezentes Grau */
+    
+    --border-color: #333333;           /* Dunkle Borders */
+    --border-color-subtle: #222222;    /* Noch dezentere Borders */
+    
+    --card-bg: #0f0f0f;                /* Fast schwarze Karten */
+    --modal-bg: #0d0d0d;               /* Modal Hintergrund */
+    
+    --particle-color: #444444;         /* Dezente Partikel */
+    --particle-line-color: #222222;    /* Sehr dezente Linien */
+    
+    /* Dotted Line Style (wie im Original) */
+    --dotted-line-color: #444444;
+}
+
+/* Body Anpassungen */
+body {
+    background-color: var(--bg-color) !important;
+    color: var(--text-color) !important;
+}
+
+/* Hero Section */
+#hero {
+    background-color: var(--bg-color);
+}
+
+/* Partikel dezenter */
+#particles-js {
+    opacity: 0.2 !important;
+}
+
+/* Profile Picture - dezenter Rahmen */
+.profile-picture {
+    border: 1px solid var(--border-color);
+    border-radius: 0; /* Eckig wie im Torino-Design */
+    filter: grayscale(20%);
+    transition: filter 0.4s ease, border-color 0.4s ease;
+}
+
+.profile-picture:hover {
+    filter: grayscale(0%);
+    border-color: var(--accent-color);
+}
+
+/* Typografie - Cleaner */
+#hero h1 {
+    font-weight: 400; /* Leichter */
+    letter-spacing: 0.02em;
+    color: var(--text-color);
+}
+
+#hero .subtitle {
+    font-weight: 300;
+    color: var(--text-color-muted);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+}
+
+/* Accent Text */
+.accent-text-inline {
+    color: var(--accent-color) !important;
+}
+
+/* AI Form - Minimalistischer */
+#ai-form {
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 0; /* Keine Rundung */
+    transition: border-color 0.3s ease;
+}
+
+#ai-form:focus-within {
+    border-color: var(--accent-color);
+}
+
+#ai-question {
+    color: var(--text-color);
+    font-weight: 300;
+    letter-spacing: 0.02em;
+}
+
+#ai-question::placeholder {
+    color: var(--text-color-muted);
+    font-style: italic;
+}
+
+#ai-form button {
+    background: transparent;
+    color: var(--accent-color);
+    border-left: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+#ai-form button:hover {
+    background: var(--accent-color);
+    color: var(--bg-color);
+}
+
+/* Info Button - Torino Style */
+#flip-info-btn {
+    background: transparent;
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color);
+    border-radius: 0;
+    font-weight: 400;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    padding: 14px 24px;
+    transition: all 0.3s ease;
+}
+
+#flip-info-btn:hover {
+    background-color: var(--accent-color);
+    color: var(--bg-color);
+    box-shadow: none;
+    transform: none;
+}
+
+/* Flip Panel */
+.flip-panel-content {
+    background: transparent;
+}
+
+.flip-panel h2 {
+    font-weight: 400;
+    letter-spacing: 0.03em;
+    color: var(--accent-color);
+}
+
+.flip-header-white {
+    color: var(--text-color) !important;
+    font-weight: 300;
+}
+
+.flip-panel p,
+.flip-panel ul li {
+    color: var(--text-color-muted);
+    font-weight: 300;
+    line-height: 1.8;
+}
+
+/* Buttons - Torino Style */
+.flip-btn-style {
+    background: transparent !important;
+    border: 1px solid var(--accent-color) !important;
+    color: var(--accent-color) !important;
+    border-radius: 0 !important;
+    font-weight: 400 !important;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    font-size: 0.85rem !important;
+}
+
+.flip-btn-style:hover {
+    background-color: var(--accent-color) !important;
+    color: var(--bg-color) !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+/* Header */
+.main-header {
+    background-color: transparent;
+}
+
+.main-header.scrolled {
+    background-color: rgba(10, 10, 10, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-color-subtle);
+}
+
+.header-right-controls button {
+    color: var(--text-color-muted);
+    border-radius: 0;
+}
+
+.header-right-controls button:hover {
+    background-color: transparent;
+    color: var(--accent-color);
+    transform: none;
+}
+
+/* Footer */
+footer {
+    background-color: rgba(10, 10, 10, 0.9);
+    border: 1px solid var(--border-color-subtle);
+    border-radius: 0;
+}
+
+footer a:not(.footer-btn) {
+    color: var(--text-color-muted);
+}
+
+footer a:not(.footer-btn):hover {
+    color: var(--accent-color);
+    background-color: transparent;
+}
+
+#back-to-top {
+    background-color: transparent;
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color);
+    border-radius: 0;
+    box-shadow: none;
+}
+
+#back-to-top:hover {
+    background-color: var(--accent-color);
+    color: var(--bg-color);
+    box-shadow: none;
+}
+
+/* Modal Anpassungen */
+.modal-content {
+    background-color: var(--modal-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 0;
+}
+
+.close-button {
+    color: var(--text-color-muted);
+}
+
+.close-button:hover {
+    color: var(--accent-color);
+    transform: none;
+}
+
+/* CTA Buttons in Modals */
+.modal-content .cta-button,
+.lightbox-button {
+    border-radius: 0;
+    font-weight: 400;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+#acknowledge-cookie-lightbox {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    color: var(--bg-color);
+}
+
+#acknowledge-cookie-lightbox:hover {
+    background-color: var(--accent-color-hover);
+    border-color: var(--accent-color-hover);
+}
+
+/* Side Menu */
+.side-menu {
+    background-color: rgba(10, 10, 10, 0.98);
+    box-shadow: -5px 0 30px rgba(0, 0, 0, 0.5);
+}
+
+.side-menu-content li a {
+    font-weight: 400;
+    letter-spacing: 0.02em;
+}
+
+.side-menu-content li.active a,
+.side-menu-content li a:hover {
+    color: var(--accent-color);
+    background-color: transparent;
+}
+
+/* Form Inputs */
+.modal-content input[type="text"],
+.modal-content input[type="email"],
+.modal-content textarea {
+    background-color: var(--bg-color-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 0;
+    color: var(--text-color);
+}
+
+.modal-content input:focus,
+.modal-content textarea:focus {
+    border-color: var(--accent-color);
+}
+
+/* Links */
+a {
+    color: var(--accent-color);
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: var(--accent-color-hover);
+}
+
+/* Selection */
+::selection {
+    background-color: var(--accent-color);
+    color: var(--bg-color);
+}
+
+/* Scrollbar - Minimal */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-color);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-color);
+}
+
+/* AI Chat Styles */
+#ai-chat-form {
+    border-radius: 0 !important;
+    border-color: var(--border-color) !important;
+}
+
+#ai-chat-form button {
+    background: var(--accent-color) !important;
+    color: var(--bg-color) !important;
+}
+
+.chat-message.user {
+    background-color: var(--accent-color) !important;
+    color: var(--bg-color) !important;
+    border-radius: 0 !important;
+}
+
+.chat-message.ai {
+    background-color: var(--card-bg) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 0 !important;
+}
+
+/* Evita Image Block */
+.evita-image-block img {
+    border: 1px solid var(--border-color);
+    filter: grayscale(30%);
+    transition: filter 0.4s ease;
+}
+
+.evita-image-block img:hover {
+    filter: grayscale(0%);
+}
+
+/* List Styling */
+.flip-panel ul {
+    list-style-type: none;
+}
+
+.flip-panel ul li::before {
+    content: "→";
+    color: var(--accent-color);
+    margin-right: 10px;
+    font-size: 0.9em;
+}
