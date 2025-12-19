@@ -221,6 +221,7 @@ const initHeroFlip = () => {
     // Reagiere auf Änderungen des Hashes (wenn man im Menü klickt)
     window.addEventListener('hashchange', checkHashAndFlip);
 
+    // --- BESTEHENDE EVENT LISTENER ---
     if (btnToBack) {
         btnToBack.addEventListener('click', (e) => {
             e.preventDefault();
@@ -232,13 +233,14 @@ const initHeroFlip = () => {
     if (btnBackToStart) {
         btnBackToStart.addEventListener('click', (e) => {
             e.preventDefault();
+            // Entferne Hash beim Klick auf Home/Zurück
+            history.pushState("", document.title, window.location.pathname + window.location.search);
             if(viewMain) viewMain.style.display = 'block';
             if(viewThird) viewThird.style.display = 'none';
             heroFlipWrapper.classList.remove('flipped');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     }
-
     if (btnToThird) {
         btnToThird.addEventListener('click', (e) => {
             e.preventDefault();
