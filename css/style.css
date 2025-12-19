@@ -1,5 +1,5 @@
 /* ============================================================
-   STYLE.CSS - OPTIMIERT
+   STYLE.CSS - SEMANTIC VERSION
    Startseite & globale Styles (Dark Mode)
    ============================================================ */
 
@@ -25,7 +25,7 @@
 /* DAY MODE (Überschreibt nur die Farben) */
 body.light-mode {
     --bg-color: #FFFDF7;      /* Heller Hintergrund */
-    --text-color: ##333333;   /* Dunkler Text */
+    --text-color: #333333;    /* Dunkler Text */
     --border-color: #dddddd;
     --card-bg: #f0f0f0;
     --modal-bg: #ffffff;
@@ -164,11 +164,13 @@ h1 b {
     padding-bottom: 12vh;
 }
 
-#hero .container {
+#hero .container,
+#hero section.container {
     position: relative;
     z-index: 2;
 }
 
+/* Particle Background - jetzt <figure> */
 #particles-js {
     height: 100%;
     left: 0;
@@ -178,6 +180,7 @@ h1 b {
     z-index: 1;
     opacity: 0.4;
     pointer-events: none;
+    margin: 0; /* Reset figure margin */
 }
 
 /* ===================
@@ -215,6 +218,7 @@ h1 b {
 
 /* ===================
    6. AI FORM (Startseite)
+   ai-container ist jetzt <section>
    =================== */
 
 .ai-container {
