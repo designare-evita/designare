@@ -216,11 +216,10 @@ h1 b {
 }
 
 #hero .subtitle {
-    font-size: 1rem;                      /* Etwas kleiner */
+    font-size: 1.15rem;                      /* Etwas kleiner */
     letter-spacing: 0.05em;                  /* Mehr Luft zwischen den Buchstaben */
     text-transform: uppercase;               /* Wirkt oft hochwertiger/minimalistischer */
-    color: var(--text-color-muted);          /* Das dezentere Grau aus deiner style.css */
-    margin-top: -10px;                       /* Näher an die H1 rücken */
+    color: var(--text-color-muted);          /* Das dezentere Grau aus deiner style.css */                   
     margin-bottom: 2.5rem;
 }
 
@@ -235,20 +234,26 @@ h1 b {
 }
 
 #ai-form {
-    background-color: transparent !important; /* Hintergrund weg */
-    border: none !important;                 /* Globaler Rahmen weg */
-    border-bottom: 1px solid var(--border-color) !important; /* Nur eine feine Linie unten */
-    border-radius: 0 !important;             /* Ecken nicht mehr abgerundet */
+    background-color: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    display: flex;
+    overflow: hidden;
     transition: border-color 0.3s ease;
 }
 
 #ai-form:focus-within {
-    border-bottom-color: var(--accent-color) !important; /* Akzent beim Tippen */
+    border-color: var(--accent-color);
 }
 
 #ai-question {
-    padding: 12px 0 !important;              /* Seitliches Padding weg */
-    font-weight: 300;                        /* Dünnere Schrift für Purismus */
+    background: none;
+    border: none;
+    color: var(--text-color);
+    flex-grow: 1;
+    font-size: 1rem;
+    outline: none;
+    padding: 12px 15px;
 }
 
 #ai-question::placeholder {
@@ -262,9 +267,13 @@ h1 b {
 }
 
 #ai-form button {
-    background: transparent !important;      /* Button-Hintergrund weg */
-    color: var(--accent-color) !important;   /* Nur das Icon leuchtet */
-    padding-right: 0 !important;
+    background: var(--accent-color);
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0 18px;
+    transition: background-color 0.3s ease;
 }
 
 #ai-form button:hover {
