@@ -1,72 +1,68 @@
-/* menu-interactive.css */
+/* --- SIDE MENU PURISM --- */
 
 .side-menu-content {
-    padding: 60px 20px 20px 20px !important; /* Etwas weniger Padding oben ohne Matrix */
+    padding: 60px 24px 24px 24px !important;
     display: flex;
     flex-direction: column;
 }
 
-/* Trennlinie */
+/* Trenner passend zur globalen Border-Farbe */
 .menu-divider {
     height: 1px;
-    background: rgba(255, 255, 255, 0.1);
-    margin: 15px 0 25px 0;
+    background: var(--border-color-subtle); /* Globaler Variable folgen */
+    margin: 20px 0;
     width: 100%;
 }
 
-.menu-search-container {
-    margin-bottom: 5px; /* Abstand zur Linie */
-}
-
+/* Suchfeld im Menü - Stil analog zum AI-Formular */
 #menu-topic-search {
     width: 100%;
-    padding: 10px 12px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 4px; /* Rundung stark reduziert */
-    color: #fff;
-    font-size: 14px; /* Font Größe 14px */
+    padding: 10px 0;
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    border-radius: 0 !important;
+    color: var(--text-color);
+    font-size: 14px;
+    transition: border-color 0.3s ease;
 }
 
-.topic-grid, #toc-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
+#menu-topic-search:focus {
+    outline: none;
+    border-bottom-color: var(--accent-color) !important;
 }
 
+/* Buttons als dezente Outlines/Flächen */
 .topic-btn {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    color: #eee;
-    padding: 8px 14px;
-    border-radius: 4px; /* Rundung stark reduziert */
-    font-size: 14px; /* Font Größe 14px */
+    background: transparent;
+    border: 1px solid var(--border-color); /* Dezente Begrenzung */
+    color: var(--text-color-muted);
+    padding: 6px 14px;
+    border-radius: 0; /* Harte Kanten für Purismus */
+    font-size: 13px;
+    letter-spacing: 0.5px;
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
-/* Inhaltsverzeichnis Buttons im gleichen Stil */
-.topic-btn.toc-mini {
-    font-size: 14px; /* Gleiche Größe wie andere Buttons */
-    border-style: solid; /* Gleicher Stil */
-    opacity: 1;
+.topic-btn:hover {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+    background: rgba(196, 163, 90, 0.05); /* Sehr subtiler Akzent */
+}
+
+/* Aktiver Status ohne harten Glow */
+.topic-btn.highlight-active {
+    background: var(--accent-color) !important;
+    border-color: var(--accent-color) !important;
+    color: var(--bg-color) !important; /* Text auf Akzentfarbe dunkel */
+    box-shadow: none !important;
 }
 
 .toc-title {
-    font-size: 12px;
+    font-size: 11px;
     text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.4);
-    margin-bottom: 12px;
-    letter-spacing: 1px;
-}
-
-.topic-btn:hover {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: #00ffcc;
-}
-
-.topic-btn.highlight-active {
-    background: #00ffcc !important;
-    color: #000 !important;
-    box-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+    color: var(--text-color-subtle);
+    margin-bottom: 15px;
+    letter-spacing: 2px;
 }
