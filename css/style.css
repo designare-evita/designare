@@ -24,14 +24,14 @@
 
 /* DAY MODE (Überschreibt die Farben) */
 body.light-mode {
-    --bg-color: #d6d6d6;      
+    --bg-color: #e0e0e0;      
     --text-color: #333333; 
     --border-color: #bbbbbb;
     --card-bg: #ffffff; /* Empfehlung: Karten reinweiß für "Pop"-Effekt */
     --modal-bg: #ffffff; /* Modals bleiben weiß */
     --particle-color: #555555;
     --particle-line-color: #cccccc;  
-    --accent-color: #d69400;     
+    --accent-color: #F57C00;     
 }
 
 
