@@ -1,5 +1,5 @@
 /* ============================================================
-   FLIP CARD STYLESHEET - FINAL
+   FLIP CARD STYLESHEET - SEMANTIC VERSION
    Logik: Grid-Overlay (Auto-Höhe basierend auf Inhalt)
    Keine internen Scrollbalken mehr.
    ============================================================ */
@@ -21,7 +21,7 @@
     overflow: visible !important;
 }
 
-#hero .container.flip-container {
+#hero section.flip-container {
     display: flex;
     justify-content: center;
     align-items: flex-start; /* Oben ausrichten */
@@ -43,6 +43,7 @@
     margin: 0 auto;
 }
 
+/* Flipper ist jetzt ein <article> */
 .flipper {
     width: 100%;
     min-height: 50vh; /* Etwas weniger Mindesthöhe */
@@ -66,6 +67,7 @@
 
 /* ===================
    3. CARD FACES
+   Jetzt <section> und <article> statt divs
    =================== */
 
 .front-face,
@@ -98,6 +100,7 @@
 
 /* ===================
    4. STARTSEITE (#view-main)
+   Jetzt ein <header> Element
    =================== */
 
 #view-main {
@@ -167,6 +170,7 @@
 
 /* ===================
    6. EVITA VIEW (#view-third)
+   Jetzt ein <article> Element
    =================== */
 
 #view-third {
@@ -216,16 +220,24 @@
     margin: 10px 0 15px 0;
 }
 
+/* evita-grid-wrapper ist jetzt <figure> */
 .evita-grid-wrapper {
     width: 100%;
     text-align: left;
+    margin: 0; /* Reset figure margin */
 }
 
+/* evita-image-block ist jetzt <aside> */
 .evita-image-block img {
     height: auto;
     display: block;
     width: 100%;
     margin-left: auto;
+}
+
+/* evita-text-bottom ist jetzt <footer> */
+.evita-text-bottom {
+    margin: 0;
 }
 
 /* ===================
@@ -251,7 +263,7 @@
         grid-row: 1 / 2;
         display: flex;
         justify-content: flex-end;
-       align-self: center;
+        align-self: center;
     }
 
     .evita-text-bottom {
@@ -262,6 +274,7 @@
 
 /* ===================
    9. BUTTONS (Navigation Back/Evita)
+   flip-controls ist jetzt <nav>
    =================== */
 
 .flip-controls {
@@ -405,5 +418,3 @@ body.light-mode .flipper li i,
 body.light-mode .flipper p {
     color: #333333 !important;
 }
-
-
