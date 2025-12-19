@@ -128,7 +128,7 @@ html {
 
 .blog-article h2 {
     font-size: 1.8rem;
-    font-weight: 400;
+    font-weight: 600;
     letter-spacing: 0.02em;
     margin: 2.5rem 0 1.2rem;
     padding-top: 40px;
@@ -139,7 +139,7 @@ html {
 
 .blog-article h3 {
     font-size: 1.4rem;
-    font-weight: 400;
+    font-weight: 600;
     margin: 2rem 0 1rem;
     color: var(--text-color);
 }
@@ -220,7 +220,7 @@ color: var(--text-color);
     margin-bottom: 1rem;
     color: var(--accent-color);
     font-size: 1.2rem;
-    font-weight: 400;
+    font-weight: 600;
 }
 
 .summary-box ul {
@@ -295,7 +295,7 @@ color: var(--text-color);
     color: var(--accent-color);
     font-size: 1.2rem;
     margin-bottom: 0.8rem;
-    font-weight: 400;
+    font-weight: 600;
 }
 
 /* Feature List */
@@ -439,7 +439,7 @@ color: var(--text-color);
     margin-top: 0;
     margin-bottom: 1.5rem;
     font-size: 1.3rem;
-    font-weight: 400;
+    font-weight: 600;
     letter-spacing: 0.02em;
 }
 
@@ -461,7 +461,7 @@ color: var(--text-color);
     margin-top: 0;
     margin-bottom: 1rem;
     font-size: 1.5rem;
-    font-weight: 400;
+    font-weight: 600;
     letter-spacing: 0.02em;
 }
 
