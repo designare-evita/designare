@@ -41,12 +41,22 @@
 
 /* Zustand: Gescrollt (Dunkel & Blur) */
 .main-header.scrolled {
-    background-color: rgba(18, 18, 18, 0.85);
-    backdrop-filter: blur(12px);
+   background-color: rgba(10, 10, 10, 0.95);
+    border-bottom: 1px solid var(--border-color-subtle);
+    backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(12px);
     height: 70px;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.header-right-controls button {
+    border-radius: 0 !important; 
+    color: var(--text-color-muted);
+}
+
+.header-right-controls button:hover {
+    background-color: transparent !important;
+    color: var(--accent-color) !important;
+    transform: none !important;
 }
 
 /* Zustand: Versteckt (Nach oben geschoben) */
@@ -134,12 +144,12 @@ footer {
     padding: 8px 15px; /* Etwas breiteres Padding für Kapsel-Look */
     
     /* Glassmorphism Design */
-    background-color: rgba(18, 18, 18, 0.75);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 50px; /* Pill-Shape */
+border: 1px solid var(--border-color-subtle);
+   border-radius: 0 !important; /* Eckiger Kapsel-Look */
+   background-color: rgba(10, 10, 10, 0.9);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     
     /* Weiche Animation für das Ein-/Ausblenden */
