@@ -65,12 +65,10 @@
         <section class="container flip-container" id="hero-flip-wrapper">
             <article class="flipper">
                 
-                <!-- ================================================
-                     FRONT FACE - Sichtbar beim Laden
-                     ================================================ -->
+                <!-- FRONT FACE -->
                 <section class="front-face">
                     
-                    <!-- VIEW: Startseite (Hero) -->
+                    <!-- VIEW: Startseite -->
                     <header id="view-main">
                         <img fetchpriority="high" 
                              src="images/Michael.webp" 
@@ -101,54 +99,8 @@
                         </section>
                     </header>
 
-                    <!-- VIEW: Michael Info (im Quelltext VOR Evita für SEO) -->
-                    <article id="view-michael" class="flip-panel" style="display: none;">
-                        <section class="flip-panel-content">
-                            <h2>MICHAEL <span class="flip-header-white">Web-Purist</span></h2>
-                            
-                            <div class="evita-grid-wrapper">
-                                <div class="evita-desktop-group">
-                                    <div class="evita-text-top">
-                                        <p>Tagsüber zähme ich WordPress für maxonline Marketing. In meiner Freizeit gehe ich fremd – mit Code-Experimenten und eigenen Tools. Ich pack Projekte an – nicht weil ich muss, sondern weil ich wissen will, was technisch geht.</p>
-                                    </div>
-
-                                    <div class="evita-text-middle">
-                                        <ul>
-                                            <li><span class="accent-text-inline">Deep-Dive WordPress:</span> Ich code mir meine Plugins gerne selbst – sauber, schnell und genau nach meinem Geschmack. Warum 5000 Zeilen Code laden, wenn 50 reichen?</li>
-                                            
-                                            <li><span class="accent-text-inline">KI & API:</span> Ich vernetze klassisches Web-Handwerk mit modernen KI-Gehirnen. Automatisierung ist für mich kein Buzzword, sondern Sport.</li>
-                                            
-                                            <li><span class="accent-text-inline">Performance-First:</span> Ladezeiten, SEO und KI-Suche? Ich optimiere das direkt im Code – Effizienz ist mein Ding.</li>
-                                            
-                                            <li><span class="accent-text-inline">Eigenbau-Tools:</span> Wenn es kein passendes Tool gibt, entwickle ich es. Wie z.B. DataPeak – mein eigenes SEO-Dashboard mit integrierter KI.</li>
-                                        </ul>
-                                    </div>
-                                </div>
-
-                                <aside class="evita-image-block">
-                                    <img src="https://designare.at/images/michael-evita-ai.webp" 
-                                         alt="Michael und Evita AI" 
-                                         onerror="this.src='images/Michael.webp'"
-                                         loading="lazy">
-                                </aside>
-
-                                <div class="evita-text-bottom">
-                                    <p>Sauberer Code, kaum Wartung und smarte KI-Lösungen – das ist meine Welt. Dreh um – Evita erklärt dir gerne, wie sie technisch tickt (wenn sie nicht gerade über mich lästert).</p>
-                                    <nav class="flip-controls" aria-label="Navigation zwischen Ansichten">
-                                        <button id="flip-michael-home-btn" type="button" class="flip-btn-style">
-                                            <i class="fa-solid fa-house" aria-hidden="true"></i> Home
-                                        </button>
-                                        <button id="flip-michael-to-evita-btn" type="button" class="flip-btn-style">
-                                            <i class="fa-solid fa-robot" aria-hidden="true"></i> Evita
-                                        </button>
-                                    </nav>
-                                </div>
-                            </div>
-                        </section>
-                    </article>
-
-                    <!-- VIEW: Evita Info (im Quelltext NACH Michael) -->
-                    <article id="view-evita" class="flip-panel" style="display: none;">
+                    <!-- VIEW: Evita Info -->
+                    <article id="view-third" class="flip-panel" style="display: none;">
                         <section class="flip-panel-content">
                             <h2>EVITA <span class="flip-header-white">KI-Komplizin</span></h2>
                             
@@ -173,17 +125,16 @@
                                 <aside class="evita-image-block">
                                     <img src="images/michael_webentwicklung.webp" 
                                          alt="Michael Kanda Webentwicklung" 
-                                         onerror="this.src='images/Michael.webp'"
-                                         loading="lazy">
+                                         onerror="this.src='images/Michael.webp'">
                                 </aside>
 
                                 <div class="evita-text-bottom">
                                     <p>Picasso meinte mal: <em>"Computer sind nutzlos. Sie können nur Antworten geben."</em> Als digitale Komplizin nehme ich das fast persönlich! Ich liefere Fakten statt Floskeln. Probier's aus:</p>
                                     <nav class="flip-controls" aria-label="Navigation zwischen Ansichten">
-                                        <button id="flip-evita-to-michael-btn" type="button" class="flip-btn-style">
+                                        <button id="flip-third-back-btn" type="button" class="flip-btn-style">
                                             <i class="fa-regular fa-circle-user" aria-hidden="true"></i> Michael
                                         </button>
-                                        <button id="flip-evita-chat-btn" type="button" class="flip-btn-style" data-action="open-evita-chat">
+                                        <button id="flip-third-to-start-btn" type="button" class="flip-btn-style" data-action="open-evita-chat">
                                             <i class="fa-solid fa-robot" aria-hidden="true"></i>Her mit deinen Fragen...!
                                         </button>
                                     </nav>
@@ -194,12 +145,57 @@
 
                 </section>
 
+                <!-- BACK FACE -->
+                <article class="back-face flip-panel">
+                    <section class="flip-panel-content">
+                        <h2>MICHAEL <span class="flip-header-white">Web-Purist</span></h2>
+                        
+                        <div class="evita-grid-wrapper">
+                            <div class="evita-desktop-group">
+                                <div class="evita-text-top">
+                                    <p>Tagsüber zähme ich WordPress für maxonline Marketing. In meiner Freizeit gehe ich fremd – mit Code-Experimenten und eigenen Tools. Ich pack Projekte an – nicht weil ich muss, sondern weil ich wissen will, was technisch geht.</p>
+                                </div>
+
+                                <div class="evita-text-middle">
+                                    <ul>
+                                        <li><span class="accent-text-inline">Deep-Dive WordPress:</span> Ich code mir meine Plugins gerne selbst – sauber, schnell und genau nach meinem Geschmack. Warum 5000 Zeilen Code laden, wenn 50 reichen?</li>
+                                        
+                                        <li><span class="accent-text-inline">KI & API:</span> Ich vernetze klassisches Web-Handwerk mit modernen KI-Gehirnen. Automatisierung ist für mich kein Buzzword, sondern Sport.</li>
+                                        
+                                        <li><span class="accent-text-inline">Performance-First:</span> Ladezeiten, SEO und KI-Suche? Ich optimiere das direkt im Code – Effizienz ist mein Ding.</li>
+                                        
+                                        <li><span class="accent-text-inline">Eigenbau-Tools:</span> Wenn es kein passendes Tool gibt, entwickle ich es. Wie z.B. DataPeak – mein eigenes SEO-Dashboard mit integrierter KI.</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <aside class="evita-image-block">
+                                <img src="https://designare.at/images/michael-evita-ai.webp" 
+                                     alt="Michael und Evita AI" 
+                                     onerror="this.src='images/Michael.webp'">
+                            </aside>
+
+                            <div class="evita-text-bottom">
+                                <p>Sauberer Code, kaum Wartung und smarte KI-Lösungen – das ist meine Welt. Dreh um – Evita erklärt dir gerne, wie sie technisch tickt (wenn sie nicht gerade über mich lästert).</p>
+                            </div>
+                        </div>
+                        
+                        <nav class="flip-controls" aria-label="Navigation zwischen Ansichten">
+                            <button id="flip-back-btn" type="button" class="flip-btn-style">
+                                <i class="fa-solid fa-house" aria-hidden="true"></i> Home
+                            </button>
+                            <button id="flip-to-third-btn" type="button" class="flip-btn-style">
+                                <i class="fa-solid fa-robot" aria-hidden="true"></i> Evita
+                            </button>
+                        </nav>
+                    </section>
+                </article>
+
             </article>
         </section>
     </main>
 
-    <!-- Footer wird per JS geladen -->
-    <div id="footer-placeholder"></div>
+<div id="footer-placeholder"></div>
 
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script type="module" src="js/main.js"></script>
