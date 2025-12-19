@@ -9,18 +9,18 @@
 /* Trenner passend zur globalen Border-Farbe */
 .menu-divider {
     height: 1px;
-    background: var(--border-color-subtle); /* Globaler Variable folgen */
+    background: var(--border-color-subtle); 
     margin: 20px 0;
     width: 100%;
 }
 
-/* Suchfeld im Menü - Stil analog zum AI-Formular */
+/* Suchfeld im Menü */
 #menu-topic-search {
     width: 100%;
     padding: 10px 0;
     background: transparent !important;
     border: none !important;
-    border-bottom: 1px solid var(--accent-color) !important; !important;
+    border-bottom: 1px solid var(--accent-color) !important;
     border-radius: 0 !important;
     color: var(--text-color);
     font-size: 15px;
@@ -35,10 +35,10 @@
 /* Buttons als dezente Outlines/Flächen */
 .topic-btn {
     background: transparent;
-    border: 1px solid var(--border-color); /* Dezente Begrenzung */
+    border: 1px solid var(--border-color); 
     color: var(--text-color-muted);
     padding: 6px 14px;
-    border-radius: 0; /* Harte Kanten für Purismus */
+    border-radius: 0; 
     font-size: 14px;
     letter-spacing: 0.5px;
     cursor: pointer;
@@ -48,14 +48,14 @@
 .topic-btn:hover {
     border-color: var(--accent-color);
     color: var(--accent-color);
-    background: rgba(196, 163, 90, 0.05); /* Sehr subtiler Akzent */
+    background: rgba(196, 163, 90, 0.05); 
 }
 
-/* Aktiver Status ohne harten Glow */
+/* Aktiver Status */
 .topic-btn.highlight-active {
     background: var(--accent-color) !important;
     border-color: var(--accent-color) !important;
-    color: var(--bg-color) !important; /* Text auf Akzentfarbe dunkel */
+    color: var(--bg-color) !important; /* Nimmt Hintergrundfarbe als Textfarbe */
     box-shadow: none !important;
 }
 
@@ -65,4 +65,19 @@
     color: var(--text-color-subtle);
     margin-bottom: 15px;
     letter-spacing: 2px;
+}
+
+/* ============================
+   LIGHT MODE SPECIFICS (MENU)
+   ============================ */
+body.light-mode .topic-btn.highlight-active {
+    /* Im Light Mode ist bg-color hellgrau. 
+       Auf Gold (#D39A00) liest sich Weiß aber besser als Grau. */
+    color: #ffffff !important; 
+    font-weight: 600;
+}
+
+body.light-mode .topic-btn:hover {
+    /* Etwas dunklerer Hintergrund beim Hover im Light Mode für Sichtbarkeit */
+    background: rgba(211, 154, 0, 0.1); 
 }
