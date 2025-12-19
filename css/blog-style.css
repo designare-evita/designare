@@ -147,7 +147,7 @@ html {
 
 .blog-article p {
     margin-bottom: 1.5rem;
-    color: var(--text-color-muted);
+    color: var(--text-color);
     font-weight: 300;
     line-height: 1.8;
 }
@@ -182,7 +182,7 @@ html {
 
 .blog-article li {
     margin-bottom: 0.8rem;
-    color: var(--text-color-muted);
+color: var(--text-color);
     font-weight: 300;
 }
 
@@ -200,7 +200,7 @@ html {
 .blog-article dd {
     margin-left: 1.5rem;
     margin-bottom: 1rem;
-    color: var(--text-color-muted);
+   color: var(--text-color);
 }
 
 /* ===================
@@ -417,7 +417,7 @@ html {
 
 .faq-content {
     padding: 0 1.5rem 1.5rem 1.5rem;
-    color: var(--text-color-muted);
+    color: var(--text-color);
     line-height: 1.7;
     border-top: 1px solid var(--border-color-subtle);
     font-weight: 300;
