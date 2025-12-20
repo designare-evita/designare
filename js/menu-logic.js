@@ -36,7 +36,21 @@ function generateDynamicTOC() {
         tocContainer.classList.remove('hidden');
         tocList.innerHTML = ''; // Vorher leeren
 
-        articleHeadings.forEach((heading, index) => {
+        // Sortiere Überschriften: Michael zuerst, dann Evita, dann der Rest
+        const headingsArray = Array.from(articleHeadings);
+        const sortedHeadings = headingsArray.sort((a, b) => {
+            const aId = a.id || '';
+            const bId = b.id || '';
+            
+            if (aId === 'michael') return -1;
+            if (bId === 'michael') return 1;
+            if (aId === 'evita') return -1;
+            if (bId === 'evita') return 1;
+            
+            return 0; // Behalte die ursprüngliche Reihenfolge für den Rest
+        });
+
+        sortedHeadings.forEach((heading, index) => {
             // Sicherstellen, dass die Überschrift eine ID für den Anker-Link hat
             if (!heading.id) {
                 heading.id = `section-${index}`;
