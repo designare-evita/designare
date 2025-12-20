@@ -24,20 +24,57 @@
     <link rel="canonical" href="https://designare.at/" />
 
     <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
     {
-      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "@id": "https://designare.at/#website",
+      "url": "https://designare.at/",
+      "name": "designare",
+      "publisher": { "@id": "https://designare.at/#person" },
+      "inLanguage": "de-AT"
+    },
+    {
+      "@type": "AboutPage",
+      "@id": "https://designare.at/#webpage",
+      "url": "https://designare.at/",
+      "name": "Über Michael Kanda - Web-Purist & KI-Enthusiast",
+      "isPartOf": { "@id": "https://designare.at/#website" },
+      "primaryImageOfPage": { "@id": "https://designare.at/#primaryimage" },
+      "description": "Michael Kanda ist Web-Purist und KI-Komplize aus Wien. Er zähmt WordPress für maximale Performance und verbindet klassisches Handwerk mit modernen KI-Lösungen.",
+      "inLanguage": "de-AT",
+      "mainEntity": { "@id": "https://designare.at/#person" }
+    },
+    {
       "@type": "Person",
       "@id": "https://designare.at/#person",
       "name": "Michael Kanda",
       "givenName": "Michael",
       "familyName": "Kanda",
       "url": "https://designare.at/",
-      "image": "https://designare.at/images/Michael-Kanda.jpg",
+      "image": {
+        "@type": "ImageObject",
+        "@id": "https://designare.at/#primaryimage",
+        "url": "https://designare.at/images/Michael-Kanda.jpg",
+        "contentUrl": "https://designare.at/images/Michael-Kanda.jpg",
+        "caption": "Michael Kanda"
+      },
       "jobTitle": "Web-Purist und KI-Enthusiast",
-      "description": "Michael Kanda ist Web-Purist und KI-Komplize aus Wien. Er zähmt WordPress für maximale Performance, codet Webseiten von Hand und verbindet klassisches Handwerk mit modernen KI-Lösungen.",
-      "nationality": "Austrian",
-      "homeLocation": { "@type": "Place", "name": "Wien, Österreich" },
-      "address": { "@type": "PostalAddress", "addressLocality": "Wien", "addressCountry": "AT" },
+      "description": "Web-Purist und KI-Komplize aus Wien. Spezialisiert auf WordPress-Performance, individuelles Coding und KI-Integration.",
+      "nationality": {
+        "@type": "Country",
+        "name": "Austria"
+      },
+      "homeLocation": {
+        "@type": "Place",
+        "name": "Wien, Österreich"
+      },
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Wien",
+        "addressCountry": "AT"
+      },
       "sameAs": [
         "https://github.com/designare-evita",
         "https://www.linkedin.com/in/michael-kanda-408910341/"
@@ -47,10 +84,13 @@
         { "@type": "Thing", "name": "Künstliche Intelligenz", "sameAs": "https://de.wikipedia.org/wiki/Künstliche_Intelligenz" },
         { "@type": "Thing", "name": "SEO", "sameAs": "https://de.wikipedia.org/wiki/Suchmaschinenoptimierung" },
         { "@type": "Thing", "name": "WordPress", "sameAs": "https://de.wikipedia.org/wiki/WordPress" }
-      ],
-      "mainEntityOfPage": { "@type": "ProfilePage", "@id": "https://designare.at/" }
+      ]
     }
-    </script>
+  ]
+              "mainEntityOfPage": { "@type": "ProfilePage", "@id": "https://designare.at/" }
+
+}
+</script>
 </head>
 
 <body class="dark-mode no-scroll">
