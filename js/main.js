@@ -197,36 +197,57 @@ const initHeroFlip = () => {
     const viewMain = document.getElementById('view-main');
     const viewThird = document.getElementById('view-third');
 
-    // --- NEU: Hash-Check Funktion ---
-const checkHashAndFlip = () => {
-    const hash = window.location.hash;
-    
-    if (hash === '#michael') {
-        if(viewMain) viewMain.style.display = 'block';
-        if(viewThird) viewThird.style.display = 'none';
-        heroFlipWrapper.classList.add('flipped');
+    // --- FIX: Hash-Check Funktion mit Scroll-Freigabe ---
+    const checkHashAndFlip = () => {
+        const hash = window.location.hash;
         
-        // Timeout gibt der Flip-Animation Zeit, bevor gescrollt wird
-        setTimeout(() => {
-            const target = document.getElementById('michael');
-            if (target) {
-                const headerOffset = document.querySelector('.main-header').offsetHeight + 40;
-                const elementPosition = target.getBoundingClientRect().top;
-                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+        if (hash === '#michael') {
+            if(viewMain) viewMain.style.display = 'block';
+            if(viewThird) viewThird.style.display = 'none';
+            heroFlipWrapper.classList.add('flipped');
+            
+            // WICHTIG: Scrolling erlauben!
+            document.body.classList.remove('no-scroll');
+            
+            // Timeout gibt der Flip-Animation Zeit, bevor gescrollt wird
+            setTimeout(() => {
+                const target = document.getElementById('michael');
+                if (target) {
+                    const headerOffset = document.querySelector('.main-header')?.offsetHeight || 80;
+                    const elementPosition = target.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset - 40;
 
-                window.scrollTo({
-                    top: offsetPosition,
-                    behavior: 'smooth'
-                });
-            }
-        }, 300); // Entspricht etwa der halben Transition-Zeit
-    } 
-    else if (hash === '#evita') {
-        if (viewMain) viewMain.style.display = 'none';
-        if (viewThird) viewThird.style.display = 'flex';
-        heroFlipWrapper.classList.remove('flipped');
-    }
-};
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            }, 300);
+        } 
+        else if (hash === '#evita') {
+            if (viewMain) viewMain.style.display = 'none';
+            if (viewThird) viewThird.style.display = 'flex';
+            heroFlipWrapper.classList.remove('flipped');
+            
+            // WICHTIG: Scrolling erlauben!
+            document.body.classList.remove('no-scroll');
+            
+            // Auch hier zum Anker scrollen
+            setTimeout(() => {
+                const target = document.getElementById('evita');
+                if (target) {
+                    const headerOffset = document.querySelector('.main-header')?.offsetHeight || 80;
+                    const elementPosition = target.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset - 40;
+
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            }, 300);
+        }
+    };
 
     // Führe den Check sofort aus (beim Initialisieren)
     checkHashAndFlip();
