@@ -32,6 +32,15 @@
     border-bottom-color: var(--accent-color) !important;
 }
 
+/* ===================
+   TOPIC GRID LAYOUT
+   =================== */
+.topic-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px; /* Horizontaler UND vertikaler Abstand */
+}
+
 /* Buttons als dezente Outlines/Flächen */
 .topic-btn {
     background: transparent;
@@ -55,8 +64,19 @@
 .topic-btn.highlight-active {
     background: var(--accent-color) !important;
     border-color: var(--accent-color) !important;
-    color: var(--bg-color) !important; /* Nimmt Hintergrundfarbe als Textfarbe */
+    color: var(--bg-color) !important;
     box-shadow: none !important;
+}
+
+/* ===================
+   TOC (Inhaltsverzeichnis) LAYOUT
+   =================== */
+.toc-container {
+    width: 100%;
+}
+
+.toc-container.hidden {
+    display: none;
 }
 
 .toc-title {
@@ -67,17 +87,26 @@
     letter-spacing: 2px;
 }
 
+#toc-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 10px; /* 8px vertikal, 10px horizontal */
+}
+
+/* Mini-Buttons im TOC etwas kleiner */
+.toc-mini {
+    padding: 4px 10px;
+    font-size: 13px;
+}
+
 /* ============================
    LIGHT MODE SPECIFICS (MENU)
    ============================ */
 body.light-mode .topic-btn.highlight-active {
-    /* Im Light Mode ist bg-color hellgrau. 
-       Auf Gold (#D39A00) liest sich Weiß aber besser als Grau. */
     color: #ffffff !important; 
     font-weight: 600;
 }
 
 body.light-mode .topic-btn:hover {
-    /* Etwas dunklerer Hintergrund beim Hover im Light Mode für Sichtbarkeit */
     background: rgba(211, 154, 0, 0.1); 
 }
