@@ -51,10 +51,54 @@ function generateDynamicTOC() {
             
             // Klick-Event: Zum Anker springen und Menü schließen
             tocBtn.onclick = () => {
-                document.getElementById(heading.id).scrollIntoView({ behavior: 'smooth' });
-                // Optional: Menü nach Klick schließen
+                const headingId = heading.id;
+                const heroFlipWrapper = document.getElementById('hero-flip-wrapper');
+                const viewMain = document.getElementById('view-main');
+                const viewThird = document.getElementById('view-third');
+                
+                // Menü schließen
                 document.getElementById('side-menu-panel').classList.remove('visible');
                 document.body.classList.remove('no-scroll');
+                
+                // Prüfe ob wir auf der Startseite sind und zu #michael oder #evita navigieren
+                if (headingId === 'michael' && heroFlipWrapper) {
+                    // Zeige Michael-Seite (zurück)
+                    if (viewMain) viewMain.style.display = 'block';
+                    if (viewThird) viewThird.style.display = 'none';
+                    heroFlipWrapper.classList.add('flipped');
+                    
+                    // Scrolle nach Animation
+                    setTimeout(() => {
+                        const target = document.getElementById(headingId);
+                        if (target) {
+                            const headerOffset = document.querySelector('.main-header')?.offsetHeight || 80;
+                            const elementPosition = target.getBoundingClientRect().top;
+                            const offsetPosition = elementPosition + window.pageYOffset - headerOffset - 40;
+                            window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+                        }
+                    }, 300);
+                    
+                } else if (headingId === 'evita' && heroFlipWrapper) {
+                    // Zeige Evita-Seite
+                    if (viewMain) viewMain.style.display = 'none';
+                    if (viewThird) viewThird.style.display = 'flex';
+                    heroFlipWrapper.classList.remove('flipped');
+                    
+                    // Scrolle nach Animation
+                    setTimeout(() => {
+                        const target = document.getElementById(headingId);
+                        if (target) {
+                            const headerOffset = document.querySelector('.main-header')?.offsetHeight || 80;
+                            const elementPosition = target.getBoundingClientRect().top;
+                            const offsetPosition = elementPosition + window.pageYOffset - headerOffset - 40;
+                            window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+                        }
+                    }, 300);
+                    
+                } else {
+                    // Normale Scroll-Logik für andere Überschriften
+                    document.getElementById(headingId).scrollIntoView({ behavior: 'smooth' });
+                }
             };
 
             tocList.appendChild(tocBtn);
