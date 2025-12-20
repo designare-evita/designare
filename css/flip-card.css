@@ -198,7 +198,7 @@
 }
 
 .flip-header-white {
-    color: #ffffff !important;
+    color: var(--text-color) !important; 
 }
 
 .flip-panel p,
@@ -206,7 +206,7 @@
     font-size: 1rem;
     line-height: 1.7;
     margin-bottom: 20px;
-    color: #e0e0e0;
+    color: var(--text-color); /* JETZT: Variable statt #e0e0e0 */
 }
 
 .flip-panel ul {
