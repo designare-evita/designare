@@ -258,8 +258,6 @@ color: var(--text-color);
 .info-box strong,
 .tech-box strong {
     color: var(--accent-color);
-    display: block;
-    margin-bottom: 0.5rem;
     font-weight: 400;
 }
 
