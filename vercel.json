@@ -1,5 +1,6 @@
 {
   "rewrites": [
+    { "source": "/api/metrics", "destination": "/api/metrics.js" },
     { "source": "/CSV-Creator", "destination": "/CSV-Creator.html" },
     { "source": "/CSV-Importer-PRO", "destination": "/CSV-Importer-PRO.html" },
 { "source": "/KI-Integration-auf-Webseiten", "destination": "/KI-Integration-auf-Webseiten.html" },
