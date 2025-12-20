@@ -97,6 +97,32 @@ color: var(--accent-color);
 }
 
 /* ===================
+   FEATURED IMAGE (Subtle)
+   =================== */
+
+.article-hero-wrapper {
+    display: flex;
+    justify-content: center; /* Zentriert das Bild horizontal */
+    margin: 2rem 0 0 0;      /* Abstand nach oben */
+    width: 100%;
+}
+
+.article-hero-wrapper img {
+    height: auto;
+    max-width: 100%;
+    opacity: 0.1;            /* Extrem wenig Opacity (10%) */
+    border-radius: 8px;      /* Optional: leicht abgerundete Ecken */
+    filter: grayscale(100%); /* Optional: macht es noch dezenter (schwarz-weiß) */
+    transition: opacity 0.5s ease;
+}
+
+/* Optional: Beim Drüberfahren etwas sichtbarer machen */
+.article-hero-wrapper img:hover {
+    opacity: 0.3;
+    filter: grayscale(0%);
+}
+
+/* ===================
    4. CONTENT SECTIONS
    =================== */
 
