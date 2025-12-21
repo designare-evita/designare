@@ -1354,3 +1354,48 @@
         padding: 0 !important;
     }
 }
+
+
+/* Silas Formular-Container im Torino-Stil */
+.summary-box {
+    background-color: rgba(196, 163, 90, 0.05) !important;
+    border-left: 3px solid var(--accent-color) !important;
+    padding: 2rem !important;
+    margin: 2rem 0 !important;
+}
+
+.silas-input-container {
+    background-color: rgba(255, 255, 255, 0.02) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 0 !important;
+    transition: border-color 0.3s ease !important;
+}
+
+.silas-input-container:focus-within {
+    border-color: var(--accent-color) !important;
+}
+
+.silas-extra-input {
+    color: var(--text-color) !important;
+    font-weight: 300 !important;
+}
+
+/* Der Unlock-Button unten rechts im neuen Stil */
+#master-unlock-btn {
+    background: var(--bg-color) !important;
+    border: 1px solid var(--accent-color) !important;
+    color: var(--accent-color) !important;
+    box-shadow: 0 4px 15px rgba(196, 163, 90, 0.2) !important;
+}
+
+#master-unlock-btn:hover {
+    background: var(--accent-color) !important;
+    color: var(--bg-color) !important;
+}
+
+/* Anpassung der Result-Cards */
+.result-card {
+    background-color: rgba(255, 255, 255, 0.02) !important;
+    border: 1px solid var(--border-color) !important;
+    border-left: 3px solid var(--accent-color) !important;
+}
