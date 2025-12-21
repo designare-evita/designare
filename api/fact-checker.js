@@ -333,4 +333,3 @@ export class FactChecker {
     }
 }
 
-module.exports = { FactChecker };
