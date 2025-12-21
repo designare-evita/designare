@@ -542,3 +542,18 @@ textarea.silas-extra-input {
         gap: 1rem;
     }
 }
+
+/* silas.css - Update für Container-Breite */
+.silas-generator-section .ai-container {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-color);
+    border-radius: 0;
+    padding: 2rem;
+    margin: 2rem 0;
+    
+    /* FIX: Erzwinge volle Breite */
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    display: block;
+}
