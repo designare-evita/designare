@@ -1,4 +1,4 @@
-// js/silas-form.js - FINALE VERSION
+// js/silas-form.js - FINALE VERSION (MIT VOLLSTÄNDIGEM EXPORT & PREVIEW)
 // Passwort-Authentifizierung über Lightbox & API (check-auth.js)
 
 export function initSilasForm() {
@@ -104,7 +104,6 @@ export function initSilasForm() {
         try {
             const response = await fetch('/api/check-auth', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password }) });
             
-            // Prüfe ob Response JSON ist
             const contentType = response.headers.get('content-type');
             if (!contentType || !contentType.includes('application/json')) {
                 throw new Error('API nicht erreichbar');
@@ -287,9 +286,10 @@ export function initSilasForm() {
             silasStatus.textContent = 'Sende ' + keywordList.length + ' Keywords...';
             const headers = { 'Content-Type': 'application/json' };
             if (isMasterModeActive()) headers['X-Silas-Master'] = 'true';
+            
+            // Parallel Request
             const response = await fetch('/api/generate', { method: 'POST', headers, body: JSON.stringify({ keywords: keywordList }) });
             
-            // Prüfe ob Response JSON ist
             const contentType = response.headers.get('content-type');
             if (!contentType || !contentType.includes('application/json')) {
                 throw new Error('Server-Fehler: API nicht erreichbar (Status ' + response.status + ')');
@@ -353,11 +353,100 @@ export function initSilasForm() {
         container.appendChild(card);
     }
 
+    // === HTML GENERATOR (FIX: JETZT MIT ALLEN FELDERN) ===
     function generateLandingpageHtml(data) {
-        return '<div style="color:var(--text-color);line-height:1.7;padding:20px;"><header style="text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:1px solid var(--border-color);"><h1 style="color:var(--accent-color);font-size:2rem;">' + (data.h1 || 'N/A') + '</h1><p style="color:var(--text-color-muted);">' + (data.hero_text || '') + '</p></header><section style="margin-bottom:30px;padding:20px;background:rgba(255,255,255,0.02);border-left:3px solid var(--accent-color);"><h2 style="color:var(--accent-color);">' + (data.h2_1 || '') + '</h2><p>' + (data.h2_1_text || '') + '</p></section><section style="margin-bottom:30px;padding:20px;background:rgba(255,255,255,0.02);border-left:3px solid #28a745;"><h2 style="color:#28a745;">' + (data.h2_2 || '') + '</h2><p>' + (data.h2_2_text || '') + '</p></section><aside style="margin-top:30px;padding:20px;background:rgba(255,255,255,0.02);border:1px solid var(--border-color);"><h3 style="color:var(--accent-color);">SEO Info</h3><p><strong>Titel:</strong> ' + (data.meta_title || data.post_title || 'N/A') + '</p><p><strong>Slug:</strong> ' + (data.post_name || 'n-a') + '</p><p><strong>Meta:</strong> ' + (data.meta_description || 'N/A') + '</p></aside></div>';
+        // Hilfsfunktion für FAQs
+        let faqHtml = '';
+        for(let i=1; i<=5; i++) {
+            if(data['faq_'+i] && data['faq_answer_'+i]) {
+                faqHtml += `<div style="margin-bottom:15px;"><strong>${data['faq_'+i]}</strong><p>${data['faq_answer_'+i]}</p></div>`;
+            }
+        }
+        
+        return `
+        <div style="color:var(--text-color);line-height:1.7;padding:20px;">
+            <header style="text-align:center;margin-bottom:40px;padding-bottom:30px;border-bottom:1px solid var(--border-color);">
+                <h1 style="color:var(--accent-color);font-size:2rem;">${data.h1 || 'N/A'}</h1>
+                <p style="color:var(--text-color-muted);font-size:1.1rem;">${data.hero_text || ''}</p>
+                <p style="font-style:italic;">${data.hero_subtext || ''}</p>
+                <button style="background:var(--accent-color);color:#000;border:none;padding:10px 20px;border-radius:5px;font-weight:bold;margin-top:10px;">${data.primary_cta || 'Click'}</button>
+            </header>
+
+            <section style="margin-bottom:40px;">
+                <h3 style="border-bottom:2px solid var(--accent-color);display:inline-block;margin-bottom:15px;">Vorteile</h3>
+                <p>${data.benefits_list_fließtext || ''}</p>
+                ${data.benefits_list || ''}
+            </section>
+
+            <section style="margin-bottom:30px;padding:20px;background:rgba(255,255,255,0.02);border-left:3px solid var(--accent-color);">
+                <h2 style="color:var(--accent-color);">${data.h2_1 || ''}</h2>
+                <p>${data.h2_1_text || ''}</p>
+            </section>
+
+            <section style="margin-bottom:30px;padding:20px;background:rgba(255,255,255,0.02);border-left:3px solid #28a745;">
+                <h2 style="color:#28a745;">${data.h2_2 || ''}</h2>
+                <p>${data.h2_2_text || ''}</p>
+            </section>
+
+             <section style="margin-bottom:30px;">
+                <h2 style="color:var(--accent-color);">${data.h2_3 || ''}</h2>
+                <p>${data.h2_3_text || ''}</p>
+            </section>
+
+            <section style="margin-bottom:30px;">
+                <h2 style="color:var(--accent-color);">${data.h2_4 || ''}</h2>
+                <p>${data.h2_4_text || ''}</p>
+            </section>
+
+            <section style="margin-bottom:40px;">
+                <h3 style="border-bottom:2px solid var(--accent-color);display:inline-block;margin-bottom:15px;">Features</h3>
+                <p>${data.features_list_fließtext || ''}</p>
+                ${data.features_list || ''}
+            </section>
+
+            <section style="background:rgba(255,255,255,0.03);padding:20px;margin-bottom:30px;border-radius:8px;">
+                <h3 style="color:var(--accent-color);text-align:center;">Das sagen unsere Kunden</h3>
+                <p style="text-align:center;font-style:italic;">"${data.social_proof || ''}"</p>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px;">
+                    <div style="background:rgba(0,0,0,0.2);padding:15px;"><i>"${data.testimonial_1 || ''}"</i></div>
+                    <div style="background:rgba(0,0,0,0.2);padding:15px;"><i>"${data.testimonial_2 || ''}"</i></div>
+                </div>
+            </section>
+
+            <section style="margin-bottom:40px;">
+                <h3 style="color:var(--accent-color);">Häufige Fragen (FAQ)</h3>
+                ${faqHtml}
+            </section>
+
+            <section style="text-align:center;padding:30px;border:1px solid var(--border-color);margin-bottom:30px;">
+                <h3>${data.guarantee_text || 'Zufriedenheitsgarantie'}</h3>
+                <p>${data.trust_signals || ''}</p>
+                <p><strong>Kontakt:</strong> ${data.contact_info || ''}</p>
+                <button style="background:transparent;border:2px solid var(--accent-color);color:var(--accent-color);padding:10px 20px;border-radius:5px;font-weight:bold;margin-top:10px;">${data.secondary_cta || 'Mehr Infos'}</button>
+            </section>
+
+            <aside style="margin-top:30px;padding:20px;background:rgba(255,255,255,0.02);border:1px solid var(--border-color);font-size:0.9rem;">
+                <h3 style="color:var(--accent-color);">SEO Meta-Daten</h3>
+                <p><strong>URL-Slug:</strong> ${data.post_name || 'n-a'}</p>
+                <p><strong>Meta Title:</strong> ${data.meta_title || 'N/A'}</p>
+                <p><strong>Meta Description:</strong> ${data.meta_description || 'N/A'}</p>
+            </aside>
+        </div>`;
     }
 
-    // === DOWNLOADS ===
+    // === DOWNLOADS (FIX: ALLE FELDER HINZUGEFÜGT) ===
+    const ALL_HEADERS = [
+        "keyword","intent","post_title","post_name","meta_title","meta_description",
+        "h1","hero_text","hero_subtext","primary_cta","secondary_cta",
+        "h2_1","h2_1_text","h2_2","h2_2_text","h2_3","h2_3_text","h2_4","h2_4_text",
+        "benefits_list_fließtext","benefits_list",
+        "features_list_fließtext","features_list",
+        "social_proof","testimonial_1","testimonial_2",
+        "pricing_title","price_1","price_2","price_3",
+        "faq_1","faq_answer_1","faq_2","faq_answer_2","faq_3","faq_answer_3","faq_4","faq_answer_4","faq_5","faq_answer_5",
+        "contact_info","footer_cta","trust_signals","guarantee_text"
+    ];
+
     function cleanForCsv(text) {
         if (text == null) return "";
         let str = String(text).replace(/[\u200B\u00AD\uFEFF\u2028\u2029]/g, '').replace(/\u00A0/g, ' ').replace(/(\r\n|\n|\r)/gm, ' ').replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '');
@@ -376,24 +465,25 @@ export function initSilasForm() {
     function downloadHtml(index) {
         const data = allGeneratedData[index];
         if (!data || data.error) return alert('Keine Daten verfügbar.');
-        const html = '<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>' + (data.meta_title || 'Landingpage') + '</title><style>:root{--bg-color:#0d0d0d;--text-color:#e8e8e8;--text-color-muted:#a0a0a0;--accent-color:#c4a35a;--border-color:rgba(255,255,255,0.1);}body{font-family:sans-serif;background:var(--bg-color);color:var(--text-color);margin:0;padding:20px;}</style></head><body>' + generateLandingpageHtml(data) + '</body></html>';
+        const html = '<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>' + (data.meta_title || 'Landingpage') + '</title><style>:root{--bg-color:#0d0d0d;--text-color:#e8e8e8;--text-color-muted:#a0a0a0;--accent-color:#c4a35a;--border-color:rgba(255,255,255,0.1);}body{font-family:sans-serif;background:var(--bg-color);color:var(--text-color);margin:0;padding:20px;}ul{padding-left:20px;}</style></head><body>' + generateLandingpageHtml(data) + '</body></html>';
         downloadFile(html, (data.post_name || 'landingpage') + '.html', 'text/html;charset=utf-8;');
     }
     function downloadTxt() {
-        const headers = ["keyword","post_title","post_name","meta_title","meta_description","h1","h2_1","h2_1_text","h2_2","h2_2_text","primary_cta","secondary_cta","hero_text"];
         let txt = '';
         allGeneratedData.forEach((row, i) => {
             if (row.error) return;
             txt += '='.repeat(50) + '\nINHALT FÜR: ' + row.keyword + '\n' + '='.repeat(50) + '\n\n';
-            headers.forEach(h => { const v = String(row[h] || '').replace(/<[^>]*>/g, ''); if (v) txt += h.replace(/_/g, ' ').toUpperCase() + ':\n' + v + '\n\n'; });
+            ALL_HEADERS.forEach(h => { const v = String(row[h] || '').replace(/<[^>]*>/g, ''); if (v) txt += h.toUpperCase() + ':\n' + v + '\n\n'; });
             if (i < allGeneratedData.length - 1) txt += '\n---\n\n';
         });
         downloadFile(txt, 'silas_content.txt', 'text/plain;charset=utf-8;');
     }
     function downloadCsv() {
-        const headers = ["keyword","post_title","post_name","meta_title","meta_description","h1","h2_1","h2_1_text","h2_2","h2_2_text","primary_cta","secondary_cta","hero_text"];
-        let csv = '\uFEFF' + headers.join(',') + '\n';
-        allGeneratedData.forEach(row => { if (row.error) return; csv += headers.map(h => '"' + cleanForCsv(row[h]) + '"').join(',') + '\n'; });
+        let csv = '\uFEFF' + ALL_HEADERS.join(',') + '\n';
+        allGeneratedData.forEach(row => { 
+            if (row.error) return; 
+            csv += ALL_HEADERS.map(h => '"' + cleanForCsv(row[h]) + '"').join(',') + '\n'; 
+        });
         downloadFile(csv, 'silas_content.csv', 'text/csv;charset=utf-8;');
     }
 
