@@ -240,7 +240,7 @@ h1 b {
 #ai-form {
     background-color: var(--bg-color);
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: 1px;
     display: flex;
     overflow: hidden;
     transition: border-color 0.3s ease;
@@ -288,7 +288,7 @@ h1 b {
 #ai-status {
     background-color: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: 1px;
     font-size: 1rem;
     margin-top: 10px;
     min-height: 40px;
