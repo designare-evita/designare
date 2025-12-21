@@ -6,14 +6,20 @@
     <title>Silas: AI Bulk Content Generator (CSV Export für WordPress & Co.)</title>
     <meta name="description" content="Schluss mit Copy & Paste aus ChatGPT. Silas generiert bis zu 50 SEO-optimierte Texte gleichzeitig und liefert dir eine fertige CSV-Datei für deinen Import.">
     <meta name="robots" content="index, follow">
-    <link rel="icon" href="images/favicon.webp" type="image/webp">
     
     <link rel="preload" href="Font/Poppins-Regular.ttf" as="font" type="font/ttf" crossorigin>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="icon" href="images/favicon.webp" type="image/webp">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"></noscript>
     
     <link rel="stylesheet" href="css/side-menu.css">
-    <link rel="stylesheet" href="css/blog-style.css"> <link rel="stylesheet" href="css/ai-styles.css">
+    <link rel="stylesheet" href="css/ai-styles.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/header-footer.css">
+    <link rel="stylesheet" href="css/blog-style.css">
     <link rel="stylesheet" href="css/menu-interactive.css">
+    
     <link rel="canonical" href="https://designare.at/silas" />
 
     <script type="application/ld+json">
@@ -21,7 +27,7 @@
       "@context": "https://schema.org",
       "@type": "WebApplication",
       "name": "Silas AI Bulk Content Generator",
-      "url": "https://designare.at/CSV-Creator",
+      "url": "https://designare.at/silas",
       "description": "Ein KI-Tool zur Massenerstellung von SEO-Texten mit direktem CSV-Export für CMS-Importe.",
       "applicationCategory": "BusinessApplication",
       "operatingSystem": "All",
@@ -40,65 +46,127 @@
       "screenshot": "https://designare.at/images/Content-Magie-von-Silas.webp"
     }
     </script>
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [{
+            "@type": "Question",
+            "name": "Was ist Silas und wie funktioniert es?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Silas ist ein KI-gestützter Bulk Content Generator, der aus deinen Keywords vollständige, SEO-optimierte Landingpage-Texte erstellt und als CSV, TXT oder HTML exportiert – bereit für den direkten Import in WordPress & Co."
+            }
+        }, {
+            "@type": "Question",
+            "name": "Welche Export-Formate unterstützt Silas?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Silas unterstützt drei Export-Formate: CSV für Massen-Importe in CMS-Systeme, TXT für manuelle Bearbeitung und HTML für sofortige Landingpage-Vorschauen."
+            }
+        }, {
+            "@type": "Question",
+            "name": "Wie viele Texte kann ich gleichzeitig generieren?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Im Demo-Modus kannst du bis zu 3 Keywords pro Session verarbeiten. Mit Master Access sind bis zu 50 Content-Themen gleichzeitig möglich."
+            }
+        }]
+    }
+    </script>
 </head>
 
-<body class="dark-mode">
-    <div id="particles-js"></div>
+<body class="dark-mode page-loaded">
+
     <div id="header-placeholder"></div>
     <div id="side-menu-placeholder"></div>
+    <div id="modal-container"></div>
+    <div id="particles-js"></div>
 
-    <main id="blog-main" class="blog-article">
-        <header class="article-header">
-            <div class="breadcrumb">
-                <ol>
-                    <li><a href="/">Home</a></li>
-                    <li>Silas AI</li>
-                </ol>
-            </div>
-            <h1>Silas: <span class="article-white">Dein KI-Komplize für Massen-Content</span></h1>
-            <div class="article-meta">
-                <span class="author">By Michael Kanda</span>
-                <span class="reading-time"><i class="fa-regular fa-clock"></i> Bulk-Processing Ready</span>
-            </div>
-        </header>
-
-        <section>
-            <h2 class="article-white">Vom Keyword zum Import – <span style="color: var(--accent-color);">in einem Klick.</span></h2>
-            <div class="info-box">
-                <i class="fas fa-magic"></i>
-                <div>
-                    <p>Kennst du das? Du hast 50 Keywords und brauchst 50 Landingpages. Mit ChatGPT kopierst du dich zu Tode. <strong>Silas macht das anders.</strong> Gib deine Keywords ein, definiere den Stil, und Silas generiert dir nicht nur die Texte, sondern die <strong>fertige CSV-Datei</strong> (inkl. H1, Meta-Description, Slugs) für deine Import-Tools.</p>
-                </div>
-            </div>
-        </section>
-
-        <section>
-            <h2 class="article-white">Content-Erstellung mit Silas</h2>
-            <p>Silas ist kein einfacher Textgenerator. Er ist ein strategisches Werkzeug, das darauf ausgelegt ist, den Prozess der Content-Erstellung für Webprojekte radikal zu vereinfachen und zu beschleunigen.</p>
+    <main id="blog-main">
+        
+        <article class="blog-article">
             
-            <h3 class="article-white">Die Features im Überblick:</h3>
-            <ul class="feature-list">
-                <li><strong>Massenproduktion:</strong> Erstelle mit nur einem Klick bis zu 50 vollständige Content-Themen auf einmal.</li>
-                <li><strong>Hochgradig personalisierter Content:</strong> Jeder Text wird individuell für dein Keyword erstellt.</li>
-                <li><strong>Flexible Download-Optionen:</strong> Lade alle generierten Texte als <strong>CSV- oder TXT-Datei</strong> herunter.</li>
-                <li><strong>Einzelner HTML-Download:</strong> Lade jedes Content Theme als eigenständige HTML-Landingpage herunter.</li>
-                <li><strong>Vollständige Vorschau:</strong> Überprüfe den generierten Content in einer Live-Vorschau.</li>
-                <li><strong>Ready for Import:</strong> Perfekt formatiert für den direkten CMS-Import.</li>
-            </ul>
-        </section>
+            <!-- ARTICLE HEADER -->
+            <header class="article-header">
+                <h1>Silas: <span class="article-white">Dein KI-Komplize für Massen-Content</span></h1>
+                
+                <div class="article-meta">
+                    <span class="reading-time"><i class="fa-solid fa-robot"></i> AI Content Tool</span>
+                    <address class="author">
+                        Von <a href="index.html#michael" rel="author">Michael Kanda</a>
+                    </address>
+                </div>
+            </header>
 
-        <section class="cta-section">
-            <div class="ai-container">
-                <h2 class="article-white">Deine Texte, deine Regeln: <span style="color: var(--accent-color);">Mehr als nur Keywords!</span></h2>
-                <p>Nutze die optionalen Felder, um die Textqualität auf ein neues Level zu heben. Je mehr Details du angibst, desto präziser wird das Ergebnis.</p>
+            <!-- HERO IMAGE -->
+            <div class="article-hero-wrapper">
+                <img src="https://designare.at/images/Content-Magie-von-Silas.webp" alt="Silas AI Bulk Content Generator Illustration" width="800" height="450" loading="eager">
+            </div>
 
-                <div class="summary-box" style="text-align: left;">
-                    <h3 class="article-white"><i class="fas fa-wand-magic-sparkles"></i> Style-Transfer & Mustertexte</h3>
-                    <p style="font-size: 0.9rem; margin-bottom: 1.5rem;">Wähle eine Vorlage oder füge einen eigenen Text ein, dessen Schreibstil Silas imitieren soll.</p>
+            <!-- SUMMARY BOX -->
+            <section class="article-summary" aria-labelledby="summary-heading">
+                <h2 id="summary-heading" class="visually-hidden">Vom Keyword zum Import</h2>
+                <div class="summary-box">
+                    <h3>Vom Keyword zum Import – in einem Klick:</h3>
+                    <ul>
+                        <li><strong>Schluss mit Copy & Paste:</strong> Du hast 50 Keywords und brauchst 50 Landingpages? Mit ChatGPT kopierst du dich zu Tode. Silas macht das anders.</li>
+                        <li><strong>Fertige CSV-Datei:</strong> Gib deine Keywords ein, definiere den Stil, und Silas generiert nicht nur die Texte, sondern die komplette Datenstruktur (H1, Meta-Description, Slugs).</li>
+                        <li><strong>Ready for Import:</strong> Perfekt formatiert für Import-Tools wie den <a title="CSV-Importer PRO" href="https://designare.at/CSV-Importer-PRO">CSV-Importer PRO</a>.</li>
+                    </ul>
+                </div>
+            </section>
 
-                    <div class="input-group" style="margin-bottom: 1rem;">
+            <!-- FEATURES SECTION -->
+            <section aria-labelledby="features-heading">
+                <h2 id="features-heading">Content-Erstellung mit <span class="article-white">Silas</span></h2>
+                
+                <p>Silas ist <strong>kein</strong> einfacher Textgenerator. Er ist ein strategisches Werkzeug, das darauf ausgelegt ist, den Prozess der Content-Erstellung für Webprojekte radikal zu vereinfachen und zu beschleunigen. Anstatt mühsam einzelne Texte zu erstellen, kannst du jetzt ganze Content-Kampagnen auf einmal planen und umsetzen.</p>
+
+                <div class="info-box">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <div>
+                        <strong>Hochgradig personalisiert:</strong>
+                        <p>Jeder Text wird individuell für dein Keyword erstellt. Durch optionale Angaben wie Brand, Zielgruppe, Tonalität und USP passt sich Silas perfekt an deine Bedürfnisse an.</p>
+                    </div>
+                </div>
+
+                <dl class="feature-list">
+                    <dt><i class="fa-solid fa-file-csv"></i> Flexible Download-Optionen</dt>
+                    <dd>Lade alle generierten Texte als CSV- oder TXT-Datei für den Massen-Import herunter.</dd>
+                    
+                    <dt><i class="fa-solid fa-code"></i> Einzelner HTML-Download</dt>
+                    <dd>Perfekt für schnelle Tests – lade jedes Content-Theme als eigenständige HTML-Landingpage mit nur einem Klick herunter.</dd>
+                    
+                    <dt><i class="fa-solid fa-layer-group"></i> Massenproduktion</dt>
+                    <dd>Erstelle mit nur einem Klick bis zu 50 vollständige Content-Themen auf einmal.</dd>
+                    
+                    <dt><i class="fa-solid fa-eye"></i> Vollständige Vorschau</dt>
+                    <dd>Überprüfe den gesamten generierten Content in einer Live-Vorschau, bevor du ihn herunterlädst.</dd>
+                </dl>
+            </section>
+
+            <!-- SILAS GENERATOR SECTION -->
+            <section aria-labelledby="generator-heading" class="silas-generator-section">
+                <h2 id="generator-heading">Deine Texte, deine Regeln: <span class="article-white">Mehr als nur Keywords!</span></h2>
+                
+                <p>Gib deine Keywords vor und nutze die optionalen Felder, um die Textqualität auf ein neues Level zu heben. Je mehr Details du zu Domain, Brand, Zielgruppe, Tonalität und deinem USP angibst, desto präziser und überzeugender wird der von Silas generierte Content.</p>
+
+                <div class="ai-container">
+                    
+                    <!-- STYLE-TRANSFER SECTION -->
+                    <aside class="expert-tip" style="margin-bottom: 2rem;">
+                        <i class="fa-solid fa-magic"></i>
+                        <div>
+                            <strong>Style-Transfer & Mustertexte</strong>
+                            <p>Wähle eine Vorlage oder füge einen eigenen Text ein, dessen Schreibstil Silas imitieren soll.</p>
+                        </div>
+                    </aside>
+
+                    <div class="input-group" style="margin-bottom: 1.5rem;">
                         <label for="template-selector">Vorlage wählen:</label>
-                        <select id="template-selector" class="custom-select" style="width: 100%;">
+                        <select id="template-selector" class="custom-select">
                             <option value="">-- Bitte wählen oder eigenen Text eingeben --</option>
                             <option value="emotional">Emotional & Storytelling (B2C)</option>
                             <option value="hard-facts">Faktenorientiert & Kurz (B2B)</option>
@@ -107,15 +175,19 @@
                         </select>
                     </div>
 
-                    <label for="custom-style-input">Mustertext / Stil-Vorlage:</label>
-                    <div class="silas-input-container">
-                        <textarea id="custom-style-input" class="silas-extra-input" rows="6" placeholder="Hier erscheint der Mustertext..."></textarea>
+                    <div class="input-group" style="margin-bottom: 2rem;">
+                        <label for="custom-style-input">Mustertext / Stil-Vorlage:</label>
+                        <div class="silas-input-container" style="height: auto; padding: 0;">
+                            <textarea id="custom-style-input" class="silas-extra-input" 
+                                placeholder="Hier erscheint der Mustertext. Du kannst ihn bearbeiten oder etwas ganz Eigenes hineinkopieren..."
+                                rows="5" 
+                                style="width:100%; min-height:100px; padding: 15px; line-height: 1.5; resize: vertical; background: transparent; border: none; color: var(--text-color); box-sizing: border-box;"></textarea>
+                        </div>
                     </div>
-                </div>
 
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-top: 2rem; text-align: left;">
+                    <!-- GENERATION SETTINGS -->
                     <div class="input-group">
-                        <label for="readability-select">Lesbarkeit:</label>
+                        <label for="readability-select">Komplexität & Lesbarkeit:</label>
                         <select id="readability-select" class="custom-select">
                             <option value="balanced" selected>Ausgewogen (Standard)</option>
                             <option value="simple">Einfach (Für Laien / B2C)</option>
@@ -123,6 +195,7 @@
                             <option value="academic">Akademisch (Hochkomplex)</option>
                         </select>
                     </div>
+
                     <div class="input-group">
                         <label for="text-intent-select">Text-Typ:</label>
                         <select id="text-intent-select" class="custom-select">
@@ -130,86 +203,167 @@
                             <option value="commercial">Kommerziell</option>
                         </select>
                     </div>
+
                     <div class="input-group">
                         <label for="grammatical-person-select">Ansprache:</label>
                         <select id="grammatical-person-select" class="custom-select">
                             <option value="plural">Wir-Form (Unternehmen)</option>
-                            <option value="singular">Ich-Form (Einzelperson)</option>
+                            <option value="singular">Ich-Form (Einzelperson)</option> 
                         </select>
                     </div>
-                </div>
 
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-top: 1.5rem;">
-                    <div class="silas-input-container"><input type="text" id="text-domain-input" class="silas-extra-input" placeholder="Webseiten-Domain (z.B. designare.at)"></div>
-                    <div class="silas-input-container"><input type="text" id="text-brand-input" class="silas-extra-input" placeholder="Brand/Ansprechpartner"></div>
-                    <div class="silas-input-container"><input type="email" id="text-email-input" class="silas-extra-input" placeholder="E-Mail für CTA"></div>
-                    <div class="silas-input-container"><input type="tel" id="text-phone-input" class="silas-extra-input" placeholder="Telefonnummer für CTA"></div>
-                    <div class="silas-input-container"><input type="text" id="text-adress-input" class="silas-extra-input" placeholder="Anschrift für CTA"></div>
-                    <div class="silas-input-container"><input type="text" id="text-zielgruppe-input" class="silas-extra-input" placeholder="Zielgruppe (z.B. Anfänger)"></div>
-                    <div class="silas-input-container"><input type="text" id="text-tonalitaet-input" class="silas-extra-input" placeholder="Tonalität (z.B. humorvoll)"></div>
-                    <div class="silas-input-container"><input type="text" id="text-usp-input" class="silas-extra-input" placeholder="Alleinstellungsmerkmal (USP)"></div>
-                </div>
+                    <!-- OPTIONAL FIELDS -->
+                    <div class="silas-input-container">
+                        <input type="text" id="text-domain-input" class="silas-extra-input" placeholder="Webseiten-Domain (optional): z.B. designare.at" autocomplete="off">
+                    </div>
+                    <div class="silas-input-container">
+                        <input type="text" id="text-brand-input" class="silas-extra-input" placeholder="Brand/Ansprechpartner (optional): z.B. Michael" autocomplete="off">
+                    </div>
+                    <div class="silas-input-container">
+                        <input type="email" id="text-email-input" class="silas-extra-input" placeholder="E-Mail für CTA (optional): z.B. info@deinewebseite.at" autocomplete="off">
+                    </div>
+                    <div class="silas-input-container">
+                        <input type="tel" id="text-phone-input" class="silas-extra-input" placeholder="Telefonnummer für CTA (optional): z.B. +43 123 456789" autocomplete="off">
+                    </div>
+                    <div class="silas-input-container">
+                        <input type="text" id="text-adress-input" class="silas-extra-input" placeholder="Anschrift für CTA (optional): z.B. 1010 Wien, Österreich" autocomplete="off">
+                    </div>
+                    <div class="silas-input-container">
+                        <input type="text" id="text-zielgruppe-input" class="silas-extra-input" placeholder="Zielgruppe (optional): z.B. Anfänger, Experten, Familien" autocomplete="off">
+                    </div>
+                    <div class="silas-input-container">
+                        <input type="text" id="text-tonalitaet-input" class="silas-extra-input" placeholder="Tonalität (optional): z.B. humorvoll, professionell, seriös" autocomplete="off">
+                    </div>
+                    <div class="silas-input-container">
+                        <input type="text" id="text-usp-input" class="silas-extra-input" placeholder="Alleinstellungsmerkmal (USP) (optional): z.B. 24/7-Support" autocomplete="off">
+                    </div>
 
-                <form id="silas-form" style="margin-top: 30px;">
-                    <div class="silas-input-container" style="display: flex; align-items: center;">
-                        <input type="text" id="silas-keyword-input" placeholder="Keywords mit Komma trennen..." style="flex-grow: 1; border: none;">
-                        <button type="submit" id="add-keyword-btn" aria-label="Keyword hinzufügen" style="border: none; margin: 0; padding: 15px 25px;">
+                    <!-- KEYWORD INPUT FORM -->
+                    <form id="silas-form" style="margin-top: 2rem;">
+                        <input type="text" id="silas-keyword-input" placeholder="Gib ein oder mehrere Keywords ein (mit Komma trennen)..." autocomplete="off">
+                        <button type="submit" id="add-keyword-btn" aria-label="Keyword hinzufügen">
                             <i class="fa-regular fa-square-plus"></i>
                         </button>
-                    </div>
-                </form>
-            </div>
-
-            <div class="keyword-list-container">
-                <h4 class="article-white">Deine Content-Themen:</h4>
-                <ul id="keyword-display-list"></ul>
-                <div class="keyword-list-controls">
-                    <button id="start-generation-btn" class="cta-button">
-                        <i class="fas fa-cogs"></i> Content erstellen
-                    </button>
-                    <button id="clear-list-btn" class="cta-button secondary">
-                        <i class="fas fa-trash"></i> Liste leeren
-                    </button>
+                    </form>
                 </div>
-            </div>
 
-            <p id="silas-status" style="margin-top: 1rem; color: var(--accent-color);"></p>
-            <div id="silas-response-container" style="display: none;"></div>
-        </section>
+                <!-- KEYWORD LIST -->
+                <div class="keyword-list-container">
+                    <h3>Deine Content-Themen:</h3>
+                    <ul id="keyword-display-list"></ul>
+                    <div class="keyword-list-controls">
+                        <button id="start-generation-btn" class="cta-button">
+                            <i class="fas fa-cogs"></i> Content erstellen
+                        </button>
+                        <button id="clear-list-btn" class="cta-button secondary" style="display: none;">
+                            <i class="fas fa-trash"></i> Liste leeren
+                        </button>
+                    </div>
+                </div>
+
+                <p id="silas-status"></p>
+                
+                <!-- RESPONSE CONTAINER -->
+                <div id="silas-response-container" style="display: none;"></div>
+            </section>
+
+            <!-- FAQ SECTION -->
+            <section aria-labelledby="faq-heading">
+                <h2 id="faq-heading">Häufig gestellte Fragen (FAQ)</h2>
+                
+                <div class="faq-accordion">
+                    <details name="faq-group" open>
+                        <summary>Was ist Silas und wie funktioniert es?</summary>
+                        <div class="faq-content">
+                            <p>Silas ist ein KI-gestützter Bulk Content Generator, der aus deinen Keywords vollständige, SEO-optimierte Landingpage-Texte erstellt. Du gibst deine Keywords ein, definierst optional Stil und Zielgruppe, und Silas generiert die komplette Datenstruktur – bereit für den direkten Import in WordPress & Co.</p>
+                        </div>
+                    </details>
+
+                    <details name="faq-group">
+                        <summary>Welche Export-Formate unterstützt Silas?</summary>
+                        <div class="faq-content">
+                            <p>Silas unterstützt drei Export-Formate: CSV für Massen-Importe in CMS-Systeme, TXT für manuelle Bearbeitung, und HTML für sofortige Landingpage-Vorschauen. Alle Formate sind UTF-8-kodiert und WordPress-kompatibel.</p>
+                        </div>
+                    </details>
+
+                    <details name="faq-group">
+                        <summary>Wie viele Texte kann ich gleichzeitig generieren?</summary>
+                        <div class="faq-content">
+                            <p>Im Demo-Modus kannst du bis zu 3 Keywords pro Session verarbeiten mit täglichen Limits. Mit Master Access sind bis zu 50 Content-Themen gleichzeitig möglich – ohne Rate Limits.</p>
+                        </div>
+                    </details>
+
+                    <details name="faq-group">
+                        <summary>Was beinhaltet der generierte Content?</summary>
+                        <div class="faq-content">
+                            <p>Jedes generierte Content-Theme enthält: SEO-Titel, Meta-Description, URL-Slug, H1-H4 Überschriften, Hero-Text, Features & Benefits Listen, FAQs, Testimonials, Pricing-Bereiche, CTAs und Trust-Signals – alles vollständig strukturiert.</p>
+                        </div>
+                    </details>
+                </div>
+            </section>
+
+            <!-- CTA SECTION -->
+            <section class="cta-section" aria-labelledby="cta-heading">
+                <h2 id="cta-heading">Bereit für effiziente Content-Erstellung?</h2>
+                <p>Starte jetzt mit Silas und erlebe, wie einfach Massen-Content-Produktion sein kann.</p>
+                <a href="#generator-heading" class="cta-button">
+                    <i class="fas fa-arrow-up"></i> Zum Generator
+                </a>
+            </section>
+
+            <footer class="article-footer">
+                <a href="index.html" class="back-to-blog">
+                    <i class="fas fa-arrow-left"></i> Zurück zur Startseite
+                </a>
+            </footer>
+
+        </article>
+
     </main>
 
+    <!-- ========================================
+         MODALS
+         ======================================== -->
+
+    <!-- AUTH MODAL (Lightbox für Master-Passwort) -->
     <div id="silas-auth-modal" class="modal-overlay">
-        <div class="modal-content" style="max-width: 450px; height: auto; padding: 40px; text-align: center;">
-            <button id="close-auth-modal" class="close-button">&times;</button>
-            <i class="fas fa-lock" style="font-size: 3rem; color: var(--accent-color); margin-bottom: 20px;"></i>
-            <h2 class="article-white">Master Access</h2>
-            <p style="margin-bottom: 25px;">Bitte gib das Passwort ein, um alle Limits aufzuheben.</p>
-            
-            <div class="silas-input-container" style="margin-bottom: 20px;">
-                <input type="password" id="master-pwd-input" class="silas-extra-input" placeholder="Passwort..." style="text-align: center;">
+        <div class="modal-content" style="max-width: 400px; height: auto; padding: 40px;">
+            <button id="close-auth-modal" class="close-button" aria-label="Modal schließen">&times;</button>
+            <div style="text-align: center;">
+                <i class="fas fa-lock" style="font-size: 2.5rem; color: var(--accent-color); margin-bottom: 20px;"></i>
+                <h3 class="article-white" style="margin-bottom: 0.5rem;">Master Access</h3>
+                <p style="font-size: 0.9rem; margin-bottom: 25px; color: var(--text-color-muted);">Bitte gib das Passwort ein, um alle Limits aufzuheben.</p>
+                
+                <div class="silas-input-container" style="margin-bottom: 20px;">
+                    <input type="password" id="master-pwd-input" class="silas-extra-input" placeholder="Passwort eingeben..." style="text-align: center;" autocomplete="off">
+                </div>
+                
+                <button id="confirm-unlock-btn" class="cta-button" style="width: 100%;">
+                    <i class="fas fa-unlock"></i> Freischalten
+                </button>
+                <p id="auth-error-msg" style="color: #ff6b6b; font-size: 0.85rem; margin-top: 15px; display: none;">
+                    <i class="fas fa-exclamation-circle"></i> Passwort inkorrekt
+                </p>
             </div>
-            
-            <button id="confirm-unlock-btn" class="cta-button" style="width: 100%;">
-                <i class="fas fa-unlock"></i> Freischalten
-            </button>
-            <p id="auth-error-msg" style="color: #ff6b6b; font-size: 0.8rem; margin-top: 15px; display: none;">❌ Passwort inkorrekt</p>
         </div>
     </div>
 
+    <!-- PREVIEW MODAL (Lightbox für Content-Vorschau) -->
+    <div id="silas-preview-modal" class="modal-overlay">
+        <div class="modal-content preview-modal-content">
+            <button id="close-preview-modal" class="close-button" aria-label="Vorschau schließen">&times;</button>
+            <div id="preview-content-area"></div>
+        </div>
+    </div>
+
+    <!-- AI RESPONSE MODAL -->
     <div id="ai-response-modal" class="modal-overlay">
         <div class="modal-content">
-            <button id="close-ai-response-modal-top" class="close-button">&times;</button>
+            <button id="close-ai-response-modal-top" class="close-button" aria-label="Modal schließen">&times;</button>
             <div id="ai-response-content-area"></div>
             <div class="modal-footer">
-                <button id="close-ai-response-modal-bottom" class="button">Frag Evita</button>
+                <button id="close-ai-response-modal-bottom" class="cta-button">Frag Evita (Die weiß mehr!)</button>
             </div>
-        </div>
-    </div>
-
-    <div id="silas-preview-modal" class="modal-overlay">
-        <div class="modal-content" style="width: 95vw; height: 90vh; max-width: 1200px;">
-            <button id="close-preview-modal" class="close-button">&times;</button>
-            <div id="preview-content-area"></div>
         </div>
     </div>
 
@@ -217,5 +371,6 @@
 
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script type="module" src="js/main.js"></script>
+    <script src="js/matrix-effect.js"></script>
 </body>
 </html>
