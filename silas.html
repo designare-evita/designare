@@ -148,100 +148,142 @@
                 <h2 id="generator-heading">Deine Texte, deine Regeln: <span class="article-white">Mehr als nur Keywords!</span></h2>
                 
                 <p>Gib deine Keywords vor und nutze die optionalen Felder, um die Textqualität auf ein neues Level zu heben. Je mehr Details du zu Domain, Brand, Zielgruppe, Tonalität und deinem USP angibst, desto präziser und überzeugender wird der von Silas generierte Content.</p>
+<div class="ai-container">
+    
+    <div class="silas-config-group">
+        <span class="silas-section-label"><i class="fa-solid fa-pen-nib"></i> Schreibstil & Vorlage</span>
+        
+        <aside class="expert-tip" style="margin: 0 0 1.5rem 0; padding: 1rem;">
+            <i class="fa-solid fa-magic" style="font-size: 1.2rem;"></i>
+            <div>
+                <strong style="font-size: 1rem;">Style-Transfer</strong>
+                <p style="font-size: 0.9rem;">Wähle eine Vorlage oder füge einen eigenen Text ein, dessen Schreibstil Silas imitieren soll.</p>
+            </div>
+        </aside>
 
-                <div class="ai-container">
-                    
-                    <!-- STYLE-TRANSFER SECTION -->
-                    <aside class="expert-tip" style="margin-bottom: 2rem;">
-                        <i class="fa-solid fa-magic"></i>
-                        <div>
-                            <strong>Style-Transfer & Mustertexte</strong>
-                            <p>Wähle eine Vorlage oder füge einen eigenen Text ein, dessen Schreibstil Silas imitieren soll.</p>
-                        </div>
-                    </aside>
+        <div class="input-group">
+            <label for="template-selector">Vorlage wählen:</label>
+            <select id="template-selector" class="custom-select">
+                <option value="">-- Bitte wählen oder eigenen Text eingeben --</option>
+                <option value="emotional">Emotional & Storytelling (B2C)</option>
+                <option value="hard-facts">Faktenorientiert & Kurz (B2B)</option>
+                <option value="du-ansprache">Locker & 'Du'-Ansprache</option>
+                <option value="serioes">Seriös & Professionell (Enterprise)</option>
+            </select>
+        </div>
 
-                    <div class="input-group" style="margin-bottom: 1.5rem;">
-                        <label for="template-selector">Vorlage wählen:</label>
-                        <select id="template-selector" class="custom-select">
-                            <option value="">-- Bitte wählen oder eigenen Text eingeben --</option>
-                            <option value="emotional">Emotional & Storytelling (B2C)</option>
-                            <option value="hard-facts">Faktenorientiert & Kurz (B2B)</option>
-                            <option value="du-ansprache">Locker & 'Du'-Ansprache</option>
-                            <option value="serioes">Seriös & Professionell (Enterprise)</option>
-                        </select>
-                    </div>
+        <div class="silas-input-container">
+            <textarea id="custom-style-input" class="silas-extra-input" 
+                placeholder="Hier erscheint der Mustertext. Du kannst ihn bearbeiten oder etwas ganz Eigenes hineinkopieren..."
+                rows="4" 
+                autocomplete="off" 
+                spellcheck="false"></textarea>
+        </div>
 
-                    <div class="input-group" style="margin-bottom: 2rem;">
-                        <label for="custom-style-input">Mustertext / Stil-Vorlage:</label>
-                        <div class="silas-input-container" style="height: auto; padding: 0;">
-                            <textarea id="custom-style-input" class="silas-extra-input" 
-                                placeholder="Hier erscheint der Mustertext. Du kannst ihn bearbeiten oder etwas ganz Eigenes hineinkopieren..."
-                                rows="5" 
-                                style="width:100%; min-height:100px; padding: 15px; line-height: 1.5; resize: vertical; background: transparent; border: none; color: var(--text-color); box-sizing: border-box;"></textarea>
-                        </div>
-                    </div>
+        <div class="silas-grid-3">
+            <div class="input-group" style="margin-bottom: 0;">
+                <label for="readability-select">Niveau:</label>
+                <select id="readability-select" class="custom-select">
+                    <option value="balanced" selected>Ausgewogen</option>
+                    <option value="simple">Einfach (B2C)</option>
+                    <option value="expert">Experte (B2B)</option>
+                    <option value="academic">Akademisch</option>
+                </select>
+            </div>
+            <div class="input-group" style="margin-bottom: 0;">
+                <label for="text-intent-select">Intention:</label>
+                <select id="text-intent-select" class="custom-select">
+                    <option value="informational">Info / Ratgeber</option>
+                    <option value="commercial">Verkauf / Landingpage</option>
+                </select>
+            </div>
+            <div class="input-group" style="margin-bottom: 0;">
+                <label for="grammatical-person-select">Perspektive:</label>
+                <select id="grammatical-person-select" class="custom-select">
+                    <option value="plural">Wir (Team)</option>
+                    <option value="singular">Ich (Einzel)</option> 
+                </select>
+            </div>
+        </div>
+    </div>
 
-                    <!-- GENERATION SETTINGS -->
-                    <div class="input-group">
-                        <label for="readability-select">Sprachstil:</label>
-                        <select id="readability-select" class="custom-select">
-                            <option value="balanced" selected>Ausgewogen (Standard)</option>
-                            <option value="simple">Einfach (Für Laien / B2C)</option>
-                            <option value="expert">Experte (Für Profis / B2B)</option>
-                            <option value="academic">Akademisch (Hochkomplex)</option>
-                        </select>
-                    </div>
+    <div class="silas-config-group">
+        <span class="silas-section-label"><i class="fa-solid fa-bullseye"></i> Kontext & Marke</span>
+        
+        <div class="silas-grid-2">
+            <div class="silas-input-container">
+                <input type="text" id="text-brand-input" class="silas-extra-input" 
+                       placeholder="Markenname / Firma" 
+                       autocomplete="off" 
+                       name="silas_brand_field_x1">
+            </div>
+            <div class="silas-input-container">
+                <input type="text" id="text-domain-input" class="silas-extra-input" 
+                       placeholder="Webseite (z.B. deine.at)" 
+                       autocomplete="off" 
+                       name="silas_domain_field_x1">
+            </div>
+        </div>
 
-                    <div class="input-group">
-                        <label for="text-intent-select">Text-Typ:</label>
-                        <select id="text-intent-select" class="custom-select">
-                            <option value="informational">Informationsorientiert</option>
-                            <option value="commercial">Kommerziell</option>
-                        </select>
-                    </div>
+        <div class="silas-grid-2">
+            <div class="silas-input-container">
+                <input type="text" id="text-zielgruppe-input" class="silas-extra-input" 
+                       placeholder="Zielgruppe (z.B. Anfänger)" 
+                       autocomplete="off" 
+                       name="silas_target_field_x1">
+            </div>
+            <div class="silas-input-container">
+                <input type="text" id="text-tonalitaet-input" class="silas-extra-input" 
+                       placeholder="Tonalität (z.B. humorvoll)" 
+                       autocomplete="off" 
+                       name="silas_tone_field_x1">
+            </div>
+        </div>
+        
+        <div class="silas-input-container">
+            <input type="text" id="text-usp-input" class="silas-extra-input" 
+                   placeholder="USP / Alleinstellungsmerkmal (z.B. 24/7 Support)" 
+                   autocomplete="off" 
+                   name="silas_usp_field_x1">
+        </div>
+    </div>
 
-                    <div class="input-group">
-                        <label for="grammatical-person-select">Ansprache:</label>
-                        <select id="grammatical-person-select" class="custom-select">
-                            <option value="plural">Wir-Form (Unternehmen)</option>
-                            <option value="singular">Ich-Form (Einzelperson)</option> 
-                        </select>
-                    </div>
+    <div class="silas-config-group">
+        <span class="silas-section-label"><i class="fa-solid fa-address-card"></i> Kontakt-Daten für CTA</span>
+        
+        <div class="silas-grid-2">
+            <div class="silas-input-container">
+                <input type="email" id="text-email-input" class="silas-extra-input" 
+                       placeholder="E-Mail (z.B. info@seite.at)" 
+                       autocomplete="off" 
+                       name="silas_gen_email_v2_random">
+            </div>
+            <div class="silas-input-container">
+                <input type="text" id="text-phone-input" class="silas-extra-input" 
+                       placeholder="Telefon (z.B. +43 ...)" 
+                       autocomplete="off" 
+                       name="silas_gen_phone_v2_random">
+            </div>
+        </div>
+        
+        <div class="silas-input-container">
+            <input type="text" id="text-adress-input" class="silas-extra-input" 
+                   placeholder="Adresse (z.B. 1010 Wien)" 
+                   autocomplete="off" 
+                   name="silas_gen_address_v2">
+        </div>
+    </div>
 
-                    <!-- OPTIONAL FIELDS -->
-                    <div class="silas-input-container">
-                        <input type="text" id="text-domain-input" class="silas-extra-input" placeholder="Webseiten-Domain (optional): z.B. deineseite.at" autocomplete="off">
-                    </div>
-                    <div class="silas-input-container">
-                        <input type="text" id="text-brand-input" class="silas-extra-input" placeholder="Brand/Ansprechpartner (optional): z.B. Silas" autocomplete="off">
-                    </div>
-                    <div class="silas-input-container">
-                        <input type="email" id="text-email-input" class="silas-extra-input" placeholder="E-Mail für CTA (optional): z.B. info@deinewebseite.at" autocomplete="off">
-                    </div>
-                    <div class="silas-input-container">
-                        <input type="tel" id="text-phone-input" class="silas-extra-input" placeholder="Telefonnummer für CTA (optional): z.B. +43 123 456789" autocomplete="off">
-                    </div>
-                    <div class="silas-input-container">
-                        <input type="text" id="text-adress-input" class="silas-extra-input" placeholder="Anschrift für CTA (optional): z.B. 1010 Wien, Österreich" autocomplete="off">
-                    </div>
-                    <div class="silas-input-container">
-                        <input type="text" id="text-zielgruppe-input" class="silas-extra-input" placeholder="Zielgruppe (optional): z.B. Anfänger, Experten, Familien" autocomplete="off">
-                    </div>
-                    <div class="silas-input-container">
-                        <input type="text" id="text-tonalitaet-input" class="silas-extra-input" placeholder="Tonalität (optional): z.B. humorvoll, professionell, seriös" autocomplete="off">
-                    </div>
-                    <div class="silas-input-container">
-                        <input type="text" id="text-usp-input" class="silas-extra-input" placeholder="Alleinstellungsmerkmal (USP) (optional): z.B. 24/7-Support" autocomplete="off">
-                    </div>
-
-                    <!-- KEYWORD INPUT FORM -->
-                    <form id="silas-form" style="margin-top: 2rem;">
-                        <input type="text" id="silas-keyword-input" placeholder="Gib ein oder mehrere Keywords ein (mit Komma trennen)..." autocomplete="off">
-                        <button type="submit" id="add-keyword-btn" aria-label="Keyword hinzufügen">
-                            <i class="fa-regular fa-square-plus"></i>
-                        </button>
-                    </form>
-                </div>
+    <form id="silas-form" style="margin-top: 0;">
+        <input type="text" id="silas-keyword-input" 
+               placeholder="Gib ein oder mehrere Keywords ein (mit Komma trennen)..." 
+               autocomplete="off" 
+               name="silas_main_keyword_input">
+        <button type="submit" id="add-keyword-btn" aria-label="Keyword hinzufügen">
+            <i class="fa-regular fa-square-plus"></i>
+        </button>
+    </form>
+</div>
 
                 <!-- KEYWORD LIST -->
                 <div class="keyword-list-container">
