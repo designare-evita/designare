@@ -5,10 +5,7 @@
     { "source": "/api/metrics", "destination": "/api/metrics.js" },
     { "source": "/api/feedback", "destination": "/api/feedback.js" },
     { "source": "/api/ask-gemini", "destination": "/api/ask-gemini.js" },
-    
-    /* Die folgenden Zeilen sind nur nötig, wenn die Dateien NICHT im Root liegen. 
-       Da sie bei dir im Root liegen, regelt cleanUrls das automatisch. 
-       Ich lasse sie als "Sicherheitsnetz" für die SEO-Namen drin: */
+
     { "source": "/CSV-Creator", "destination": "/CSV-Creator.html" },
     { "source": "/KI-Integration-auf-Webseiten", "destination": "/KI-Integration-auf-Webseiten.html" }
   ]
