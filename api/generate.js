@@ -1,19 +1,15 @@
-// api/generate.js - KORRIGIERTE VERSION (Fix für Adresse & Semantic-API)
-
-const { GoogleGenerativeAI } = require("@google/generative-ai");
-const { FactChecker } = require('./fact-checker.js');
+// api/generate.js
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import { FactChecker } from './fact-checker.js'; 
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const factChecker = new FactChecker();
 
 // === HILFSFUNKTION FÜR SEMANTISCHE OPTIMIERUNG ===
 async function fetchSemanticTerms(keyword) {
-    // FIX 1: Wir geben hier sofort null zurück.
-    // Grund: Die Datamuse API liefert nur englische Begriffe (z.B. "happy", "elements").
-    // Das verhinderte "Denglisch" in den deutschen Texten.
+    // Gibt null zurück, um Denglisch zu vermeiden
     return null;
 }
-// ========================================================
 
 function cleanJsonString(str) {
     let cleaned = str
@@ -43,16 +39,21 @@ function cleanJsonString(str) {
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-const MODEL_HIERARCHY = [
-    "gemini-2.5-flash",           
-    "gemini-2.5-flash-lite",      
-    "gemini-2.0-flash-exp"        
-];
-
 async function generateContentWithRetry(prompt, preferredModel, maxRetries = 3) {
-    const modelsToTry = preferredModel === "gemini-2.5-pro" 
-        ? MODEL_HIERARCHY 
-        : ["gemini-2.5-flash-lite", "gemini-2.5-flash", "gemini-2.0-flash-exp"];
+    // HIER DIE KORRIGIERTE HIERARCHIE NACH DEINEN VORGABEN:
+    let modelsToTry = [];
+
+    if (preferredModel === "gemini-2.5-pro") {
+        // Master Mode Hierarchie
+        modelsToTry = ["gemini-2.5-pro", "gemini-3-flash-preview", "gemini-2.5-flash"];
+    } else {
+        // Standard Mode Hierarchie (Deine Vorgabe)
+        modelsToTry = [
+            "gemini-3-flash-preview", 
+            "gemini-2.5-flash",
+            "gemini-1.5-flash" // Letzter Sicherheits-Fallback
+        ];
+    }
     
     let lastError = null;
     
@@ -87,7 +88,8 @@ async function generateContentWithRetry(prompt, preferredModel, maxRetries = 3) 
                         break; 
                     }
                 } else {
-                    throw error;
+                    // Bei Modell-Nicht-Gefunden etc. sofort weiter
+                    break;
                 }
             }
         }
@@ -110,12 +112,12 @@ export default async function handler(req, res) {
     const results = [];
     
     for (const keywordData of keywords) {
-      // FIX 2: 'address' hier mit auslesen!
       const { keyword, intent, domain, email, phone, brand, address } = keywordData;
       console.log(`\n[PROCESSING] Keyword: '${keyword}'`);
 
       try {
-        const preferredModel = isMasterRequest ? "gemini-2.5-pro" : "gemini-2.5-flash-lite";
+        // Standard: gemini-3-flash-preview (wird in generateContentWithRetry gesetzt)
+        const preferredModel = isMasterRequest ? "gemini-2.5-pro" : "gemini-3-flash-preview";
         
         const semanticTerms = await fetchSemanticTerms(keyword);
         
@@ -129,8 +131,7 @@ export default async function handler(req, res) {
 
         let jsonData = {};
         let parseError = false;
-        let originalText = text;
-
+        
         try {
             const cleanedText = cleanJsonString(text);
             jsonData = JSON.parse(cleanedText);
@@ -152,14 +153,12 @@ export default async function handler(req, res) {
             jsonData._factCheck = factCheckResult;
         }
 
-        // Daten zusammenbauen für die Antwort (und damit für die CSV)
         jsonData.keyword = keyword;
         jsonData.intent = intent;
         jsonData.domain = domain;
         jsonData.email = email;
         jsonData.phone = phone;
         jsonData.brand = brand;
-        // FIX 3: 'address' explizit zum JSON hinzufügen
         jsonData.address = address;
 
         jsonData._seo = {
