@@ -494,3 +494,51 @@ textarea.silas-extra-input {
 .modal-overlay.visible .modal-content {
     animation: fadeIn 0.3s ease forwards;
 }
+
+/* ===================
+   14. CONFIGURATION GRID (New)
+   =================== */
+
+.silas-config-group {
+    margin-bottom: 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: 2rem;
+}
+
+.silas-config-group:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.silas-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.silas-grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.silas-section-label {
+    display: block;
+    color: var(--accent-color);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    opacity: 0.8;
+}
+
+/* Fix für Mobile */
+@media (max-width: 768px) {
+    .silas-grid-2, 
+    .silas-grid-3 {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+}
