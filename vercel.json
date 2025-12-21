@@ -5,6 +5,7 @@
     { "source": "/CSV-Importer-PRO", "destination": "/CSV-Importer-PRO.html" },
     { "source": "/CSV-Importer-PRO/(.*)", "destination": "/CSV-Importer-PRO/$1" },
     { "source": "/KI-Integration-auf-Webseiten", "destination": "/KI-Integration-auf-Webseiten.html" },
+    { "source": "/downloads/(.*)", "destination": "/downloads/$1" },
     { "source": "/", "destination": "/index.html" }
   ],
   "cleanUrls": true
