@@ -1,4 +1,4 @@
-// js/silas-form.js - FINALE VERSION (MIT VOLLSTÄNDIGEM EXPORT & PREVIEW)
+// js/silas-form.js - FINALE VERSION (Button Links)
 // Passwort-Authentifizierung über Lightbox & API (check-auth.js)
 
 export function initSilasForm() {
@@ -61,7 +61,10 @@ export function initSilasForm() {
             unlockBtn.id = 'master-unlock-btn';
             unlockBtn.innerHTML = '<i class="fas fa-lock"></i>';
             unlockBtn.title = 'Master Access';
-            unlockBtn.style.cssText = 'position:fixed;bottom:40px;right:20px;background:linear-gradient(135deg,var(--accent-color) 0%,#d4a84a 100%);border:2px solid var(--accent-color);color:var(--bg-color);width:50px;height:50px;border-radius:50%;cursor:pointer;font-size:1.2rem;box-shadow:0 4px 15px rgba(196,163,90,0.3);transition:all 0.3s ease;z-index:1000;';
+            
+            // ÄNDERUNG HIER: right:20px -> left:20px
+            unlockBtn.style.cssText = 'position:fixed;bottom:40px;left:20px;background:linear-gradient(135deg,var(--accent-color) 0%,#d4a84a 100%);border:2px solid var(--accent-color);color:var(--bg-color);width:50px;height:50px;border-radius:50%;cursor:pointer;font-size:1.2rem;box-shadow:0 4px 15px rgba(196,163,90,0.3);transition:all 0.3s ease;z-index:1000;';
+            
             unlockBtn.onclick = () => openAuthModal();
             document.body.appendChild(unlockBtn);
         }
