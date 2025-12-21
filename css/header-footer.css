@@ -293,4 +293,21 @@ body.light-mode #back-to-top:hover {
         height: 30px;
         font-size: 0.9rem;
     }
+
+   /* Nur Glüh-Effekt - Ultra-Minimal */
+#evita-chat-button i {
+    transition: all 0.4s ease;
+    animation: evita-breathe 4s ease-in-out infinite;
+}
+
+@keyframes evita-breathe {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+}
+
+#evita-chat-button:hover i {
+    filter: drop-shadow(0 0 8px var(--accent-color));
+    animation: none;
+    opacity: 1;
+}
 }
