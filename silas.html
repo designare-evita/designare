@@ -252,12 +252,16 @@
         <span class="silas-section-label"><i class="fa-solid fa-address-card"></i> Kontakt-Daten für CTA</span>
         
         <div class="silas-grid-2">
-            <div class="silas-input-container">
-                <input type="email" id="text-email-input" class="silas-extra-input" 
-                       placeholder="E-Mail (z.B. info@seite.at)" 
-                       autocomplete="off" 
-                       name="silas_gen_email_v2_random">
-            </div>
+   <div class="silas-input-container">
+    <input type="text" 
+           id="text-email-input" 
+           class="silas-extra-input" 
+           placeholder="E-Mail für CTA (z.B. info@seite.at)" 
+           autocomplete="new-password" 
+           name="silas_custom_field_random_x99"
+           readonly
+           onfocus="this.removeAttribute('readonly');">
+</div>
             <div class="silas-input-container">
                 <input type="text" id="text-phone-input" class="silas-extra-input" 
                        placeholder="Telefon (z.B. +43 ...)" 
