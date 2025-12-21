@@ -92,7 +92,8 @@ a {
     font-family: 'Poppins';
     font-style: normal;
     font-weight: 300;
-    src: url('../Font/Poppins-Light.ttf') format('truetype');
+    /* Pfad geändert zu absolut: /Font/... */
+    src: url('/Font/Poppins-Light.ttf') format('truetype');
     font-display: swap;
 }
 
@@ -100,7 +101,8 @@ a {
     font-family: 'Poppins';
     font-style: normal;
     font-weight: 400;
-    src: url('../Font/Poppins-Regular.ttf') format('truetype');
+    /* Pfad geändert zu absolut: /Font/... */
+    src: url('/Font/Poppins-Regular.ttf') format('truetype');
     font-display: swap;
 }
 
@@ -108,7 +110,8 @@ a {
     font-family: 'Poppins';
     font-style: normal;
     font-weight: 600;
-    src: url('../Font/Poppins-SemiBold.ttf') format('truetype');
+    /* Pfad geändert zu absolut: /Font/... */
+    src: url('/Font/Poppins-SemiBold.ttf') format('truetype');
     font-display: swap;
 }
 
@@ -116,7 +119,8 @@ a {
     font-family: 'Poppins';
     font-style: normal;
     font-weight: 700;
-    src: url('../Font/Poppins-Bold.ttf') format('truetype');
+    /* Pfad geändert zu absolut: /Font/... */
+    src: url('/Font/Poppins-Bold.ttf') format('truetype');
     font-display: swap;
 }
 
