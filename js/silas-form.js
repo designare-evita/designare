@@ -1,4 +1,5 @@
 // js/silas-form.js - FINALE VERSION (Optimiert für WordPress Import)
+// Passwort-Authentifizierung läuft jetzt über API (check-auth.js)
 
 export function initSilasForm() {
     const silasForm = document.getElementById('silas-form');
@@ -6,8 +7,7 @@ export function initSilasForm() {
         return;
     }
 
-    // KONFIGURATION & LIMITS
-    const MASTER_PASSWORD = "SilasUnlimited2024!";
+    // KONFIGURATION & LIMITS (Passwort entfernt - Auth über API)
     let DEMO_LIMITS = { maxKeywordsPerSession: 3, maxGenerationsPerHour: 5, maxGenerationsPerDay: 10, cooldownBetweenRequests: 30000 };
     const MASTER_LIMITS = { maxKeywordsPerSession: 50, maxGenerationsPerHour: 100, maxGenerationsPerDay: 500, cooldownBetweenRequests: 1000 };
     
@@ -35,16 +35,16 @@ export function initSilasForm() {
     const phoneInput = document.getElementById('text-phone-input');
     const addressInput = document.getElementById('text-adress-input'); 
     const grammaticalPersonSelect = document.getElementById('grammatical-person-select');
-    const readabilitySelect = document.getElementById('readability-select'); // NEU: Lesbarkeit
+    const readabilitySelect = document.getElementById('readability-select');
     
-    // NEU: Style-Transfer Elemente
+    // Style-Transfer Elemente
     const customStyleInput = document.getElementById('custom-style-input');
     const templateSelector = document.getElementById('template-selector');
 
     let keywordList = [];
     let allGeneratedData = [];
 
-    // === 1. MASTER MODE & LIMIT LOGIK ===
+    // === 1. MASTER MODE & LIMIT LOGIK (Auth über API) ===
 
     function isMasterModeActive() {
         const masterMode = sessionStorage.getItem('silas_master_mode');
@@ -82,12 +82,28 @@ export function initSilasForm() {
         }
     }
 
-    function showPasswordPrompt() {
+    // Passwort-Prompt mit API-Validierung
+    async function showPasswordPrompt() {
         const password = prompt('🔓 Master-Passwort eingeben:');
-        if (password === MASTER_PASSWORD) {
-            activateMasterMode();
-        } else if (password !== null) {
-            alert('❌ Falsches Passwort!');
+        if (password === null) return; // Abgebrochen
+        
+        try {
+            const response = await fetch('/api/check-auth', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password })
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok && result.success) {
+                activateMasterMode();
+            } else {
+                alert('❌ ' + (result.message || 'Falsches Passwort!'));
+            }
+        } catch (error) {
+            console.error('Auth-Fehler:', error);
+            alert('❌ Verbindungsfehler. Bitte später erneut versuchen.');
         }
     }
 
@@ -222,9 +238,7 @@ export function initSilasForm() {
                 phone: phoneInput ? phoneInput.value.trim() : '',
                 address: addressInput ? addressInput.value.trim() : '', 
                 grammaticalPerson: grammaticalPersonSelect ? grammaticalPersonSelect.value : 'singular',
-                // NEU: Lesbarkeit (Readability)
                 readability: readabilitySelect ? readabilitySelect.value : 'balanced',
-                // NEU: Style-Transfer Feld
                 customStyle: customStyleInput ? customStyleInput.value.trim() : ''
             };
 
@@ -236,13 +250,11 @@ export function initSilasForm() {
 
             newKeywords.forEach(keyword => {
                 const existingIndex = keywordList.findIndex(item => item.keyword === keyword);
-                // Merge keyword mit den aktuellen Formular-Settings
                 const keywordData = { keyword, ...formValues };
                 
                 if (existingIndex === -1) {
                     keywordList.push(keywordData);
                 } else {
-                    // Update existierendes Keyword mit neuen Settings
                     keywordList[existingIndex] = keywordData;
                 }
             });
@@ -285,8 +297,8 @@ export function initSilasForm() {
 
             const badges = [
                 createBadge(item.intent === 'commercial' ? 'Kommerziell' : 'Informativ', item.intent === 'commercial' ? '#28a745' : '#17a2b8'),
-                createBadge(item.customStyle ? '🎨 Custom Style' : null, '#9c27b0'), // Lila Badge für Custom Style
-                createBadge(item.readability !== 'balanced' ? `Lvl: ${item.readability}` : null, '#00bcd4'), // Cyan für Lesbarkeit
+                createBadge(item.customStyle ? '🎨 Custom Style' : null, '#9c27b0'),
+                createBadge(item.readability !== 'balanced' ? `Lvl: ${item.readability}` : null, '#00bcd4'),
                 createBadge(item.domain ? `Domain: ${item.domain}`: '', '#4CAF50'),
                 createBadge(item.brand ? `Brand: ${item.brand}`: '', '#fd7e14'),
                 createBadge(item.zielgruppe ? `Für: ${item.zielgruppe}`: '', '#6c757d')
@@ -310,7 +322,6 @@ export function initSilasForm() {
 
     // === 4. TEMPLATE & MUSTERTEXT LOGIK ===
     
-    // Templates definieren
     const STYLE_TEMPLATES = {
         'emotional': "Stell dir vor, du wachst morgens auf und fühlst dich endlich ausgeschlafen. Genau dieses Gefühl möchten wir dir mit [PRODUKT] zurückgeben. Es ist nicht einfach nur eine Matratze – es ist dein täglicher Rückzugsort, der dich sanft in den Schlaf begleitet.",
         'hard-facts': "Mit [PRODUKT] steigern Sie Ihre Effizienz nachweislich um 20%. Unsere Lösung basiert auf patentierter Technologie, die Prozesse automatisiert und Fehlerquellen minimiert. Die Amortisationszeit beträgt durchschnittlich weniger als 6 Monate.",
@@ -318,15 +329,12 @@ export function initSilasForm() {
         'serioes': "Die [UNTERNEHMEN] steht seit über 25 Jahren für Exzellenz und Zuverlässigkeit. Wir begleiten unsere Mandanten mit fundierter Expertise und diskreter Beratung. Unser Anspruch ist es, nachhaltige Werte zu schaffen und langfristige Partnerschaften zu pflegen."
     };
 
-    // Event Listener für Template-Selector
     if (templateSelector && customStyleInput) {
         templateSelector.addEventListener('change', (e) => {
             const selectedType = e.target.value;
             if (STYLE_TEMPLATES[selectedType]) {
-                // Füge Template ein und animiere kurz den Fokus
                 customStyleInput.value = STYLE_TEMPLATES[selectedType];
                 customStyleInput.focus();
-                // Optional: Visuelles Feedback
                 customStyleInput.style.borderColor = '#ffc107';
                 setTimeout(() => customStyleInput.style.borderColor = '', 500);
             } else if (selectedType === '') {
@@ -351,12 +359,15 @@ export function initSilasForm() {
             silasResponseContainer.style.display = 'block';
             silasStatus.textContent = `Sende ${keywordList.length} Keywords an Silas...`;
             
+            const headers = { 'Content-Type': 'application/json' };
+            // Master Mode Token für API-Anfragen (optional)
+            if (isMasterModeActive()) {
+                headers['X-Silas-Master'] = 'true';
+            }
+            
             const response = await fetch('/api/generate', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...(isMasterModeActive() && { 'X-Silas-Master': MASTER_PASSWORD })
-                },
+                headers,
                 body: JSON.stringify({ keywords: keywordList })
             });
 
@@ -411,7 +422,81 @@ export function initSilasForm() {
         }
     });
 
-    // === 6. ANZEIGE & PREVIEW FUNKTIONEN ===
+    // === 6. LIGHTBOX / PREVIEW MODAL STEUERUNG ===
+
+    function openPreviewModal() {
+        if (!previewModal) {
+            console.error('Preview modal element not found!');
+            return;
+        }
+        
+        // Body-Scroll verhindern
+        document.body.classList.add('modal-open');
+        document.body.style.overflow = 'hidden';
+        
+        // Modal anzeigen mit kleiner Verzögerung für Animation
+        previewModal.style.display = 'flex';
+        requestAnimationFrame(() => {
+            previewModal.classList.add('visible');
+        });
+    }
+
+    function closePreviewModal() {
+        if (!previewModal) return;
+        
+        // Visible-Klasse entfernen für Fade-Out
+        previewModal.classList.remove('visible');
+        
+        // Nach Animation verstecken
+        setTimeout(() => {
+            previewModal.style.display = 'none';
+            // Body-Scroll wiederherstellen
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+        }, 300);
+    }
+
+    // Event-Delegation für Preview und Download Buttons
+    silasResponseContainer.addEventListener('click', function(e) {
+        const button = e.target.closest('button');
+        if (!button) return;
+
+        const index = parseInt(button.getAttribute('data-index'));
+        const data = allGeneratedData[index];
+
+        if (button.classList.contains('preview-btn') && data && !data.error && previewContentArea) {
+            previewContentArea.innerHTML = generateLandingpageHtml(data);
+            openPreviewModal();
+        } else if (button.classList.contains('download-html-btn')) {
+            downloadHtml(index);
+        }
+    });
+
+    // Close-Button Event
+    if (closePreviewModalBtn) {
+        closePreviewModalBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            closePreviewModal();
+        });
+    }
+
+    // Klick auf Overlay schließt Modal
+    if (previewModal) {
+        previewModal.addEventListener('click', (e) => {
+            // Nur schließen wenn direkt auf Overlay geklickt wird
+            if (e.target === previewModal) {
+                closePreviewModal();
+            }
+        });
+    }
+
+    // ESC-Taste schließt Modal
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && previewModal && previewModal.classList.contains('visible')) {
+            closePreviewModal();
+        }
+    });
 
     function displayResult(data, index, container) {
         const resultCard = document.createElement('div');
@@ -452,177 +537,147 @@ export function initSilasForm() {
         container.appendChild(resultCard);
     }
 
-    function openPreviewModal() { if (previewModal) previewModal.classList.add('visible'); }
-    function closePreviewModal() { if (previewModal) previewModal.classList.remove('visible'); }
+    // Hilfsfunktion für HTML-Vorschau
+    function generateLandingpageHtml(data) {
+        const createFaqEntry = (question, answer) => {
+            if (!question || !answer) return '';
+            return `<details style="background-color: rgba(255,255,255,0.05); border-radius: 8px; padding: 15px; margin-bottom: 15px;">
+                        <summary style="color: #ffc107; font-weight: bold; cursor: pointer; margin-bottom: 10px;">${question}</summary>
+                        <p style="color: #ccc; margin-top: 10px;">${answer}</p>
+                    </details>`;
+        };
 
-    silasResponseContainer.addEventListener('click', function(e) {
-        const button = e.target.closest('button');
-        if (!button) return;
-
-        const index = parseInt(button.getAttribute('data-index'));
-        const data = allGeneratedData[index];
-
-        if (button.classList.contains('preview-btn') && data && !data.error && previewContentArea) {
-            previewContentArea.innerHTML = generateLandingpageHtml(data);
-            openPreviewModal();
-        } else if (button.classList.contains('download-html-btn')) {
-            downloadHtml(index);
-        }
-    });
-
-   // Hilfsfunktion für HTML-Vorschau
-   function generateLandingpageHtml(data) {
-    const createFaqEntry = (question, answer) => {
-        if (!question || !answer) return '';
-        return `<details style="background-color: rgba(255,255,255,0.05); border-radius: 8px; padding: 15px; margin-bottom: 15px;">
-                    <summary style="color: #ffc107; font-weight: bold; cursor: pointer; margin-bottom: 10px;">${question}</summary>
-                    <p style="color: #ccc; margin-top: 10px;">${answer}</p>
-                </details>`;
-    };
-
-    return `
-        <div class="preview-landingpage" style="color: #f0f0f0; line-height: 1.6; background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); padding: 20px; border-radius: 10px;">
-            <header style="text-align: center; margin-bottom: 40px; padding: 30px 0; border-bottom: 2px solid #ffc107;">
-                <h1 style="color: #ffc107; font-size: 2.3rem; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">${data.h1 || 'N/A'}</h1>
-                <p style="font-size: 1.2rem; color: #ccc; margin-bottom: 15px; max-width: 800px; margin-left: auto; margin-right: auto;">${data.hero_text || 'N/A'}</p>
-                <p style="font-size: 1rem; color: #aaa; margin-bottom: 25px;">${data.hero_subtext || ''}</p>
-                <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                    <button style="background: #ffc107; color: #1a1a1a; border: none; padding: 12px 25px; border-radius: 5px; font-weight: bold; cursor: pointer;">${data.primary_cta || 'N/A'}</button>
-                    <button style="background: transparent; color: #ffc107; border: 2px solid #ffc107; padding: 12px 25px; border-radius: 5px; font-weight: bold; cursor: pointer;">${data.secondary_cta || 'N/A'}</button>
-                </div>
-            </header>
-            
-            <main style="max-width: 1000px; margin: 0 auto;">
-                <section style="margin-bottom: 40px; padding: 25px; background-color: rgba(255,255,255,0.05); border-radius: 8px; border-left: 4px solid #ff6b6b;">
-                    <h2 style="color: #ff6b6b; margin-bottom: 15px; font-size: 1.8rem;">${data.h2_1 || 'N/A'}</h2>
-                    <p style="color: #ccc; font-size: 1rem; line-height: 1.7; margin-top: 15px;">${data.h2_1_text || ''}</p>
-                </section>
+        return `
+            <div class="preview-landingpage" style="color: #f0f0f0; line-height: 1.6; background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); padding: 20px; border-radius: 10px;">
+                <header style="text-align: center; margin-bottom: 40px; padding: 30px 0; border-bottom: 2px solid #ffc107;">
+                    <h1 style="color: #ffc107; font-size: 2.3rem; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">${data.h1 || 'N/A'}</h1>
+                    <p style="font-size: 1.2rem; color: #ccc; margin-bottom: 15px; max-width: 800px; margin-left: auto; margin-right: auto;">${data.hero_text || 'N/A'}</p>
+                    <p style="font-size: 1rem; color: #aaa; margin-bottom: 25px;">${data.hero_subtext || ''}</p>
+                    <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                        <button style="background: #ffc107; color: #1a1a1a; border: none; padding: 12px 25px; border-radius: 5px; font-weight: bold; cursor: pointer;">${data.primary_cta || 'N/A'}</button>
+                        <button style="background: transparent; color: #ffc107; border: 2px solid #ffc107; padding: 12px 25px; border-radius: 5px; font-weight: bold; cursor: pointer;">${data.secondary_cta || 'N/A'}</button>
+                    </div>
+                </header>
                 
-                <section style="margin-bottom: 40px; padding: 25px; background-color: rgba(255,255,255,0.05); border-radius: 8px; border-left: 4px solid #28a745;">
-                    <h2 style="color: #28a745; margin-bottom: 15px; font-size: 1.8rem;">${data.h2_2 || 'N/A'}</h2>
-                    <p style="color: #ccc; font-size: 1rem; line-height: 1.7; margin-top: 15px;">${data.h2_2_text || ''}</p>
-                </section>
-                
-                <section style="margin-bottom: 40px;">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;">
-                        <div style="padding: 25px; background-color: rgba(255,255,255,0.05); border-radius: 8px;">
-                            <h3 style="color: #ffc107; margin-bottom: 15px; font-size: 1.5rem;">${data.h2_3 || 'Features'}</h3>
-                            <p style="color: #ccc; font-size: 1rem; line-height: 1.7; margin-bottom: 15px;">${data.h2_3_text || ''}</p>
-                            <div style="color: #ccc;">${data.features_list || ''}</div>
-                            <p style="color: #ccc; margin-top: 15px; border-top: 1px solid #444; padding-top: 15px;">${data.features_list_fließtext || ''}</p>
+                <main style="max-width: 1000px; margin: 0 auto;">
+                    <section style="margin-bottom: 40px; padding: 25px; background-color: rgba(255,255,255,0.05); border-radius: 8px; border-left: 4px solid #ff6b6b;">
+                        <h2 style="color: #ff6b6b; margin-bottom: 15px; font-size: 1.8rem;">${data.h2_1 || 'N/A'}</h2>
+                        <p style="color: #ccc; font-size: 1rem; line-height: 1.7; margin-top: 15px;">${data.h2_1_text || ''}</p>
+                    </section>
+                    
+                    <section style="margin-bottom: 40px; padding: 25px; background-color: rgba(255,255,255,0.05); border-radius: 8px; border-left: 4px solid #28a745;">
+                        <h2 style="color: #28a745; margin-bottom: 15px; font-size: 1.8rem;">${data.h2_2 || 'N/A'}</h2>
+                        <p style="color: #ccc; font-size: 1rem; line-height: 1.7; margin-top: 15px;">${data.h2_2_text || ''}</p>
+                    </section>
+                    
+                    <section style="margin-bottom: 40px;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;">
+                            <div style="padding: 25px; background-color: rgba(255,255,255,0.05); border-radius: 8px;">
+                                <h3 style="color: #ffc107; margin-bottom: 15px; font-size: 1.5rem;">${data.h2_3 || 'Features'}</h3>
+                                <p style="color: #ccc; font-size: 1rem; line-height: 1.7; margin-bottom: 15px;">${data.h2_3_text || ''}</p>
+                                <div style="color: #ccc;">${data.features_list || ''}</div>
+                                <p style="color: #ccc; margin-top: 15px; border-top: 1px solid #444; padding-top: 15px;">${data.features_list_fließtext || ''}</p>
+                            </div>
+                            <div style="padding: 25px; background-color: rgba(255,255,255,0.05); border-radius: 8px;">
+                                <h3 style="color: #ffc107; margin-bottom: 15px; font-size: 1.5rem;">Vorteile</h3>
+                                <div style="color: #ccc;">${data.benefits_list || ''}</div>
+                                <p style="color: #ccc; margin-top: 15px; border-top: 1px solid #444; padding-top: 15px;">${data.benefits_list_fließtext || ''}</p>
+                            </div>
                         </div>
-                        <div style="padding: 25px; background-color: rgba(255,255,255,0.05); border-radius: 8px;">
-                            <h3 style="color: #ffc107; margin-bottom: 15px; font-size: 1.5rem;">Vorteile</h3>
-                            <div style="color: #ccc;">${data.benefits_list || ''}</div>
-                            <p style="color: #ccc; margin-top: 15px; border-top: 1px solid #444; padding-top: 15px;">${data.benefits_list_fließtext || ''}</p>
+                    </section>
+                    
+                    <section style="margin-bottom: 40px; padding: 25px; background-color: rgba(255,255,255,0.05); border-radius: 8px; border-left: 4px solid #17a2b8;">
+                        <h2 style="color: #17a2b8; margin-bottom: 15px; font-size: 1.8rem;">${data.h2_4 || 'Vertrauen & Qualität'}</h2>
+                        <p style="color: #ccc; font-size: 1rem; line-height: 1.7; margin-bottom: 20px;">${data.h2_4_text || ''}</p>
+                        <p style="color: #ffc107; font-weight: bold; text-align: center; margin-bottom: 20px;">${data.social_proof || ''}</p>
+                        <p style="color: #aaa; text-align: center;">${data.trust_signals || ''}</p>
+                    </section>
+                    
+                    <section style="margin-bottom: 40px;">
+                        <h3 style="color: #ffc107; text-align: center; margin-bottom: 25px; font-size: 1.8rem;">Kundenstimmen</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div style="padding: 20px; background-color: rgba(255,193,7,0.1); border-radius: 8px; border-left: 4px solid #ffc107;">
+                                <p style="color: #ccc; font-style: italic; margin-bottom: 10px;">${data.testimonial_1 || ''}</p>
+                            </div>
+                            <div style="padding: 20px; background-color: rgba(255,193,7,0.1); border-radius: 8px; border-left: 4px solid #ffc107;">
+                                <p style="color: #ccc; font-style: italic; margin-bottom: 10px;">${data.testimonial_2 || ''}</p>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <section style="margin-bottom: 40px;">
+                        <h3 style="color: #ffc107; text-align: center; margin-bottom: 25px; font-size: 1.8rem;">${data.pricing_title || 'Unsere Pakete'}</h3>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+                            <div style="padding: 20px; background-color: rgba(255,255,255,0.05); border-radius: 8px; text-align: center;">
+                                <h4 style="color: #ffc107; margin-bottom: 10px;">Starter</h4>
+                                <p style="color: #ccc; font-size: 0.9rem;">${data.price_1 || ''}</p>
+                            </div>
+                            <div style="padding: 20px; background-color: rgba(255,193,7,0.1); border: 2px solid #ffc107; border-radius: 8px; text-align: center;">
+                                <h4 style="color: #ffc107; margin-bottom: 10px;">Professional</h4>
+                                <p style="color: #ccc; font-size: 0.9rem;">${data.price_2 || ''}</p>
+                            </div>
+                            <div style="padding: 20px; background-color: rgba(255,255,255,0.05); border-radius: 8px; text-align: center;">
+                                <h4 style="color: #ffc107; margin-bottom: 10px;">Enterprise</h4>
+                                <p style="color: #ccc; font-size: 0.9rem;">${data.price_3 || ''}</p>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <section style="margin-bottom: 40px;">
+                        <h3 style="color: #ffc107; text-align: center; margin-bottom: 25px; font-size: 1.8rem;">Häufige Fragen</h3>
+                        <div>
+                            ${createFaqEntry(data.faq_1, data.faq_answer_1)}
+                            ${createFaqEntry(data.faq_2, data.faq_answer_2)}
+                            ${createFaqEntry(data.faq_3, data.faq_answer_3)}
+                            ${createFaqEntry(data.faq_4, data.faq_answer_4)}
+                            ${createFaqEntry(data.faq_5, data.faq_answer_5)}
+                        </div>
+                    </section>
+                    
+                    <section style="text-align: center; padding: 30px; background: linear-gradient(45deg, rgba(255,193,7,0.1), rgba(255,193,7,0.2)); border-radius: 10px; border: 2px solid #ffc107;">
+                        <h3 style="color: #ffc107; margin-bottom: 15px;">${data.guarantee_text || 'N/A'}</h3>
+                        <p style="color: #ccc; margin-bottom: 25px;">${data.contact_info || ''}</p>
+                        <button style="background: #ffc107; color: #1a1a1a; border: none; padding: 15px 30px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 1.1rem;">${data.footer_cta || 'N/A'}</button>
+                    </section>
+                </main>
+                
+                <aside style="margin-top: 50px; padding: 25px; background: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(45,45,45,0.7) 100%); border-radius: 12px; border: 2px solid #444;">
+                    <h3 style="color: #ffc107; margin: 0 0 25px 0; text-align: center; font-size: 1.5rem; border-bottom: 2px solid #ffc107; padding-bottom: 10px;">📊 SEO & Meta-Informationen</h3>
+                    <div style="display: flex; flex-direction: column; gap: 20px; max-width: 100%;">
+                        <div style="padding: 15px; background: linear-gradient(90deg, rgba(40,167,69,0.1) 0%, rgba(40,167,69,0.05) 100%); border-radius: 8px; border-left: 4px solid #28a745;">
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                <strong style="color: #28a745; font-size: 1rem;">🎯 SEO Titel:</strong>
+                                <span style="color: #e9e9e9; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word;">${data.meta_title || data.post_title || 'N/A'}</span>
+                            </div>
+                        </div>
+                        <div style="padding: 15px; background: linear-gradient(90deg, rgba(23,162,184,0.1) 0%, rgba(23,162,184,0.05) 100%); border-radius: 8px; border-left: 4px solid #17a2b8;">
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                <strong style="color: #17a2b8; font-size: 1rem;">🔗 URL Slug:</strong>
+                                <span style="color: #e9e9e9; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word; font-family: monospace; background-color: rgba(0,0,0,0.3); padding: 5px 8px; border-radius: 4px;">${data.post_name || 'n-a'}</span>
+                            </div>
+                        </div>
+                        <div style="padding: 15px; background: linear-gradient(90deg, rgba(255,193,7,0.1) 0%, rgba(255,193,7,0.05) 100%); border-radius: 8px; border-left: 4px solid #ffc107;">
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                <strong style="color: #ffc107; font-size: 1rem;">📝 Meta Description:</strong>
+                                <span style="color: #e9e9e9; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word;">${data.meta_description || 'N/A'}</span>
+                            </div>
                         </div>
                     </div>
-                </section>
-                
-                <section style="margin-bottom: 40px; padding: 25px; background-color: rgba(255,255,255,0.05); border-radius: 8px; border-left: 4px solid #17a2b8;">
-                    <h2 style="color: #17a2b8; margin-bottom: 15px; font-size: 1.8rem;">${data.h2_4 || 'Vertrauen & Qualität'}</h2>
-                    <p style="color: #ccc; font-size: 1rem; line-height: 1.7; margin-bottom: 20px;">${data.h2_4_text || ''}</p>
-                    <p style="color: #ffc107; font-weight: bold; text-align: center; margin-bottom: 20px;">${data.social_proof || ''}</p>
-                    <p style="color: #aaa; text-align: center;">${data.trust_signals || ''}</p>
-                </section>
-                
-                <section style="margin-bottom: 40px;">
-                    <h3 style="color: #ffc107; text-align: center; margin-bottom: 25px; font-size: 1.8rem;">Kundenstimmen</h3>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                        <div style="padding: 20px; background-color: rgba(255,193,7,0.1); border-radius: 8px; border-left: 4px solid #ffc107;">
-                            <p style="color: #ccc; font-style: italic; margin-bottom: 10px;">${data.testimonial_1 || ''}</p>
-                        </div>
-                        <div style="padding: 20px; background-color: rgba(255,193,7,0.1); border-radius: 8px; border-left: 4px solid #ffc107;">
-                            <p style="color: #ccc; font-style: italic; margin-bottom: 10px;">${data.testimonial_2 || ''}</p>
-                        </div>
-                    </div>
-                </section>
-                
-                <section style="margin-bottom: 40px;">
-                    <h3 style="color: #ffc107; text-align: center; margin-bottom: 25px; font-size: 1.8rem;">${data.pricing_title || 'Unsere Pakete'}</h3>
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
-                        <div style="padding: 20px; background-color: rgba(255,255,255,0.05); border-radius: 8px; text-align: center;">
-                            <h4 style="color: #ffc107; margin-bottom: 10px;">Starter</h4>
-                            <p style="color: #ccc; font-size: 0.9rem;">${data.price_1 || ''}</p>
-                        </div>
-                        <div style="padding: 20px; background-color: rgba(255,193,7,0.1); border: 2px solid #ffc107; border-radius: 8px; text-align: center;">
-                            <h4 style="color: #ffc107; margin-bottom: 10px;">Professional</h4>
-                            <p style="color: #ccc; font-size: 0.9rem;">${data.price_2 || ''}</p>
-                        </div>
-                        <div style="padding: 20px; background-color: rgba(255,255,255,0.05); border-radius: 8px; text-align: center;">
-                            <h4 style="color: #ffc107; margin-bottom: 10px;">Enterprise</h4>
-                            <p style="color: #ccc; font-size: 0.9rem;">${data.price_3 || ''}</p>
-                        </div>
-                    </div>
-                </section>
-                
-                <section style="margin-bottom: 40px;">
-                    <h3 style="color: #ffc107; text-align: center; margin-bottom: 25px; font-size: 1.8rem;">Häufige Fragen</h3>
-                    <div>
-                        ${createFaqEntry(data.faq_1, data.faq_answer_1)}
-                        ${createFaqEntry(data.faq_2, data.faq_answer_2)}
-                        ${createFaqEntry(data.faq_3, data.faq_answer_3)}
-                        ${createFaqEntry(data.faq_4, data.faq_answer_4)}
-                        ${createFaqEntry(data.faq_5, data.faq_answer_5)}
-                    </div>
-                </section>
-                
-                <section style="text-align: center; padding: 30px; background: linear-gradient(45deg, rgba(255,193,7,0.1), rgba(255,193,7,0.2)); border-radius: 10px; border: 2px solid #ffc107;">
-                    <h3 style="color: #ffc107; margin-bottom: 15px;">${data.guarantee_text || 'N/A'}</h3>
-                    <p style="color: #ccc; margin-bottom: 25px;">${data.contact_info || ''}</p>
-                    <button style="background: #ffc107; color: #1a1a1a; border: none; padding: 15px 30px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 1.1rem;">${data.footer_cta || 'N/A'}</button>
-                </section>
-            </main>
-            
-            <aside style="margin-top: 50px; padding: 25px; background: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(45,45,45,0.7) 100%); border-radius: 12px; border: 2px solid #444;">
-                <h3 style="color: #ffc107; margin: 0 0 25px 0; text-align: center; font-size: 1.5rem; border-bottom: 2px solid #ffc107; padding-bottom: 10px;">📊 SEO & Meta-Informationen</h3>
-                <div style="display: flex; flex-direction: column; gap: 20px; max-width: 100%;">
-                    <div style="padding: 15px; background: linear-gradient(90deg, rgba(40,167,69,0.1) 0%, rgba(40,167,69,0.05) 100%); border-radius: 8px; border-left: 4px solid #28a745;">
-                        <div style="display: flex; flex-direction: column; gap: 8px;">
-                            <strong style="color: #28a745; font-size: 1rem;">🎯 SEO Titel:</strong>
-                            <span style="color: #e9e9e9; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word;">${data.meta_title || data.post_title || 'N/A'}</span>
-                        </div>
-                    </div>
-                    <div style="padding: 15px; background: linear-gradient(90deg, rgba(23,162,184,0.1) 0%, rgba(23,162,184,0.05) 100%); border-radius: 8px; border-left: 4px solid #17a2b8;">
-                        <div style="display: flex; flex-direction: column; gap: 8px;">
-                            <strong style="color: #17a2b8; font-size: 1rem;">🔗 URL Slug:</strong>
-                            <span style="color: #e9e9e9; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word; font-family: monospace; background-color: rgba(0,0,0,0.3); padding: 5px 8px; border-radius: 4px;">${data.post_name || 'n-a'}</span>
-                        </div>
-                    </div>
-                    <div style="padding: 15px; background: linear-gradient(90deg, rgba(255,193,7,0.1) 0%, rgba(255,193,7,0.05) 100%); border-radius: 8px; border-left: 4px solid #ffc107;">
-                        <div style="display: flex; flex-direction: column; gap: 8px;">
-                            <strong style="color: #ffc107; font-size: 1rem;">📝 Meta Description:</strong>
-                            <span style="color: #e9e9e9; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word;">${data.meta_description || 'N/A'}</span>
-                        </div>
-                    </div>
-                </div>
-            </aside>
-        </div>
-    `;
+                </aside>
+            </div>
+        `;
     }
 
     // === 7. DOWNLOAD FUNKTIONEN (OPTIMIERT FÜR WORDPRESS) ===
 
     function cleanForCsv(text) {
-        // Leere Werte abfangen
         if (text === null || text === undefined) return "";
         
         let str = String(text);
-
-        // 1. Unsichtbare Steuerzeichen entfernen
         str = str.replace(/[\u200B\u00AD\uFEFF\u2028\u2029]/g, '');
-
-        // 2. Non-Breaking Space zu normalem Leerzeichen
         str = str.replace(/\u00A0/g, ' ');
-
-        // 3. WICHTIG: Alle Zeilenumbrüche durch Leerzeichen ersetzen
-        // Das garantiert, dass jeder Datensatz in der CSV exakt eine Zeile ist.
         str = str.replace(/(\r\n|\n|\r)/gm, ' ');
-
-        // 4. Andere ASCII-Steuerzeichen entfernen
         str = str.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '');
-
-        // 5. Doppelte Anführungszeichen escapen (" wird zu "")
         return str.replace(/"/g, '""');
     }
 
@@ -713,19 +768,14 @@ export function initSilasForm() {
         "faq_5", "faq_answer_5", 
         "contact_info", "footer_cta", "trust_signals", "guarantee_text"];
         
-        // FÜR WORDPRESS: Komma als Trennzeichen ist Standard
         const separator = ",";
-        
-        // BOM (\uFEFF) ist für WordPress oft okay
         let csvContent = '\uFEFF' + headers.join(separator) + "\n";
         
         allGeneratedData.forEach(rowData => {
             if (rowData.error) return;
             
             const values = headers.map(header => {
-                // Nutzung der verbesserten cleanForCsv Funktion
                 const cleanValue = cleanForCsv(rowData[header]);
-                // In Anführungszeichen setzen, um Kommas und Umbrüche im Text zu erlauben
                 return `"${cleanValue}"`;
             });
             
@@ -753,9 +803,6 @@ export function initSilasForm() {
         silasResponseContainer.style.display = 'none';
         silasStatus.textContent = 'Bereit zur Generierung.';
     });
-
-    if (closePreviewModalBtn) closePreviewModalBtn.addEventListener('click', closePreviewModal);
-    if (previewModal) previewModal.addEventListener('click', e => { if (e.target === previewModal) closePreviewModal(); });
     
     initDemoTracking();
     showDemoStatus();
