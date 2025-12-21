@@ -1,6 +1,5 @@
 // api/fact-checker.js - FINALE VERSION (Mit Lektorat-Modus & Rechtschreibprüfung)
-
-class FactChecker {
+export class FactChecker {
     constructor() {
         // 1. Problematische Phrasen für den E-E-A-T Check
         this.problematicPhrases = {
