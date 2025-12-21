@@ -14,10 +14,10 @@
     "ioredis": "^5.8.2",
     "redis": "^5.10.0"
   },
- "scripts": {
-  "test": "echo \"Error: no test specified\" && exit 1",
-  "inject-ratings": "node js/inject-ratings.js",
-"build": "npm run inject-ratings && mkdir -p public && cp -r *.html *.css *.svg *.csv js css images Font CSV-Importer-PRO downloads public/ 2>/dev/null || echo 'Some assets missing, continuing...'"
-  "postbuild": "node generate-sitemap.js"
-}
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "inject-ratings": "node js/inject-ratings.js",
+    "build": "npm run inject-ratings && mkdir -p public && cp -r *.html *.css *.svg *.csv js css images Font CSV-Importer-PRO downloads public/ 2>/dev/null || echo 'Some assets missing, continuing...'",
+    "postbuild": "node generate-sitemap.js"
+  }
 }
