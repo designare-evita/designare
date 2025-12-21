@@ -317,7 +317,7 @@
     
     /* Hero muss wachsen können */
     #hero:has(.flip-container) {
-        padding-top: 35px !important;
+        padding-top: 40px !important;
         height: auto !important;
         min-height: 100vh;
     }
