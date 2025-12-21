@@ -103,10 +103,17 @@ export function initSilasForm() {
         if (confirmUnlockBtn) { confirmUnlockBtn.disabled = true; confirmUnlockBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Prüfe...'; }
         try {
             const response = await fetch('/api/check-auth', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password }) });
+            
+            // Prüfe ob Response JSON ist
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                throw new Error('API nicht erreichbar');
+            }
+            
             const result = await response.json();
             if (response.ok && result.success) { closeAuthModal(); activateMasterMode(); }
             else { showAuthError(result.message || 'Falsches Passwort'); }
-        } catch (error) { console.error('Auth-Fehler:', error); showAuthError('Verbindungsfehler'); }
+        } catch (error) { console.error('Auth-Fehler:', error); showAuthError('API-Fehler: ' + error.message); }
         finally { if (confirmUnlockBtn) { confirmUnlockBtn.disabled = false; confirmUnlockBtn.innerHTML = '<i class="fas fa-unlock"></i> Freischalten'; } }
     }
 
@@ -281,8 +288,16 @@ export function initSilasForm() {
             const headers = { 'Content-Type': 'application/json' };
             if (isMasterModeActive()) headers['X-Silas-Master'] = 'true';
             const response = await fetch('/api/generate', { method: 'POST', headers, body: JSON.stringify({ keywords: keywordList }) });
-            if (!response.ok) throw new Error((await response.json()).error || 'Server-Fehler');
+            
+            // Prüfe ob Response JSON ist
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                throw new Error('Server-Fehler: API nicht erreichbar (Status ' + response.status + ')');
+            }
+            
             const results = await response.json();
+            if (!response.ok) throw new Error(results.error || 'Server-Fehler: ' + response.status);
+            
             allGeneratedData = results;
             silasResponseContainer.querySelector('h3').innerHTML = '<i class="fas fa-check-circle"></i> Fertig!';
             const content = document.getElementById('silas-response-content');
