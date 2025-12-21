@@ -11,7 +11,7 @@
 
 #hero:has(.flip-container) {
     align-items: flex-start !important;
-    padding-top: 40px !important; 
+    padding-top: 35px !important; 
     padding-bottom: 60px !important;
     height: auto !important;
     min-height: 100vh;
