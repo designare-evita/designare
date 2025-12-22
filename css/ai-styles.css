@@ -1399,3 +1399,39 @@
     border: 1px solid var(--border-color) !important;
     border-left: 3px solid var(--accent-color) !important;
 }
+
+
+/* Container für die Animation */
+.typing-indicator {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 12px;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 15px;
+    width: fit-content;
+    margin-bottom: 10px;
+}
+
+/* Die einzelnen Punkte */
+.typing-indicator span {
+    width: 6px;
+    height: 6px;
+    background-color: #555; /* Farbe der Punkte */
+    border-radius: 50%;
+    display: inline-block;
+    animation: bounce 1.4s infinite ease-in-out both;
+}
+
+/* Verzögerung für den Wellen-Effekt */
+.typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+.typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes bounce {
+    0%, 80%, 100% { 
+        transform: scale(0); 
+    }
+    40% { 
+        transform: scale(1.0); 
+    }
+}
