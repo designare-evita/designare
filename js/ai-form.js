@@ -178,36 +178,38 @@ const handleKeyboardResize = () => {
     // CHAT UI - ERWEITERT (unverändert)
     // ===================================================================
     const ChatUI = {
-        addMessage(message, sender) {
-            if (!DOM.chatHistoryContainer) return;
+addMessage(message, sender) {
+    if (!DOM.chatHistoryContainer) return;
 
-            // WICHTIG: Entferne interne Tags aus der Chat-Anzeige
-            let cleanMessage = message;
-            if (sender === 'ai') {
-                cleanMessage = message
-                    .replace(/\[BOOKING_CONFIRM_REQUEST\]/g, '')
-                    .replace(/\[buchung_starten\]/g, '')
-                    .replace(/\[booking_starten\]/g, '')
-                    .trim();
-            }
+    let cleanMessage = message;
+    if (sender === 'ai') {
+        cleanMessage = message
+            .replace(/\[BOOKING_CONFIRM_REQUEST\]/g, '')
+            .replace(/\[buchung_starten\]/g, '')
+            .replace(/\[booking_starten\]/g, '')
+            .trim();
+    }
 
-            const msgDiv = document.createElement('div');
-            msgDiv.className = `chat-message ${sender}`;
-            msgDiv.textContent = cleanMessage; // Zeige nur die saubere Nachricht
-            DOM.chatHistoryContainer.appendChild(msgDiv);
-            
-            this.scrollToBottom();
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `chat-message ${sender}`;
+    
+    // Wir lassen den Inhalt erst leer, wenn es die KI ist
+    msgDiv.textContent = sender === 'user' ? cleanMessage : ''; 
+    
+    DOM.chatHistoryContainer.appendChild(msgDiv);
+    this.scrollToBottom();
 
-            // Aber speichere die Original-Nachricht in der Historie (mit Tags)
-            state.chatHistory.push({ 
-                role: sender === 'user' ? 'user' : 'assistant', 
-                content: message // Original mit Tags für API-Kontext
-            });
-            
-            if (state.chatHistory.length > 20) {
-                state.chatHistory = state.chatHistory.slice(-20);
-            }
-        },
+    state.chatHistory.push({ 
+        role: sender === 'user' ? 'user' : 'assistant', 
+        content: message 
+    });
+    
+    if (state.chatHistory.length > 20) {
+        state.chatHistory = state.chatHistory.slice(-20);
+    }
+
+    return msgDiv; // <--- WICHTIG: Das Element zurückgeben!
+},
 
 showTypingIndicator() {
     this.removeTypingIndicator();
