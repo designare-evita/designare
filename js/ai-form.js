@@ -829,3 +829,14 @@ async function typeWriterEffect(element, text, speed = 20) {
         await new Promise(resolve => setTimeout(resolve, speed));
     }
 }
+
+
+function formatMarkdown(text) {
+    return text
+        // Fettgedruckt: **Text** -> <strong>Text</strong>
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        // Listenpunkte: * Punkt -> <li>Punkt</li> (verpackt in <ul>)
+        .replace(/^\* (.*$)/gm, '<li>$1</li>')
+        // Zeilenumbrüche: \n -> <br>
+        .replace(/\n/g, '<br>');
+}
