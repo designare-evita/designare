@@ -157,7 +157,7 @@
 
 .chat-message.user {
     background-color: var(--accent-color) !important;
-    color: var(--bg-color) !important;
+    color: var(--text-color) !important;
     margin-left: auto !important;
     margin-right: 0 !important;
     border-radius: 0 !important;
