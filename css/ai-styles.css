@@ -8,7 +8,7 @@
 /* ======================================== */
 
 #ai-chat-form button .fa-paper-plane {
-    color: var(--bg-color);
+    color: var(--bg-color) !important;
     font-size: 16px;
 }
 
