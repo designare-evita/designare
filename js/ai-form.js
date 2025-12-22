@@ -209,19 +209,27 @@ const handleKeyboardResize = () => {
             }
         },
 
-        showTypingIndicator() {
-            this.removeTypingIndicator();
-            if (!DOM.chatHistoryContainer) return;
-            
-            const indicator = document.createElement('div');
-            state.typingIndicatorId = 'typing-' + Date.now();
-            indicator.id = state.typingIndicatorId;
-            indicator.className = 'chat-message ai';
-            indicator.innerHTML = '<i>Evita tippt...</i>';
-            DOM.chatHistoryContainer.appendChild(indicator);
-            
-            this.scrollToBottom();
-        },
+showTypingIndicator() {
+    this.removeTypingIndicator();
+    if (!DOM.chatHistoryContainer) return;
+    
+    const indicator = document.createElement('div');
+    state.typingIndicatorId = 'typing-' + Date.now();
+    indicator.id = state.typingIndicatorId;
+    indicator.className = 'chat-message ai';
+    
+    // Hier ersetzen wir den Text durch die 3 Punkte
+    indicator.innerHTML = `
+        <div class="typing-dots">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    `;
+    
+    DOM.chatHistoryContainer.appendChild(indicator);
+    this.scrollToBottom();
+},
 
         removeTypingIndicator() {
             if (state.typingIndicatorId) {
