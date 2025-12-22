@@ -3,22 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content">
-    <link rel="canonical" href="https://designare.at/datenschutz.html" />
     <title>Datenschutz | Michael Kanda</title>
     <meta name="robots" content="noindex, nofollow">
-
-    <link rel="icon" href="images/favicon.png" type="image/png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <link rel="stylesheet" href="legal-style.css">
-    <link rel="stylesheet" href="style.css">
+    
+<link rel="preload" href="/Font/Poppins-Regular.ttf" as="font" type="font/ttf" crossorigin="anonymous">    <link rel="icon" href="images/favicon.webp" type="image/webp">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"></noscript>
+    
+    <link rel="stylesheet" href="css/side-menu.css">
+    <link rel="stylesheet" href="css/ai-styles.css">
+    <link rel="stylesheet" href="css/style.css">     
+    <link rel="stylesheet" href="css/flip-card.css"> 
+    <link rel="stylesheet" href="css/booking.css">
+    <link rel="stylesheet" href="css/legal-style.css">
+    <link rel="stylesheet" href="css/header-footer.css">
+    <link rel="stylesheet" href="css/menu-interactive.css">
+    
+    <link rel="canonical" href="https://designare.at/datenschutz.html" />
 </head>
-<body class="dark-mode"> 
-  <div id="header-placeholder"></div>
-    <div id="side-menu-placeholder"></div> 
+
+<body class="dark-mode">
+
+    <div id="header-placeholder"></div>
+    <div id="side-menu-placeholder"></div>
+    <div id="modal-container"></div>
 
     <main class="article-page-main-content">
         <div class="article-container">
-            <div class="legal-container">
+               <div class="legal-container">
                 <h1>Datenschutz</h1>
                 <p>Stand: 21. Juli 2025</p>
                 <p>Wir freuen uns über Ihr Interesse an unserer Webseite designare.at. Der Schutz Ihrer persönlichen Daten ist uns ein wichtiges Anliegen. Nachfolgend informieren wir Sie ausführlich über den Umgang mit Ihren Daten.</p>
@@ -49,7 +62,7 @@
                 </ul>
                 <p>Diese Daten werden zur Gewährleistung eines reibungslosen Verbindungsaufbaus, zur Sicherstellung der Systemsicherheit und -stabilität sowie zur Fehleranalyse benötigt. Die Rechtsgrundlage für die Datenverarbeitung ist unser berechtigtes Interesse (Art. 6 Abs. 1 lit. f DSGVO) an einer sicheren und funktionsfähigen Darstellung unserer Webseite.</p>
                 <p>Die Datenverarbeitung durch Vercel kann in den USA stattfinden. Die Datenübermittlung wird ebenfalls durch Standardvertragsklauseln (Standard Contractual Clauses, SCC) der Europäischen Kommission gestützt, um ein angemessenes Datenschutzniveau zu gewährleisten.</p>
-
+<p>"Wir nutzen eine selbst gehostete Server-Side-Lösung auf Vercel-Infrastruktur, um Analysedaten an Google Analytics 4 zu übertragen. Hierbei wird die IP-Adresse des Nutzers vor der Weiterleitung an Google auf unseren Servern in der EU maskiert/gekürzt. Es findet keine direkte Verbindung zwischen Ihrem Browser und den Servern von Google in den USA statt."</p>
                 <h3 id="datenschutz-part-3-start">4. Kontaktformular</h3>
                 <p>Wenn Sie uns per Kontaktformular Anfragen zukommen lassen, werden Ihre Angaben aus dem Anfrageformular inklusive der von Ihnen dort angegebenen Kontaktdaten (z.B. Name, E-Mail-Adresse) zwecks Bearbeitung der Anfrage und für den Fall von Anschlussfragen bei uns gespeichert.</p>
                 <p>Die Verarbeitung dieser Daten erfolgt auf Grundlage von Art. 6 Abs. 1 lit. b DSGVO, sofern Ihre Anfrage mit der Erfüllung eines Vertrags zusammenhängt oder zur Durchführung vorvertraglicher Maßnahmen erforderlich ist. In allen übrigen Fällen beruht die Verarbeitung auf unserem berechtigten Interesse an der effektiven Bearbeitung der an uns gerichteten Anfragen (Art. 6 Abs. 1 lit. f DSGVO).</p>
@@ -65,60 +78,12 @@
 
                 <h3>7. Webfonts (Lokale Einbindung)</h3>
                 <p>Wir nutzen auf dieser Webseite Schriftarten, die lokal von unserem eigenen Webspace geladen werden. Dadurch werden beim Aufruf unserer Seite keine personenbezogenen Daten (wie z.B. Ihre IP-Adresse) an externe Schriften-Anbieter (wie z.B. Google Fonts) übermittelt.</p>
-            </div>
-        </div>
+            </div>  </div>
     </main>
-    
-    <footer>
-        <a href="impressum.html" id="impressum-link">Impressum</a>
-        <a href="datenschutz.html" id="datenschutz-link">Datenschutz</a>
-    </footer>
 
-    <!-- Der Rest der HTML-Datei bleibt unverändert -->
-    <div id="contact-modal" class="modal-overlay">
-        <div class="modal-content">
-            <button id="close-modal" class="close-button">&times;</button>
-            <h2>Frag Michael!</h2>
-            <form id="contact-form-inner">
-                <input type="text" name="name" placeholder="Dein Name (oder Künstlername):" required>
-                <input type="email" name="email" placeholder="Deine E-Mail (kein Spam, versprochen!)" required>
-                <input type="text" name="_subject" placeholder="Worum geht's? (Bitte kein KI-Drama)">
-                <textarea name="message" placeholder="Deine Botschaft an mich (und Evita):" rows="5" required></textarea>
-                <div class="privacy-checkbox">
-                    <input type="checkbox" name="privacy" id="privacy" required>
-                    <label for="privacy">Passt! Michael darf meine Nachricht lesen und Evita darf alles verarbeiten, was sie versteht. (Details im Datenschutz)</label>
-                </div>
-                <button type="submit" class="cta-button">Ab die Post!</button>
-            </form>
-            <div id="contact-success-message" style="display: none; text-align: center;">
-                <h2>Nachricht empfangen! </h2>
-                <p>Michael (oder Evita, wenn er zu sehr bastelt) meldet sich in Kürze.</p>
-                <p style="margin-top: 20px;">
-                    <a href="#" id="close-success-message" class="cta-button">Schließen</a>
-                </p>
-            </div>
-        </div>
-    </div>
+    <div id="footer-placeholder"></div>
 
-    <div id="cookie-info-lightbox" class="modal-overlay">
-        <div class="modal-content">
-            <h2>Hinweis zu Cookies</h2>
-            <p style="text-align: center;">Wir backen hier nur Cookies, die unsere Website am Laufen halten. Reine Technik, kein Schnickschnack!</p>
-            <div class="cookie-lightbox-buttons">
-                <a href="datenschutz.html" target="_blank" rel="noopener noreferrer" id="privacy-policy-link-button" class="lightbox-button">Datenschutzerklärung</a>
-                <button id="acknowledge-cookie-lightbox" class="lightbox-button">Alles klar</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="legal-modal" class="modal-overlay">
-        <div class="modal-content">
-            <button id="close-legal-modal" class="close-button">&times;</button>
-            <div id="legal-modal-content-area">
-                </div>
-        </div>
-    </div>
-
-<script type="module" src="js/main.js"></script>
+    <script type="module" src="js/main.js"></script>
+<script src="/js/analytics-proxy.js"></script>
 </body>
 </html>

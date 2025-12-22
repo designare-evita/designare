@@ -1,21 +1,19 @@
-// api/generate.js - KORRIGIERTE VERSION (Fix für Adresse & Semantic-API)
-
-const { GoogleGenerativeAI } = require("@google/generative-ai");
-const { FactChecker } = require('./fact-checker.js');
+// api/generate.js
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import { FactChecker } from './fact-checker.js'; 
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const factChecker = new FactChecker();
 
 // === HILFSFUNKTION FÜR SEMANTISCHE OPTIMIERUNG ===
 async function fetchSemanticTerms(keyword) {
-    // FIX 1: Wir geben hier sofort null zurück.
-    // Grund: Die Datamuse API liefert nur englische Begriffe (z.B. "happy", "elements").
-    // Das verhinderte "Denglisch" in den deutschen Texten.
     return null;
 }
-// ========================================================
 
 function cleanJsonString(str) {
+    // Falls das Modell dank JSON-Mode schon reines JSON liefert, fangen wir das hier ab
+    if (typeof str !== 'string') return JSON.stringify(str);
+
     let cleaned = str
         .replace(/```json\s*/gi, '')
         .replace(/```javascript\s*/gi, '')
@@ -29,30 +27,23 @@ function cleanJsonString(str) {
         cleaned = cleaned.substring(firstBrace, lastBrace + 1);
     }
     
-    if (!cleaned.startsWith('{')) {
-        const firstBracket = cleaned.indexOf('[');
-        const lastBracket = cleaned.lastIndexOf(']');
-        
-        if (firstBracket !== -1 && lastBracket !== -1 && firstBracket < lastBracket) {
-            cleaned = cleaned.substring(firstBracket, lastBracket + 1);
-        }
-    }
-    
     return cleaned.trim();
 }
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-const MODEL_HIERARCHY = [
-    "gemini-2.5-flash",           
-    "gemini-2.5-flash-lite",      
-    "gemini-2.0-flash-exp"        
-];
-
 async function generateContentWithRetry(prompt, preferredModel, maxRetries = 3) {
-    const modelsToTry = preferredModel === "gemini-2.5-pro" 
-        ? MODEL_HIERARCHY 
-        : ["gemini-2.5-flash-lite", "gemini-2.5-flash", "gemini-2.0-flash-exp"];
+    let modelsToTry = [];
+
+    if (preferredModel === "gemini-2.5-pro") {
+        modelsToTry = ["gemini-2.5-pro", "gemini-3-flash-preview", "gemini-2.5-flash"];
+    } else {
+        modelsToTry = [
+            "gemini-3-flash-preview", 
+            "gemini-2.5-flash",
+            "gemini-1.5-flash"
+        ];
+    }
     
     let lastError = null;
     
@@ -61,12 +52,27 @@ async function generateContentWithRetry(prompt, preferredModel, maxRetries = 3) 
             try {
                 console.log(`[ATTEMPT] Modell: ${modelName}, Versuch: ${attempt}/${maxRetries}`);
                 
-                const model = genAI.getGenerativeModel({ model: modelName });
+                // --- WICHTIGE ÄNDERUNG HIER ---
+                // Wir konfigurieren das Modell explizit für lange JSON-Antworten
+                const model = genAI.getGenerativeModel({ 
+                    model: modelName,
+                    generationConfig: {
+                        responseMimeType: "application/json", // Erzwingt JSON-Format (Verhindert Abbruch)
+                        maxOutputTokens: 8192,               // Erlaubt sehr lange Texte (Verhindert Abschneiden)
+                        temperature: 0.7                     // Kreativität (0.0 - 1.0)
+                    }
+                });
+                
                 const result = await model.generateContent(prompt);
                 const response = await result.response;
                 const text = await response.text();
                 
-                console.log(`✅ Erfolg mit Modell: ${modelName}`);
+                // Check, ob die Antwort leer ist
+                if (!text || text.length < 50) {
+                    throw new Error("Antwort war zu kurz oder leer.");
+                }
+
+                console.log(`✅ Erfolg mit Modell: ${modelName} (Länge: ${text.length} Zeichen)`);
                 return { text, modelUsed: modelName };
                 
             } catch (error) {
@@ -87,7 +93,7 @@ async function generateContentWithRetry(prompt, preferredModel, maxRetries = 3) 
                         break; 
                     }
                 } else {
-                    throw error;
+                    break;
                 }
             }
         }
@@ -110,12 +116,11 @@ export default async function handler(req, res) {
     const results = [];
     
     for (const keywordData of keywords) {
-      // FIX 2: 'address' hier mit auslesen!
       const { keyword, intent, domain, email, phone, brand, address } = keywordData;
       console.log(`\n[PROCESSING] Keyword: '${keyword}'`);
 
       try {
-        const preferredModel = isMasterRequest ? "gemini-2.5-pro" : "gemini-2.5-flash-lite";
+        const preferredModel = isMasterRequest ? "gemini-2.5-pro" : "gemini-3-flash-preview";
         
         const semanticTerms = await fetchSemanticTerms(keyword);
         
@@ -129,11 +134,20 @@ export default async function handler(req, res) {
 
         let jsonData = {};
         let parseError = false;
-        let originalText = text;
-
+        
         try {
             const cleanedText = cleanJsonString(text);
             jsonData = JSON.parse(cleanedText);
+            
+            // Plausibilitäts-Check: Fehlen wichtige Felder?
+            const requiredFields = ['faq_1', 'testimonial_1', 'guarantee_text'];
+            const missingFields = requiredFields.filter(f => !jsonData[f]);
+            
+            if (missingFields.length > 0) {
+                console.warn(`[WARN] Antwort unvollständig. Fehlende Felder: ${missingFields.join(', ')}`);
+                // Optional: Hier könnte man einen Fehler werfen, um einen Retry auszulösen
+            }
+
         } catch (e) {
             console.warn(`[WARN] JSON-Parsing für '${keyword}' fehlgeschlagen:`, e.message);
             parseError = true;
@@ -152,14 +166,12 @@ export default async function handler(req, res) {
             jsonData._factCheck = factCheckResult;
         }
 
-        // Daten zusammenbauen für die Antwort (und damit für die CSV)
         jsonData.keyword = keyword;
         jsonData.intent = intent;
         jsonData.domain = domain;
         jsonData.email = email;
         jsonData.phone = phone;
         jsonData.brand = brand;
-        // FIX 3: 'address' explizit zum JSON hinzufügen
         jsonData.address = address;
 
         jsonData._seo = {

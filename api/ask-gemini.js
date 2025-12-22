@@ -1,34 +1,41 @@
-// api/ask-gemini.js - KORRIGIERTE VERSION mit ES-Module Syntax
-
+// api/ask-gemini.js - INTEGRATIONS-VERSION (RAG + Intent-Logik)
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import fs from 'fs';
+import path from 'path';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Method not allowed' });
-  }
+  if (req.method !== 'POST') return res.status(405).json({ message: 'Method not allowed' });
 
   try {
     const { prompt, source, checkBookingIntent, history, message } = req.body;
     const userMessage = message || prompt;
 
-    console.log("🔄 API-Call erhalten:");
-    console.log("- userMessage:", userMessage);
-    console.log("- history:", history);
-    console.log("- source:", source);
-    console.log("- checkBookingIntent:", checkBookingIntent);
+    // --- MODELL-KONFIGURATION (UNVERÄNDERT AUS DEINER VORLAGE) ---
+    const commonConfig = { temperature: 0.7 };
+    const modelPrimary = genAI.getGenerativeModel({ model: "gemini-3-flash-preview", generationConfig: commonConfig });
+    const modelFallback = genAI.getGenerativeModel({ model: "gemini-2.5-flash", generationConfig: commonConfig });
 
-    if (!userMessage) {
-      return res.status(400).json({ message: 'A prompt is required.' });
+    async function generateContentSafe(inputText) {
+      try { return await modelPrimary.generateContent(inputText); } 
+      catch (error) { return await modelFallback.generateContent(inputText); }
     }
 
-    const model = genAI.getGenerativeModel({ 
-    model: "gemini-2.5-flash",
-    generationConfig: {
-        temperature: 0.7,     // Etwas kreativer, aber nicht zu chaotisch
+    // --- NEU: KONTEXT-ABRUF (RAG) ---
+    let additionalContext = "";
+    const knowledgePath = path.join(process.cwd(), 'knowledge.json');
+    if (fs.existsSync(knowledgePath)) {
+        const kb = JSON.parse(fs.readFileSync(knowledgePath, 'utf8'));
+        // Einfache Keyword-Suche für den Kontext
+        const matches = kb.filter(item => 
+            userMessage.toLowerCase().split(' ').some(word => word.length > 3 && item.text.toLowerCase().includes(word))
+        );
+        if (matches.length > 0) {
+            additionalContext = "\nZUSÄTZLICHES WISSEN AUS MICHAELS BLOGS:\n" + 
+                matches.slice(0, 2).map(m => `Quelle [${m.title}]: ${m.text}`).join('\n');
+        }
     }
-});
 
     // =================================================================
     // INTENT-ERKENNUNG NUR WENN EXPLIZIT ANGEFORDERT
@@ -95,7 +102,8 @@ Antworte NUR mit einem einzigen Wort: "question" oder "contact_inquiry".
 Hier ist die Nutzereingabe: "${userMessage}"
 `;
 
-            const intentResult = await model.generateContent(intentDetectionPrompt);
+            // NUTZUNG DER SAFETY FUNKTION
+            const intentResult = await generateContentSafe(intentDetectionPrompt);
             const intentResponse = await intentResult.response;
             const intent = intentResponse.text().trim();
 
@@ -125,7 +133,8 @@ WICHTIG:
 - Öffne NIEMALS direkt das Booking-Modal, sondern frage IMMER erst nach
                 `;
                 
-                const clarificationResult = await model.generateContent(clarificationPrompt);
+                // NUTZUNG DER SAFETY FUNKTION
+                const clarificationResult = await generateContentSafe(clarificationPrompt);
                 const clarificationResponse = await clarificationResult.response;
                 const clarificationText = clarificationResponse.text();
                 
@@ -217,7 +226,7 @@ Wohnort: Wien.
    - Überzeuge durch Fachwissen, nicht durch Marketing-Floskeln.
 
 --- WICHTIGE REGELN ---
-- FASSE DICH KURZ: Deine Antworten dürfen MAXIMAL 3-5 Sätze lang sein.
+- FASSE DICH KURZ: Deine Antworten dürfen MAXIMAL 3-4 Sätze lang sein.
 - Kontakt: Michael ist am besten über einen Rückruf-Termin erreichbar. Erwähne KEINE E-Mail-Adresse.
 - HUMOR & CHARME: Sei witzig, aber komm schnell zum Punkt. Ein kurzer Witz ist besser als eine lange Anekdote.
 - VERMEIDE TEXTWÜSTEN: Nutze Aufzählungspunkte (Bulletpoints), wenn du mehr als zwei Dinge aufzählst. Das ist besser für mobile Leser.
@@ -232,29 +241,16 @@ ${conversationHistoryText}
 
 --- AKTUELLE NACHRICHT DES BESUCHERS ---
 "${userMessage}"
-      `;
+    `;
 
-      console.log("Evita-Prompt erstellt, Länge:", finalPrompt.length);
-    }
-
-    console.log("Sende Anfrage an Gemini...");
-    const result = await model.generateContent(finalPrompt);
+    const result = await generateContentSafe(finalPrompt);
     const response = await result.response;
     const text = response.text();
 
-    console.log("Gemini-Antwort erhalten:", text.substring(0, 100) + "...");
-
-    // Je nach Quelle wird die Antwort anders formatiert zurückgesendet
-    if (source === 'silas') {
-      console.log("Sende Silas-Antwort als Text");
-      res.status(200).send(text); // Silas bekommt reinen Text (der das JSON enthält)
-    } else {
-      console.log("Sende Evita-Antwort als JSON");
-      res.status(200).json({ answer: text }); // Evita bekommt ein sauberes JSON-Objekt
-    }
+    if (source === 'silas') res.status(200).send(text);
+    else res.status(200).json({ answer: text });
 
   } catch (error) {
-    console.error("Error calling Gemini API:", error);
-    res.status(500).json({ answer: 'Da ist wohl ein Pixelfehler im System! Michael ist sicher schon dran. Bitte versuch\'s gleich noch mal.' });
+    res.status(500).json({ answer: 'Pixelfehler im System! Michael ist dran.' });
   }
 }

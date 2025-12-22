@@ -1,5 +1,5 @@
 /* ============================================================
-   BLOG.CSS - MINIMALISTISCH & SEMANTISCH
+   BLOG.CSS - TORINO STYLE
    Fokussiert auf Lesbarkeit, Struktur und Performance
    ============================================================ */
 
@@ -12,8 +12,6 @@
     margin: 0 auto;
     padding: 120px 2rem 4rem;
     min-height: 100vh;
-    
-    /* KORREKTUR: Z-Index damit Inhalt über den Partikeln liegt */
     position: relative;
     z-index: 2; 
 }
@@ -26,7 +24,6 @@
     line-height: 1.8;
 }
 
-/* Visually hidden but accessible for screen readers */
 .visually-hidden {
     position: absolute;
     width: 1px;
@@ -49,16 +46,15 @@
     padding-bottom: 1rem;
 }
 
-/* Main Heading */
 .article-header h1 {
-    font-size: 2.5rem;
-    font-weight: 700;
+    font-size: 2.3rem;
+    font-weight: 600;
     line-height: 1.2;
     margin-bottom: 1rem;
-    color: var(--text-color);
+color: var(--accent-color);
+      text-transform: uppercase;
 }
 
-/* Breadcrumb Anpassung */
 .breadcrumb ol {
     display: flex;
     flex-wrap: wrap;
@@ -68,7 +64,6 @@
     margin: 0;
 }
 
-/* Article Meta Info */
 .article-meta {
     display: flex;
     flex-wrap: wrap;
@@ -83,15 +78,48 @@
     display: flex;
     align-items: center;
     gap: 0.4rem;
+    color: var(--text-color-muted);
 }
 
 .article-meta .author {
     font-style: normal;
+    color: var(--text-color-muted);
 }
 
 .article-meta a {
     color: var(--accent-color);
-    font-weight: 500;
+    font-weight: 400;
+}
+
+.article-white {
+    color: var(--text-color) !important;
+    text-transform: none; /* Schaltet Groß-/Kleinschreibung-Zwang aus */
+}
+
+/* ===================
+   FEATURED IMAGE (Subtle)
+   =================== */
+
+.article-hero-wrapper {
+    display: flex;
+    justify-content: center; /* Zentriert das Bild horizontal */
+    margin: 2rem 0 0 0;      /* Abstand nach oben */
+    width: 100%;
+}
+
+.article-hero-wrapper img {
+    height: auto;
+    max-width: 100%;
+    opacity: 0.1;            /* Extrem wenig Opacity (10%) */
+    border-radius: 8px;      /* Optional: leicht abgerundete Ecken */
+    filter: grayscale(100%); /* Optional: macht es noch dezenter (schwarz-weiß) */
+    transition: opacity 0.5s ease;
+}
+
+/* Optional: Beim Drüberfahren etwas sichtbarer machen */
+.article-hero-wrapper img:hover {
+    opacity: 0.3;
+    filter: grayscale(0%);
 }
 
 /* ===================
@@ -102,24 +130,20 @@
     margin-bottom: 6rem;
     position: relative;
     padding-top: 3rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.05); 
+    border-top: 1px solid var(--border-color-subtle); 
     scroll-margin-top: 100px;
 }
 
-/* Der Pfeil (Dreieck) mittig auf der Linie - IMMER SICHTBAR */
 .blog-article section::after {
-    content: "\f107"; /* FontAwesome Unicode */
+    content: "\f107";
     font-family: "Font Awesome 6 Free";
     font-weight: 900;
-    
     position: absolute;
     top: -0.9rem;
     left: 50%;
     transform: translateX(-50%);
-    
     background-color: var(--bg-color); 
     padding: 0 1rem;
-    
     font-size: 1.2rem;
     opacity: 1; 
     color: var(--accent-color); 
@@ -130,7 +154,6 @@
     transform: translateX(-50%) scale(1.2);
 }
 
-/* Smooth Scrolling */
 html {
     scroll-behavior: smooth;
 }
@@ -138,9 +161,10 @@ html {
 .blog-article h2 {
     font-size: 1.8rem;
     font-weight: 600;
+    letter-spacing: 0.03em;
     margin: 2.5rem 0 1.2rem;
     padding-top: 40px;
-    color: var(--text-color);
+    color: var(--accent-color);
     line-height: 1.3;
     scroll-margin-top: 100px;
 }
@@ -155,24 +179,31 @@ html {
 .blog-article p {
     margin-bottom: 1.5rem;
     color: var(--text-color);
+    font-weight: 300;
+    line-height: 1.8;
 }
 
-/* Code Elements */
 .blog-article code {
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--border-color);
-    border-radius: 3px;
+    border-radius: 0;
     padding: 0.2em 0.4em;
     font-family: 'Courier New', monospace;
     font-size: 0.9em;
     color: var(--accent-color);
 }
 
-/* Lists */
 .blog-article ul {
     margin-bottom: 1.5rem;
     padding-left: 1.5rem;
-    list-style-type: square; 
+    list-style-type: none;
+}
+
+.blog-article ul li::before {
+    content: "→";
+    color: var(--accent-color);
+    margin-right: 10px;
+    font-size: 0.9em;
 }
 
 .blog-article ol {
@@ -182,15 +213,16 @@ html {
 
 .blog-article li {
     margin-bottom: 0.8rem;
+color: var(--text-color);
+    font-weight: 300;
 }
 
-/* Definition Lists */
 .blog-article dl {
     margin-bottom: 2rem;
 }
 
 .blog-article dt {
-    font-weight: 600;
+    font-weight: 400;
     color: var(--accent-color);
     margin-top: 1.5rem;
     margin-bottom: 0.5rem;
@@ -199,105 +231,8 @@ html {
 .blog-article dd {
     margin-left: 1.5rem;
     margin-bottom: 1rem;
+   color: var(--text-color);
 }
-
-/* ===================
-   5. SPECIAL BOXES (TOC - GLASS DESIGN)
-   =================== */
-
-.toc-container {
-    position: -webkit-sticky;
-    position: sticky;
-    
-    /* Da der Header wegfährt, kleben wir nah am oberen Rand */
-    top: 20px; 
-    z-index: 900;
-    
-    display: flex;
-    justify-content: flex-start;
-    width: 100%;
-    
-    /* KORREKTUR: Hintergrund für Lesbarkeit */
-    padding: 12px 20px;
-    margin-bottom: 3rem;
-    
-    /* Glassmorphism Background */
-    background-color: rgba(18, 18, 18, 0.85); /* Dunkel & Halbtransparent */
-    backdrop-filter: blur(12px);             /* Weichzeichner für Text dahinter */
-    -webkit-backdrop-filter: blur(12px);
-    
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-}
-
-/* Liste resetten */
-.blog-article .toc-container ul,
-.toc-container ul {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    gap: 0.8rem;
-    
-    list-style: none !important;
-    list-style-type: none !important;
-    padding-left: 0 !important;
-    margin: 0;
-    
-    pointer-events: none;
-}
-
-.toc-container li {
-    margin: 0;
-    padding: 0;
-    list-style: none !important;
-    pointer-events: none;
-}
-
-/* Mini-Buttons (Badges) */
-.toc-container a {
-    pointer-events: auto; 
-    display: inline-block;
-    padding: 0.4rem 1rem;
-    
-    font-size: 12px;
-    border-radius: 8px;
-    
-    font-weight: 500;
-    text-decoration: none;
-    color: var(--text-color);
-    
-    /* Button Hintergrund etwas heller als der Container */
-    background-color: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    
-    transition: all 0.3s ease;
-}
-
-.toc-container a:hover {
-    background-color: var(--accent-color);
-    color: #1a1a1a;
-    border-color: var(--accent-color);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    cursor: pointer;
-}
-
-/* Mobile Anpassung */
-@media (max-width: 768px) {
-    .toc-container {
-        /* Mobile Header ist da, also etwas Abstand */
-        top: 80px; 
-        padding: 10px;
-        justify-content: center;
-    }
-    
-    .toc-container ul {
-         justify-content: center;
-         gap: 0.5rem;
-    }
-}
-
 
 /* ===================
    6. CONTENT BOXES
@@ -305,11 +240,11 @@ html {
 
 /* Summary Box */
 .summary-box {
-    background-color: rgba(252, 181, 0, 0.08);
-    border-left: 4px solid var(--accent-color);
+    background-color: rgba(196, 163, 90, 0.05);
+    border-left: 3px solid var(--accent-color);
     padding: 1.5rem;
     margin: 2rem 0;
-    border-radius: 4px;
+    border-radius: 0;
 }
 
 .summary-box h3 {
@@ -317,20 +252,21 @@ html {
     margin-bottom: 1rem;
     color: var(--accent-color);
     font-size: 1.2rem;
+    font-weight: 600;
 }
 
 .summary-box ul {
     margin-bottom: 0;
-    list-style-type: square;
-    padding-left: 1.5rem;
+    list-style-type: none;
+    padding-left: 0;
 }
 
 /* Info & Tech Box */
 .info-box,
 .tech-box {
-    background-color: rgba(255, 255, 255, 0.03);
+    background-color: rgba(255, 255, 255, 0.02);
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: 0;
     padding: 1.5rem;
     margin: 2rem 0;
     display: flex;
@@ -348,8 +284,7 @@ html {
 .info-box strong,
 .tech-box strong {
     color: var(--accent-color);
-    display: block;
-    margin-bottom: 0.5rem;
+    font-weight: 400;
 }
 
 .info-box p,
@@ -359,9 +294,9 @@ html {
 
 /* Expert Tip */
 .expert-tip {
-    background-color: rgba(252, 181, 0, 0.1);
-    border: 2px solid var(--accent-color);
-    border-radius: 8px;
+    background-color: rgba(196, 163, 90, 0.08);
+    border: 1px solid var(--accent-color);
+    border-radius: 0;
     padding: 1.5rem;
     margin: 2rem 0;
     display: flex;
@@ -377,6 +312,7 @@ html {
 .expert-tip strong {
     color: var(--accent-color);
     font-size: 1.1rem;
+    font-weight: 400;
 }
 
 /* Step Guide */
@@ -389,14 +325,16 @@ html {
     color: var(--accent-color);
     font-size: 1.2rem;
     margin-bottom: 0.8rem;
+    font-weight: 600;
 }
 
 /* Feature List */
 .feature-list {
     background-color: rgba(255, 255, 255, 0.02);
     padding: 1.5rem;
-    border-radius: 8px;
+    border-radius: 0;
     margin: 2rem 0;
+    border: 1px solid var(--border-color);
 }
 
 .feature-list dt {
@@ -404,6 +342,7 @@ html {
     color: var(--accent-color);
     margin-top: 1.5rem;
     margin-bottom: 0.5rem;
+    font-weight: 400;
 }
 
 .feature-list dt:first-child {
@@ -425,13 +364,14 @@ html {
 }
 
 .comparison-table thead {
-    background-color: rgba(252, 181, 0, 0.1);
+    background-color: rgba(196, 163, 90, 0.08);
 }
 
 .comparison-table th {
     padding: 1rem;
     text-align: left;
-    font-weight: 600;
+    font-weight: 400;
+    letter-spacing: 0.02em;
     color: var(--accent-color);
     border-bottom: 2px solid var(--accent-color);
 }
@@ -443,6 +383,7 @@ html {
     padding: 1rem;
     border-bottom: 1px solid var(--border-color);
     vertical-align: top;
+    color: var(--text-color);
 }
 
 .comparison-table code {
@@ -456,26 +397,27 @@ html {
 
 .faq-accordion details {
     background-color: rgba(255, 255, 255, 0.02);
-    border-radius: 8px;
+    border-radius: 0;
     margin-bottom: 1rem;
-    border-left: none;
+    border: 1px solid var(--border-color);
     transition: background-color 0.3s ease;
     overflow: hidden;
 }
 
 .faq-accordion details:hover {
-    background-color: rgba(255, 255, 255, 0.04);
+    background-color: rgba(255, 255, 255, 0.03);
 }
 
 .faq-accordion summary {
     padding: 1.2rem 1.5rem;
-    font-weight: 600;
+    font-weight: 400;
     cursor: pointer;
     list-style: none;
     position: relative;
     color: var(--accent-color);
     font-size: 1.1rem;
     outline: none;
+    letter-spacing: 0.02em;
 }
 
 .faq-accordion summary::after {
@@ -484,15 +426,15 @@ html {
     right: 1.5rem;
     top: 50%;
     transform: translateY(-50%);
-    font-weight: 700;
+    font-weight: 400;
     font-size: 1.2rem;
-    color: var(--text-color);
+    color: var(--text-color-muted);
     opacity: 0.7;
     transition: transform 0.3s ease;
 }
 
 .faq-accordion details[open] summary::after {
-    content: '-';
+    content: '−';
     transform: translateY(-50%) rotate(0deg);
     color: var(--accent-color);
     opacity: 1;
@@ -506,18 +448,18 @@ html {
     padding: 0 1.5rem 1.5rem 1.5rem;
     color: var(--text-color);
     line-height: 1.7;
-    border-top: 1px solid rgba(255,255,255,0.05);
+    border-top: 1px solid var(--border-color-subtle);
+    font-weight: 300;
 }
 
 .faq-content p { margin-bottom: 0; }
 .faq-content ol { margin-top: 1rem; margin-bottom: 0; padding-left: 1.2rem; }
 
-
 /* Key Points */
 .key-points {
-    background: linear-gradient(135deg, rgba(252, 181, 0, 0.08) 0%, rgba(252, 181, 0, 0.03) 100%);
+    background: rgba(196, 163, 90, 0.05);
     border: 1px solid var(--accent-color);
-    border-radius: 10px;
+    border-radius: 0;
     padding: 2rem;
     margin: 2.5rem 0;
 }
@@ -527,6 +469,8 @@ html {
     margin-top: 0;
     margin-bottom: 1.5rem;
     font-size: 1.3rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
 }
 
 .key-points ul { list-style: none; padding-left: 0; }
@@ -534,9 +478,9 @@ html {
 
 /* CTA Section */
 .cta-section {
-    background: linear-gradient(135deg, rgba(252, 181, 0, 0.15) 0%, rgba(252, 181, 0, 0.05) 100%);
-    border: 2px solid var(--accent-color);
-    border-radius: 12px;
+    background: rgba(196, 163, 90, 0.08);
+    border: 1px solid var(--accent-color);
+    border-radius: 0;
     padding: 2.5rem;
     margin: 3rem 0;
     text-align: center;
@@ -547,27 +491,35 @@ html {
     margin-top: 0;
     margin-bottom: 1rem;
     font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
 }
 
-.cta-section p { margin-bottom: 1.5rem; font-size: 1.05rem; }
+.cta-section p { 
+    margin-bottom: 1.5rem; 
+    font-size: 1.05rem; 
+    color: var(--text-color-muted);
+}
 
 .cta-button {
     display: inline-block;
-    background-color: var(--accent-color);
-    color: #1a1a1a;
+    background-color: transparent;
+    color: var(--accent-color);
     padding: 1rem 2rem;
-    border-radius: 8px;
-    font-weight: 600;
+    border-radius: 0;
+    border: 1px solid var(--accent-color);
+    font-weight: 400;
     font-size: 1.05rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
     transition: all 0.3s ease;
-    border: 2px solid var(--accent-color);
 }
 
 .cta-button:hover {
-    background-color: #d39a00;
-    border-color: #d39a00;
-    transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba(252, 181, 0, 0.3);
+    background-color: var(--accent-color);
+    color: var(--bg-color);
+    transform: none;
+    box-shadow: none;
 }
 
 /* Article Footer */
@@ -581,9 +533,9 @@ html {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    color: var(--text-color);
+    color: var(--text-color-muted);
     opacity: 0.8;
-    font-weight: 500;
+    font-weight: 400;
     transition: all 0.3s ease;
 }
 
@@ -607,7 +559,6 @@ html {
     .blog-article h2 { font-size: 1.5rem; margin: 2rem 0 1rem; padding-top: 30px; }
     .blog-article h3 { font-size: 1.2rem; }
 
-    /* Container Padding Mobile */
     .summary-box, .info-box, .tech-box, .expert-tip, .key-points, .cta-section {
         padding: 1.2rem;
     }
@@ -617,7 +568,6 @@ html {
         gap: 0.8rem;
     }
 
-    /* Table Responsive */
     .comparison-table { font-size: 0.85rem; }
     .comparison-table th, .comparison-table td { padding: 0.7rem; }
     .comparison-table thead { display: none; }
@@ -626,7 +576,7 @@ html {
         display: block;
         margin-bottom: 1.5rem;
         background-color: rgba(255, 255, 255, 0.02);
-        border-radius: 8px;
+        border: 1px solid var(--border-color);
         overflow: hidden;
     }
 
@@ -638,13 +588,12 @@ html {
     }
 
     .comparison-table td:first-child {
-        background-color: rgba(255, 0, 0, 0.1);
+        background-color: rgba(255, 107, 107, 0.1);
         border-bottom: 1px solid var(--border-color);
     }
-    .comparison-table td:first-child::before { content: "Falsch: "; font-weight: 600; color: #ff6b6b; }
-    .comparison-table td:last-child::before { content: "Richtig: "; font-weight: 600; color: #51cf66; }
+    .comparison-table td:first-child::before { content: "Falsch: "; font-weight: 400; color: #ff6b6b; }
+    .comparison-table td:last-child::before { content: "Richtig: "; font-weight: 400; color: #51cf66; }
 
-    /* CTA Mobile */
     .cta-section h2 { font-size: 1.3rem; }
     .cta-button { display: block; width: 100%; padding: 0.9rem 1.5rem; }
 }

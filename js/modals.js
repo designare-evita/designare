@@ -695,23 +695,8 @@ export function initModals() {
         setupLegalModalCloseButton();
         setupModalBackgroundClose();
 
-        // Event Delegation für Links
-        document.body.addEventListener('click', (e) => {
-            const target = e.target;
-            const legalPages = ['impressum.html', 'datenschutz.html', 'disclaimer.html'];
-            
-            for (let page of legalPages) {
-                const linkSelector = `a[href="${page}"]`;
-                const idSelector = `#${page.replace('.html', '')}-link`;
-                
-                if (target.matches(linkSelector) || target.matches(idSelector)) {
-                    e.preventDefault(); 
-                    console.log(`📄 ${page} geklickt`);
-                    loadLegalContentWithPagination(page);
-                    return;
-                }
-            }
-        });
+        // HINWEIS: Die Event-Delegation für Impressum/Datenschutz wurde entfernt,
+        // damit diese Links nun wie normale Links funktionieren (neuer Tab).
 
         console.log('✅ Modals bereit');
     }, 100);

@@ -1,5 +1,5 @@
 /* ============================================================
-   STYLE.CSS - OPTIMIERT
+   STYLE.CSS - SEMANTIC VERSION
    Startseite & globale Styles (Dark Mode)
    ============================================================ */
 
@@ -8,16 +8,37 @@
    =================== */
 
 :root {
-    --accent-color: #FCB500;
-    --accent-color-rgba: rgba(252, 181, 0, 0.85);
-    --bg-color: #1a1a1a;
+   /* NIGHT MODE (Standard) */
+    --accent-color: #c4a35a;
+    --accent-color-rgba: rgba(196, 163, 90, 0.85);
+    --bg-color: #0a0a0a;
+   --bg-color-secondary: #111111;
     --border-color: #aaaaaa;
-    --particle-color: #bbbbbb;
+    --particle-color: #e0e0e0;
     --particle-line-color: #555555;
-    --text-color: #eeeeee;
+    --text-color: #E4E4E4;
+   --text-color-muted: #949494;
+    --text-color-subtle: #555555;
+   --border-color: #333333;           /* Subtile Trennung */
+    --border-color-subtle: #222222;
+    --card-bg: #0f0f0f;
+    --modal-bg: #0d0d0d;
     --header-height-desktop: 80px;
     --header-height-mobile: 65px;
 }
+
+/* DAY MODE (Überschreibt die Farben) */
+body.light-mode {
+    --bg-color: #e0e0e0;      
+    --text-color: #333333; 
+    --border-color: #bbbbbb;
+    --card-bg: #ffffff; /* Empfehlung: Karten reinweiß für "Pop"-Effekt */
+    --modal-bg: #ffffff; /* Modals bleiben weiß */
+    --particle-color: #555555;
+    --particle-line-color: #cccccc;  
+    --accent-color: #D39A00;     
+}
+
 
 * {
     box-sizing: border-box;
@@ -51,6 +72,7 @@ body.no-scroll {
 
 a {
     text-decoration: none !important;
+   color: var(--text-color);
 }
 
 /* ===================
@@ -70,7 +92,8 @@ a {
     font-family: 'Poppins';
     font-style: normal;
     font-weight: 300;
-    src: url('../Font/Poppins-Light.ttf') format('truetype');
+    /* Pfad geändert zu absolut: /Font/... */
+    src: url('/Font/Poppins-Light.ttf') format('truetype');
     font-display: swap;
 }
 
@@ -78,7 +101,8 @@ a {
     font-family: 'Poppins';
     font-style: normal;
     font-weight: 400;
-    src: url('../Font/Poppins-Regular.ttf') format('truetype');
+    /* Pfad geändert zu absolut: /Font/... */
+    src: url('/Font/Poppins-Regular.ttf') format('truetype');
     font-display: swap;
 }
 
@@ -86,7 +110,8 @@ a {
     font-family: 'Poppins';
     font-style: normal;
     font-weight: 600;
-    src: url('../Font/Poppins-SemiBold.ttf') format('truetype');
+    /* Pfad geändert zu absolut: /Font/... */
+    src: url('/Font/Poppins-SemiBold.ttf') format('truetype');
     font-display: swap;
 }
 
@@ -94,7 +119,8 @@ a {
     font-family: 'Poppins';
     font-style: normal;
     font-weight: 700;
-    src: url('../Font/Poppins-Bold.ttf') format('truetype');
+    /* Pfad geändert zu absolut: /Font/... */
+    src: url('/Font/Poppins-Bold.ttf') format('truetype');
     font-display: swap;
 }
 
@@ -149,11 +175,13 @@ h1 b {
     padding-bottom: 12vh;
 }
 
-#hero .container {
+#hero .container,
+#hero section.container {
     position: relative;
     z-index: 2;
 }
 
+/* Particle Background - jetzt <figure> */
 #particles-js {
     height: 100%;
     left: 0;
@@ -163,6 +191,7 @@ h1 b {
     z-index: 1;
     opacity: 0.4;
     pointer-events: none;
+    margin: 0; /* Reset figure margin */
 }
 
 /* ===================
@@ -192,14 +221,15 @@ h1 b {
 }
 
 #hero .subtitle {
-    font-size: 1.2rem;
-    font-weight: 300;
-    margin-bottom: 1.5rem;
-    padding-top: 15px;
+    font-size: 1.15rem;                      /* Etwas kleiner */
+    text-transform: uppercase;               /* Wirkt oft hochwertiger/minimalistischer */
+    color: var(--text-color-muted);          /* Das dezentere Grau aus deiner style.css */                   
+    margin-bottom: 2rem;
 }
 
 /* ===================
    6. AI FORM (Startseite)
+   ai-container ist jetzt <section>
    =================== */
 
 .ai-container {
@@ -210,7 +240,7 @@ h1 b {
 #ai-form {
     background-color: var(--bg-color);
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: 1px;
     display: flex;
     overflow: hidden;
     transition: border-color 0.3s ease;
@@ -242,8 +272,9 @@ h1 b {
 
 #ai-form button {
     background: var(--accent-color);
-    border: none;
-    color: #fff;
+    border: 1px;
+    border-color: var(--accent-color);
+    color: var(--text-color);
     cursor: pointer;
     font-size: 1rem;
     padding: 0 18px;
@@ -251,13 +282,13 @@ h1 b {
 }
 
 #ai-form button:hover {
-    background: #d39a00;
+    background:  var(--accent-color);
 }
 
 #ai-status {
     background-color: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: 1px;
     font-size: 1rem;
     margin-top: 10px;
     min-height: 40px;
@@ -753,5 +784,16 @@ h1 b {
     .legal-modal-pagination-buttons button {
         font-size: 0.9rem;
         width: 100%;
+    }
+}
+
+/* Verhindert, dass Anker-Überschriften hinter dem Header verschwinden */
+h2[id] {
+    scroll-margin-top: calc(var(--header-height-desktop) + 40px);
+}
+
+@media (max-width: 768px) {
+    h2[id] {
+        scroll-margin-top: calc(var(--header-height-mobile) + 20px);
     }
 }

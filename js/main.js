@@ -1,11 +1,13 @@
 // js/main.js
 
 // === 1. IMPORTE ===
+import { initTheme } from './theme.js';
 import { initEffects } from './effects.js';
 import { initTypewriters } from './typewriter.js';
 import { initModals } from './modals.js';
 import { initAiForm } from './ai-form.js';
 import { initSilasForm } from './silas-form.js';
+import { initMenuInteractions } from './menu-logic.js'; // NEU: Import der interaktiven Menü-Logik
 
 // === 2. GLOBALE STATES ===
 let globalAiFormInstance = null;
@@ -41,50 +43,36 @@ const loadFeedback = async () => {
 };
 
 // === 4. SMART HEADER & FOOTER LOGIK ===
-
 const initHeaderScrollEffect = () => {
     const header = document.querySelector('.main-header');
-    // WICHTIG: Wir holen den Footer später im Loop oder prüfen auf Existenz, 
-    // da er dynamisch geladen wird.
-    
     if (!header) return;
 
     let lastScrollY = window.scrollY;
 
     const handleScroll = () => {
         const currentScrollY = window.scrollY;
-        const footer = document.querySelector('footer'); // Immer aktuell holen
+        const footer = document.querySelector('footer'); 
         
-        // --- 1. GLASSMORPHISM EFFEKT (Dunkel werden) ---
         if (currentScrollY > 50) {
             header.classList.add('scrolled');
         } else {
             header.classList.remove('scrolled');
-            // Wenn ganz oben: Header immer zeigen
             header.classList.remove('hide-up'); 
         }
 
-        // --- 2. SMART HIDE LOGIK ---
-        
-        // Berechnung: Sind wir am Ende der Seite?
-        // (ScrollPosition + Fensterhöhe >= Gesamthöhe - kleiner Puffer)
         const isAtBottom = (window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 50;
 
         if (currentScrollY > 100 && !isAtBottom) {
             if (currentScrollY > lastScrollY) {
-                // SCROLL DOWN -> Verstecken
                 header.classList.add('hide-up');
                 if (footer) footer.classList.add('hide-down');
             } else {
-                // SCROLL UP -> Zeigen
                 header.classList.remove('hide-up');
                 if (footer) footer.classList.remove('hide-down');
             }
         } else if (isAtBottom) {
-            // ENDE DER SEITE -> Footer zwingend zeigen
             if (footer) footer.classList.remove('hide-down');
         } else {
-            // ANFANG DER SEITE (< 100px) -> Footer zwingend zeigen
             if (footer) footer.classList.remove('hide-down');
         }
 
@@ -92,11 +80,8 @@ const initHeaderScrollEffect = () => {
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    
-    // Initial einmal ausführen
     handleScroll();
 };
-
 
 const setupSideMenu = () => {
     const menuButton = document.getElementById('menu-toggle-button');
@@ -104,7 +89,6 @@ const setupSideMenu = () => {
     const closeMenuButton = document.getElementById('close-menu-button');
 
     if (menuButton && sideMenu) {
-        // Öffnen
         menuButton.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -112,7 +96,6 @@ const setupSideMenu = () => {
             document.body.classList.add('no-scroll');
         });
 
-        // Schließen Funktion
         const closeMenu = () => {
             sideMenu.classList.remove('visible');
             const heroFlipped = document.querySelector('.hero-flip-wrapper.flipped'); 
@@ -146,7 +129,6 @@ const setupSideMenu = () => {
 };
 
 // === 5. EVITA CHAT LOGIK ===
-
 const setupEvitaChatButton = () => {
     const evitaChatButton = document.getElementById('evita-chat-button');
     if (evitaChatButton) {
@@ -202,7 +184,6 @@ const addWelcomeMessage = (message) => {
 };
 
 // === 6. HERO FLIP LOGIK ===
-
 const initHeroFlip = () => {
     const heroFlipWrapper = document.getElementById('hero-flip-wrapper');
     if (!heroFlipWrapper) return;
@@ -216,6 +197,65 @@ const initHeroFlip = () => {
     const viewMain = document.getElementById('view-main');
     const viewThird = document.getElementById('view-third');
 
+    // --- FIX: Hash-Check Funktion mit Scroll-Freigabe ---
+    const checkHashAndFlip = () => {
+        const hash = window.location.hash;
+        
+        if (hash === '#michael') {
+            if(viewMain) viewMain.style.display = 'block';
+            if(viewThird) viewThird.style.display = 'none';
+            heroFlipWrapper.classList.add('flipped');
+            
+            // WICHTIG: Scrolling erlauben!
+            document.body.classList.remove('no-scroll');
+            
+            // Timeout gibt der Flip-Animation Zeit, bevor gescrollt wird
+            setTimeout(() => {
+                const target = document.getElementById('michael');
+                if (target) {
+                    const headerOffset = document.querySelector('.main-header')?.offsetHeight || 80;
+                    const elementPosition = target.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset - 40;
+
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            }, 300);
+        } 
+        else if (hash === '#evita') {
+            if (viewMain) viewMain.style.display = 'none';
+            if (viewThird) viewThird.style.display = 'flex';
+            heroFlipWrapper.classList.remove('flipped');
+            
+            // WICHTIG: Scrolling erlauben!
+            document.body.classList.remove('no-scroll');
+            
+            // Auch hier zum Anker scrollen
+            setTimeout(() => {
+                const target = document.getElementById('evita');
+                if (target) {
+                    const headerOffset = document.querySelector('.main-header')?.offsetHeight || 80;
+                    const elementPosition = target.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset - 40;
+
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            }, 300);
+        }
+    };
+
+    // Führe den Check sofort aus (beim Initialisieren)
+    checkHashAndFlip();
+
+    // Reagiere auf Änderungen des Hashes (wenn man im Menü klickt)
+    window.addEventListener('hashchange', checkHashAndFlip);
+
+    // --- BESTEHENDE EVENT LISTENER ---
     if (btnToBack) {
         btnToBack.addEventListener('click', (e) => {
             e.preventDefault();
@@ -227,13 +267,14 @@ const initHeroFlip = () => {
     if (btnBackToStart) {
         btnBackToStart.addEventListener('click', (e) => {
             e.preventDefault();
+            // Entferne Hash beim Klick auf Home/Zurück
+            history.pushState("", document.title, window.location.pathname + window.location.search);
             if(viewMain) viewMain.style.display = 'block';
             if(viewThird) viewThird.style.display = 'none';
             heroFlipWrapper.classList.remove('flipped');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     }
-
     if (btnToThird) {
         btnToThird.addEventListener('click', (e) => {
             e.preventDefault();
@@ -269,10 +310,12 @@ const initHeroFlip = () => {
 
 const initializeDynamicScripts = () => {
     initModals();
-    initHeaderScrollEffect(); // Startet Smart Header/Footer
+    initHeaderScrollEffect(); 
     setupSideMenu();
     setupEvitaChatButton();
     initHeroFlip();
+    initTheme(); 
+    initMenuInteractions(); // NEU: Initialisierung der Themen-Suche im Menü
 };
 
 const initializeStaticScripts = () => {
@@ -288,33 +331,33 @@ const initializeForms = async () => {
 // MAIN EVENT LISTENER
 document.addEventListener('DOMContentLoaded', async () => {
     
-    initializeStaticScripts();
-
+    // Vorab-Check für den Theme-Status
     if (localStorage.getItem('theme') === 'dark') {
         document.body.classList.add('dark-mode');
     }
 
+    initializeStaticScripts();
+
     try {
-        await Promise.all([
-            loadContent('header.html', 'header-placeholder'),
-            loadContent('modals.html', 'modal-container'),
-            loadContent('footer.html', 'footer-placeholder'),
-            loadContent('side-menu.html', 'side-menu-placeholder'),
-            loadFeedback()
-        ]);
+        // Sequentielles Laden, um sicherzustellen, dass DOM-Elemente vorhanden sind
+        await loadContent('header.html', 'header-placeholder');
+        await loadContent('modals.html', 'modal-container');
+        await loadContent('footer.html', 'footer-placeholder');
+        await loadContent('side-menu.html', 'side-menu-placeholder');
+        await loadFeedback();
 
         console.log("✅ Layout geladen.");
         
-        // Timeout gibt dem Browser kurz Zeit, das DOM zu rendern
+        // Kleine Verzögerung, um sicherzugehen, dass die innerHTML-Inhalte verarbeitet wurden
         setTimeout(() => {
             initializeDynamicScripts();
             initializeForms();
-        }, 50);
+        }, 100);
 
         document.body.classList.add('page-loaded');
 
     } catch (error) {
-        console.error("❌ Fehler:", error);
+        console.error("❌ Fehler beim Laden der Komponenten:", error);
         document.body.classList.add('page-loaded');
     }
 });

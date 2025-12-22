@@ -1,5 +1,5 @@
 /* ==============
-   AI-STYLES.CSS - BEREINIGT
+   AI-STYLES.CSS - TORINO STYLE
    Für Evita KI (Hauptseite) und Silas KI (CSV-Creator)
    ============== */
 
@@ -7,17 +7,15 @@
 /* EVITA KI - HAUPTSEITEN-FORMULAR         */
 /* ======================================== */
 
-/* Das Haupt-AI-Formular auf der Startseite verwendet die Stile aus style.css */
-/* Hier nur spezielle Ergänzungen falls nötig */
-
 #ai-chat-form button .fa-paper-plane {
-    color: white;
-   font-size: 16px;
+    color: var(--bg-color);
+    font-size: 16px;
 }
 
 #ai-question::placeholder {
-    color: var(--text-color);
-    opacity: 0.5;
+    color: var(--text-color-muted);
+    opacity: 0.7;
+    font-style: italic;
     transition: opacity 0.6s ease-in-out;
 }
 
@@ -29,18 +27,16 @@
 /* MODAL GRUNDLAGEN - EVITA CHAT           */
 /* ======================================== */
 
-/* GRUND-MODAL OVERLAY */
-
-  .modal-overlay {
+.modal-overlay {
     position: fixed !important;
     top: 0 !important;
     left: 0 !important;
     width: 100% !important;
     height: 100% !important;
     z-index: 9999 !important;
-    background-color: rgba(10, 10, 10, 0.9) !important;
+    background-color: rgba(10, 10, 10, 0.95) !important;
     
-    display: none !important; /* Standardmäßig versteckt */
+    display: none !important;
     align-items: center !important;
     justify-content: center !important;
     
@@ -48,11 +44,8 @@
     visibility: hidden !important;
     pointer-events: none !important;
     transition: opacity 0.3s ease, visibility 0.3s ease !important;
-  }
+}
 
-
-   
-/* MODAL SICHTBAR MACHEN */
 .modal-overlay.visible {
     display: flex !important;
     opacity: 1 !important;
@@ -60,7 +53,6 @@
     pointer-events: auto !important;
 }
 
-/* ALTERNATIVE: Direkte Display-Steuerung */
 .modal-overlay[style*="display: flex"] {
     display: flex !important;
     opacity: 1 !important;
@@ -68,7 +60,6 @@
     pointer-events: auto !important;
 }
 
-/* FALLBACK: Falls .visible nicht funktioniert */
 .modal-overlay.show,
 .modal-overlay.open {
     display: flex !important;
@@ -77,23 +68,15 @@
     pointer-events: auto !important;
 }
 
-/* DEBUG: Zum Testen sichtbar machen */
-.modal-overlay[data-debug="true"] {
-    display: flex !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
-    background-color: rgba(255, 0, 0, 0.3) !important; /* Rote Farbe zum Debuggen */
-}
-
 /* ======================================== */
 /* AI-RESPONSE-MODAL SPEZIFISCH            */
 /* ======================================== */
 
 #ai-response-modal .modal-content {
-    background-color: #1e1e1e !important;
-    color: #e0e0e0 !important;
-    border-radius: 10px !important;
+    background-color: var(--modal-bg) !important;
+    color: var(--text-color) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 0 !important;
     width: 90vw !important;
     height: 80vh !important;
     max-width: 800px !important;
@@ -117,10 +100,10 @@
     position: absolute !important;
     top: 15px !important;
     right: 20px !important;
-    background: rgba(255, 255, 255, 0.1) !important;
-    border: none !important;
-    color: #fff !important;
-    border-radius: 50% !important;
+    background: transparent !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-color-muted) !important;
+    border-radius: 0 !important;
     width: 35px !important;
     height: 35px !important;
     cursor: pointer !important;
@@ -129,11 +112,14 @@
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    transition: background-color 0.3s ease !important;
+    transition: all 0.3s ease !important;
 }
 
 .close-button:hover {
-    background: rgba(255, 255, 255, 0.2) !important;
+    background: transparent !important;
+    border-color: var(--accent-color) !important;
+    color: var(--accent-color) !important;
+    transform: none !important;
 }
 
 /* ======================================== */
@@ -143,19 +129,18 @@
 #ai-chat-history {
     flex: 1 !important;
     overflow-y: auto !important;
-    padding: 60px 20px 20px 20px !important; /* Top-Padding für Close-Button */
-    background-color: rgba(0, 0, 0, 0.1) !important;
-    border-radius: 8px !important;
+    padding: 60px 20px 20px 20px !important;
+    background-color: rgba(0, 0, 0, 0.2) !important;
+    border-radius: 0 !important;
     margin-bottom: 15px !important;
     min-height: 200px !important;
     max-height: 400px !important;
-
 }
 
 /* CHAT-NACHRICHTEN */
 .chat-message {
     padding: 12px 16px !important;
-    border-radius: 12px !important;
+    border-radius: 0 !important;
     margin-bottom: 12px !important;
     max-width: 85% !important;
     line-height: 1.5 !important;
@@ -171,21 +156,22 @@
 }
 
 .chat-message.user {
-    background-color: var(--accent-color, #ffc107) !important;
-    color: #1a1a1a !important;
+    background-color: var(--accent-color) !important;
+    color: var(--bg-color) !important;
     margin-left: auto !important;
     margin-right: 0 !important;
-    border-bottom-right-radius: 4px !important;
+    border-radius: 0 !important;
     float: right !important;
 }
 
 .chat-message.ai {
-    background-color: #2a2a2a !important;
-    color: var(--text-color, #e0e0e0) !important;
+    background-color: var(--card-bg) !important;
+    color: var(--text-color) !important;
     margin-left: 0 !important;
     margin-right: auto !important;
-    border-bottom-left-radius: 4px !important;
+    border-radius: 0 !important;
     float: left !important;
+    border: 1px solid var(--border-color) !important;
 }
 
 /* ======================================== */
@@ -194,9 +180,9 @@
 
 #ai-chat-form {
     flex-shrink: 0 !important;
-    background-color: var(--bg-color, #1a1a1a) !important;
-    border: 1px solid var(--border-color, #444) !important;
-    border-radius: 10px !important;
+    background-color: transparent !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 0 !important;
     display: flex !important;
     flex-direction: row !important;
     align-items: stretch !important;
@@ -212,16 +198,19 @@
     flex: 1 1 auto !important;
     background: none !important;
     border: none !important;
-    color: var(--text-color, #e0e0e0) !important;
+    color: var(--text-color) !important;
     font-size: 1rem !important;
+    font-weight: 300 !important;
+    letter-spacing: 0.02em !important;
     outline: none !important;
     padding: 12px 15px !important;
     box-sizing: border-box !important;
 }
 
 #ai-chat-form input[type="text"]::placeholder {
-    color: var(--text-color, #e0e0e0) !important;
-    opacity: 0.5 !important;
+    color: var(--text-color-muted) !important;
+    font-style: italic !important;
+    opacity: 0.7 !important;
     transition: opacity 0.6s ease-in-out !important;
 }
 
@@ -231,9 +220,10 @@
 
 #ai-chat-form button,
 #ai-response-modal #ai-chat-form button {
-    background: var(--accent-color, #ffc107) !important;
-    color: #1a1a1a !important;
+    background: var(--accent-color) !important;
+    color: var(--bg-color) !important;
     border: none !important;
+    border-left: 1px solid var(--border-color) !important;
     padding: 12px 18px !important;
     display: flex !important;
     align-items: center !important;
@@ -248,7 +238,7 @@
 
 #ai-chat-form button:hover,
 #ai-response-modal #ai-chat-form button:hover {
-    background: #d39a00 !important;
+    background: var(--accent-color-hover) !important;
 }
 
 /* ======================================== */
@@ -259,27 +249,30 @@
     flex-shrink: 0 !important;
     text-align: center !important;
     padding: 15px 20px !important;
-    border-top: 1px solid var(--border-color, #444) !important;
-    background-color: rgba(0, 0, 0, 0.1) !important;
+    border-top: 1px solid var(--border-color) !important;
+    background-color: transparent !important;
 }
 
 .modal-footer .button {
-    background-color: var(--accent-color, #ffc107) !important;
-    color: #1a1a1a !important;
+    background-color: transparent !important;
+    color: var(--accent-color) !important;
     cursor: pointer !important;
     padding: 0.75rem 1.5rem !important;
     transition: all 0.3s ease !important;
-    border: 2px solid var(--accent-color, #ffc107) !important;
+    border: 1px solid var(--accent-color) !important;
     font-size: 1rem !important;
-    border-radius: 5px !important;
+    font-weight: 400 !important;
+    letter-spacing: 0.03em !important;
+    text-transform: uppercase !important;
+    border-radius: 0 !important;
     text-decoration: none !important;
     display: inline-block !important;
 }
 
 .modal-footer .button:hover {
-    background-color: #ffca2c !important;
-    border-color: #ffca2c !important;
-    transform: translateY(-1px) !important;
+    background-color: var(--accent-color) !important;
+    color: var(--bg-color) !important;
+    transform: none !important;
 }
 
 /* ======================================== */
@@ -289,30 +282,34 @@
 .ai-container {
     width: 100%;
     margin: 0 auto;
-    position: relative; /* Notwendig, damit z-index funktioniert */
-    z-index: 10;      /* Ein hoher Wert stellt sicher, dass es über anderen Elementen liegt */
+    position: relative;
+    z-index: 10;
 }
 
 .ai-container h3 {
-    color: #ffc107;
+    color: var(--accent-color);
     text-align: center;
     margin-bottom: 1rem;
+    font-weight: 400;
+    letter-spacing: 0.03em;
 }
 
 .ai-container p {
-    color: #ccc;
+    color: var(--text-color-muted);
+    opacity: 0.8;
     text-align: center;
     margin-bottom: 1.5rem;
+    font-weight: 300;
 }
 
 #silas-form,
 .silas-input-container {
     display: flex;
     flex-direction: row;
-    border-radius: 7px;
+    border-radius: 0;
     overflow: hidden;
-    border: 1px solid #444;
-    background-color: #2d2d2d;
+    border: 1px solid var(--border-color);
+    background-color: transparent;
     transition: all 0.3s ease-in-out;
     align-items: center;
     margin-bottom: 1.5rem;
@@ -326,8 +323,8 @@
 #silas-form:focus-within,
 .silas-input-container:hover,
 .silas-input-container:focus-within {
-    border-color: #ffc107;
-    box-shadow: 0 0 15px rgba(255, 193, 7, 0.2);
+    border-color: var(--accent-color);
+    box-shadow: none;
 }
 
 #silas-keyword-input,
@@ -338,21 +335,25 @@
     outline: none;
     padding: 15px 20px;
     font-size: 1rem;
-    color: #eee;
+    font-weight: 300;
+    letter-spacing: 0.02em;
+    color: var(--text-color);
     font-family: 'Poppins', sans-serif;
     width: 100%;
 }
 
 #silas-keyword-input::placeholder,
 .silas-extra-input::placeholder {
-    color: #888;
-    opacity: 1;
+    color: var(--text-color-muted);
+    font-style: italic;
+    opacity: 0.7;
 }
 
 #silas-form button {
-    background: #ffc107;
+    background: var(--accent-color);
     border: none;
-    color: #1a1a1a;
+    border-left: 1px solid var(--border-color);
+    color: var(--bg-color);
     padding: 0 20px;
     cursor: pointer;
     font-size: 1.2rem;
@@ -360,13 +361,14 @@
 }
 
 #silas-form button:hover {
-    background: #e0a800;
+    background: var(--accent-color-hover);
 }
 
 #add-keyword-btn {
     background: transparent;
     border: none;
-    color: #ffc107;
+    border-left: 1px solid var(--border-color);
+    color: var(--accent-color);
     padding: 10px 20px;
     cursor: pointer;
     font-size: 1.2rem;
@@ -378,8 +380,8 @@
 }
 
 #add-keyword-btn:hover {
-    color: #fff;
-    background-color: rgba(255, 193, 7, 0.1);
+    color: var(--text-color);
+    background-color: rgba(196, 163, 90, 0.1);
 }
 
 /* ======================================== */
@@ -392,34 +394,34 @@
     margin-top: 15px;
     gap: 15px;
     width: 100%;
-    background-color: rgba(45, 45, 45, 0.3);
+    background-color: rgba(255, 255, 255, 0.02);
     padding: 12px 15px;
-    border-radius: 7px;
-    border: 1px solid #444;
+    border-radius: 0;
+    border: 1px solid var(--border-color);
     transition: all 0.3s ease-in-out;
 }
 
 .ai-container .input-group:hover {
-    border-color: #ffc107;
-    box-shadow: 0 0 5px rgba(255, 193, 7, 0.3);
+    border-color: var(--accent-color);
+    box-shadow: none;
 }
 
 .ai-container .input-group label {
     display: flex;
     align-items: center;
-    font-weight: 500;
+    font-weight: 400;
     white-space: nowrap;
-    color: #f0f0f0;
+    color: var(--text-color-muted);
     min-width: 80px;
     margin-right: 15px;
 }
 
 .ai-container .custom-select {
     flex-grow: 1;
-    background-color: #2d2d2d;
-    border: 1px solid #444;
-    border-radius: 7px;
-    color: #fff;
+    background-color: var(--bg-color-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 0;
+    color: var(--text-color);
     padding: 10px 15px;
     font-size: 1rem;
     font-family: inherit;
@@ -429,7 +431,7 @@
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffc107' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c4a35a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
     background-repeat: no-repeat;
     background-position: right 12px center;
     background-size: 16px;
@@ -438,14 +440,14 @@
 
 .ai-container .custom-select:hover,
 .ai-container .custom-select:focus {
-    border-color: #ffc107;
-    box-shadow: 0 0 10px rgba(255, 193, 7, 0.3);
+    border-color: var(--accent-color);
+    box-shadow: none;
     outline: none;
 }
 
 .ai-container .custom-select option {
-    background-color: #2d2d2d;
-    color: #fff;
+    background-color: var(--card-bg);
+    color: var(--text-color);
     padding: 10px;
 }
 
@@ -456,15 +458,17 @@
 .keyword-list-container {
     margin-top: 2rem;
     padding: 1.5rem;
-    border: 1px solid #444;
-    border-radius: 10px;
-    background-color: rgba(45, 45, 45, 0.5);
+    border: 1px solid var(--border-color);
+    border-radius: 0;
+    background-color: rgba(255, 255, 255, 0.02);
 }
 
 .keyword-list-container h4 {
     margin-top: 0;
-    color: #ffc107;
+    color: var(--accent-color);
     text-align: center;
+    font-weight: 400;
+    letter-spacing: 0.03em;
 }
 
 #keyword-display-list {
@@ -473,35 +477,36 @@
     margin: 1rem 0;
     max-height: 200px;
     overflow-y: auto;
-    background-color: rgba(0,0,0,0.2);
-    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 0;
     padding: 0.5rem;
 }
 
 #keyword-display-list li {
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: var(--bg-color-secondary);
     margin-bottom: 12px;
     padding: 15px;
-    border-radius: 8px;
+    border-radius: 0;
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     font-size: 0.95rem;
-    color: #fff;
+    color: var(--text-color);
     min-height: 50px;
     gap: 10px;
     transition: background-color 0.3s ease;
+    border: 1px solid var(--border-color);
 }
 
 #keyword-display-list li:hover {
-    background-color: rgba(255, 255, 255, 0.08);
+    background-color: rgba(255, 255, 255, 0.03);
 }
 
 #keyword-display-list li button {
-    background-color: #ff6b6b;
-    color: white;
-    border: none;
-    border-radius: 6px;
+    background-color: transparent;
+    color: #ff6b6b;
+    border: 1px solid #ff6b6b;
+    border-radius: 0;
     min-width: 36px;
     height: 36px;
     cursor: pointer;
@@ -510,12 +515,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background-color 0.3s ease;
+    transition: all 0.3s ease;
     flex-shrink: 0;
 }
 
 #keyword-display-list li button:hover {
-    background-color: #ff5252;
+    background-color: #ff6b6b;
+    color: var(--bg-color);
 }
 
 /* ======================================== */
@@ -536,10 +542,12 @@
     justify-content: center;
     padding: 12px 25px;
     font-size: 1rem;
-    font-weight: 600;
-    border-radius: 7px;
+    font-weight: 400;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    border-radius: 0;
     cursor: pointer;
-    border: 2px solid;
+    border: 1px solid;
     transition: all 0.3s ease;
     text-decoration: none;
 }
@@ -549,29 +557,29 @@
 }
 
 .cta-button:not(.secondary) {
-    background-color: #ffc107;
-    border-color: #ffc107;
-    color: #1a1a1a;
+    background-color: transparent;
+    border-color: var(--accent-color);
+    color: var(--accent-color);
 }
 
 .cta-button:not(.secondary):hover {
-    background-color: #ffca2c;
-    border-color: #ffca2c;
-    color: #000;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(255, 193, 7, 0.2);
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    color: var(--bg-color);
+    transform: none;
+    box-shadow: none;
 }
 
 .cta-button.secondary {
     background-color: transparent;
-    border-color: #555;
-    color: #aaa;
+    border-color: var(--border-color);
+    color: var(--text-color-muted);
 }
 
 .cta-button.secondary:hover {
-    background-color: #333;
-    border-color: #777;
-    color: #fff;
+    background-color: transparent;
+    border-color: var(--accent-color);
+    color: var(--accent-color);
     transform: none;
     box-shadow: none;
 }
@@ -586,34 +594,40 @@
 }
 
 #silas-response-container h3 {
-    color: #ffc107;
+    color: var(--accent-color);
     text-align: center;
     margin-bottom: 1.5rem;
+    font-weight: 400;
+    letter-spacing: 0.03em;
 }
 
 #silas-response-content {
-    background-color: rgba(255,255,255,0.05);
-    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 0;
     padding: 10px;
     margin-bottom: 1rem;
 }
 
 .result-card {
-    background-color: rgba(255,255,255,0.05);
-    border-radius: 8px;
+    background-color: var(--card-bg);
+    border-radius: 0;
     padding: 15px;
     margin-bottom: 15px;
-    border-left: 4px solid #ffc107;
+    border: 1px solid var(--border-color);
+    border-left: 3px solid var(--accent-color);
+    color: var(--text-color);
 }
 
 .result-card h4 {
-    color: #fff;
+    color: var(--accent-color);
     margin: 0 0 10px 0;
+    font-weight: 400;
 }
 
 .result-card p {
     margin: 5px 0;
-    color: #ccc;
+    color: var(--text-color-muted);
+    opacity: 0.8;
 }
 
 .result-card .error {
@@ -621,18 +635,22 @@
 }
 
 .preview-btn {
-    background-color: #007cba;
-    color: white;
-    border: none;
+    background-color: transparent;
+    color: var(--accent-color);
+    border: 1px solid var(--accent-color);
     padding: 8px 16px;
-    border-radius: 4px;
+    border-radius: 0;
     cursor: pointer;
     margin-top: 10px;
-    transition: background-color 0.3s ease;
+    transition: all 0.3s ease;
+    font-weight: 400;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
 }
 
 .preview-btn:hover {
-    background-color: #005f8a;
+    background-color: var(--accent-color);
+    color: var(--bg-color);
 }
 
 /* ======================================== */
@@ -646,7 +664,7 @@
     width: 100%;
     height: 100%;
     z-index: 9999;
-    background-color: rgba(10, 10, 10, 0.9);
+    background-color: rgba(10, 10, 10, 0.95);
     
     display: flex !important;
     align-items: center !important;
@@ -666,9 +684,10 @@
 }
 
 #silas-preview-modal .modal-content {
-    background-color: #1e1e1e;
-    color: #e0e0e0;
-    border-radius: 10px;
+    background-color: var(--modal-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 0;
     width: 90vw;
     height: 90vh;
     max-width: 1200px;
@@ -688,8 +707,9 @@
     overflow-y: auto;
     padding: 20px;
     flex-grow: 1;
-    background: #2a2a2a;
-    border-radius: 5px;
+    background: var(--card-bg);
+    border-radius: 0;
+    color: var(--text-color);
 }
 
 #download-csv,
@@ -698,14 +718,17 @@
 #download-txt-dynamic {
     width: 100%;
     text-align: center;
-    border: 2px solid #ffc107;
+    border: 1px solid var(--accent-color);
     background-color: transparent;
-    color: #ffc107;
+    color: var(--accent-color);
     padding: 12px 20px;
-    border-radius: 7px;
+    border-radius: 0;
     cursor: pointer;
     transition: all 0.3s ease;
     font-size: 1rem;
+    font-weight: 400;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
     margin-top: 1rem;
     display: inline-flex;
     align-items: center;
@@ -716,9 +739,9 @@
 #download-csv-dynamic:hover,
 #download-txt:hover,
 #download-txt-dynamic:hover {
-    background-color: #ffc107;
-    color: #2d2d2d;
-    box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
+    background-color: var(--accent-color);
+    color: var(--bg-color);
+    box-shadow: none;
 }
 
 #download-csv .fas,
@@ -733,8 +756,8 @@
     text-align: center;
     width: 100%;
     margin-top: 1rem;
-    color: #ffc107;
-    font-weight: 500;
+    color: var(--accent-color);
+    font-weight: 400;
 }
 
 /* ======================================== */
@@ -747,18 +770,20 @@
         width: 95vw !important;
         height: 90vh !important;
         max-height: none !important;
-        border-radius: 5px !important;
+        border-radius: 0 !important;
     }
     
     #ai-chat-history {
         padding: 50px 15px 15px 15px !important;
         max-height: none !important;
         flex: 1 !important;
+        border-radius: 0 !important;
     }
     
     .chat-message {
         max-width: 90% !important;
         padding: 10px 12px !important;
+        border-radius: 0 !important;
     }
     
     .close-button {
@@ -767,6 +792,7 @@
         width: 32px !important;
         height: 32px !important;
         font-size: 1.1rem !important;
+        border-radius: 0 !important;
     }
 
     /* Silas Responsive */
@@ -779,8 +805,8 @@
     #silas-keyword-input {
         width: 100%;
         margin-bottom: 10px;
-        border: 1px solid #444;
-        border-radius: 7px;
+        border: 1px solid var(--border-color);
+        border-radius: 0;
         padding: 15px;
         font-size: 16px;
     }
@@ -789,8 +815,8 @@
         width: 100%;
         justify-content: center;
         padding: 15px;
-        border: 1px solid #ffc107;
-        border-radius: 7px;
+        border: 1px solid var(--accent-color);
+        border-radius: 0;
         font-size: 1.1rem;
         min-height: 50px;
     }
@@ -816,11 +842,13 @@
         padding: 15px;
         font-size: 16px;
         min-height: 50px;
+        border-radius: 0;
     }
 
     .keyword-list-container {
         padding: 20px;
         margin-top: 25px;
+        border-radius: 0;
     }
     
     .keyword-list-container h4 {
@@ -831,6 +859,7 @@
     #keyword-display-list {
         padding: 10px;
         max-height: 300px;
+        border-radius: 0;
     }
     
     #keyword-display-list li {
@@ -840,6 +869,7 @@
         flex-direction: row;
         align-items: flex-start;
         gap: 15px;
+        border-radius: 0;
     }
     
     #keyword-display-list li > div {
@@ -852,7 +882,7 @@
         min-width: 44px !important;
         height: 44px !important;
         font-size: 20px !important;
-        border-radius: 8px !important;
+        border-radius: 0 !important;
         margin-left: 0 !important;
     }
 
@@ -868,11 +898,13 @@
         padding: 18px 25px;
         font-size: 1.1rem;
         min-height: 55px;
+        border-radius: 0;
     }
 
     .result-card {
         padding: 20px !important;
         margin-bottom: 20px !important;
+        border-radius: 0 !important;
     }
     
     .result-card h4 {
@@ -886,6 +918,7 @@
         font-size: 1rem !important;
         margin-top: 15px !important;
         min-height: 50px !important;
+        border-radius: 0 !important;
     }
 
     #download-csv,
@@ -895,16 +928,18 @@
         padding: 18px 20px !important;
         font-size: 1.1rem !important;
         min-height: 55px !important;
+        border-radius: 0 !important;
     }
 
     body #silas-preview-modal .modal-content {
         width: 95vw !important;
         height: 95vh !important;
-        border-radius: 5px !important;
+        border-radius: 0 !important;
     }
     
     body #silas-preview-modal #preview-content-area {
         padding: 15px !important;
+        border-radius: 0 !important;
     }
     
     body #silas-preview-modal .close-button {
@@ -913,6 +948,7 @@
         width: 38px !important;
         height: 38px !important;
         font-size: 1.3rem !important;
+        border-radius: 0 !important;
     }
 }
 
@@ -925,8 +961,6 @@
     max-width: none !important;
     width: 100% !important;
 }
-
-
 
 /* ======================================== */
 /* BOOKING MODAL STYLES                   */
@@ -959,9 +993,10 @@
 }
 
 #booking-modal .modal-content {
-    background-color: #1e1e1e !important;
-    color: #e0e0e0 !important;
-    border-radius: 10px !important;
+    background-color: var(--modal-bg) !important;
+    color: var(--text-color) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 0 !important;
     width: 90vw !important;
     max-width: 600px !important;
     max-height: 80vh !important;
@@ -987,21 +1022,24 @@
 }
 
 .day-button {
-    background: var(--accent-color, #ffc107) !important;
-    color: #1a1a1a !important;
-    border: none !important;
+    background: transparent !important;
+    color: var(--accent-color) !important;
+    border: 1px solid var(--accent-color) !important;
     padding: 15px 20px !important;
-    border-radius: 8px !important;
+    border-radius: 0 !important;
     cursor: pointer !important;
     font-size: 1rem !important;
-    font-weight: 600 !important;
+    font-weight: 400 !important;
+    letter-spacing: 0.03em !important;
+    text-transform: uppercase !important;
     transition: all 0.3s ease !important;
 }
 
 .day-button:hover {
-    background: #ffca2c !important;
-    transform: translateY(-2px) !important;
-    box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3) !important;
+    background: var(--accent-color) !important;
+    color: var(--bg-color) !important;
+    transform: none !important;
+    box-shadow: none !important;
 }
 
 #slots-container {
@@ -1012,20 +1050,20 @@
 }
 
 .slot-button {
-    background: rgba(255, 255, 255, 0.1) !important;
-    color: var(--text-color, #e0e0e0) !important;
-    border: 1px solid var(--border-color, #444) !important;
+    background: transparent !important;
+    color: var(--text-color) !important;
+    border: 1px solid var(--border-color) !important;
     padding: 12px 16px !important;
-    border-radius: 6px !important;
+    border-radius: 0 !important;
     cursor: pointer !important;
     font-size: 0.9rem !important;
     transition: all 0.3s ease !important;
 }
 
 .slot-button:hover {
-    background: var(--accent-color, #ffc107) !important;
-    color: #1a1a1a !important;
-    border-color: var(--accent-color, #ffc107) !important;
+    background: var(--accent-color) !important;
+    color: var(--bg-color) !important;
+    border-color: var(--accent-color) !important;
 }
 
 .form-group {
@@ -1034,34 +1072,34 @@
 
 .form-group label {
     display: block !important;
-    color: var(--text-color, #e0e0e0) !important;
+    color: var(--text-color-muted) !important;
     margin-bottom: 8px !important;
-    font-weight: 500 !important;
+    font-weight: 400 !important;
 }
 
 .form-group input {
     width: 100% !important;
-    background: rgba(255, 255, 255, 0.1) !important;
-    border: 1px solid var(--border-color, #444) !important;
-    border-radius: 6px !important;
+    background: var(--bg-color-secondary) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 0 !important;
     padding: 12px 15px !important;
-    color: var(--text-color, #e0e0e0) !important;
+    color: var(--text-color) !important;
     font-size: 1rem !important;
     box-sizing: border-box !important;
 }
 
 .form-group input:focus {
     outline: none !important;
-    border-color: var(--accent-color, #ffc107) !important;
-    box-shadow: 0 0 10px rgba(255, 193, 7, 0.3) !important;
+    border-color: var(--accent-color) !important;
+    box-shadow: none !important;
 }
 
 .back-button {
-    background: rgba(255, 255, 255, 0.1) !important;
-    color: var(--text-color, #e0e0e0) !important;
-    border: 1px solid var(--border-color, #444) !important;
+    background: transparent !important;
+    color: var(--text-color-muted) !important;
+    border: 1px solid var(--border-color) !important;
     padding: 10px 15px !important;
-    border-radius: 6px !important;
+    border-radius: 0 !important;
     cursor: pointer !important;
     font-size: 0.9rem !important;
     margin-bottom: 20px !important;
@@ -1069,37 +1107,43 @@
 }
 
 .back-button:hover {
-    background: rgba(255, 255, 255, 0.2) !important;
+    border-color: var(--accent-color) !important;
+    color: var(--accent-color) !important;
+    background: transparent !important;
 }
 
 #submit-booking-button {
     width: 100% !important;
-    background: var(--accent-color, #ffc107) !important;
-    color: #1a1a1a !important;
-    border: none !important;
+    background: var(--accent-color) !important;
+    color: var(--bg-color) !important;
+    border: 1px solid var(--accent-color) !important;
     padding: 15px 20px !important;
-    border-radius: 8px !important;
+    border-radius: 0 !important;
     cursor: pointer !important;
     font-size: 1.1rem !important;
-    font-weight: 600 !important;
+    font-weight: 400 !important;
+    letter-spacing: 0.03em !important;
+    text-transform: uppercase !important;
     transition: all 0.3s ease !important;
 }
 
 #submit-booking-button:hover {
-    background: #ffca2c !important;
-    transform: translateY(-1px) !important;
+    background: var(--accent-color-hover) !important;
+    border-color: var(--accent-color-hover) !important;
+    transform: none !important;
 }
 
 #submit-booking-button:disabled {
-    background: #666 !important;
-    color: #999 !important;
+    background: var(--border-color) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-color-subtle) !important;
     cursor: not-allowed !important;
     transform: none !important;
 }
 
 .loader {
-    border: 3px solid rgba(255, 193, 7, 0.3) !important;
-    border-top: 3px solid var(--accent-color, #ffc107) !important;
+    border: 3px solid rgba(196, 163, 90, 0.3) !important;
+    border-top: 3px solid var(--accent-color) !important;
     border-radius: 50% !important;
     width: 30px !important;
     height: 30px !important;
@@ -1113,11 +1157,11 @@
 }
 
 .error-message {
-    background: rgba(244, 67, 54, 0.1) !important;
-    border: 1px solid #f44336 !important;
-    color: #f44336 !important;
+    background: rgba(255, 107, 107, 0.1) !important;
+    border: 1px solid #ff6b6b !important;
+    color: #ff6b6b !important;
     padding: 15px !important;
-    border-radius: 6px !important;
+    border-radius: 0 !important;
     margin: 15px 0 !important;
     text-align: center !important;
 }
@@ -1127,19 +1171,22 @@
 }
 
 #step-confirmation h2 {
-    color: var(--accent-color, #ffc107) !important;
+    color: var(--accent-color) !important;
     margin-bottom: 20px !important;
+    font-weight: 400 !important;
 }
 
 #close-confirmation-button {
-    background: var(--accent-color, #ffc107) !important;
-    color: #1a1a1a !important;
-    border: none !important;
+    background: var(--accent-color) !important;
+    color: var(--bg-color) !important;
+    border: 1px solid var(--accent-color) !important;
     padding: 12px 25px !important;
-    border-radius: 6px !important;
+    border-radius: 0 !important;
     cursor: pointer !important;
     font-size: 1rem !important;
-    font-weight: 600 !important;
+    font-weight: 400 !important;
+    letter-spacing: 0.03em !important;
+    text-transform: uppercase !important;
     margin-top: 20px !important;
 }
 
@@ -1147,10 +1194,10 @@
     position: absolute !important;
     top: 15px !important;
     right: 20px !important;
-    background: rgba(255, 255, 255, 0.1) !important;
-    border: none !important;
-    color: #fff !important;
-    border-radius: 50% !important;
+    background: transparent !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-color-muted) !important;
+    border-radius: 0 !important;
     width: 35px !important;
     height: 35px !important;
     cursor: pointer !important;
@@ -1159,17 +1206,18 @@
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    transition: background-color 0.3s ease !important;
+    transition: all 0.3s ease !important;
 }
 
 #close-booking-modal:hover {
-    background: rgba(255, 255, 255, 0.2) !important;
+    border-color: var(--accent-color) !important;
+    color: var(--accent-color) !important;
+    background: transparent !important;
 }
 
-/* MOBILE VIEWPORT UND TASTATUR-FIX - KORRIGIERT */
+/* MOBILE VIEWPORT UND TASTATUR-FIX */
 
 @media (max-width: 768px) {
-    /* Modal Container - Vollbild */
     #ai-response-modal .modal-content {
         position: fixed !important;
         top: 0 !important;
@@ -1177,74 +1225,60 @@
         width: 100% !important;
         height: 100% !important;
         height: 100vh !important;
-        height: 100dvh !important; /* Neue dynamische viewport height */
+        height: 100dvh !important;
         max-width: none !important;
         max-height: none !important;
         border-radius: 0 !important;
         margin: 0 !important;
-        
-        /* Flexbox für Layout */
         display: flex !important;
         flex-direction: column !important;
         padding: 0 !important;
         overflow: hidden !important;
+        background-color: var(--modal-bg) !important;
     }
     
-    /* Chat-History - Flexibles Scrolling */
     #ai-chat-history {
         flex: 1 1 auto !important;
         overflow-y: auto !important;
         overflow-x: hidden !important;
-        
-        /* ENTFERNE alle festen Höhen */
         min-height: unset !important;
         max-height: none !important;
         height: auto !important;
-        
-        /* Touch-optimiertes Scrolling */
         -webkit-overflow-scrolling: touch !important;
         overscroll-behavior: contain !important;
-        
-        /* Padding */
         padding: 50px 15px 15px 15px !important;
         margin: 0 !important;
+        border-radius: 0 !important;
     }
     
-    /* Chat-Form - Am unteren Rand fixiert */
     #ai-chat-form {
         flex: 0 0 auto !important;
         margin: 10px 15px !important;
         margin-bottom: env(safe-area-inset-bottom, 20px) !important;
-        
-        /* Mindesthöhe für Touch */
         min-height: 50px !important;
-        
-        /* Styling */
-        border-radius: 10px !important;
-        border: 1px solid var(--border-color, #444) !important;
+        border-radius: 0 !important;
+        border: 1px solid var(--border-color) !important;
+        background-color: var(--card-bg) !important;
     }
     
-    /* Modal Footer komplett verstecken auf Mobile */
     #ai-response-modal .modal-footer {
         display: none !important;
     }
     
-    /* Input-Feld optimiert */
     #ai-chat-form input[type="text"] {
-        font-size: 16px !important; /* Verhindert Zoom auf iOS */
+        font-size: 16px !important;
         padding: 15px !important;
         line-height: 1.4 !important;
         -webkit-appearance: none !important;
+        color: var(--text-color) !important;
     }
     
-    /* Send-Button optimiert */
     #ai-chat-form button {
         min-width: 60px !important;
         min-height: 50px !important;
         padding: 15px 20px !important;
     }
     
-    /* Close-Button fixiert */
     #ai-response-modal .close-button {
         position: fixed !important;
         top: 10px !important;
@@ -1253,9 +1287,9 @@
         height: 44px !important;
         font-size: 1.2rem !important;
         z-index: 1001 !important;
+        border-radius: 0 !important;
     }
     
-    /* Chat-Nachrichten optimiert */
     .chat-message {
         font-size: 0.9rem !important;
         line-height: 1.4 !important;
@@ -1264,9 +1298,9 @@
         padding: 10px 12px !important;
         word-wrap: break-word !important;
         overflow-wrap: break-word !important;
+        border-radius: 0 !important;
     }
     
-    /* Scrollbar sichtbar machen */
     #ai-chat-history::-webkit-scrollbar {
         width: 4px !important;
     }
@@ -1276,26 +1310,21 @@
     }
     
     #ai-chat-history::-webkit-scrollbar-thumb {
-        background: rgba(255, 193, 7, 0.3) !important;
-        border-radius: 2px !important;
+        background: var(--accent-color-rgba) !important;
+        border-radius: 0 !important;
     }
 }
 
-/* iOS-spezifische Fixes ENTFERNEN oder anpassen */
 @supports (-webkit-touch-callout: none) {
-    /* iOS Safari spezifisch */
     #ai-response-modal .modal-content {
         height: 100vh !important;
-        /* KEINE calc() heights hier! */
     }
     
     #ai-chat-history {
-        /* KEINE festen Heights! */
         flex: 1 1 auto !important;
     }
 }
 
-/* Safe Area Support für iPhone X+ */
 @supports (padding: max(0px)) {
     @media (max-width: 768px) {
         #ai-chat-form {
@@ -1308,25 +1337,65 @@
 /* MOBILE: BUTTON VERSTECKEN, RETURN-TASTE NUTZEN */
 
 @media (max-width: 768px) {
-    /* Senden-Button auf Mobile komplett verstecken */
     #ai-chat-form button {
         display: none !important;
     }
     
-    /* Input-Feld nimmt die ganze Breite */
     #ai-chat-form input[type="text"] {
         width: 100% !important;
         padding: 18px 20px !important;
-        font-size: 16px !important; /* Verhindert Zoom */
-        border-radius: 10px !important;
-        
-        /* Zeige "Senden" auf der Tastatur */
+        font-size: 16px !important;
+        border-radius: 0 !important;
         -webkit-appearance: none !important;
     }
     
-    /* Formular-Container anpassen */
     #ai-chat-form {
         margin-bottom: 20px !important;
         padding: 0 !important;
     }
+}
+
+
+/* Silas Formular-Container im Torino-Stil */
+.summary-box {
+    background-color: rgba(196, 163, 90, 0.05) !important;
+    border-left: 3px solid var(--accent-color) !important;
+    padding: 2rem !important;
+    margin: 2rem 0 !important;
+}
+
+.silas-input-container {
+    background-color: rgba(255, 255, 255, 0.02) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 0 !important;
+    transition: border-color 0.3s ease !important;
+}
+
+.silas-input-container:focus-within {
+    border-color: var(--accent-color) !important;
+}
+
+.silas-extra-input {
+    color: var(--text-color) !important;
+    font-weight: 300 !important;
+}
+
+/* Der Unlock-Button unten rechts im neuen Stil */
+#master-unlock-btn {
+    background: var(--bg-color) !important;
+    border: 1px solid var(--accent-color) !important;
+    color: var(--accent-color) !important;
+    box-shadow: 0 4px 15px rgba(196, 163, 90, 0.2) !important;
+}
+
+#master-unlock-btn:hover {
+    background: var(--accent-color) !important;
+    color: var(--bg-color) !important;
+}
+
+/* Anpassung der Result-Cards */
+.result-card {
+    background-color: rgba(255, 255, 255, 0.02) !important;
+    border: 1px solid var(--border-color) !important;
+    border-left: 3px solid var(--accent-color) !important;
 }

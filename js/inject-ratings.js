@@ -1,10 +1,12 @@
 #!/usr/bin/env node
-// scripts/inject-ratings.js
+// js/inject-ratings.js
 // Injiziert AggregateRating in alle HTML-Dateien vor dem Build/Deploy
 //
+// AUTOMATISCH: Findet selbständig alle HTML-Dateien mit feedback-placeholder
+//
 // Verwendung:
-//   node scripts/inject-ratings.js
-//   oder automatisch via "prebuild" in package.json
+//   node js/inject-ratings.js
+//   oder automatisch via "build" in package.json
 
 import fs from 'fs';
 import path from 'path';
@@ -23,16 +25,20 @@ const CONFIG = {
     // Verzeichnis mit HTML-Dateien (Projekt-Root)
     htmlDir: ROOT_DIR,
     
-    // Blog-Artikel mit Feedback-Widget
-    // WICHTIG: Hier alle Artikel eintragen die das Feedback-Widget haben!
-    includeFiles: [
-        'semantisches-markup.html',
-        // Weitere Blog-Artikel hier hinzufügen:
-        // 'weiterer-artikel.html',
-        // 'noch-ein-artikel.html',
+    // Alle Schema.org Typen die ein AggregateRating bekommen können
+    supportedSchemaTypes: [
+        'BlogPosting',
+        'Article',
+        'NewsArticle',
+        'TechArticle',
+        'HowTo',
+        'Review',
+        'Product',
+        'LocalBusiness',
+        'WebPage'
     ],
     
-    // Dateien die NIE verarbeitet werden sollen
+    // Dateien die NIE verarbeitet werden sollen (Partials, Templates, etc.)
     excludeFiles: [
         'index.html',
         'header.html',
@@ -41,10 +47,59 @@ const CONFIG = {
         'side-menu.html',
         'blog-feedback.html',
         '404.html'
+    ],
+    
+    // Verzeichnisse die ignoriert werden sollen
+    excludeDirs: [
+        'node_modules',
+        'public',
+        '.git',
+        '.vercel',
+        'api',
+        'css',
+        'js',
+        'images',
+        'Font'
     ]
 };
 
 // === HELPER FUNKTIONEN ===
+
+// Alle HTML-Dateien im Root-Verzeichnis finden (nicht rekursiv in Unterordner)
+function findHtmlFiles(dir) {
+    const files = [];
+    
+    try {
+        const entries = fs.readdirSync(dir, { withFileTypes: true });
+        
+        for (const entry of entries) {
+            // Nur Dateien im Root, keine Unterordner
+            if (entry.isFile() && entry.name.endsWith('.html')) {
+                // Ausgeschlossene Dateien überspringen
+                if (!CONFIG.excludeFiles.includes(entry.name)) {
+                    files.push(entry.name);
+                }
+            }
+        }
+    } catch (error) {
+        console.error(`Fehler beim Lesen von ${dir}:`, error.message);
+    }
+    
+    return files;
+}
+
+// Prüft ob eine HTML-Datei das Feedback-Widget enthält
+function hasFeedbackWidget(filepath) {
+    try {
+        const content = fs.readFileSync(filepath, 'utf-8');
+        // Sucht nach dem feedback-placeholder div
+        return content.includes('id="feedback-placeholder"') || 
+               content.includes("id='feedback-placeholder'");
+    } catch (error) {
+        console.warn(`  ⚠️  Konnte ${filepath} nicht lesen:`, error.message);
+        return false;
+    }
+}
 
 // Slug aus Dateiname generieren (identisch zum Frontend)
 function getSlugFromFilename(filename) {
@@ -99,8 +154,8 @@ function injectRatingIntoHtml(htmlContent, aggregateRating) {
         try {
             const schema = JSON.parse(jsonContent);
             
-            // Nur BlogPosting, Article, NewsArticle bearbeiten
-            if (['BlogPosting', 'Article', 'NewsArticle'].includes(schema['@type'])) {
+            // Prüfen ob es ein unterstützter Schema-Typ ist
+            if (CONFIG.supportedSchemaTypes.includes(schema['@type'])) {
                 
                 // Prüfen ob sich das Rating geändert hat
                 const existingRating = schema.aggregateRating;
@@ -114,7 +169,7 @@ function injectRatingIntoHtml(htmlContent, aggregateRating) {
                     schema.aggregateRating = aggregateRating;
                     changed = true;
                     
-                    // Formatiert zurückgeben (4 Spaces Indent passend zu deinem HTML)
+                    // Formatiert zurückgeben (4 Spaces Indent passend zum HTML)
                     const jsonStr = JSON.stringify(schema, null, 2);
                     const indentedJson = jsonStr.split('\n').map(line => '    ' + line).join('\n');
                     return `<script type="application/ld+json">\n${indentedJson}\n    </script>`;
@@ -136,7 +191,7 @@ function injectRatingIntoHtml(htmlContent, aggregateRating) {
 // === HAUPTFUNKTION ===
 
 async function main() {
-    console.log('\n🚀 Rating-Injection gestartet');
+    console.log('\n🚀 Rating-Injection gestartet (Auto-Discovery)');
     console.log('═'.repeat(50));
     console.log(`   API: ${CONFIG.apiBaseUrl}`);
     console.log(`   Verzeichnis: ${CONFIG.htmlDir}\n`);
@@ -156,29 +211,34 @@ async function main() {
         console.log('   ❌ API nicht erreichbar - fahre trotzdem fort\n');
     }
     
-    // Dateien sammeln
-    const files = CONFIG.includeFiles.filter(f => {
-        const filepath = path.join(CONFIG.htmlDir, f);
-        const exists = fs.existsSync(filepath);
-        if (!exists) {
-            console.warn(`  ⚠️  Datei nicht gefunden: ${f}`);
-        }
-        return exists;
-    });
+    // AUTOMATISCH: Alle HTML-Dateien finden
+    console.log('🔍 Suche HTML-Dateien mit Feedback-Widget...\n');
     
-    if (files.length === 0) {
-        console.log('ℹ️  Keine Dateien zu verarbeiten.');
-        console.log('   Tipp: Füge Blog-Artikel zu CONFIG.includeFiles hinzu.\n');
+    const allHtmlFiles = findHtmlFiles(CONFIG.htmlDir);
+    const filesWithFeedback = [];
+    
+    for (const filename of allHtmlFiles) {
+        const filepath = path.join(CONFIG.htmlDir, filename);
+        if (hasFeedbackWidget(filepath)) {
+            filesWithFeedback.push(filename);
+        }
+    }
+    
+    if (filesWithFeedback.length === 0) {
+        console.log('ℹ️  Keine Dateien mit Feedback-Widget gefunden.');
+        console.log('   Tipp: Füge <div id="feedback-placeholder"></div> zu deinen Blog-Artikeln hinzu.\n');
         return;
     }
     
-    console.log(`📄 ${files.length} Datei(en) werden verarbeitet:\n`);
+    console.log(`📄 ${filesWithFeedback.length} Datei(en) mit Feedback-Widget gefunden:\n`);
+    filesWithFeedback.forEach(f => console.log(`   • ${f}`));
+    console.log('');
     
     let updatedCount = 0;
     let skippedCount = 0;
     let errorCount = 0;
     
-    for (const filename of files) {
+    for (const filename of filesWithFeedback) {
         const filepath = path.join(CONFIG.htmlDir, filename);
         const slug = getSlugFromFilename(filename);
         
@@ -219,10 +279,11 @@ async function main() {
     // Zusammenfassung
     console.log('\n' + '═'.repeat(50));
     console.log('📊 Zusammenfassung:');
+    console.log(`   🔍 Gefunden:     ${filesWithFeedback.length} Dateien`);
     console.log(`   ✅ Aktualisiert: ${updatedCount}`);
     console.log(`   ⏭️  Übersprungen: ${skippedCount}`);
     if (errorCount > 0) {
-        console.log(`   ❌ Fehler: ${errorCount}`);
+        console.log(`   ❌ Fehler:       ${errorCount}`);
     }
     console.log('═'.repeat(50) + '\n');
     
