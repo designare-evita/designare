@@ -4,6 +4,10 @@
   "description": "Michael Kanda - Web Purist & SEO Expert",
   "main": "index.html",
   "type": "module",
+  "private": true,
+  "engines": {
+    "node": "22.x"
+  },
   "dependencies": {
     "@getbrevo/brevo": "^2.2.0",
     "@google/generative-ai": "^0.12.0",
