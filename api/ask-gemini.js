@@ -12,17 +12,28 @@ export default async function handler(req, res) {
     const { prompt, source, checkBookingIntent, history, message } = req.body;
     const userMessage = message || prompt;
 
-    // --- MODELL-KONFIGURATION (UNVERÄNDERT AUS DEINER VORLAGE) ---
+// --- MODELL-KONFIGURATION (ERWEITERT UM 3. FALLBACK) ---
     const commonConfig = { temperature: 0.7 };
     const modelPrimary = genAI.getGenerativeModel({ model: "gemini-3-flash-preview", generationConfig: commonConfig });
-    const modelFallback = genAI.getGenerativeModel({ model: "gemini-2.5-flash", generationConfig: commonConfig });
+    const modelFallback1 = genAI.getGenerativeModel({ model: "gemini-2.5-flash", generationConfig: commonConfig });
+    const modelFallback2 = genAI.getGenerativeModel({ model: "gemini-2.0-flash", generationConfig: commonConfig });
 
     async function generateContentSafe(inputText) {
       try { 
+        // 1. Versuch: Primary Model
         return await modelPrimary.generateContent(inputText); 
       } catch (error) { 
-        console.log("Primary model failed, trying fallback:", error.message);
-        return await modelFallback.generateContent(inputText); 
+        console.log("Primary model failed, trying Fallback 1:", error.message);
+        
+        try {
+          // 2. Versuch: Fallback 1
+          return await modelFallback1.generateContent(inputText);
+        } catch (error1) {
+          console.log("Fallback 1 failed, trying Fallback 2 (Gemini 2.0):", error1.message);
+          
+          // 3. Versuch: Fallback 2 (Gemini 2.0 Flash - stabilste Option)
+          return await modelFallback2.generateContent(inputText);
+        }
       }
     }
 
