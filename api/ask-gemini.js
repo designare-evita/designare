@@ -1,61 +1,39 @@
-// api/ask-gemini.js - KORRIGIERTE VERSION mit Fallback-Logik (Gemini 3 -> 2.5)
-
+// api/ask-gemini.js - INTEGRATIONS-VERSION (RAG + Intent-Logik)
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import fs from 'fs';
+import path from 'path';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Method not allowed' });
-  }
+  if (req.method !== 'POST') return res.status(405).json({ message: 'Method not allowed' });
 
   try {
     const { prompt, source, checkBookingIntent, history, message } = req.body;
     const userMessage = message || prompt;
 
-    console.log("🔄 API-Call erhalten:");
-    console.log("- userMessage:", userMessage);
-    console.log("- history:", history);
-    console.log("- source:", source);
-    console.log("- checkBookingIntent:", checkBookingIntent);
+    // --- MODELL-KONFIGURATION (UNVERÄNDERT AUS DEINER VORLAGE) ---
+    const commonConfig = { temperature: 0.7 };
+    const modelPrimary = genAI.getGenerativeModel({ model: "gemini-3-flash-preview", generationConfig: commonConfig });
+    const modelFallback = genAI.getGenerativeModel({ model: "gemini-2.5-flash", generationConfig: commonConfig });
 
-    if (!userMessage) {
-      return res.status(400).json({ message: 'A prompt is required.' });
+    async function generateContentSafe(inputText) {
+      try { return await modelPrimary.generateContent(inputText); } 
+      catch (error) { return await modelFallback.generateContent(inputText); }
     }
 
-    // =================================================================
-    // MODELL-KONFIGURATION MIT FALLBACK
-    // =================================================================
-    
-    // Gemeinsame Konfiguration für Konsistenz
-    const commonConfig = {
-        temperature: 0.7, // Etwas kreativer, aber nicht zu chaotisch
-    };
-
-    // 1. Primäres Modell (Das Neueste)
-    const modelPrimary = genAI.getGenerativeModel({ 
-        model: "gemini-3-flash-preview",
-        generationConfig: commonConfig
-    });
-
-    // 2. Fallback Modell (Das Stabile)
-    const modelFallback = genAI.getGenerativeModel({ 
-        model: "gemini-2.5-flash",
-        generationConfig: commonConfig
-    });
-
-    /**
-     * Hilfsfunktion: Versucht erst Gemini 3, bei Fehler Gemini 2.5
-     * Gibt das result-Objekt zurück, genau wie das normale generateContent
-     */
-    async function generateContentSafe(inputText) {
-        try {
-            console.log("✨ Versuche Generierung mit Gemini 3...");
-            return await modelPrimary.generateContent(inputText);
-        } catch (error) {
-            console.warn("⚠️ Fehler mit Gemini 3, wechsle zu Fallback (Gemini 2.5).", error.message);
-            // Fallback auf das stabile Modell
-            return await modelFallback.generateContent(inputText);
+    // --- NEU: KONTEXT-ABRUF (RAG) ---
+    let additionalContext = "";
+    const knowledgePath = path.join(process.cwd(), 'knowledge.json');
+    if (fs.existsSync(knowledgePath)) {
+        const kb = JSON.parse(fs.readFileSync(knowledgePath, 'utf8'));
+        // Einfache Keyword-Suche für den Kontext
+        const matches = kb.filter(item => 
+            userMessage.toLowerCase().split(' ').some(word => word.length > 3 && item.text.toLowerCase().includes(word))
+        );
+        if (matches.length > 0) {
+            additionalContext = "\nZUSÄTZLICHES WISSEN AUS MICHAELS BLOGS:\n" + 
+                matches.slice(0, 2).map(m => `Quelle [${m.title}]: ${m.text}`).join('\n');
         }
     }
 
@@ -263,32 +241,16 @@ ${conversationHistoryText}
 
 --- AKTUELLE NACHRICHT DES BESUCHERS ---
 "${userMessage}"
-      `;
+    `;
 
-      console.log("Evita-Prompt erstellt, Länge:", finalPrompt.length);
-    }
-
-    console.log("Sende Anfrage an Gemini (via Safe-Function)...");
-    
-    // NUTZUNG DER SAFETY FUNKTION
     const result = await generateContentSafe(finalPrompt);
-    
     const response = await result.response;
     const text = response.text();
 
-    console.log("Gemini-Antwort erhalten:", text.substring(0, 100) + "...");
-
-    // Je nach Quelle wird die Antwort anders formatiert zurückgesendet
-    if (source === 'silas') {
-      console.log("Sende Silas-Antwort als Text");
-      res.status(200).send(text); // Silas bekommt reinen Text (der das JSON enthält)
-    } else {
-      console.log("Sende Evita-Antwort als JSON");
-      res.status(200).json({ answer: text }); // Evita bekommt ein sauberes JSON-Objekt
-    }
+    if (source === 'silas') res.status(200).send(text);
+    else res.status(200).json({ answer: text });
 
   } catch (error) {
-    console.error("Error calling Gemini API:", error);
-    res.status(500).json({ answer: 'Da ist wohl ein Pixelfehler im System! Michael ist sicher schon dran. Bitte versuch\'s gleich noch mal.' });
+    res.status(500).json({ answer: 'Pixelfehler im System! Michael ist dran.' });
   }
 }
