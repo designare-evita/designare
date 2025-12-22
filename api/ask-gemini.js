@@ -1,4 +1,4 @@
-// api/ask-gemini.js - INTEGRATIONS-VERSION (RAG + Intent-Logik)
+// api/ask-gemini.js - INTEGRATIONS-VERSION (RAG + Intent-Logik) - KORRIGIERT
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import fs from 'fs';
 import path from 'path';
@@ -14,12 +14,16 @@ export default async function handler(req, res) {
 
     // --- MODELL-KONFIGURATION (UNVERÄNDERT AUS DEINER VORLAGE) ---
     const commonConfig = { temperature: 0.7 };
-    const modelPrimary = genAI.getGenerativeModel({ model: "gemini-3-flash-preview", generationConfig: commonConfig });
-    const modelFallback = genAI.getGenerativeModel({ model: "gemini-2.5-flash", generationConfig: commonConfig });
+    const modelPrimary = genAI.getGenerativeModel({ model: "gemini-2.5-flash", generationConfig: commonConfig });
+    const modelFallback = genAI.getGenerativeModel({ model: "gemini-2.0-flash", generationConfig: commonConfig });
 
     async function generateContentSafe(inputText) {
-      try { return await modelPrimary.generateContent(inputText); } 
-      catch (error) { return await modelFallback.generateContent(inputText); }
+      try { 
+        return await modelPrimary.generateContent(inputText); 
+      } catch (error) { 
+        console.log("Primary model failed, trying fallback:", error.message);
+        return await modelFallback.generateContent(inputText); 
+      }
     }
 
     // --- NEU: KONTEXT-ABRUF (RAG) ---
@@ -241,16 +245,24 @@ ${conversationHistoryText}
 
 --- AKTUELLE NACHRICHT DES BESUCHERS ---
 "${userMessage}"
-    `;
+      `;
+    }
 
+    // =================================================================
+    // GENERIERE ANTWORT UND SENDE RESPONSE
+    // =================================================================
     const result = await generateContentSafe(finalPrompt);
     const response = await result.response;
     const text = response.text();
 
-    if (source === 'silas') res.status(200).send(text);
-    else res.status(200).json({ answer: text });
+    if (source === 'silas') {
+      res.status(200).send(text);
+    } else {
+      res.status(200).json({ answer: text });
+    }
 
   } catch (error) {
+    console.error("API Error:", error);
     res.status(500).json({ answer: 'Pixelfehler im System! Michael ist dran.' });
   }
 }
