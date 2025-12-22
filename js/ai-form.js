@@ -663,6 +663,7 @@ async function handleUserMessage(userInput) {
     const chatInput = DOM.chatInputDynamic;
     const submitButton = DOM.chatFormDynamic?.querySelector('button[type="submit"]');
 
+    // Eingabe sperren
     if (chatInput) chatInput.disabled = true;
     if (submitButton) submitButton.disabled = true;
 
@@ -670,14 +671,22 @@ async function handleUserMessage(userInput) {
     ChatUI.showTypingIndicator();
 
     try {
+        // Buchungs-Kontext prüfen
         const lastAiMessageBeforeReply = state.chatHistory
             .filter(msg => msg.role === 'assistant')
             .pop();
         const wasBookingQuestion = lastAiMessageBeforeReply &&
             lastAiMessageBeforeReply.content.includes('[BOOKING_CONFIRM_REQUEST]');
 
+        // Antwort von API holen
         const data = await ApiHandler.sendToEvita(userInput);
         ChatUI.removeTypingIndicator();
+
+        // 1. REAKTIVIERUNG (Behebt Button-Transparenz auf Mobile)
+        // Wir schalten den Button frei, sobald die Daten da sind, nicht erst nach dem Tippen.
+        if (chatInput) chatInput.disabled = false;
+        if (submitButton) submitButton.disabled = false;
+        if (chatInput) chatInput.focus();
 
         let answer = "Entschuldigung, ich konnte keine passende Antwort finden.";
         if (typeof data === 'string') {
@@ -688,32 +697,25 @@ async function handleUserMessage(userInput) {
             answer = data.message;
         }
 
-        // --- TYPEWRITER LOGIK START ---
-        // 1. Text für die Anzeige säubern
+        // 2. Text für die Anzeige säubern
         const textToAnimate = answer
             .replace(/\[BOOKING_CONFIRM_REQUEST\]/g, '')
             .replace(/\[buchung_starten\]/g, '')
             .replace(/\[booking_starten\]/g, '')
             .trim();
 
-        // 2. KI-Nachricht-Container erstellen (kommt leer zurück)
+        // 3. KI-Nachricht-Container erstellen (kommt leer zurück)
         const aiMsgElement = ChatUI.addMessage(answer, 'ai');
 
-        // 3. Animation abwarten
+        // 4. Animation abwarten (mit Markdown-Support)
         await typeWriterEffect(aiMsgElement, textToAnimate, 25);
-        // --- TYPEWRITER LOGIK ENDE ---
 
+        // Buchungs-Logik nach dem Tippen prüfen
         const isBookingConfirmRequest = answer.includes('[BOOKING_CONFIRM_REQUEST]');
         const shouldLaunchAfterConfirmation = wasBookingQuestion && (
             answer.includes('[buchung_starten]') ||
             answer.includes('[booking_starten]')
         );
-
-        console.log("🔍 Antwort-Analyse:", { 
-            isBookingConfirmRequest, 
-            wasBookingQuestion, 
-            shouldLaunchAfterConfirmation 
-        });
 
         if (shouldLaunchAfterConfirmation) {
             console.log("🎯 Launch nach Bestätigung erkannt");
@@ -726,11 +728,9 @@ async function handleUserMessage(userInput) {
         console.error("❌ Fehler bei User-Message:", error);
         ChatUI.removeTypingIndicator();
         ChatUI.addMessage(`Fehler: ${error.message}`, 'ai');
-    } finally {
-        if (chatInput) {
-            chatInput.disabled = false;
-            chatInput.focus();
-        }
+        
+        // Im Fehlerfall auch wieder freischalten
+        if (chatInput) chatInput.disabled = false;
         if (submitButton) submitButton.disabled = false;
     }
 }
