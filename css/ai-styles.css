@@ -171,7 +171,7 @@
     margin-right: auto !important;
     border-radius: 0 !important;
     float: left !important;
-    border: 1px solid var(--border-color) !important;
+    /* border: 1px solid var(--border-color) !important; */
 }
 
 /* ======================================== */
