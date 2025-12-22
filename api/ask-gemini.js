@@ -14,8 +14,8 @@ export default async function handler(req, res) {
 
     // --- MODELL-KONFIGURATION (UNVERÄNDERT AUS DEINER VORLAGE) ---
     const commonConfig = { temperature: 0.7 };
-    const modelPrimary = genAI.getGenerativeModel({ model: "gemini-2.5-flash", generationConfig: commonConfig });
-    const modelFallback = genAI.getGenerativeModel({ model: "gemini-2.0-flash", generationConfig: commonConfig });
+    const modelPrimary = genAI.getGenerativeModel({ model: "gemini-3-flash-preview", generationConfig: commonConfig });
+    const modelFallback = genAI.getGenerativeModel({ model: "gemini-2.5-flash", generationConfig: commonConfig });
 
     async function generateContentSafe(inputText) {
       try { 
@@ -242,6 +242,13 @@ Datum: ${formattedDate}
 Uhrzeit: ${formattedTime}
 
 ${conversationHistoryText}
+
+${additionalContext ? `--- RELEVANTER KONTEXT VON DER WEBSEITE ---
+${additionalContext}
+--- ENDE KONTEXT ---
+
+Nutze diesen Kontext, um präzise und fundierte Antworten zu geben. Verweise bei Bedarf auf die Quelle.
+` : ''}
 
 --- AKTUELLE NACHRICHT DES BESUCHERS ---
 "${userMessage}"
