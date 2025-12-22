@@ -181,6 +181,7 @@ const handleKeyboardResize = () => {
 addMessage(message, sender) {
     if (!DOM.chatHistoryContainer) return;
 
+    // 1. Nachricht säubern (interne Befehle wie [BOOKING...] entfernen)
     let cleanMessage = message;
     if (sender === 'ai') {
         cleanMessage = message
@@ -190,25 +191,37 @@ addMessage(message, sender) {
             .trim();
     }
 
+    // 2. Ein neues DIV-Element für die Sprechblase erstellen
     const msgDiv = document.createElement('div');
+    // Die Klasse bestimmt das Aussehen (links für AI, rechts für User)
     msgDiv.className = `chat-message ${sender}`;
     
-    // Wir lassen den Inhalt erst leer, wenn es die KI ist
+    // 3. Inhalt setzen:
+    // User-Nachrichten werden sofort angezeigt. 
+    // KI-Nachrichten bleiben leer (""), damit der Typewriter sie füllen kann.
     msgDiv.textContent = sender === 'user' ? cleanMessage : ''; 
     
+    // 4. Die Sprechblase in das Chat-Fenster einfügen
     DOM.chatHistoryContainer.appendChild(msgDiv);
+    
+    // 5. Automatisch nach unten scrollen
     this.scrollToBottom();
 
+    // 6. Die Nachricht für das Gedächtnis der KI speichern (im State)
     state.chatHistory.push({ 
         role: sender === 'user' ? 'user' : 'assistant', 
-        content: message 
+        content: message // Hier speichern wir das Original mit den Tags für die Logik
     });
     
+    // Verlauf auf die letzten 20 Nachrichten begrenzen
     if (state.chatHistory.length > 20) {
         state.chatHistory = state.chatHistory.slice(-20);
     }
 
-    return msgDiv; // <--- WICHTIG: Das Element zurückgeben!
+    // 7. WICHTIG: Das erstellte Element zurückgeben!
+    // Ohne dieses 'return' wüsste die Funktion 'handleUserMessage' nicht,
+    // in welche Sprechblase sie den Text "tippen" soll.
+    return msgDiv; 
 },
 
 showTypingIndicator() {
