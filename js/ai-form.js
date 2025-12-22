@@ -826,23 +826,24 @@ async function handleUserMessage(userInput) {
 
 
 async function typeWriterEffect(element, text, speed = 20) {
-    element.innerHTML = ""; // Container leeren
+    let currentContent = "";
     const words = text.split(" ");
     
     for (let i = 0; i < words.length; i++) {
-        element.innerHTML += words[i] + " ";
-        // Automatisches Scrollen, während der Text wächst
-        if (typeof this !== 'undefined' && this.scrollToBottom) {
-            this.scrollToBottom();
-        } else {
-            const chatContainer = document.getElementById('chat-history');
-            if (chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight;
+        currentContent += words[i] + " ";
+        
+        // GEÄNDERT: Nutze formatMarkdown und innerHTML
+        element.innerHTML = formatMarkdown(currentContent);
+        
+        // Scrollen
+        const container = document.getElementById('ai-chat-history');
+        if (container) {
+            container.scrollTop = container.scrollHeight;
         }
-        // Kurze Pause zwischen den Wörtern
+        
         await new Promise(resolve => setTimeout(resolve, speed));
     }
 }
-
 
 function formatMarkdown(text) {
     return text
