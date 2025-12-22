@@ -1,4 +1,4 @@
-// api/ask-gemini.js - INTEGRATIONS-VERSION (RAG + Intent-Logik)
+// api/ask-gemini.js - INTEGRATIONS-VERSION (RAG + Intent-Logik) - KORRIGIERT
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import fs from 'fs';
 import path from 'path';
@@ -18,22 +18,102 @@ export default async function handler(req, res) {
     const modelFallback = genAI.getGenerativeModel({ model: "gemini-2.5-flash", generationConfig: commonConfig });
 
     async function generateContentSafe(inputText) {
-      try { return await modelPrimary.generateContent(inputText); } 
-      catch (error) { return await modelFallback.generateContent(inputText); }
+      try { 
+        return await modelPrimary.generateContent(inputText); 
+      } catch (error) { 
+        console.log("Primary model failed, trying fallback:", error.message);
+        return await modelFallback.generateContent(inputText); 
+      }
     }
 
-    // --- NEU: KONTEXT-ABRUF (RAG) ---
+    // --- VERBESSERTER KONTEXT-ABRUF (RAG) ---
     let additionalContext = "";
     const knowledgePath = path.join(process.cwd(), 'knowledge.json');
+    
     if (fs.existsSync(knowledgePath)) {
-        const kb = JSON.parse(fs.readFileSync(knowledgePath, 'utf8'));
-        // Einfache Keyword-Suche für den Kontext
-        const matches = kb.filter(item => 
-            userMessage.toLowerCase().split(' ').some(word => word.length > 3 && item.text.toLowerCase().includes(word))
-        );
-        if (matches.length > 0) {
-            additionalContext = "\nZUSÄTZLICHES WISSEN AUS MICHAELS BLOGS:\n" + 
-                matches.slice(0, 2).map(m => `Quelle [${m.title}]: ${m.text}`).join('\n');
+        try {
+            const kbData = JSON.parse(fs.readFileSync(knowledgePath, 'utf8'));
+            const kb = kbData.pages || kbData; // Unterstütze beide Formate
+            const searchIndex = kbData.search_index || null;
+            
+            // Extrahiere Suchbegriffe aus der User-Nachricht
+            const searchTerms = userMessage
+                .toLowerCase()
+                .match(/[a-zäöüß]{3,}/g) || [];
+            
+            let matchedPages = [];
+            
+            // Methode 1: Nutze Search-Index falls vorhanden (schneller)
+            if (searchIndex && searchTerms.length > 0) {
+                const pageScores = {};
+                
+                searchTerms.forEach(term => {
+                    // Exakte Matches
+                    if (searchIndex[term]) {
+                        searchIndex[term].forEach(pageIdx => {
+                            pageScores[pageIdx] = (pageScores[pageIdx] || 0) + 2;
+                        });
+                    }
+                    // Partial Matches (für zusammengesetzte Wörter)
+                    Object.keys(searchIndex).forEach(indexTerm => {
+                        if (indexTerm.includes(term) || term.includes(indexTerm)) {
+                            searchIndex[indexTerm].forEach(pageIdx => {
+                                pageScores[pageIdx] = (pageScores[pageIdx] || 0) + 1;
+                            });
+                        }
+                    });
+                });
+                
+                // Sortiere nach Score und nimm Top 3
+                matchedPages = Object.entries(pageScores)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 3)
+                    .map(([idx]) => kb[parseInt(idx)])
+                    .filter(Boolean);
+            }
+            
+            // Methode 2: Fallback zur direkten Textsuche
+            if (matchedPages.length === 0) {
+                matchedPages = kb.filter(page => {
+                    const pageText = `${page.title} ${page.text} ${(page.keywords || []).join(' ')}`.toLowerCase();
+                    return searchTerms.some(term => pageText.includes(term));
+                }).slice(0, 3);
+            }
+            
+            // Baue Kontext-String
+            if (matchedPages.length > 0) {
+                additionalContext = matchedPages.map(page => {
+                    let context = `\n📄 QUELLE: ${page.title}`;
+                    
+                    // Füge relevante Sektionen hinzu falls vorhanden
+                    if (page.sections && page.sections.length > 0) {
+                        const relevantSections = page.sections
+                            .filter(section => 
+                                searchTerms.some(term => 
+                                    section.heading.toLowerCase().includes(term) ||
+                                    section.content.toLowerCase().includes(term)
+                                )
+                            )
+                            .slice(0, 2);
+                        
+                        if (relevantSections.length > 0) {
+                            context += '\n' + relevantSections
+                                .map(s => `[${s.heading}]: ${s.content.substring(0, 500)}`)
+                                .join('\n');
+                        } else {
+                            context += `\n${page.text.substring(0, 800)}`;
+                        }
+                    } else {
+                        context += `\n${page.text.substring(0, 800)}`;
+                    }
+                    
+                    return context;
+                }).join('\n\n');
+                
+                console.log(`RAG: ${matchedPages.length} relevante Seiten gefunden für: "${userMessage.substring(0, 50)}..."`);
+            }
+        } catch (error) {
+            console.error('RAG Fehler:', error.message);
         }
     }
 
@@ -239,18 +319,33 @@ Uhrzeit: ${formattedTime}
 
 ${conversationHistoryText}
 
+${additionalContext ? `--- RELEVANTER KONTEXT VON DER WEBSEITE ---
+${additionalContext}
+--- ENDE KONTEXT ---
+
+Nutze diesen Kontext, um präzise und fundierte Antworten zu geben. Verweise bei Bedarf auf die Quelle.
+` : ''}
+
 --- AKTUELLE NACHRICHT DES BESUCHERS ---
 "${userMessage}"
-    `;
+      `;
+    }
 
+    // =================================================================
+    // GENERIERE ANTWORT UND SENDE RESPONSE
+    // =================================================================
     const result = await generateContentSafe(finalPrompt);
     const response = await result.response;
     const text = response.text();
 
-    if (source === 'silas') res.status(200).send(text);
-    else res.status(200).json({ answer: text });
+    if (source === 'silas') {
+      res.status(200).send(text);
+    } else {
+      res.status(200).json({ answer: text });
+    }
 
   } catch (error) {
+    console.error("API Error:", error);
     res.status(500).json({ answer: 'Pixelfehler im System! Michael ist dran.' });
   }
 }

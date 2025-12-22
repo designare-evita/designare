@@ -1,6 +1,8 @@
 {
-  "name": "digital-business-card-ai",
+  "name": "designare",
   "version": "1.0.0",
+  "description": "Michael Kanda - Web Purist & SEO Expert",
+  "main": "index.html",
   "type": "module",
   "private": true,
   "engines": {
@@ -18,8 +20,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "inject-ratings": "node js/inject-ratings.js",
-    "build": "npm run inject-ratings && mkdir -p public && cp -r *.html *.css *.svg *.csv js css images Font public/ 2>/dev/null || echo 'Some assets missing, continuing...'",
-    "postbuild": "node generate-sitemap.js"
+    "generate-knowledge": "node js/generate-knowledge.js",
+    "generate-sitemap": "node generate-sitemap.js",
+    "build": "node js/generate-knowledge.js && node generate-sitemap.js && node js/inject-ratings.js && mkdir -p public && cp -r *.html *.css *.svg *.csv js css images Font CSV-Importer-PRO downloads public/ 2>/dev/null || echo 'Some assets missing, continuing...'"
   }
 }
-
