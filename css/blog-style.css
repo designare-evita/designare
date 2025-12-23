@@ -618,3 +618,46 @@ color: var(--text-color);
     .blog-article a { color: #000; text-decoration: underline; }
     .blog-article code { border: 1px solid #000; }
 }
+
+/* --- Mobile First (Standard) --- */
+.summary-box {
+    display: flex;
+    flex-direction: column; /* Erst Text, dann Bild untereinander */
+    gap: 2rem;
+    align-items: center;
+    
+    /* Dein bestehendes Styling (Farben, Padding) wird hier übernommen */
+    background-color: var(--box-bg, #1a1a1a); /* Fallback, falls Variable fehlt */
+    padding: 2rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.summary-image img {
+    max-width: 100%;
+    height: auto; /* WICHTIG: Erlaubt dem Bild, sich proportional zu skalieren */
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3); /* Ein leichter Schatten für Tiefe */
+    display: block;
+}
+
+/* --- Desktop Ansicht (ab 992px) --- */
+@media screen and (min-width: 992px) {
+    .summary-box {
+        flex-direction: row; /* Nebeneinander */
+        align-items: center; /* Vertikal zentriert */
+        justify-content: space-between;
+    }
+
+    .summary-content {
+        flex: 0 0 62%; /* Text bekommt ca. 2/3 Platz */
+        max-width: 62%;
+    }
+
+    .summary-image {
+        flex: 0 0 33%; /* Bild bekommt ca. 1/3 Platz */
+        max-width: 33%;
+        display: flex;
+        justify-content: flex-end; /* Bild rechtsbündig im Container */
+    }
+}
