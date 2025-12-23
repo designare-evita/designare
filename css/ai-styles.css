@@ -238,7 +238,8 @@
 
 #ai-chat-form button:hover,
 #ai-response-modal #ai-chat-form button:hover {
-    background: var(--accent-color-hover) !important;
+    background: var(--accent-color) !important; /* Gleiche Farbe wie normal */
+    opacity: 0.9; /* Nur leichte Transparenz für Feedback */
 }
 
 /* DISABLED STATE - Behält Farbe, nur leicht transparent */
