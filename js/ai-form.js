@@ -1,8 +1,8 @@
-// js/ai-form.js - REPARIERTE VERSION mit funktionierender Booking-Integration und mobilem Tastatur-Fix
+// js/ai-form.js - VOLLSTÄNDIGE VERSION mit Fallback-Antworten
 let isKeyboardListenerActive = false;
 
 export const initAiForm = () => {
-    console.log("🚀 Initialisiere AI-Form-Modul mit Booking-Fix und Tastatur-Fix");
+    console.log("🚀 Initialisiere AI-Form-Modul mit Fallback-System");
 
     // ===================================================================
     // ZENTRALER ZUSTAND (State Management)
@@ -11,7 +11,118 @@ export const initAiForm = () => {
         chatHistory: [],
         selectedCallbackData: null,
         typingIndicatorId: null,
-        animationRunning: false
+        animationRunning: false,
+        apiFailureCount: 0,
+        lastApiError: null
+    };
+
+    // ===================================================================
+    // FALLBACK-ANTWORTEN SYSTEM
+    // ===================================================================
+    const FallbackResponses = {
+        // Kategorisierte Antworten für verschiedene Themen
+        responses: {
+            greeting: [
+                "Hallo! 👋 Ich bin Evita, Michaels digitale Assistentin. Gerade bin ich etwas überlastet, aber ich helfe dir trotzdem gerne! Was möchtest du wissen?",
+                "Hi! Schön, dass du da bist! Mein KI-Gehirn macht gerade eine kleine Pause, aber die Basics kann ich dir trotzdem verraten.",
+                "Hey! Willkommen bei designare. Ich bin Evita – aktuell im Energiesparmodus, aber für dich da!"
+            ],
+            
+            contact: [
+                "📧 **Michael erreichst du am besten so:**\n\n• E-Mail: michael@designare.at\n• Oder nutze das Kontaktformular auf der Seite\n\nEr meldet sich normalerweise innerhalb von 24 Stunden!",
+                "Du willst direkt mit Michael sprechen? Kein Problem!\n\n**E-Mail:** michael@designare.at\n\nFür einen Rückruf-Termin sag einfach Bescheid!"
+            ],
+            
+            services: [
+                "🛠️ **Michaels Spezialgebiete:**\n\n• **WordPress-Entwicklung** – Custom Themes & Plugins\n• **Performance-Optimierung** – Schnelle Ladezeiten\n• **KI-Integration** – Chatbots & Automatisierung\n• **SEO** – Technische Optimierung\n\nFür Details schreib ihm eine Mail an michael@designare.at!",
+                "Michael ist Web-Purist und KI-Komplize! Er macht:\n\n• Maßgeschneiderte WordPress-Lösungen\n• Performance-Tuning (Core Web Vitals)\n• KI-Assistenten wie mich 😊\n• Technisches SEO\n\nInteressiert? → michael@designare.at"
+            ],
+            
+            pricing: [
+                "💰 **Zu Preisen:**\n\nJedes Projekt ist individuell, daher gibt's keine Pauschalpreise. Am besten beschreibst du Michael dein Vorhaben per Mail (michael@designare.at) und er macht dir ein faires Angebot!",
+                "Preise hängen vom Projektumfang ab. Michael arbeitet transparent und fair. Schreib ihm einfach, was du brauchst: michael@designare.at"
+            ],
+            
+            booking: [
+                "📅 **Termin vereinbaren?**\n\nSuper Idee! Schreib Michael eine kurze Mail an michael@designare.at mit:\n• Worum geht's?\n• Wann passt es dir?\n\nEr meldet sich schnell zurück!",
+                "Einen Rückruf oder Termin kannst du direkt per Mail anfragen: michael@designare.at\n\nMichael ist flexibel und findet sicher einen passenden Slot!"
+            ],
+            
+            about: [
+                "👨‍💻 **Über Michael:**\n\nMichael Kanda ist Web-Purist aus Wien. Tagsüber zähmt er WordPress für maxonline Marketing, in seiner Freizeit baut er eigene Tools – wie mich!\n\nSein Motto: *Sauberer Code, kaum Wartung, smarte Lösungen.*",
+                "Michael ist ein Code-Tüftler aus Wien, der WordPress liebt (fast so sehr wie seinen Hund Evita 🐕). Er entwickelt performante Websites und KI-Lösungen.\n\nMehr auf: designare.at"
+            ],
+            
+            evita: [
+                "🤖 **Das bin ich – Evita!**\n\nIch bin Michaels digitale Assistentin, benannt nach seinem Hund (ja, wirklich!). Ich basiere auf einer RAG-Architektur und helfe hier auf der Website.\n\nDie echte Evita ist übrigens eine Tierschutz-Export-Hundedame und die wahre Chefin! 🐕",
+                "Ich bin Evita, die digitale Version! Mein Namensvetter ist ein Hund – Michaels vierbeinige Chefin. Ich bin die geduldige Variante und beantworte Fragen rund um die Uhr... naja, meistens. 😅"
+            ],
+            
+            tools: [
+                "🔧 **Michaels Tools:**\n\n• **DataPeak** – Sein eigenes SEO-Dashboard mit KI\n• **Silas** – Content-Generator für Keywords\n• **Evita** (das bin ich!) – KI-Assistentin\n\nAlle selbst entwickelt, weil: *Wenn's kein passendes Tool gibt, baut man es halt selbst!*"
+            ],
+            
+            error: [
+                "🔄 Hmm, mein KI-Gehirn stockt gerade etwas. Kannst du die Frage anders formulieren oder es gleich nochmal versuchen?",
+                "Ups, da hab ich kurz gehakt! Versuch's bitte nochmal – manchmal brauche ich einen zweiten Anlauf.",
+                "Entschuldige, ich bin gerade etwas verwirrt. Probier's in ein paar Sekunden noch einmal!"
+            ],
+            
+            rateLimit: [
+                "⏳ **Kurze Verschnaufpause!**\n\nIch bin gerade sehr gefragt und muss kurz durchatmen. Bitte versuch es in etwa einer Minute noch einmal.\n\n*Dringende Fragen? → michael@designare.at*",
+                "🫠 Puh, ganz schön viel los hier! Mein API-Kontingent ist kurz erschöpft. Gib mir eine Minute, dann bin ich wieder fit!\n\nOder schreib direkt an: michael@designare.at"
+            ],
+            
+            default: [
+                "Interessante Frage! Leider bin ich gerade im Offline-Modus und kann nicht voll antworten. Schreib Michael direkt: michael@designare.at",
+                "Da müsste ich nachdenken, aber mein Gehirn macht gerade Pause. Michael kann dir sicher helfen: michael@designare.at",
+                "Gute Frage! Im Moment kann ich sie nicht richtig beantworten. Am besten fragst du Michael direkt: michael@designare.at"
+            ]
+        },
+
+        // Keyword-Matching für Kategorien
+        keywords: {
+            greeting: ['hallo', 'hi', 'hey', 'guten', 'servus', 'grüß', 'moin', 'was geht', 'wie geht'],
+            contact: ['kontakt', 'erreichen', 'mail', 'email', 'anrufen', 'telefon', 'schreiben', 'melden'],
+            services: ['angebot', 'service', 'leistung', 'macht ihr', 'machst du', 'bietet', 'können', 'hilfe bei', 'wordpress', 'website', 'webseite', 'homepage'],
+            pricing: ['preis', 'kosten', 'kostet', 'budget', 'teuer', 'günstig', 'zahlen', 'euro', 'geld'],
+            booking: ['termin', 'buchung', 'buchen', 'rückruf', 'treffen', 'gespräch', 'call', 'meeting', 'vereinbaren'],
+            about: ['wer ist', 'über michael', 'michael kanda', 'wer bist', 'erzähl', 'hintergrund', 'erfahrung'],
+            evita: ['evita', 'ki', 'chatbot', 'assistent', 'wie funktionierst', 'bist du', 'was bist'],
+            tools: ['tool', 'datapeak', 'silas', 'dashboard', 'seo tool', 'entwickelt']
+        },
+
+        // Hauptfunktion: Finde passende Antwort
+        getResponse(userMessage) {
+            const msg = userMessage.toLowerCase().trim();
+            
+            // Durchsuche alle Kategorien nach Keyword-Matches
+            for (const [category, keywords] of Object.entries(this.keywords)) {
+                for (const keyword of keywords) {
+                    if (msg.includes(keyword)) {
+                        return this.getRandomFromCategory(category);
+                    }
+                }
+            }
+            
+            // Keine Kategorie gefunden → Default
+            return this.getRandomFromCategory('default');
+        },
+
+        // Zufällige Antwort aus Kategorie
+        getRandomFromCategory(category) {
+            const responses = this.responses[category] || this.responses.default;
+            return responses[Math.floor(Math.random() * responses.length)];
+        },
+
+        // Spezifische Getter
+        getRateLimitResponse() {
+            return this.getRandomFromCategory('rateLimit');
+        },
+
+        getErrorResponse() {
+            return this.getRandomFromCategory('error');
+        }
     };
 
     // ===================================================================
@@ -35,38 +146,30 @@ export const initAiForm = () => {
     };
     
     // ===================================================================
-    // KEYBOARD RESIZE HANDLER - NEU
+    // KEYBOARD RESIZE HANDLER FÜR MOBILE
     // ===================================================================
-const handleKeyboardResize = () => {
-    // Nur auf Mobile-Geräten ausführen
-    if (window.innerWidth > 768) return;
-    
-    const modalContent = document.querySelector('#ai-response-modal .modal-content');
-    const chatHistory = document.getElementById('ai-chat-history');
-    const chatForm = document.getElementById('ai-chat-form');
-    
-    if (modalContent && chatHistory && chatForm) {
-        // Nutze visualViewport für bessere Tastatur-Erkennung
-        if (window.visualViewport) {
-            const viewportHeight = window.visualViewport.height;
-            modalContent.style.height = `${viewportHeight}px`;
-            
-            // Scrolle zum Ende der Nachrichten
-            setTimeout(() => {
-                chatHistory.scrollTop = chatHistory.scrollHeight;
-            }, 100);
-            
-            console.log(`Viewport angepasst: ${viewportHeight}px`);
-        } else {
-            // Fallback für ältere Browser
-            modalContent.style.height = `${window.innerHeight}px`;
+    const handleKeyboardResize = () => {
+        if (window.innerWidth > 768) return;
+        
+        const modalContent = document.querySelector('#ai-response-modal .modal-content');
+        const chatHistory = document.getElementById('ai-chat-history');
+        
+        if (modalContent && chatHistory) {
+            if (window.visualViewport) {
+                const viewportHeight = window.visualViewport.height;
+                modalContent.style.height = `${viewportHeight}px`;
+                
+                setTimeout(() => {
+                    chatHistory.scrollTop = chatHistory.scrollHeight;
+                }, 100);
+            } else {
+                modalContent.style.height = `${window.innerHeight}px`;
+            }
         }
-    }
-};
-
+    };
 
     // ===================================================================
-    // API HANDLER (unverändert)
+    // API HANDLER MIT FALLBACK-LOGIK
     // ===================================================================
     const ApiHandler = {
         async safeFetch(url, options = {}) {
@@ -80,8 +183,16 @@ const handleKeyboardResize = () => {
 
                 console.log(`📥 Response Status: ${response.status} ${response.statusText}`);
                 
+                // Rate Limit Check
+                if (response.status === 429) {
+                    console.warn("⚠️ Rate Limit erreicht!");
+                    state.apiFailureCount++;
+                    state.lastApiError = 'rateLimit';
+                    throw new Error('RATE_LIMIT');
+                }
+                
                 if (!response.ok) {
-                    throw new Error(`Serverfehler: ${response.statusText}`);
+                    throw new Error(`SERVER_ERROR: ${response.status}`);
                 }
 
                 const contentType = response.headers.get('content-type');
@@ -89,25 +200,57 @@ const handleKeyboardResize = () => {
                     ? await response.json()
                     : await response.text();
                 
-                console.log(`📋 API-Antwort erhalten:`, responseData);
+                // Check if API returned rate limit in body
+                if (responseData?.rateLimited || 
+                    responseData?.error?.includes?.('429') ||
+                    responseData?.error?.includes?.('quota')) {
+                    state.apiFailureCount++;
+                    state.lastApiError = 'rateLimit';
+                    throw new Error('RATE_LIMIT');
+                }
+                
+                // Reset failure count on success
+                state.apiFailureCount = 0;
+                state.lastApiError = null;
+                
                 return responseData;
 
             } catch (error) {
-                console.error(`❌ Kritischer API-Fehler bei ${url}:`, error);
+                console.error(`❌ API-Fehler bei ${url}:`, error);
+                state.apiFailureCount++;
+                
+                // Kategorisiere den Fehler
+                if (error.message === 'RATE_LIMIT' || 
+                    error.message?.includes('429') || 
+                    error.message?.includes('quota') ||
+                    error.message?.includes('Too Many Requests')) {
+                    state.lastApiError = 'rateLimit';
+                } else {
+                    state.lastApiError = 'serverError';
+                }
+                
                 throw error;
             }
         },
 
-        sendToEvita(userInput) {
+        async sendToEvita(userInput) {
             console.log("💬 Sende Nachricht an Evita:", userInput);
             
-            // STUFE 1: Prüfe auf initiale Booking-Trigger
+            // Bei zu vielen Fehlern → Direkt Fallback nutzen
+            if (state.apiFailureCount >= 3) {
+                console.log("🔄 Zu viele API-Fehler, nutze Fallback");
+                return {
+                    answer: FallbackResponses.getResponse(userInput),
+                    isFallback: true
+                };
+            }
+            
+            // Booking-Intent Prüfung
             const bookingTriggers = [
                 'termin', 'buchung', 'buchen', 'rückruf', 'anrufen', 
                 'sprechen', 'kontakt', 'meeting', 'appointment', 'erreichen'
             ];
             
-            // STUFE 2: Prüfe auf Bestätigungs-Keywords (nach einer Rückfrage)
             const confirmationKeywords = [
                 'ja', 'gerne', 'okay', 'ok', 'bitte', 'genau', 'richtig', 
                 'korrekt', 'stimmt', 'passt', 'mach das', 'hilf mir'
@@ -121,45 +264,64 @@ const handleKeyboardResize = () => {
                 userInput.toLowerCase().includes(keyword)
             );
             
-            // Prüfe ob die letzte AI-Nachricht eine Booking-Rückfrage war
             const lastAiMessage = state.chatHistory
                 .filter(msg => msg.role === 'assistant')
                 .pop();
             
             const wasBookingQuestion = lastAiMessage && 
                 lastAiMessage.content.includes('[BOOKING_CONFIRM_REQUEST]');
-            
-            console.log("🔍 Booking-Intent erkannt:", hasBookingIntent);
-            console.log("🔍 Bestätigung erkannt:", hasConfirmation);
-            console.log("🔍 War letzte Nachricht Booking-Frage:", wasBookingQuestion);
 
             // Spezielle Behandlung für Bestätigungen nach Rückfragen
             if (hasConfirmation && wasBookingQuestion) {
-                console.log("✅ User hat Booking-Rückfrage bestätigt - sende Bestätigung an API");
-                
                 const requestData = {
                     history: state.chatHistory,
                     message: userInput,
                     checkBookingIntent: true,
-                    isConfirmation: true // Flag für: "User hat Rückfrage bestätigt"
+                    isConfirmation: true
                 };
                 
-                return this.safeFetch('/api/ask-gemini', {
-                    method: 'POST',
-                    body: JSON.stringify(requestData)
-                });
+                try {
+                    return await this.safeFetch('/api/ask-gemini', {
+                        method: 'POST',
+                        body: JSON.stringify(requestData)
+                    });
+                } catch (error) {
+                    // Bei Booking-Bestätigung und API-Fehler → Booking-Fallback
+                    return {
+                        answer: FallbackResponses.responses.booking[0],
+                        isFallback: true
+                    };
+                }
             }
 
             const requestData = {
                 history: state.chatHistory,
                 message: userInput,
-                checkBookingIntent: hasBookingIntent // Explizite Intent-Prüfung nur bei Triggern
+                checkBookingIntent: hasBookingIntent
             };
             
-            return this.safeFetch('/api/ask-gemini', {
-                method: 'POST',
-                body: JSON.stringify(requestData)
-            });
+            try {
+                return await this.safeFetch('/api/ask-gemini', {
+                    method: 'POST',
+                    body: JSON.stringify(requestData)
+                });
+            } catch (error) {
+                // API fehlgeschlagen → Fallback-Antwort
+                console.log("🔄 API fehlgeschlagen, nutze Fallback-Antwort");
+                
+                if (state.lastApiError === 'rateLimit') {
+                    return {
+                        answer: FallbackResponses.getRateLimitResponse(),
+                        isFallback: true,
+                        rateLimited: true
+                    };
+                }
+                
+                return {
+                    answer: FallbackResponses.getResponse(userInput),
+                    isFallback: true
+                };
+            }
         },
 
         getAvailableSlots() {
@@ -175,76 +337,60 @@ const handleKeyboardResize = () => {
     };
 
     // ===================================================================
-    // CHAT UI - ERWEITERT (unverändert)
+    // CHAT UI
     // ===================================================================
     const ChatUI = {
-addMessage(message, sender) {
-    if (!DOM.chatHistoryContainer) return;
+        addMessage(message, sender) {
+            if (!DOM.chatHistoryContainer) return;
 
-    // 1. Nachricht säubern (interne Befehle wie [BOOKING...] entfernen)
-    let cleanMessage = message;
-    if (sender === 'ai') {
-        cleanMessage = message
-            .replace(/\[BOOKING_CONFIRM_REQUEST\]/g, '')
-            .replace(/\[buchung_starten\]/g, '')
-            .replace(/\[booking_starten\]/g, '')
-            .trim();
-    }
+            let cleanMessage = message;
+            if (sender === 'ai') {
+                cleanMessage = message
+                    .replace(/\[BOOKING_CONFIRM_REQUEST\]/g, '')
+                    .replace(/\[buchung_starten\]/g, '')
+                    .replace(/\[booking_starten\]/g, '')
+                    .trim();
+            }
 
-    // 2. Ein neues DIV-Element für die Sprechblase erstellen
-    const msgDiv = document.createElement('div');
-    // Die Klasse bestimmt das Aussehen (links für AI, rechts für User)
-    msgDiv.className = `chat-message ${sender}`;
-    
-    // 3. Inhalt setzen:
-    // User-Nachrichten werden sofort angezeigt. 
-    // KI-Nachrichten bleiben leer (""), damit der Typewriter sie füllen kann.
-    msgDiv.textContent = sender === 'user' ? cleanMessage : ''; 
-    
-    // 4. Die Sprechblase in das Chat-Fenster einfügen
-    DOM.chatHistoryContainer.appendChild(msgDiv);
-    
-    // 5. Automatisch nach unten scrollen
-    this.scrollToBottom();
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `chat-message ${sender}`;
+            msgDiv.textContent = sender === 'user' ? cleanMessage : '';
+            
+            DOM.chatHistoryContainer.appendChild(msgDiv);
+            this.scrollToBottom();
 
-    // 6. Die Nachricht für das Gedächtnis der KI speichern (im State)
-    state.chatHistory.push({ 
-        role: sender === 'user' ? 'user' : 'assistant', 
-        content: message // Hier speichern wir das Original mit den Tags für die Logik
-    });
-    
-    // Verlauf auf die letzten 20 Nachrichten begrenzen
-    if (state.chatHistory.length > 20) {
-        state.chatHistory = state.chatHistory.slice(-20);
-    }
+            state.chatHistory.push({ 
+                role: sender === 'user' ? 'user' : 'assistant', 
+                content: message
+            });
+            
+            if (state.chatHistory.length > 20) {
+                state.chatHistory = state.chatHistory.slice(-20);
+            }
 
-    // 7. WICHTIG: Das erstellte Element zurückgeben!
-    // Ohne dieses 'return' wüsste die Funktion 'handleUserMessage' nicht,
-    // in welche Sprechblase sie den Text "tippen" soll.
-    return msgDiv; 
-},
+            return msgDiv;
+        },
 
-showTypingIndicator() {
-    this.removeTypingIndicator();
-    if (!DOM.chatHistoryContainer) return;
-    
-    const indicator = document.createElement('div');
-    state.typingIndicatorId = 'typing-' + Date.now();
-    indicator.id = state.typingIndicatorId;
-    indicator.className = 'chat-message ai';
-    
-    // Hier ersetzen wir den Text durch die 3 Punkte
-    indicator.innerHTML = `
-        <div class="typing-dots">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
-    `;
-    
-    DOM.chatHistoryContainer.appendChild(indicator);
-    this.scrollToBottom();
-},
+        showTypingIndicator() {
+            this.removeTypingIndicator();
+            if (!DOM.chatHistoryContainer) return;
+            
+            const indicator = document.createElement('div');
+            state.typingIndicatorId = 'typing-' + Date.now();
+            indicator.id = state.typingIndicatorId;
+            indicator.className = 'chat-message ai';
+            
+            indicator.innerHTML = `
+                <div class="typing-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            `;
+            
+            DOM.chatHistoryContainer.appendChild(indicator);
+            this.scrollToBottom();
+        },
 
         removeTypingIndicator() {
             if (state.typingIndicatorId) {
@@ -265,11 +411,13 @@ showTypingIndicator() {
                 DOM.chatHistoryContainer.innerHTML = '';
             }
             state.chatHistory = [];
+            state.apiFailureCount = 0;
+            state.lastApiError = null;
         }
     };
 
     // ===================================================================
-    // MODAL CONTROLLER - KORRIGIERT
+    // MODAL CONTROLLER
     // ===================================================================
     const ModalController = {
         openChatModal() {
@@ -278,14 +426,11 @@ showTypingIndicator() {
             DOM.modalOverlay.style.display = 'flex';
             document.body.classList.add('no-scroll');
             
-            // Setze die Höhe sofort beim Öffnen
-            handleKeyboardResize(); 
+            handleKeyboardResize();
             
-            // Füge den Listener hinzu, aber nur, wenn er noch nicht aktiv ist
             if (!isKeyboardListenerActive) {
                 window.addEventListener('resize', handleKeyboardResize);
                 isKeyboardListenerActive = true;
-                console.log('Resize-Listener für Tastatur HINZUGEFÜGT.');
             }
             
             setTimeout(() => {
@@ -293,7 +438,7 @@ showTypingIndicator() {
                 DOM.chatInputDynamic?.focus();
                 setTimeout(() => {
                     ChatUI.scrollToBottom();
-                }, 400); 
+                }, 400);
             }, 10);
         },
         
@@ -302,17 +447,14 @@ showTypingIndicator() {
             
             DOM.modalOverlay.classList.remove('visible');
             
-            // Entferne den Listener beim Schließen, um die Performance zu schonen
             if (isKeyboardListenerActive) {
                 window.removeEventListener('resize', handleKeyboardResize);
                 isKeyboardListenerActive = false;
-                console.log('Resize-Listener für Tastatur ENTFERNT.');
             }
             
-            // Setze die Höhe im CSS zurück
             const modalContent = document.querySelector('#ai-response-modal .modal-content');
             if (modalContent) {
-                modalContent.style.height = ''; 
+                modalContent.style.height = '';
             }
             
             setTimeout(() => {
@@ -323,21 +465,18 @@ showTypingIndicator() {
     };
 
     // ===================================================================
-    // BOOKING MODAL (unverändert)
+    // BOOKING MODAL
     // ===================================================================
     const BookingModal = {
         async launch() {
-            console.log("📞 NEUE Booking-Launch-Funktion aufgerufen");
+            console.log("📞 Booking-Modal wird geöffnet");
             
             try {
-                // Schließe Chat-Modal
                 ModalController.closeChatModal();
                 await new Promise(resolve => setTimeout(resolve, 300));
 
-                // Entferne altes Modal
                 this.remove();
                 
-                // Erstelle neues Modal
                 const modalHTML = this.createHTML();
                 document.body.insertAdjacentHTML('beforeend', modalHTML);
 
@@ -348,14 +487,10 @@ showTypingIndicator() {
                     
                     this.setupEventListeners();
                     await this.loadSlots();
-                    
-                    console.log("✅ Booking-Modal erfolgreich geöffnet");
-                } else {
-                    throw new Error("Modal konnte nicht erstellt werden");
                 }
             } catch (error) {
                 console.error("❌ Fehler beim Öffnen des Booking-Modals:", error);
-                alert("Entschuldigung, das Buchungssystem konnte nicht geladen werden. Bitte versuche es später erneut oder kontaktiere Michael direkt per E-Mail.");
+                alert("Das Buchungssystem konnte nicht geladen werden. Bitte kontaktiere Michael direkt: michael@designare.at");
             }
         },
 
@@ -365,7 +500,6 @@ showTypingIndicator() {
             
             document.body.classList.remove('no-scroll');
             state.selectedCallbackData = null;
-            console.log("✅ Booking-Modal entfernt");
         },
 
         createHTML() {
@@ -385,145 +519,50 @@ showTypingIndicator() {
                                 </div>
                                 <div id="callback-slots-container" style="display: none;"></div>
                                 <div id="no-slots-message" style="display: none; text-align: center; color: #aaa; padding: 20px;">
-                                    Aktuell sind leider keine Rückruf-Termine verfügbar.<br>
-                                    Bitte kontaktiere Michael direkt per E-Mail: 
-                                    <a href="mailto:michael@designare.at" style="color: #ffc107;">michael@designare.at</a>
+                                    Aktuell sind keine Termine verfügbar.<br>
+                                    <a href="mailto:michael@designare.at" style="color: var(--accent-color);">michael@designare.at</a>
                                 </div>
                             </div>
 
                             <div id="step-contact-details" class="booking-step">
-                                <div id="selected-slot-display" style="text-align: center; margin-bottom: 20px; padding: 12px; background: rgba(255, 193, 7, 0.1); border: 1px solid #ffc107; border-radius: 8px; color: #ffc107;"></div>
+                                <div id="selected-slot-display" style="text-align: center; margin-bottom: 20px; padding: 12px; background: rgba(196, 163, 90, 0.1); border: 1px solid var(--accent-color);"></div>
                                 <h3 class="booking-step-title">Deine Kontaktdaten</h3>
                                 <form id="callback-form">
                                     <div class="booking-form-group">
                                         <label for="callback-name">Dein Name *</label>
-                                        <input type="text" id="callback-name" required style="width: 100%; padding: 12px; background: #2a2a2a; border: 1px solid #444; border-radius: 8px; color: #f0f0f0; box-sizing: border-box;">
+                                        <input type="text" id="callback-name" required>
                                     </div>
                                     <div class="booking-form-group">
-                                        <label for="callback-phone">Deine Telefonnummer *</label>
-                                        <input type="tel" id="callback-phone" required placeholder="z.B. 0664 123 45 67" style="width: 100%; padding: 12px; background: #2a2a2a; border: 1px solid #444; border-radius: 8px; color: #f0f0f0; box-sizing: border-box;">
+                                        <label for="callback-phone">Telefonnummer *</label>
+                                        <input type="tel" id="callback-phone" required placeholder="z.B. 0664 123 45 67">
                                     </div>
                                     <div class="booking-form-group">
-                                        <label for="callback-topic">Dein Anliegen (optional)</label>
-                                        <textarea id="callback-topic" rows="3" placeholder="Worum geht es bei deinem Projekt?" style="width: 100%; padding: 12px; background: #2a2a2a; border: 1px solid #444; border-radius: 8px; color: #f0f0f0; box-sizing: border-box; resize: vertical;"></textarea>
+                                        <label for="callback-topic">Anliegen (optional)</label>
+                                        <textarea id="callback-topic" rows="3" placeholder="Worum geht es?"></textarea>
                                     </div>
                                     <div class="booking-form-actions" style="display: flex; gap: 15px; margin-top: 20px;">
-                                        <button type="button" id="back-to-slots" style="flex: 1; padding: 14px; background: #333; color: #f0f0f0; border: 1px solid #555; border-radius: 8px; cursor: pointer;">← Zurück</button>
-                                        <button type="submit" id="submit-callback" style="flex: 2; padding: 14px; background: #ffc107; color: #1a1a1a; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">Rückruf buchen</button>
+                                        <button type="button" id="back-to-slots" class="cta-button secondary">← Zurück</button>
+                                        <button type="submit" id="submit-callback" class="cta-button">Rückruf buchen</button>
                                     </div>
                                 </form>
                             </div>
 
                             <div id="step-confirmation" class="booking-step">
                                 <div style="text-align: center;">
-                                    <div style="font-size: 3.5rem; color: #ffc107; margin-bottom: 20px;">🎉</div>
-                                    <h3 style="color: #ffffff; margin-bottom: 15px;">Termin erfolgreich gebucht!</h3>
-                                    <div id="confirmation-details" style="margin: 25px 0; padding: 20px; background: #2a2a2a; border-radius: 8px; text-align: left; color: #ccc;"></div>
-                    
-                                <button onclick="closeCallbackModal()" style="background: #ffc107; color: #1a1a1a; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-weight: 600;">Perfekt!</button>
+                                    <div style="font-size: 3rem; margin-bottom: 20px;">🎉</div>
+                                    <h3>Termin gebucht!</h3>
+                                    <div id="confirmation-details" style="margin: 25px 0; padding: 20px; background: rgba(255,255,255,0.05);"></div>
+                                    <button onclick="closeCallbackModal()" class="cta-button">Perfekt!</button>
                                 </div>
                             </div>
                         </div>
-                        <button onclick="closeCallbackModal()" style="position: absolute; top: 15px; right: 20px; background: rgba(255,255,255,0.1); border: none; color: #fff; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; font-size: 1.2rem;">&times;</button>
+                        <button onclick="closeCallbackModal()" class="close-button">&times;</button>
                     </div>
                 </div>
-                
-                <style>
-                .booking-modal {
-                    position: fixed !important;
-                    top: 0 !important;
-                    left: 0 !important;
-                    width: 100% !important;
-                    height: 100% !important;
-                    background: rgba(10, 10, 10, 0.95) !important;
-                    display: flex !important;
-                    align-items: center !important;
-                    justify-content: center !important;
-                    z-index: 999999 !important;
-                    font-family: 'Poppins', sans-serif;
-                }
-                .booking-modal-content {
-                    background: #1e1e1e;
-                    border-radius: 12px;
-                    border: 1px solid #333;
-                    padding: 0;
-                    max-width: 500px;
-                    width: 90%;
-                    max-height: 90vh;
-                    overflow: hidden;
-                    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-                    position: relative;
-                    color: #f0f0f0;
-                    display: flex;
-                    flex-direction: column;
-                }
-                .booking-modal-header {
-                    padding: 24px 30px;
-                    text-align: center;
-                    border-bottom: 1px solid #333;
-                }
-                .booking-modal-title {
-                    margin: 0 0 5px 0;
-                    font-size: 1.5rem;
-                    font-weight: 600;
-                    color: #ffffff;
-                }
-                .booking-modal-subtitle {
-                    margin: 0;
-                    color: #aaa;
-                    font-size: 0.95rem;
-                }
-                .booking-modal-body {
-                    padding: 30px;
-                    overflow-y: auto;
-                    flex-grow: 1;
-                }
-                .booking-step {
-                    display: none;
-                }
-                .booking-step.active {
-                    display: block;
-                }
-                .booking-step-title {
-                    font-size: 1.2rem;
-                    margin: 0 0 20px 0;
-                    color: #ffffff;
-                    text-align: center;
-                }
-                .callback-slot-button {
-                    display: flex;
-                    align-items: center;
-                    width: 100%;
-                    padding: 15px 20px;
-                    background: #2a2a2a;
-                    border: 1px solid #444;
-                    border-radius: 8px;
-                    cursor: pointer;
-                    text-align: left;
-                    transition: all 0.2s ease;
-                    color: #f0f0f0;
-                    margin-bottom: 12px;
-                }
-                .callback-slot-button:hover {
-                    border-color: #ffc107;
-                    background: #333;
-                }
-                .booking-form-group {
-                    margin-bottom: 18px;
-                }
-                .booking-form-group label {
-                    display: block;
-                    margin-bottom: 6px;
-                    font-size: 0.9rem;
-                    color: #aaa;
-                }
-                </style>
             `;
         },
 
         setupEventListeners() {
-            console.log("🔧 Richte Booking Event-Listener ein");
-
             const callbackForm = document.getElementById('callback-form');
             if (callbackForm) {
                 callbackForm.addEventListener('submit', (e) => this.handleSubmit(e));
@@ -536,8 +575,6 @@ showTypingIndicator() {
         },
 
         async loadSlots() {
-            console.log("📞 Lade verfügbare Rückruf-Termine");
-            
             const loadingDiv = document.getElementById('callback-loading');
             const slotsContainer = document.getElementById('callback-slots-container');
             const noSlotsMessage = document.getElementById('no-slots-message');
@@ -556,37 +593,33 @@ showTypingIndicator() {
                         button.className = 'callback-slot-button';
                         button.innerHTML = `
                             <div style="flex-grow: 1;">
-                                <div style="font-size: 1.1rem; font-weight: 500; color: #ffffff;">${suggestion.formattedString.split(' um ')[1]}</div>
-                                <div style="font-size: 0.9rem; color: #aaa;">${suggestion.formattedString.split(' um ')[0]}</div>
+                                <div style="font-weight: 500;">${suggestion.formattedString.split(' um ')[1]}</div>
+                                <div style="font-size: 0.9rem; opacity: 0.7;">${suggestion.formattedString.split(' um ')[0]}</div>
                             </div>
-                            <div style="font-size: 1.5rem; color: #888;">→</div>
+                            <div style="font-size: 1.5rem;">→</div>
                         `;
                         button.onclick = () => this.selectSlot(suggestion);
                         slotsContainer.appendChild(button);
                     });
-                    
-                    console.log(`✅ ${data.suggestions.length} Rückruf-Termine geladen`);
                 } else {
                     if (noSlotsMessage) noSlotsMessage.style.display = 'block';
-                    console.warn("⚠️ Keine Rückruf-Termine verfügbar");
                 }
             } catch (error) {
-                console.error("❌ Fehler beim Laden der Rückruf-Termine:", error);
+                console.error("❌ Fehler beim Laden der Termine:", error);
+                if (loadingDiv) loadingDiv.style.display = 'none';
                 if (noSlotsMessage) {
-                    noSlotsMessage.innerHTML = 'Fehler beim Laden der Rückruf-Termine. Bitte versuche es später erneut oder kontaktiere Michael direkt per E-Mail: <a href="mailto:michael@designare.at" style="color: #ffc107;">michael@designare.at</a>';
+                    noSlotsMessage.innerHTML = 'Termine konnten nicht geladen werden.<br><a href="mailto:michael@designare.at" style="color: var(--accent-color);">michael@designare.at</a>';
                     noSlotsMessage.style.display = 'block';
                 }
             }
         },
 
         selectSlot(suggestion) {
-            console.log("✅ Rückruf-Termin ausgewählt:", suggestion.formattedString);
-            
             state.selectedCallbackData = suggestion;
             
             const displayElement = document.getElementById('selected-slot-display');
             if (displayElement) {
-                displayElement.innerHTML = `Dein Termin: <strong>${suggestion.formattedString}</strong>`;
+                displayElement.innerHTML = `<strong>${suggestion.formattedString}</strong>`;
             }
             
             this.showStep('step-contact-details');
@@ -594,7 +627,6 @@ showTypingIndicator() {
 
         async handleSubmit(event) {
             event.preventDefault();
-            console.log("📞 Verarbeite Rückruf-Buchungs-Formular");
 
             const form = event.target;
             const submitButton = form.querySelector('#submit-callback');
@@ -622,23 +654,19 @@ showTypingIndicator() {
                     const confirmationDetails = document.getElementById('confirmation-details');
                     if (confirmationDetails) {
                         confirmationDetails.innerHTML = `
-    <div><strong>Termin:</strong> ${state.selectedCallbackData.formattedString}</div>
-    <div><strong>Name:</strong> ${name}</div>
-    <div><strong>Telefon:</strong> ${phone}</div>
-    ${topic ? `<div><strong>Anliegen:</strong> ${topic}</div>` : ''}
-    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #444; color: #aaa; font-size: 0.9rem;">
-        Michael wird dich zum vereinbarten Zeitpunkt anrufen. Halte dein Telefon bitte bereit.
-    </div>
+                            <p><strong>Termin:</strong> ${state.selectedCallbackData.formattedString}</p>
+                            <p><strong>Name:</strong> ${name}</p>
+                            <p><strong>Telefon:</strong> ${phone}</p>
+                            ${topic ? `<p><strong>Anliegen:</strong> ${topic}</p>` : ''}
                         `;
                     }
                     this.showStep('step-confirmation');
-                    console.log("✅ Rückruf-Buchung erfolgreich!");
                 } else {
-                    throw new Error(data.message || 'Unbekannter Rückruf-Buchungsfehler');
+                    throw new Error(data.message || 'Buchung fehlgeschlagen');
                 }
             } catch (error) {
-                console.error("❌ Rückruf-Booking-Fehler:", error);
-                alert(`Rückruf-Buchung fehlgeschlagen: ${error.message}`);
+                console.error("❌ Booking-Fehler:", error);
+                alert(`Buchung fehlgeschlagen: ${error.message}`);
             } finally {
                 submitButton.disabled = false;
                 submitButton.textContent = 'Rückruf buchen';
@@ -649,94 +677,119 @@ showTypingIndicator() {
             document.querySelectorAll('.booking-step').forEach(step => step.classList.remove('active'));
             const targetStep = document.getElementById(stepId);
             if (targetStep) targetStep.classList.add('active');
-            
-            console.log("📋 Zeige Schritt:", stepId);
         }
     };
 
     // ===================================================================
-    // KERNLOGIK: Conversation Flow - ERWEITERT (unverändert)
+    // KERNLOGIK: Conversation Flow
     // ===================================================================
-async function handleUserMessage(userInput) {
-    console.log("💬 Verarbeite User-Nachricht:", userInput);
+    async function handleUserMessage(userInput) {
+        console.log("💬 Verarbeite User-Nachricht:", userInput);
 
-    const chatInput = DOM.chatInputDynamic;
-    const submitButton = DOM.chatFormDynamic?.querySelector('button[type="submit"]');
+        const chatInput = DOM.chatInputDynamic;
+        const submitButton = DOM.chatFormDynamic?.querySelector('button[type="submit"]');
 
-    // Eingabe sperren
-    if (chatInput) chatInput.disabled = true;
-    if (submitButton) submitButton.disabled = true;
+        if (chatInput) chatInput.disabled = true;
+        if (submitButton) submitButton.disabled = true;
 
-    ChatUI.addMessage(userInput, 'user');
-    ChatUI.showTypingIndicator();
+        ChatUI.addMessage(userInput, 'user');
+        ChatUI.showTypingIndicator();
 
-    try {
-        // Buchungs-Kontext prüfen
-        const lastAiMessageBeforeReply = state.chatHistory
-            .filter(msg => msg.role === 'assistant')
-            .pop();
-        const wasBookingQuestion = lastAiMessageBeforeReply &&
-            lastAiMessageBeforeReply.content.includes('[BOOKING_CONFIRM_REQUEST]');
+        try {
+            const lastAiMessageBeforeReply = state.chatHistory
+                .filter(msg => msg.role === 'assistant')
+                .pop();
+            const wasBookingQuestion = lastAiMessageBeforeReply &&
+                lastAiMessageBeforeReply.content.includes('[BOOKING_CONFIRM_REQUEST]');
 
-        // Antwort von API holen
-        const data = await ApiHandler.sendToEvita(userInput);
-        ChatUI.removeTypingIndicator();
+            const data = await ApiHandler.sendToEvita(userInput);
+            ChatUI.removeTypingIndicator();
 
-        // 1. REAKTIVIERUNG (Behebt Button-Transparenz auf Mobile)
-        // Wir schalten den Button frei, sobald die Daten da sind, nicht erst nach dem Tippen.
-        if (chatInput) chatInput.disabled = false;
-        if (submitButton) submitButton.disabled = false;
-        if (chatInput) chatInput.focus();
+            if (chatInput) chatInput.disabled = false;
+            if (submitButton) submitButton.disabled = false;
+            if (chatInput) chatInput.focus();
 
-        let answer = "Entschuldigung, ich konnte keine passende Antwort finden.";
-        if (typeof data === 'string') {
-            answer = data;
-        } else if (data?.answer) {
-            answer = data.answer;
-        } else if (data?.message) {
-            answer = data.message;
+            let answer = "Entschuldigung, ich konnte keine Antwort finden.";
+            let isFallback = false;
+            
+            if (typeof data === 'string') {
+                answer = data;
+            } else if (data?.answer) {
+                answer = data.answer;
+                isFallback = data.isFallback || false;
+            } else if (data?.message) {
+                answer = data.message;
+            }
+
+            // Log ob Fallback genutzt wurde
+            if (isFallback) {
+                console.log("ℹ️ Fallback-Antwort verwendet");
+            }
+
+            const textToAnimate = answer
+                .replace(/\[BOOKING_CONFIRM_REQUEST\]/g, '')
+                .replace(/\[buchung_starten\]/g, '')
+                .replace(/\[booking_starten\]/g, '')
+                .trim();
+
+            const aiMsgElement = ChatUI.addMessage(answer, 'ai');
+            await typeWriterEffect(aiMsgElement, textToAnimate, 25);
+
+            // Booking-Launch Check
+            const shouldLaunchAfterConfirmation = wasBookingQuestion && (
+                answer.includes('[buchung_starten]') ||
+                answer.includes('[booking_starten]')
+            );
+
+            if (shouldLaunchAfterConfirmation) {
+                setTimeout(() => {
+                    BookingModal.launch();
+                }, 800);
+            }
+
+        } catch (error) {
+            console.error("❌ Fehler bei User-Message:", error);
+            ChatUI.removeTypingIndicator();
+            
+            // Fallback-Antwort bei Fehler
+            const fallbackAnswer = FallbackResponses.getResponse(userInput);
+            const aiMsgElement = ChatUI.addMessage(fallbackAnswer, 'ai');
+            await typeWriterEffect(aiMsgElement, fallbackAnswer, 25);
+            
+            if (chatInput) chatInput.disabled = false;
+            if (submitButton) submitButton.disabled = false;
         }
-
-        // 2. Text für die Anzeige säubern
-        const textToAnimate = answer
-            .replace(/\[BOOKING_CONFIRM_REQUEST\]/g, '')
-            .replace(/\[buchung_starten\]/g, '')
-            .replace(/\[booking_starten\]/g, '')
-            .trim();
-
-        // 3. KI-Nachricht-Container erstellen (kommt leer zurück)
-        const aiMsgElement = ChatUI.addMessage(answer, 'ai');
-
-        // 4. Animation abwarten (mit Markdown-Support)
-        await typeWriterEffect(aiMsgElement, textToAnimate, 25);
-
-        // Buchungs-Logik nach dem Tippen prüfen
-        const isBookingConfirmRequest = answer.includes('[BOOKING_CONFIRM_REQUEST]');
-        const shouldLaunchAfterConfirmation = wasBookingQuestion && (
-            answer.includes('[buchung_starten]') ||
-            answer.includes('[booking_starten]')
-        );
-
-        if (shouldLaunchAfterConfirmation) {
-            console.log("🎯 Launch nach Bestätigung erkannt");
-            setTimeout(() => {
-                BookingModal.launch();
-            }, 800);
-        }
-
-    } catch (error) {
-        console.error("❌ Fehler bei User-Message:", error);
-        ChatUI.removeTypingIndicator();
-        ChatUI.addMessage(`Fehler: ${error.message}`, 'ai');
-        
-        // Im Fehlerfall auch wieder freischalten
-        if (chatInput) chatInput.disabled = false;
-        if (submitButton) submitButton.disabled = false;
     }
-}
 
     // ===================================================================
-    // EVENT LISTENERS SETUP (unverändert)
+    // TYPEWRITER EFFECT MIT MARKDOWN
+    // ===================================================================
+    async function typeWriterEffect(element, text, speed = 20) {
+        let currentContent = "";
+        const words = text.split(" ");
+        
+        for (let i = 0; i < words.length; i++) {
+            currentContent += words[i] + " ";
+            element.innerHTML = formatMarkdown(currentContent);
+            
+            const container = document.getElementById('ai-chat-history');
+            if (container) {
+                container.scrollTop = container.scrollHeight;
+            }
+            
+            await new Promise(resolve => setTimeout(resolve, speed));
+        }
+    }
+
+    function formatMarkdown(text) {
+        return text
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/^\* (.*$)/gm, '<li>$1</li>')
+            .replace(/\n/g, '<br>');
+    }
+
+    // ===================================================================
+    // EVENT LISTENERS SETUP
     // ===================================================================
     function initializeEventListeners() {
         console.log("🔧 Initialisiere Event-Listener");
@@ -755,7 +808,7 @@ async function handleUserMessage(userInput) {
             });
         }
 
-        // Chat-Formular im Modal (dynamisch)
+        // Chat-Formular im Modal
         const setupChatFormListener = () => {
             const chatForm = DOM.chatFormDynamic;
             if (chatForm && !chatForm.hasAttribute('data-listener-added')) {
@@ -773,7 +826,6 @@ async function handleUserMessage(userInput) {
             }
         };
 
-        // Observer für dynamisches Chat-Formular
         const observer = new MutationObserver(setupChatFormListener);
         observer.observe(document.body, { childList: true, subtree: true });
 
@@ -800,57 +852,18 @@ async function handleUserMessage(userInput) {
             });
         }
 
-        console.log("✅ Event-Listener erfolgreich initialisiert");
+        console.log("✅ Event-Listener initialisiert");
     }
 
     // ===================================================================
-    // GLOBALE FUNKTIONEN (unverändert)
+    // GLOBALE FUNKTIONEN
     // ===================================================================
     window.closeCallbackModal = () => BookingModal.remove();
     window.launchBookingFromChat = () => BookingModal.launch();
-
-    // Test-Funktion für Debug
-    if (window.location.search.includes('debug=true')) {
-        window.debugBookingLaunch = () => {
-            console.log("🔧 DEBUG: Manueller Booking-Launch");
-            BookingModal.launch();
-        };
-    }
 
     // ===================================================================
     // INITIALISIERUNG
     // ===================================================================
     initializeEventListeners();
-    console.log("✅ AI-Form-Modul mit funktionierender Booking-Integration initialisiert!");
-}
-
-
-async function typeWriterEffect(element, text, speed = 20) {
-    let currentContent = "";
-    const words = text.split(" ");
-    
-    for (let i = 0; i < words.length; i++) {
-        currentContent += words[i] + " ";
-        
-        // GEÄNDERT: Nutze formatMarkdown und innerHTML
-        element.innerHTML = formatMarkdown(currentContent);
-        
-        // Scrollen
-        const container = document.getElementById('ai-chat-history');
-        if (container) {
-            container.scrollTop = container.scrollHeight;
-        }
-        
-        await new Promise(resolve => setTimeout(resolve, speed));
-    }
-}
-
-function formatMarkdown(text) {
-    return text
-        // Fettgedruckt: **Text** -> <strong>Text</strong>
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        // Listenpunkte: * Punkt -> <li>Punkt</li> (verpackt in <ul>)
-        .replace(/^\* (.*$)/gm, '<li>$1</li>')
-        // Zeilenumbrüche: \n -> <br>
-        .replace(/\n/g, '<br>');
-}
+    console.log("✅ AI-Form-Modul mit Fallback-System initialisiert!");
+};
