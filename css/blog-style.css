@@ -661,3 +661,94 @@ color: var(--text-color);
         justify-content: flex-end; /* Bild rechtsbündig im Container */
     }
 }
+
+
+
+/* --- LOKALE BOX (Community Style) --- */
+.local-relevance-box {
+    background: rgba(196, 163, 90, 0.1);
+    border-left: 4px solid var(--accent-color);
+    border-radius: 4px;
+    padding: 2rem;
+    margin: 3rem 0;
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.local-box-icon i {
+    font-size: 2rem;
+    color: var(--accent-color);
+    margin-top: 5px;
+}
+
+.local-box-content h3 {
+    margin-top: 0;
+    color: #fff;
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+}
+
+.local-box-content p {
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+}
+
+.local-box-content p:last-child {
+    margin-bottom: 0;
+}
+
+/* --- FRAG MICHAEL SECTION --- */
+.blog-cta-wrapper {
+    text-align: center;
+    background: var(--bg-color-secondary);
+    padding: 3rem 2rem;
+    border-radius: 8px;
+    margin-top: 4rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--border-color);
+}
+
+.blog-cta-wrapper h2 {
+    font-size: 1.6rem; /* Etwas kleiner als H1 */
+    margin-bottom: 1rem;
+    color: var(--accent-color);
+}
+
+.blog-cta-wrapper p {
+    max-width: 600px;
+    margin: 0 auto 2rem auto;
+    color: var(--text-color);
+}
+
+.cta-button-blog {
+    background: var(--accent-color);
+    color: #fff;
+    border: none;
+    padding: 12px 25px;
+    font-size: 1.1rem; /* Etwas größer für "Klickbarkeit" */
+    font-weight: 600;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.cta-button-blog:hover {
+    background: #d39a00;
+    transform: translateY(-2px);
+}
+
+/* Mobile Anpassung */
+@media (max-width: 768px) {
+    .local-relevance-box {
+        flex-direction: column;
+        padding: 1.5rem;
+    }
+    
+    .local-box-icon {
+        margin-bottom: 10px;
+    }
+}
