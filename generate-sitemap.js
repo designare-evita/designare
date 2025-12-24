@@ -24,8 +24,6 @@ const EXCLUDE_FILES = [
     'footer.html', 
     'modals.html', 
     'CSV-Creator.html', 
-    'CSV-Importer-PRO.html', 
-    'silas.html', 
     'blog-feedback.html',
     'sitemap.html' // Sich selbst ausschließen
 ];
