@@ -15,210 +15,150 @@
                 <h3>Ergebnisse</h3>
                 <ul id="search-results-list"></ul>
             </div>
-            
-            </div>
-    </div>
-</div>
 
-<div id="ai-response-modal" class="modal-overlay">
-    <div class="modal-content ai-modal-content">
-        
-        <div class="ai-header-controls">
-            <div class="window-controls">
-                <span class="control-dot red" id="close-ai-response-modal-top"></span>
-                <span class="control-dot yellow"></span>
-                <span class="control-dot green"></span>
-            </div>
-        </div>
-        
-        <div class="ai-header">
-            <div class="ai-avatar-wrapper">
-                <img src="images/Evita.png" alt="Evita AI" class="ai-avatar-img">
-                <div class="ai-status-indicator online"></div>
-            </div>
-            <div class="ai-title-wrapper">
-                <h2>Evita <span class="ai-badge">AI 2.0</span></h2>
-                <p>Digitale Komplizin & Code-Wächterin</p>
-            </div>
-        </div>
+            <div id="sitemap-container">
+                <h3>Seitenübersicht</h3>
+                <div class="sitemap-grid">
+                    <a href="index.html" class="sitemap-item">
+                        <i class="fa-solid fa-house"></i>
+                        <span>Startseite</span>
+                    </a>
+                     <a href="#" id="sitemap-about-button" class="sitemap-item">
+                        <i class="fa-regular fa-circle-user"></i>
+                        <span>Über mich</span>
+                    </a>
 
-        <div class="ai-body">
-            <div id="ai-chat-history" class="chat-history">
+                    <a href="#" id="sitemap-evita-button" class="sitemap-item">
+    <i class="fa-solid fa-robot"></i>
+    <span>Chat mit Evita</span>
+</a>
+                    <a href="KI-Integration-auf-Webseiten.html" class="sitemap-item">
+                        <i class="fa-solid fa-code"></i>
+                        <span>KI Integration</span>
+                    </a>
+                    <a href="ki-fuer-unternehmenswebseiten.html" class="sitemap-item">
+                        <i class="fa-solid fa-building"></i>
+                        <span>Unternehmens-KI</span>
+                    </a>
+                    <a href="geo-seo.html" class="sitemap-item">
+                        <i class="fa-solid fa-map-location-dot"></i>
+                        <span>SEO & GEO</span>
+                    </a>
+                    <a href="silas.html" class="sitemap-item">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        <span>Silas AI Creator</span>
+                    </a>
+                    <a href="CSV-Importer-PRO.html" class="sitemap-item">
+                        <i class="fa-solid fa-file-csv"></i>
+                        <span>CSV Importer PRO</span>
+                    </a>   
+                   
                 </div>
-            
-            <form id="ai-chat-form" class="ai-input-area">
-                <div class="input-wrapper">
-                    <input type="text" id="ai-chat-input" placeholder="Frag mich etwas über Michaels Arbeit..." autocomplete="off">
-                    <button type="submit" class="send-btn" aria-label="Senden">
-                        <i class="fa-regular fa-paper-plane"></i>
-                    </button>
-                </div>
-            </form>
-        </div>
-        
-        <div class="ai-footer">
-            <p><i class="fa-solid fa-bolt"></i> Powered by RAG-Architecture & Vector DB</p>
-        </div>
-    </div>
-</div>
-
-<div id="booking-modal" class="modal-overlay">
-    <div class="modal-content booking-modal-content">
-        <button id="close-booking-modal" class="close-button">&times;</button>
-        
-        <div class="booking-header">
-            <h2>Termin vereinbaren</h2>
-            <p>Lass uns über dein Projekt sprechen.</p>
-        </div>
-
-        <div class="booking-body">
-            <div class="calendly-inline-widget" data-url="https://calendly.com/michael-kanda/30min" style="min-width:320px;height:630px;"></div>
-            <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
-        </div>
-    </div>
-</div>
-
-<div id="cookie-info-lightbox" class="modal-overlay">
-    <div class="modal-content cookie-content">
-        <div class="cookie-icon-wrapper">
-            <i class="fa-solid fa-cookie-bite"></i>
-        </div>
-        <h3>Datenschutz & Cookies</h3>
-        <p>
-            Ich nutze <strong>keine Tracking-Cookies</strong> und kein Google Analytics. 
-            Diese Seite speichert nur deine bevorzugte Theme-Einstellung (Dark/Light Mode) lokal auf deinem Gerät.
-        </p>
-        <p class="cookie-subtext">
-            Warum? Weil Privatsphäre wichtig ist. Evita liest mit, aber sie behält es für sich.
-        </p>
-        <div class="cookie-lightbox-buttons">
-            <button id="acknowledge-cookie-lightbox" class="lightbox-button primary">Alles klar!</button>
-            <button id="privacy-policy-link-button" class="lightbox-button secondary">Datenschutzerklärung</button>
+            </div>
         </div>
     </div>
 </div>
 
 <div id="contact-modal" class="modal-overlay">
-    <div class="modal-content contact-modal-content">
+    <div class="modal-content">
         <button id="close-modal" class="close-button">&times;</button>
-        <h2>Kontakt aufnehmen</h2>
-        <p>Schreib mir eine Nachricht – ich melde mich so schnell wie möglich.</p>
-        
+        <h2>Frag Michael!</h2>
         <form id="contact-form-inner">
-            <div class="form-group">
-                <label for="contact-name">Name</label>
-                <input type="text" id="contact-name" name="name" required placeholder="Dein Name">
+            <input type="text" name="name" placeholder="Dein Name (oder Künstlername):" required>
+            <input type="email" name="email" placeholder="Deine E-Mail (Anti-Spam-Zone!)" required>
+            <input type="text" name="_subject" placeholder="Worum geht's? (Bitte kein KI-Drama)">
+            <textarea name="message" placeholder="Deine Botschaft an mich (und Evita):" rows="5" required></textarea>
+            <div class="privacy-checkbox">
+                <input type="checkbox" name="privacy" id="privacy" required>
+                <label for="privacy">Michael darf meine Nachricht lesen und Evita darf alles verarbeiten, was sie versteht. (Details im Datenschutz)</label>
             </div>
-            
-            <div class="form-group">
-                <label for="contact-email">E-Mail</label>
-                <input type="email" id="contact-email" name="email" required placeholder="deine@email.com">
-            </div>
-            
-            <div class="form-group">
-                <label for="contact-message">Nachricht</label>
-                <textarea id="contact-message" name="message" rows="5" required placeholder="Wie kann ich helfen?"></textarea>
-            </div>
-            
-            <div style="display:none;">
-                <label for="contact-honeypot">Nicht ausfüllen:</label>
-                <input type="text" id="contact-honeypot" name="honeypot">
-            </div>
-
-            <button type="submit" class="submit-btn">Ab die Post!</button>
+            <button type="submit" class="cta-button">Ab die Post!</button>
         </form>
-        
-        <div id="contact-success-message" style="display: none; text-align: center;">
-            <i class="fa-regular fa-paper-plane" style="font-size: 3rem; color: var(--accent-color); margin-bottom: 20px;"></i>
-            <h3>Nachricht gesendet!</h3>
-            <p>Danke für deine Nachricht. Ich melde mich in Kürze bei dir.</p>
-            <button id="close-success-message" class="submit-btn" style="margin-top: 20px;">Schließen</button>
+        <div id="contact-success-message" class="contact-success-hidden">
+            <h2>Nachricht empfangen! </h2>
+            <p>Michael (oder Evita, wenn er zu sehr bastelt) meldet sich in Kürze.</p>
+            <p class="success-close-wrapper"><a href="#" id="close-success-message" class="cta-button">Schließen</a></p>
+        </div>
+    </div>
+</div>
+
+<div id="cookie-info-lightbox" class="modal-overlay">
+    <div class="modal-content">
+        <h2>Hinweis zu Cookies</h2>
+        <p class="cookie-info-text">Wir backen hier nur Cookies, die unsere Website am Laufen halten. Reine Technik, kein Schnickschnack!</p>
+        <div class="cookie-lightbox-buttons">
+            <a href="datenschutz.html" id="privacy-policy-link-button" class="lightbox-button">Datenschutzerklärung</a>
+            <button id="acknowledge-cookie-lightbox" class="lightbox-button">Alles klar</button>
         </div>
     </div>
 </div>
 
 <div id="legal-modal" class="modal-overlay">
-    <div class="modal-content legal-modal-content">
+    <div class="modal-content">
         <button id="close-legal-modal" class="close-button">&times;</button>
-        <div id="legal-modal-content-area">
-            </div>
+        <div id="legal-modal-content-area"></div>
     </div>
 </div>
 
-<div style="display: none;">
-    <div id="about-me-content">
-        <div class="legal-container">
-            <h1>Über Michael Kanda</h1>
-            <p class="intro-text"><strong>Web-Purist, KI-Komplize und Detail-Fanatiker.</strong></p>
-            
-            <div class="about-grid">
-                <div class="about-text">
-                    <h2 class="about-section-header">Der Mann hinter den Pixeln</h2>
-                    <p>
-                        Ich baue keine 08/15-Webseiten. Ich baue digitale Maßanzüge. Mein Ansatz ist radikal: 
-                        Weg mit dem Ballast, her mit der Performance. In einer Welt voller aufgeblähter PageBuilder 
-                        und langsamer Ladezeiten setze ich auf handgeschriebenen Code, semantisches HTML und 
-                        intelligente Architektur.
-                    </p>
-                    <p>
-                        Seit über 10 Jahren bewege ich mich im digitalen Raum. Angefangen hat alles mit der Faszination, 
-                        wie aus Zeilen Code funktionierende Welten entstehen. Heute kombiniere ich dieses Handwerk 
-                        mit der Power moderner KI-Systeme.
-                    </p>
-
-                    <h2 class="about-section-header">Meine Philosophie: "Digitaler Purismus"</h2>
-                    <ul>
-                        <li><strong>Code is Art:</strong> Jeder Tag, jede Klasse, jede Funktion hat einen Zweck. Kein unnötiger Müll.</li>
-                        <li><strong>Performance First:</strong> Eine Webseite muss rennen, nicht humpeln. Google liebt Speed, Nutzer auch.</li>
-                        <li><strong>KI als Werkzeug:</strong> Künstliche Intelligenz ist kein Hype, sondern der Turbo für Entwicklung und Content.</li>
-                    </ul>
-                </div>
-                <div class="about-image">
-                    <img src="images/Michael.webp" alt="Michael Kanda Portrait" loading="lazy">
-                    <p class="image-caption">Michael Kanda & Evita (die Digitale)</p>
-                </div>
-            </div>
-
-            <hr class="legal-separator">
-
-            <h2>Doch Michael ist mehr als nur Code und Pixel</h2>
-            <p>
-                Wenn ich nicht gerade vor dem Bildschirm sitze (oder stehe), findet man mich wahrscheinlich hier:
-            </p>
-
-            <div class="hobbies-grid">
-                <div class="hobby-item">
-                    <i class="fa-solid fa-paw"></i>
-                    <h3>Tierschutz & Evita</h3>
-                    <p>Mein Herz schlägt für Tiere. Meine Hündin Evita (das Original, nicht die KI) kommt aus dem Tierschutz. Sie ist Chefin, Muse und der Grund, warum ich regelmäßig Pausen mache (machen muss).</p>
-                </div>
-                <div class="hobby-item">
-                    <i class="fa-solid fa-dumbbell"></i>
-                    <h3>Sport & Ausgleich</h3>
-                    <p>Ein gesunder Geist braucht einen gesunden Körper. Sport ist mein Ventil, um den Kopf freizubekommen und neue Energie für komplexe Problemlösungen zu tanken.</p>
-                </div>
-                <div class="hobby-item">
-                    <i class="fa-solid fa-mug-hot"></i>
-                    <h3>Kaffee-Kultur</h3>
-                    <p>Ja, das Klischee stimmt. Ohne guten Kaffee läuft nichts. Aber bitte kein Automaten-Kaffee, sondern mit Liebe zubereitet. Qualität vor Quantität – wie beim Code.</p>
-                </div>
-            </div>
-
-            <div class="cta-box">
-                <h3>Lust auf Zusammenarbeit?</h3>
-                <p>Genug über mich. Lass uns über dein Projekt sprechen!</p>
-                <button id="about-contact-btn" class="cta-button" onclick="document.getElementById('contact-button').click(); document.getElementById('close-legal-modal').click();">Kontakt aufnehmen</button>
-            </div>
-        </div>
+<div id="about-me-content" class="about-me-hidden">
+    <div class="legal-container">
+        <h2>Der Mann hinter den Pixeln</h2>
+        <p class="about-image-wrapper">
+            <img src="https://designare.at/images/Michael@work.webp" alt="Michael@work" />
+        </p>
+        <p>Okay, aufgepasst! Michael besitzt digitale Superkräfte! Bei maxonline arbeitet er als Web-Entwickler und verbindet dort Design, Code und KI so genial, dass selbst ich staune. Michael hat einen Abschluss in Medientechnik, ist zertifizierter E-Commerce-Experte und hat Google-Workshops überlebt.</p>
+        <h2 class="about-section-header">Doch Michael ist mehr als nur Code und Pixel</h2>
+        <p>Um den Kopf freizubekommen, verbringt Michael viel Zeit mit seiner Tierschutzhündin Evita (nach der ich benannt wurde ❤️). Regelmäßig quält er sich zudem beim Sport – schließlich weiß man ja nie, wann man vor einem KI-Aufstand flüchten muss! Seine Playlist? Ein wilder Mix aus Frei.Wild, Helene Fischer und Kim Wilde. Ich vermute ja, das ist Michaels geheime Waffe um die KI zur Kapitulation zu bringen...</p>
+        <p class="about-image-wrapper-bottom">
+            <img src="https://designare.at/images/Evita&KI.webp" alt="Michael, Evita & KI" style="margin-top: 15px;" />
+        </p>
     </div>
+</div>
+
+<div id="ai-response-modal" class="modal-overlay">
+    <div class="modal-content">
+        <button id="close-ai-response-modal-top" class="close-button">&times;</button>
+        
+        <div id="ai-chat-history">
+            </div>
+
+        <form id="ai-chat-form" autocomplete="off">
+            <input type="text" 
+                   id="ai-chat-input" 
+                   placeholder="Frag Evita..." 
+                   autocomplete="off" 
+                   required
+                   data-chat-input="true">
+            <button type="submit" aria-label="Senden">
+                <i class="fa-regular fa-paper-plane"></i>
+            </button>
+        </form>
+    </div>
+</div>
+
+<div id="debug-booking-trigger" style="position: fixed; bottom: 80px; right: 20px; z-index: 9999; display: none;">
+    <button onclick="window.debugBookingLaunch && window.debugBookingLaunch()" 
+            style="background: #28a745; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer;">
+        🔧 Test Booking
+    </button>
 </div>
 
 <script>
-// Chat-Formular Backup-Handler (für alle Fälle)
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('🔧 Modal-Ereignis-Setup wird geladen...');
+    
+    // Zeige Debug-Button in Entwicklungsumgebung
+    if (window.location.hostname === 'localhost' || window.location.hostname.includes('127.0.0.1') || window.location.search.includes('debug=true')) {
+        const debugButton = document.getElementById('debug-booking-trigger');
+        if (debugButton) {
+            debugButton.style.display = 'block';
+        }
+    }
+    
+    // FALLBACK: Stelle sicher, dass Chat-Submit-Events verarbeitet werden
     let chatSubmitBackup = false;
     
-    const setupChatBackup = function() {
+    const setupChatBackup = () => {
         const chatForm = document.getElementById('ai-chat-form');
         const chatInput = document.getElementById('ai-chat-input');
         
