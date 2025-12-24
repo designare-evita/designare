@@ -1,109 +1,135 @@
 // ===================================================================
-// SEARCH MODAL SETUP
+// SEARCH MODAL SETUP (Dynamic + Sitemap Version)
 // ===================================================================
 
-// 1. Definiere deine Inhalte (Index)
-const siteContentIndex = [
-    { 
-        title: "Michael Kanda & Evita - ganz privat.", 
-        url: "index.html", 
-        keywords: "home startseite michael kanda webentwickler wien",
-        desc: "Willkommen im privaten Code-Labor von Michael & Evita. Webentwicklung, KI-Experimente und digitale Abenteuer."
-    },
-    { 
-        title: "KI-Integration auf Webseiten", 
-        url: "KI-Integration-auf-Webseiten.html", 
-        keywords: "ki integration künstliche intelligenz chatbot automatisierung",
-        desc: "Wie KI moderne Webseiten interaktiver und effizienter macht."
-    },
-    { 
-        title: "KI für Unternehmenswebseiten", 
-        url: "ki-fuer-unternehmenswebseiten.html", 
-        keywords: "unternehmen business b2b lösungen",
-        desc: "Maßgeschneiderte KI-Lösungen für dein Unternehmen."
-    },
-    { 
-        title: "SEO & GEO", 
-        url: "geo-seo.html", 
-        keywords: "seo suchmaschinenoptimierung google ranking geo lokal",
-        desc: "Optimiere deine Seite für lokale Suchanfragen,Google und KI-Bots."
-    },
-    { 
-        title: "Silas AI Creator", 
-        url: "silas.html", 
-        keywords: "silas ai creator tool generator content",
-        desc: "Der KI-gestützte Content Creator für schnelle Ergebnisse."
-    },
-    { 
-        title: "CSV Importer PRO", 
-        url: "CSV-Importer-PRO.html", 
-        keywords: "csv import tool daten management pro",
-        desc: "Professionelles Tool zum Importieren großer Datensätze."
-    },
-    
-];
+let siteContentIndex = [];
+let isIndexLoaded = false;
 
-function setupSearchModal() {
+// 1. Daten laden (Statisch + Dynamic aus knowledge.json)
+function loadSearchIndex() {
+    if (isIndexLoaded) return;
+
+    // A) Deine statischen Seiten
+    const staticPages = [
+        { 
+            title: "Michael Kanda & Evita - Startseite", 
+            url: "index.html", 
+            keywords: "home startseite michael kanda webentwickler wien",
+            desc: "Willkommen im privaten Code-Labor von Michael & Evita. Webentwicklung, KI-Experimente und digitale Abenteuer."
+        },
+        { 
+            title: "Impressum & Kontakt", 
+            url: "impressum.html", 
+            keywords: "kontakt adresse rechtliches",
+            desc: "Impressum und rechtliche Informationen."
+        }
+    ];
+
+    // B) Dynamische Daten holen
+    fetch('/knowledge.json')
+        .then(response => response.json())
+        .then(data => {
+            const dynamicPages = data.map(item => ({
+                title: item.title,
+                url: item.url || (item.slug ? `${item.slug}.html` : '#'),
+                keywords: item.title + " " + (item.text || ""),
+                desc: getShortDesc(item.text || item.content)
+            }));
+
+            siteContentIndex = [...staticPages, ...dynamicPages];
+            isIndexLoaded = true;
+            console.log('Such-Index geladen:', siteContentIndex.length, 'Einträge');
+        })
+        .catch(err => {
+            console.error('Fehler beim Laden des Such-Index:', err);
+            siteContentIndex = staticPages;
+        });
+}
+
+// Hilfsfunktion: Kurzbeschreibung
+function getShortDesc(text) {
+    if (!text) return "";
+    return text.substring(0, 100).replace(/<[^>]*>?/gm, '') + "...";
+}
+
+// 2. Hauptfunktion (EXPORTIERT für main.js)
+export function setupSearchModal() {  // <--- HIER WAR DAS PROBLEM
+    // Index sofort laden
+    loadSearchIndex();
+
     const searchModal = document.getElementById('search-modal');
-    const searchButton = document.getElementById('search-button');
+    // Suche nach verschiedenen Button-IDs/Klassen
+    const searchButtons = document.querySelectorAll('#search-button, .open-search-modal'); 
     const closeSearchBtn = document.getElementById('close-search-modal');
     const searchInput = document.getElementById('site-search-input');
     const resultsContainer = document.getElementById('search-results-container');
     const resultsList = document.getElementById('search-results-list');
     const sitemapContainer = document.getElementById('sitemap-container');
 
-    // Öffnen
-    if (searchButton) {
-        searchButton.addEventListener('click', (e) => {
+    // Helper: Modal öffnen/schließen
+    const openModal = (modal) => {
+        modal.classList.add('visible');
+        modal.style.display = 'flex';
+        document.body.classList.add('no-scroll');
+    };
+    
+    const closeModal = (modal) => {
+        modal.classList.remove('visible');
+        modal.style.display = 'none';
+        document.body.classList.remove('no-scroll');
+    };
+
+    // Event Listener für Buttons
+    searchButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
             e.preventDefault();
             if (searchModal) {
                 openModal(searchModal);
-                // Fokus auf Input setzen
-                setTimeout(() => searchInput.focus(), 100);
+                setTimeout(() => searchInput && searchInput.focus(), 100);
             }
         });
-    }
+    });
 
-    // Schließen
+    // Schließen Button
     if (closeSearchBtn) {
         closeSearchBtn.addEventListener('click', () => {
             if (searchModal) closeModal(searchModal);
         });
     }
 
-    // Suchlogik
+    // Suchlogik im Input
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
             const query = e.target.value.toLowerCase().trim();
 
             if (query.length === 0) {
-                // Keine Eingabe -> Sitemap zeigen
-                sitemapContainer.style.display = 'block';
-                resultsContainer.style.display = 'none';
+                // Leer -> Sitemap zeigen
+                if (sitemapContainer) sitemapContainer.style.display = 'block';
+                if (resultsContainer) resultsContainer.style.display = 'none';
             } else {
-                // Eingabe vorhanden -> Sitemap weg, Ergebnisse zeigen
-                sitemapContainer.style.display = 'none';
-                resultsContainer.style.display = 'block';
+                // Eingabe -> Ergebnisse zeigen
+                if (sitemapContainer) sitemapContainer.style.display = 'none';
+                if (resultsContainer) resultsContainer.style.display = 'block';
 
-                // Filtern
                 const results = siteContentIndex.filter(page => 
-                    page.title.toLowerCase().includes(query) || 
-                    page.keywords.includes(query) ||
-                    page.desc.toLowerCase().includes(query)
+                    (page.title && page.title.toLowerCase().includes(query)) || 
+                    (page.keywords && page.keywords.toLowerCase().includes(query)) ||
+                    (page.desc && page.desc.toLowerCase().includes(query))
                 );
 
-                // Rendern
-                renderSearchResults(results, resultsList);
+                renderSearchResults(results, resultsList, searchModal, closeModal);
             }
         });
     }
 }
 
-function renderSearchResults(results, listElement) {
-    listElement.innerHTML = ''; // Liste leeren
+// Render Funktion
+function renderSearchResults(results, listElement, modal, closeFunc) {
+    if (!listElement) return;
+    listElement.innerHTML = '';
 
     if (results.length === 0) {
-        listElement.innerHTML = '<li style="color: #888; text-align: center; padding: 20px;">Keine Ergebnisse gefunden.</li>';
+        listElement.innerHTML = '<li style="color: var(--text-color-muted); text-align: center; padding: 20px;">Keine Ergebnisse gefunden.</li>';
         return;
     }
 
@@ -115,11 +141,12 @@ function renderSearchResults(results, listElement) {
                 <span class="search-result-snippet">${page.desc}</span>
             </a>
         `;
-        // Bei Klick Modal schließen
-        li.querySelector('a').addEventListener('click', () => {
-             const searchModal = document.getElementById('search-modal');
-             closeModal(searchModal);
+        
+        const link = li.querySelector('a');
+        link.addEventListener('click', () => {
+             if (modal && closeFunc) closeFunc(modal);
         });
+        
         listElement.appendChild(li);
     });
 }
