@@ -7,7 +7,8 @@ import { initTypewriters } from './typewriter.js';
 import { initModals } from './modals.js';
 import { initAiForm } from './ai-form.js';
 import { initSilasForm } from './silas-form.js';
-import { initMenuInteractions } from './menu-logic.js'; // NEU: Import der interaktiven Menü-Logik
+import { initMenuInteractions } from './menu-logic.js';
+import { setupSearchModal } from './search.js';
 
 // === 2. GLOBALE STATES ===
 let globalAiFormInstance = null;
@@ -348,10 +349,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         console.log("✅ Layout geladen.");
         
-        // Kleine Verzögerung, um sicherzugehen, dass die innerHTML-Inhalte verarbeitet wurden
-        setTimeout(() => {
+       setTimeout(() => {
             initializeDynamicScripts();
             initializeForms();
+            setupSearchModal(); // <--- NEU
+            
         }, 100);
 
         document.body.classList.add('page-loaded');
