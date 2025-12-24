@@ -1,4 +1,4 @@
-// js/modals.js - FINAL (Inkl. Suche, Über Mich & Evita)
+// js/modals.js - FINAL (Bereinigt: Keine Such-Logik mehr!)
 
 export const openModal = (modalElement) => {
     if (modalElement) {
@@ -154,7 +154,6 @@ function setupContactModal() {
 // ABOUT ME MODAL SETUP
 // ===================================================================
 function setupAboutModal() {
-    // Button im Header
     const aboutButton = document.getElementById('about-me-button');
     if (aboutButton) {
         aboutButton.addEventListener('click', (e) => {
@@ -162,181 +161,10 @@ function setupAboutModal() {
             openAboutMeModal();
         });
     }
-
-    // Button in der Sitemap
-    const sitemapAboutButton = document.getElementById('sitemap-about-button');
-    if (sitemapAboutButton) {
-        sitemapAboutButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            const searchModal = document.getElementById('search-modal');
-            if (searchModal) closeModal(searchModal);
-            openAboutMeModal();
-        });
-    }
+    // Sitemap Button Listener entfernt, da Sitemap nicht mehr existiert
 }
 
-// ===================================================================
-// SEARCH MODAL SETUP (Inkl. Evita)
-// ===================================================================
-
-const siteContentIndex = [
-    { 
-        title: "Chat mit Evita (KI)", 
-        url: "#open-evita",  // Spezial-URL für Evita
-        keywords: "evita ai ki chat assistent frage hilfe künstliche intelligenz",
-        desc: "Starte den Chat mit meiner KI-Assistentin Evita."
-    },
-    { 
-        title: "Erfahre mehr über den Mann hinter den Pixeln (und Evita)", 
-        url: "#open-about",
-        keywords: "über mich wer bin ich profil michael kanda lebenslauf",
-        desc: "Michael mag Tierschutz, Sport, sauberen Code und guten Cafe.."
-    },
-    { 
-        title: "Michael Kanda - Komplize für Web & KI aus Wien", 
-        url: "index.html", 
-        keywords: "home startseite michael kanda webentwickler wien",
-        desc: "Willkommen im privaten Code-Labor von Michael & Evita. Webentwicklung, KI-Experimente und digitale Abenteuer."
-    },
-    { 
-        title: "KI-Integration auf Webseiten", 
-        url: "KI-Integration-auf-Webseiten.html", 
-        keywords: "ki integration künstliche intelligenz chatbot automatisierung",
-        desc: "Wie KI moderne Webseiten interaktiver und effizienter macht."
-    },
-    { 
-        title: "KI für Unternehmenswebseiten", 
-        url: "ki-fuer-unternehmenswebseiten.html", 
-        keywords: "unternehmen business b2b lösungen",
-        desc: "Maßgeschneiderte KI-Lösungen für dein Unternehmen."
-    },
-    { 
-        title: "SEO & GEO", 
-        url: "geo-seo.html", 
-        keywords: "seo suchmaschinenoptimierung google ranking geo lokal",
-        desc: "Optimiere deine Seite für lokale Suchanfragen, Google und KI-Bots."
-    },
-    { 
-        title: "Silas AI Creator", 
-        url: "silas.html", 
-        keywords: "silas ai creator tool generator content",
-        desc: "Der KI-gestützte Content Creator für schnelle Ergebnisse."
-    },
-    { 
-        title: "CSV Importer PRO", 
-        url: "CSV-Importer-PRO.html", 
-        keywords: "csv import tool daten management pro",
-        desc: "Professionelles WordPress Tool zum Importieren großer Datensätze."
-    },
-];
-
-function setupSearchModal() {
-    const searchModal = document.getElementById('search-modal');
-    const searchButton = document.getElementById('search-button');
-    const closeSearchBtn = document.getElementById('close-search-modal');
-    const searchInput = document.getElementById('site-search-input');
-    const resultsContainer = document.getElementById('search-results-container');
-    const resultsList = document.getElementById('search-results-list');
-    const sitemapContainer = document.getElementById('sitemap-container');
-    
-    // Neuer Evita Sitemap Button
-    const sitemapEvitaButton = document.getElementById('sitemap-evita-button');
-
-    // Öffnen
-    if (searchButton) {
-        searchButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (searchModal) {
-                openModal(searchModal);
-                setTimeout(() => searchInput.focus(), 100);
-            }
-        });
-    }
-
-    // Schließen
-    if (closeSearchBtn) {
-        closeSearchBtn.addEventListener('click', () => {
-            if (searchModal) closeModal(searchModal);
-        });
-    }
-
-    // Evita Sitemap Button Handler
-    if (sitemapEvitaButton) {
-        sitemapEvitaButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (searchModal) closeModal(searchModal); // Suche schließen
-            
-            // Simuliere Klick auf den Header-Button, um Evita zu starten
-            const evitaHeaderBtn = document.getElementById('evita-chat-button');
-            if (evitaHeaderBtn) evitaHeaderBtn.click();
-        });
-    }
-
-    // Suchlogik
-    if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase().trim();
-
-            if (query.length === 0) {
-                sitemapContainer.style.display = 'block';
-                resultsContainer.style.display = 'none';
-            } else {
-                sitemapContainer.style.display = 'none';
-                resultsContainer.style.display = 'block';
-
-                const results = siteContentIndex.filter(page => 
-                    page.title.toLowerCase().includes(query) || 
-                    page.keywords.includes(query) ||
-                    page.desc.toLowerCase().includes(query)
-                );
-                renderSearchResults(results, resultsList);
-            }
-        });
-    }
-}
-
-function renderSearchResults(results, listElement) {
-    listElement.innerHTML = ''; 
-
-    if (results.length === 0) {
-        listElement.innerHTML = '<li style="color: #888; text-align: center; padding: 20px;">Keine Ergebnisse gefunden.</li>';
-        return;
-    }
-
-    results.forEach(page => {
-        const li = document.createElement('li');
-        li.innerHTML = `
-            <a href="${page.url}" class="search-result-link">
-                <span class="search-result-title">${page.title}</span>
-                <span class="search-result-snippet">${page.desc}</span>
-            </a>
-        `;
-        
-        li.querySelector('a').addEventListener('click', (e) => {
-             const searchModal = document.getElementById('search-modal');
-             
-             if (page.url === '#open-about') {
-                 // Über mich
-                 e.preventDefault();
-                 if (searchModal) closeModal(searchModal);
-                 openAboutMeModal();
-                 
-             } else if (page.url === '#open-evita') {
-                 // Evita Chat
-                 e.preventDefault();
-                 if (searchModal) closeModal(searchModal);
-                 const evitaHeaderBtn = document.getElementById('evita-chat-button');
-                 if (evitaHeaderBtn) evitaHeaderBtn.click();
-                 
-             } else {
-                 // Normale Links
-                 if (searchModal) closeModal(searchModal);
-             }
-        });
-        
-        listElement.appendChild(li);
-    });
-}
+// [SUCH-LOGIK WURDE HIER ENTFERNT - DAS MACHT JETZT JS/SEARCH.JS]
 
 // ===================================================================
 // ABOUT-ME PAGINATION
@@ -684,19 +512,16 @@ function setupLegalModalCloseButton() {
 // INIT
 // ===================================================================
 export function initModals() {
-    console.log('🚀 Initialisiere Modals (Optimiert)...');
+    console.log('🚀 Initialisiere Modals (Bereinigt)...');
     
     setTimeout(() => {
         setupCookieModal();
         setupContactModal();
         setupAboutModal();
         setupAiModal();
-        setupSearchModal();
+        // setupSearchModal() entfernt! Das macht jetzt search.js
         setupLegalModalCloseButton();
         setupModalBackgroundClose();
-
-        // HINWEIS: Die Event-Delegation für Impressum/Datenschutz wurde entfernt,
-        // damit diese Links nun wie normale Links funktionieren (neuer Tab).
 
         console.log('✅ Modals bereit');
     }, 100);
