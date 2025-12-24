@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content">
  <title>Semantisches Markup für SEO & KI-Suche | Michael Kanda</title>
-    <meta name="description" content="Semantisches Markup ist die harte Währung für moderne Suchmaschinen und KI-Modelle. Erfahre, warum sauberes HTML der Schlüssel für GEO und SEO ist.">    
+    <meta name="description" content="Semantisches Markup ist die harte Währung für moderne Suchmaschinen und KI-Modelle. Erfahre, warum sauberes HTML der Schlüssel für GEO und SEO ist.">
+            <meta name="author" content="Michael Kanda">
+
 <link rel="preload" href="/Font/Poppins-Regular.ttf" as="font" type="font/ttf" crossorigin="anonymous">    <link rel="icon" href="images/favicon.webp" type="image/webp">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" media="print" onload="this.media='all'">
@@ -19,11 +21,13 @@
         <link rel="stylesheet" href="css/menu-interactive.css">
     <link rel="canonical" href="https://designare.at/semantisches-markup.html" />
 
-    <script type="application/ld+json">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
     {
-      "@context": "https://schema.org",
       "@type": "BlogPosting",
-      "@id": "https://designare.at/semantisches-markup.html",
+      "@id": "https://designare.at/semantisches-markup.html#article",
       "headline": "Semantisches Markup: Warum sauberer Code das Fundament für SEO und KI-Suche ist",
       "description": "Eine technische Analyse, warum semantisches HTML die Grundlage für moderne Suchmaschinenoptimierung und KI-Verständnis bildet.",
       "image": "https://designare.at/images/Michael-Kanda.jpg",
@@ -61,9 +65,60 @@
         "bestRating": "5",
         "worstRating": "1",
         "ratingCount": "1"
+      },
+      "hasPart": {
+        "@id": "https://designare.at/semantisches-markup.html#faq-heading"
       }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://designare.at/semantisches-markup.html#faq-heading",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Was ist semantisches Markup?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Semantisches Markup bedeutet, HTML-Code so zu schreiben, dass er den Inhalt und die Bedeutung der Elemente beschreibt, nicht nur deren Aussehen. Anstatt alles in generische div-Container zu packen, nutzen wir spezifische Tags wie article, nav oder footer. Das liefert Suchmaschinen und KIs den nötigen Kontext."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Wie funktioniert semantisches Markup?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Es funktioniert wie eine Übersetzungshilfe für Maschinen. Während wir Menschen visuell erkennen, was eine Überschrift ist, braucht der Crawler klare Anweisungen. Durch die Trennung von Struktur (HTML) und Design (CSS) sagen wir dem Browser und LLMs exakt, was wichtig ist."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Lohnt sich semantisches Markup?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Absolut. Es ist das technische Fundament deiner SEO-Strategie. Sauberes Markup sorgt für Barrierefreiheit, blitzschnelle Ladezeiten und macht deine Seite fit für die KI-Suche (GEO). Es ist ein Investment in die Zukunftsfähigkeit."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Für wen eignet sich semantisches Markup?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Für jeden Web-Puristen und Unternehmen, die gefunden werden wollen. Besonders kritisch ist es für Seiten mit vielen Inhalten (Blogs, News), E-Commerce und alle, die wollen, dass ihre Daten von KI-Systemen wie ChatGPT oder Gemini korrekt interpretiert werden."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Was sind die häufigsten Fehler bei semantisches Markup?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "<ol><li><strong>Falsche Tag-Nutzung:</strong> Ein Article-Tag für etwas nutzen, das eigentlich eine Section ist.</li><li><strong>Struktur-Chaos:</strong> Mehrere H1 Tags wild durcheinander gewürfelt.</li><li><strong>Thin Content:</strong> Markup ohne inhaltlichen Mehrwert.</li></ol>"
+          }
+        }
+      ]
     }
-    </script>
+  ]
+}
+</script>
 </head>
 
 <body class="dark-mode page-loaded">
