@@ -408,3 +408,106 @@ body.light-mode .flipper li i,
 body.light-mode .flipper p {
     color: #333333 !important;
 }
+
+/* ============================================================
+   EXPERT FAQ STYLES (Tech & Clean Look)
+   ============================================================ */
+
+/* Layout im Grid: Nimmt die volle Breite ein */
+.expert-faq-wrapper {
+    width: 100%;
+    margin-top: 30px;
+    border-top: 1px solid var(--border-color-subtle);
+    /* Falls Grid aktiv ist (Desktop), volle Breite erzwingen: */
+    grid-column: 1 / -1; 
+}
+
+/* Einzelnes FAQ Item */
+details[name="expert-faq"] {
+    border-bottom: 1px solid var(--border-color-subtle);
+    transition: border-color 0.3s ease;
+}
+
+/* Die Frage (Summary) */
+details[name="expert-faq"] summary {
+    padding: 16px 0;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: var(--text-color);
+    list-style: none; /* Standard-Marker entfernen */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: color 0.3s ease;
+}
+
+/* Hover-Effekt auf Text */
+details[name="expert-faq"] summary:hover {
+    color: var(--accent-color);
+}
+
+/* Custom Pfeil (Tech Style Chevron) */
+details[name="expert-faq"] summary::after {
+    content: '\f078'; /* FontAwesome Chevron Down */
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    font-size: 0.75rem;
+    color: var(--text-color-subtle);
+    transition: transform 0.3s ease, color 0.3s ease;
+    margin-left: 10px;
+}
+
+/* Zustand: Geöffnet */
+details[name="expert-faq"][open] summary::after {
+    transform: rotate(180deg);
+    color: var(--accent-color);
+}
+
+/* Webkit Marker Fix (für Safari/Chrome sicherheitshalber) */
+details[name="expert-faq"] summary::-webkit-details-marker {
+    display: none;
+}
+
+/* Inhalt (Antwort) */
+.faq-content {
+    padding-bottom: 20px;
+    padding-right: 20px;
+    animation: fadeIn 0.4s ease; /* Sanftes Einblenden */
+}
+
+/* Typografie im Content */
+.faq-content p {
+    font-size: 0.9rem !important; /* Wie gewünscht etwas kleiner */
+    line-height: 1.6;
+    color: var(--text-color-muted);
+    margin-bottom: 0 !important;
+}
+
+/* Tech-Highlighting für Code-Tags */
+.faq-content code {
+    font-family: 'Courier New', monospace;
+    font-size: 0.85em;
+    background: rgba(255, 255, 255, 0.08);
+    padding: 2px 4px;
+    border-radius: 3px;
+    color: var(--accent-color);
+}
+
+/* Der Link am Ende */
+.faq-link {
+    display: inline-block;
+    margin-left: 6px;
+    color: var(--accent-color);
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-decoration: none;
+    transition: transform 0.2s ease;
+}
+
+.faq-link:hover {
+    transform: translateX(4px); /* Kleiner Slide-Effekt */
+    text-decoration: none;
+}
