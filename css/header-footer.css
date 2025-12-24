@@ -294,3 +294,59 @@ body.light-mode #back-to-top:hover {
         font-size: 0.9rem;
     }
 
+/* ===================
+   FOOTER BUTTONS (Suche & Back-to-Top)
+   =================== */
+
+/* Basis-Style für Footer Icons */
+.footer-btn {
+    color: var(--text-color);
+    font-size: 1.2rem;
+    margin-left: 15px; /* Abstand zwischen Links und Icons */
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none !important;
+    width: 35px; /* Feste Breite für Touch-Target */
+    height: 35px;
+    border-radius: 50%; /* Optional: Rundes Hover-Feld */
+}
+
+/* Hover Effekt für beide Icons */
+.footer-btn:hover {
+    color: var(--accent-color);
+    background-color: rgba(255, 255, 255, 0.05); /* Subtiler Hintergrund */
+    transform: translateY(-3px);
+}
+
+/* Light Mode Anpassung */
+body.light-mode .footer-btn {
+    color: var(--text-color);
+}
+
+body.light-mode .footer-btn:hover {
+    color: var(--accent-color);
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Spezifisch für Back-to-Top (falls nötig, um alte Styles zu überschreiben) */
+#back-to-top {
+    /* Eventuell bestehende Styles hier resetten oder integrieren */
+    margin-left: 10px; /* Abstand zwischen Suche und Pfeil */
+}
+
+/* Mobile Optimierung */
+@media (max-width: 768px) {
+    footer {
+        flex-wrap: wrap;
+        gap: 15px;
+        justify-content: center;
+    }
+    
+    .footer-btn {
+        margin-left: 10px;
+        margin-right: 10px;
+        font-size: 1.4rem; /* Größer für Finger */
+    }
+}
