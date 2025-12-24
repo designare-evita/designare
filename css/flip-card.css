@@ -653,7 +653,7 @@ details[name="expert-faq"] summary::-webkit-details-marker {
     
     /* Typografie */
     font-family: 'Poppins', sans-serif;
-    font-size: 0.85rem;
+    font-size: 1rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 2px;
