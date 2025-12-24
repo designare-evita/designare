@@ -22,7 +22,7 @@
     
     <link rel="canonical" href="https://designare.at/" />
 
-    <script type="application/ld+json">
+<script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@graph": [
@@ -96,10 +96,81 @@
         "@type": "ProfilePage",
         "@id": "https://designare.at/"
       }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://designare.at/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Warum killen PageBuilder meine WordPress-Performance?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Weil sie eine fatale \"Div-Suppe\" kochen. Ab 2026 sprengen diese aufgeblähten DOM-Strukturen oft das PHP-Memory-Limit deines Servers. Clean Code ist die einzige Diät, die wirkt. <a href=\"https://designare.at/wordpress-pagebuilder-ressourcenverbrauch-2026.html\">Zum Rant</a>"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "KI-Integration auf Webseiten: Serverless oder Plugin?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ganz klar: Serverless gewinnt. Während WordPress-Plugins bei jedem Request den ganzen CMS-Ballast mitschleppen, feuert eine Serverless-Architektur deine KI-Antworten isoliert und ohne Overhead raus. <a href=\"https://designare.at/KI-Integration-auf-Webseiten.html\">Zum Tech-Vergleich</a>"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Warum ist semantisches Markup Pflicht für KIs?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Weil LLMs keine Pixel sehen, sondern Code parsen. Tags wie &lt;article&gt; oder &lt;nav&gt; liefern den nötigen Kontext. Ohne Semantik ist dein Content für die KI nur unstrukturierter Datenmüll und wird ignoriert. <a href=\"https://designare.at/semantisches-markup.html\">Zum Guide</a>"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Welche KI-Features lohnen sich für Webseiten?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Vergiss den Hype. Echter Mehrwert entsteht durch smarte Service-Chatbots (die wirklich Probleme lösen) und Personalisierung. Alles andere ist Spielerei. Dein Bot muss liefern, nicht nur plaudern. <a href=\"https://designare.at/ki-fuer-unternehmenswebseiten.html\">Zur Analyse</a>"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "SEO vs. GEO: Wo liegt der Unterschied?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "SEO kämpft um die 10 blauen Links bei Google. GEO (Generative Engine Optimization) optimiert deine Fakten so, dass KI-Modelle wie ChatGPT sie direkt zitieren und als primäre Antwort ausspucken. <a href=\"https://designare.at/geo-seo.html\">Zur Strategie</a>"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Kann man viele SEO-Texte auf einmal generieren?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ja, mit dem KI-Tool Silas kannst du 50 SEO-Texte auf einmal generieren – inklusive CSV-Export für die Weiterverarbeitung. <a href=\"https://designare.at/silas.html\">Zu Silas</a>"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Können WordPress Plugins reduziert werden?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ja, oft können 10 Einzel-Plugins durch eine modulare Lösung ersetzt werden. Die SEO Wunderkiste vereint Funktionen wie Caching, Bildoptimierung und Security in einem Tool. <a href=\"https://designare.at/seo-wunderkiste.html\">Zur SEO Wunderkiste</a>"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Kann man Landingpages aus Excel erstellen?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ja, der CSV Importer PRO ermöglicht es, vollständige Landingpages direkt aus Excel-Listen oder CSV-Dateien programmatisch zu erstellen. <a href=\"https://designare.at/CSV-Importer-PRO.html\">Zum CSV Importer PRO</a>"
+          }
+        }
+      ]
     }
   ]
 }
 </script>
+    
 </head>
 
 <body class="dark-mode no-scroll">
@@ -206,7 +277,10 @@
             <p class="cmd-text">echo "Fact_01: Massenproduktion"</p>
             <p class="output-text">
                 Wusstest du, dass du 50 SEO-Texte auf einmal generieren kannst? Mein Kollege <strong>Silas</strong> macht genau das – inkl. CSV-Export.
-                <a href="silas.html" class="terminal-link">>> sh run_silas.sh</a>
+                <a href="silas.html" 
+           class="terminal-link"
+           title="Silas: KI-Tool für SEO-Texterstellung"
+           aria-label="Details zum KI-Text-Generator Silas ansehen">>> sh run_silas.sh</a>
             </p>
         </div>
 
@@ -215,7 +289,10 @@
             <p class="cmd-text">grep "Effizienz" tools.log</p>
             <p class="output-text">
                 Wusstest du, dass 10 Plugins oft durch eines ersetzt werden können? Die <strong>SEO Wunderkiste</strong> ist mein modulares Taschenmesser.
-                <a href="seo-wunderkiste.html" class="terminal-link">>> open wunderkiste.exe</a>
+               <a href="seo-wunderkiste.html" 
+           class="terminal-link"
+           title="SEO Wunderkiste: Das All-in-One WordPress Performance Plugin"
+           aria-label="Zur SEO Wunderkiste: Performance Plugin Dokumentation öffnen">>> open wunderkiste.exe</a>
             </p>
         </div>
 
@@ -224,7 +301,10 @@
             <p class="cmd-text">import "Excel-to-Web"</p>
             <p class="output-text">
                 Wusstest du, dass man Landingpages direkt aus Excel-Listen bauen kann? Der <strong>CSV Importer PRO</strong> erledigt das.
-                <a href="CSV-Importer-PRO.html" class="terminal-link">>> init import_pro</a>
+               <a href="CSV-Importer-PRO.html" 
+           class="terminal-link"
+           title="CSV Importer PRO: Landingpages generieren"
+           aria-label="Zum CSV Importer PRO: Landingpages aus Excel erstellen">>> init import_pro</a>
             </p>
         </div>
 
@@ -288,7 +368,10 @@
         <summary>Warum killen PageBuilder meine WordPress-Performance?</summary>
         <div class="faq-content">
             <p>Weil sie eine fatale "Div-Suppe" kochen. Ab 2026 sprengen diese aufgeblähten DOM-Strukturen oft das PHP-Memory-Limit deines Servers. Clean Code ist die einzige Diät, die wirkt. 
-            <a href="wordpress-pagebuilder-ressourcenverbrauch-2026.html" class="faq-link">Zum Rant &rarr;</a></p>
+           <a href="wordpress-pagebuilder-ressourcenverbrauch-2026.html" 
+           class="faq-link" 
+           title="Analyse: WordPress PageBuilder Ressourcenverbrauch 2026"
+           aria-label="Lies den Rant über den Ressourcenverbrauch von PageBuildern">Zum Rant &rarr;</a></p>
         </div>
     </details>
 
@@ -296,7 +379,10 @@
         <summary>KI-Integration auf Webseiten: Serverless oder Plugin?</summary>
         <div class="faq-content">
             <p>Ganz klar: Serverless gewinnt. Während WordPress-Plugins bei jedem Request den ganzen CMS-Ballast mitschleppen, feuert eine Serverless-Architektur deine KI-Antworten isoliert und ohne Overhead raus.
-            <a href="KI-Integration-auf-Webseiten.html" class="faq-link">Zum Tech-Vergleich &rarr;</a></p>
+            <a href="KI-Integration-auf-Webseiten.html" 
+           class="faq-link"
+           title="Technischer Vergleich: WordPress Plugins vs. Serverless KI"
+           aria-label="Zum Tech-Vergleich zwischen Plugins und Serverless Architecture">Zum Tech-Vergleich &rarr;</a></p>
         </div>
     </details>
 
@@ -304,7 +390,10 @@
         <summary>Warum ist semantisches Markup Pflicht für KIs?</summary>
         <div class="faq-content">
             <p>Weil LLMs keine Pixel sehen, sondern Code parsen. Tags wie <code>&lt;article&gt;</code> oder <code>&lt;nav&gt;</code> liefern den nötigen Kontext. Ohne Semantik ist dein Content für die KI nur unstrukturierter Datenmüll und wird ignoriert.
-            <a href="semantisches-markup.html" class="faq-link">Zum Guide &rarr;</a></p>
+           <a href="semantisches-markup.html" 
+           class="faq-link"
+           title="Guide: Semantisches HTML für KI-Optimierung"
+           aria-label="Zum Guide für semantisches Markup und Generative Engine Optimization">Zum Guide &rarr;</a></p>
         </div>
     </details>
 
@@ -312,7 +401,10 @@
         <summary>Welche KI-Features lohnen sich für Webseiten?</summary>
         <div class="faq-content">
             <p>Vergiss den Hype. Echter Mehrwert entsteht durch smarte Service-Chatbots (die wirklich Probleme lösen) und Personalisierung. Alles andere ist Spielerei. Dein Bot muss liefern, nicht nur plaudern.
-            <a href="ki-fuer-unternehmenswebseiten.html" class="faq-link">Zur Analyse &rarr;</a></p>
+           <a href="ki-fuer-unternehmenswebseiten.html" 
+           class="faq-link"
+           title="Analyse: Sinnvolle KI-Features für Unternehmen"
+           aria-label="Zur Analyse: Welche KI-Features lohnen sich für Firmenwebseiten?">Zur Analyse &rarr;</a></p>
         </div>
     </details>
 
@@ -320,8 +412,10 @@
         <summary>SEO vs. GEO: Wo liegt der Unterschied?</summary>
         <div class="faq-content">
             <p>SEO kämpft um die 10 blauen Links bei Google. GEO (Generative Engine Optimization) optimiert deine Fakten so, dass KI-Modelle wie ChatGPT sie direkt zitieren und als primäre Antwort ausspucken.
-            <a href="geo-seo.html" class="faq-link">Zur Strategie &rarr;</a></p>
-        </div>
+           <a href="geo-seo.html" 
+           class="faq-link"
+           title="Strategie-Vergleich: SEO vs. Generative Engine Optimization"
+           aria-label="Zur Strategie: Unterschied zwischen SEO und GEO verstehen">Zur Strategie &rarr;</a></p>
     </details>
 
 </div>
