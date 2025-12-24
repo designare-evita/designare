@@ -511,3 +511,127 @@ details[name="expert-faq"] summary::-webkit-details-marker {
     transform: translateX(4px); /* Kleiner Slide-Effekt */
     text-decoration: none;
 }
+
+/* ============================================================
+   TECH-TERMINAL STYLES (Evita Seite)
+   ============================================================ */
+
+/* Container Layout */
+.tech-terminal-wrapper {
+    grid-column: 1 / -1; /* Volle Breite im Grid */
+    margin-top: 30px;
+    background-color: #1e1e1e; /* Dunklerer Hintergrund für Terminal-Look */
+    border-radius: 8px;
+    border: 1px solid #333;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    overflow: hidden;
+    font-family: 'Courier New', Courier, monospace; /* Monospace für Code-Look */
+    width: 100%;
+}
+
+/* Header Bar (Mac/Ubuntu Terminal Style) */
+.terminal-header-bar {
+    background-color: #2d2d2d;
+    padding: 8px 15px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #333;
+}
+
+.terminal-controls {
+    display: flex;
+    gap: 6px;
+    margin-right: 15px;
+}
+
+.control-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.control-dot.red { background-color: #ff5f56; }
+.control-dot.yellow { background-color: #ffbd2e; }
+.control-dot.green { background-color: #27c93f; }
+
+.terminal-title-text {
+    color: #888;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    user-select: none;
+}
+
+/* Content Body */
+.terminal-body-content {
+    padding: 20px;
+}
+
+/* Einzelnes Item */
+.tech-fact-item {
+    margin-bottom: 20px;
+    border-left: 2px solid #333;
+    padding-left: 15px;
+    transition: border-color 0.3s ease;
+}
+
+.tech-fact-item:hover {
+    border-left-color: var(--accent-color); /* Goldener Border bei Hover */
+}
+
+.tech-fact-item:last-child {
+    margin-bottom: 0;
+}
+
+/* Prompt Zeichen ($) */
+.prompt-sign {
+    color: var(--accent-color);
+    font-weight: bold;
+    margin-right: 8px;
+    float: left; /* Damit es neben dem Command steht */
+}
+
+/* Der fiktive Befehl */
+.cmd-text {
+    color: #a9b7c6; /* Code-Editor Grau/Blau */
+    font-size: 0.85rem;
+    margin-bottom: 5px !important;
+    display: block;
+}
+
+/* Der Output Text (Die eigentliche Info) */
+.output-text {
+    color: var(--text-color);
+    font-family: 'Poppins', sans-serif; /* Zurück zur Leseschrift für den Inhalt */
+    font-size: 0.9rem !important;
+    line-height: 1.5;
+    margin-left: 20px; /* Einrückung unter den Command */
+    margin-bottom: 0 !important;
+    display: block;
+}
+
+.output-text strong {
+    color: #fff;
+    font-weight: 600;
+}
+
+/* Der Link Button im Terminal Look */
+.terminal-link {
+    display: inline-block;
+    margin-top: 8px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.8rem;
+    color: var(--accent-color);
+    text-decoration: none;
+    background: rgba(196, 163, 90, 0.1); /* Hauch von Gold im Hintergrund */
+    padding: 2px 8px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.terminal-link:hover {
+    background: var(--accent-color);
+    color: #000; /* Schwarz auf Gold für Kontrast */
+    box-shadow: 0 0 10px rgba(196, 163, 90, 0.4);
+    transform: translateX(5px);
+}
