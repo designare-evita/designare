@@ -635,3 +635,46 @@ details[name="expert-faq"] summary::-webkit-details-marker {
     box-shadow: 0 0 10px rgba(196, 163, 90, 0.4);
     transform: translateX(5px);
 }
+
+/* ============================================================
+   SECTION SEPARATOR TITLES (Zwischenüberschriften)
+   ============================================================ */
+
+.section-separator-title {
+    /* Layout im Grid */
+    grid-column: 1 / -1;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    
+    /* Der deutliche Abstand nach oben (zu den Buttons) */
+    margin-top: 60px; 
+    margin-bottom: 20px;
+    
+    /* Typografie */
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--accent-color); /* Dein Gold-Ton */
+    opacity: 0.9;
+}
+
+/* Dekorative Linie rechts neben dem Text */
+.section-separator-title::after {
+    content: '';
+    flex-grow: 1; /* Füllt den Rest der Zeile */
+    height: 1px;
+    background: linear-gradient(to right, var(--accent-color), transparent);
+    margin-left: 15px;
+    opacity: 0.3;
+}
+
+/* Mobile Anpassung: Etwas weniger Abstand */
+@media (max-width: 768px) {
+    .section-separator-title {
+        margin-top: 40px;
+        font-size: 0.8rem;
+    }
+}
