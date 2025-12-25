@@ -105,8 +105,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    /* ÄNDERUNG: Margin auf 0, da wir den Abstand jetzt global im #hero steuern */
-    margin-top: 0; 
+    justify-content: center; 
+   margin-top: 0; 
     margin-bottom: 20px;
 }
 
