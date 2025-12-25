@@ -104,10 +104,19 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center !important;
-   margin-top: 0; 
+    align-items: center; /* Horizontal zentrieren */
+    justify-content: center; /* Vertikal zentrieren falls nötig */
+    margin-top: 0; 
     margin-bottom: 20px;
+    text-align: center; /* Text-Zentrierung für inline Elemente */
+}
+
+#view-main .profile-picture,
+#view-main h1,
+#view-main .subtitle,
+#view-main .ai-container {
+    margin-left: auto;
+    margin-right: auto;
 }
 
 #view-main > * {
@@ -115,10 +124,7 @@
     width: 100%;
 }
 
-#view-main .profile-picture {
-    width: 200px;
-    max-width: 200px;
-}
+
 
 .info-btn-wrapper {
     width: 100%;
