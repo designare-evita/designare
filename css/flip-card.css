@@ -110,6 +110,16 @@
     margin-bottom: 20px;
 }
 
+#view-main > * {
+    max-width: 500px;
+    width: 100%;
+}
+
+#view-main .profile-picture {
+    width: 200px;
+    max-width: 200px;
+}
+
 .info-btn-wrapper {
     width: 100%;
     margin-top: 15px;
