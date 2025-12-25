@@ -352,7 +352,7 @@ document.addEventListener('DOMContentLoaded', async () => {
        setTimeout(() => {
             initializeDynamicScripts();
             initializeForms();
-            setupSearchModal(); // <--- NEU
+            // setupSearchModal(); // <--- Auskommentiert, da Suche noch nicht aktiv
             
         }, 100);
 
