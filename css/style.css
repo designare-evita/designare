@@ -234,7 +234,10 @@ h1 b {
 
 .ai-container {
     margin-bottom: 2.5rem;
-    width: 500px;
+        width: 100%;
+   max-width: 500px; 
+    margin-left: auto; 
+    margin-right: auto; 
 }
 
 #ai-form {
