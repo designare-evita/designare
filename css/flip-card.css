@@ -20,7 +20,7 @@
 
 #hero section.flip-container {
     display: flex;
-    justify-content: center;
+    justify-content: center !important;
     align-items: flex-start; /* Oben ausrichten */
     min-height: unset;
     height: auto;
@@ -105,7 +105,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center; 
+    justify-content: center !important;
    margin-top: 0; 
     margin-bottom: 20px;
 }
