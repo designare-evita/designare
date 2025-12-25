@@ -1,4 +1,4 @@
-// js/modals.js - FINAL (Bereinigt: Keine Such-Logik mehr!)
+// js/modals.js - FINAL (Bereinigt: Keine Such-Logik und About-Me mehr!)
 
 export const openModal = (modalElement) => {
     if (modalElement) {
@@ -28,22 +28,6 @@ export function showAIResponse(content, isHTML = false) {
             contentArea.textContent = content;
         }
         openModal(modal);
-    }
-}
-
-// ===================================================================
-// HILFSFUNKTION: ÜBER MICH MODAL ÖFFNEN
-// ===================================================================
-function openAboutMeModal() {
-    const legalModal = document.getElementById('legal-modal');
-    const aboutContent = document.getElementById('about-me-content');
-    const contentArea = document.getElementById('legal-modal-content-area');
-
-    if (legalModal && aboutContent && contentArea) {
-        console.log('👤 Öffne Über Mich Modal');
-        contentArea.innerHTML = aboutContent.innerHTML;
-        setupAboutMePagination(contentArea); 
-        openModal(legalModal);
     }
 }
 
@@ -148,148 +132,6 @@ function setupContactModal() {
             }
         });
     }
-}
-
-// ===================================================================
-// ABOUT ME MODAL SETUP
-// ===================================================================
-function setupAboutModal() {
-    const aboutButton = document.getElementById('about-me-button');
-    if (aboutButton) {
-        aboutButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            openAboutMeModal();
-        });
-    }
-    // Sitemap Button Listener entfernt, da Sitemap nicht mehr existiert
-}
-
-// [SUCH-LOGIK WURDE HIER ENTFERNT - DAS MACHT JETZT JS/SEARCH.JS]
-
-// ===================================================================
-// ABOUT-ME PAGINATION
-// ===================================================================
-function setupAboutMePagination(contentArea) {
-    const config = {
-        totalPages: 2,
-        pages: [
-            { title: "Seite 1: Der Mann hinter den Pixeln", sections: [0, 0] },
-            { title: "Seite 2: Mehr als Code und Pixel", sections: [1, 2] }
-        ]
-    };
-    
-    const paginationState = {
-        currentPage: 0,
-        pages: config.pages
-    };
-    
-    function createPaginationHTML(pageIndex) {
-        const isFirstPage = pageIndex === 0;
-        const isLastPage = pageIndex === config.totalPages - 1;
-        
-        return `
-            <div class="legal-modal-pagination-buttons">
-                <button id="about-prev-btn" ${isFirstPage ? 'disabled' : ''}>
-                    ← ${isFirstPage ? 'Erste Seite' : 'Vorherige Seite'}
-                </button>
-                <span style="color: var(--text-color); font-weight: 500; padding: 10px; text-align: center; font-size: 0.9rem;">
-                    ${paginationState.pages[pageIndex].title}<br>
-                    <small style="opacity: 0.7;">(${pageIndex + 1}/${config.totalPages})</small>
-                </span>
-                <button id="about-next-btn" ${isLastPage ? 'disabled' : ''}>
-                    ${isLastPage ? 'Letzte Seite' : 'Nächste Seite'} →
-                </button>
-            </div>
-        `;
-    }
-    
-    function updatePagination() {
-        const existingPagination = contentArea.querySelector('.legal-modal-pagination-buttons');
-        if (existingPagination) existingPagination.remove();
-        
-        contentArea.insertAdjacentHTML('beforeend', createPaginationHTML(paginationState.currentPage));
-        
-        const prevBtn = document.getElementById('about-prev-btn');
-        const nextBtn = document.getElementById('about-next-btn');
-        
-        if (prevBtn && !prevBtn.disabled) {
-            prevBtn.addEventListener('click', () => {
-                if (paginationState.currentPage > 0) {
-                    paginationState.currentPage--;
-                    showPage(paginationState.currentPage);
-                }
-            });
-        }
-        if (nextBtn && !nextBtn.disabled) {
-            nextBtn.addEventListener('click', () => {
-                if (paginationState.currentPage < config.totalPages - 1) {
-                    paginationState.currentPage++;
-                    showPage(paginationState.currentPage);
-                }
-            });
-        }
-    }
-    
-    function showPage(pageIndex) {
-        const legalContainer = contentArea.querySelector('.legal-container');
-        if (!legalContainer) return;
-        
-        const allElements = Array.from(legalContainer.children);
-        allElements.forEach(element => element.style.display = 'none');
-        
-        const title = legalContainer.querySelector('h1');
-        if (title) title.style.display = 'block';
-        
-        if (pageIndex === 0) {
-            let foundBreakpoint = false;
-            for (let i = 0; i < allElements.length; i++) {
-                const element = allElements[i];
-                const isBreakpoint = (element.tagName === 'H2' && 
-                    (element.classList.contains('about-section-header') || 
-                     element.textContent.includes('Doch Michael ist mehr als nur Code und Pixel')));
-                
-                if (isBreakpoint) {
-                    foundBreakpoint = true;
-                    break;
-                }
-                element.style.display = 'block';
-            }
-            if (!foundBreakpoint) {
-                const splitIndex = Math.floor(allElements.length * 0.6);
-                for (let i = 0; i < splitIndex; i++) {
-                    if (allElements[i]) allElements[i].style.display = 'block';
-                }
-            }
-        } else if (pageIndex === 1) {
-            let foundBreakpoint = false;
-            let breakpointIndex = -1;
-            for (let i = 0; i < allElements.length; i++) {
-                const element = allElements[i];
-                const isBreakpoint = (element.tagName === 'H2' && 
-                    (element.classList.contains('about-section-header') || 
-                     element.textContent.includes('Doch Michael ist mehr als nur Code und Pixel')));
-                
-                if (isBreakpoint) {
-                    foundBreakpoint = true;
-                    breakpointIndex = i;
-                    break;
-                }
-            }
-            if (foundBreakpoint) {
-                for (let i = breakpointIndex; i < allElements.length; i++) {
-                    allElements[i].style.display = 'block';
-                }
-            } else {
-                const splitIndex = Math.floor(allElements.length * 0.6);
-                for (let i = splitIndex; i < allElements.length; i++) {
-                    if (allElements[i]) allElements[i].style.display = 'block';
-                }
-            }
-        }
-        updatePagination();
-        contentArea.scrollTop = 0;
-    }
-    showPage(0);
 }
 
 // ===================================================================
@@ -517,9 +359,7 @@ export function initModals() {
     setTimeout(() => {
         setupCookieModal();
         setupContactModal();
-        setupAboutModal();
         setupAiModal();
-        // setupSearchModal() entfernt! Das macht jetzt search.js
         setupLegalModalCloseButton();
         setupModalBackgroundClose();
 
