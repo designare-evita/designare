@@ -733,6 +733,7 @@ h1 b {
         width: 155px;
         height: 155px;
         margin-bottom: 1rem;
+       object-fit: cover;
     }
 
     .cookie-lightbox-buttons {
