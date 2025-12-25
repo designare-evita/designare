@@ -287,11 +287,32 @@ const initHeroFlip = () => {
     }
 
     if (btnThirdToBack) {
-        btnThirdToBack.addEventListener('click', (e) => {
-            e.preventDefault();
-            heroFlipWrapper.classList.add('flipped');
-        });
-    }
+    btnThirdToBack.addEventListener('click', (e) => {
+        e.preventDefault();
+        
+        // Hash setzen, damit checkHashAndFlip() triggert
+        window.location.hash = '#michael';
+        
+        // Fallback-Scroll falls Hash-Change nicht funktioniert
+        setTimeout(() => {
+            if (!heroFlipWrapper.classList.contains('flipped')) {
+                heroFlipWrapper.classList.add('flipped');
+            }
+            
+            const target = document.getElementById('michael');
+            if (target) {
+                const headerOffset = document.querySelector('.main-header')?.offsetHeight || 80;
+                const elementPosition = target.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset - 40;
+
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+            }
+        }, 300);
+    });
+}
 
     if (btnThirdToStart) {
         btnThirdToStart.addEventListener('click', async (e) => {
