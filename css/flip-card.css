@@ -83,7 +83,7 @@
 .front-face {
     z-index: 2;
     transform: rotateY(0deg);
-    /* ÄNDERUNG: Oben beginnen */
+     align-items: center; 
     justify-content: flex-start; 
     align-self: start;
 }
