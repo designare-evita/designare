@@ -29,10 +29,16 @@ export function updateParticleColors() {
  * Initialisiert den Partikel-Effekt mit Basiseinstellungen.
  */
 export function initEffects() {
-    // Initialisiere particles.js
-    // Die Farben werden hier zunächst gesetzt, aber durch updateParticleColors() verfeinert
+    // 1. Prüfen, ob die Bibliothek da ist
     if (typeof particlesJS !== 'undefined') {
-        particlesJS("particles-js", {
+        
+        // 2. WICHTIG: Prüfen, ob der Container 'particles-js' existiert
+        const particlesContainer = document.getElementById('particles-js');
+        
+        if (particlesContainer) {
+            // Nur ausführen, wenn der Container da ist!
+            particlesJS("particles-js", {
+
             "particles": {
                 "number": {
                     "value": 80,
