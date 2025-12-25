@@ -118,6 +118,7 @@
 }
 
 #flip-info-btn {
+   margin-top: 12px;
     width: 100%;
     background: transparent;
     border: 1px solid var(--accent-color) !important;
