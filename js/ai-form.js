@@ -1,8 +1,8 @@
-// js/ai-form.js - VOLLSTÄNDIGE VERSION mit Fallback-Antworten
+// js/ai-form.js - KORRIGIERTE VERSION mit robuster Initialisierung
 let isKeyboardListenerActive = false;
 
 export const initAiForm = () => {
-    console.log("🚀 Initialisiere AI-Form-Modul mit Fallback-System");
+    console.log("🚀 Initialisiere AI-Form-Modul");
 
     // ===================================================================
     // ZENTRALER ZUSTAND (State Management)
@@ -13,14 +13,14 @@ export const initAiForm = () => {
         typingIndicatorId: null,
         animationRunning: false,
         apiFailureCount: 0,
-        lastApiError: null
+        lastApiError: null,
+        initialized: false
     };
 
     // ===================================================================
     // FALLBACK-ANTWORTEN SYSTEM
     // ===================================================================
     const FallbackResponses = {
-        // Kategorisierte Antworten für verschiedene Themen
         responses: {
             greeting: [
                 "Hallo! 👋 Ich bin Evita, Michaels digitale Assistentin. Gerade bin ich etwas überlastet, aber ich helfe dir trotzdem gerne! Was möchtest du wissen?",
@@ -80,7 +80,6 @@ export const initAiForm = () => {
             ]
         },
 
-        // Keyword-Matching für Kategorien
         keywords: {
             greeting: ['hallo', 'hi', 'hey', 'guten', 'servus', 'grüß', 'moin', 'was geht', 'wie geht'],
             contact: ['kontakt', 'erreichen', 'mail', 'email', 'anrufen', 'telefon', 'schreiben', 'melden'],
@@ -92,11 +91,9 @@ export const initAiForm = () => {
             tools: ['tool', 'datapeak', 'silas', 'dashboard', 'seo tool', 'entwickelt']
         },
 
-        // Hauptfunktion: Finde passende Antwort
         getResponse(userMessage) {
             const msg = userMessage.toLowerCase().trim();
             
-            // Durchsuche alle Kategorien nach Keyword-Matches
             for (const [category, keywords] of Object.entries(this.keywords)) {
                 for (const keyword of keywords) {
                     if (msg.includes(keyword)) {
@@ -105,17 +102,14 @@ export const initAiForm = () => {
                 }
             }
             
-            // Keine Kategorie gefunden → Default
             return this.getRandomFromCategory('default');
         },
 
-        // Zufällige Antwort aus Kategorie
         getRandomFromCategory(category) {
             const responses = this.responses[category] || this.responses.default;
             return responses[Math.floor(Math.random() * responses.length)];
         },
 
-        // Spezifische Getter
         getRateLimitResponse() {
             return this.getRandomFromCategory('rateLimit');
         },
@@ -126,9 +120,9 @@ export const initAiForm = () => {
     };
 
     // ===================================================================
-    // DOM-ELEMENTE
+    // DOM-ELEMENTE - Mit Null-Safety
     // ===================================================================
-    const DOM = {
+    const getDOM = () => ({
         aiForm: document.getElementById('ai-form'),
         aiQuestionInput: document.getElementById('ai-question'),
         aiStatus: document.getElementById('ai-status'),
@@ -143,7 +137,9 @@ export const initAiForm = () => {
         get chatInputDynamic() {
             return document.getElementById('ai-chat-input');
         }
-    };
+    });
+
+    let DOM = getDOM();
     
     // ===================================================================
     // KEYBOARD RESIZE HANDLER FÜR MOBILE
@@ -183,7 +179,6 @@ export const initAiForm = () => {
 
                 console.log(`📥 Response Status: ${response.status} ${response.statusText}`);
                 
-                // Rate Limit Check
                 if (response.status === 429) {
                     console.warn("⚠️ Rate Limit erreicht!");
                     state.apiFailureCount++;
@@ -200,7 +195,6 @@ export const initAiForm = () => {
                     ? await response.json()
                     : await response.text();
                 
-                // Check if API returned rate limit in body
                 if (responseData?.rateLimited || 
                     responseData?.error?.includes?.('429') ||
                     responseData?.error?.includes?.('quota')) {
@@ -209,7 +203,6 @@ export const initAiForm = () => {
                     throw new Error('RATE_LIMIT');
                 }
                 
-                // Reset failure count on success
                 state.apiFailureCount = 0;
                 state.lastApiError = null;
                 
@@ -219,7 +212,6 @@ export const initAiForm = () => {
                 console.error(`❌ API-Fehler bei ${url}:`, error);
                 state.apiFailureCount++;
                 
-                // Kategorisiere den Fehler
                 if (error.message === 'RATE_LIMIT' || 
                     error.message?.includes('429') || 
                     error.message?.includes('quota') ||
@@ -236,7 +228,6 @@ export const initAiForm = () => {
         async sendToEvita(userInput) {
             console.log("💬 Sende Nachricht an Evita:", userInput);
             
-            // Bei zu vielen Fehlern → Direkt Fallback nutzen
             if (state.apiFailureCount >= 3) {
                 console.log("🔄 Zu viele API-Fehler, nutze Fallback");
                 return {
@@ -245,7 +236,6 @@ export const initAiForm = () => {
                 };
             }
             
-            // Booking-Intent Prüfung
             const bookingTriggers = [
                 'termin', 'buchung', 'buchen', 'rückruf', 'anrufen', 
                 'sprechen', 'kontakt', 'meeting', 'appointment', 'erreichen'
@@ -271,7 +261,6 @@ export const initAiForm = () => {
             const wasBookingQuestion = lastAiMessage && 
                 lastAiMessage.content.includes('[BOOKING_CONFIRM_REQUEST]');
 
-            // Spezielle Behandlung für Bestätigungen nach Rückfragen
             if (hasConfirmation && wasBookingQuestion) {
                 const requestData = {
                     history: state.chatHistory,
@@ -286,7 +275,6 @@ export const initAiForm = () => {
                         body: JSON.stringify(requestData)
                     });
                 } catch (error) {
-                    // Bei Booking-Bestätigung und API-Fehler → Booking-Fallback
                     return {
                         answer: FallbackResponses.responses.booking[0],
                         isFallback: true
@@ -306,7 +294,6 @@ export const initAiForm = () => {
                     body: JSON.stringify(requestData)
                 });
             } catch (error) {
-                // API fehlgeschlagen → Fallback-Antwort
                 console.log("🔄 API fehlgeschlagen, nutze Fallback-Antwort");
                 
                 if (state.lastApiError === 'rateLimit') {
@@ -341,7 +328,13 @@ export const initAiForm = () => {
     // ===================================================================
     const ChatUI = {
         addMessage(message, sender) {
-            if (!DOM.chatHistoryContainer) return;
+            // DOM-Referenz neu holen (falls dynamisch geladen)
+            const chatHistoryContainer = document.getElementById('ai-chat-history');
+            
+            if (!chatHistoryContainer) {
+                console.warn("⚠️ Chat-History Container nicht gefunden");
+                return null;
+            }
 
             let cleanMessage = message;
             if (sender === 'ai') {
@@ -356,7 +349,7 @@ export const initAiForm = () => {
             msgDiv.className = `chat-message ${sender}`;
             msgDiv.textContent = sender === 'user' ? cleanMessage : '';
             
-            DOM.chatHistoryContainer.appendChild(msgDiv);
+            chatHistoryContainer.appendChild(msgDiv);
             this.scrollToBottom();
 
             state.chatHistory.push({ 
@@ -373,7 +366,8 @@ export const initAiForm = () => {
 
         showTypingIndicator() {
             this.removeTypingIndicator();
-            if (!DOM.chatHistoryContainer) return;
+            const chatHistoryContainer = document.getElementById('ai-chat-history');
+            if (!chatHistoryContainer) return;
             
             const indicator = document.createElement('div');
             state.typingIndicatorId = 'typing-' + Date.now();
@@ -388,7 +382,7 @@ export const initAiForm = () => {
                 </div>
             `;
             
-            DOM.chatHistoryContainer.appendChild(indicator);
+            chatHistoryContainer.appendChild(indicator);
             this.scrollToBottom();
         },
 
@@ -401,14 +395,16 @@ export const initAiForm = () => {
         },
 
         scrollToBottom() {
-            if (DOM.chatHistoryContainer) {
-                DOM.chatHistoryContainer.scrollTop = DOM.chatHistoryContainer.scrollHeight;
+            const chatHistoryContainer = document.getElementById('ai-chat-history');
+            if (chatHistoryContainer) {
+                chatHistoryContainer.scrollTop = chatHistoryContainer.scrollHeight;
             }
         },
         
         resetChat() {
-            if (DOM.chatHistoryContainer) {
-                DOM.chatHistoryContainer.innerHTML = '';
+            const chatHistoryContainer = document.getElementById('ai-chat-history');
+            if (chatHistoryContainer) {
+                chatHistoryContainer.innerHTML = '';
             }
             state.chatHistory = [];
             state.apiFailureCount = 0;
@@ -421,9 +417,13 @@ export const initAiForm = () => {
     // ===================================================================
     const ModalController = {
         openChatModal() {
-            if (!DOM.modalOverlay) return;
+            const modalOverlay = document.getElementById('ai-response-modal');
+            if (!modalOverlay) {
+                console.error("❌ Modal nicht gefunden!");
+                return;
+            }
             
-            DOM.modalOverlay.style.display = 'flex';
+            modalOverlay.style.display = 'flex';
             document.body.classList.add('no-scroll');
             
             handleKeyboardResize();
@@ -434,8 +434,11 @@ export const initAiForm = () => {
             }
             
             setTimeout(() => {
-                DOM.modalOverlay.classList.add('visible');
-                DOM.chatInputDynamic?.focus();
+                modalOverlay.classList.add('visible');
+                
+                const chatInput = document.getElementById('ai-chat-input');
+                if (chatInput) chatInput.focus();
+                
                 setTimeout(() => {
                     ChatUI.scrollToBottom();
                 }, 400);
@@ -443,9 +446,10 @@ export const initAiForm = () => {
         },
         
         closeChatModal() {
-            if (!DOM.modalOverlay) return;
+            const modalOverlay = document.getElementById('ai-response-modal');
+            if (!modalOverlay) return;
             
-            DOM.modalOverlay.classList.remove('visible');
+            modalOverlay.classList.remove('visible');
             
             if (isKeyboardListenerActive) {
                 window.removeEventListener('resize', handleKeyboardResize);
@@ -458,7 +462,7 @@ export const initAiForm = () => {
             }
             
             setTimeout(() => {
-                DOM.modalOverlay.style.display = 'none';
+                modalOverlay.style.display = 'none';
                 document.body.classList.remove('no-scroll');
             }, 300);
         }
@@ -686,8 +690,9 @@ export const initAiForm = () => {
     async function handleUserMessage(userInput) {
         console.log("💬 Verarbeite User-Nachricht:", userInput);
 
-        const chatInput = DOM.chatInputDynamic;
-        const submitButton = DOM.chatFormDynamic?.querySelector('button[type="submit"]');
+        const chatInput = document.getElementById('ai-chat-input');
+        const chatForm = document.getElementById('ai-chat-form');
+        const submitButton = chatForm?.querySelector('button[type="submit"]');
 
         if (chatInput) chatInput.disabled = true;
         if (submitButton) submitButton.disabled = true;
@@ -721,7 +726,6 @@ export const initAiForm = () => {
                 answer = data.message;
             }
 
-            // Log ob Fallback genutzt wurde
             if (isFallback) {
                 console.log("ℹ️ Fallback-Antwort verwendet");
             }
@@ -733,9 +737,10 @@ export const initAiForm = () => {
                 .trim();
 
             const aiMsgElement = ChatUI.addMessage(answer, 'ai');
-            await typeWriterEffect(aiMsgElement, textToAnimate, 25);
+            if (aiMsgElement) {
+                await typeWriterEffect(aiMsgElement, textToAnimate, 25);
+            }
 
-            // Booking-Launch Check
             const shouldLaunchAfterConfirmation = wasBookingQuestion && (
                 answer.includes('[buchung_starten]') ||
                 answer.includes('[booking_starten]')
@@ -751,10 +756,11 @@ export const initAiForm = () => {
             console.error("❌ Fehler bei User-Message:", error);
             ChatUI.removeTypingIndicator();
             
-            // Fallback-Antwort bei Fehler
             const fallbackAnswer = FallbackResponses.getResponse(userInput);
             const aiMsgElement = ChatUI.addMessage(fallbackAnswer, 'ai');
-            await typeWriterEffect(aiMsgElement, fallbackAnswer, 25);
+            if (aiMsgElement) {
+                await typeWriterEffect(aiMsgElement, fallbackAnswer, 25);
+            }
             
             if (chatInput) chatInput.disabled = false;
             if (submitButton) submitButton.disabled = false;
@@ -765,6 +771,8 @@ export const initAiForm = () => {
     // TYPEWRITER EFFECT MIT MARKDOWN
     // ===================================================================
     async function typeWriterEffect(element, text, speed = 20) {
+        if (!element) return;
+        
         let currentContent = "";
         const words = text.split(" ");
         
@@ -789,69 +797,113 @@ export const initAiForm = () => {
     }
 
     // ===================================================================
-    // EVENT LISTENERS SETUP
+    // EVENT LISTENERS SETUP - KORRIGIERT
     // ===================================================================
     function initializeEventListeners() {
         console.log("🔧 Initialisiere Event-Listener");
+        
+        // DOM-Referenzen aktualisieren
+        DOM = getDOM();
 
         // Haupt-Formular auf der Startseite
-        if (DOM.aiForm) {
+        if (DOM.aiForm && !DOM.aiForm.hasAttribute('data-listener-added')) {
+            DOM.aiForm.setAttribute('data-listener-added', 'true');
             DOM.aiForm.addEventListener('submit', (e) => {
                 e.preventDefault();
-                const userInput = DOM.aiQuestionInput.value.trim();
+                const userInput = DOM.aiQuestionInput?.value?.trim();
                 if (userInput) {
                     ChatUI.resetChat();
                     ModalController.openChatModal();
-                    handleUserMessage(userInput);
-                    DOM.aiQuestionInput.value = '';
+                    
+                    // Verzögerung für Chat-Begrüßung
+                    setTimeout(() => {
+                        handleUserMessage(userInput);
+                    }, 150);
+                    
+                    if (DOM.aiQuestionInput) DOM.aiQuestionInput.value = '';
                 }
             });
+            console.log("✅ Haupt-Formular Listener hinzugefügt");
         }
 
         // Chat-Formular im Modal
         const setupChatFormListener = () => {
-            const chatForm = DOM.chatFormDynamic;
+            const chatForm = document.getElementById('ai-chat-form');
             if (chatForm && !chatForm.hasAttribute('data-listener-added')) {
                 chatForm.setAttribute('data-listener-added', 'true');
                 chatForm.addEventListener('submit', async (e) => {
                     e.preventDefault();
-                    const chatInput = DOM.chatInputDynamic;
-                    const userInput = chatInput?.value.trim();
+                    const chatInput = document.getElementById('ai-chat-input');
+                    const userInput = chatInput?.value?.trim();
                     if (userInput) {
                         await handleUserMessage(userInput);
-                        chatInput.value = '';
-                        chatInput.focus();
+                        if (chatInput) {
+                            chatInput.value = '';
+                            chatInput.focus();
+                        }
                     }
                 });
+                console.log("✅ Chat-Form Listener hinzugefügt");
             }
         };
 
-        const observer = new MutationObserver(setupChatFormListener);
+        // MutationObserver für dynamisch geladene Elemente
+        const observer = new MutationObserver((mutations) => {
+            for (const mutation of mutations) {
+                if (mutation.addedNodes.length) {
+                    setupChatFormListener();
+                }
+            }
+        });
+        
         observer.observe(document.body, { childList: true, subtree: true });
+        
+        // Initial Setup
+        setupChatFormListener();
 
         // Header-Chat-Button
-        if (DOM.headerChatButton) {
-            DOM.headerChatButton.addEventListener('click', (e) => {
+        const headerChatButton = document.getElementById('evita-chat-button');
+        if (headerChatButton && !headerChatButton.hasAttribute('data-listener-added')) {
+            headerChatButton.setAttribute('data-listener-added', 'true');
+            headerChatButton.addEventListener('click', (e) => {
                 e.preventDefault();
                 ChatUI.resetChat();
-                ChatUI.addMessage("Hallo! Ich bin Evita, Michaels KI-Assistentin. Womit kann ich dir heute helfen?", 'ai');
                 ModalController.openChatModal();
+                
+                // Begrüßung nach Modal-Öffnung
+                setTimeout(() => {
+                    const chatHistory = document.getElementById('ai-chat-history');
+                    if (chatHistory && chatHistory.children.length === 0) {
+                        ChatUI.addMessage(
+                            "Hallo! Ich bin Evita, Michaels KI-Assistentin. Womit kann ich dir heute helfen?", 
+                            'ai'
+                        );
+                    }
+                }, 100);
             });
+            console.log("✅ Header-Chat-Button Listener hinzugefügt");
         }
 
         // Modal schließen
-        DOM.closeModalButtons.forEach(button => {
-            button.addEventListener('click', ModalController.closeChatModal);
+        const closeButtons = document.querySelectorAll('#close-ai-response-modal-top, #close-ai-response-modal-bottom');
+        closeButtons.forEach(button => {
+            if (button && !button.hasAttribute('data-listener-added')) {
+                button.setAttribute('data-listener-added', 'true');
+                button.addEventListener('click', ModalController.closeChatModal);
+            }
         });
 
-        if (DOM.modalOverlay) {
-            DOM.modalOverlay.addEventListener('click', (e) => {
-                if (e.target === DOM.modalOverlay) {
+        const modalOverlay = document.getElementById('ai-response-modal');
+        if (modalOverlay && !modalOverlay.hasAttribute('data-listener-added')) {
+            modalOverlay.setAttribute('data-listener-added', 'true');
+            modalOverlay.addEventListener('click', (e) => {
+                if (e.target === modalOverlay) {
                     ModalController.closeChatModal();
                 }
             });
         }
 
+        state.initialized = true;
         console.log("✅ Event-Listener initialisiert");
     }
 
@@ -864,6 +916,10 @@ export const initAiForm = () => {
     // ===================================================================
     // INITIALISIERUNG
     // ===================================================================
-    initializeEventListeners();
-    console.log("✅ AI-Form-Modul mit Fallback-System initialisiert!");
+    
+    // Warte kurz auf DOM-Elemente
+    setTimeout(() => {
+        initializeEventListeners();
+        console.log("✅ AI-Form-Modul initialisiert!");
+    }, 50);
 };
