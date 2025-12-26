@@ -709,3 +709,43 @@ details[name="expert-faq"] summary::-webkit-details-marker {
     margin-top: 30px !important;
     margin-bottom: 30px !important;
 }
+
+/* ============================================================
+   FACTS CARD (Visitenkarten-Style)
+   ============================================================ */
+
+.facts-card {
+    margin-top: 15px;
+    padding: 12px 15px;
+    background: rgba(255, 255, 255, 0.03);
+    border-left: 2px solid var(--accent-color);
+    font-size: 0.85rem;
+    line-height: 1.5;
+}
+
+.facts-card-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--accent-color);
+    margin-bottom: 5px !important;
+    font-weight: 600;
+}
+
+.facts-card-content {
+    color: var(--text-color-muted);
+    margin-bottom: 0 !important;
+}
+
+/* Light Mode */
+body.light-mode .facts-card {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+/* Mobile: Etwas kompakter */
+@media (max-width: 768px) {
+    .facts-card {
+        margin-top: 12px;
+        padding: 10px 12px;
+    }
+}
