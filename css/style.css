@@ -1,5 +1,5 @@
 /* ============================================================
-   STYLE.CSS - SEMANTIC VERSION
+   STYLE.CSS - SEMANTIC VERSION (KORRIGIERT)
    Startseite & globale Styles (Dark Mode)
    ============================================================ */
 
@@ -32,8 +32,8 @@ body.light-mode {
     --bg-color: #e0e0e0;      
     --text-color: #333333; 
     --border-color: #bbbbbb;
-    --card-bg: #ffffff; /* Empfehlung: Karten reinweiß für "Pop"-Effekt */
-    --modal-bg: #ffffff; /* Modals bleiben weiß */
+    --card-bg: #ffffff;
+    --modal-bg: #ffffff;
     --particle-color: #555555;
     --particle-line-color: #cccccc;  
     --accent-color: #D39A00;     
@@ -66,8 +66,33 @@ body.page-loaded {
     opacity: 1;
 }
 
+/* ===================
+   NO-SCROLL MIT FALLBACK
+   =================== */
+
 body.no-scroll {
     overflow-y: hidden !important;
+}
+
+/* KRITISCH: Wenn page-loaded aber kein Modal offen, Scroll erlauben */
+body.no-scroll.page-loaded {
+    overflow-y: auto !important;
+}
+
+/* Ausnahme: Bei offenem Modal bleibt scroll disabled */
+body.no-scroll.page-loaded:has(.modal-overlay.visible),
+body.no-scroll.page-loaded:has(#side-menu-panel.visible) {
+    overflow-y: hidden !important;
+}
+
+/* CSS-Only Fallback: Nach 5 Sekunden automatisch Scroll freigeben */
+@keyframes unlock-scroll-fallback {
+    from { overflow-y: hidden; }
+    to { overflow-y: auto; }
+}
+
+body.no-scroll:not(.page-loaded) {
+    animation: unlock-scroll-fallback 0s 5s forwards;
 }
 
 a {
@@ -92,7 +117,6 @@ a {
     font-family: 'Poppins';
     font-style: normal;
     font-weight: 300;
-    /* Pfad geändert zu absolut: /Font/... */
     src: url('/Font/Poppins-Light.ttf') format('truetype');
     font-display: swap;
 }
@@ -101,7 +125,6 @@ a {
     font-family: 'Poppins';
     font-style: normal;
     font-weight: 400;
-    /* Pfad geändert zu absolut: /Font/... */
     src: url('/Font/Poppins-Regular.ttf') format('truetype');
     font-display: swap;
 }
@@ -110,7 +133,6 @@ a {
     font-family: 'Poppins';
     font-style: normal;
     font-weight: 600;
-    /* Pfad geändert zu absolut: /Font/... */
     src: url('/Font/Poppins-SemiBold.ttf') format('truetype');
     font-display: swap;
 }
@@ -119,7 +141,6 @@ a {
     font-family: 'Poppins';
     font-style: normal;
     font-weight: 700;
-    /* Pfad geändert zu absolut: /Font/... */
     src: url('/Font/Poppins-Bold.ttf') format('truetype');
     font-display: swap;
 }
@@ -128,13 +149,11 @@ a {
    3. UTILITY CLASSES
    =================== */
 
-/* Strong-Tag: font-weight 600 als Standard */
 strong,
 b {
     font-weight: 600;
 }
 
-/* Ausnahme: In h1 bleibt strong bei 700 */
 h1 strong,
 h1 b {
     font-weight: 700;
@@ -181,17 +200,17 @@ h1 b {
     z-index: 2;
 }
 
-/* Particle Background - jetzt <figure> */
+/* Particle Background */
 #particles-js {
     height: 100%;
     left: 0;
-    position: fixed; /* Geändert auf fixed für Parallax-Effekt auf allen Seiten */
+    position: fixed;
     top: 0;
     width: 100%;
     z-index: 1;
     opacity: 0.4;
     pointer-events: none;
-    margin: 0; /* Reset figure margin */
+    margin: 0;
 }
 
 /* ===================
@@ -221,21 +240,20 @@ h1 b {
 }
 
 #hero .subtitle {
-    font-size: 1.15rem;                      /* Etwas kleiner */
-    text-transform: uppercase;               /* Wirkt oft hochwertiger/minimalistischer */
-    color: var(--text-color-muted);          /* Das dezentere Grau aus deiner style.css */                   
+    font-size: 1.15rem;
+    text-transform: uppercase;
+    color: var(--text-color-muted);
     margin-bottom: 2rem;
 }
 
 /* ===================
    6. AI FORM (Startseite)
-   ai-container ist jetzt <section>
    =================== */
 
 .ai-container {
     margin-bottom: 2.5rem;
-        width: 100%;
-   max-width: 500px; 
+    width: 100%;
+    max-width: 500px; 
     margin-left: auto; 
     margin-right: auto; 
 }
