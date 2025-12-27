@@ -168,12 +168,22 @@ const launchEvitaChat = async () => {
     aiResponseModal.classList.add('visible');
     document.body.classList.add('no-scroll');
     
-    // Warte kurz, dann Begrüßung hinzufügen
+    // Warte kurz, dann Begrüßung hinzufügen - NUR wenn Chat leer ist
     setTimeout(() => {
         const chatHistory = document.getElementById('ai-chat-history');
         if (chatHistory && chatHistory.children.length === 0) {
             addWelcomeMessage("Hallo! Ich bin Evita, Michaels KI-Assistentin. Wie kann ich dir heute helfen?");
+            console.log("✅ Begrüßung von launchEvitaChat hinzugefügt");
         }
+        
+        // Focus auf Input
+        setTimeout(() => {
+            const chatInput = document.getElementById('ai-chat-input');
+            if (chatInput) chatInput.focus();
+        }, 100);
+    }, 300); // Erhöht auf 300ms
+};
+
         
         // Focus auf Input
         setTimeout(() => {
