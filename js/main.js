@@ -184,15 +184,6 @@ const launchEvitaChat = async () => {
     }, 300); // Erhöht auf 300ms
 };
 
-        
-        // Focus auf Input
-        setTimeout(() => {
-            const chatInput = document.getElementById('ai-chat-input');
-            if (chatInput) chatInput.focus();
-        }, 100);
-    }, 50);
-};
-
 const ensureAiFormAvailable = async () => {
     if (globalAiFormInstance || document.getElementById('ai-chat-form')) {
         return;
