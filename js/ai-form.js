@@ -327,7 +327,7 @@ export const initAiForm = () => {
     // CHAT UI
     // ===================================================================
     const ChatUI = {
-        addMessage(message, sender) {
+        addMessage(message, sender, displayImmediately = false) {
             console.log(`📝 addMessage aufgerufen - Sender: ${sender}, Message: ${message.substring(0, 50)}...`);
             
             // DOM-Referenz neu holen (falls dynamisch geladen)
@@ -349,7 +349,14 @@ export const initAiForm = () => {
 
             const msgDiv = document.createElement('div');
             msgDiv.className = `chat-message ${sender}`;
-            msgDiv.textContent = sender === 'user' ? cleanMessage : '';
+            
+            // Wenn displayImmediately true ist, zeige Text sofort an (für Begrüßungen)
+            // Sonst: User-Nachrichten sofort, AI-Nachrichten leer (für Typewriter)
+            if (displayImmediately) {
+                msgDiv.textContent = cleanMessage;
+            } else {
+                msgDiv.textContent = sender === 'user' ? cleanMessage : '';
+            }
             
             chatHistoryContainer.appendChild(msgDiv);
             this.scrollToBottom();
@@ -881,7 +888,8 @@ export const initAiForm = () => {
                             !chatHistory.querySelector('.chat-message.ai')) {
                             const welcomeMsg = ChatUI.addMessage(
                                 "Hallo! Ich bin Evita, Michaels KI-Assistentin. Womit kann ich dir heute helfen?", 
-                                'ai'
+                                'ai',
+                                true // displayImmediately = true für sofortige Anzeige
                             );
                             console.log("✅ Begrüßung hinzugefügt:", welcomeMsg);
                         }
