@@ -328,6 +328,8 @@ export const initAiForm = () => {
     // ===================================================================
     const ChatUI = {
         addMessage(message, sender) {
+            console.log(`📝 addMessage aufgerufen - Sender: ${sender}, Message: ${message.substring(0, 50)}...`);
+            
             // DOM-Referenz neu holen (falls dynamisch geladen)
             const chatHistoryContainer = document.getElementById('ai-chat-history');
             
@@ -860,33 +862,34 @@ export const initAiForm = () => {
         
         // Initial Setup
         setupChatFormListener();
-// Header-Chat-Button
-const headerChatButton = document.getElementById('evita-chat-button');
-if (headerChatButton && !headerChatButton.hasAttribute('data-listener-added')) {
-    headerChatButton.setAttribute('data-listener-added', 'true');
-    headerChatButton.addEventListener('click', (e) => {
-        e.preventDefault();
-        ChatUI.resetChat();
-        ModalController.openChatModal();
-        
-        // WICHTIG: Begrüßung zuverlässig nach Modal-Animation hinzufügen
-        setTimeout(() => {
-            const chatHistory = document.getElementById('ai-chat-history');
-            if (chatHistory) {
-                // Prüfe ob WIRKLICH leer (auch nach Reset)
-                if (chatHistory.children.length === 0 || 
-                    !chatHistory.querySelector('.chat-message.ai')) {
-                    const welcomeMsg = ChatUI.addMessage(
-                        "Hallo! Ich bin Evita, Michaels KI-Assistentin. Womit kann ich dir heute helfen?", 
-                        'ai'
-                    );
-                    console.log("✅ Begrüßung hinzugefügt:", welcomeMsg);
-                }
-            }
-        }, 400); // Erhöht auf 400ms für sicheres Timing nach Modal-Animation
-    });
-    console.log("✅ Header-Chat-Button Listener hinzugefügt");
-}
+
+        // Header-Chat-Button
+        const headerChatButton = document.getElementById('evita-chat-button');
+        if (headerChatButton && !headerChatButton.hasAttribute('data-listener-added')) {
+            headerChatButton.setAttribute('data-listener-added', 'true');
+            headerChatButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                ChatUI.resetChat();
+                ModalController.openChatModal();
+                
+                // WICHTIG: Begrüßung zuverlässig nach Modal-Animation hinzufügen
+                setTimeout(() => {
+                    const chatHistory = document.getElementById('ai-chat-history');
+                    if (chatHistory) {
+                        // Prüfe ob WIRKLICH leer (auch nach Reset)
+                        if (chatHistory.children.length === 0 || 
+                            !chatHistory.querySelector('.chat-message.ai')) {
+                            const welcomeMsg = ChatUI.addMessage(
+                                "Hallo! Ich bin Evita, Michaels KI-Assistentin. Womit kann ich dir heute helfen?", 
+                                'ai'
+                            );
+                            console.log("✅ Begrüßung hinzugefügt:", welcomeMsg);
+                        }
+                    }
+                }, 400); // Erhöht auf 400ms für sicheres Timing nach Modal-Animation
+            });
+            console.log("✅ Header-Chat-Button Listener hinzugefügt");
+        }
 
         // Modal schließen
         const closeButtons = document.querySelectorAll('#close-ai-response-modal-top, #close-ai-response-modal-bottom');
