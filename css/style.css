@@ -29,7 +29,7 @@
 
 /* DAY MODE (Überschreibt die Farben) */
 body.light-mode {
-    --bg-color: #e0e0e0;      
+    --bg-color: #ffffff;      
     --text-color: #333333; 
     --border-color: #bbbbbb;
     --card-bg: #ffffff;
