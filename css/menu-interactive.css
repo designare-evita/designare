@@ -52,6 +52,7 @@
     letter-spacing: 0.5px;
     cursor: pointer;
     transition: all 0.3s ease;
+    text-align: left;
 }
 
 .topic-btn:hover {
@@ -97,6 +98,9 @@
 .toc-mini {
     padding: 4px 10px;
     font-size: 14px;
+    text-align: left; /* NEU: Linksbündig statt zentriert */
+    display: flex;    /* Optional: Hilft bei der Ausrichtung von Inhalten */
+    align-items: center;
 }
 
 /* ============================
