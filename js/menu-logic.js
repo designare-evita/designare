@@ -51,6 +51,11 @@ function generateDynamicTOC() {
         });
 
         sortedHeadings.forEach((heading, index) => {
+            // NEU: Filtern von unerwünschten Einträgen
+    const headingText = heading.innerText.trim();
+    if (headingText === "Feedback geben" || headingText === "Weiterlesen") {
+        return; // Überspringe diesen Eintrag
+    }
             // Sicherstellen, dass die Überschrift eine ID für den Anker-Link hat
             if (!heading.id) {
                 heading.id = `section-${index}`;
