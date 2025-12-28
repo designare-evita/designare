@@ -17,14 +17,14 @@
     "googleapis": "^142.0.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "generate-articles-db": "node js/generate-articles-db.js",
+    "generate-knowledge": "node js/generate-knowledge.js",
+    "generate-sitemap": "node generate-sitemap.js",
     "inject-ratings": "node js/inject-ratings.js",
     "inject-footer": "node js/inject-footer.js",
     "inject-breadcrumb": "node js/inject-breadcrumb.js",
     "inject-related": "node js/inject-related.js",
     "inject-blog": "node js/inject-blog-articles.js",
-    "generate-knowledge": "node js/generate-knowledge.js",
-    "generate-sitemap": "node generate-sitemap.js",
-    "build": "node js/generate-knowledge.js && node generate-sitemap.js && node js/inject-ratings.js && mkdir -p public && cp -r *.html *.css *.svg *.csv js css images Font CSV-Importer-PRO downloads public/ 2>/dev/null || echo 'Assets copy done' && node js/inject-footer.js && node js/inject-breadcrumb.js && node js/inject-related.js && node js/inject-blog-articles.js"
+    "build": "node js/generate-articles-db.js && node js/generate-knowledge.js && node generate-sitemap.js && node js/inject-ratings.js && mkdir -p public && cp -r *.html *.css *.svg *.csv *.json js css images Font CSV-Importer-PRO downloads public/ 2>/dev/null || echo 'Assets copy done' && node js/inject-footer.js && node js/inject-breadcrumb.js && node js/inject-related.js && node js/inject-blog-articles.js"
   }
 }
