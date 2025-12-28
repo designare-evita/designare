@@ -1,32 +1,13 @@
 // api/schema.js
 // Liefert das komplette JSON-LD Schema inkl. AggregateRating für eine Seite
-import Redis from 'ioredis';
+// Upstash REST API Version
 
-const redisUrl = process.env.REDIS_URL;
+import { Redis } from '@upstash/redis';
 
-const redisOptions = {
-    family: 4,
-    connectTimeout: 10000,
-    maxRetriesPerRequest: 3,
-    retryStrategy: (times) => Math.min(times * 50, 2000)
-};
-
-let redis;
-try {
-    if (process.env.NODE_ENV === 'production') {
-        redis = new Redis(redisUrl, redisOptions);
-    } else {
-        if (!global.redis) {
-            global.redis = new Redis(redisUrl, redisOptions);
-        }
-        redis = global.redis;
-    }
-    redis.on('error', (err) => {
-        console.error('Redis Verbindungsproblem:', err.message);
-    });
-} catch (e) {
-    console.error("Fehler beim Initialisieren von Redis:", e);
-}
+const redis = new Redis({
+    url: process.env.UPSTASH_REDIS_REST_URL,
+    token: process.env.UPSTASH_REDIS_REST_TOKEN,
+});
 
 // Berechnet das AggregateRating aus den Feedback-Stats
 function calculateRating(stats) {
@@ -61,16 +42,10 @@ export default async function handler(req, res) {
     const slug = req.query.slug;
     if (!slug) return res.status(400).json({ error: 'Slug fehlt' });
 
-    if (!redis) {
-        return res.status(500).json({ error: 'Datenbank nicht verfügbar' });
-    }
-
     try {
         const kvKey = `feedback:${slug}`;
-        const dataString = await redis.get(kvKey);
-        const stats = dataString 
-            ? JSON.parse(dataString) 
-            : { positive: 0, neutral: 0, negative: 0 };
+        const data = await redis.get(kvKey);
+        const stats = data || { positive: 0, neutral: 0, negative: 0 };
         
         const aggregateRating = calculateRating(stats);
         
