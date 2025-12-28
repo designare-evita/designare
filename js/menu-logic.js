@@ -51,10 +51,14 @@ function generateDynamicTOC() {
         });
 
         sortedHeadings.forEach((heading, index) => {
-            // NEU: Filtern von unerwünschten Einträgen
-    const headingText = heading.innerText.trim();
-    if (headingText === "Feedback geben" || headingText === "Weiterlesen") {
-        return; // Überspringe diesen Eintrag
+// 1. Text für den Filter vorbereiten (Kleinschreibung & Trim)
+    const rawText = heading.textContent.toLowerCase().trim();
+    
+    // 2. Erweitertes Filtern (Feedback, Weiterlesen und ggf. leere Einträge)
+    if (rawText.includes("feedback geben") || 
+        rawText.includes("weiterlesen") || 
+        rawText === "") {
+        return; // Überspringe diese Einträge
     }
             // Sicherstellen, dass die Überschrift eine ID für den Anker-Link hat
             if (!heading.id) {
@@ -66,7 +70,7 @@ function generateDynamicTOC() {
             tocBtn.className = 'topic-btn toc-mini';
             
             // KORREKTUR: Bindestrich (-) wurde zur Regex hinzugefügt
-            tocBtn.innerText = heading.innerText.replace(/[^\w\säöüÄÖÜß?-]/g, ''); 
+          tocBtn.innerText = heading.innerText.replace(/[^\w\säöüÄÖÜß?-]/g, '').trim();
             
             // Klick-Event: Zum Anker springen und Menü schließen
             tocBtn.onclick = () => {
