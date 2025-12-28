@@ -564,8 +564,13 @@ color: var(--text-color);
     }
 
     .info-box, .tech-box, .expert-tip {
-        flex-direction: column;
+        flex-direction: row;  /* Bleibt nebeneinander */
         gap: 0.8rem;
+    }
+    
+    .info-box i, .tech-box i, .expert-tip i {
+        flex-shrink: 0;
+        min-width: 1.5rem;
     }
 
     .comparison-table { font-size: 0.85rem; }
