@@ -936,3 +936,128 @@ color: var(--text-color);
         display: none;
     }
 }
+
+* ===================
+   BLOG OVERVIEW - FAQ CARDS
+   =================== */
+
+.blog-overview .blog-intro {
+    font-size: 1.1rem;
+    color: var(--text-color-muted, #aaa);
+    max-width: 700px;
+    margin-bottom: 2.5rem;
+    line-height: 1.7;
+}
+
+.faq-cards-section {
+    margin-bottom: 3rem;
+}
+
+.faq-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+}
+
+@media (max-width: 900px) {
+    .faq-cards-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* FAQ Card */
+.faq-card {
+    display: flex;
+    gap: 1.25rem;
+    padding: 1.5rem;
+    background: var(--card-bg, rgba(255,255,255,0.02));
+    border: 1px solid var(--border-color, rgba(255,255,255,0.08));
+    border-radius: 10px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.25s ease;
+}
+
+.faq-card:hover {
+    border-color: var(--accent-color, #00d4ff);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(0, 212, 255, 0.08);
+}
+
+.faq-card:hover .faq-card-link {
+    color: var(--accent-color, #00d4ff);
+}
+
+.faq-card:hover .faq-card-link i {
+    transform: translateX(4px);
+}
+
+.faq-card-icon {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--card-bg-hover, rgba(255,255,255,0.05));
+    border-radius: 10px;
+    font-size: 1.3rem;
+    color: var(--accent-color, #00d4ff);
+}
+
+.faq-card-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.faq-card-category {
+    display: inline-block;
+    font-size: 0.7rem;
+    color: var(--accent-color, #00d4ff);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.4rem;
+    opacity: 0.8;
+}
+
+.faq-card h2 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text-color, #fff);
+    margin: 0 0 0.5rem 0;
+    line-height: 1.35;
+}
+
+.faq-card p {
+    font-size: 0.88rem;
+    color: var(--text-color-muted, #999);
+    margin: 0 0 0.75rem 0;
+    line-height: 1.55;
+}
+
+.faq-card-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    color: var(--text-color-subtle, #666);
+    transition: color 0.2s ease;
+}
+
+.faq-card-link i {
+    font-size: 0.7rem;
+    transition: transform 0.2s ease;
+}
+
+
+/* ===================
+   PRINT STYLES
+   =================== */
+
+@media print {
+    .related-articles,
+    .faq-cards-section {
+        display: none;
+    }
+}
+
