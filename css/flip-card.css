@@ -36,7 +36,7 @@
     position: relative;
     z-index: 10;
     width: 100%;
-    max-width: 1000px;
+    max-width: 1200px; /* GLEICHE BREITE WIE BLOG */
     margin: 0 auto;
 }
 
@@ -170,11 +170,11 @@
 
 .flip-panel-content {
     width: 100%;
-    max-width: 1200px;
+    max-width: 1200px; /* GLEICHE BREITE WIE BLOG */
     box-sizing: border-box;
     position: relative; 
     top: -30px;             
-    padding: 20px;
+    padding: 20px 2rem; /* GLEICHES PADDING WIE BLOG */
     margin: 0 auto;     
     text-align: left;
     background: transparent; 
@@ -404,7 +404,7 @@
     }
     
     .flip-panel-content {
-        padding: 10px 15px 40px 15px;
+        padding: 10px 1.5rem 40px 1.5rem; /* Mobiles Padding wie Blog */
     }
 
     .flip-panel h2 { font-size: 1.6rem; margin-bottom: 15px; }
@@ -415,7 +415,7 @@
    =================== */
 
 @media (max-width: 400px) {
-    .flip-panel-content { padding: 12px; }
+    .flip-panel-content { padding: 12px 1rem; }
     .flip-panel h2 { font-size: 1.5rem; }
     .evita-image-block img { width: 50%; max-width: 150px; }
 }
