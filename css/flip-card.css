@@ -51,9 +51,6 @@
     display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: 1fr; 
-    
-    /* ÄNDERUNG: Nicht mehr 'center', sondern 'start'.
-       Damit orientiert sich alles an der Oberkante. */
     align-items: start; 
     justify-items: center;
 }
@@ -173,15 +170,12 @@
 
 .flip-panel-content {
     width: 100%;
-    max-width: 1000px;
+    max-width: 1200px;
     box-sizing: border-box;
-    
-    /* HIER DIE ÄNDERUNG: */
-    position: relative; /* Damit 'top' funktioniert */
-    top: -30px;             /* Setzt den Startpunkt oben */
-    
+    position: relative; 
+    top: -30px;             
     padding: 20px;
-    margin: 0 auto;     /* Zentriert den Container horizontal */
+    margin: 0 auto;     
     text-align: left;
     background: transparent; 
 }
