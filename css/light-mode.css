@@ -1049,13 +1049,3 @@ body.light-mode .terminal-link:hover {
     background: var(--accent-color);
     color: #000;
 }
-
-/* Erwingt die weiße Schriftfarbe für das Terminal-Inhalt-Element */
-.terminal-body-content {
-    color: #ffffff !important;
-}
-
-/* Optional: Falls auch Links oder fettgedruckter Text im Terminal weiß sein sollen */
-.terminal-body-content * {
-    color: #ffffff !important;
-}
