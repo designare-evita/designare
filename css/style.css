@@ -878,20 +878,21 @@ body.light-mode .toggle-icon-right {
 
 .theme-toggle {
     position: relative;
-    width: 44px;
-    height: 24px;
+    width: 46px;
+    height: 26px;
     background: transparent;
-    border: 2px solid var(--text-color-muted);
+    border: 2px solid #888888 !important;  /* Sichtbarer Rahmen */
     border-radius: 50px;
     cursor: pointer;
     transition: all 0.3s ease;
     padding: 0;
     display: flex;
     align-items: center;
+    box-sizing: border-box;
 }
 
 .theme-toggle:hover {
-    border-color: var(--accent-color);
+    border-color: var(--accent-color) !important;
 }
 
 .theme-toggle:focus {
@@ -905,11 +906,11 @@ body.light-mode .toggle-icon-right {
 
 /* Light Mode: Border-Farbe anpassen */
 body.light-mode .theme-toggle {
-    border-color: var(--text-color-muted);
+    border-color: #666666 !important;
 }
 
 body.light-mode .theme-toggle:hover {
-    border-color: var(--accent-color);
+    border-color: var(--accent-color) !important;
 }
 
 /* ===================
@@ -918,18 +919,20 @@ body.light-mode .theme-toggle:hover {
 
 .toggle-knob {
     position: absolute;
-    left: 3px;
-    width: 16px;
-    height: 16px;
+    left: 4px;
+    width: 18px;
+    height: 18px;
     background-color: var(--accent-color);
     border-radius: 50%;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    top: 50%;
+    transform: translateY(-50%);
 }
 
 /* Light Mode: Knob nach rechts */
 body.light-mode .toggle-knob {
-    left: calc(100% - 19px);
+    left: calc(100% - 22px);
     background-color: var(--accent-color);
 }
 
@@ -944,22 +947,22 @@ body.light-mode .toggle-knob {
     
     .toggle-icon-left,
     .toggle-icon-right {
-        font-size: 0.95rem;
+        font-size: 0.9rem;
     }
     
     .theme-toggle {
-        width: 40px;
-        height: 22px;
+        width: 42px;
+        height: 24px;
     }
     
     .toggle-knob {
-        width: 14px;
-        height: 14px;
+        width: 16px;
+        height: 16px;
         left: 3px;
     }
     
     body.light-mode .toggle-knob {
-        left: calc(100% - 17px);
+        left: calc(100% - 19px);
     }
 }
 
