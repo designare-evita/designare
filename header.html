@@ -2,16 +2,23 @@
     <a href="index.html" id="top-left-logo-link" aria-label="Zur Startseite">
         <img src="images/favicon.webp" alt="Michael Kanda Logo" id="top-left-logo-img">
     </a>
-<div class="header-right-controls">
-      <button id="theme-toggle" aria-label="Tag/Nacht Modus umschalten">
-            <i class="fas fa-moon"></i>
-        </button>
+    
+    <div class="header-right-controls">
+        <!-- Neuer moderner Theme Toggle Switch -->
+        <div class="theme-toggle-wrapper">
+            <button class="theme-toggle" id="theme-toggle" aria-label="Tag/Nacht Modus umschalten" role="switch" aria-checked="false">
+                <span class="toggle-stars"></span>
+                <span class="toggle-clouds"></span>
+                <span class="toggle-icon icon-moon"><i class="fas fa-moon"></i></span>
+                <span class="toggle-icon icon-sun"><i class="fas fa-sun"></i></span>
+                <span class="toggle-knob"></span>
+            </button>
+        </div>
         
         <button id="evita-chat-button" aria-label="Evita Chat öffnen">
             <i class="fa-solid fa-robot"></i>
         </button>
         
- 
         <button id="contact-button" aria-label="Kontaktformular öffnen">
             <i class="fa-solid fa-envelopes-bulk"></i>
         </button>
