@@ -1,36 +1,31 @@
 /* ============================================================
    HOMEPAGE-SCROLL-FIX.CSS
-   Startseite: Kein Scroll (100vh fest)
-   Flip Card ODER Evita geöffnet: Scroll erlaubt
+   NUR für das Scroll-Problem - minimale Lösung
    ============================================================ */
 
 /* ===================
-   1. JS-KLASSEN FÜR SCROLL-STEUERUNG
+   EVITA (#view-third) SCROLL FIX
+   Das ist der kritische Fix!
    =================== */
 
-/* Kein Scroll (Startseite geschlossen) */
-body.homepage-no-scroll {
-    overflow: hidden !important;
-    height: 100vh !important;
+/* Wenn Evita sichtbar ist, muss der Body scrollen können */
+#view-third[style*="flex"],
+#view-third[style*="block"] {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
 }
 
-/* Scroll erlaubt (Flip/Evita offen) */
-body.homepage-scroll-enabled {
+/* Body muss scrollen wenn Evita sichtbar */
+body:has(#view-third[style*="flex"]),
+body:has(#view-third[style*="block"]) {
     overflow-y: auto !important;
     height: auto !important;
 }
 
-/* ===================
-   2. HERO ANPASSUNGEN MIT JS-KLASSEN
-   =================== */
-
-body.homepage-no-scroll #hero {
-    height: calc(100vh - var(--header-height-desktop)) !important;
-    max-height: calc(100vh - var(--header-height-desktop)) !important;
-    overflow: hidden !important;
-}
-
-body.homepage-scroll-enabled #hero {
+/* Hero muss wachsen können wenn Evita sichtbar */
+body:has(#view-third[style*="flex"]) #hero,
+body:has(#view-third[style*="block"]) #hero {
     height: auto !important;
     min-height: auto !important;
     max-height: none !important;
@@ -38,42 +33,49 @@ body.homepage-scroll-enabled #hero {
 }
 
 /* ===================
-   3. CSS :has() FALLBACK (Moderne Browser)
-   Greift wenn JS nicht läuft
+   FLIP CARD SCROLL
    =================== */
 
-@supports selector(:has(*)) {
-    /* Startseite ohne Flip = kein Scroll */
-    body:has(.flip-container):not(:has(.flip-container.flipped)):not(.homepage-scroll-enabled):not(.homepage-no-scroll) {
-        overflow: hidden;
-        height: 100vh;
-    }
-    
-    /* Geflippt = Scroll erlauben */
-    body:has(.flip-container.flipped) {
-        overflow-y: auto !important;
-        height: auto !important;
-    }
-    
-    /* Hero bei geflippter Card */
-    body:has(.flip-container.flipped) #hero {
-        height: auto !important;
-        min-height: auto !important;
-        max-height: none !important;
-        overflow: visible !important;
-    }
+/* Geflippt = Scroll erlauben */
+body:has(.flip-container.flipped) {
+    overflow-y: auto !important;
+    height: auto !important;
+}
+
+body:has(.flip-container.flipped) #hero {
+    height: auto !important;
+    min-height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
 }
 
 /* ===================
-   4. MOBILE
+   STARTSEITE (nicht geflippt, Evita nicht sichtbar)
+   =================== */
+
+/* Nur wenn WEDER geflippt NOCH Evita sichtbar */
+body:has(.flip-container):not(:has(.flip-container.flipped)):not(:has(#view-third[style*="flex"])):not(:has(#view-third[style*="block"])) {
+    overflow: hidden;
+    height: 100vh;
+}
+
+body:has(.flip-container):not(:has(.flip-container.flipped)):not(:has(#view-third[style*="flex"])):not(:has(#view-third[style*="block"])) #hero {
+    height: calc(100vh - var(--header-height-desktop));
+    max-height: calc(100vh - var(--header-height-desktop));
+    overflow: hidden;
+}
+
+/* ===================
+   MOBILE
    =================== */
 
 @media (max-width: 768px) {
-    body.homepage-no-scroll {
-        height: 100dvh !important;
+    body:has(.flip-container):not(:has(.flip-container.flipped)):not(:has(#view-third[style*="flex"])):not(:has(#view-third[style*="block"])) {
+        height: 100dvh;
     }
     
-    body.homepage-no-scroll #hero {
-        height: calc(100dvh - var(--header-height-mobile)) !important;
+    body:has(.flip-container):not(:has(.flip-container.flipped)):not(:has(#view-third[style*="flex"])):not(:has(#view-third[style*="block"])) #hero {
+        height: calc(100dvh - var(--header-height-mobile));
+        max-height: calc(100dvh - var(--header-height-mobile));
     }
 }
