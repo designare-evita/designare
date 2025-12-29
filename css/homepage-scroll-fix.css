@@ -2,68 +2,44 @@
    HOMEPAGE-SCROLL-FIX.CSS
    Startseite: Kein Scroll (100vh fest)
    Flip Card ODER Evita geöffnet: Scroll erlaubt
+   
+   WICHTIG: Diese Datei funktioniert nur mit homepage-scroll.js!
+   CSS :has() kann nicht in inline-styles suchen.
    ============================================================ */
 
 /* ===================
-   1. STARTSEITE - KEIN SCROLL
-   Nur wenn weder Flip Card noch Evita (#view-third) sichtbar
+   1. STARTSEITE - KEIN SCROLL (via JS-Klasse)
    =================== */
 
-/* Kein Scroll wenn:
-   - Flip Container existiert
-   - NICHT geflippt ist
-   - UND view-third NICHT sichtbar ist */
-body:has(#hero):has(.flip-container):not(:has(.flip-container.flipped)):not(:has(#view-third[style*="display: flex"])):not(:has(#view-third[style*="display: block"])) {
-    overflow: hidden !important;
-    height: 100vh !important;
-}
-
-/* Alternative Klasse für JS Fallback */
 body.homepage-no-scroll {
     overflow: hidden !important;
     height: 100vh !important;
 }
 
 /* ===================
-   2. FLIP CARD ODER EVITA GEÖFFNET - SCROLL ERLAUBEN
+   2. SCROLL ERLAUBT (via JS-Klasse)
    =================== */
 
-/* Scroll erlauben wenn Flip Card geflippt */
-body:has(.flip-container.flipped) {
-    overflow-y: auto !important;
-    height: auto !important;
-}
-
-/* Scroll erlauben wenn Evita (#view-third) sichtbar */
-body:has(#view-third[style*="display: flex"]),
-body:has(#view-third[style*="display: block"]) {
-    overflow-y: auto !important;
-    height: auto !important;
-}
-
-/* Alternative Klasse für JS Fallback */
 body.homepage-scroll-enabled {
     overflow-y: auto !important;
     height: auto !important;
 }
 
 /* ===================
-   3. HERO SECTION - FESTE HÖHE
+   3. HERO SECTION ANPASSUNGEN
    =================== */
 
-/* Standard Hero - volle Bildschirmhöhe ohne Overflow */
-#hero:not(:has(.flip-container.flipped)):not(:has(#view-third[style*="display: flex"])):not(:has(#view-third[style*="display: block"])) {
-    height: 100vh !important;
-    max-height: 100vh !important;
+/* Wenn Scroll gesperrt - Hero füllt Bildschirm */
+body.homepage-no-scroll #hero {
+    height: calc(100vh - var(--header-height-desktop)) !important;
+    max-height: calc(100vh - var(--header-height-desktop)) !important;
     overflow: hidden !important;
 }
 
-/* Hero mit geflippter Card ODER Evita sichtbar - darf wachsen */
-#hero:has(.flip-container.flipped),
-#hero:has(#view-third[style*="display: flex"]),
-#hero:has(#view-third[style*="display: block"]) {
+/* Wenn Scroll erlaubt - Hero darf wachsen */
+body.homepage-scroll-enabled #hero {
     height: auto !important;
-    min-height: 100vh !important;
+    min-height: calc(100vh - var(--header-height-desktop)) !important;
     overflow: visible !important;
 }
 
@@ -72,19 +48,35 @@ body.homepage-scroll-enabled {
    =================== */
 
 @media (max-width: 768px) {
-    body:has(#hero):has(.flip-container):not(:has(.flip-container.flipped)):not(:has(#view-third[style*="display: flex"])):not(:has(#view-third[style*="display: block"])) {
-        overflow: hidden !important;
+    body.homepage-no-scroll {
         height: 100vh !important;
         height: 100dvh !important;
     }
     
-    body.homepage-no-scroll {
-        height: 100dvh !important;
-    }
-    
-    #hero:not(:has(.flip-container.flipped)):not(:has(#view-third[style*="display: flex"])):not(:has(#view-third[style*="display: block"])) {
+    body.homepage-no-scroll #hero {
         height: calc(100vh - var(--header-height-mobile)) !important;
         height: calc(100dvh - var(--header-height-mobile)) !important;
-        max-height: none !important;
+    }
+    
+    body.homepage-scroll-enabled #hero {
+        min-height: calc(100vh - var(--header-height-mobile)) !important;
+        min-height: calc(100dvh - var(--header-height-mobile)) !important;
+    }
+}
+
+/* ===================
+   5. FALLBACK für CSS :has() (moderne Browser)
+   Funktioniert NUR für .flipped Klasse, NICHT für style-Attribute
+   =================== */
+
+@supports selector(:has(*)) {
+    body:has(#hero):has(.flip-container):not(:has(.flip-container.flipped)):not(.homepage-scroll-enabled) {
+        overflow: hidden;
+        height: 100vh;
+    }
+    
+    body:has(.flip-container.flipped) {
+        overflow-y: auto;
+        height: auto;
     }
 }
