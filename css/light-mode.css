@@ -991,3 +991,61 @@ body.light-mode .cta-button-blog {
 body.light-mode .cta-button-blog:hover {
     background: var(--accent-color-hover);
 }
+
+/* ===================
+   17. TECH-TERMINAL - LIGHT MODE
+   Terminal bleibt dunkel für Kontrast
+   =================== */
+
+body.light-mode .tech-terminal-wrapper {
+    background-color: #1a1a1a;
+    border-color: #333;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+body.light-mode .terminal-header-bar {
+    background-color: #252525;
+    border-bottom-color: #333;
+}
+
+body.light-mode .terminal-title-text {
+    color: #999;
+}
+
+body.light-mode .terminal-body-content {
+    background-color: #1a1a1a;
+}
+
+body.light-mode .tech-fact-item {
+    border-left-color: #444;
+}
+
+body.light-mode .tech-fact-item:hover {
+    border-left-color: var(--accent-color);
+}
+
+body.light-mode .prompt-sign {
+    color: var(--accent-color);
+}
+
+body.light-mode .cmd-text {
+    color: #8ab4f8;
+}
+
+body.light-mode .output-text {
+    color: #e0e0e0;
+}
+
+body.light-mode .output-text strong {
+    color: #ffffff;
+}
+
+body.light-mode .terminal-link {
+    color: var(--accent-color);
+    background: rgba(196, 163, 90, 0.15);
+}
+
+body.light-mode .terminal-link:hover {
+    background: var(--accent-color);
+    color: #000;
+}
