@@ -2,81 +2,78 @@
    HOMEPAGE-SCROLL-FIX.CSS
    Startseite: Kein Scroll (100vh fest)
    Flip Card ODER Evita geöffnet: Scroll erlaubt
-   
-   WICHTIG: Diese Datei funktioniert nur mit homepage-scroll.js!
-   CSS :has() kann nicht in inline-styles suchen.
    ============================================================ */
 
 /* ===================
-   1. STARTSEITE - KEIN SCROLL (via JS-Klasse)
+   1. JS-KLASSEN FÜR SCROLL-STEUERUNG
    =================== */
 
+/* Kein Scroll (Startseite geschlossen) */
 body.homepage-no-scroll {
     overflow: hidden !important;
     height: 100vh !important;
 }
 
-/* ===================
-   2. SCROLL ERLAUBT (via JS-Klasse)
-   =================== */
-
+/* Scroll erlaubt (Flip/Evita offen) */
 body.homepage-scroll-enabled {
     overflow-y: auto !important;
     height: auto !important;
 }
 
 /* ===================
-   3. HERO SECTION ANPASSUNGEN
+   2. HERO ANPASSUNGEN MIT JS-KLASSEN
    =================== */
 
-/* Wenn Scroll gesperrt - Hero füllt Bildschirm */
 body.homepage-no-scroll #hero {
     height: calc(100vh - var(--header-height-desktop)) !important;
     max-height: calc(100vh - var(--header-height-desktop)) !important;
     overflow: hidden !important;
 }
 
-/* Wenn Scroll erlaubt - Hero darf wachsen */
 body.homepage-scroll-enabled #hero {
     height: auto !important;
-    min-height: calc(100vh - var(--header-height-desktop)) !important;
+    min-height: auto !important;
+    max-height: none !important;
     overflow: visible !important;
 }
 
 /* ===================
-   4. MOBILE ANPASSUNGEN
-   =================== */
-
-@media (max-width: 768px) {
-    body.homepage-no-scroll {
-        height: 100vh !important;
-        height: 100dvh !important;
-    }
-    
-    body.homepage-no-scroll #hero {
-        height: calc(100vh - var(--header-height-mobile)) !important;
-        height: calc(100dvh - var(--header-height-mobile)) !important;
-    }
-    
-    body.homepage-scroll-enabled #hero {
-        min-height: calc(100vh - var(--header-height-mobile)) !important;
-        min-height: calc(100dvh - var(--header-height-mobile)) !important;
-    }
-}
-
-/* ===================
-   5. FALLBACK für CSS :has() (moderne Browser)
-   Funktioniert NUR für .flipped Klasse, NICHT für style-Attribute
+   3. CSS :has() FALLBACK (Moderne Browser)
+   Greift wenn JS nicht läuft
    =================== */
 
 @supports selector(:has(*)) {
-    body:has(#hero):has(.flip-container):not(:has(.flip-container.flipped)):not(.homepage-scroll-enabled) {
+    /* Startseite ohne Flip = kein Scroll */
+    body:has(.flip-container):not(:has(.flip-container.flipped)):not(.homepage-scroll-enabled):not(.homepage-no-scroll) {
         overflow: hidden;
         height: 100vh;
     }
     
+    /* Geflippt = Scroll erlauben */
     body:has(.flip-container.flipped) {
-        overflow-y: auto;
-        height: auto;
+        overflow-y: auto !important;
+        height: auto !important;
+    }
+    
+    /* Hero bei geflippter Card */
+    body:has(.flip-container.flipped) #hero {
+        height: auto !important;
+        min-height: auto !important;
+        max-height: none !important;
+        overflow: visible !important;
+    }
+}
+
+/* ===================
+   4. MOBILE
+   =================== */
+
+@media (max-width: 768px) {
+    body.homepage-no-scroll {
+        height: 100dvh !important;
+    }
+    
+    body.homepage-no-scroll #hero {
+        height: calc(100dvh - var(--header-height-mobile)) !important;
     }
 }
