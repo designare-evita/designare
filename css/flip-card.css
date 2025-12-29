@@ -21,7 +21,7 @@
 #hero section.flip-container {
     display: flex;
     justify-content: center !important;
-    align-items: flex-start; /* Oben ausrichten */
+    align-items: flex-start;
     min-height: unset;
     height: auto;
     padding: 0 20px;
@@ -36,14 +36,13 @@
     position: relative;
     z-index: 10;
     width: 100%;
-    max-width: 1200px; /* GLEICHE BREITE WIE BLOG */
+    max-width: 1200px;
     margin: 0 auto;
 }
 
-/* Flipper ist jetzt ein <article> */
 .flipper {
     width: 100%;
-    min-height: 50vh; /* Etwas weniger Mindesthöhe */
+    min-height: 50vh;
     position: relative;
     transform-style: preserve-3d;
     transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -61,7 +60,6 @@
 
 /* ===================
    3. CARD FACES
-   Jetzt <section> und <article> statt divs
    =================== */
 
 .front-face,
@@ -80,7 +78,7 @@
 .front-face {
     z-index: 2;
     transform: rotateY(0deg);
-     align-items: center; 
+    align-items: center; 
     justify-content: flex-start; 
     align-self: start;
 }
@@ -89,23 +87,21 @@
     z-index: 1;
     transform: rotateY(180deg);
     justify-content: flex-start;
-    /* Hier kein overflow:hidden, damit man scrollen kann */
 }
 
 /* ===================
    4. STARTSEITE (#view-main)
-   Jetzt ein <header> Element
    =================== */
 
 #view-main {
     width: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center; /* Horizontal zentrieren */
-    justify-content: center; /* Vertikal zentrieren falls nötig */
+    align-items: center;
+    justify-content: center;
     margin-top: 0; 
     margin-bottom: 20px;
-    text-align: center; /* Text-Zentrierung für inline Elemente */
+    text-align: center;
 }
 
 #view-main .profile-picture,
@@ -126,8 +122,6 @@
     max-width: 200px;
 }
 
-
-
 .info-btn-wrapper {
     width: 100%;
     margin-top: 15px;
@@ -136,7 +130,7 @@
 }
 
 #flip-info-btn {
-   margin-top: 12px;
+    margin-top: 12px;
     width: 100%;
     background: transparent;
     border: 1px solid var(--accent-color) !important;
@@ -164,17 +158,16 @@
    =================== */
 
 .flip-panel {
-    /* WICHTIG: Sichtbar lassen für Body-Scroll */
     overflow: visible !important; 
 }
 
 .flip-panel-content {
     width: 100%;
-    max-width: 1200px; /* GLEICHE BREITE WIE BLOG */
+    max-width: 1200px;
     box-sizing: border-box;
     position: relative; 
     top: -30px;             
-    padding: 20px 2rem; /* GLEICHES PADDING WIE BLOG */
+    padding: 20px 2rem;
     margin: 0 auto;     
     text-align: left;
     background: transparent; 
@@ -182,18 +175,17 @@
 
 /* ===================
    6. EVITA VIEW (#view-third)
-   Jetzt ein <article> Element
    =================== */
 
 #view-third {
     display: none;
     width: 100%;
-    height: auto !important; /* Wächst mit Inhalt */
+    height: auto !important;
 }
 
 #view-third[style*="display: flex"],
 #view-third[style*="display: block"] {
-    display: block !important; /* Block damit Grid funktioniert */
+    display: block !important;
     animation: fadeIn 0.5s ease-in-out;
 }
 
@@ -222,7 +214,7 @@
     font-size: 1rem;
     line-height: 1.7;
     margin-bottom: 20px;
-    color: var(--text-color); /* JETZT: Variable statt #e0e0e0 */
+    color: var(--text-color);
 }
 
 .flip-panel ul {
@@ -232,14 +224,11 @@
     margin: 10px 0 15px 0;
 }
 
-/* Grid-Wrapper für Content-Layout */
 .evita-grid-wrapper {
     width: 100%;
     text-align: left;
 }
 
-/* Image Block - jetzt <aside> für semantische Korrektheit */
-/* WICHTIG: Flex-Column für Bild + Facts-Card untereinander */
 .evita-image-block {
     display: flex;
     flex-direction: column;
@@ -260,7 +249,7 @@
 }
 
 /* ===================
-   8. DESKTOP GRID LAYOUT (Inhalt)
+   8. DESKTOP GRID LAYOUT
    =================== */
 
 @media (min-width: 769px) {
@@ -295,7 +284,6 @@
 
 /* ===================
    9. BUTTONS (Navigation Back/Evita)
-   flip-controls ist jetzt <nav>
    =================== */
 
 .flip-controls {
@@ -305,16 +293,16 @@
     gap: 15px;
     margin-top: 30px;
     width: 100%;
-    flex-direction: row !important; /* Immer nebeneinander */
+    flex-direction: row !important;
 }
 
 .flip-btn-style {
     background: transparent;
-    border: 1px solid var(--accent-color) !important; /* 1px Rahmen */
+    border: 1px solid var(--accent-color) !important;
     color: var(--accent-color) !important;
     border-radius: 7px;
     font-size: 1rem;
-    font-weight: 400; /* Dünnere Schrift */
+    font-weight: 400;
     cursor: pointer;
     transition: all 0.3s ease;
     padding: 0 10px;
@@ -323,12 +311,9 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    
-    /* Layout: 50/50 Aufteilung */
     flex: 1; 
     width: auto;
     min-width: 0;
-    
     text-decoration: none;
     pointer-events: auto;
 }
@@ -346,19 +331,16 @@
 
 @media (max-width: 768px) {
     
-    /* Hero muss wachsen können */
     #hero:has(.flip-container) {
         padding-top: 40px !important;
         height: auto !important;
         min-height: 100vh;
     }
 
-    /* Flipper darf nicht zu klein sein, aber muss wachsen */
     .flipper {
         min-height: 50vh; 
     }
 
-    /* Content Layout Mobile */
     .evita-grid-wrapper {
         display: flex;
         flex-direction: column;
@@ -387,7 +369,6 @@
     .evita-text-middle { order: 3; }
     .evita-text-bottom { order: 4; }
 
-    /* Buttons Mobile: Untereinander aber gleiches Padding wie Desktop */
     .flip-controls {
         flex-direction: column !important;
         margin-top: 20px;
@@ -396,7 +377,6 @@
 
     .flip-btn-style {
         width: 100%;
-        /* GLEICHES PADDING WIE DESKTOP */
         padding: 12px 20px;
         min-height: 50px;
         height: auto;
@@ -404,7 +384,7 @@
     }
     
     .flip-panel-content {
-        padding: 10px 1.5rem 40px 1.5rem; /* Mobiles Padding wie Blog */
+        padding: 10px 1.5rem 40px 1.5rem;
     }
 
     .flip-panel h2 { font-size: 1.6rem; margin-bottom: 15px; }
@@ -427,6 +407,7 @@
 body.light-mode .flipper {
     color: #333333 !important;
 }
+
 body.light-mode .evita-text-top,
 body.light-mode .evita-text-middle,
 body.light-mode .evita-text-bottom,
@@ -436,53 +417,46 @@ body.light-mode .flipper ul,
 body.light-mode .flipper li,
 body.light-mode .flip-header-white,
 body.light-mode .flipper li::before,
-body.light-mode .flipper h2,
 body.light-mode .flipper li i,
 body.light-mode .flipper p {
     color: #333333 !important;
 }
 
 /* ============================================================
-   EXPERT FAQ STYLES (Tech & Clean Look)
+   EXPERT FAQ STYLES
    ============================================================ */
 
-/* Layout im Grid: Nimmt die volle Breite ein */
 .expert-faq-wrapper {
     width: 100%;
     margin-top: 30px;
     border-top: 1px solid var(--border-color-subtle);
-    /* Falls Grid aktiv ist (Desktop), volle Breite erzwingen: */
     grid-column: 1 / -1; 
 }
 
-/* Einzelnes FAQ Item */
 details[name="expert-faq"] {
     border-bottom: 1px solid var(--border-color-subtle);
     transition: border-color 0.3s ease;
 }
 
-/* Die Frage (Summary) */
 details[name="expert-faq"] summary {
     padding: 16px 0;
     cursor: pointer;
     font-weight: 500;
     font-size: 0.95rem;
     color: var(--text-color);
-    list-style: none; /* Standard-Marker entfernen */
+    list-style: none;
     display: flex;
     justify-content: space-between;
     align-items: center;
     transition: color 0.3s ease;
 }
 
-/* Hover-Effekt auf Text */
 details[name="expert-faq"] summary:hover {
     color: var(--accent-color);
 }
 
-/* Custom Pfeil (Tech Style Chevron) */
 details[name="expert-faq"] summary::after {
-    content: '\f078'; /* FontAwesome Chevron Down */
+    content: '\f078';
     font-family: "Font Awesome 6 Free";
     font-weight: 900;
     font-size: 0.75rem;
@@ -491,33 +465,28 @@ details[name="expert-faq"] summary::after {
     margin-left: 10px;
 }
 
-/* Zustand: Geöffnet */
 details[name="expert-faq"][open] summary::after {
     transform: rotate(180deg);
     color: var(--accent-color);
 }
 
-/* Webkit Marker Fix (für Safari/Chrome sicherheitshalber) */
 details[name="expert-faq"] summary::-webkit-details-marker {
     display: none;
 }
 
-/* Inhalt (Antwort) */
 .faq-content {
     padding-bottom: 20px;
     padding-right: 20px;
-    animation: fadeIn 0.4s ease; /* Sanftes Einblenden */
+    animation: fadeIn 0.4s ease;
 }
 
-/* Typografie im Content */
 .faq-content p {
-    font-size: 0.9rem !important; /* Wie gewünscht etwas kleiner */
+    font-size: 0.9rem !important;
     line-height: 1.6;
     color: var(--text-color-muted);
     margin-bottom: 0 !important;
 }
 
-/* Tech-Highlighting für Code-Tags */
 .faq-content code {
     font-family: 'Courier New', monospace;
     font-size: 0.85em;
@@ -527,7 +496,6 @@ details[name="expert-faq"] summary::-webkit-details-marker {
     color: var(--accent-color);
 }
 
-/* Der Link am Ende */
 .faq-link {
     display: inline-block;
     margin-left: 6px;
@@ -541,28 +509,26 @@ details[name="expert-faq"] summary::-webkit-details-marker {
 }
 
 .faq-link:hover {
-    transform: translateX(4px); /* Kleiner Slide-Effekt */
+    transform: translateX(4px);
     text-decoration: none;
 }
 
 /* ============================================================
-   TECH-TERMINAL STYLES (Evita Seite)
+   TECH-TERMINAL STYLES
    ============================================================ */
 
-/* Container Layout */
 .tech-terminal-wrapper {
-    grid-column: 1 / -1; /* Volle Breite im Grid */
+    grid-column: 1 / -1;
     margin-top: 30px;
-    background-color: #1e1e1e; /* Dunklerer Hintergrund für Terminal-Look */
+    background-color: #1e1e1e;
     border-radius: 8px;
     border: 1px solid #333;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     overflow: hidden;
-    font-family: 'Courier New', Courier, monospace; /* Monospace für Code-Look */
+    font-family: 'Courier New', Courier, monospace;
     width: 100%;
 }
 
-/* Header Bar (Mac/Ubuntu Terminal Style) */
 .terminal-header-bar {
     background-color: #2d2d2d;
     padding: 8px 15px;
@@ -595,12 +561,10 @@ details[name="expert-faq"] summary::-webkit-details-marker {
     user-select: none;
 }
 
-/* Content Body */
 .terminal-body-content {
     padding: 20px;
 }
 
-/* Einzelnes Item */
 .tech-fact-item {
     margin-bottom: 20px;
     border-left: 2px solid #333;
@@ -609,36 +573,33 @@ details[name="expert-faq"] summary::-webkit-details-marker {
 }
 
 .tech-fact-item:hover {
-    border-left-color: var(--accent-color); /* Goldener Border bei Hover */
+    border-left-color: var(--accent-color);
 }
 
 .tech-fact-item:last-child {
     margin-bottom: 0;
 }
 
-/* Prompt Zeichen ($) */
 .prompt-sign {
     color: var(--accent-color);
     font-weight: bold;
     margin-right: 8px;
-    float: left; /* Damit es neben dem Command steht */
+    float: left;
 }
 
-/* Der fiktive Befehl */
 .cmd-text {
-    color: #a9b7c6; /* Code-Editor Grau/Blau */
+    color: #a9b7c6;
     font-size: 0.85rem;
     margin-bottom: 5px !important;
     display: block;
 }
 
-/* Der Output Text (Die eigentliche Info) */
 .output-text {
-    color: #e0e0e0; /* Hell auf dunkel - IMMER */
-    font-family: 'Poppins', sans-serif; /* Zurück zur Leseschrift für den Inhalt */
+    color: #e0e0e0;
+    font-family: 'Poppins', sans-serif;
     font-size: 0.9rem !important;
     line-height: 1.5;
-    margin-left: 20px; /* Einrückung unter den Command */
+    margin-left: 20px;
     margin-bottom: 0 !important;
     display: block;
 }
@@ -648,7 +609,6 @@ details[name="expert-faq"] summary::-webkit-details-marker {
     font-weight: 600;
 }
 
-/* Der Link Button im Terminal Look */
 .terminal-link {
     display: inline-block;
     margin-top: 8px;
@@ -656,7 +616,7 @@ details[name="expert-faq"] summary::-webkit-details-marker {
     font-size: 0.8rem;
     color: var(--accent-color);
     text-decoration: none;
-    background: rgba(196, 163, 90, 0.1); /* Hauch von Gold im Hintergrund */
+    background: rgba(196, 163, 90, 0.1);
     padding: 2px 8px;
     border-radius: 4px;
     transition: all 0.2s ease;
@@ -664,66 +624,58 @@ details[name="expert-faq"] summary::-webkit-details-marker {
 
 .terminal-link:hover {
     background: var(--accent-color);
-    color: #000; /* Schwarz auf Gold für Kontrast */
+    color: #000;
     box-shadow: 0 0 10px rgba(196, 163, 90, 0.4);
     transform: translateX(5px);
 }
 
-
 /* ============================================================
-   SECTION SEPARATOR TITLES (Zwischenüberschriften)
+   SECTION SEPARATOR TITLES
    ============================================================ */
 
 .section-separator-title {
-    /* Layout im Grid */
     grid-column: 1 / -1;
     width: 100%;
     display: flex;
     align-items: center;
-    
     margin-top: 20px !important;
     margin-bottom: 20px !important;
-    
-    /* Typografie */
     font-family: 'Poppins', sans-serif;
     font-size: 1rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 2px;
-    color: var(--accent-color); /* Dein Gold-Ton */
+    color: var(--accent-color);
     opacity: 0.9;
 }
 
-/* Dekorative Linie rechts neben dem Text */
 .section-separator-title::after {
     content: '';
-    flex-grow: 1; /* Füllt den Rest der Zeile */
+    flex-grow: 1;
     height: 1px;
     background: linear-gradient(to right, var(--accent-color), transparent);
     margin-left: 15px;
     opacity: 0.3;
 }
 
-/* Mobile Anpassung */
 @media (max-width: 768px) {
     .section-separator-title {
-        margin-top: 30px; /* Auch mobil angepasst */
+        margin-top: 30px;
         font-size: 0.8rem;
     }
 }
 
 /* ============================================================
-   HELPER CLASSES (Neu)
+   HELPER CLASSES
    ============================================================ */
 
-/* Für die abschließenden Texte vor den Buttons */
 .flip-cta-text {
     margin-top: 30px !important;
     margin-bottom: 30px !important;
 }
 
 /* ============================================================
-   FACTS CARD (Visitenkarten-Style)
+   FACTS CARD
    ============================================================ */
 
 .facts-card {
@@ -752,12 +704,10 @@ details[name="expert-faq"] summary::-webkit-details-marker {
     font-size: 0.85rem !important;
 }
 
-/* Light Mode */
 body.light-mode .facts-card {
     background: rgba(0, 0, 0, 0.03);
 }
 
-/* Mobile: Facts-Card zentriert */
 @media (max-width: 768px) {
     .facts-card {
         margin-top: 12px;
