@@ -634,7 +634,7 @@ details[name="expert-faq"] summary::-webkit-details-marker {
 
 /* Der Output Text (Die eigentliche Info) */
 .output-text {
-    color: var(--text-color);
+    color: #e0e0e0; /* Hell auf dunkel - IMMER */
     font-family: 'Poppins', sans-serif; /* Zurück zur Leseschrift für den Inhalt */
     font-size: 0.9rem !important;
     line-height: 1.5;
@@ -667,6 +667,64 @@ details[name="expert-faq"] summary::-webkit-details-marker {
     color: #000; /* Schwarz auf Gold für Kontrast */
     box-shadow: 0 0 10px rgba(196, 163, 90, 0.4);
     transform: translateX(5px);
+}
+
+/* ============================================================
+   TECH-TERMINAL - LIGHT MODE
+   Terminal bleibt IMMER dunkel (ist ein Terminal!)
+   Nur sicherstellen dass Farben nicht überschrieben werden
+   ============================================================ */
+
+body.light-mode .tech-terminal-wrapper {
+    background-color: #1e1e1e !important;
+    border-color: #333 !important;
+}
+
+body.light-mode .terminal-header-bar {
+    background-color: #2d2d2d !important;
+    border-bottom-color: #333 !important;
+}
+
+body.light-mode .terminal-body-content {
+    background-color: #1e1e1e !important;
+}
+
+body.light-mode .terminal-title-text {
+    color: #888 !important;
+}
+
+body.light-mode .tech-fact-item {
+    border-left-color: #444 !important;
+}
+
+body.light-mode .tech-fact-item:hover {
+    border-left-color: var(--accent-color) !important;
+}
+
+body.light-mode .prompt-sign {
+    color: var(--accent-color) !important;
+}
+
+body.light-mode .cmd-text {
+    color: #8ab4f8 !important; /* Helleres Blau für guten Kontrast */
+}
+
+body.light-mode .output-text {
+    color: #e0e0e0 !important; /* Heller Text bleibt! */
+}
+
+body.light-mode .output-text strong {
+    color: #ffffff !important;
+}
+
+body.light-mode .terminal-link {
+    color: var(--accent-color) !important;
+    background: rgba(196, 163, 90, 0.15) !important;
+}
+
+body.light-mode .terminal-link:hover {
+    background: var(--accent-color) !important;
+    color: #000 !important;
 }
 
 /* ============================================================
