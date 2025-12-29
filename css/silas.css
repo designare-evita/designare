@@ -786,8 +786,180 @@ textarea.silas-extra-input {
     width: 100% !important;
 }
 
+/* ============================================================
+   16. LIGHT MODE ANPASSUNGEN
+   ============================================================ */
+
+/* Container Backgrounds */
+body.light-mode .silas-generator-section .ai-container {
+    background: rgba(0, 0, 0, 0.02);
+    border-color: var(--border-color);
+}
+
+body.light-mode .ai-container .input-group {
+    background-color: rgba(0, 0, 0, 0.02);
+    border-color: var(--border-color);
+}
+
+/* Input Containers - HELLER Hintergrund */
+body.light-mode .silas-input-container {
+    background-color: #ffffff;
+    border-color: var(--border-color);
+}
+
+body.light-mode .silas-input-container:hover,
+body.light-mode .silas-input-container:focus-within {
+    border-color: var(--accent-color);
+}
+
+/* Text Inputs */
+body.light-mode .silas-extra-input {
+    color: #333333;
+    background-color: transparent;
+}
+
+body.light-mode .silas-extra-input::placeholder {
+    color: #888888;
+}
+
+/* Custom Selects - HELLER Hintergrund mit dunklem Text */
+body.light-mode .custom-select,
+body.light-mode .ai-container .custom-select {
+    background-color: #1a1a1a;
+    color: #ffffff;
+    border-color: #333333;
+}
+
+body.light-mode .custom-select option,
+body.light-mode .ai-container .custom-select option {
+    background-color: #1a1a1a;
+    color: #ffffff;
+}
+
+body.light-mode .custom-select:hover,
+body.light-mode .custom-select:focus,
+body.light-mode .ai-container .custom-select:hover,
+body.light-mode .ai-container .custom-select:focus {
+    border-color: var(--accent-color);
+    background-color: #252525;
+}
+
+/* Keyword Form */
+body.light-mode #silas-form {
+    background-color: #ffffff;
+    border-color: var(--border-color);
+}
+
+body.light-mode #silas-keyword-input {
+    color: #333333;
+}
+
+body.light-mode #silas-keyword-input::placeholder {
+    color: #888888;
+}
+
+body.light-mode #add-keyword-btn {
+    border-left-color: var(--border-color);
+}
+
+/* Keyword List Container */
+body.light-mode .keyword-list-container {
+    background: rgba(0, 0, 0, 0.02);
+    border-color: var(--border-color);
+}
+
+body.light-mode #keyword-display-list {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+body.light-mode #keyword-display-list li {
+    background-color: #ffffff;
+    border-color: var(--border-color);
+    color: #333333;
+}
+
+body.light-mode #keyword-display-list li:hover {
+    background-color: #f5f5f5;
+}
+
+/* Config Group Border */
+body.light-mode .silas-config-group {
+    border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+
+/* Result Cards */
+body.light-mode .result-card {
+    background-color: #ffffff;
+    border-color: var(--border-color);
+}
+
+body.light-mode .result-card:hover {
+    background-color: #f9f9f9;
+}
+
+body.light-mode .result-card p {
+    color: #666666;
+}
+
+/* Response Container */
+body.light-mode #silas-response-container {
+    background: rgba(0, 0, 0, 0.02);
+    border-color: var(--border-color);
+}
+
+body.light-mode #silas-response-content {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Expert Tip Box in Light Mode */
+body.light-mode .expert-tip {
+    background-color: rgba(196, 163, 90, 0.08);
+    border-color: var(--accent-color);
+}
+
+/* Labels */
+body.light-mode .ai-container .input-group label {
+    color: #666666;
+}
+
+body.light-mode .silas-section-label {
+    color: var(--accent-color);
+}
+
+/* Summary Box Light Mode */
+body.light-mode .summary-box {
+    background-color: rgba(196, 163, 90, 0.08) !important;
+}
+
+/* Modals Light Mode */
+body.light-mode #silas-preview-modal {
+    background-color: rgba(255, 255, 255, 0.95);
+}
+
+body.light-mode #silas-preview-modal .modal-content {
+    background-color: #ffffff;
+    border-color: var(--border-color);
+}
+
+body.light-mode #preview-content-area {
+    background: #ffffff;
+    color: #333333;
+}
+
+body.light-mode #silas-auth-modal .modal-content {
+    background-color: #ffffff;
+}
+
+body.light-mode #silas-auth-modal .silas-input-container {
+    background-color: #f5f5f5;
+}
+
+body.light-mode #silas-auth-modal #master-pwd-input {
+    color: #333333;
+}
+
 /* ===================
-   16. RESPONSIVE
+   17. RESPONSIVE
    =================== */
 
 @media (max-width: 768px) {
