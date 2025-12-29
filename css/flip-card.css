@@ -181,12 +181,13 @@
     display: none;
     width: 100%;
     height: auto !important;
+    overflow: visible !important;
 }
 
-#view-third[style*="display: flex"],
-#view-third[style*="display: block"] {
-    display: block !important;
-    animation: fadeIn 0.5s ease-in-out;
+/* WICHTIG: Wenn JS display:flex/block setzt */
+#view-third[style] {
+    height: auto !important;
+    overflow: visible !important;
 }
 
 @keyframes fadeIn {
