@@ -821,10 +821,10 @@ h2[id] {
 }
 
 
-
 /* ============================================================
    THEME-TOGGLE.CSS
    Clean Pill-Shape Toggle - MIT MAXIMALER SPEZIFITÄT
+   10% kleiner als vorher
    ============================================================ */
 
 /* ===================
@@ -835,7 +835,7 @@ h2[id] {
 .theme-toggle-wrapper {
     display: flex !important;
     align-items: center !important;
-    gap: 10px !important;
+    gap: 9px !important;
 }
 
 /* ===================
@@ -844,7 +844,7 @@ h2[id] {
 
 .theme-toggle-wrapper .toggle-icon-left,
 .theme-toggle-wrapper .toggle-icon-right {
-    font-size: 1rem !important;
+    font-size: 0.9rem !important;
     transition: color 0.3s ease, opacity 0.3s ease !important;
     width: auto !important;
     height: auto !important;
@@ -879,7 +879,7 @@ body.light-mode .theme-toggle-wrapper .toggle-icon-right {
 /* ===================
    3. TOGGLE BUTTON (Pill Shape)
    ===================
-   WICHTIG: Alle Header-Button-Styles überschreiben!
+   Desktop: 40px × 22px (war 45px × 25px)
    =================== */
 
 .header-right-controls .theme-toggle-wrapper .theme-toggle,
@@ -893,8 +893,8 @@ button.theme-toggle,
     /* Dann neu definieren */
     position: relative !important;
     display: block !important;
-    width: 45px !important;
-    height: 25px !important;
+    width: 40px !important;
+    height: 22px !important;
     background-color: #6b6b6b !important;
     border: none !important;
     border-radius: 50px !important;
@@ -936,16 +936,18 @@ body.light-mode #theme-toggle:hover {
 
 /* ===================
    4. KNOB (Weißer Kreis)
+   ===================
+   Desktop: 17px × 17px (war 19px × 19px)
    =================== */
 
 .theme-toggle .toggle-knob,
 #theme-toggle .toggle-knob,
 .toggle-knob {
     position: absolute !important;
-    top: 3px !important;
-    left: 3px !important;
-    width: 19px !important;
-    height: 19px !important;
+    top: 2.5px !important;
+    left: 2.5px !important;
+    width: 17px !important;
+    height: 17px !important;
     background-color: #ffffff !important;
     border: none !important;
     border-radius: 50% !important;
@@ -956,46 +958,51 @@ body.light-mode #theme-toggle:hover {
 }
 
 /* Light Mode: Knob nach rechts */
+/* Position: width(40) - knob(17) - padding(2.5) = 20.5px */
 body.light-mode .theme-toggle .toggle-knob,
 body.light-mode #theme-toggle .toggle-knob,
 body.light-mode .toggle-knob {
-    left: 23px !important;
+    left: 20.5px !important;
 }
 
 /* ===================
    5. MOBILE
+   ===================
+   Mobile: 36px × 20px (war 40px × 22px)
    =================== */
 
 @media (max-width: 768px) {
     .theme-toggle-wrapper {
-        gap: 8px !important;
+        gap: 7px !important;
     }
     
     .theme-toggle-wrapper .toggle-icon-left,
     .theme-toggle-wrapper .toggle-icon-right {
-        font-size: 0.9rem !important;
+        font-size: 0.8rem !important;
     }
     
     .header-right-controls .theme-toggle-wrapper .theme-toggle,
     .theme-toggle-wrapper .theme-toggle,
     #theme-toggle {
-        width: 40px !important;
-        height: 22px !important;
+        width: 36px !important;
+        height: 20px !important;
     }
     
     .theme-toggle .toggle-knob,
     #theme-toggle .toggle-knob,
     .toggle-knob {
-        width: 16px !important;
-        height: 16px !important;
+        width: 14px !important;
+        height: 14px !important;
         top: 3px !important;
         left: 3px !important;
     }
     
+    /* Mobile Light Mode: knob rechts */
+    /* Position: width(36) - knob(14) - padding(3) = 19px */
     body.light-mode .theme-toggle .toggle-knob,
     body.light-mode #theme-toggle .toggle-knob,
     body.light-mode .toggle-knob {
-        left: 21px !important;
+        left: 19px !important;
     }
 }
 
@@ -1010,3 +1017,4 @@ body.light-mode .toggle-knob {
         transition: none !important;
     }
 }
+
