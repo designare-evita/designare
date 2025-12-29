@@ -1,38 +1,47 @@
 /* ============================================================
    HOMEPAGE-SCROLL-FIX.CSS
    Startseite: Kein Scroll (100vh fest)
-   Flip Card geöffnet: Scroll erlaubt
+   Flip Card ODER Evita geöffnet: Scroll erlaubt
    ============================================================ */
 
 /* ===================
    1. STARTSEITE - KEIN SCROLL
-   Body bekommt overflow:hidden wenn auf der Startseite
+   Nur wenn weder Flip Card noch Evita (#view-third) sichtbar
    =================== */
 
-/* Wenn die Seite die Startseite ist (index.html mit #hero) */
-body:has(#hero):has(.flip-container):not(:has(.flip-container.flipped)) {
+/* Kein Scroll wenn:
+   - Flip Container existiert
+   - NICHT geflippt ist
+   - UND view-third NICHT sichtbar ist */
+body:has(#hero):has(.flip-container):not(:has(.flip-container.flipped)):not(:has(#view-third[style*="display: flex"])):not(:has(#view-third[style*="display: block"])) {
     overflow: hidden !important;
     height: 100vh !important;
 }
 
-/* Alternative falls :has nicht überall funktioniert - 
-   Klasse die per JS gesetzt wird */
+/* Alternative Klasse für JS Fallback */
 body.homepage-no-scroll {
     overflow: hidden !important;
     height: 100vh !important;
 }
 
 /* ===================
-   2. FLIP CARD GEÖFFNET - SCROLL ERLAUBEN
+   2. FLIP CARD ODER EVITA GEÖFFNET - SCROLL ERLAUBEN
    =================== */
 
-/* Wenn Flip Card geflippt ist, Scroll erlauben */
+/* Scroll erlauben wenn Flip Card geflippt */
 body:has(.flip-container.flipped) {
     overflow-y: auto !important;
     height: auto !important;
 }
 
-/* Alternative mit Klasse */
+/* Scroll erlauben wenn Evita (#view-third) sichtbar */
+body:has(#view-third[style*="display: flex"]),
+body:has(#view-third[style*="display: block"]) {
+    overflow-y: auto !important;
+    height: auto !important;
+}
+
+/* Alternative Klasse für JS Fallback */
 body.homepage-scroll-enabled {
     overflow-y: auto !important;
     height: auto !important;
@@ -43,14 +52,16 @@ body.homepage-scroll-enabled {
    =================== */
 
 /* Standard Hero - volle Bildschirmhöhe ohne Overflow */
-#hero:not(:has(.flip-container.flipped)) {
+#hero:not(:has(.flip-container.flipped)):not(:has(#view-third[style*="display: flex"])):not(:has(#view-third[style*="display: block"])) {
     height: 100vh !important;
     max-height: 100vh !important;
     overflow: hidden !important;
 }
 
-/* Hero mit geflippter Card - darf wachsen */
-#hero:has(.flip-container.flipped) {
+/* Hero mit geflippter Card ODER Evita sichtbar - darf wachsen */
+#hero:has(.flip-container.flipped),
+#hero:has(#view-third[style*="display: flex"]),
+#hero:has(#view-third[style*="display: block"]) {
     height: auto !important;
     min-height: 100vh !important;
     overflow: visible !important;
@@ -61,17 +72,17 @@ body.homepage-scroll-enabled {
    =================== */
 
 @media (max-width: 768px) {
-    body:has(#hero):has(.flip-container):not(:has(.flip-container.flipped)) {
+    body:has(#hero):has(.flip-container):not(:has(.flip-container.flipped)):not(:has(#view-third[style*="display: flex"])):not(:has(#view-third[style*="display: block"])) {
         overflow: hidden !important;
         height: 100vh !important;
-        height: 100dvh !important; /* Dynamic viewport height für Mobile */
+        height: 100dvh !important;
     }
     
     body.homepage-no-scroll {
         height: 100dvh !important;
     }
     
-    #hero:not(:has(.flip-container.flipped)) {
+    #hero:not(:has(.flip-container.flipped)):not(:has(#view-third[style*="display: flex"])):not(:has(#view-third[style*="display: block"])) {
         height: calc(100vh - var(--header-height-mobile)) !important;
         height: calc(100dvh - var(--header-height-mobile)) !important;
         max-height: none !important;
