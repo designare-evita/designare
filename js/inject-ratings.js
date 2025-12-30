@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 // js/inject-ratings.js
 // Injiziert AggregateRating in alle HTML-Dateien vor dem Build/Deploy
-//
-// AUTOMATISCH: Findet selbständig alle HTML-Dateien mit feedback-placeholder
+// 
+// WICHTIG: AggregateRating ist nur für bestimmte Schema.org Typen erlaubt!
+// Google lehnt Ratings für BlogPosting, Article, NewsArticle etc. ab.
 //
 // Verwendung:
 //   node js/inject-ratings.js
@@ -25,17 +26,63 @@ const CONFIG = {
     // Verzeichnis mit HTML-Dateien (Projekt-Root)
     htmlDir: ROOT_DIR,
     
-    // Alle Schema.org Typen die ein AggregateRating bekommen können
-    supportedSchemaTypes: [
+    // ✅ NUR diese Schema.org Typen dürfen AggregateRating bekommen
+    // Quelle: https://developers.google.com/search/docs/appearance/structured-data/review-snippet
+    allowedSchemaTypes: [
+        // Produkte & Software
+        'Product',
+        'SoftwareApplication',
+        'WebApplication',
+        'MobileApplication',
+        'VideoGame',
+        
+        // Business & Organisationen
+        'LocalBusiness',
+        'Organization',
+        'Restaurant',
+        'Hotel',
+        'Store',
+        
+        // Medien & Unterhaltung
+        'Book',
+        'Movie',
+        'TVSeries',
+        'MusicRecording',
+        'MusicAlbum',
+        'MediaObject',
+        
+        // Bildung & Events
+        'Course',
+        'Event',
+        
+        // Rezepte
+        'Recipe',
+        
+        // Creative Works (spezifisch erlaubte)
+        'CreativeWorkSeason',
+        'CreativeWorkSeries'
+    ],
+    
+    // ❌ Diese Typen NIEMALS mit AggregateRating versehen
+    // Google gibt hier explizit Fehler aus!
+    blockedSchemaTypes: [
         'BlogPosting',
         'Article',
         'NewsArticle',
         'TechArticle',
+        'ScholarlyArticle',
+        'Report',
         'HowTo',
-        'Review',
-        'Product',
-        'LocalBusiness',
-        'WebPage'
+        'FAQPage',
+        'QAPage',
+        'WebPage',
+        'CollectionPage',
+        'ItemPage',
+        'AboutPage',
+        'ContactPage',
+        'Review',           // Review HAT ein Rating, bekommt aber kein AggregateRating
+        'Person',
+        'ImageGallery'
     ],
     
     // Dateien die NIE verarbeitet werden sollen (Partials, Templates, etc.)
@@ -92,7 +139,6 @@ function findHtmlFiles(dir) {
 function hasFeedbackWidget(filepath) {
     try {
         const content = fs.readFileSync(filepath, 'utf-8');
-        // Sucht nach dem feedback-placeholder div
         return content.includes('id="feedback-placeholder"') || 
                content.includes("id='feedback-placeholder'");
     } catch (error) {
@@ -117,9 +163,8 @@ async function fetchRating(slug) {
         const response = await fetch(url, {
             headers: {
                 'Accept': 'application/json',
-                'User-Agent': 'Rating-Injector/1.0'
+                'User-Agent': 'Rating-Injector/2.0'
             },
-            // Timeout nach 10 Sekunden
             signal: AbortSignal.timeout(10000)
         });
         
@@ -141,35 +186,89 @@ async function fetchRating(slug) {
     }
 }
 
+// Prüft ob ein Schema-Typ AggregateRating haben darf
+function isRatingAllowed(schemaType) {
+    // Explizit geblockt?
+    if (CONFIG.blockedSchemaTypes.includes(schemaType)) {
+        return false;
+    }
+    // Explizit erlaubt?
+    if (CONFIG.allowedSchemaTypes.includes(schemaType)) {
+        return true;
+    }
+    // Im Zweifel: NICHT erlauben (sicherer Ansatz)
+    return false;
+}
+
 // JSON-LD im HTML finden und aktualisieren
-function injectRatingIntoHtml(htmlContent, aggregateRating) {
-    if (!aggregateRating) return { html: htmlContent, changed: false };
+function injectRatingIntoHtml(htmlContent, aggregateRating, filename) {
+    if (!aggregateRating) return { html: htmlContent, changed: false, reason: 'no-rating' };
     
     // Regex um JSON-LD Scripts zu finden
     const jsonLdRegex = /<script\s+type="application\/ld\+json">([\s\S]*?)<\/script>/gi;
     
     let changed = false;
+    let reason = 'no-match';
+    let foundType = null;
     
     const updatedHtml = htmlContent.replace(jsonLdRegex, (match, jsonContent) => {
         try {
             const schema = JSON.parse(jsonContent);
             
-            // Prüfen ob es ein unterstützter Schema-Typ ist
-            if (CONFIG.supportedSchemaTypes.includes(schema['@type'])) {
+            // Fall 1: Einfaches Schema (kein @graph)
+            if (schema['@type'] && !schema['@graph']) {
+                foundType = schema['@type'];
                 
-                // Prüfen ob sich das Rating geändert hat
-                const existingRating = schema.aggregateRating;
-                const newRatingValue = aggregateRating.ratingValue;
-                const newRatingCount = aggregateRating.ratingCount;
+                if (isRatingAllowed(schema['@type'])) {
+                    // Prüfen ob sich das Rating geändert hat
+                    const existingRating = schema.aggregateRating;
+                    const newRatingValue = aggregateRating.ratingValue;
+                    const newRatingCount = aggregateRating.ratingCount;
+                    
+                    if (!existingRating || 
+                        existingRating.ratingValue !== newRatingValue ||
+                        existingRating.ratingCount !== newRatingCount) {
+                        
+                        schema.aggregateRating = aggregateRating;
+                        changed = true;
+                        reason = 'updated';
+                        
+                        const jsonStr = JSON.stringify(schema, null, 2);
+                        const indentedJson = jsonStr.split('\n').map(line => '    ' + line).join('\n');
+                        return `<script type="application/ld+json">\n${indentedJson}\n    </script>`;
+                    } else {
+                        reason = 'already-current';
+                    }
+                } else {
+                    reason = `blocked-type:${schema['@type']}`;
+                }
+            }
+            
+            // Fall 2: @graph Array (mehrere Schemas)
+            if (schema['@graph'] && Array.isArray(schema['@graph'])) {
+                let graphChanged = false;
                 
-                if (!existingRating || 
-                    existingRating.ratingValue !== newRatingValue ||
-                    existingRating.ratingCount !== newRatingCount) {
-                    
-                    schema.aggregateRating = aggregateRating;
-                    changed = true;
-                    
-                    // Formatiert zurückgeben (4 Spaces Indent passend zum HTML)
+                for (const node of schema['@graph']) {
+                    if (node['@type'] && isRatingAllowed(node['@type'])) {
+                        foundType = node['@type'];
+                        
+                        const existingRating = node.aggregateRating;
+                        const newRatingValue = aggregateRating.ratingValue;
+                        const newRatingCount = aggregateRating.ratingCount;
+                        
+                        if (!existingRating || 
+                            existingRating.ratingValue !== newRatingValue ||
+                            existingRating.ratingCount !== newRatingCount) {
+                            
+                            node.aggregateRating = aggregateRating;
+                            graphChanged = true;
+                            changed = true;
+                            reason = 'updated';
+                        }
+                    }
+                }
+                
+                if (graphChanged) {
                     const jsonStr = JSON.stringify(schema, null, 2);
                     const indentedJson = jsonStr.split('\n').map(line => '    ' + line).join('\n');
                     return `<script type="application/ld+json">\n${indentedJson}\n    </script>`;
@@ -179,22 +278,24 @@ function injectRatingIntoHtml(htmlContent, aggregateRating) {
             return match; // Unverändert zurückgeben
             
         } catch (e) {
-            // JSON Parse Fehler - unverändert lassen
-            console.warn('  ⚠️  Konnte JSON-LD nicht parsen:', e.message);
+            console.warn(`  ⚠️  Konnte JSON-LD nicht parsen:`, e.message);
+            reason = 'parse-error';
             return match;
         }
     });
     
-    return { html: updatedHtml, changed };
+    return { html: updatedHtml, changed, reason, foundType };
 }
 
 // === HAUPTFUNKTION ===
 
 async function main() {
-    console.log('\n🚀 Rating-Injection gestartet (Auto-Discovery)');
-    console.log('═'.repeat(50));
+    console.log('\n🚀 Rating-Injection gestartet (v2.0 - Schema-Type-Safe)');
+    console.log('═'.repeat(60));
     console.log(`   API: ${CONFIG.apiBaseUrl}`);
-    console.log(`   Verzeichnis: ${CONFIG.htmlDir}\n`);
+    console.log(`   Verzeichnis: ${CONFIG.htmlDir}`);
+    console.log(`   Erlaubte Typen: ${CONFIG.allowedSchemaTypes.length}`);
+    console.log(`   Geblockte Typen: ${CONFIG.blockedSchemaTypes.length}\n`);
     
     // Prüfen ob API erreichbar ist
     console.log('🔌 Teste API-Verbindung...');
@@ -226,7 +327,7 @@ async function main() {
     
     if (filesWithFeedback.length === 0) {
         console.log('ℹ️  Keine Dateien mit Feedback-Widget gefunden.');
-        console.log('   Tipp: Füge <div id="feedback-placeholder"></div> zu deinen Blog-Artikeln hinzu.\n');
+        console.log('   Tipp: Füge <div id="feedback-placeholder"></div> zu deinen Seiten hinzu.\n');
         return;
     }
     
@@ -236,7 +337,10 @@ async function main() {
     
     let updatedCount = 0;
     let skippedCount = 0;
+    let blockedCount = 0;
     let errorCount = 0;
+    
+    const blockedFiles = [];
     
     for (const filename of filesWithFeedback) {
         const filepath = path.join(CONFIG.htmlDir, filename);
@@ -257,16 +361,24 @@ async function main() {
             // 2. HTML einlesen
             const htmlContent = fs.readFileSync(filepath, 'utf-8');
             
-            // 3. Rating injizieren
-            const { html: updatedHtml, changed } = injectRatingIntoHtml(htmlContent, rating);
+            // 3. Rating injizieren (mit Type-Check!)
+            const { html: updatedHtml, changed, reason, foundType } = injectRatingIntoHtml(htmlContent, rating, filename);
             
             if (changed) {
                 // 4. Datei speichern
                 fs.writeFileSync(filepath, updatedHtml, 'utf-8');
-                console.log(`✅ ${rating.ratingValue}⭐ (${rating.ratingCount} Bewertungen)`);
+                console.log(`✅ ${rating.ratingValue}⭐ (${rating.ratingCount} Bewertungen) → ${foundType}`);
                 updatedCount++;
-            } else {
+            } else if (reason.startsWith('blocked-type:')) {
+                const blockedType = reason.split(':')[1];
+                console.log(`🚫 Schema-Typ "${blockedType}" erlaubt kein AggregateRating`);
+                blockedCount++;
+                blockedFiles.push({ file: filename, type: blockedType });
+            } else if (reason === 'already-current') {
                 console.log('⏭️  Schema bereits aktuell');
+                skippedCount++;
+            } else {
+                console.log(`⏭️  Kein passendes Schema gefunden (${reason})`);
                 skippedCount++;
             }
             
@@ -277,17 +389,32 @@ async function main() {
     }
     
     // Zusammenfassung
-    console.log('\n' + '═'.repeat(50));
+    console.log('\n' + '═'.repeat(60));
     console.log('📊 Zusammenfassung:');
     console.log(`   🔍 Gefunden:     ${filesWithFeedback.length} Dateien`);
     console.log(`   ✅ Aktualisiert: ${updatedCount}`);
     console.log(`   ⏭️  Übersprungen: ${skippedCount}`);
+    console.log(`   🚫 Geblockt:     ${blockedCount} (Schema-Typ nicht erlaubt)`);
     if (errorCount > 0) {
         console.log(`   ❌ Fehler:       ${errorCount}`);
     }
-    console.log('═'.repeat(50) + '\n');
     
-    // Kein Exit-Error bei 0 Updates (ist normal bei erstem Run ohne Bewertungen)
+    // Warnung für geblockte Dateien
+    if (blockedFiles.length > 0) {
+        console.log('\n' + '─'.repeat(60));
+        console.log('⚠️  HINWEIS: Folgende Dateien haben Bewertungen, aber der');
+        console.log('   Schema-Typ erlaubt kein AggregateRating (Google-Richtlinie):');
+        console.log('');
+        for (const { file, type } of blockedFiles) {
+            console.log(`   • ${file} → @type: "${type}"`);
+        }
+        console.log('');
+        console.log('   💡 Lösung: Ändere den Schema-Typ auf z.B. "SoftwareApplication"');
+        console.log('      oder entferne das Feedback-Widget von Blog-Artikeln.');
+    }
+    
+    console.log('═'.repeat(60) + '\n');
+    
     if (errorCount > 0) {
         process.exit(1);
     }
