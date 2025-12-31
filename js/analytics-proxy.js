@@ -1,6 +1,9 @@
 // js/analytics-proxy.js
 const Analytics = {
-  // 1. Client ID: Identifiziert den Browser eindeutig (First-Party Cookie Ersatz)
+  // Startzeit für Engagement-Berechnung speichern
+  startTime: Date.now(),
+
+  // 1. Client ID: Identifiziert den Browser eindeutig
   getClientId() {
     let id = localStorage.getItem('designare_id');
     if (!id) {
@@ -10,34 +13,39 @@ const Analytics = {
     return id;
   },
 
-  // 2. Session ID: Verwaltet Sitzungen (wichtig für "Sitzungsdauer" & "Absprungrate")
+  // 2. Session ID: Verwaltet Sitzungen (30 Min Timeout)
   getSessionId() {
     const now = Date.now();
     let sessionId = localStorage.getItem('designare_session_id');
     let lastActive = localStorage.getItem('designare_last_active');
-    
-    // Sitzungstimeout: 30 Minuten (1.800.000 ms)
-    const SESSION_TIMEOUT = 1800000; 
+    const SESSION_TIMEOUT = 1800000; // 30 Minuten
 
-    // Neue Session starten, wenn keine existiert oder Timeout abgelaufen ist
+    // Neue Session starten?
     if (!sessionId || !lastActive || (now - lastActive) > SESSION_TIMEOUT) {
-      sessionId = now.toString(); // GA4 nutzt oft den Zeitstempel als Session-ID
+      sessionId = now.toString();
       localStorage.setItem('designare_session_id', sessionId);
-      
-      // Optional: Hier könnte man loggen, dass eine neue Session beginnt
+      // Flag setzen, dass diese Session noch nicht als "gestartet" gemeldet wurde
+      localStorage.removeItem('designare_session_started');
     }
 
-    // Zeitstempel der letzten Aktivität aktualisieren
     localStorage.setItem('designare_last_active', now); 
     return sessionId;
   },
 
-  // 3. Track-Funktion: Sendet Daten an deinen Proxy
+  // 3. Track-Funktion: Sendet Daten an den Proxy
   async track(eventName, params = {}) {
     try {
-      // Session-Logik vor jedem Event prüfen/aktualisieren
       const sessionId = this.getSessionId();
       const clientId = this.getClientId();
+      
+      // Berechne echte Verweildauer in Millisekunden
+      const timeSinceLoad = Date.now() - this.startTime;
+
+      // Session Start Logik für GA4
+      if (!localStorage.getItem('designare_session_started')) {
+        params.session_start = 1;
+        localStorage.setItem('designare_session_started', 'true');
+      }
 
       await fetch('/api/metrics', {
         method: 'POST',
@@ -48,9 +56,10 @@ const Analytics = {
             name: eventName,
             params: {
               ...params,
-              // Standard GA4 Parameter, die bei serverseitigem Tracking fehlen würden
+              // Standard Parameter
               ga_session_id: sessionId,
-              engagement_time_msec: 100, // Standardwert, damit User als "aktiv" gelten
+              // Wir senden echte Zeit (min. 1 Sekunde für Pageview, sonst echte Dauer)
+              engagement_time_msec: eventName === 'page_view' ? 1000 : timeSinceLoad,
               page_location: window.location.href,
               page_title: document.title,
               language: navigator.language || 'de-DE',
@@ -65,21 +74,71 @@ const Analytics = {
   }
 };
 
-// Automatischer Page-View beim Laden der Seite
+// === AUTOMATISCHE TRIGGER ===
+
+// 1. Page View beim Laden
 window.addEventListener('DOMContentLoaded', () => {
-  // Kleiner Timeout, damit Titel und URL sicher initialisiert sind
   setTimeout(() => {
     Analytics.track('page_view');
   }, 200);
 });
 
-// Klicks auf externe Links tracken (Optional, aber empfohlen)
+// 2. Engagement beim Verlassen der Seite speichern
+window.addEventListener('beforeunload', () => {
+  // Senden via navigator.sendBeacon wäre besser, aber wir nutzen den Proxy.
+  // Wir feuern 'user_engagement' mit der finalen Zeit.
+  Analytics.track('user_engagement', {
+     engagement_time_msec: Date.now() - Analytics.startTime
+  });
+});
+
+// 3. Klick-Tracking (Downloads, Kontakt, Externe Links)
 document.addEventListener('click', (e) => {
   const link = e.target.closest('a');
-  if (link && link.hostname !== window.location.hostname && link.hostname) {
+  if (!link) return;
+
+  const url = link.href;
+  const hostname = link.hostname;
+
+  // A) Datei-Downloads
+  if (url.match(/\.(pdf|zip|docx|xlsx|pptx|mp3|txt|csv)$/i)) {
+    Analytics.track('file_download', {
+      file_name: link.innerText.trim() || url.split('/').pop(),
+      file_extension: url.split('.').pop(),
+      link_url: url
+    });
+    return;
+  }
+
+  // B) Kontakt-Links (Mailto / Tel)
+  if (url.startsWith('mailto:') || url.startsWith('tel:')) {
+    Analytics.track('contact_click', {
+      method: url.startsWith('mailto:') ? 'email' : 'phone',
+      link_url: url
+    });
+    return;
+  }
+
+  // C) Externe Links (Outbound)
+  if (hostname && hostname !== window.location.hostname) {
     Analytics.track('click', { 
-      link_url: link.href, 
-      link_domain: link.hostname 
+      link_url: url, 
+      link_domain: hostname,
+      outbound: true
     });
   }
 });
+
+// 4. Formular-Tracking
+document.addEventListener('submit', (e) => {
+  const form = e.target;
+  const formName = form.id || form.getAttribute('name') || 'unknown_form';
+  
+  Analytics.track('form_submit', {
+    form_id: formName,
+    page_location: window.location.href
+  });
+});
+
+// Export für manuelle Nutzung (z.B. im Chat)
+window.Analytics = Analytics;
