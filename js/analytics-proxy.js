@@ -8,6 +8,7 @@ const Analytics = {
   maxScrollDepth: 0,
   isEngaged: false,
   heartbeatInterval: null,
+  debugMode: localStorage.getItem('analytics_debug') === 'true',
 
   // ─────────────────────────────────────────────
   // CORE: IDs & Session Management
@@ -102,6 +103,9 @@ const Analytics = {
         // Browser/Device
         language: navigator.language || 'de-DE',
         screen_resolution: `${screen.width}x${screen.height}`,
+        
+        // Debug Mode – zeigt Events im GA4 DebugView
+        debug_mode: this.debugMode,
         
         // Custom Parameters überschreiben/ergänzen
         ...customParams
@@ -432,7 +436,8 @@ const Analytics = {
    */
   enableDebug() {
     localStorage.setItem('analytics_debug', 'true');
-    console.log('📊 Analytics Debug enabled. Reload page to see logs.');
+    this.debugMode = true;
+    console.log('📊 Analytics Debug enabled. Events will appear in GA4 DebugView.');
   },
 
   /**
@@ -440,6 +445,7 @@ const Analytics = {
    */
   disableDebug() {
     localStorage.removeItem('analytics_debug');
+    this.debugMode = false;
     console.log('📊 Analytics Debug disabled.');
   },
 
