@@ -95,29 +95,34 @@ export default async function handler(req, res) {
       timestamp_micros: String(Date.now() * 1000)
     };
 
-    // Debug oder Production
     const debugMode = process.env.GA_DEBUG === 'true';
-    const endpoint = debugMode
-      ? 'https://www.google-analytics.com/debug/mp/collect'
-      : 'https://www.google-analytics.com/mp/collect';
+    const productionUrl = `https://www.google-analytics.com/mp/collect?measurement_id=${GA_ID}&api_secret=${API_SECRET}`;
 
-    const url = `${endpoint}?measurement_id=${GA_ID}&api_secret=${API_SECRET}`;
-
-    const response = await fetch(url, {
+    // IMMER an Production senden
+    const response = await fetch(productionUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
 
-    // Debug Logging
+    // Debug: Zusätzlich validieren und loggen
     if (debugMode) {
-      const debugData = await response.json().catch(() => ({}));
+      const debugUrl = `https://www.google-analytics.com/debug/mp/collect?measurement_id=${GA_ID}&api_secret=${API_SECRET}`;
+      const debugResponse = await fetch(debugUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      
+      const debugData = await debugResponse.json().catch(() => ({}));
       console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       console.log('GA4 Debug Mode');
       console.log('Payload:', JSON.stringify(payload, null, 2));
-      console.log('Response:', JSON.stringify(debugData, null, 2));
+      console.log('Validation:', JSON.stringify(debugData, null, 2));
       if (debugData.validationMessages?.length > 0) {
-        console.error('Validation Errors:', debugData.validationMessages);
+        console.error('⚠️ Validation Errors:', debugData.validationMessages);
+      } else {
+        console.log('✅ No validation errors');
       }
       console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       
