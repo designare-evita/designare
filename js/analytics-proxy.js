@@ -227,8 +227,7 @@ const Analytics = {
   sendHeartbeat() {
     if (document.visibilityState !== 'visible') return;
 
-    this.track('user_engagement', {
-      engagement_type: 'heartbeat',
+    this.track('heartbeat', {
       time_on_page_sec: Math.round((Date.now() - this.startTime) / 1000)
     });
   },
@@ -484,7 +483,7 @@ window.Analytics = Analytics;
 // - contact_click (mailto:, tel:)
 // - outbound_click (externe Links)
 // - form_submit (Formulare)
-// - user_engagement (Heartbeat)
+// - heartbeat (alle 30s)
 //
 // Manuell:
 // Analytics.event('video_play', { video_id: 'xyz', video_title: 'Demo' });
