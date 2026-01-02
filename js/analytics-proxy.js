@@ -1,5 +1,5 @@
-// js/analytics-proxy.js – Version 2.0
-// Erweitert für vollständiges GA4-Tracking
+// js/analytics-proxy.js – Version 3.0
+// Korrigiert für GA4 Measurement Protocol
 
 const Analytics = {
   startTime: Date.now(),
@@ -7,109 +7,167 @@ const Analytics = {
   scrollTracked: new Set(),
   maxScrollDepth: 0,
   isEngaged: false,
+  heartbeatInterval: null,
 
   // ─────────────────────────────────────────────
   // CORE: IDs & Session Management
   // ─────────────────────────────────────────────
 
+  /**
+   * Client ID im GA4-kompatiblen Format
+   * Format: timestamp.random (z.B. "1234567890.987654321")
+   */
   getClientId() {
-    let id = localStorage.getItem('designare_id');
+    let id = localStorage.getItem('ga_client_id');
     if (!id) {
-      id = crypto.randomUUID();
-      localStorage.setItem('designare_id', id);
+      const timestamp = Math.floor(Date.now() / 1000);
+      const random = Math.floor(Math.random() * 1000000000);
+      id = `${timestamp}.${random}`;
+      localStorage.setItem('ga_client_id', id);
     }
     return id;
   },
 
-  getSessionId() {
+  /**
+   * Session Management
+   * - Session ID muss eine Zahl sein (Unix Timestamp)
+   * - Session Number zählt die Sessions pro Client
+   * - Timeout: 30 Minuten Inaktivität
+   */
+  getSession() {
     const now = Date.now();
-    let sessionId = localStorage.getItem('designare_session_id');
-    let lastActive = localStorage.getItem('designare_last_active');
-    const SESSION_TIMEOUT = 1800000; // 30 Min
+    const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 Minuten
 
-    if (!sessionId || !lastActive || (now - lastActive) > SESSION_TIMEOUT) {
-      sessionId = now.toString();
-      localStorage.setItem('designare_session_id', sessionId);
-      localStorage.removeItem('designare_session_started');
+    let sessionId = localStorage.getItem('ga_session_id');
+    let sessionNumber = parseInt(localStorage.getItem('ga_session_number') || '0', 10);
+    let lastActive = parseInt(localStorage.getItem('ga_last_active') || '0', 10);
+    let isNewSession = false;
+
+    // Neue Session wenn: keine existiert ODER Timeout überschritten
+    if (!sessionId || (now - lastActive) > SESSION_TIMEOUT) {
+      sessionId = Math.floor(now / 1000).toString();
+      sessionNumber += 1;
+      isNewSession = true;
+
+      localStorage.setItem('ga_session_id', sessionId);
+      localStorage.setItem('ga_session_number', sessionNumber.toString());
     }
 
-    localStorage.setItem('designare_last_active', now);
-    return sessionId;
+    localStorage.setItem('ga_last_active', now.toString());
+
+    return {
+      id: parseInt(sessionId, 10),  // GA4 erwartet Number
+      number: sessionNumber,
+      isNew: isNewSession
+    };
+  },
+
+  /**
+   * Engagement Time berechnen
+   * GA4 braucht mindestens 1ms, aber realistischere Werte sind besser
+   */
+  getEngagementTime() {
+    const timeOnPage = Date.now() - this.startTime;
+    return Math.max(100, timeOnPage); // Minimum 100ms
   },
 
   // ─────────────────────────────────────────────
   // TRACKING: Events senden
   // ─────────────────────────────────────────────
 
-  async track(eventName, params = {}) {
+  /**
+   * Haupt-Tracking-Methode
+   * Sendet Events an den Proxy-Endpoint
+   */
+  async track(eventName, customParams = {}) {
     try {
-      const sessionId = this.getSessionId();
+      const session = this.getSession();
       const clientId = this.getClientId();
-      const timeSinceLoad = Date.now() - this.startTime;
 
-      // Session Start Flag
-      if (!localStorage.getItem('designare_session_started')) {
+      // Basis-Parameter die GA4 erwartet
+      const params = {
+        // Session-Parameter (WICHTIG: als Zahlen!)
+        ga_session_id: session.id,
+        ga_session_number: session.number,
+        
+        // Engagement
+        engagement_time_msec: this.getEngagementTime(),
+        
+        // Seiten-Infos
+        page_location: window.location.href,
+        page_title: document.title,
+        page_path: window.location.pathname,
+        page_referrer: document.referrer || '(direct)',
+        
+        // Browser/Device
+        language: navigator.language || 'de-DE',
+        screen_resolution: `${screen.width}x${screen.height}`,
+        
+        // Custom Parameters überschreiben/ergänzen
+        ...customParams
+      };
+
+      // Session Start markieren (nur beim ersten Event einer neuen Session)
+      if (session.isNew && !sessionStorage.getItem('session_start_sent')) {
         params.session_start = 1;
-        localStorage.setItem('designare_session_started', 'true');
+        sessionStorage.setItem('session_start_sent', 'true');
       }
 
       const payload = {
         client_id: clientId,
         events: [{
           name: eventName,
-          params: {
-            ...params,
-            ga_session_id: sessionId,
-            engagement_time_msec: Math.max(1000, timeSinceLoad),
-            page_location: window.location.href,
-            page_title: document.title,
-            page_path: window.location.pathname,
-            language: navigator.language || 'de-DE',
-            screen_resolution: `${window.screen.width}x${window.screen.height}`,
-            // Referrer für Traffic-Quellen
-            page_referrer: document.referrer || '(direct)'
-          }
+          params: params
         }]
       };
 
-      await fetch('/api/metrics', {
+      const response = await fetch('/api/metrics', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
+        keepalive: true // Wichtig für beforeunload
       });
 
-    } catch (e) {
-      console.warn('Analytics blocked or failed:', e);
+      if (!response.ok) {
+        console.warn(`Analytics: HTTP ${response.status}`);
+      }
+
+    } catch (error) {
+      // Silently fail – Analytics sollte nie die UX blockieren
+      console.warn('Analytics error:', error.message);
     }
   },
 
-  // sendBeacon für zuverlässiges Tracking beim Verlassen
-  trackBeacon(eventName, params = {}) {
+  /**
+   * Beacon-Tracking für Page Exit
+   * sendBeacon ist zuverlässiger als fetch bei beforeunload/visibilitychange
+   */
+  trackBeacon(eventName, customParams = {}) {
     try {
-      const sessionId = this.getSessionId();
+      const session = this.getSession();
       const clientId = this.getClientId();
-      const timeSinceLoad = Date.now() - this.startTime;
 
       const payload = {
         client_id: clientId,
         events: [{
           name: eventName,
           params: {
-            ...params,
-            ga_session_id: sessionId,
-            engagement_time_msec: timeSinceLoad,
+            ga_session_id: session.id,
+            ga_session_number: session.number,
+            engagement_time_msec: this.getEngagementTime(),
             page_location: window.location.href,
             page_title: document.title,
-            page_path: window.location.pathname
+            page_path: window.location.pathname,
+            ...customParams
           }
         }]
       };
 
-      // sendBeacon ist zuverlässiger als fetch bei beforeunload
+      // sendBeacon sendet als text/plain – der Server muss das parsen können
       navigator.sendBeacon('/api/metrics', JSON.stringify(payload));
 
-    } catch (e) {
-      console.warn('Beacon failed:', e);
+    } catch (error) {
+      console.warn('Beacon error:', error.message);
     }
   },
 
@@ -124,144 +182,107 @@ const Analytics = {
     );
     const viewHeight = window.innerHeight;
     const scrollTop = window.scrollY || document.documentElement.scrollTop;
-    
+
     if (docHeight <= viewHeight) return 100;
     return Math.round((scrollTop / (docHeight - viewHeight)) * 100);
   },
 
   checkScrollMilestones() {
     const percentage = this.getScrollPercentage();
-    
-    // Maximale Scroll-Tiefe speichern
+
+    // Max Scroll Depth speichern
     if (percentage > this.maxScrollDepth) {
       this.maxScrollDepth = percentage;
     }
 
-    // Milestone-Events feuern
-    this.scrollMilestones.forEach(milestone => {
+    // Milestone Events
+    for (const milestone of this.scrollMilestones) {
       if (percentage >= milestone && !this.scrollTracked.has(milestone)) {
         this.scrollTracked.add(milestone);
-        this.track('scroll', {
-          percent_scrolled: milestone,
-          // GA4 Standard-Parameter
-          engagement_type: 'scroll'
-        });
         
-        // Ab 50% Scroll als "engaged" markieren
+        this.track('scroll', {
+          percent_scrolled: milestone
+        });
+
+        // Ab 50% als engaged markieren
         if (milestone >= 50) {
           this.isEngaged = true;
         }
       }
-    });
-  },
-
-  // ─────────────────────────────────────────────
-  // ENGAGEMENT TRACKING
-  // ─────────────────────────────────────────────
-
-  // Wird alle 15 Sekunden aufgerufen für "aktive" Zeit
-  heartbeat() {
-    // Nur senden wenn Tab aktiv ist
-    if (document.visibilityState === 'visible') {
-      this.track('user_engagement', {
-        engagement_type: 'heartbeat',
-        time_on_page_sec: Math.round((Date.now() - this.startTime) / 1000)
-      });
     }
   },
 
   // ─────────────────────────────────────────────
-  // CONVERSION TRACKING (manuell aufrufbar)
+  // ENGAGEMENT & HEARTBEAT
   // ─────────────────────────────────────────────
 
-  // Für Kontaktformular, Anfragen etc.
-  trackConversion(conversionType, value = null) {
+  /**
+   * Heartbeat für aktive Verweildauer
+   * Sendet nur wenn Tab sichtbar ist
+   */
+  sendHeartbeat() {
+    if (document.visibilityState !== 'visible') return;
+
+    this.track('user_engagement', {
+      engagement_type: 'heartbeat',
+      time_on_page_sec: Math.round((Date.now() - this.startTime) / 1000)
+    });
+  },
+
+  /**
+   * Page Exit Event
+   * Wird bei visibilitychange und beforeunload gefeuert
+   */
+  sendExitEvent() {
+    this.trackBeacon('page_exit', {
+      time_on_page_sec: Math.round((Date.now() - this.startTime) / 1000),
+      max_scroll_depth: this.maxScrollDepth,
+      was_engaged: this.isEngaged
+    });
+  },
+
+  // ─────────────────────────────────────────────
+  // CONVERSION TRACKING
+  // ─────────────────────────────────────────────
+
+  /**
+   * Conversion Event
+   * Für Formulare, Kontakt-Klicks, etc.
+   */
+  trackConversion(type, value = null, currency = 'EUR') {
     const params = {
-      conversion_type: conversionType
+      conversion_type: type
     };
-    
+
     if (value !== null) {
       params.value = value;
-      params.currency = 'EUR';
+      params.currency = currency;
     }
 
     this.track('conversion', params);
-    
-    // Auch als generate_lead für GA4 Standard-Reports
-    if (conversionType === 'contact' || conversionType === 'inquiry') {
+
+    // Zusätzlich GA4 Standard-Events für bessere Reports
+    if (type === 'contact' || type === 'inquiry' || type === 'form') {
       this.track('generate_lead', params);
     }
-  },
-
-  // ─────────────────────────────────────────────
-  // INITIALISIERUNG
-  // ─────────────────────────────────────────────
-
-  init() {
-    // 1. Page View
-    this.track('page_view');
-
-    // 2. Scroll-Listener (throttled)
-    let scrollTimeout;
-    window.addEventListener('scroll', () => {
-      if (scrollTimeout) return;
-      scrollTimeout = setTimeout(() => {
-        this.checkScrollMilestones();
-        scrollTimeout = null;
-      }, 150);
-    }, { passive: true });
-
-    // 3. Heartbeat alle 15 Sekunden für Verweildauer
-    setInterval(() => this.heartbeat(), 15000);
-
-    // 4. Engagement beim Verlassen (zuverlässig via Beacon)
-    window.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'hidden') {
-        this.trackBeacon('user_engagement', {
-          engagement_type: 'page_exit',
-          time_on_page_sec: Math.round((Date.now() - this.startTime) / 1000),
-          max_scroll_depth: this.maxScrollDepth,
-          was_engaged: this.isEngaged
-        });
-      }
-    });
-
-    // Fallback für ältere Browser
-    window.addEventListener('beforeunload', () => {
-      this.trackBeacon('user_engagement', {
-        engagement_type: 'page_exit',
-        time_on_page_sec: Math.round((Date.now() - this.startTime) / 1000),
-        max_scroll_depth: this.maxScrollDepth
-      });
-    });
-
-    // 5. Klick-Tracking
-    document.addEventListener('click', (e) => this.handleClick(e));
-
-    // 6. Formular-Tracking
-    document.addEventListener('submit', (e) => this.handleFormSubmit(e));
-
-    console.log('📊 Analytics v2.0 initialized');
   },
 
   // ─────────────────────────────────────────────
   // EVENT HANDLERS
   // ─────────────────────────────────────────────
 
-  handleClick(e) {
-    const link = e.target.closest('a');
-    const button = e.target.closest('button');
+  handleClick(event) {
+    const target = event.target;
     
-    // CTA-Buttons tracken (NEU!)
+    // Button Clicks
+    const button = target.closest('button, [role="button"], .btn');
     if (button) {
-      const buttonText = button.innerText.trim();
-      const buttonId = button.id || button.className || 'unknown';
-      
-      // Bestimmte CTAs als Conversion werten
-      const conversionKeywords = ['anfragen', 'kontakt', 'buchen', 'kaufen', 'bestellen', 'senden'];
-      const isConversionCTA = conversionKeywords.some(kw => 
-        buttonText.toLowerCase().includes(kw)
-      );
+      const buttonText = (button.innerText || button.value || '').trim().substring(0, 100);
+      const buttonId = button.id || button.name || button.className?.split(' ')[0] || 'unknown';
+
+      // CTA-Keywords für Conversions
+      const ctaKeywords = ['anfragen', 'kontakt', 'buchen', 'kaufen', 'bestellen', 'senden', 'submit', 'absenden'];
+      const isConversionCTA = ctaKeywords.some(kw => buttonText.toLowerCase().includes(kw));
 
       this.track('cta_click', {
         button_text: buttonText,
@@ -269,65 +290,165 @@ const Analytics = {
         is_conversion_cta: isConversionCTA
       });
 
-      // Interaktion markieren
+      if (isConversionCTA) {
+        this.trackConversion('cta_click');
+      }
+
       this.isEngaged = true;
       return;
     }
 
-    if (!link) return;
+    // Link Clicks
+    const link = target.closest('a');
+    if (!link || !link.href) return;
 
     const url = link.href;
-    const hostname = link.hostname;
+    const linkText = (link.innerText || link.title || '').trim().substring(0, 100);
 
-    // Datei-Downloads
-    if (url.match(/\.(pdf|zip|docx|xlsx|pptx|mp3|txt|csv)$/i)) {
+    // Downloads
+    const downloadExtensions = /\.(pdf|zip|docx?|xlsx?|pptx?|mp3|mp4|txt|csv|rar|7z)$/i;
+    if (downloadExtensions.test(url)) {
+      const fileName = url.split('/').pop() || 'unknown';
+      const fileExt = fileName.split('.').pop()?.toLowerCase() || 'unknown';
+
       this.track('file_download', {
-        file_name: link.innerText.trim() || url.split('/').pop(),
-        file_extension: url.split('.').pop().toLowerCase(),
+        file_name: fileName,
+        file_extension: fileExt,
+        link_text: linkText,
         link_url: url
       });
       this.isEngaged = true;
       return;
     }
 
-    // Kontakt-Links
+    // E-Mail Links
     if (url.startsWith('mailto:')) {
-      this.track('contact_click', { method: 'email', link_url: url });
+      const email = url.replace('mailto:', '').split('?')[0];
+      this.track('contact_click', {
+        method: 'email',
+        contact_info: email
+      });
       this.trackConversion('contact_email');
       this.isEngaged = true;
       return;
     }
 
+    // Telefon Links
     if (url.startsWith('tel:')) {
-      this.track('contact_click', { method: 'phone', link_url: url });
+      const phone = url.replace('tel:', '');
+      this.track('contact_click', {
+        method: 'phone',
+        contact_info: phone
+      });
       this.trackConversion('contact_phone');
       this.isEngaged = true;
       return;
     }
 
-    // Externe Links
-    if (hostname && hostname !== window.location.hostname) {
-      this.track('click', {
-        link_url: url,
-        link_domain: hostname,
-        outbound: true,
-        link_text: link.innerText.trim().substring(0, 50)
+    // Externe Links (Outbound)
+    try {
+      const linkHost = new URL(url).hostname;
+      if (linkHost && linkHost !== window.location.hostname) {
+        this.track('outbound_click', {
+          link_url: url,
+          link_domain: linkHost,
+          link_text: linkText
+        });
+      }
+    } catch {
+      // Invalid URL – ignorieren
+    }
+  },
+
+  handleFormSubmit(event) {
+    const form = event.target;
+    if (!(form instanceof HTMLFormElement)) return;
+
+    const formId = form.id || form.name || form.action || 'unknown_form';
+
+    this.track('form_submit', {
+      form_id: formId,
+      form_destination: form.action || window.location.href,
+      form_method: form.method || 'GET'
+    });
+
+    this.trackConversion('form_submission');
+    this.isEngaged = true;
+  },
+
+  // ─────────────────────────────────────────────
+  // INITIALISIERUNG
+  // ─────────────────────────────────────────────
+
+  init() {
+    // Verhindere doppelte Initialisierung
+    if (window.__analyticsInitialized) return;
+    window.__analyticsInitialized = true;
+
+    // 1. Page View
+    this.track('page_view');
+
+    // 2. Scroll Tracking (throttled)
+    let scrollTimeout = null;
+    window.addEventListener('scroll', () => {
+      if (scrollTimeout) return;
+      scrollTimeout = setTimeout(() => {
+        this.checkScrollMilestones();
+        scrollTimeout = null;
+      }, 200);
+    }, { passive: true });
+
+    // 3. Heartbeat alle 30 Sekunden
+    this.heartbeatInterval = setInterval(() => this.sendHeartbeat(), 30000);
+
+    // 4. Exit Tracking
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') {
+        this.sendExitEvent();
+      }
+    });
+
+    // Fallback für ältere Browser / iOS Safari
+    window.addEventListener('pagehide', () => this.sendExitEvent());
+
+    // 5. Click Tracking
+    document.addEventListener('click', (e) => this.handleClick(e), { capture: true });
+
+    // 6. Form Tracking
+    document.addEventListener('submit', (e) => this.handleFormSubmit(e), { capture: true });
+
+    // Debug Info
+    if (localStorage.getItem('analytics_debug') === 'true') {
+      console.log('📊 Analytics v3.0 initialized', {
+        clientId: this.getClientId(),
+        session: this.getSession()
       });
     }
   },
 
-  handleFormSubmit(e) {
-    const form = e.target;
-    const formName = form.id || form.getAttribute('name') || 'unknown_form';
-    
-    this.track('form_submit', {
-      form_id: formName,
-      form_destination: form.action || window.location.href
-    });
+  /**
+   * Debug-Modus aktivieren
+   * Aufruf: Analytics.enableDebug()
+   */
+  enableDebug() {
+    localStorage.setItem('analytics_debug', 'true');
+    console.log('📊 Analytics Debug enabled. Reload page to see logs.');
+  },
 
-    // Formulare sind Conversions!
-    this.trackConversion('form_submission');
-    this.isEngaged = true;
+  /**
+   * Debug-Modus deaktivieren
+   */
+  disableDebug() {
+    localStorage.removeItem('analytics_debug');
+    console.log('📊 Analytics Debug disabled.');
+  },
+
+  /**
+   * Manuelles Event senden
+   * Aufruf: Analytics.event('custom_event', { key: 'value' })
+   */
+  event(name, params = {}) {
+    return this.track(name, params);
   }
 };
 
@@ -338,13 +459,32 @@ const Analytics = {
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => Analytics.init());
 } else {
-  // DOM bereits geladen
   Analytics.init();
 }
 
-// Export für manuelle Nutzung
+// Global verfügbar machen
 window.Analytics = Analytics;
 
-// Beispiel-Nutzung für manuelle Conversions:
-// Analytics.trackConversion('inquiry', 500);  // Mit Wert
-// Analytics.trackConversion('newsletter');     // Ohne Wert
+// ─────────────────────────────────────────────
+// USAGE EXAMPLES
+// ─────────────────────────────────────────────
+//
+// Automatisch getrackt:
+// - page_view (beim Laden)
+// - scroll (25%, 50%, 75%, 90%)
+// - page_exit (beim Verlassen)
+// - cta_click (Button-Klicks)
+// - file_download (PDF, ZIP, etc.)
+// - contact_click (mailto:, tel:)
+// - outbound_click (externe Links)
+// - form_submit (Formulare)
+// - user_engagement (Heartbeat)
+//
+// Manuell:
+// Analytics.event('video_play', { video_id: 'xyz', video_title: 'Demo' });
+// Analytics.trackConversion('purchase', 99.99);
+// Analytics.trackConversion('newsletter_signup');
+//
+// Debug:
+// Analytics.enableDebug();
+// Analytics.disableDebug();
