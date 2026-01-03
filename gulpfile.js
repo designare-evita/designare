@@ -30,7 +30,8 @@ const articleFiles = [
     'css/artikel.css',            // WICHTIG: Spezifische Artikel-Styles (vermutlich für Bilder)
     'css/feedback-style.css',     // Feedback Formulare
     'css/silas.css',              // Falls DataPeak Silas-Styles nutzt
-    'css/lightbox.css'            // Falls Bilder eine Lightbox haben
+    'css/lightbox.css',           // Falls Bilder eine Lightbox haben
+    'css/blog-components.css'     // Blog Übersicht
 ];
 
 // Tasks definieren
