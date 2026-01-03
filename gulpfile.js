@@ -26,12 +26,17 @@ const homeFiles = [
 // 3. ARTICLE: Für Blogposts
 const articleFiles = [
     'css/blog-style.css',         // Basis Blog-Layout
-  // 'css/artikel.css',         // Spezifische Artikel-Styles (AUSKOMMENTIERT)
+    // 'css/artikel.css',         // Spezifische Artikel-Styles
     'css/blog-components.css',    // NEU: Blog-Komponenten
     'css/feedback-style.css',     // Feedback Formulare
-    'css/silas.css',              // Falls genutzt
+    // 'css/silas.css',           // HIER ENTFERNT (wird unten dynamisch hinzugefügt)
     'css/lightbox.css'            // Falls genutzt
 ];
+
+// Dynamischer Check: Sind wir auf der Silas-Seite?
+if (window.location.pathname.includes('silas')) {
+    articleFiles.push('css/silas.css');
+}
 
 // Tasks definieren
 function buildCore() {
