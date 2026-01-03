@@ -29,7 +29,7 @@ const articleFiles = [
     // 'css/artikel.css',         // Spezifische Artikel-Styles (AUSKOMMENTIERT)
     'css/blog-components.css',    // NEU: Blog-Komponenten
     'css/feedback-style.css',     // Feedback Formulare
-    //'css/silas.css',            // Wir lassen es hier drin, damit Gulp die Datei kopiert/erstellt
+    'css/silas.css',            // Wir lassen es hier drin, damit Gulp die Datei kopiert/erstellt
     'css/lightbox.css'            // Falls genutzt
 ];
 
