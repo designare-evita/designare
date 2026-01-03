@@ -16,6 +16,11 @@
     "cheerio": "^1.1.2",
     "googleapis": "^142.0.0"
   },
+  "devDependencies": {
+    "gulp": "^5.0.0",
+    "gulp-clean-css": "^4.3.0",
+    "gulp-concat": "^2.6.1"
+  },
   "scripts": {
     "generate-articles-db": "node js/generate-articles-db.js",
     "generate-knowledge": "node js/generate-knowledge.js",
@@ -26,6 +31,7 @@
     "inject-related": "node js/inject-related.js",
     "inject-blog": "node js/inject-blog-articles.js",
     "inject-lazy": "node js/inject-lazy-loading.js",
-    "build": "node js/generate-articles-db.js && node js/generate-knowledge.js && node generate-sitemap.js && node js/inject-ratings.js && mkdir -p public && cp -r *.html *.css *.svg *.csv *.json js css images Font CSV-Importer-PRO downloads public/ 2>/dev/null || echo 'Assets copy done' && node js/inject-footer.js && node js/inject-breadcrumb.js && node js/inject-related.js && node js/inject-blog-articles.js && node js/inject-lazy-loading.js"
+    "bundle-css": "gulp",
+    "build": "node js/generate-articles-db.js && node js/generate-knowledge.js && node generate-sitemap.js && node js/inject-ratings.js && mkdir -p public/css && cp -r *.html *.svg *.csv *.json js images Font CSV-Importer-PRO downloads public/ 2>/dev/null || echo 'Assets copy done' && npm run bundle-css && node js/inject-footer.js && node js/inject-breadcrumb.js && node js/inject-related.js && node js/inject-blog-articles.js && node js/inject-lazy-loading.js"
   }
 }
