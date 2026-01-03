@@ -23,20 +23,20 @@ const homeFiles = [
     'css/legal-style.css'         // Oft auf Home + Impressum
 ];
 
-// 3. ARTICLE: Für Blogposts
+// 3. ARTICLE: Für Blogposts (OHNE Silas)
 const articleFiles = [
     'css/blog-style.css',         // Basis Blog-Layout
     // 'css/artikel.css',         // Spezifische Artikel-Styles (AUSKOMMENTIERT)
     'css/blog-components.css',    // NEU: Blog-Komponenten
     'css/feedback-style.css',     // Feedback Formulare
-    'css/silas.css',            // Wir lassen es hier drin, damit Gulp die Datei kopiert/erstellt
+    // 'css/silas.css',           // HIER ENTFERNT -> Eigener Task unten!
     'css/lightbox.css'            // Falls genutzt
 ];
 
 
-// Tasks definieren
+// --- TASKS ---
+
 function buildCore() {
-    // allowEmpty: true verhindert Absturz, falls eine Datei fehlt
     return src(coreFiles, { allowEmpty: true }) 
         .pipe(concat('core.min.css'))
         .pipe(cleanCSS({ compatibility: 'ie11', level: 2 }))
@@ -57,5 +57,14 @@ function buildArticle() {
         .pipe(dest('public/css'));
 }
 
-// Alle Tasks parallel ausführen
-export default parallel(buildCore, buildHome, buildArticle);
+// NEU: Eigener Task nur für Silas
+function buildSilas() {
+    return src('css/silas.css', { allowEmpty: true })
+        // Kein concat nötig, da es nur eine Datei ist
+        // Wir minifizieren sie trotzdem für Performance
+        .pipe(cleanCSS({ compatibility: 'ie11', level: 2 }))
+        .pipe(dest('public/css')); // Speichert sie als "silas.css" in public/css
+}
+
+// Alle Tasks parallel ausführen (Silas Task hinzugefügt)
+export default parallel(buildCore, buildHome, buildArticle, buildSilas);
