@@ -27,11 +27,11 @@ const homeFiles = [
 // 3. ARTICLE: Für Blogposts (geo-seo.html, wordpress-diaet.html etc.)
 const articleFiles = [
     'css/blog-style.css',         // Basis Blog-Layout
-    'css/artikel.css',            // WICHTIG: Spezifische Artikel-Styles (vermutlich für Bilder)
+    'css/artikel.css',            // Spezifische Artikel-Styles
+    'css/blog-components.css',    // NEU: Blog-Komponenten (Boxen, Buttons etc.)
     'css/feedback-style.css',     // Feedback Formulare
-    'css/silas.css',              // Falls DataPeak Silas-Styles nutzt
-    'css/lightbox.css',           // Falls Bilder eine Lightbox haben
-    'css/blog-components.css'     // Blog Übersicht
+    'css/silas.css',              // Falls genutzt
+    'css/lightbox.css'            // Falls genutzt
 ];
 
 // Tasks definieren
