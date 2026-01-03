@@ -26,7 +26,7 @@ const homeFiles = [
 // 3. ARTICLE: Für Blogposts
 const articleFiles = [
     'css/blog-style.css',         // Basis Blog-Layout
-    'css/artikel.css',            // Spezifische Artikel-Styles
+  // 'css/artikel.css',         // Spezifische Artikel-Styles (AUSKOMMENTIERT)
     'css/blog-components.css',    // NEU: Blog-Komponenten
     'css/feedback-style.css',     // Feedback Formulare
     'css/silas.css',              // Falls genutzt
