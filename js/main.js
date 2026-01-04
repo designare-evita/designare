@@ -291,6 +291,13 @@ const initHeroFlip = () => {
                 }
             }, 300);
         }
+        else {
+            // ✅ NEU: Startseite (kein Hash) - view-main anzeigen
+            if(viewMain) viewMain.style.display = 'flex';
+            if(viewThird) viewThird.style.display = 'none';
+            heroFlipWrapper.classList.remove('flipped');
+            window.scrollTo(0, 0);
+        }
     };
 
     // Check beim Initialisieren
