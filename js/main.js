@@ -308,7 +308,24 @@ const initHeroFlip = () => {
             if(viewMain) viewMain.style.display = 'flex';
             if(viewThird) viewThird.style.display = 'none';
             heroFlipWrapper.classList.remove('flipped');
+            
+            // ✅ FIX: Mehrfach scrollen um Browser-Restore zu überschreiben
             window.scrollTo(0, 0);
+            
+            setTimeout(() => {
+                window.scrollTo(0, 0);
+                if(viewMain) viewMain.scrollIntoView({ behavior: 'instant', block: 'start' });
+            }, 10);
+            
+            setTimeout(() => {
+                window.scrollTo(0, 0);
+                if(viewMain) viewMain.scrollIntoView({ behavior: 'instant', block: 'start' });
+            }, 100);
+            
+            setTimeout(() => {
+                window.scrollTo(0, 0);
+                if(viewMain) viewMain.scrollIntoView({ behavior: 'instant', block: 'start' });
+            }, 300);
         }
     };
 
@@ -337,21 +354,19 @@ const initHeroFlip = () => {
             // Hash aus URL entfernen
             history.pushState("", document.title, window.location.pathname + window.location.search);
             
-            // ✅ SOFORT nach oben scrollen (vor allem anderen!)
-            window.scrollTo(0, 0);
-            document.documentElement.scrollTop = 0;
-            document.body.scrollTop = 0;
-            
-            // ✅ FIX: Explizit flex setzen
-            if(viewMain) {
-                viewMain.style.display = 'flex';
-            }
-            if(viewThird) {
-                viewThird.style.display = 'none';
-            }
+            // Views setzen
+            if(viewMain) viewMain.style.display = 'flex';
+            if(viewThird) viewThird.style.display = 'none';
             
             // Karte zurückdrehen
             heroFlipWrapper.classList.remove('flipped');
+            
+            // ✅ FIX: scrollIntoView statt scrollTo!
+            setTimeout(() => {
+                if(viewMain) {
+                    viewMain.scrollIntoView({ behavior: 'instant', block: 'start' });
+                }
+            }, 50);
         });
     }
     
