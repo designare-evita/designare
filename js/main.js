@@ -318,10 +318,14 @@ const initHeroFlip = () => {
             // Hash aus URL entfernen
             history.pushState("", document.title, window.location.pathname + window.location.search);
             
-            // ✅ FIX: Explizit flex setzen (nicht leerer String!)
+            // ✅ SOFORT nach oben scrollen (vor allem anderen!)
+            window.scrollTo(0, 0);
+            document.documentElement.scrollTop = 0;
+            document.body.scrollTop = 0;
+            
+            // ✅ FIX: Explizit flex setzen
             if(viewMain) {
                 viewMain.style.display = 'flex';
-                console.log('✅ viewMain display gesetzt auf:', viewMain.style.display);
             }
             if(viewThird) {
                 viewThird.style.display = 'none';
@@ -329,9 +333,6 @@ const initHeroFlip = () => {
             
             // Karte zurückdrehen
             heroFlipWrapper.classList.remove('flipped');
-            
-            // Nach oben scrollen
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     }
     
