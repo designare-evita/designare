@@ -249,7 +249,7 @@ const initHeroFlip = () => {
         
         if (hash === '#michael') {
             // Michael anzeigen (Back-Face)
-            if(viewMain) viewMain.style.display = 'block';
+            if(viewMain) viewMain.style.display = '';  // CSS: display: flex
             if(viewThird) viewThird.style.display = 'none';
             heroFlipWrapper.classList.add('flipped');
             
@@ -318,8 +318,8 @@ const initHeroFlip = () => {
             // Hash aus URL entfernen
             history.pushState("", document.title, window.location.pathname + window.location.search);
             
-            // ✅ WICHTIG: Views VOR dem Flip setzen!
-            if(viewMain) viewMain.style.display = 'block';
+            // ✅ FIX: Inline-Styles entfernen, damit CSS wieder greift!
+            if(viewMain) viewMain.style.display = '';  // CSS: display: flex
             if(viewThird) viewThird.style.display = 'none';
             
             // Karte zurückdrehen
@@ -368,7 +368,7 @@ const initHeroFlip = () => {
             e.preventDefault();
             
             // Views setzen für nach dem Flip
-            if(viewMain) viewMain.style.display = 'block';
+            if(viewMain) viewMain.style.display = '';  // CSS: display: flex
             if(viewThird) viewThird.style.display = 'none';
             
             // Flippen zur Back-Face
@@ -400,7 +400,7 @@ const initHeroFlip = () => {
             if (btnThirdToStart.dataset.action === 'open-evita-chat') {
                 await launchEvitaChat();
             } else {
-                if(viewMain) viewMain.style.display = 'block';
+                if(viewMain) viewMain.style.display = '';  // CSS: display: flex
                 if(viewThird) viewThird.style.display = 'none';
                 heroFlipWrapper.classList.remove('flipped');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
