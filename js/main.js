@@ -1,4 +1,4 @@
-// js/main.js - KORRIGIERTE VERSION (Home-Button Bug Fix)
+// js/main.js - KORRIGIERTE VERSION (Home-Button Bug Fix v2)
 
 // === 1. IMPORTE ===
 import { initTheme } from './theme.js';
@@ -229,7 +229,7 @@ const addWelcomeMessage = (message) => {
     console.log("✅ Begrüßungsnachricht hinzugefügt");
 };
 
-// === 6. HERO FLIP LOGIK - BUG FIX ===
+// === 6. HERO FLIP LOGIK - KOMPLETT NEU ===
 const initHeroFlip = () => {
     const heroFlipWrapper = document.getElementById('hero-flip-wrapper');
     if (!heroFlipWrapper) return;
@@ -243,35 +243,16 @@ const initHeroFlip = () => {
     const viewMain = document.getElementById('view-main');
     const viewThird = document.getElementById('view-third');
 
-    // ✅ HELPER: Views auf Startzustand zurücksetzen
-    const resetToStartView = () => {
-        if (viewMain) {
-            viewMain.style.display = 'flex';  // ✅ FIX: flex statt block
-        }
-        if (viewThird) {
-            viewThird.style.display = 'none';
-        }
-    };
-
-    // ✅ HELPER: Evita-View anzeigen
-    const showEvitaView = () => {
-        if (viewMain) {
-            viewMain.style.display = 'none';
-        }
-        if (viewThird) {
-            viewThird.style.display = 'flex';
-        }
-    };
-
     // Hash-Check Funktion mit Scroll-Freigabe
     const checkHashAndFlip = () => {
         const hash = window.location.hash;
         
         if (hash === '#michael') {
-            resetToStartView();
+            // Michael anzeigen (Back-Face)
+            if(viewMain) viewMain.style.display = 'block';
+            if(viewThird) viewThird.style.display = 'none';
             heroFlipWrapper.classList.add('flipped');
             
-            // WICHTIG: Scrolling erlauben!
             document.body.classList.remove('no-scroll');
             
             setTimeout(() => {
@@ -289,10 +270,11 @@ const initHeroFlip = () => {
             }, 300);
         } 
         else if (hash === '#evita') {
-            showEvitaView();
+            // Evita anzeigen (Front-Face, view-third)
+            if (viewMain) viewMain.style.display = 'none';
+            if (viewThird) viewThird.style.display = 'flex';
             heroFlipWrapper.classList.remove('flipped');
             
-            // WICHTIG: Scrolling erlauben!
             document.body.classList.remove('no-scroll');
             
             setTimeout(() => {
@@ -319,17 +301,16 @@ const initHeroFlip = () => {
 
     // === EVENT LISTENERS ===
 
-    // Button: "Neugierig geworden?" → Flip zu Michael
+    // Button: "Neugierig geworden?" → Flip zu Michael (Back-Face)
     if (btnToBack) {
         btnToBack.addEventListener('click', (e) => {
             e.preventDefault();
-            resetToStartView();
             heroFlipWrapper.classList.add('flipped');
             document.body.classList.remove('no-scroll');
         });
     }
 
-    // ✅ FIX: Button "Home" → Zurück zur Startseite
+    // ✅ FIX: Button "Home" → Zurück zur Startseite (Front-Face, view-main)
     if (btnBackToStart) {
         btnBackToStart.addEventListener('click', (e) => {
             e.preventDefault();
@@ -337,46 +318,60 @@ const initHeroFlip = () => {
             // Hash aus URL entfernen
             history.pushState("", document.title, window.location.pathname + window.location.search);
             
+            // ✅ WICHTIG: Views VOR dem Flip setzen!
+            if(viewMain) viewMain.style.display = 'block';
+            if(viewThird) viewThird.style.display = 'none';
+            
             // Karte zurückdrehen
             heroFlipWrapper.classList.remove('flipped');
-            
-            // ✅ FIX: Views NACH der Animation zurücksetzen
-            // Warte auf halbe Flip-Animation (0.8s / 2 = 400ms)
-            setTimeout(() => {
-                resetToStartView();
-            }, 400);
             
             // Nach oben scrollen
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     }
     
-    // Button: "Evita" → Wechsel zu Evita-View (auf Front-Face)
+    // ✅ FIX: Button "Evita" → Flip zurück zur Front-Face und Evita-View anzeigen
     if (btnToThird) {
         btnToThird.addEventListener('click', (e) => {
             e.preventDefault();
             
-            // Erst die Karte zurückdrehen
+            // ✅ WICHTIG: Views VOR dem Flip setzen!
+            if (viewMain) viewMain.style.display = 'none';
+            if (viewThird) viewThird.style.display = 'flex';
+            
+            // Karte zurückdrehen (zur Front-Face)
             heroFlipWrapper.classList.remove('flipped');
             
-            // Nach Animation: Evita-View anzeigen
-            setTimeout(() => {
-                showEvitaView();
-            }, 400);
-            
+            // Nach oben scrollen
             window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            // Nach Flip-Animation zum Evita-Header scrollen
+            setTimeout(() => {
+                const target = document.getElementById('evita');
+                if (target) {
+                    const headerOffset = document.querySelector('.main-header')?.offsetHeight || 80;
+                    const elementPosition = target.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset - 40;
+
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            }, 850); // Warte auf Flip-Animation (0.8s) + Buffer
         });
     }
 
-    // Button: Evita → Michael (von Evita-View zu Michael)
+    // Button: Evita → Michael (von Evita-View zur Back-Face)
     if (btnThirdToBack) {
         btnThirdToBack.addEventListener('click', (e) => {
             e.preventDefault();
             
-            // Erst Views zurücksetzen
-            resetToStartView();
+            // Views setzen für nach dem Flip
+            if(viewMain) viewMain.style.display = 'block';
+            if(viewThird) viewThird.style.display = 'none';
             
-            // Dann flippen
+            // Flippen zur Back-Face
             heroFlipWrapper.classList.add('flipped');
             
             // Hash setzen
@@ -405,7 +400,8 @@ const initHeroFlip = () => {
             if (btnThirdToStart.dataset.action === 'open-evita-chat') {
                 await launchEvitaChat();
             } else {
-                resetToStartView();
+                if(viewMain) viewMain.style.display = 'block';
+                if(viewThird) viewThird.style.display = 'none';
                 heroFlipWrapper.classList.remove('flipped');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
