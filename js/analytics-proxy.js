@@ -1,5 +1,5 @@
-// js/analytics-proxy.js – Version 3.0
-// Korrigiert für GA4 Measurement Protocol
+// js/analytics-proxy.js – Version 3.1
+// Korrigiert für GA4 Measurement Protocol + Neue Nutzer Tracking
 
 const Analytics = {
   startTime: Date.now(),
@@ -27,6 +27,20 @@ const Analytics = {
       localStorage.setItem('ga_client_id', id);
     }
     return id;
+  },
+
+  /**
+   * Prüft ob dies ein neuer Nutzer ist (noch nie besucht)
+   */
+  isNewUser() {
+    return !localStorage.getItem('ga_returning_user');
+  },
+
+  /**
+   * Markiert den Nutzer als wiederkehrend
+   */
+  markAsReturningUser() {
+    localStorage.setItem('ga_returning_user', 'true');
   },
 
   /**
@@ -77,6 +91,63 @@ const Analytics = {
   // ─────────────────────────────────────────────
 
   /**
+   * Sendet session_start und first_visit Events
+   * WICHTIG: Diese Events sind nötig für "Neue Nutzer" in GA4
+   */
+  async sendSessionStart(clientId, session) {
+    const events = [];
+    
+    // 1. session_start Event (für jede neue Session)
+    events.push({
+      name: 'session_start',
+      params: {
+        ga_session_id: session.id,
+        ga_session_number: session.number,
+        engagement_time_msec: 1,
+        page_location: window.location.href,
+        page_title: document.title,
+        debug_mode: this.debugMode
+      }
+    });
+
+    // 2. first_visit Event (nur beim allerersten Besuch)
+    if (this.isNewUser()) {
+      events.push({
+        name: 'first_visit',
+        params: {
+          ga_session_id: session.id,
+          ga_session_number: session.number,
+          engagement_time_msec: 1,
+          page_location: window.location.href,
+          page_title: document.title,
+          debug_mode: this.debugMode
+        }
+      });
+      this.markAsReturningUser();
+    }
+
+    const payload = {
+      client_id: clientId,
+      events: events
+    };
+
+    try {
+      await fetch('/api/metrics', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        keepalive: true
+      });
+
+      if (this.debugMode) {
+        console.log('📊 Session/First Visit Events sent:', events.map(e => e.name));
+      }
+    } catch (error) {
+      console.warn('Session start error:', error.message);
+    }
+  },
+
+  /**
    * Haupt-Tracking-Methode
    * Sendet Events an den Proxy-Endpoint
    */
@@ -111,9 +182,9 @@ const Analytics = {
         ...customParams
       };
 
-      // Session Start markieren (nur beim ersten Event einer neuen Session)
+      // ✅ FIX: Session Start als SEPARATES Event senden
       if (session.isNew && !sessionStorage.getItem('session_start_sent')) {
-        params.session_start = 1;
+        await this.sendSessionStart(clientId, session);
         sessionStorage.setItem('session_start_sent', 'true');
       }
 
@@ -421,10 +492,11 @@ const Analytics = {
     document.addEventListener('submit', (e) => this.handleFormSubmit(e), { capture: true });
 
     // Debug Info
-    if (localStorage.getItem('analytics_debug') === 'true') {
-      console.log('📊 Analytics v3.0 initialized', {
+    if (this.debugMode) {
+      console.log('📊 Analytics v3.1 initialized', {
         clientId: this.getClientId(),
-        session: this.getSession()
+        session: this.getSession(),
+        isNewUser: this.isNewUser()
       });
     }
   },
@@ -454,6 +526,20 @@ const Analytics = {
    */
   event(name, params = {}) {
     return this.track(name, params);
+  },
+
+  /**
+   * Reset für Tests (löscht alle gespeicherten Daten)
+   * Aufruf: Analytics.reset()
+   */
+  reset() {
+    localStorage.removeItem('ga_client_id');
+    localStorage.removeItem('ga_session_id');
+    localStorage.removeItem('ga_session_number');
+    localStorage.removeItem('ga_last_active');
+    localStorage.removeItem('ga_returning_user');
+    sessionStorage.removeItem('session_start_sent');
+    console.log('📊 Analytics reset. Reload page to start fresh.');
   }
 };
 
@@ -475,6 +561,8 @@ window.Analytics = Analytics;
 // ─────────────────────────────────────────────
 //
 // Automatisch getrackt:
+// - first_visit (nur beim allerersten Besuch)
+// - session_start (bei jeder neuen Session)
 // - page_view (beim Laden)
 // - scroll (25%, 50%, 75%, 90%)
 // - page_exit (beim Verlassen)
@@ -493,3 +581,4 @@ window.Analytics = Analytics;
 // Debug:
 // Analytics.enableDebug();
 // Analytics.disableDebug();
+// Analytics.reset(); // Für Tests - simuliert neuen Nutzer
