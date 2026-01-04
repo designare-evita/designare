@@ -309,22 +309,19 @@ const initHeroFlip = () => {
             if(viewThird) viewThird.style.display = 'none';
             heroFlipWrapper.classList.remove('flipped');
             
-            // ✅ FIX: Mehrfach scrollen um Browser-Restore zu überschreiben
+            // ✅ FIX: Nur scrollTo(0,0) - kein scrollIntoView (versteckt Header)
             window.scrollTo(0, 0);
             
             setTimeout(() => {
                 window.scrollTo(0, 0);
-                if(viewMain) viewMain.scrollIntoView({ behavior: 'instant', block: 'start' });
             }, 10);
             
             setTimeout(() => {
                 window.scrollTo(0, 0);
-                if(viewMain) viewMain.scrollIntoView({ behavior: 'instant', block: 'start' });
             }, 100);
             
             setTimeout(() => {
                 window.scrollTo(0, 0);
-                if(viewMain) viewMain.scrollIntoView({ behavior: 'instant', block: 'start' });
             }, 300);
         }
     };
