@@ -1,5 +1,10 @@
 // js/main.js - KORRIGIERTE VERSION (Home-Button Bug Fix v2)
 
+// ✅ Browser Scroll-Restore deaktivieren
+if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+}
+
 // === 1. IMPORTE ===
 import { initTheme } from './theme.js';
 import { initEffects } from './effects.js';
@@ -474,6 +479,13 @@ const unlockScrollFallback = () => {
 // MAIN EVENT LISTENER
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("🚀 DOMContentLoaded - Starte Initialisierung...");
+    
+    // ✅ SOFORT nach oben scrollen (verhindert Browser Scroll-Restore)
+    if (!window.location.hash) {
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+    }
     
     // Theme vorab setzen
     if (localStorage.getItem('theme') === 'dark' || !localStorage.getItem('theme')) {
