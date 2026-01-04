@@ -1,8 +1,15 @@
 // js/main.js - KORRIGIERTE VERSION (Home-Button Bug Fix v2)
 
-// ✅ Browser Scroll-Restore deaktivieren
+// ✅ SOFORT ausführen - Browser Scroll-Restore deaktivieren
 if ('scrollRestoration' in history) {
     history.scrollRestoration = 'manual';
+}
+
+// ✅ SOFORT nach oben scrollen (vor allem anderen!)
+if (!window.location.hash) {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
 }
 
 // === 1. IMPORTE ===
