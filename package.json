@@ -39,6 +39,5 @@
     "inject-lazy": "node js/inject-lazy-loading.js",
     "bundle-css": "gulp",
     "build": "node js/generate-articles-db.js && node js/generate-knowledge.js && node generate-sitemap.js && node js/inject-ratings.js && mkdir -p public/css && cp -r *.html *.svg *.csv *.json js images Font CSV-Importer-PRO downloads public/ 2>/dev/null || echo 'Assets copy done' && npm run bundle-css && node js/inject-footer.js && node js/inject-breadcrumb.js && node js/inject-related.js && node js/inject-blog-articles.js && node js/inject-lazy-loading.js"
->>>>>>> 78c898ae0c439f7ed09705e382c9ebb6cab9450c
   }
 }
