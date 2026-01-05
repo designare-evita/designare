@@ -25,14 +25,12 @@
     "generate-articles-db": "node js/generate-articles-db.js",
     "generate-knowledge": "node js/generate-knowledge.js",
     "generate-sitemap": "node generate-sitemap.js",
-<<<<<<< HEAD
-    "build": "node js/generate-knowledge.js && node generate-sitemap.js && node js/inject-ratings.js && mkdir -p public && cp -r *.html *.css *.svg *.csv js css images Font CSV-Importer-PRO downloads public/ 2>/dev/null || echo 'Some assets missing, continuing...'"
+    "build": "node js/generate-knowledge.js && node generate-sitemap.js && node js/inject-ratings.js && mkdir -p public && cp -r *.html *.css *.svg *.csv js css images font CSV-Importer-PRO downloads public/ 2>/dev/null || echo 'Some assets missing, continuing...'"
   },
   "devDependencies": {
     "gulp": "^5.0.1",
     "gulp-clean-css": "^4.3.0",
     "gulp-concat": "^2.6.1"
-=======
     "inject-ratings": "node js/inject-ratings.js",
     "inject-footer": "node js/inject-footer.js",
     "inject-breadcrumb": "node js/inject-breadcrumb.js",
