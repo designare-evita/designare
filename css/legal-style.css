@@ -36,48 +36,7 @@ body.light-mode {
    2. FONTS & RESET
    =================== */
 
-@font-face {
-    font-family: 'Poppins Fallback';
-    src: local('Arial');
-    ascent-override: 90%;
-    descent-override: 22%;
-    line-gap-override: 0%;
-    size-adjust: 107%;
-}
 
-/* Hinweis: Wir gehen davon aus, dass die Fonts im ../Font/ Ordner liegen, 
-   passend zur Struktur der Hauptseite. */
-@font-face {
-    font-family: 'Poppins';
-    font-style: normal;
-    font-weight: 300;
-    src: url('../Font/Poppins-Light.ttf') format('truetype');
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Poppins';
-    font-style: normal;
-    font-weight: 400;
-    src: url('../Font/Poppins-Regular.ttf') format('truetype');
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Poppins';
-    font-style: normal;
-    font-weight: 600;
-    src: url('../Font/Poppins-SemiBold.ttf') format('truetype');
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Poppins';
-    font-style: normal;
-    font-weight: 700;
-    src: url('../Font/Poppins-Bold.ttf') format('truetype');
-    font-display: swap;
-}
 
 * {
     box-sizing: border-box;
