@@ -564,8 +564,13 @@ color: var(--text-color);
     }
 
     .info-box, .tech-box, .expert-tip {
-        flex-direction: column;
+        flex-direction: row;  /* Bleibt nebeneinander */
         gap: 0.8rem;
+    }
+    
+    .info-box i, .tech-box i, .expert-tip i {
+        flex-shrink: 0;
+        min-width: 1.5rem;
     }
 
     .comparison-table { font-size: 0.85rem; }
@@ -618,3 +623,446 @@ color: var(--text-color);
     .blog-article a { color: #000; text-decoration: underline; }
     .blog-article code { border: 1px solid #000; }
 }
+
+/* --- Mobile First (Standard) --- */
+.summary-box {
+    display: flex;
+    flex-direction: column; /* Erst Text, dann Bild untereinander */
+    gap: 2rem;
+    align-items: center;
+    
+    /* Dein bestehendes Styling (Farben, Padding) wird hier übernommen */
+    background-color: var(--box-bg, #1a1a1a); /* Fallback, falls Variable fehlt */
+    padding: 2rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.summary-image img {
+    max-width: 100%;
+    height: auto; /* WICHTIG: Erlaubt dem Bild, sich proportional zu skalieren */
+    border-radius: 8px;
+    /* box-shadow: 0 4px 15px rgba(0,0,0,0.3);  */
+    display: block;
+}
+
+/* --- Desktop Ansicht (ab 992px) --- */
+@media screen and (min-width: 992px) {
+    .summary-box {
+        flex-direction: row; /* Nebeneinander */
+        align-items: center; /* Vertikal zentriert */
+        justify-content: space-between;
+    }
+
+    .summary-content {
+        flex: 0 0 62%; /* Text bekommt ca. 2/3 Platz */
+        max-width: 62%;
+    }
+
+    .summary-image {
+        flex: 0 0 33%; /* Bild bekommt ca. 1/3 Platz */
+        max-width: 33%;
+        display: flex;
+        justify-content: flex-end; /* Bild rechtsbündig im Container */
+    }
+}
+
+
+
+/* --- LOKALE BOX (Community Style) --- */
+.local-relevance-box {
+    background: rgba(196, 163, 90, 0.1);
+    border-left: 4px solid var(--accent-color);
+    border-radius: 4px;
+    padding: 2rem;
+    margin: 3rem 0;
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.local-box-icon i {
+    font-size: 2rem;
+    color: var(--accent-color);
+    margin-top: 5px;
+}
+
+.local-box-content h3 {
+    margin-top: 0;
+    color: #fff;
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+}
+
+.local-box-content p {
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+}
+
+.local-box-content p:last-child {
+    margin-bottom: 0;
+}
+
+/* --- FRAG MICHAEL SECTION --- */
+.blog-cta-wrapper {
+    text-align: center;
+    background: var(--bg-color-secondary);
+    padding: 3rem 2rem;
+    border-radius: 8px;
+    margin-top: 4rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--border-color);
+}
+
+.blog-cta-wrapper h2 {
+    font-size: 1.6rem; /* Etwas kleiner als H1 */
+    margin-bottom: 1rem;
+    color: var(--accent-color);
+}
+
+.blog-cta-wrapper p {
+    max-width: 600px;
+    margin: 0 auto 2rem auto;
+    color: var(--text-color);
+}
+
+.cta-button-blog {
+    background: var(--accent-color);
+    color: #fff;
+    border: none;
+    padding: 12px 25px;
+    font-size: 1.1rem; /* Etwas größer für "Klickbarkeit" */
+    font-weight: 600;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.cta-button-blog:hover {
+    background: #d39a00;
+    transform: translateY(-2px);
+}
+
+/* Mobile Anpassung */
+@media (max-width: 768px) {
+    .local-relevance-box {
+        flex-direction: column;
+        padding: 1.5rem;
+    }
+    
+    .local-box-icon {
+        margin-bottom: 10px;
+    }
+}
+
+
+/* ===================
+   BREADCRUMB
+   =================== */
+
+.breadcrumb {
+    margin-bottom: 1.5rem;
+}
+
+.breadcrumb ol {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 0.85rem;
+}
+
+.breadcrumb li {
+    display: flex;
+    align-items: center;
+    color: var(--text-color-muted);
+    margin-bottom: 0;
+}
+
+.breadcrumb li::before {
+    content: none; /* Override blog-style.css arrow */
+}
+
+.breadcrumb li:not(:last-child)::after {
+    content: "/";
+    margin: 0 0.6rem;
+    color: var(--text-color-subtle);
+    font-weight: 300;
+}
+
+.breadcrumb a {
+    color: var(--text-color-muted);
+    transition: color 0.2s ease;
+}
+
+.breadcrumb a:hover {
+    color: var(--accent-color);
+}
+
+.breadcrumb li:last-child span {
+    color: var(--text-color);
+    font-weight: 400;
+}
+
+/* ===================
+   RELATED ARTICLES
+   =================== */
+
+.related-articles {
+    margin-top: 4rem;
+    padding-top: 3rem;
+    border-top: 1px solid var(--border-color-subtle);
+}
+
+.related-articles h2 {
+    font-size: 1.1rem;
+    font-weight: 400;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-color-muted);
+    margin-bottom: 1.5rem;
+    padding-top: 0;
+}
+
+.related-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+.related-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.25rem;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-color);
+    border-radius: 0;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.related-card:hover {
+    border-color: var(--accent-color);
+    background: rgba(196, 163, 90, 0.05);
+    transform: translateY(-2px);
+}
+
+.related-card i {
+    font-size: 1.5rem;
+    color: var(--accent-color);
+    opacity: 0.7;
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+    transition: opacity 0.2s ease;
+}
+
+.related-card:hover i {
+    opacity: 1;
+}
+
+.related-card-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.related-card-category {
+    display: inline-block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--accent-color);
+    margin-bottom: 0.3rem;
+    font-weight: 400;
+}
+
+.related-card h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin: 0 0 0.4rem 0;
+    line-height: 1.3;
+}
+
+.related-card p {
+    font-size: 0.85rem;
+    color: var(--text-color-muted);
+    margin: 0;
+    line-height: 1.5;
+    font-weight: 300;
+}
+
+/* ===================
+   RESPONSIVE
+   =================== */
+
+@media (max-width: 992px) {
+    .related-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .breadcrumb ol {
+        font-size: 0.8rem;
+    }
+    
+    .related-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .related-card {
+        padding: 1rem;
+    }
+    
+    .related-card i {
+        font-size: 1.25rem;
+    }
+    
+    .related-card h3 {
+        font-size: 0.95rem;
+    }
+}
+
+/* ===================
+   PRINT
+   =================== */
+
+@media print {
+    .breadcrumb,
+    .related-articles {
+        display: none;
+    }
+}
+
+* ===================
+   BLOG OVERVIEW - FAQ CARDS
+   =================== */
+
+.blog-overview .blog-intro {
+    font-size: 1.1rem;
+    color: var(--text-color-muted, #aaa);
+    max-width: 700px;
+    margin-bottom: 2.5rem;
+    line-height: 1.7;
+}
+
+.faq-cards-section {
+    margin-bottom: 3rem;
+}
+
+.faq-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+}
+
+@media (max-width: 900px) {
+    .faq-cards-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* FAQ Card */
+.faq-card {
+    display: flex;
+    gap: 1.25rem;
+    padding: 1.5rem;
+    background: var(--card-bg, rgba(255,255,255,0.02));
+    border: 1px solid var(--border-color, rgba(255,255,255,0.08));
+    border-radius: 10px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.25s ease;
+}
+
+.faq-card:hover {
+    border-color: var(--accent-color, #00d4ff);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(0, 212, 255, 0.08);
+}
+
+.faq-card:hover .faq-card-link {
+    color: var(--accent-color, #00d4ff);
+}
+
+.faq-card:hover .faq-card-link i {
+    transform: translateX(4px);
+}
+
+.faq-card-icon {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--card-bg-hover, rgba(255,255,255,0.05));
+    border-radius: 10px;
+    font-size: 1.3rem;
+    color: var(--accent-color, #00d4ff);
+}
+
+.faq-card-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.faq-card-category {
+    display: inline-block;
+    font-size: 0.7rem;
+    color: var(--accent-color, #00d4ff);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.4rem;
+    opacity: 0.8;
+}
+
+.faq-card h2 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text-color, #fff);
+    margin: 0 0 0.5rem 0;
+    line-height: 1.35;
+}
+
+.faq-card p {
+    font-size: 0.88rem;
+    color: var(--text-color-muted, #999);
+    margin: 0 0 0.75rem 0;
+    line-height: 1.55;
+}
+
+.faq-card-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    color: var(--text-color-subtle, #666);
+    transition: color 0.2s ease;
+}
+
+.faq-card-link i {
+    font-size: 0.7rem;
+    transition: transform 0.2s ease;
+}
+
+
+/* ===================
+   PRINT STYLES
+   =================== */
+
+@media print {
+    .related-articles,
+    .faq-cards-section {
+        display: none;
+    }
+}
+

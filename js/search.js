@@ -1,68 +1,79 @@
 // ===================================================================
-// SEARCH MODAL SETUP
+// SEARCH MODAL SETUP (Powered by existing Knowledge Base)
 // ===================================================================
 
-// 1. Definiere deine Inhalte (Index)
-const siteContentIndex = [
-    { 
-        title: "Michael Kanda & Evita - ganz privat.", 
-        url: "index.html", 
-        keywords: "home startseite michael kanda webentwickler wien",
-        desc: "Willkommen im privaten Code-Labor von Michael & Evita. Webentwicklung, KI-Experimente und digitale Abenteuer."
-    },
-    { 
-        title: "KI-Integration auf Webseiten", 
-        url: "KI-Integration-auf-Webseiten.html", 
-        keywords: "ki integration künstliche intelligenz chatbot automatisierung",
-        desc: "Wie KI moderne Webseiten interaktiver und effizienter macht."
-    },
-    { 
-        title: "KI für Unternehmenswebseiten", 
-        url: "ki-fuer-unternehmenswebseiten.html", 
-        keywords: "unternehmen business b2b lösungen",
-        desc: "Maßgeschneiderte KI-Lösungen für dein Unternehmen."
-    },
-    { 
-        title: "SEO & GEO", 
-        url: "geo-seo.html", 
-        keywords: "seo suchmaschinenoptimierung google ranking geo lokal",
-        desc: "Optimiere deine Seite für lokale Suchanfragen,Google und KI-Bots."
-    },
-    { 
-        title: "Silas AI Creator", 
-        url: "silas.html", 
-        keywords: "silas ai creator tool generator content",
-        desc: "Der KI-gestützte Content Creator für schnelle Ergebnisse."
-    },
-    { 
-        title: "CSV Importer PRO", 
-        url: "CSV-Importer-PRO.html", 
-        keywords: "csv import tool daten management pro",
-        desc: "Professionelles Tool zum Importieren großer Datensätze."
-    },
-    
-];
+let siteContentIndex = [];
+let isIndexLoaded = false;
 
-function setupSearchModal() {
-    const searchModal = document.getElementById('search-modal');
-    const searchButton = document.getElementById('search-button');
-    const closeSearchBtn = document.getElementById('close-search-modal');
+// 1. Daten laden (Aus deiner existierenden knowledge.json)
+function loadSearchIndex() {
+    if (isIndexLoaded) return;
+
+    fetch('/knowledge.json')
+        .then(response => {
+            if (!response.ok) throw new Error("knowledge.json nicht gefunden");
+            return response.json();
+        })
+        .then(data => {
+            // WICHTIG: Deine generate-knowledge.js speichert die Seiten unter "pages"
+            // Wir prüfen, ob es data.pages gibt, sonst nehmen wir data direkt (Falls sich Struktur ändert)
+            const pagesArray = data.pages ? data.pages : (Array.isArray(data) ? data : []);
+
+            siteContentIndex = pagesArray.map(item => ({
+                title: item.title,
+                // Deine URL hat schon einen Slash (z.B. "/index.html"), das passt
+                url: item.url, 
+                // item.text ist der gesäuberte Volltext aus deinem Script
+                content: item.text || "", 
+                // Meta Description für die hübsche Anzeige
+                desc: item.meta_description || item.text.substring(0, 100) + "..."
+            }));
+
+            isIndexLoaded = true;
+            console.log(`🧠 Evita-Knowledge geladen: ${siteContentIndex.length} Seiten indexiert.`);
+        })
+        .catch(err => {
+            console.error('Fehler beim Laden der Knowledge-Base:', err);
+        });
+}
+
+// 2. Hauptfunktion
+export function setupSearchModal() {
+    loadSearchIndex(); // Index laden anstoßen
+
     const searchInput = document.getElementById('site-search-input');
-    const resultsContainer = document.getElementById('search-results-container');
     const resultsList = document.getElementById('search-results-list');
     const sitemapContainer = document.getElementById('sitemap-container');
+    const resultsContainer = document.getElementById('search-results-container');
+    
+    // Buttons & Modal Logik
+    const searchModal = document.getElementById('search-modal');
+    const searchButtons = document.querySelectorAll('#search-button, .open-search-modal, .footer-btn.open-search-modal'); 
+    const closeSearchBtn = document.getElementById('close-search-modal');
 
-    // Öffnen
-    if (searchButton) {
-        searchButton.addEventListener('click', (e) => {
+    // Helper: Modal öffnen/schließen
+    const openModal = (modal) => {
+        modal.classList.add('visible');
+        modal.style.display = 'flex';
+        document.body.classList.add('no-scroll');
+    };
+    
+    const closeModal = (modal) => {
+        modal.classList.remove('visible');
+        modal.style.display = 'none';
+        document.body.classList.remove('no-scroll');
+    };
+
+    // Event Listener für Öffnen
+    searchButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
             e.preventDefault();
             if (searchModal) {
                 openModal(searchModal);
-                // Fokus auf Input setzen
-                setTimeout(() => searchInput.focus(), 100);
+                setTimeout(() => searchInput && searchInput.focus(), 100);
             }
         });
-    }
+    });
 
     // Schließen
     if (closeSearchBtn) {
@@ -71,55 +82,73 @@ function setupSearchModal() {
         });
     }
 
-    // Suchlogik
+    // VOLLTEXT-SUCHLOGIK
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
             const query = e.target.value.toLowerCase().trim();
 
+            // Umschalten zwischen Sitemap und Ergebnissen
             if (query.length === 0) {
-                // Keine Eingabe -> Sitemap zeigen
-                sitemapContainer.style.display = 'block';
-                resultsContainer.style.display = 'none';
+                if (sitemapContainer) sitemapContainer.style.display = 'block';
+                if (resultsContainer) resultsContainer.style.display = 'none';
             } else {
-                // Eingabe vorhanden -> Sitemap weg, Ergebnisse zeigen
-                sitemapContainer.style.display = 'none';
-                resultsContainer.style.display = 'block';
+                if (sitemapContainer) sitemapContainer.style.display = 'none';
+                if (resultsContainer) resultsContainer.style.display = 'block';
 
-                // Filtern
+                // Filtern: Sucht im Titel UND im gesamten Text (content)
                 const results = siteContentIndex.filter(page => 
-                    page.title.toLowerCase().includes(query) || 
-                    page.keywords.includes(query) ||
-                    page.desc.toLowerCase().includes(query)
+                    (page.title && page.title.toLowerCase().includes(query)) || 
+                    (page.content && page.content.toLowerCase().includes(query))
                 );
 
-                // Rendern
-                renderSearchResults(results, resultsList);
+                renderSearchResults(results, resultsList, query, searchModal, closeModal);
             }
         });
     }
 }
 
-function renderSearchResults(results, listElement) {
-    listElement.innerHTML = ''; // Liste leeren
+// Render Funktion mit Snippet-Highlighting
+function renderSearchResults(results, listElement, query, modal, closeFunc) {
+    if (!listElement) return;
+    listElement.innerHTML = '';
 
     if (results.length === 0) {
-        listElement.innerHTML = '<li style="color: #888; text-align: center; padding: 20px;">Keine Ergebnisse gefunden.</li>';
+        listElement.innerHTML = '<li style="padding: 20px; text-align: center; color: var(--text-color-muted);">Keine Ergebnisse gefunden.</li>';
         return;
     }
 
     results.forEach(page => {
         const li = document.createElement('li');
+        
+        // Snippet generieren: Zeige den relevanten Textausschnitt
+        let snippet = page.desc;
+        if (page.content) {
+            const index = page.content.toLowerCase().indexOf(query);
+            if (index > -1) {
+                // Text um den Treffer herum ausschneiden (30 Zeichen davor, 80 danach)
+                const start = Math.max(0, index - 30);
+                const end = Math.min(page.content.length, index + 80);
+                snippet = "..." + page.content.substring(start, end) + "...";
+                
+                // Suchbegriff hervorheben (case-insensitive replace)
+                const regex = new RegExp(`(${query})`, 'gi');
+                snippet = snippet.replace(regex, '<span style="color: var(--accent-color); font-weight: 600;">$1</span>');
+            }
+        }
+
         li.innerHTML = `
             <a href="${page.url}" class="search-result-link">
                 <span class="search-result-title">${page.title}</span>
-                <span class="search-result-snippet">${page.desc}</span>
+                <span class="search-result-snippet">${snippet}</span>
             </a>
         `;
-        // Bei Klick Modal schließen
-        li.querySelector('a').addEventListener('click', () => {
-             const searchModal = document.getElementById('search-modal');
-             closeModal(searchModal);
+        
+        // Klick schließt Modal
+        const link = li.querySelector('a');
+        link.addEventListener('click', () => {
+             if (modal && closeFunc) closeFunc(modal);
         });
+        
         listElement.appendChild(li);
     });
 }

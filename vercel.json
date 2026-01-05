@@ -1,23 +1,5 @@
 {
-  "cleanUrls": true,
-  "trailingSlash": false,
-  "crons": [
-    {
-      "path": "/api/cron/regenerate-knowledge",
-      "schedule": "0 3 * * *"
-    }
-  ],
-  "functions": {
-    "api/cron/regenerate-knowledge.js": {
-      "maxDuration": 60
-    }
-  },
-  "rewrites": [
-    { "source": "/api/metrics", "destination": "/api/metrics.js" },
-    { "source": "/api/feedback", "destination": "/api/feedback.js" },
-    { "source": "/api/ask-gemini", "destination": "/api/ask-gemini.js" },
-    { "source": "/api/cron/regenerate-knowledge", "destination": "/api/cron/regenerate-knowledge.js" },
-    { "source": "/CSV-Creator", "destination": "/CSV-Creator.html" },
-    { "source": "/KI-Integration-auf-Webseiten", "destination": "/KI-Integration-auf-Webseiten.html" }
-  ]
+  "buildCommand": "npm run build",
+  "outputDirectory": "public",
+  "framework": null
 }

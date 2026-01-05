@@ -177,7 +177,31 @@ footer a:not(.footer-btn) {
 footer a:not(.footer-btn):hover {
     opacity: 1;
     color: var(--accent-color);
-    background-color: rgba(255, 255, 255, 0.05); /* Heller Hover für Dark Mode */
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* ===================
+   6. FOOTER BUTTONS (Suche & Back-to-Top)
+   =================== */
+
+.footer-btn {
+    color: var(--text-color);
+    font-size: 1.2rem;
+    margin-left: 15px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none !important;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+}
+
+.footer-btn:hover {
+    color: var(--accent-color);
+    background-color: rgba(255, 255, 255, 0.05);
+    transform: translateY(-3px);
 }
 
 /* Back-to-Top Button */
@@ -197,7 +221,7 @@ footer a:not(.footer-btn):hover {
     text-decoration: none;
     transition: all 0.3s ease;
     box-shadow: 0 0 15px rgba(252, 181, 0, 0.4);
-    margin-left: 8px;
+    margin-left: 10px;
 }
 
 #back-to-top:hover {
@@ -208,42 +232,45 @@ footer a:not(.footer-btn):hover {
 }
 
 /* ============================
-   LIGHT MODE SPECIFICS (HEADER/FOOTER)
+   7. LIGHT MODE SPECIFICS
    ============================ */
 
 body.light-mode .main-header.scrolled {
-    /* Weißer transparenter Hintergrund statt Schwarz */
     background-color: rgba(255, 255, 255, 0.9); 
     border-bottom-color: var(--border-color);
 }
 
 body.light-mode footer {
-    /* Weißer Kapsel-Hintergrund */
     background-color: rgba(255, 255, 255, 0.9);
     border-color: var(--border-color);
-    /* Weicherer Schatten für hellen Hintergrund */
     box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1); 
 }
 
 body.light-mode footer a:not(.footer-btn):hover {
-    /* Dunklerer Hover-Hintergrund, da Footer jetzt weiß ist */
     background-color: rgba(0, 0, 0, 0.05); 
 }
 
+body.light-mode .footer-btn {
+    color: var(--text-color);
+}
+
+body.light-mode .footer-btn:hover {
+    color: var(--accent-color);
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
 body.light-mode #back-to-top {
-    /* Text im Button darf im Light Mode nicht zu dunkel sein auf Gold */
     color: #fff; 
     box-shadow: 0 0 15px rgba(211, 154, 0, 0.4);
 }
 
 body.light-mode #back-to-top:hover {
-    /* Im Light Mode: Dunkles Grau beim Hover für Kontrast, statt Weiß auf Weiß */
     background-color: #333; 
     color: #fff;
 }
 
 /* ===================
-   6. MOBILE RESPONSIVE
+   8. MOBILE RESPONSIVE
    =================== */
 
 @media (max-width: 768px) {
@@ -275,8 +302,11 @@ body.light-mode #back-to-top:hover {
     footer {
         bottom: 15px;
         right: 15px;
-        padding: 6px 12px;
+        padding: 5px 12px;
         transform: scale(0.9); 
+        flex-wrap: wrap;
+        gap: 15px;
+        justify-content: center;
     }
     
     footer.hide-down {
@@ -284,7 +314,7 @@ body.light-mode #back-to-top:hover {
     }
     
     footer a:not(.footer-btn) {
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         padding: 3px 6px;
     }
     
@@ -293,4 +323,10 @@ body.light-mode #back-to-top:hover {
         height: 30px;
         font-size: 0.9rem;
     }
-
+    
+    .footer-btn {
+        margin-left: 10px;
+        margin-right: 10px;
+        font-size: 1.4rem;
+    }
+}

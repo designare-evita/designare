@@ -1,4 +1,4 @@
-// js/main.js
+// js/main.js - KORRIGIERTE VERSION
 
 // === 1. IMPORTE ===
 import { initTheme } from './theme.js';
@@ -7,24 +7,29 @@ import { initTypewriters } from './typewriter.js';
 import { initModals } from './modals.js';
 import { initAiForm } from './ai-form.js';
 import { initSilasForm } from './silas-form.js';
-import { initMenuInteractions } from './menu-logic.js'; // NEU: Import der interaktiven Menü-Logik
+import { initMenuInteractions } from './menu-logic.js';
+import { setupSearchModal } from './search.js';
 
 // === 2. GLOBALE STATES ===
 let globalAiFormInstance = null;
+let contentLoaded = false;
 
 // === 3. CONTENT LOADING HELPER ===
 const loadContent = async (url, elementId) => {
     const placeholder = document.getElementById(elementId);
     if (!placeholder) {
-        return Promise.resolve(); 
+        console.warn(`⚠️ Placeholder #${elementId} nicht gefunden`);
+        return false; 
     }
     try {
         const response = await fetch(url);
         if (!response.ok) throw new Error(`HTTP Error ${response.status} bei ${url}`);
         const data = await response.text();
         placeholder.innerHTML = data;
+        return true;
     } catch (error) {
         console.warn(`⚠️ Konnte ${url} nicht in #${elementId} laden:`, error);
+        return false;
     }
 };
 
@@ -128,7 +133,7 @@ const setupSideMenu = () => {
     }
 };
 
-// === 5. EVITA CHAT LOGIK ===
+// === 5. EVITA CHAT LOGIK - KORRIGIERT ===
 const setupEvitaChatButton = () => {
     const evitaChatButton = document.getElementById('evita-chat-button');
     if (evitaChatButton) {
@@ -144,27 +149,63 @@ window.launchEvitaChatFromAnywhere = async () => {
 };
 
 const launchEvitaChat = async () => {
+    console.log("🚀 launchEvitaChat aufgerufen");
+    
     await ensureAiFormAvailable();
     
+    // Warte bis DOM-Elemente sicher verfügbar sind
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
     const aiResponseModal = document.getElementById('ai-response-modal');
-    if (aiResponseModal) {
+    
+    if (!aiResponseModal) {
+        console.error("❌ AI Response Modal nicht gefunden!");
+        return;
+    }
+    
+    // Modal öffnen
+    aiResponseModal.style.display = 'flex';
+    aiResponseModal.classList.add('visible');
+    document.body.classList.add('no-scroll');
+    
+    // Warte kurz, dann Begrüßung hinzufügen - NUR wenn Chat leer ist
+    setTimeout(() => {
         const chatHistory = document.getElementById('ai-chat-history');
         if (chatHistory && chatHistory.children.length === 0) {
-             addWelcomeMessage("Hallo! Ich bin Evita, Michaels KI-Assistentin. Wie kann ich dir heute helfen?");
+            addWelcomeMessage("Hallo! Ich bin Evita, Michaels KI-Assistentin. Wie kann ich dir heute helfen?");
+            console.log("✅ Begrüßung von launchEvitaChat hinzugefügt");
         }
         
-        aiResponseModal.classList.add('visible');
-        document.body.classList.add('no-scroll');
-        
+        // Focus auf Input
         setTimeout(() => {
             const chatInput = document.getElementById('ai-chat-input');
             if (chatInput) chatInput.focus();
-        }, 300);
-    }
+        }, 100);
+    }, 300); // Erhöht auf 300ms
 };
 
 const ensureAiFormAvailable = async () => {
-    if (globalAiFormInstance || document.getElementById('ai-chat-form')) return;
+    if (globalAiFormInstance || document.getElementById('ai-chat-form')) {
+        return;
+    }
+    
+    // Warte auf Content wenn noch nicht geladen
+    if (!contentLoaded) {
+        await new Promise(resolve => {
+            const checkInterval = setInterval(() => {
+                if (contentLoaded || document.getElementById('ai-chat-form')) {
+                    clearInterval(checkInterval);
+                    resolve();
+                }
+            }, 50);
+            // Timeout nach 3 Sekunden
+            setTimeout(() => {
+                clearInterval(checkInterval);
+                resolve();
+            }, 3000);
+        });
+    }
+    
     try {
         await initAiForm();
         globalAiFormInstance = true;
@@ -175,12 +216,17 @@ const ensureAiFormAvailable = async () => {
 
 const addWelcomeMessage = (message) => {
     const chatHistory = document.getElementById('ai-chat-history');
-    if (!chatHistory) return;
+    if (!chatHistory) {
+        console.warn("⚠️ Chat-History Container nicht gefunden");
+        return;
+    }
     
     const messageDiv = document.createElement('div');
     messageDiv.className = 'chat-message ai';
-    messageDiv.innerHTML = `<div class="message-content">${message}</div>`;
+    messageDiv.textContent = message;
     chatHistory.appendChild(messageDiv);
+    
+    console.log("✅ Begrüßungsnachricht hinzugefügt");
 };
 
 // === 6. HERO FLIP LOGIK ===
@@ -197,7 +243,7 @@ const initHeroFlip = () => {
     const viewMain = document.getElementById('view-main');
     const viewThird = document.getElementById('view-third');
 
-    // --- FIX: Hash-Check Funktion mit Scroll-Freigabe ---
+    // Hash-Check Funktion mit Scroll-Freigabe
     const checkHashAndFlip = () => {
         const hash = window.location.hash;
         
@@ -209,7 +255,6 @@ const initHeroFlip = () => {
             // WICHTIG: Scrolling erlauben!
             document.body.classList.remove('no-scroll');
             
-            // Timeout gibt der Flip-Animation Zeit, bevor gescrollt wird
             setTimeout(() => {
                 const target = document.getElementById('michael');
                 if (target) {
@@ -232,7 +277,6 @@ const initHeroFlip = () => {
             // WICHTIG: Scrolling erlauben!
             document.body.classList.remove('no-scroll');
             
-            // Auch hier zum Anker scrollen
             setTimeout(() => {
                 const target = document.getElementById('evita');
                 if (target) {
@@ -249,13 +293,13 @@ const initHeroFlip = () => {
         }
     };
 
-    // Führe den Check sofort aus (beim Initialisieren)
+    // Check beim Initialisieren
     checkHashAndFlip();
 
-    // Reagiere auf Änderungen des Hashes (wenn man im Menü klickt)
+    // Reagiere auf Hash-Änderungen
     window.addEventListener('hashchange', checkHashAndFlip);
 
-    // --- BESTEHENDE EVENT LISTENER ---
+    // Event Listener für Buttons
     if (btnToBack) {
         btnToBack.addEventListener('click', (e) => {
             e.preventDefault();
@@ -267,7 +311,6 @@ const initHeroFlip = () => {
     if (btnBackToStart) {
         btnBackToStart.addEventListener('click', (e) => {
             e.preventDefault();
-            // Entferne Hash beim Klick auf Home/Zurück
             history.pushState("", document.title, window.location.pathname + window.location.search);
             if(viewMain) viewMain.style.display = 'block';
             if(viewThird) viewThird.style.display = 'none';
@@ -275,6 +318,7 @@ const initHeroFlip = () => {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     }
+    
     if (btnToThird) {
         btnToThird.addEventListener('click', (e) => {
             e.preventDefault();
@@ -288,7 +332,25 @@ const initHeroFlip = () => {
     if (btnThirdToBack) {
         btnThirdToBack.addEventListener('click', (e) => {
             e.preventDefault();
-            heroFlipWrapper.classList.add('flipped');
+            window.location.hash = '#michael';
+            
+            setTimeout(() => {
+                if (!heroFlipWrapper.classList.contains('flipped')) {
+                    heroFlipWrapper.classList.add('flipped');
+                }
+                
+                const target = document.getElementById('michael');
+                if (target) {
+                    const headerOffset = document.querySelector('.main-header')?.offsetHeight || 80;
+                    const elementPosition = target.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset - 40;
+
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            }, 300);
         });
     }
 
@@ -309,13 +371,15 @@ const initHeroFlip = () => {
 // === 7. INITIALISIERUNG ===
 
 const initializeDynamicScripts = () => {
+    console.log("🔧 Initialisiere dynamische Scripte...");
     initModals();
     initHeaderScrollEffect(); 
     setupSideMenu();
     setupEvitaChatButton();
     initHeroFlip();
     initTheme(); 
-    initMenuInteractions(); // NEU: Initialisierung der Themen-Suche im Menü
+    initMenuInteractions();
+    console.log("✅ Dynamische Scripte initialisiert");
 };
 
 const initializeStaticScripts = () => {
@@ -324,44 +388,102 @@ const initializeStaticScripts = () => {
 };
 
 const initializeForms = async () => {
-    try { await initAiForm(); } catch (e) { console.warn(e); }
-    try { initSilasForm(); } catch (e) { console.warn(e); }
+    try { 
+        await initAiForm(); 
+        globalAiFormInstance = true;
+    } catch (e) { 
+        console.warn("AI-Form Init Fehler:", e); 
+    }
+    try { 
+        initSilasForm(); 
+    } catch (e) { 
+        console.warn("Silas-Form Init Fehler:", e); 
+    }
+};
+
+// === UNLOCK SCROLL FALLBACK ===
+const unlockScrollFallback = () => {
+    // Entferne no-scroll wenn Seite geladen ist
+    if (document.body.classList.contains('no-scroll')) {
+        const modal = document.querySelector('.modal-overlay.visible');
+        const sideMenu = document.getElementById('side-menu-panel');
+        const sideMenuVisible = sideMenu?.classList.contains('visible');
+        
+        // Nur entfernen wenn kein Modal/Menu offen ist
+        if (!modal && !sideMenuVisible) {
+            document.body.classList.remove('no-scroll');
+            console.log("🔓 no-scroll Klasse entfernt (Fallback)");
+        }
+    }
 };
 
 // MAIN EVENT LISTENER
 document.addEventListener('DOMContentLoaded', async () => {
+    console.log("🚀 DOMContentLoaded - Starte Initialisierung...");
     
-    // Vorab-Check für den Theme-Status
-    if (localStorage.getItem('theme') === 'dark') {
+    // Theme vorab setzen
+    if (localStorage.getItem('theme') === 'dark' || !localStorage.getItem('theme')) {
         document.body.classList.add('dark-mode');
     }
 
+    // Statische Scripts initialisieren (Partikel, Typewriter)
     initializeStaticScripts();
 
     try {
-        // Sequentielles Laden, um sicherzustellen, dass DOM-Elemente vorhanden sind
-        await loadContent('header.html', 'header-placeholder');
-        await loadContent('modals.html', 'modal-container');
-        await loadContent('footer.html', 'footer-placeholder');
-        await loadContent('side-menu.html', 'side-menu-placeholder');
-        await loadFeedback();
-
-        console.log("✅ Layout geladen.");
+        // Sequentielles Laden der Layout-Komponenten
+        console.log("📦 Lade Layout-Komponenten...");
         
-        // Kleine Verzögerung, um sicherzugehen, dass die innerHTML-Inhalte verarbeitet wurden
-        setTimeout(() => {
-            initializeDynamicScripts();
-            initializeForms();
-        }, 100);
-
-        document.body.classList.add('page-loaded');
+        const results = await Promise.all([
+            loadContent('header.html', 'header-placeholder'),
+            loadContent('modals.html', 'modal-container'),
+            loadContent('footer.html', 'footer-placeholder'),
+            loadContent('side-menu.html', 'side-menu-placeholder')
+        ]);
+        
+        await loadFeedback();
+        
+        contentLoaded = true;
+        console.log("✅ Layout geladen:", results);
+        
+        // Warte auf nächsten Frame + zusätzliche Zeit für DOM-Updates
+        requestAnimationFrame(() => {
+            setTimeout(() => {
+                // Scripte initialisieren
+                initializeDynamicScripts();
+                initializeForms();
+                
+                // KRITISCH: no-scroll entfernen und Seite sichtbar machen
+                document.body.classList.remove('no-scroll');
+                document.body.classList.add('page-loaded');
+                
+                console.log("✅ Seite vollständig initialisiert");
+                
+            }, 200); // Erhöht von 100 auf 200ms
+        });
 
     } catch (error) {
         console.error("❌ Fehler beim Laden der Komponenten:", error);
+        
+        // Fallback: Seite trotzdem bedienbar machen
+        contentLoaded = true;
+        document.body.classList.remove('no-scroll');
         document.body.classList.add('page-loaded');
     }
+    
+    // Zusätzlicher Fallback-Timer
+    setTimeout(unlockScrollFallback, 2000);
 });
 
+// Globaler Fallback: Falls nach 5 Sekunden noch nicht geladen
+setTimeout(() => {
+    if (!document.body.classList.contains('page-loaded')) {
+        console.warn("⚠️ Fallback: Seite nach 5s nicht geladen, erzwinge Anzeige");
+        document.body.classList.remove('no-scroll');
+        document.body.classList.add('page-loaded');
+    }
+}, 5000);
+
+// Intersection Observer für Performance-Tipps
 const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {

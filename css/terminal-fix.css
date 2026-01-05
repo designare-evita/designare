@@ -1,0 +1,96 @@
+/* ============================================================
+   TERMINAL-FIX.CSS
+   Diese Datei GANZ AM ENDE nach allen anderen CSS laden!
+   ============================================================ */
+
+/* Terminal muss IMMER dunkel bleiben mit heller Schrift */
+/* Maximale Spezifität um alle anderen Regeln zu überschreiben */
+
+body.light-mode .tech-terminal-wrapper,
+html body.light-mode .tech-terminal-wrapper {
+    background-color: #1e1e1e !important;
+    border-color: #333 !important;
+}
+
+body.light-mode .terminal-body-content,
+html body.light-mode .terminal-body-content,
+body.light-mode .flipper .terminal-body-content,
+body.light-mode .flip-panel .terminal-body-content {
+    background-color: #1e1e1e !important;
+    color: #e0e0e0 !important;
+}
+
+/* Output Text - MUSS helle Schrift haben */
+body.light-mode .output-text,
+html body.light-mode .output-text,
+body.light-mode .flipper .output-text,
+body.light-mode .flipper p.output-text,
+body.light-mode .flip-panel .output-text,
+body.light-mode .flip-panel p.output-text,
+body.light-mode .terminal-body-content .output-text,
+body.light-mode .terminal-body-content p.output-text,
+body.light-mode .tech-terminal-wrapper .output-text,
+body.light-mode .tech-fact-item .output-text,
+body.light-mode .tech-fact-item p.output-text {
+    color: #e0e0e0 !important;
+}
+
+body.light-mode .output-text strong,
+html body.light-mode .output-text strong,
+body.light-mode .flipper .output-text strong,
+body.light-mode .terminal-body-content .output-text strong,
+body.light-mode .tech-fact-item .output-text strong {
+    color: #ffffff !important;
+}
+
+/* CMD Text */
+body.light-mode .cmd-text,
+html body.light-mode .cmd-text,
+body.light-mode .flipper .cmd-text,
+body.light-mode .flipper p.cmd-text,
+body.light-mode .terminal-body-content .cmd-text,
+body.light-mode .tech-fact-item .cmd-text {
+    color: #8ab4f8 !important;
+}
+
+/* Prompt Sign */
+body.light-mode .prompt-sign,
+html body.light-mode .prompt-sign,
+body.light-mode .terminal-body-content .prompt-sign {
+    color: var(--accent-color) !important;
+}
+
+/* Terminal Links */
+body.light-mode .terminal-link,
+html body.light-mode .terminal-link,
+body.light-mode .terminal-body-content .terminal-link {
+    color: var(--accent-color) !important;
+    background: rgba(196, 163, 90, 0.15) !important;
+}
+
+body.light-mode .terminal-link:hover {
+    background: var(--accent-color) !important;
+    color: #000 !important;
+}
+
+/* Tech Fact Items */
+body.light-mode .tech-fact-item,
+html body.light-mode .tech-fact-item {
+    border-left-color: #444 !important;
+}
+
+body.light-mode .tech-fact-item:hover {
+    border-left-color: var(--accent-color) !important;
+}
+
+/* Header Bar */
+body.light-mode .terminal-header-bar,
+html body.light-mode .terminal-header-bar {
+    background-color: #2d2d2d !important;
+    border-bottom-color: #333 !important;
+}
+
+body.light-mode .terminal-title-text,
+html body.light-mode .terminal-title-text {
+    color: #888 !important;
+}

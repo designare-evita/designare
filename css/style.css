@@ -1,5 +1,5 @@
 /* ============================================================
-   STYLE.CSS - SEMANTIC VERSION
+   STYLE.CSS - SEMANTIC VERSION (KORRIGIERT)
    Startseite & globale Styles (Dark Mode)
    ============================================================ */
 
@@ -29,11 +29,11 @@
 
 /* DAY MODE (Überschreibt die Farben) */
 body.light-mode {
-    --bg-color: #e0e0e0;      
+    --bg-color: #ffffff;      
     --text-color: #333333; 
     --border-color: #bbbbbb;
-    --card-bg: #ffffff; /* Empfehlung: Karten reinweiß für "Pop"-Effekt */
-    --modal-bg: #ffffff; /* Modals bleiben weiß */
+    --card-bg: #ffffff;
+    --modal-bg: #ffffff;
     --particle-color: #555555;
     --particle-line-color: #cccccc;  
     --accent-color: #D39A00;     
@@ -66,8 +66,33 @@ body.page-loaded {
     opacity: 1;
 }
 
+/* ===================
+   NO-SCROLL MIT FALLBACK
+   =================== */
+
 body.no-scroll {
     overflow-y: hidden !important;
+}
+
+/* KRITISCH: Wenn page-loaded aber kein Modal offen, Scroll erlauben */
+body.no-scroll.page-loaded {
+    overflow-y: auto !important;
+}
+
+/* Ausnahme: Bei offenem Modal bleibt scroll disabled */
+body.no-scroll.page-loaded:has(.modal-overlay.visible),
+body.no-scroll.page-loaded:has(#side-menu-panel.visible) {
+    overflow-y: hidden !important;
+}
+
+/* CSS-Only Fallback: Nach 5 Sekunden automatisch Scroll freigeben */
+@keyframes unlock-scroll-fallback {
+    from { overflow-y: hidden; }
+    to { overflow-y: auto; }
+}
+
+body.no-scroll:not(.page-loaded) {
+    animation: unlock-scroll-fallback 0s 5s forwards;
 }
 
 a {
@@ -92,7 +117,6 @@ a {
     font-family: 'Poppins';
     font-style: normal;
     font-weight: 300;
-    /* Pfad geändert zu absolut: /Font/... */
     src: url('/Font/Poppins-Light.ttf') format('truetype');
     font-display: swap;
 }
@@ -101,7 +125,6 @@ a {
     font-family: 'Poppins';
     font-style: normal;
     font-weight: 400;
-    /* Pfad geändert zu absolut: /Font/... */
     src: url('/Font/Poppins-Regular.ttf') format('truetype');
     font-display: swap;
 }
@@ -110,7 +133,6 @@ a {
     font-family: 'Poppins';
     font-style: normal;
     font-weight: 600;
-    /* Pfad geändert zu absolut: /Font/... */
     src: url('/Font/Poppins-SemiBold.ttf') format('truetype');
     font-display: swap;
 }
@@ -119,7 +141,6 @@ a {
     font-family: 'Poppins';
     font-style: normal;
     font-weight: 700;
-    /* Pfad geändert zu absolut: /Font/... */
     src: url('/Font/Poppins-Bold.ttf') format('truetype');
     font-display: swap;
 }
@@ -128,13 +149,11 @@ a {
    3. UTILITY CLASSES
    =================== */
 
-/* Strong-Tag: font-weight 600 als Standard */
 strong,
 b {
     font-weight: 600;
 }
 
-/* Ausnahme: In h1 bleibt strong bei 700 */
 h1 strong,
 h1 b {
     font-weight: 700;
@@ -181,17 +200,17 @@ h1 b {
     z-index: 2;
 }
 
-/* Particle Background - jetzt <figure> */
+/* Particle Background */
 #particles-js {
     height: 100%;
     left: 0;
-    position: fixed; /* Geändert auf fixed für Parallax-Effekt auf allen Seiten */
+    position: fixed;
     top: 0;
     width: 100%;
     z-index: 1;
     opacity: 0.4;
     pointer-events: none;
-    margin: 0; /* Reset figure margin */
+    margin: 0;
 }
 
 /* ===================
@@ -200,10 +219,10 @@ h1 b {
 
 .profile-picture {
     margin-top: 25px;
-    height: 200px;
-    width: 200px;
-    margin-bottom: 1.5rem;
-    object-fit: cover;
+    height: 220px;
+    width: 220px;
+    margin-bottom: 1rem;
+    object-fit: contain;
 }
 
 #hero h1 {
@@ -221,20 +240,22 @@ h1 b {
 }
 
 #hero .subtitle {
-    font-size: 1.15rem;                      /* Etwas kleiner */
-    text-transform: uppercase;               /* Wirkt oft hochwertiger/minimalistischer */
-    color: var(--text-color-muted);          /* Das dezentere Grau aus deiner style.css */                   
+    font-size: 1.15rem;
+    text-transform: uppercase;
+    color: var(--text-color-muted);
     margin-bottom: 2rem;
 }
 
 /* ===================
    6. AI FORM (Startseite)
-   ai-container ist jetzt <section>
    =================== */
 
 .ai-container {
     margin-bottom: 2.5rem;
-    width: 500px;
+    width: 100%;
+    max-width: 500px; 
+    margin-left: auto; 
+    margin-right: auto; 
 }
 
 #ai-form {
@@ -727,9 +748,10 @@ h1 b {
     }
 
     .profile-picture {
-        width: 160px;
-        height: 160px;
+        width: 180px;
+        height: 180px;
         margin-bottom: 1rem;
+       object-fit: contain;
     }
 
     .cookie-lightbox-buttons {
@@ -797,3 +819,202 @@ h2[id] {
         scroll-margin-top: calc(var(--header-height-mobile) + 20px);
     }
 }
+
+
+/* ============================================================
+   THEME-TOGGLE.CSS
+   Clean Pill-Shape Toggle - MIT MAXIMALER SPEZIFITÄT
+   10% kleiner als vorher
+   ============================================================ */
+
+/* ===================
+   1. WRAPPER
+   =================== */
+
+.header-right-controls .theme-toggle-wrapper,
+.theme-toggle-wrapper {
+    display: flex !important;
+    align-items: center !important;
+    gap: 9px !important;
+}
+
+/* ===================
+   2. ICONS (Mond & Sonne)
+   =================== */
+
+.theme-toggle-wrapper .toggle-icon-left,
+.theme-toggle-wrapper .toggle-icon-right {
+    font-size: 0.9rem !important;
+    transition: color 0.3s ease, opacity 0.3s ease !important;
+    width: auto !important;
+    height: auto !important;
+    background: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* Dark Mode: Mond aktiv, Sonne inaktiv */
+.theme-toggle-wrapper .toggle-icon-left {
+    color: var(--accent-color) !important;
+    opacity: 1 !important;
+}
+
+.theme-toggle-wrapper .toggle-icon-right {
+    color: #666 !important;
+    opacity: 0.6 !important;
+}
+
+/* Light Mode: Sonne aktiv, Mond inaktiv */
+body.light-mode .theme-toggle-wrapper .toggle-icon-left {
+    color: #999 !important;
+    opacity: 0.6 !important;
+}
+
+body.light-mode .theme-toggle-wrapper .toggle-icon-right {
+    color: var(--accent-color) !important;
+    opacity: 1 !important;
+}
+
+/* ===================
+   3. TOGGLE BUTTON (Pill Shape)
+   ===================
+   Desktop: 40px × 22px (war 45px × 25px)
+   =================== */
+
+.header-right-controls .theme-toggle-wrapper .theme-toggle,
+.theme-toggle-wrapper .theme-toggle,
+.theme-toggle-wrapper button.theme-toggle,
+button.theme-toggle,
+#theme-toggle {
+    /* Reset ALLES */
+    all: unset !important;
+    
+    /* Dann neu definieren */
+    position: relative !important;
+    display: block !important;
+    width: 40px !important;
+    height: 22px !important;
+    background-color: #6b6b6b !important;
+    border: none !important;
+    border-radius: 50px !important;
+    cursor: pointer !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    transition: background-color 0.3s ease !important;
+}
+
+.header-right-controls .theme-toggle-wrapper .theme-toggle:hover,
+.theme-toggle-wrapper .theme-toggle:hover,
+#theme-toggle:hover {
+    background-color: #7a7a7a !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.theme-toggle:focus-visible,
+#theme-toggle:focus-visible {
+    box-shadow: 0 0 0 2px var(--accent-color) !important;
+}
+
+/* Light Mode Track */
+body.light-mode .header-right-controls .theme-toggle-wrapper .theme-toggle,
+body.light-mode .theme-toggle-wrapper .theme-toggle,
+body.light-mode #theme-toggle {
+    background-color: #b0b0b0 !important;
+}
+
+body.light-mode .theme-toggle:hover,
+body.light-mode #theme-toggle:hover {
+    background-color: #a0a0a0 !important;
+}
+
+/* ===================
+   4. KNOB (Weißer Kreis)
+   ===================
+   Desktop: 17px × 17px (war 19px × 19px)
+   =================== */
+
+.theme-toggle .toggle-knob,
+#theme-toggle .toggle-knob,
+.toggle-knob {
+    position: absolute !important;
+    top: 2.5px !important;
+    left: 2.5px !important;
+    width: 17px !important;
+    height: 17px !important;
+    background-color: #ffffff !important;
+    border: none !important;
+    border-radius: 50% !important;
+    transition: left 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+    pointer-events: none !important;
+    display: block !important;
+}
+
+/* Light Mode: Knob nach rechts */
+/* Position: width(40) - knob(17) - padding(2.5) = 20.5px */
+body.light-mode .theme-toggle .toggle-knob,
+body.light-mode #theme-toggle .toggle-knob,
+body.light-mode .toggle-knob {
+    left: 20.5px !important;
+}
+
+/* ===================
+   5. MOBILE
+   ===================
+   Mobile: 36px × 20px (war 40px × 22px)
+   =================== */
+
+@media (max-width: 768px) {
+    .theme-toggle-wrapper {
+        gap: 7px !important;
+    }
+    
+    .theme-toggle-wrapper .toggle-icon-left,
+    .theme-toggle-wrapper .toggle-icon-right {
+        font-size: 0.8rem !important;
+    }
+    
+    .header-right-controls .theme-toggle-wrapper .theme-toggle,
+    .theme-toggle-wrapper .theme-toggle,
+    #theme-toggle {
+        width: 36px !important;
+        height: 20px !important;
+    }
+    
+    .theme-toggle .toggle-knob,
+    #theme-toggle .toggle-knob,
+    .toggle-knob {
+        width: 14px !important;
+        height: 14px !important;
+        top: 3px !important;
+        left: 3px !important;
+    }
+    
+    /* Mobile Light Mode: knob rechts */
+    /* Position: width(36) - knob(14) - padding(3) = 19px */
+    body.light-mode .theme-toggle .toggle-knob,
+    body.light-mode #theme-toggle .toggle-knob,
+    body.light-mode .toggle-knob {
+        left: 19px !important;
+    }
+}
+
+/* ===================
+   6. REDUCED MOTION
+   =================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .theme-toggle,
+    #theme-toggle,
+    .toggle-knob {
+        transition: none !important;
+    }
+}
+

@@ -12,21 +12,35 @@
     "@getbrevo/brevo": "^2.2.0",
     "@google/generative-ai": "^0.12.0",
     "@supabase/supabase-js": "^2.43.5",
+    "@upstash/redis": "^1.34.3",
     "cheerio": "^1.1.2",
-    "googleapis": "^142.0.0",
-    "ioredis": "^5.8.2",
-    "redis": "^5.10.0"
+    "googleapis": "^142.0.0"
+  },
+  "devDependencies": {
+    "gulp": "^5.0.0",
+    "gulp-clean-css": "^4.3.0",
+    "gulp-concat": "^2.6.1"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "inject-ratings": "node js/inject-ratings.js",
+    "generate-articles-db": "node js/generate-articles-db.js",
     "generate-knowledge": "node js/generate-knowledge.js",
     "generate-sitemap": "node generate-sitemap.js",
+<<<<<<< HEAD
     "build": "node js/generate-knowledge.js && node generate-sitemap.js && node js/inject-ratings.js && mkdir -p public && cp -r *.html *.css *.svg *.csv js css images Font CSV-Importer-PRO downloads public/ 2>/dev/null || echo 'Some assets missing, continuing...'"
   },
   "devDependencies": {
     "gulp": "^5.0.1",
     "gulp-clean-css": "^4.3.0",
     "gulp-concat": "^2.6.1"
+=======
+    "inject-ratings": "node js/inject-ratings.js",
+    "inject-footer": "node js/inject-footer.js",
+    "inject-breadcrumb": "node js/inject-breadcrumb.js",
+    "inject-related": "node js/inject-related.js",
+    "inject-blog": "node js/inject-blog-articles.js",
+    "inject-lazy": "node js/inject-lazy-loading.js",
+    "bundle-css": "gulp",
+    "build": "node js/generate-articles-db.js && node js/generate-knowledge.js && node generate-sitemap.js && node js/inject-ratings.js && mkdir -p public/css && cp -r *.html *.svg *.csv *.json js images Font CSV-Importer-PRO downloads public/ 2>/dev/null || echo 'Assets copy done' && npm run bundle-css && node js/inject-footer.js && node js/inject-breadcrumb.js && node js/inject-related.js && node js/inject-blog-articles.js && node js/inject-lazy-loading.js"
+>>>>>>> 78c898ae0c439f7ed09705e382c9ebb6cab9450c
   }
 }

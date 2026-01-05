@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content">
     <title>CSV Importer PRO | Schnelles & sauberes Content-Management | Michael Kanda</title>
-    <meta name="description" content="Das WP Plugin mit digitalen Superkräften, das deine Content-Tabellen in blitzschnelle Landingpages verwandelt.">
+    <meta name="description" content="Das WP Plugin das deine Content-Tabellen in blitzschnelle Landingpages verwandelt.">
     <meta name="robots" content="index, follow">
     
 <link rel="preload" href="/Font/Poppins-Regular.ttf" as="font" type="font/ttf" crossorigin="anonymous">    <link rel="icon" href="images/favicon.webp" type="image/webp">
@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="css/blog-style.css">
     <link rel="stylesheet" href="css/feedback-style.css">
     <link rel="stylesheet" href="css/menu-interactive.css">
+        <link rel="stylesheet" href="css/light-mode.css">
     
     <link rel="canonical" href="https://designare.at/CSV-Content-Importer.html" />
 
@@ -140,6 +141,9 @@
       "screenshot": "https://designare.at/images/csv-importer-interface.webp"
     }
     </script>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js" defer></script>
+    <script type="module" src="js/main.js"></script>
+    <script src="/js/analytics-proxy.js" async></script>
 </head>
 
 <body class="dark-mode page-loaded">
@@ -154,6 +158,7 @@
         <article class="blog-article">
             
             <header class="article-header">
+                  <div id="breadcrumb-placeholder"></div>
                 <h1>CSV Importer PRO: <span class="article-white">Schnelles & sauberes Content-Management<span></h1>
                 
                 <div class="article-meta">
@@ -172,7 +177,7 @@
                         <div style="display: flex; flex-wrap: wrap; gap: 2rem; align-items: center;">
                             <img src="images/CSV-Importer-PRO.webp" alt="CSV Importer PRO Interface" style="max-width: 230px; border-radius: 4px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
                             <div style="flex: 1; min-width: 280px;">
-                                <p>Schluss mit dem mühsamen manuellen Content-Import in WordPress! Die Lösung ist mein Duo SILAS und CSV Importer PRO. <a href="https://designare.at/CSV-Creator.html" style="color: var(--accent-color); font-weight: bold;">SILAS</a> erstellt hochwertige, SEO-optimierte Texte direkt als fertige CSV-Datei.</p>
+                                <p>Schluss mit dem mühsamen manuellen Content-Import in WordPress! Die Lösung ist mein Duo SILAS und CSV Importer PRO. <a href="https://designare.at/silas.html" style="color: var(--accent-color); font-weight: bold;">SILAS</a> erstellt hochwertige, SEO-optimierte Texte direkt als fertige CSV-Datei.</p>
                                 <p style="margin-bottom: 0;">Der CSV Importer PRO übernimmt dann nahtlos und verwandelt die Daten im Handumdrehen in makellose Landingpages, Blogs oder Produktseiten.</p>
                             </div>
                         </div>
@@ -181,7 +186,7 @@
             </section>
 
             <section aria-labelledby="process-heading">
-                <h2 id="process-heading">Das Herzstück des Imports: So geht’s</h2>
+                <h2 id="process-heading">Das Herzstück des Imports: <span class="article-white">So geht's<span></h2>
                 
                 <p>Schluss mit Chaos! Der Importer führt dich einfach und schnell durch den Prozess. Dank der "individuellen Spaltenzuordnung" weiß das System genau, welches CSV-Feld in welches WordPress-Feld gehört.</p>
 
@@ -190,13 +195,13 @@
                     <ul>
                         <li><strong>Dropbox & lokal:</strong> Hol deine CSV-Datei, egal wo sie liegt – ob im Dropbox-Cloud-Garten oder direkt auf deinem Server.</li>
                         <li><strong>Templates:</strong> Verknüpfe deine CSV-Daten mit (d)einer vordefinierten WordPress-Vorlage. So sind deine Landingpages nicht nur schnell erstellt, sondern sehen auch noch verdammt gut aus.</li>
-                        <li><strong>Page Builder Support:</strong> Der Importer unterstützt die gängigsten Page Builder wie Gutenberg, Elementor oder Breakdance.</li>
+                        <li><strong>Page Builder Support:</strong> Der Importer unterstützt die gängigsten Page Builder wie Gutenberg, Elementor oder Breakdance. Performance-Tipp: Achte bei der Template-Wahl auf <a href="https://designare.at/wordpress-pagebuilder-ressourcenverbrauch-2026" title="Warum schlanker Code wichtiger ist als PageBuilder-Komfort">ressourcenschonende Architektur</a>.</li>
                     </ul>
                 </article>
             </section>
 
             <section aria-labelledby="features-heading">
-                <h2 id="features-heading">Digitale Superkräfte, die du lieben wirst</h2>
+                <h2 id="features-heading">Digitale Superkräfte, <span class="article-white">die du lieben wirst<span></h2>
                 
                 <div class="tech-box">
                     <i class="fa-solid fa-wand-magic-sparkles"></i>
@@ -211,7 +216,7 @@
                     <dd>Warum importieren, wenn du es automatisieren kannst? Der Scheduler erledigt deine Imports vollautomatisch – stündlich, täglich oder wöchentlich.</dd>
                     
                     <dt>SEO im Blick</dt>
-                    <dd>Das Tool arbeitet Hand in Hand mit den gängigen SEO-Plugins wie Yoast SEO oder Rank Math. Definiere Meta-Titles und Descriptions direkt im Import.</dd>
+                    <dd>Das Tool arbeitet Hand in Hand mit den gängigen SEO-Plugins wie Yoast SEO oder Rank Math. Definiere Meta-Titles und Descriptions direkt im Import. Für maximale Sichtbarkeit in der KI-Suche empfehlen wir zusätzlich eine saubere <a href="https://designare.at/semantisches-markup" title="Warum semantisches HTML für SEO und KI-Suche entscheidend ist">semantische Markup-Struktur</a>.</dd>
                     
                     <dt>Sicherheit & Backups</dt>
                     <dd>Mit der Backup-Funktion kannst du jeden Import mit nur einem Klick rückgängig machen. So bist du immer auf der sicheren Seite – ganz ohne digitales Drama.</dd>
@@ -223,7 +228,7 @@
                     <dd>Von der Batch-Größe bis zur Fehlerbehandlung – du hast die volle Kontrolle über den Prozess.</dd>
                 </dl>
             </section>
-
+<!--
             <section aria-labelledby="preview-heading">
                 <h2 id="preview-heading">Einblicke in das Tool</h2>
                 
@@ -249,15 +254,16 @@
     </a>
 </div>
             </section>
+                    -->
+<section class="blog-cta-wrapper">
+    <h2>Interesse am CSV Importer PRO?</h2>
 
-            <section aria-labelledby="cta-heading" class="cta-section">
-                <h2 id="cta-heading">Interesse am CSV Importer PRO?</h2>
-                <p>Du hast eine ähnliche Herausforderung oder möchtest das Tool in Aktion sehen?</p>
-                <a href="mailto:michael@designare.at?subject=CSV-Importer%20PRO" class="cta-button">
-                    Schreib mir einfach <i class="fa-regular fa-paper-plane" style="margin-left: 8px;"></i>
-                </a>
-            </section>
-
+    <p>Du hast eine ähnliche Herausforderung oder möchtest das Tool in Aktion sehen?</p>
+    
+    <button onclick="document.getElementById('contact-modal').classList.add('visible')" class="cta-button-blog">
+        <i class="fa-solid fa-wand-magic-sparkles"></i> Zeig mir den Import-Trick
+    </button>
+</section>
             <div id="feedback-placeholder"></div>
 
         </article>
@@ -270,12 +276,8 @@
             <iframe id="preview-iframe" src="" style="width: 100%; height: 80vh; border: none;"></iframe>
         </div>
     </div>
-
+ <div id="related-placeholder"></div>
     <div id="footer-placeholder"></div>
-
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-    <script type="module" src="js/main.js"></script>
-<script src="/js/analytics-proxy.js"></script>
     <script src="js/feedback.js"></script>
 
     <script>
