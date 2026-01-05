@@ -75,7 +75,7 @@
 #ai-response-modal .modal-content {
     background-color: var(--modal-bg) !important;
     color: var(--text-color) !important;
-    border: 1px solid var(--border-color) !important;
+    /* border: 1px solid var(--border-color) !important; */
     border-radius: 0 !important;
     width: 90vw !important;
     height: 80vh !important;

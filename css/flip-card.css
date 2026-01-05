@@ -240,6 +240,7 @@
     height: auto;
     display: block;
     width: 100%;
+    aspect-ratio: attr(width) / attr(height);
 }
 
 .evita-text-middle a,

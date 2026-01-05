@@ -1,4 +1,16 @@
-// js/main.js - KORRIGIERTE VERSION
+// js/main.js - KORRIGIERTE VERSION (Home-Button Bug Fix v2)
+
+// ✅ SOFORT ausführen - Browser Scroll-Restore deaktivieren
+if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+}
+
+// ✅ SOFORT nach oben scrollen (vor allem anderen!)
+if (!window.location.hash) {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+}
 
 // === 1. IMPORTE ===
 import { initTheme } from './theme.js';
@@ -181,7 +193,7 @@ const launchEvitaChat = async () => {
             const chatInput = document.getElementById('ai-chat-input');
             if (chatInput) chatInput.focus();
         }, 100);
-    }, 300); // Erhöht auf 300ms
+    }, 300);
 };
 
 const ensureAiFormAvailable = async () => {
@@ -229,7 +241,7 @@ const addWelcomeMessage = (message) => {
     console.log("✅ Begrüßungsnachricht hinzugefügt");
 };
 
-// === 6. HERO FLIP LOGIK ===
+// === 6. HERO FLIP LOGIK - KOMPLETT NEU ===
 const initHeroFlip = () => {
     const heroFlipWrapper = document.getElementById('hero-flip-wrapper');
     if (!heroFlipWrapper) return;
@@ -248,11 +260,11 @@ const initHeroFlip = () => {
         const hash = window.location.hash;
         
         if (hash === '#michael') {
-            if(viewMain) viewMain.style.display = 'block';
+            // Michael anzeigen (Back-Face)
+            if(viewMain) viewMain.style.display = 'flex';
             if(viewThird) viewThird.style.display = 'none';
             heroFlipWrapper.classList.add('flipped');
             
-            // WICHTIG: Scrolling erlauben!
             document.body.classList.remove('no-scroll');
             
             setTimeout(() => {
@@ -270,11 +282,11 @@ const initHeroFlip = () => {
             }, 300);
         } 
         else if (hash === '#evita') {
+            // Evita anzeigen (Front-Face, view-third)
             if (viewMain) viewMain.style.display = 'none';
             if (viewThird) viewThird.style.display = 'flex';
             heroFlipWrapper.classList.remove('flipped');
             
-            // WICHTIG: Scrolling erlauben!
             document.body.classList.remove('no-scroll');
             
             setTimeout(() => {
@@ -291,6 +303,27 @@ const initHeroFlip = () => {
                 }
             }, 300);
         }
+        else {
+            // ✅ NEU: Startseite (kein Hash) - view-main anzeigen
+            if(viewMain) viewMain.style.display = 'flex';
+            if(viewThird) viewThird.style.display = 'none';
+            heroFlipWrapper.classList.remove('flipped');
+            
+            // ✅ FIX: Nur scrollTo(0,0) - kein scrollIntoView (versteckt Header)
+            window.scrollTo(0, 0);
+            
+            setTimeout(() => {
+                window.scrollTo(0, 0);
+            }, 10);
+            
+            setTimeout(() => {
+                window.scrollTo(0, 0);
+            }, 100);
+            
+            setTimeout(() => {
+                window.scrollTo(0, 0);
+            }, 300);
+        }
     };
 
     // Check beim Initialisieren
@@ -299,7 +332,9 @@ const initHeroFlip = () => {
     // Reagiere auf Hash-Änderungen
     window.addEventListener('hashchange', checkHashAndFlip);
 
-    // Event Listener für Buttons
+    // === EVENT LISTENERS ===
+
+    // Button: "Neugierig geworden?" → Flip zu Michael (Back-Face)
     if (btnToBack) {
         btnToBack.addEventListener('click', (e) => {
             e.preventDefault();
@@ -308,37 +343,78 @@ const initHeroFlip = () => {
         });
     }
 
+    // ✅ FIX: Button "Home" → Zurück zur Startseite (Front-Face, view-main)
     if (btnBackToStart) {
         btnBackToStart.addEventListener('click', (e) => {
             e.preventDefault();
+            
+            // Hash aus URL entfernen
             history.pushState("", document.title, window.location.pathname + window.location.search);
-            if(viewMain) viewMain.style.display = 'block';
+            
+            // Views setzen
+            if(viewMain) viewMain.style.display = 'flex';
             if(viewThird) viewThird.style.display = 'none';
+            
+            // Karte zurückdrehen
             heroFlipWrapper.classList.remove('flipped');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            // ✅ FIX: scrollIntoView statt scrollTo!
+            setTimeout(() => {
+                if(viewMain) {
+                    viewMain.scrollIntoView({ behavior: 'instant', block: 'start' });
+                }
+            }, 50);
         });
     }
     
+    // ✅ FIX: Button "Evita" → Flip zurück zur Front-Face und Evita-View anzeigen
     if (btnToThird) {
         btnToThird.addEventListener('click', (e) => {
             e.preventDefault();
+            
+            // ✅ WICHTIG: Views VOR dem Flip setzen!
             if (viewMain) viewMain.style.display = 'none';
             if (viewThird) viewThird.style.display = 'flex';
+            
+            // Karte zurückdrehen (zur Front-Face)
             heroFlipWrapper.classList.remove('flipped');
+            
+            // Nach oben scrollen
             window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            // Nach Flip-Animation zum Evita-Header scrollen
+            setTimeout(() => {
+                const target = document.getElementById('evita');
+                if (target) {
+                    const headerOffset = document.querySelector('.main-header')?.offsetHeight || 80;
+                    const elementPosition = target.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset - 40;
+
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            }, 850); // Warte auf Flip-Animation (0.8s) + Buffer
         });
     }
 
+    // Button: Evita → Michael (von Evita-View zur Back-Face)
     if (btnThirdToBack) {
         btnThirdToBack.addEventListener('click', (e) => {
             e.preventDefault();
+            
+            // Views setzen für nach dem Flip
+            if(viewMain) viewMain.style.display = 'flex';
+            if(viewThird) viewThird.style.display = 'none';
+            
+            // Flippen zur Back-Face
+            heroFlipWrapper.classList.add('flipped');
+            
+            // Hash setzen
             window.location.hash = '#michael';
             
             setTimeout(() => {
-                if (!heroFlipWrapper.classList.contains('flipped')) {
-                    heroFlipWrapper.classList.add('flipped');
-                }
-                
                 const target = document.getElementById('michael');
                 if (target) {
                     const headerOffset = document.querySelector('.main-header')?.offsetHeight || 80;
@@ -354,15 +430,17 @@ const initHeroFlip = () => {
         });
     }
 
+    // Button: "Her mit deinen Fragen" → Chat öffnen ODER zurück zur Startseite
     if (btnThirdToStart) {
         btnThirdToStart.addEventListener('click', async (e) => {
             e.preventDefault();
             if (btnThirdToStart.dataset.action === 'open-evita-chat') {
                 await launchEvitaChat();
             } else {
-                if(viewMain) viewMain.style.display = 'block';
+                if(viewMain) viewMain.style.display = 'flex';
                 if(viewThird) viewThird.style.display = 'none';
                 heroFlipWrapper.classList.remove('flipped');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         });
     }
@@ -421,6 +499,13 @@ const unlockScrollFallback = () => {
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("🚀 DOMContentLoaded - Starte Initialisierung...");
     
+    // ✅ SOFORT nach oben scrollen (verhindert Browser Scroll-Restore)
+    if (!window.location.hash) {
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+    }
+    
     // Theme vorab setzen
     if (localStorage.getItem('theme') === 'dark' || !localStorage.getItem('theme')) {
         document.body.classList.add('dark-mode');
@@ -458,7 +543,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 
                 console.log("✅ Seite vollständig initialisiert");
                 
-            }, 200); // Erhöht von 100 auf 200ms
+            }, 200);
         });
 
     } catch (error) {
