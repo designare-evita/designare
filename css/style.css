@@ -1018,3 +1018,120 @@ body.light-mode .toggle-knob {
     }
 }
 
+
+/* ===================
+   NO-SCROLL MIT FALLBACK - ERWEITERT
+   =================== */
+
+body.no-scroll {
+    overflow-y: hidden !important;
+}
+
+/* KRITISCH: Wenn page-loaded aber kein Modal offen, Scroll erlauben */
+body.no-scroll.page-loaded {
+    overflow-y: auto !important;
+}
+
+/* Ausnahme: Bei offenem Modal bleibt scroll disabled */
+body.no-scroll.page-loaded:has(.modal-overlay.visible),
+body.no-scroll.page-loaded:has(#side-menu-panel.visible) {
+    overflow-y: hidden !important;
+}
+
+/* Homepage No-Scroll (für Flip-Container Startseite) */
+body.homepage-no-scroll {
+    overflow: hidden !important;
+    position: fixed !important;
+    width: 100% !important;
+}
+
+/* Homepage Scroll Enabled */
+body.homepage-scroll-enabled {
+    overflow: auto !important;
+    position: relative !important;
+}
+
+/* =====================================================
+   NEU: AI-INPUT FOCUS FIX FÜR MOBILE
+   Erlaubt Scrollen wenn #ai-question fokussiert ist
+   ===================================================== */
+
+/* Wenn AI-Input fokussiert: Scroll IMMER erlauben */
+body.ai-input-focused {
+    overflow: auto !important;
+    overflow-y: auto !important;
+    position: relative !important;
+    height: auto !important;
+}
+
+/* Überschreibt auch homepage-no-scroll */
+body.homepage-no-scroll.ai-input-focused {
+    overflow: auto !important;
+    overflow-y: auto !important;
+    position: relative !important;
+}
+
+/* Mobile-spezifische Regeln */
+@media (max-width: 768px) {
+    
+    /* AI-Input fokussiert: Scroll aktivieren */
+    body.ai-input-focused {
+        overflow: auto !important;
+        overflow-y: scroll !important;
+        -webkit-overflow-scrolling: touch !important;
+        position: relative !important;
+        width: 100% !important;
+        height: auto !important;
+    }
+    
+    /* Auch wenn homepage-no-scroll aktiv ist */
+    body.homepage-no-scroll.ai-input-focused {
+        overflow: auto !important;
+        overflow-y: scroll !important;
+        -webkit-overflow-scrolling: touch !important;
+        position: relative !important;
+    }
+    
+    /* Hero anpassen wenn Input fokussiert */
+    body.ai-input-focused #hero {
+        min-height: auto !important;
+        height: auto !important;
+        position: relative !important;
+    }
+    
+    /* AI-Container bei Focus erhöhen */
+    body.ai-input-focused .ai-container {
+        position: relative !important;
+        z-index: 100 !important;
+    }
+    
+    /* Input selbst hervorheben */
+    #ai-question:focus {
+        position: relative !important;
+        z-index: 101 !important;
+    }
+    
+    /* Sanftes Scroll-Verhalten */
+    body.ai-input-focused {
+        scroll-behavior: smooth;
+    }
+}
+
+/* iOS Safari Fix */
+@supports (-webkit-touch-callout: none) {
+    body.ai-input-focused {
+        position: relative !important;
+        overflow: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+}
+
+/* CSS-Only Fallback: Nach 5 Sekunden automatisch Scroll freigeben */
+@keyframes unlock-scroll-fallback {
+    from { overflow-y: hidden; }
+    to { overflow-y: auto; }
+}
+
+body.no-scroll:not(.page-loaded) {
+    animation: unlock-scroll-fallback 0s 5s forwards;
+}
