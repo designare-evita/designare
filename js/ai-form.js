@@ -1,4 +1,4 @@
-// js/ai-form.js - KORRIGIERTE VERSION mit robuster Initialisierung
+// js/ai-form.js - MIT DIREKTEM MODAL-ÖFFNEN BEI KLICK AUF #ai-question
 let isKeyboardListenerActive = false;
 
 export const initAiForm = () => {
@@ -330,7 +330,6 @@ export const initAiForm = () => {
         addMessage(message, sender, displayImmediately = false) {
             console.log(`📝 addMessage aufgerufen - Sender: ${sender}, Message: ${message.substring(0, 50)}...`);
             
-            // DOM-Referenz neu holen (falls dynamisch geladen)
             const chatHistoryContainer = document.getElementById('ai-chat-history');
             
             if (!chatHistoryContainer) {
@@ -350,8 +349,6 @@ export const initAiForm = () => {
             const msgDiv = document.createElement('div');
             msgDiv.className = `chat-message ${sender}`;
             
-            // Wenn displayImmediately true ist, zeige Text sofort an (für Begrüßungen)
-            // Sonst: User-Nachrichten sofort, AI-Nachrichten leer (für Typewriter)
             if (displayImmediately) {
                 msgDiv.textContent = cleanMessage;
             } else {
@@ -806,30 +803,62 @@ export const initAiForm = () => {
     }
 
     // ===================================================================
-    // EVENT LISTENERS SETUP - KORRIGIERT
+    // EVENT LISTENERS SETUP - MIT DIREKTEM MODAL-ÖFFNEN
     // ===================================================================
     function initializeEventListeners() {
         console.log("🔧 Initialisiere Event-Listener");
         
-        // DOM-Referenzen aktualisieren
         DOM = getDOM();
 
-        // Haupt-Formular auf der Startseite
+        // ✅ NEU: Klick/Focus auf #ai-question öffnet direkt das Modal
+        const aiQuestionInput = document.getElementById('ai-question');
+        if (aiQuestionInput && !aiQuestionInput.hasAttribute('data-modal-listener-added')) {
+            aiQuestionInput.setAttribute('data-modal-listener-added', 'true');
+            
+            // Bei Klick: Modal öffnen
+            aiQuestionInput.addEventListener('click', (e) => {
+                e.preventDefault();
+                openEvitaChatWithWelcome();
+            });
+            
+            // Bei Focus (Tab-Navigation): Modal öffnen
+            aiQuestionInput.addEventListener('focus', (e) => {
+                e.preventDefault();
+                // Blur das Input sofort wieder
+                aiQuestionInput.blur();
+                openEvitaChatWithWelcome();
+            });
+            
+            // Bei Touch (Mobile): Modal öffnen
+            aiQuestionInput.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                openEvitaChatWithWelcome();
+            }, { passive: false });
+            
+            console.log("✅ #ai-question öffnet jetzt direkt das Modal");
+        }
+
+        // Haupt-Formular auf der Startseite (Submit mit Text)
         if (DOM.aiForm && !DOM.aiForm.hasAttribute('data-listener-added')) {
             DOM.aiForm.setAttribute('data-listener-added', 'true');
             DOM.aiForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 const userInput = DOM.aiQuestionInput?.value?.trim();
+                
+                ChatUI.resetChat();
+                ModalController.openChatModal();
+                
+                // Wenn Text eingegeben wurde, diesen als erste Nachricht senden
                 if (userInput) {
-                    ChatUI.resetChat();
-                    ModalController.openChatModal();
-                    
-                    // Verzögerung für Chat-Begrüßung
                     setTimeout(() => {
                         handleUserMessage(userInput);
                     }, 150);
-                    
                     if (DOM.aiQuestionInput) DOM.aiQuestionInput.value = '';
+                } else {
+                    // Nur Begrüßung zeigen
+                    setTimeout(() => {
+                        addWelcomeMessageToChat();
+                    }, 300);
                 }
             });
             console.log("✅ Haupt-Formular Listener hinzugefügt");
@@ -866,8 +895,6 @@ export const initAiForm = () => {
         });
         
         observer.observe(document.body, { childList: true, subtree: true });
-        
-        // Initial Setup
         setupChatFormListener();
 
         // Header-Chat-Button
@@ -876,25 +903,7 @@ export const initAiForm = () => {
             headerChatButton.setAttribute('data-listener-added', 'true');
             headerChatButton.addEventListener('click', (e) => {
                 e.preventDefault();
-                ChatUI.resetChat();
-                ModalController.openChatModal();
-                
-                // WICHTIG: Begrüßung zuverlässig nach Modal-Animation hinzufügen
-                setTimeout(() => {
-                    const chatHistory = document.getElementById('ai-chat-history');
-                    if (chatHistory) {
-                        // Prüfe ob WIRKLICH leer (auch nach Reset)
-                        if (chatHistory.children.length === 0 || 
-                            !chatHistory.querySelector('.chat-message.ai')) {
-                            const welcomeMsg = ChatUI.addMessage(
-                                "Hallo! Ich bin Evita, Michaels KI-Assistentin. Womit kann ich dir heute helfen?", 
-                                'ai',
-                                true // displayImmediately = true für sofortige Anzeige
-                            );
-                            console.log("✅ Begrüßung hinzugefügt:", welcomeMsg);
-                        }
-                    }
-                }, 400); // Erhöht auf 400ms für sicheres Timing nach Modal-Animation
+                openEvitaChatWithWelcome();
             });
             console.log("✅ Header-Chat-Button Listener hinzugefügt");
         }
@@ -923,16 +932,39 @@ export const initAiForm = () => {
     }
 
     // ===================================================================
+    // HELPER: Chat mit Begrüßung öffnen
+    // ===================================================================
+    function openEvitaChatWithWelcome() {
+        ChatUI.resetChat();
+        ModalController.openChatModal();
+        
+        setTimeout(() => {
+            addWelcomeMessageToChat();
+        }, 300);
+    }
+    
+    function addWelcomeMessageToChat() {
+        const chatHistory = document.getElementById('ai-chat-history');
+        if (chatHistory && chatHistory.children.length === 0) {
+            ChatUI.addMessage(
+                "Hallo! Ich bin Evita, Michaels KI-Assistentin. Womit kann ich dir heute helfen?", 
+                'ai',
+                true
+            );
+            console.log("✅ Begrüßung hinzugefügt");
+        }
+    }
+
+    // ===================================================================
     // GLOBALE FUNKTIONEN
     // ===================================================================
     window.closeCallbackModal = () => BookingModal.remove();
     window.launchBookingFromChat = () => BookingModal.launch();
+    window.openEvitaChat = () => openEvitaChatWithWelcome();
 
     // ===================================================================
     // INITIALISIERUNG
     // ===================================================================
-    
-    // Warte kurz auf DOM-Elemente
     setTimeout(() => {
         initializeEventListeners();
         console.log("✅ AI-Form-Modul initialisiert!");
