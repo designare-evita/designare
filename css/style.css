@@ -1071,6 +1071,17 @@ body.homepage-no-scroll.ai-input-focused {
     position: relative !important;
 }
 
+/* =====================================================
+   FOOTER VERSTECKEN BEI AI-INPUT FOCUS
+   ===================================================== */
+
+footer.ai-input-hide {
+    transform: translateY(200%) !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transition: transform 0.3s ease, opacity 0.3s ease !important;
+}
+
 /* Mobile-spezifische Regeln */
 @media (max-width: 768px) {
     
@@ -1114,6 +1125,14 @@ body.homepage-no-scroll.ai-input-focused {
     /* Sanftes Scroll-Verhalten */
     body.ai-input-focused {
         scroll-behavior: smooth;
+    }
+    
+    /* Footer bei AI-Input Focus verstecken (Mobile) */
+    body.ai-input-focused footer,
+    footer.ai-input-hide {
+        transform: translateY(200%) !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
     }
 }
 
