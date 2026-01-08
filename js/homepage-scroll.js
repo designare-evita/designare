@@ -1,7 +1,7 @@
 /* ============================================================
    HOMEPAGE-SCROLL.JS
    Steuert das Scroll-Verhalten auf der Startseite
-   MIT FIX: Scroll erlaubt wenn ai-question Input fokussiert ist (Mobile)
+   MIT FIX: Scroll erlaubt + Footer versteckt wenn ai-question fokussiert (Mobile)
    ============================================================ */
 
 (function() {
@@ -40,7 +40,6 @@
         const style = window.getComputedStyle(viewThird);
         const inlineDisplay = viewThird.style.display;
         
-        // Prüfe sowohl inline-style als auch computed style
         return inlineDisplay === 'flex' || 
                inlineDisplay === 'block' || 
                style.display === 'flex' || 
@@ -55,6 +54,22 @@
     }
     
     /**
+     * Footer verstecken/zeigen
+     */
+    function setFooterVisibility(visible) {
+        const footer = document.querySelector('footer');
+        if (!footer) return;
+        
+        if (visible) {
+            footer.classList.remove('ai-input-hide');
+            console.log('[Scroll] Footer SICHTBAR');
+        } else {
+            footer.classList.add('ai-input-hide');
+            console.log('[Scroll] Footer VERSTECKT');
+        }
+    }
+    
+    /**
      * Setzt den Scroll-Status basierend auf dem Flip-Zustand und Evita
      */
     function updateScrollState() {
@@ -63,28 +78,27 @@
         
         console.log('[Scroll] Update:', { flipped, evitaVisible, isAiInputFocused, isMobile: isMobile() });
         
-        // ✅ NEU: Wenn ai-question fokussiert ist UND mobile → Scrollen erlauben
+        // ✅ Wenn ai-question fokussiert ist UND mobile → Scrollen erlauben + Footer verstecken
         if (isAiInputFocused && isMobile()) {
             body.classList.remove('homepage-no-scroll');
             body.classList.add('homepage-scroll-enabled');
             body.classList.add('ai-input-focused');
+            setFooterVisibility(false); // Footer verstecken
             console.log('[Scroll] → Scroll ENABLED (AI Input fokussiert auf Mobile)');
             return;
         }
         
         // Entferne ai-input-focused Klasse wenn nicht mehr fokussiert
         body.classList.remove('ai-input-focused');
+        setFooterVisibility(true); // Footer wieder zeigen
         
         if (flipped || evitaVisible) {
-            // Flip Card oder Evita ist offen - Scrollen erlauben
             body.classList.remove('homepage-no-scroll');
             body.classList.add('homepage-scroll-enabled');
             console.log('[Scroll] → Scroll ENABLED');
         } else {
-            // Beide geschlossen - Kein Scrollen
             body.classList.add('homepage-no-scroll');
             body.classList.remove('homepage-scroll-enabled');
-            // Scroll Position zurücksetzen
             window.scrollTo(0, 0);
             console.log('[Scroll] → Scroll DISABLED');
         }
@@ -97,34 +111,32 @@
         const aiQuestion = document.getElementById('ai-question');
         
         if (!aiQuestion) {
-            // Falls Element noch nicht existiert, später erneut versuchen
             setTimeout(setupAiInputListeners, 500);
             return;
         }
         
         console.log('[Scroll] AI-Question Input gefunden, setze Focus-Listener');
         
-        // Focus Event - Scroll aktivieren
+        // Focus Event
         aiQuestion.addEventListener('focus', () => {
             console.log('[Scroll] ai-question FOKUSSIERT');
             isAiInputFocused = true;
             
             if (isMobile()) {
-                // Scroll aktivieren
+                // Scroll aktivieren + Footer verstecken
                 body.classList.remove('homepage-no-scroll');
                 body.classList.add('homepage-scroll-enabled');
                 body.classList.add('ai-input-focused');
+                setFooterVisibility(false);
                 
-                // Kurz warten bis Tastatur offen ist, dann Input in View scrollen
+                // Input in View scrollen
                 setTimeout(() => {
-                    // Sanftes Scrollen zum Input
                     aiQuestion.scrollIntoView({ 
                         behavior: 'smooth', 
                         block: 'center' 
                     });
                 }, 300);
                 
-                // Nochmal nach Tastatur-Animation
                 setTimeout(() => {
                     aiQuestion.scrollIntoView({ 
                         behavior: 'smooth', 
@@ -134,14 +146,13 @@
             }
         });
         
-        // Blur Event - Zurück zum normalen Scroll-Verhalten
+        // Blur Event
         aiQuestion.addEventListener('blur', () => {
             console.log('[Scroll] ai-question BLUR');
             isAiInputFocused = false;
             
-            // Kurze Verzögerung, damit andere Interaktionen nicht gestört werden
             setTimeout(() => {
-                if (!isAiInputFocused) { // Double-check
+                if (!isAiInputFocused) {
                     updateScrollState();
                 }
             }, 200);
@@ -153,12 +164,13 @@
                 isAiInputFocused = true;
                 body.classList.remove('homepage-no-scroll');
                 body.classList.add('homepage-scroll-enabled');
+                setFooterVisibility(false);
             }
         }, { passive: true });
     }
     
     /**
-     * Visual Viewport API für bessere Keyboard-Erkennung
+     * Visual Viewport API für Keyboard-Erkennung
      */
     function setupVisualViewportListener() {
         if (window.visualViewport) {
@@ -166,7 +178,6 @@
                 if (isAiInputFocused && isMobile()) {
                     const aiQuestion = document.getElementById('ai-question');
                     if (aiQuestion && document.activeElement === aiQuestion) {
-                        // Viewport hat sich geändert (Tastatur geöffnet/geschlossen)
                         setTimeout(() => {
                             aiQuestion.scrollIntoView({ 
                                 behavior: 'smooth', 
@@ -179,7 +190,7 @@
         }
     }
     
-    // Initial setzen (mit kleinem Delay für DOM-Ready)
+    // Initial setzen
     setTimeout(updateScrollState, 100);
     
     // AI Input Listener initialisieren
@@ -188,7 +199,7 @@
     // Visual Viewport Listener
     setupVisualViewportListener();
     
-    // MutationObserver für Flip Container (class changes)
+    // MutationObserver für Flip Container
     const flipObserver = new MutationObserver(function(mutations) {
         mutations.forEach(function(mutation) {
             if (mutation.attributeName === 'class') {
@@ -203,13 +214,12 @@
         attributeFilter: ['class']
     });
     
-    // MutationObserver für view-third (Evita) - style UND class
+    // MutationObserver für view-third (Evita)
     if (viewThird) {
         const viewThirdObserver = new MutationObserver(function(mutations) {
             mutations.forEach(function(mutation) {
                 if (mutation.attributeName === 'style' || mutation.attributeName === 'class') {
                     console.log('[Scroll] Evita style/class changed');
-                    // Kleiner Delay um sicherzustellen dass Display gesetzt ist
                     setTimeout(updateScrollState, 50);
                 }
             });
@@ -221,17 +231,16 @@
         });
     }
     
-    // Event Listeners für Custom Events (falls dein flip.js diese dispatcht)
+    // Event Listeners für Custom Events
     document.addEventListener('flipcard:flipped', updateScrollState);
     document.addEventListener('flipcard:unflipped', updateScrollState);
     document.addEventListener('evita:shown', updateScrollState);
     document.addEventListener('evita:hidden', updateScrollState);
     
-    // Auch auf Click-Events der Evita-Buttons hören
+    // Click-Events der Buttons
     document.addEventListener('click', function(e) {
         const target = e.target.closest('[data-view], #show-evita-btn, #hide-evita-btn, .flip-btn-style');
         if (target) {
-            // Verzögert prüfen nach Click
             setTimeout(updateScrollState, 100);
             setTimeout(updateScrollState, 300);
         }
@@ -244,6 +253,6 @@
         updateScrollState();
     };
     
-    console.log('[Scroll] Homepage-Scroll.js initialisiert (mit AI-Input Fix)');
+    console.log('[Scroll] Homepage-Scroll.js initialisiert (mit AI-Input + Footer Fix)');
     
 })();
