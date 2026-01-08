@@ -1,6 +1,7 @@
 /* ============================================================
    HOMEPAGE-SCROLL.JS
    Steuert das Scroll-Verhalten auf der Startseite
+   MIT FIX: Scroll erlaubt wenn ai-question Input fokussiert ist (Mobile)
    ============================================================ */
 
 (function() {
@@ -12,10 +13,22 @@
     const hero = document.getElementById('hero');
     const viewThird = document.getElementById('view-third');
     
+    // State für Input-Focus
+    let isAiInputFocused = false;
+    
     // Nur auf der Startseite mit Flip-Container ausführen
     if (!flipContainer || !hero) {
         console.log('[Scroll] Keine Flip-Container gefunden, Script beendet');
         return;
+    }
+    
+    /**
+     * Prüft ob es sich um ein mobiles Gerät handelt
+     */
+    function isMobile() {
+        return window.innerWidth <= 768 || 
+               ('ontouchstart' in window) || 
+               (navigator.maxTouchPoints > 0);
     }
     
     /**
@@ -48,7 +61,19 @@
         const flipped = isFlipped();
         const evitaVisible = isViewThirdVisible();
         
-        console.log('[Scroll] Update:', { flipped, evitaVisible });
+        console.log('[Scroll] Update:', { flipped, evitaVisible, isAiInputFocused, isMobile: isMobile() });
+        
+        // ✅ NEU: Wenn ai-question fokussiert ist UND mobile → Scrollen erlauben
+        if (isAiInputFocused && isMobile()) {
+            body.classList.remove('homepage-no-scroll');
+            body.classList.add('homepage-scroll-enabled');
+            body.classList.add('ai-input-focused');
+            console.log('[Scroll] → Scroll ENABLED (AI Input fokussiert auf Mobile)');
+            return;
+        }
+        
+        // Entferne ai-input-focused Klasse wenn nicht mehr fokussiert
+        body.classList.remove('ai-input-focused');
         
         if (flipped || evitaVisible) {
             // Flip Card oder Evita ist offen - Scrollen erlauben
@@ -65,8 +90,103 @@
         }
     }
     
+    /**
+     * Setup Event Listener für ai-question Input
+     */
+    function setupAiInputListeners() {
+        const aiQuestion = document.getElementById('ai-question');
+        
+        if (!aiQuestion) {
+            // Falls Element noch nicht existiert, später erneut versuchen
+            setTimeout(setupAiInputListeners, 500);
+            return;
+        }
+        
+        console.log('[Scroll] AI-Question Input gefunden, setze Focus-Listener');
+        
+        // Focus Event - Scroll aktivieren
+        aiQuestion.addEventListener('focus', () => {
+            console.log('[Scroll] ai-question FOKUSSIERT');
+            isAiInputFocused = true;
+            
+            if (isMobile()) {
+                // Scroll aktivieren
+                body.classList.remove('homepage-no-scroll');
+                body.classList.add('homepage-scroll-enabled');
+                body.classList.add('ai-input-focused');
+                
+                // Kurz warten bis Tastatur offen ist, dann Input in View scrollen
+                setTimeout(() => {
+                    // Sanftes Scrollen zum Input
+                    aiQuestion.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'center' 
+                    });
+                }, 300);
+                
+                // Nochmal nach Tastatur-Animation
+                setTimeout(() => {
+                    aiQuestion.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'center' 
+                    });
+                }, 500);
+            }
+        });
+        
+        // Blur Event - Zurück zum normalen Scroll-Verhalten
+        aiQuestion.addEventListener('blur', () => {
+            console.log('[Scroll] ai-question BLUR');
+            isAiInputFocused = false;
+            
+            // Kurze Verzögerung, damit andere Interaktionen nicht gestört werden
+            setTimeout(() => {
+                if (!isAiInputFocused) { // Double-check
+                    updateScrollState();
+                }
+            }, 200);
+        });
+        
+        // Touch Events für bessere Mobile-Unterstützung
+        aiQuestion.addEventListener('touchstart', () => {
+            if (isMobile()) {
+                isAiInputFocused = true;
+                body.classList.remove('homepage-no-scroll');
+                body.classList.add('homepage-scroll-enabled');
+            }
+        }, { passive: true });
+    }
+    
+    /**
+     * Visual Viewport API für bessere Keyboard-Erkennung
+     */
+    function setupVisualViewportListener() {
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', () => {
+                if (isAiInputFocused && isMobile()) {
+                    const aiQuestion = document.getElementById('ai-question');
+                    if (aiQuestion && document.activeElement === aiQuestion) {
+                        // Viewport hat sich geändert (Tastatur geöffnet/geschlossen)
+                        setTimeout(() => {
+                            aiQuestion.scrollIntoView({ 
+                                behavior: 'smooth', 
+                                block: 'center' 
+                            });
+                        }, 100);
+                    }
+                }
+            });
+        }
+    }
+    
     // Initial setzen (mit kleinem Delay für DOM-Ready)
     setTimeout(updateScrollState, 100);
+    
+    // AI Input Listener initialisieren
+    setupAiInputListeners();
+    
+    // Visual Viewport Listener
+    setupVisualViewportListener();
     
     // MutationObserver für Flip Container (class changes)
     const flipObserver = new MutationObserver(function(mutations) {
@@ -119,7 +239,11 @@
     
     // Export für manuelles Triggern
     window.updateHomepageScroll = updateScrollState;
+    window.setAiInputFocused = function(focused) {
+        isAiInputFocused = focused;
+        updateScrollState();
+    };
     
-    console.log('[Scroll] Homepage-Scroll.js initialisiert');
+    console.log('[Scroll] Homepage-Scroll.js initialisiert (mit AI-Input Fix)');
     
 })();
