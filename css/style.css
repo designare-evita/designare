@@ -1051,106 +1051,48 @@ body.homepage-scroll-enabled {
     position: relative !important;
 }
 
-/* =====================================================
-   NEU: AI-INPUT FOCUS FIX FÜR MOBILE
-   Erlaubt Scrollen wenn #ai-question fokussiert ist
-   ===================================================== */
+/* ============================================================
+   AI-QUESTION INPUT ALS MODAL-TRIGGER
+   
+   Füge diesen Code in deine style.css ein
+   (im Abschnitt "AI FORM" oder am Ende)
+   ============================================================ */
 
-/* Wenn AI-Input fokussiert: Scroll IMMER erlauben */
-body.ai-input-focused {
-    overflow: auto !important;
-    overflow-y: auto !important;
-    position: relative !important;
-    height: auto !important;
+/* Input-Feld verhält sich wie ein Button/Trigger */
+#ai-question {
+    cursor: pointer !important;
+    /* Verhindert dass der Cursor zum Text-Cursor wird */
+    caret-color: transparent;
 }
 
-/* Überschreibt auch homepage-no-scroll */
-body.homepage-no-scroll.ai-input-focused {
-    overflow: auto !important;
-    overflow-y: auto !important;
-    position: relative !important;
+/* Optional: Hover-Effekt für besseres Feedback */
+#ai-question:hover {
+    border-color: var(--accent-color);
 }
 
-/* =====================================================
-   FOOTER VERSTECKEN BEI AI-INPUT FOCUS
-   ===================================================== */
-
-footer.ai-input-hide {
-    transform: translateY(200%) !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-    transition: transform 0.3s ease, opacity 0.3s ease !important;
-}
-
-/* Mobile-spezifische Regeln */
+/* Auf Mobile: Touch-Feedback */
 @media (max-width: 768px) {
-    
-    /* AI-Input fokussiert: Scroll aktivieren */
-    body.ai-input-focused {
-        overflow: auto !important;
-        overflow-y: scroll !important;
-        -webkit-overflow-scrolling: touch !important;
-        position: relative !important;
-        width: 100% !important;
-        height: auto !important;
+    #ai-question {
+        /* Verhindert iOS Zoom bei Focus */
+        font-size: 16px !important;
+        /* Touch-Feedback */
+        -webkit-tap-highlight-color: rgba(196, 163, 90, 0.2);
     }
     
-    /* Auch wenn homepage-no-scroll aktiv ist */
-    body.homepage-no-scroll.ai-input-focused {
-        overflow: auto !important;
-        overflow-y: scroll !important;
-        -webkit-overflow-scrolling: touch !important;
-        position: relative !important;
-    }
-    
-    /* Hero anpassen wenn Input fokussiert */
-    body.ai-input-focused #hero {
-        min-height: auto !important;
-        height: auto !important;
-        position: relative !important;
-    }
-    
-    /* AI-Container bei Focus erhöhen */
-    body.ai-input-focused .ai-container {
-        position: relative !important;
-        z-index: 100 !important;
-    }
-    
-    /* Input selbst hervorheben */
-    #ai-question:focus {
-        position: relative !important;
-        z-index: 101 !important;
-    }
-    
-    /* Sanftes Scroll-Verhalten */
-    body.ai-input-focused {
-        scroll-behavior: smooth;
-    }
-    
-    /* Footer bei AI-Input Focus verstecken (Mobile) */
-    body.ai-input-focused footer,
-    footer.ai-input-hide {
-        transform: translateY(200%) !important;
-        opacity: 0 !important;
-        pointer-events: none !important;
+    #ai-question:active {
+        background-color: rgba(196, 163, 90, 0.1);
     }
 }
 
-/* iOS Safari Fix */
-@supports (-webkit-touch-callout: none) {
-    body.ai-input-focused {
-        position: relative !important;
-        overflow: auto !important;
-        -webkit-overflow-scrolling: touch !important;
-    }
+/* Entferne den blinkenden Cursor da kein echtes Tippen möglich ist */
+#ai-question::placeholder {
+    color: var(--text-color);
+    opacity: 0.5;
 }
 
-/* CSS-Only Fallback: Nach 5 Sekunden automatisch Scroll freigeben */
-@keyframes unlock-scroll-fallback {
-    from { overflow-y: hidden; }
-    to { overflow-y: auto; }
-}
-
-body.no-scroll:not(.page-loaded) {
-    animation: unlock-scroll-fallback 0s 5s forwards;
+/* Focus-Ring entfernen da Modal sofort öffnet */
+#ai-question:focus {
+    outline: none;
+    /* Optional: Kurzer visueller Feedback */
+    border-color: var(--accent-color);
 }
