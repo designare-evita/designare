@@ -934,6 +934,25 @@ export const initAiForm = () => {
     // ===================================================================
     // HELPER: Chat mit Begrüßung öffnen
     // ===================================================================
+    
+    const welcomeMessages = [
+        "Hallo! Ich bin Evita, Michaels KI-Assistentin. Womit kann ich dir heute helfen?",
+        "Hey! Schön, dass du da bist. Ich bin Evita – Michaels KI-Assistentin. Womit kann ich dir heute helfen?",
+        "Servus! Evita hier, Michaels digitale Komplizin. Was möchtest du wissen?",
+        "Hi! Ich bin Evita. Michael ist gerade beschäftigt, aber ich kann dir sicher weiterhelfen. Was liegt an?",
+        "Willkommen! Ich bin Evita, Michaels digitale Komplizin. Stell mir deine Fragen!",
+        "Hey, schön dich zu sehen! Ich bin Evita. Egal, ob WordPress, KI oder Kuchenrezepte – ich bin für dich da!",
+        "Hi! Evita hier. Ich freue mich dich kennenzulernen – frag einfach drauf los!",
+        "Grüß dich! Ich bin Evita, die digitale Version an Michaels Seite. Die vierbeinige schläft gerade. Was kann ich für dich tun?",
+        "Servus! Evita hier. Ich kümmere mich um die KI, Michael um den Code und der Hund um die gute Laune. Lass uns dein Business skalieren – womit fangen wir an?",
+        "Grüß dich! Ich bin Evita, Michaels digitale Unterstützung. Der Hund schnarcht, Michael codet – und ich bin ganz Ohr für dich. Was liegt an?",
+        "Servus! Evita hier. Ich bin die KI, Michael schreibt den Code und der Hund ist für die gute Laune zuständig. Wobei kann ich dir heute helfen?"
+    ];
+    
+    function getRandomWelcomeMessage() {
+        return welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
+    }
+    
     function openEvitaChatWithWelcome() {
         ChatUI.resetChat();
         ModalController.openChatModal();
@@ -946,12 +965,9 @@ export const initAiForm = () => {
     function addWelcomeMessageToChat() {
         const chatHistory = document.getElementById('ai-chat-history');
         if (chatHistory && chatHistory.children.length === 0) {
-            ChatUI.addMessage(
-                "Hallo! Ich bin Evita, Michaels KI-Assistentin. Womit kann ich dir heute helfen?", 
-                'ai',
-                true
-            );
-            console.log("✅ Begrüßung hinzugefügt");
+            const randomGreeting = getRandomWelcomeMessage();
+            ChatUI.addMessage(randomGreeting, 'ai', true);
+            console.log("✅ Begrüßung hinzugefügt:", randomGreeting);
         }
     }
 
