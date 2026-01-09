@@ -516,6 +516,7 @@ export const initAiForm = () => {
             return `
                 <div id="booking-modal" class="booking-modal">
                     <div class="booking-modal-content">
+                        <button onclick="closeCallbackModal()" class="booking-modal-close-btn">&times;</button>
                         <div class="booking-modal-header">
                             <h2 class="booking-modal-title">Rückruf vereinbaren</h2>
                             <p class="booking-modal-subtitle">Michael ruft dich zum gewünschten Zeitpunkt an.</p>
@@ -523,19 +524,18 @@ export const initAiForm = () => {
                         <div class="booking-modal-body">
                             <div id="step-slot-selection" class="booking-step active">
                                 <h3 class="booking-step-title">Verfügbare Termine</h3>
-                                <div id="callback-loading" style="text-align: center; padding: 20px; color: #aaa;">
-                                    <div style="font-size: 1.5rem; margin-bottom: 10px;">⏳</div>
+                                <div id="callback-loading">
                                     Lade verfügbare Termine...
                                 </div>
                                 <div id="callback-slots-container" style="display: none;"></div>
-                                <div id="no-slots-message" style="display: none; text-align: center; color: #aaa; padding: 20px;">
+                                <div id="no-slots-message" style="display: none;">
                                     Aktuell sind keine Termine verfügbar.<br>
-                                    <a href="mailto:michael@designare.at" style="color: var(--accent-color);">michael@designare.at</a>
+                                    <a href="mailto:michael@designare.at">michael@designare.at</a>
                                 </div>
                             </div>
 
                             <div id="step-contact-details" class="booking-step">
-                                <div id="selected-slot-display" style="text-align: center; margin-bottom: 20px; padding: 12px; background: rgba(196, 163, 90, 0.1); border: 1px solid var(--accent-color);"></div>
+                                <div id="selected-slot-display"></div>
                                 <h3 class="booking-step-title">Deine Kontaktdaten</h3>
                                 <form id="callback-form">
                                     <div class="booking-form-group">
@@ -550,23 +550,21 @@ export const initAiForm = () => {
                                         <label for="callback-topic">Anliegen (optional)</label>
                                         <textarea id="callback-topic" rows="3" placeholder="Worum geht es?"></textarea>
                                     </div>
-                                    <div class="booking-form-actions" style="display: flex; gap: 15px; margin-top: 20px;">
-                                        <button type="button" id="back-to-slots" class="cta-button secondary">← Zurück</button>
-                                        <button type="submit" id="submit-callback" class="cta-button">Rückruf buchen</button>
+                                    <div class="booking-form-actions">
+                                        <button type="button" id="back-to-slots" class="booking-btn back-btn">← Zurück</button>
+                                        <button type="submit" id="submit-callback" class="booking-btn submit-btn">Rückruf buchen</button>
                                     </div>
                                 </form>
                             </div>
 
                             <div id="step-confirmation" class="booking-step">
-                                <div style="text-align: center;">
-                                    <div style="font-size: 3rem; margin-bottom: 20px;">🎉</div>
-                                    <h3>Termin gebucht!</h3>
-                                    <div id="confirmation-details" style="margin: 25px 0; padding: 20px; background: rgba(255,255,255,0.05);"></div>
-                                    <button onclick="closeCallbackModal()" class="cta-button">Perfekt!</button>
+                                <div class="confirmation-content">
+                                    <h3 class="confirmation-title">Termin gebucht!</h3>
+                                    <div id="confirmation-details"></div>
+                                    <button onclick="closeCallbackModal()" class="booking-btn confirm-close-btn">Perfekt!</button>
                                 </div>
                             </div>
                         </div>
-                        <button onclick="closeCallbackModal()" class="close-button">&times;</button>
                     </div>
                 </div>
             `;
