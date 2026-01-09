@@ -17,7 +17,7 @@
     justify-content: center !important;
     z-index: 999999 !important;
     opacity: 1 !important;
-    font-family: 'Poppins', sans-serif !important;
+    font-family: 'Poppins', sans-serif;
 }
 
 .booking-modal-content {
@@ -146,7 +146,8 @@
 
 .callback-slot-button:hover {
     border-color: var(--accent-color);
-    background: transparent;
+    background: rgba(196, 163, 90, 0.1);
+    color: var(--accent-color);
 }
 
 .slot-info {
@@ -156,7 +157,7 @@
 .slot-time {
     font-size: 1.1rem;
     font-weight: 400;
-    color: var(--text-color);
+    color: inherit;
 }
 
 .slot-day {
@@ -174,6 +175,11 @@
 .callback-slot-button:hover .slot-arrow {
     transform: translateX(5px);
     color: var(--accent-color);
+}
+
+.callback-slot-button:hover .slot-day {
+    color: var(--accent-color);
+    opacity: 0.8;
 }
 
 /* ------------------------- */
@@ -211,6 +217,7 @@
     border-radius: 0;
     color: var(--text-color);
     font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
     transition: border-color 0.3s ease;
     box-sizing: border-box;
 }
@@ -228,12 +235,17 @@
     margin-top: 30px;
 }
 
+/* ------------------------- */
+/* 4b. Buttons (FIXED)       */
+/* ------------------------- */
+
 .booking-btn {
     flex-grow: 1;
     padding: 14px 20px;
     border: none;
     border-radius: 0;
     font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
     font-weight: 400;
     letter-spacing: 0.03em;
     text-transform: uppercase;
@@ -241,6 +253,7 @@
     transition: all 0.3s ease;
 }
 
+/* Zurück-Button (Ghost Style) */
 .booking-btn.back-btn {
     background: transparent;
     color: var(--text-color-muted);
@@ -253,15 +266,31 @@
     background: transparent;
 }
 
+/* Submit-Button (Primary Style) */
 .booking-btn.submit-btn {
     background: var(--accent-color);
-    color: var(--bg-color);
+    color: #0a0a0a;
     border: 1px solid var(--accent-color);
 }
 
 .booking-btn.submit-btn:hover {
-    background: var(--accent-color-hover);
-    border-color: var(--accent-color-hover);
+    background: #d4b36a;
+    border-color: #d4b36a;
+    color: #0a0a0a;
+}
+
+/* Confirm/Close Button (Primary Style) */
+.booking-btn.confirm-close-btn {
+    background: var(--accent-color);
+    color: #0a0a0a;
+    width: 100%;
+    border: 1px solid var(--accent-color);
+}
+
+.booking-btn.confirm-close-btn:hover {
+    background: #d4b36a;
+    border-color: #d4b36a;
+    color: #0a0a0a;
 }
 
 .booking-btn:disabled {
@@ -312,18 +341,6 @@
     font-weight: 300;
 }
 
-.booking-btn.confirm-close-btn {
-    background: var(--accent-color);
-    color: var(--bg-color);
-    width: 100%;
-    border: 1px solid var(--accent-color);
-}
-
-.booking-btn.confirm-close-btn:hover {
-    background: var(--accent-color-hover);
-    border-color: var(--accent-color-hover);
-}
-
 /* ------------------------- */
 /* 6. QR-Code & ICS Download */
 /* ------------------------- */
@@ -368,6 +385,7 @@
     border: 1px solid var(--accent-color);
     text-decoration: none;
     font-size: 0.95rem;
+    font-family: 'Poppins', sans-serif;
     font-weight: 400;
     letter-spacing: 0.03em;
     transition: all 0.3s ease;
@@ -376,11 +394,22 @@
 
 .ics-download-btn:hover {
     background: var(--accent-color);
-    color: var(--bg-color);
+    color: #0a0a0a;
 }
 
-/* Mobile: QR kleiner, Button prominenter */
+/* ------------------------- */
+/* 7. Responsive             */
+/* ------------------------- */
+
 @media (max-width: 480px) {
+    .booking-modal-body {
+        padding: 20px;
+    }
+    
+    .booking-form-actions {
+        flex-direction: column;
+    }
+    
     .qr-code-image {
         width: 120px;
         height: 120px;
