@@ -689,7 +689,7 @@ export const initAiForm = () => {
                             const icsUrl = URL.createObjectURL(icsBlob);
                             html += `
                                 <a href="${icsUrl}" download="rueckruf-designare.ics" class="ics-download-btn">
-                                    📅 Im Kalender speichern
+                                    Im Kalender speichern
                                 </a>
                             `;
                         }
