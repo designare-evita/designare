@@ -661,12 +661,26 @@ export const initAiForm = () => {
                 if (data.success) {
                     const confirmationDetails = document.getElementById('confirmation-details');
                     if (confirmationDetails) {
-                        confirmationDetails.innerHTML = `
-                            <p><strong>Termin:</strong> ${state.selectedCallbackData.formattedString}</p>
+                        // Basis-Infos
+                        let html = `
+                            <p><strong>Termin:</strong> ${data.appointmentDetails?.formattedDate || state.selectedCallbackData.formattedString}</p>
+                            <p><strong>Uhrzeit:</strong> ${data.appointmentDetails?.formattedTime || ''}</p>
                             <p><strong>Name:</strong> ${name}</p>
                             <p><strong>Telefon:</strong> ${phone}</p>
                             ${topic ? `<p><strong>Anliegen:</strong> ${topic}</p>` : ''}
                         `;
+                        
+                        // QR-Code hinzufügen wenn vorhanden
+                        if (data.qrCode) {
+                            html += `
+                                <div class="qr-code-section">
+                                    <p class="qr-code-hint">Scanne den QR-Code um den Termin in deinem Kalender zu speichern:</p>
+                                    <img src="${data.qrCode}" alt="Termin QR-Code" class="qr-code-image" />
+                                </div>
+                            `;
+                        }
+                        
+                        confirmationDetails.innerHTML = html;
                     }
                     this.showStep('step-confirmation');
                 } else {
