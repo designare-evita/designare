@@ -323,3 +323,41 @@
     background: var(--accent-color-hover);
     border-color: var(--accent-color-hover);
 }
+
+/* ------------------------- */
+/* 6. QR-Code Section        */
+/* ------------------------- */
+
+.qr-code-section {
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+    text-align: center;
+}
+
+.qr-code-hint {
+    font-size: 0.85rem;
+    color: var(--text-color-muted);
+    margin-bottom: 15px;
+    font-weight: 300;
+}
+
+.qr-code-image {
+    width: 180px;
+    height: 180px;
+    display: block;
+    margin: 0 auto;
+    border: 1px solid var(--border-color);
+}
+
+/* Responsive für Mobile */
+@media (max-width: 480px) {
+    .qr-code-image {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .qr-code-hint {
+        font-size: 0.8rem;
+    }
+}
