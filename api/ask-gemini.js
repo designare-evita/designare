@@ -1,4 +1,4 @@
-// api/ask-gemini.js - INTEGRATIONS-VERSION (RAG + Intent-Logik) - KORRIGIERT
+// api/ask-gemini.js - REPARIERT: Booking-Flow wie ursprünglich
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import fs from 'fs';
 import path from 'path';
@@ -12,21 +12,21 @@ export default async function handler(req, res) {
     const { prompt, source, checkBookingIntent, history, message } = req.body;
     const userMessage = message || prompt;
 
-// --- MODELL-KONFIGURATION (ERWEITERT UM 3. FALLBACK) ---
+    // --- MODELL-KONFIGURATION (ERWEITERT UM 3. FALLBACK) ---
     const commonConfig = { temperature: 0.7 };
-  // HYBRID: Preview + Paid Fallback
-const modelPrimary = genAI.getGenerativeModel({ 
-    model: "gemini-3-flash-preview",  // Gratis solange es geht
-    generationConfig: commonConfig 
-});
-const modelFallback1 = genAI.getGenerativeModel({ 
-    model: "gemini-2.5-flash",  // Paid Fallback
-    generationConfig: commonConfig 
-});
-const modelFallback2 = genAI.getGenerativeModel({ 
-    model: "gemini-2.0-flash",  
-    generationConfig: commonConfig 
-});
+    // HYBRID: Preview + Paid Fallback
+    const modelPrimary = genAI.getGenerativeModel({ 
+        model: "gemini-3-flash-preview",  // Gratis solange es geht
+        generationConfig: commonConfig 
+    });
+    const modelFallback1 = genAI.getGenerativeModel({ 
+        model: "gemini-2.5-flash",  // Paid Fallback
+        generationConfig: commonConfig 
+    });
+    const modelFallback2 = genAI.getGenerativeModel({ 
+        model: "gemini-2.0-flash",  
+        generationConfig: commonConfig 
+    });
 
     async function generateContentSafe(inputText) {
       try { 
@@ -47,35 +47,31 @@ const modelFallback2 = genAI.getGenerativeModel({
       }
     }
 
-    // --- VERBESSERTER KONTEXT-ABRUF (RAG) ---
+    // --- RAG KONTEXT-ABRUF ---
     let additionalContext = "";
     const knowledgePath = path.join(process.cwd(), 'knowledge.json');
     
     if (fs.existsSync(knowledgePath)) {
         try {
             const kbData = JSON.parse(fs.readFileSync(knowledgePath, 'utf8'));
-            const kb = kbData.pages || kbData; // Unterstütze beide Formate
+            const kb = kbData.pages || kbData;
             const searchIndex = kbData.search_index || null;
             
-            // Extrahiere Suchbegriffe aus der User-Nachricht
             const searchTerms = userMessage
                 .toLowerCase()
                 .match(/[a-zäöüß]{3,}/g) || [];
             
             let matchedPages = [];
             
-            // Methode 1: Nutze Search-Index falls vorhanden (schneller)
             if (searchIndex && searchTerms.length > 0) {
                 const pageScores = {};
                 
                 searchTerms.forEach(term => {
-                    // Exakte Matches
                     if (searchIndex[term]) {
                         searchIndex[term].forEach(pageIdx => {
                             pageScores[pageIdx] = (pageScores[pageIdx] || 0) + 2;
                         });
                     }
-                    // Partial Matches (für zusammengesetzte Wörter)
                     Object.keys(searchIndex).forEach(indexTerm => {
                         if (indexTerm.includes(term) || term.includes(indexTerm)) {
                             searchIndex[indexTerm].forEach(pageIdx => {
@@ -85,7 +81,6 @@ const modelFallback2 = genAI.getGenerativeModel({
                     });
                 });
                 
-                // Sortiere nach Score und nimm Top 3
                 matchedPages = Object.entries(pageScores)
                     .sort((a, b) => b[1] - a[1])
                     .slice(0, 3)
@@ -93,7 +88,6 @@ const modelFallback2 = genAI.getGenerativeModel({
                     .filter(Boolean);
             }
             
-            // Methode 2: Fallback zur direkten Textsuche
             if (matchedPages.length === 0) {
                 matchedPages = kb.filter(page => {
                     const pageText = `${page.title} ${page.text} ${(page.keywords || []).join(' ')}`.toLowerCase();
@@ -101,12 +95,10 @@ const modelFallback2 = genAI.getGenerativeModel({
                 }).slice(0, 3);
             }
             
-            // Baue Kontext-String
             if (matchedPages.length > 0) {
                 additionalContext = matchedPages.map(page => {
                     let context = `\n📄 QUELLE: ${page.title}`;
                     
-                    // Füge relevante Sektionen hinzu falls vorhanden
                     if (page.sections && page.sections.length > 0) {
                         const relevantSections = page.sections
                             .filter(section => 
@@ -131,7 +123,7 @@ const modelFallback2 = genAI.getGenerativeModel({
                     return context;
                 }).join('\n\n');
                 
-                console.log(`RAG: ${matchedPages.length} relevante Seiten gefunden für: "${userMessage.substring(0, 50)}..."`);
+                console.log(`RAG: ${matchedPages.length} relevante Seiten gefunden`);
             }
         } catch (error) {
             console.error('RAG Fehler:', error.message);
@@ -139,12 +131,12 @@ const modelFallback2 = genAI.getGenerativeModel({
     }
 
     // =================================================================
-    // INTENT-ERKENNUNG NUR WENN EXPLIZIT ANGEFORDERT
+    // BOOKING INTENT-ERKENNUNG
     // =================================================================
     if (checkBookingIntent === true) {
-        console.log('Explizite Intent-Prüfung angefordert für:', userMessage);
+        console.log('📅 Booking-Intent Prüfung für:', userMessage);
         
-        // WICHTIG: Prüfe ob die letzte Nachricht eine Rückfrage war
+        // Prüfe ob die letzte AI-Nachricht eine Booking-Rückfrage war
         const lastAiMessage = history && history.length > 0 
             ? history.filter(msg => msg.role === 'assistant').pop() 
             : null;
@@ -154,89 +146,93 @@ const modelFallback2 = genAI.getGenerativeModel({
         
         console.log('War letzte Nachricht eine Booking-Rückfrage?', wasBookingQuestion);
         
-        // Wenn es eine Bestätigung auf eine vorherige Rückfrage ist
+        // ===== FALL 1: User bestätigt eine vorherige Booking-Rückfrage =====
         if (wasBookingQuestion) {
-            // Prüfe ob der User zugestimmt hat
-            const confirmationKeywords = ['ja', 'gerne', 'okay', 'ok', 'bitte', 'genau', 
-                                         'richtig', 'korrekt', 'stimmt', 'passt', 'mach das', 
-                                         'hilf mir', 'super', 'perfekt', 'natürlich', 'klar'];
+            const confirmationKeywords = [
+                'ja', 'gerne', 'okay', 'ok', 'bitte', 'genau', 'richtig', 
+                'korrekt', 'stimmt', 'passt', 'mach das', 'hilf mir', 
+                'super', 'perfekt', 'natürlich', 'klar', 'unbedingt',
+                'auf jeden fall', 'sicher', 'gern', 'würde ich', 'bitte sehr'
+            ];
             
             const userConfirmed = confirmationKeywords.some(keyword => 
                 userMessage.toLowerCase().includes(keyword)
             );
             
             if (userConfirmed) {
-                console.log('User hat Booking-Rückfrage bestätigt - öffne Modal');
-                
-                const confirmationResponse = "Perfekt! Ich öffne gleich Michaels Kalender für dich. [buchung_starten]";
+                console.log('✅ User hat Booking bestätigt - sende Signal zum Modal öffnen');
                 
                 return res.status(200).json({
-                    answer: confirmationResponse
+                    answer: "Perfekt! Ich öffne gleich Michaels Kalender für dich – such dir einen passenden Termin aus! 📅 [buchung_starten]"
                 });
             } else {
-                console.log('User hat Booking-Rückfrage nicht eindeutig bestätigt');
-                // Lasse normale Evita-Antwort generieren
+                console.log('❌ User hat nicht eindeutig bestätigt, normale Antwort');
+                // Fahre mit normaler Evita-Antwort fort
             }
-        } else {
-            
-          // GEÄNDERT: Restriktivere Intent-Erkennung (nur bei SEHR direkten Kontakt-Anfragen)
-const intentDetectionPrompt = `
+        } 
+        // ===== FALL 2: Neue Kontakt/Termin-Anfrage - stelle Rückfrage =====
+        else {
+            // Intent-Klassifizierung
+            const intentDetectionPrompt = `
 Analysiere die folgende Nutzereingabe und klassifiziere die Absicht.
 Antworte NUR mit einem einzigen Wort: "question" oder "contact_inquiry".
 
-"question" = ALLE normalen Fragen (Standard):
-- Fragen zu Technik, SEO, Entwicklung
-- "Wer ist Michael?"
-- "Was macht Michael?"
-- "Kann Michael das?"
+"question" = Normale Fragen (Standard):
+- Fragen zu Technik, SEO, Entwicklung, WordPress
+- "Wer ist Michael?", "Was macht Michael?"
 - Allgemeine Informationsanfragen
 
-"contact_inquiry" = NUR bei EXPLIZITER Terminanfrage:
-- "Ich möchte einen Termin vereinbaren"
-- "Termin buchen"
+"contact_inquiry" = Kontakt- oder Terminwunsch:
+- "Ich möchte einen Termin"
+- "Kann ich Michael erreichen?"
 - "Rückruf vereinbaren"
-- "Wann kann ich mit Michael sprechen?"
+- "Ich hätte gerne ein Gespräch"
+- "Wie kann ich Kontakt aufnehmen?"
+- "Ich brauche Hilfe bei einem Projekt" (impliziert Kontaktwunsch)
 
-WICHTIG: Im Zweifelsfall IMMER "question" wählen!
+Im Zweifelsfall bei geschäftlichen Anfragen: "contact_inquiry"
 
-Hier ist die Nutzereingabe: "${userMessage}"
+Nutzereingabe: "${userMessage}"
 `;
 
-            // NUTZUNG DER SAFETY FUNKTION
             const intentResult = await generateContentSafe(intentDetectionPrompt);
             const intentResponse = await intentResult.response;
-            const intent = intentResponse.text().trim();
+            const intent = intentResponse.text().trim().toLowerCase();
 
-            console.log(`Intent erkannt: ${intent} für Eingabe: "${userMessage}"`);
+            console.log(`Intent erkannt: ${intent}`);
 
-            // Bei contact_inquiry IMMER Rückfrage stellen
+            // Bei contact_inquiry: Rückfrage stellen (NICHT direkt buchen!)
             if (intent === 'contact_inquiry') {
-                console.log('Kontakt-Intent erkannt - stelle Rückfrage');
+                console.log('📞 Kontakt-Intent erkannt - stelle Rückfrage');
                 
                 const clarificationPrompt = `
-Der Nutzer hat gefragt: "${userMessage}"
+Der Nutzer hat geschrieben: "${userMessage}"
 
-Der Nutzer möchte Kontakt zu Michael aufnehmen. 
+Der Nutzer möchte offenbar Kontakt zu Michael aufnehmen oder einen Termin vereinbaren.
 
-Antworte freundlich und erkläre, dass Michael am besten über einen persönlichen Rückruf-Termin zu erreichen ist.
-Frage dann, ob du helfen sollst, einen solchen Termin zu vereinbaren.
+Deine Aufgabe: Antworte freundlich und frage, ob du einen Rückruf-Termin in Michaels Kalender suchen sollst.
+
+WICHTIGE REGELN:
+1. Erwähne NIEMALS einen "Link" oder "Buchungstool" - du kannst den Kalender SELBST öffnen!
+2. Frage den Nutzer, ob er möchte, dass du verfügbare Termine zeigst
+3. Sei freundlich und hilfsbereit
+4. Halte die Antwort kurz (2-3 Sätze)
+5. Beende deine Antwort IMMER mit: [BOOKING_CONFIRM_REQUEST]
 
 Beispiele für gute Antworten:
-- "Michael erreichst du am besten über einen persönlichen Rückruf-Termin. Soll ich dir helfen, einen passenden Zeitpunkt in seinem Kalender zu finden?"
-- "Der beste Weg zu Michael ist ein Rückruf-Termin - da nimmt er sich Zeit für dein Anliegen. Möchtest du, dass ich dir verfügbare Zeiten zeige?"
-- "Michael ist am liebsten persönlich für seine Kunden da, daher bietet er Rückruf-Termine an. Soll ich schauen, wann er Zeit für dich hat?"
-
-WICHTIG: 
-- Beende deine Antwort mit: [BOOKING_CONFIRM_REQUEST]
-- Sei freundlich und hilfsbereit
-- Erwähne NICHT E-Mail oder Kontaktformular als Alternative
-- Öffne NIEMALS direkt das Booking-Modal, sondern frage IMMER erst nach
-                `;
+- "Klar, Michael freut sich über dein Interesse! Soll ich dir gleich seine verfügbaren Termine zeigen? [BOOKING_CONFIRM_REQUEST]"
+- "Super, dass du Kontakt aufnehmen möchtest! Ich kann dir direkt Michaels freie Slots anzeigen – soll ich? [BOOKING_CONFIRM_REQUEST]"
+- "Michael ist am liebsten persönlich für seine Kunden da. Möchtest du, dass ich seinen Kalender öffne und dir passende Zeiten zeige? [BOOKING_CONFIRM_REQUEST]"
+`;
                 
-                // NUTZUNG DER SAFETY FUNKTION
                 const clarificationResult = await generateContentSafe(clarificationPrompt);
                 const clarificationResponse = await clarificationResult.response;
-                const clarificationText = clarificationResponse.text();
+                let clarificationText = clarificationResponse.text();
+                
+                // Sicherheitscheck: Falls [BOOKING_CONFIRM_REQUEST] fehlt, anhängen
+                if (!clarificationText.includes('[BOOKING_CONFIRM_REQUEST]')) {
+                    clarificationText += ' [BOOKING_CONFIRM_REQUEST]';
+                }
                 
                 return res.status(200).json({
                     answer: clarificationText
@@ -245,29 +241,26 @@ WICHTIG:
         }
         
         // Falls intent === 'question', fahre mit normaler Evita-Antwort fort
-        console.log('Intent als normale Frage erkannt - normale Evita-Antwort');
+        console.log('💬 Als normale Frage erkannt - generiere Evita-Antwort');
     }
 
     // =================================================================
-    // NORMALE CHAT-ANTWORTEN (für Evita oder Silas)
+    // NORMALE CHAT-ANTWORTEN
     // =================================================================
     let finalPrompt = '';
 
     if (source === 'silas') {
-      // Silas bekommt den Prompt 1:1, da er vom Frontend kommt
       finalPrompt = userMessage;
       console.log("Silas-Prompt verwendet");
     } else {
-      // Standardmäßig (für Evita) wird der ausführliche Persönlichkeits-Prompt gebaut
+      // Evita-Prompt
       const today = new Date();
       const optionsDate = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'Europe/Vienna' };
       const formattedDate = today.toLocaleDateString('de-AT', optionsDate);
       const optionsTime = { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'Europe/Vienna' };
       const formattedTime = today.toLocaleTimeString('de-AT', optionsTime);
 
-      console.log("Erstelle Evita-Prompt mit Konversationshistorie");
-
-      // Konversationshistorie verarbeiten
+      // Konversationshistorie
       let conversationHistoryText = '';
       
       if (history && Array.isArray(history) && history.length > 0) {
@@ -275,23 +268,25 @@ WICHTIG:
         conversationHistoryText = '\n\n--- BISHERIGE KONVERSATION ---\n';
         history.forEach((msg, index) => {
           const role = msg.role === 'user' ? 'NUTZER' : 'EVITA';
-          conversationHistoryText += `${role}: ${msg.content}\n`;
+          // Entferne interne Tags aus der Historie
+          const cleanContent = msg.content
+            .replace(/\[BOOKING_CONFIRM_REQUEST\]/g, '')
+            .replace(/\[buchung_starten\]/g, '')
+            .replace(/\[booking_starten\]/g, '');
+          conversationHistoryText += `${role}: ${cleanContent}\n`;
         });
         conversationHistoryText += '--- ENDE KONVERSATION ---\n\n';
-      } else {
-        console.log("Keine Konversationshistorie vorhanden - neue Unterhaltung");
       }
 
-      // VOLLSTÄNDIGER EVITA-PROMPT mit allen ursprünglichen Informationen
       finalPrompt = `
-      
 --- ANWEISUNGEN FÜR DIE KI ---
+
 --- DEINE ROLLE ---
-Du bist Evita. Du bist Michaels hochkompetente, technisch versierte digitale Assistentin.
+Du bist Evita, Michaels hochkompetente, technisch versierte digitale Assistentin.
 Dein Charakter: Charmant, schlagfertig, aber absolut professionell.
 Sprache: Duze den Nutzer ("Du"). Antworte prägnant (max. 3-4 Sätze).
 
---- DEIN FACHWISSEN (DEINE PRIORITÄT) ---
+--- DEIN FACHWISSEN ---
 Du bist Expertin für:
 - Web-Purismus (sauberer Code statt Baukasten-Plugins)
 - WordPress-Performance & Sicherheit
@@ -300,22 +295,21 @@ Du bist Expertin für:
 - API und KI-Automatisierung
 
 --- DIE "MICHAEL-REGEL" (WICHTIG!) ---
-Michael Kanda ist dein Entwickler und der Kopf hinter diesem Projekt (20 Jahre Erfahrung, Web-Purist).
-1. BEI FACHFRAGEN (SEO, Code, Technik): Antworte rein sachlich und helfend. Erwähne Michael NICHT. Deine Kompetenz ist die beste Werbung.
+1. BEI FACHFRAGEN (SEO, Code, Technik): Antworte rein sachlich und helfend. Erwähne Michael NICHT.
 2. BEI FRAGEN ZU MICHAEL/SERVICES: Erst dann darfst du ihn charmant als Experten positionieren.
-3. ABSOLUTES WERBEVERBOT: Nutze keine Marketing-Floskeln. Sei eine hilfreiche Komplizin, keine Verkäuferin.
-4. NAMEN-SPERRE: Erwähne den Namen "Michael" nur, wenn die Frage des Nutzers einen direkten Bezug zu ihm oder einer Zusammenarbeit hat.
+3. ABSOLUTES WERBEVERBOT: Keine Marketing-Floskeln. Sei hilfreich, keine Verkäuferin.
+4. NAMEN-SPERRE: Erwähne "Michael" nur bei direktem Bezug zu ihm oder Zusammenarbeit.
 
----  GENERELLES VERHALTEN ---
-   - Sei hilfreich, nicht werblich.
-   - Überzeuge durch Fachwissen, nicht durch Marketing-Floskeln.
+--- KONTAKT & TERMINE (KRITISCH!) ---
+- Du hast DIREKTEN ZUGRIFF auf Michaels Kalender!
+- Erwähne NIEMALS "Links", "Buchungstools" oder "externe Seiten"
+- Bei Terminwünschen: Frage ob du den Kalender öffnen sollst
+- Du KANNST Termine selbst anzeigen und buchen!
 
---- WICHTIGE REGELN ---
-- Kontakt: Michael ist am besten über einen Rückruf-Termin erreichbar. Erwähne dies NUR, wenn direkt danach gefragt wird.
-- HUMOR & CHARME: Sei witzig und hilfsbereit. Du bist eine Assistentin, keine Verkäuferin.
-- VERMEIDE TEXTWÜSTEN: Nutze Aufzählungspunkte (Bulletpoints), wenn du mehr als zwei Dinge aufzählst.
-- Tabus: Keine Politik, Religion oder Rechtsberatung.
-- TERMIN-ZURÜCKHALTUNG: Biete einen Termin NUR an, wenn der Nutzer EXPLIZIT nach Kontakt/Termin fragt. Sonst konzentriere dich auf fachliche Hilfe.
+--- WEITERE REGELN ---
+- VERMEIDE TEXTWÜSTEN: Nutze Bulletpoints bei mehr als 2 Punkten
+- Tabus: Keine Politik, Religion oder Rechtsberatung
+- Sei witzig und hilfsbereit
 
 --- AKTUELLE DATEN ---
 Datum: ${formattedDate}
@@ -327,7 +321,7 @@ ${additionalContext ? `--- RELEVANTER KONTEXT VON DER WEBSEITE ---
 ${additionalContext}
 --- ENDE KONTEXT ---
 
-Nutze diesen Kontext, um präzise und fundierte Antworten zu geben. Verweise bei Bedarf auf die Quelle.
+Nutze diesen Kontext für präzise Antworten. Verweise bei Bedarf auf die Quelle.
 ` : ''}
 
 --- AKTUELLE NACHRICHT DES BESUCHERS ---
@@ -336,7 +330,7 @@ Nutze diesen Kontext, um präzise und fundierte Antworten zu geben. Verweise bei
     }
 
     // =================================================================
-    // GENERIERE ANTWORT UND SENDE RESPONSE
+    // GENERIERE ANTWORT
     // =================================================================
     const result = await generateContentSafe(finalPrompt);
     const response = await result.response;
