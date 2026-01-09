@@ -689,7 +689,7 @@ export const initAiForm = () => {
                             const icsUrl = URL.createObjectURL(icsBlob);
                             html += `
                                 <a href="${icsUrl}" download="rueckruf-designare.ics" class="ics-download-btn">
-                                    Im Kalender speichern
+                                    📅 Im Kalender speichern
                                 </a>
                             `;
                         }
@@ -964,7 +964,7 @@ export const initAiForm = () => {
     // ===================================================================
     
     const welcomeMessages = [
-        "Hallo! Ich bin Evita, Michaels KI-Assistentin. Womit kann ich dir heute helfen?",
+       "Hallo! Ich bin Evita, Michaels KI-Assistentin. Womit kann ich dir heute helfen?",
         "Hey! Schön, dass du da bist. Ich bin Evita – Michaels KI-Assistentin. Womit kann ich dir heute helfen?",
         "Servus! Evita hier, Michaels digitale Komplizin. Was möchtest du wissen?",
         "Hi! Ich bin Evita. Michael ist gerade beschäftigt, aber ich kann dir sicher weiterhelfen. Was liegt an?",
@@ -972,9 +972,8 @@ export const initAiForm = () => {
         "Hey, schön dich zu sehen! Ich bin Evita. Egal, ob WordPress, KI oder Kuchenrezepte – ich bin für dich da!",
         "Hi! Evita hier. Ich freue mich dich kennenzulernen – frag einfach drauf los!",
         "Grüß dich! Ich bin Evita, die digitale Version an Michaels Seite. Die vierbeinige schläft gerade. Was kann ich für dich tun?",
-        "Servus! Evita hier. Ich kümmere mich um die KI, Michael um den Code und der Hund um die gute Laune. Lass uns dein Business skalieren – womit fangen wir an?",
-        "Grüß dich! Ich bin Evita, Michaels digitale Unterstützung. Der Hund schnarcht, Michael codet – und ich bin ganz Ohr für dich. Was liegt an?",
-        "Servus! Evita hier. Ich bin die KI, Michael schreibt den Code und der Hund ist für die gute Laune zuständig. Wobei kann ich dir heute helfen?"
+        "Grüß dich! Ich bin Evita, Michaels digitale Unterstützung. Der Hund schnarcht, Michael codet – und ich bin für dich da. Was liegt an?",
+        "Servus! Evita hier. Ich bin die KI-Assistenz , Michael schreibt den Code und der Hund ist für die gute Laune zuständig. Wobei kann ich dir heute helfen?"
     ];
     
     function getRandomWelcomeMessage() {
@@ -990,12 +989,16 @@ export const initAiForm = () => {
         }, 300);
     }
     
-    function addWelcomeMessageToChat() {
+    async function addWelcomeMessageToChat() {
         const chatHistory = document.getElementById('ai-chat-history');
         if (chatHistory && chatHistory.children.length === 0) {
             const randomGreeting = getRandomWelcomeMessage();
-            ChatUI.addMessage(randomGreeting, 'ai', true);
-            console.log("✅ Begrüßung hinzugefügt:", randomGreeting);
+            // Erstelle leere Message-Bubble, dann streame den Text
+            const msgElement = ChatUI.addMessage(randomGreeting, 'ai', false);
+            if (msgElement) {
+                await typeWriterEffect(msgElement, randomGreeting, 20);
+            }
+            console.log("✅ Begrüßung gestreamt:", randomGreeting);
         }
     }
 
