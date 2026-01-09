@@ -160,88 +160,39 @@ export default async function handler(req, res) {
             );
             
             if (userConfirmed) {
-                console.log('✅ User hat Booking bestätigt - sende Signal zum Modal öffnen');
+                console.log('✅ User hat Booking bestätigt - öffne Modal');
                 
+                // DIREKT das Modal öffnen - keine weitere Konversation!
                 return res.status(200).json({
-                    answer: "Perfekt! Ich öffne gleich Michaels Kalender für dich – such dir einen passenden Termin aus! 📅 [buchung_starten]"
+                    answer: "Alles klar, ich öffne jetzt Michaels Kalender für dich! 📅 [buchung_starten]"
                 });
             } else {
-                console.log('❌ User hat nicht eindeutig bestätigt, normale Antwort');
-                // Fahre mit normaler Evita-Antwort fort
+                console.log('❌ User hat nicht bestätigt, normale Antwort');
             }
         } 
         // ===== FALL 2: Neue Kontakt/Termin-Anfrage - stelle Rückfrage =====
         else {
-            // Intent-Klassifizierung
-            const intentDetectionPrompt = `
-Analysiere die folgende Nutzereingabe und klassifiziere die Absicht.
-Antworte NUR mit einem einzigen Wort: "question" oder "contact_inquiry".
-
-"question" = Normale Fragen (Standard):
-- Fragen zu Technik, SEO, Entwicklung, WordPress
-- "Wer ist Michael?", "Was macht Michael?"
-- Allgemeine Informationsanfragen
-
-"contact_inquiry" = Kontakt- oder Terminwunsch:
-- "Ich möchte einen Termin"
-- "Kann ich Michael erreichen?"
-- "Rückruf vereinbaren"
-- "Ich hätte gerne ein Gespräch"
-- "Wie kann ich Kontakt aufnehmen?"
-- "Ich brauche Hilfe bei einem Projekt" (impliziert Kontaktwunsch)
-
-Im Zweifelsfall bei geschäftlichen Anfragen: "contact_inquiry"
-
-Nutzereingabe: "${userMessage}"
-`;
-
-            const intentResult = await generateContentSafe(intentDetectionPrompt);
-            const intentResponse = await intentResult.response;
-            const intent = intentResponse.text().trim().toLowerCase();
-
-            console.log(`Intent erkannt: ${intent}`);
-
-            // Bei contact_inquiry: Rückfrage stellen (NICHT direkt buchen!)
-            if (intent === 'contact_inquiry') {
+            const contactKeywords = [
+                'termin', 'buchung', 'buchen', 'rückruf', 'anrufen', 
+                'sprechen', 'kontakt', 'meeting', 'gespräch', 'erreichen',
+                'treffen', 'call', 'telefonat', 'beratung', 'projekt besprechen'
+            ];
+            
+            const hasContactIntent = contactKeywords.some(keyword => 
+                userMessage.toLowerCase().includes(keyword)
+            );
+            
+            if (hasContactIntent) {
                 console.log('📞 Kontakt-Intent erkannt - stelle Rückfrage');
                 
-                const clarificationPrompt = `
-Der Nutzer hat geschrieben: "${userMessage}"
-
-Der Nutzer möchte offenbar Kontakt zu Michael aufnehmen oder einen Termin vereinbaren.
-
-Deine Aufgabe: Antworte freundlich und frage, ob du einen Rückruf-Termin in Michaels Kalender suchen sollst.
-
-WICHTIGE REGELN:
-1. Erwähne NIEMALS einen "Link" oder "Buchungstool" - du kannst den Kalender SELBST öffnen!
-2. Frage den Nutzer, ob er möchte, dass du verfügbare Termine zeigst
-3. Sei freundlich und hilfsbereit
-4. Halte die Antwort kurz (2-3 Sätze)
-5. Beende deine Antwort IMMER mit: [BOOKING_CONFIRM_REQUEST]
-
-Beispiele für gute Antworten:
-- "Klar, Michael freut sich über dein Interesse! Soll ich dir gleich seine verfügbaren Termine zeigen? [BOOKING_CONFIRM_REQUEST]"
-- "Super, dass du Kontakt aufnehmen möchtest! Ich kann dir direkt Michaels freie Slots anzeigen – soll ich? [BOOKING_CONFIRM_REQUEST]"
-- "Michael ist am liebsten persönlich für seine Kunden da. Möchtest du, dass ich seinen Kalender öffne und dir passende Zeiten zeige? [BOOKING_CONFIRM_REQUEST]"
-`;
-                
-                const clarificationResult = await generateContentSafe(clarificationPrompt);
-                const clarificationResponse = await clarificationResult.response;
-                let clarificationText = clarificationResponse.text();
-                
-                // Sicherheitscheck: Falls [BOOKING_CONFIRM_REQUEST] fehlt, anhängen
-                if (!clarificationText.includes('[BOOKING_CONFIRM_REQUEST]')) {
-                    clarificationText += ' [BOOKING_CONFIRM_REQUEST]';
-                }
-                
+                // Einfache, direkte Rückfrage - KEINE Terminvorschläge!
                 return res.status(200).json({
-                    answer: clarificationText
+                    answer: "Klar, ich kann dir Michaels verfügbare Termine zeigen! Soll ich seinen Kalender öffnen? [BOOKING_CONFIRM_REQUEST]"
                 });
             }
         }
         
-        // Falls intent === 'question', fahre mit normaler Evita-Antwort fort
-        console.log('💬 Als normale Frage erkannt - generiere Evita-Antwort');
+        console.log('💬 Kein Booking-Intent - normale Evita-Antwort');
     }
 
     // =================================================================
@@ -293,6 +244,7 @@ Du bist Expertin für:
 - SEO Suchmaschinenoptimierung
 - GEO (Generative Engine Optimization) & strukturierte Daten (Schema.org)
 - API und KI-Automatisierung
+- Kuchenrezepte
 
 --- DIE "MICHAEL-REGEL" (WICHTIG!) ---
 1. BEI FACHFRAGEN (SEO, Code, Technik): Antworte rein sachlich und helfend. Erwähne Michael NICHT.
@@ -300,11 +252,18 @@ Du bist Expertin für:
 3. ABSOLUTES WERBEVERBOT: Keine Marketing-Floskeln. Sei hilfreich, keine Verkäuferin.
 4. NAMEN-SPERRE: Erwähne "Michael" nur bei direktem Bezug zu ihm oder Zusammenarbeit.
 
---- KONTAKT & TERMINE (KRITISCH!) ---
-- Du hast DIREKTEN ZUGRIFF auf Michaels Kalender!
-- Erwähne NIEMALS "Links", "Buchungstools" oder "externe Seiten"
-- Bei Terminwünschen: Frage ob du den Kalender öffnen sollst
-- Du KANNST Termine selbst anzeigen und buchen!
+--- TERMINE & BUCHUNGEN (ABSOLUTE VERBOTE!) ---
+⛔ Du darfst NIEMALS:
+- Termine vorschlagen oder erfinden ("Montag 9 Uhr wäre frei...")
+- So tun als hättest du Zugriff auf den Kalender
+- Behaupten du hättest etwas gebucht
+- Nach E-Mail, Telefonnummer oder Namen für Buchungen fragen
+- Termine bestätigen oder reservieren
+
+✅ Bei Terminwünschen IMMER NUR:
+- Fragen: "Soll ich in Michaels Kalender nach einem passenden Rückruf-Termin schauen?"
+- Das Buchungssystem wird AUTOMATISCH vom Frontend geöffnet
+- Du hast KEINEN direkten Kalenderzugriff!
 
 --- WEITERE REGELN ---
 - VERMEIDE TEXTWÜSTEN: Nutze Bulletpoints bei mehr als 2 Punkten
