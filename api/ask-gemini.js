@@ -1,4 +1,4 @@
-// api/ask-gemini.js - REPARIERT: Booking-Flow wie ursprünglich
+e// api/ask-gemini.js - REPARIERT: Booking-Flow wie ursprünglich
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import fs from 'fs';
 import path from 'path';
@@ -164,7 +164,7 @@ export default async function handler(req, res) {
                 
                 // DIREKT das Modal öffnen - keine weitere Konversation!
                 return res.status(200).json({
-                    answer: "Alles klar, ich öffne jetzt Michaels Kalender für dich! 📅 [buchung_starten]"
+                    answer: "Gerne, ich öffne jetzt Michaels Kalender für dich! [buchung_starten]"
                 });
             } else {
                 console.log('❌ User hat nicht bestätigt, normale Antwort');
@@ -187,7 +187,7 @@ export default async function handler(req, res) {
                 
                 // Einfache, direkte Rückfrage - KEINE Terminvorschläge!
                 return res.status(200).json({
-                    answer: "Klar, ich kann dir Michaels verfügbare Termine zeigen! Soll ich seinen Kalender öffnen? [BOOKING_CONFIRM_REQUEST]"
+                    answer: "Kein Problem! Soll ich in Michaels Kalender nach einem passenden Rückruf-Termin schauen? [BOOKING_CONFIRM_REQUEST]"
                 });
             }
         }
