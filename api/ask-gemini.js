@@ -1,4 +1,4 @@
-e// api/ask-gemini.js - REPARIERT: Booking-Flow wie ursprünglich
+// api/ask-gemini.js - REPARIERT: Booking-Flow wie ursprünglich
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import fs from 'fs';
 import path from 'path';
