@@ -1,9 +1,6 @@
-// api/book-appointment-phone.js - KORRIGIERTER DATEINAME (ohne Bindestrich am Ende!)
+// api/book-appointment-phone.js - MIT QR-CODE ICS FEATURE
 import { google } from 'googleapis';
-import * as sibi from '@getbrevo/brevo';
-
-const apiInstance = new sibi.TransactionalSMSApi();
-apiInstance.authentications['apiKey'].apiKey = process.env.BREVO_API_KEY;
+import QRCode from 'qrcode';
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
@@ -117,8 +114,8 @@ Automatisch erstellt durch Evita AI-Assistent`,
             reminders: {
                 useDefault: false,
                 overrides: [
-                    { method: 'popup', minutes: 60 },  // 1 Stunde vorher
-                    { method: 'popup', minutes: 15 },  // 15 Minuten vorher
+                    { method: 'popup', minutes: 60 },
+                    { method: 'popup', minutes: 15 },
                 ]
             },
             
@@ -132,8 +129,7 @@ Automatisch erstellt durch Evita AI-Assistent`,
                 }
             },
             
-            // Farbe für Chat-gebuchte Termine
-            colorId: '2' // Grün für Chat-Buchungen
+            colorId: '2'
         };
 
         console.log('Creating calendar event for phone booking...');
@@ -146,77 +142,71 @@ Automatisch erstellt durch Evita AI-Assistent`,
 
         console.log('✅ Phone booking event created:', result.data.id);
 
-        // Bestätigungs-Nachricht erstellen
+        // ===================================================================
+        // QR-CODE MIT ICS GENERIEREN
+        // ===================================================================
+        
+        // ICS-Datetime Format: YYYYMMDDTHHMMSS
+        const formatICSDate = (date) => {
+            return date.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+        };
+        
+        const icsContent = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//designare.at//Evita Booking//DE
+BEGIN:VEVENT
+UID:${result.data.id}@designare.at
+DTSTART:${formatICSDate(startTime)}
+DTEND:${formatICSDate(endTime)}
+SUMMARY:Rückruf von Michael Kanda
+DESCRIPTION:Telefonat mit designare.at${topic ? ' - ' + topic : ''}
+LOCATION:Telefonat
+END:VEVENT
+END:VCALENDAR`;
 
-// --- START: NEUER CODE FÜR KUNDEN-SMS ---
+        // QR-Code als Data-URL generieren
+        let qrCodeDataUrl = null;
+        try {
+            qrCodeDataUrl = await QRCode.toDataURL(icsContent, {
+                width: 200,
+                margin: 2,
+                color: {
+                    dark: '#c4a35a',  // Gold (Accent Color)
+                    light: '#0a0a0a'  // Dunkel (Background)
+                }
+            });
+            console.log('✅ QR-Code generiert');
+        } catch (qrError) {
+            console.error('QR-Code Fehler:', qrError);
+            // Kein Abbruch - Buchung war erfolgreich
+        }
 
-// Schritt A: Telefonnummer formatieren
-let formattedPhone = phone.replace(/ /g, '').replace(/\(0\)/, '');
-if (formattedPhone.startsWith('0')) {
-    formattedPhone = `+43${formattedPhone.substring(1)}`;
-}
-
-// Schritt B: SMS-Objekt erstellen
-const customerSms = {
-    sender: 'designare', // Der Absendername, den du in Brevo konfiguriert hast
-    recipient: formattedPhone,
-    content: `Hallo ${name}! Dein Rückruf-Termin bei designare.at für ${startTime.toLocaleDateString('de-AT', { weekday: 'long', hour: '2-digit', minute: '2-digit' })} Uhr wurde erfolgreich gebucht.`,
-    type: 'transactional'
-};
-
-// Schritt C: SMS versenden (mit Fehlerbehandlung)
-try {
-    await apiInstance.sendTransacSms(customerSms);
-    console.log('SMS-Bestätigung an Kunden erfolgreich gesendet.');
-} catch (smsError) {
-    // Wichtig: Logge den Fehler, aber lass die Anfrage trotzdem erfolgreich sein,
-    // da die Terminbuchung selbst ja geklappt hat.
-    console.error('Fehler beim Senden der Kunden-SMS:', smsError);
-}
-
-// --- ENDE: NEUER CODE FÜR KUNDEN-SMS ---
-        const confirmationMessage = `🎉 Perfekt! Dein Rückruf-Termin ist gebucht!
-
-📅 **Termin-Details:**
-Datum: ${startTime.toLocaleDateString('de-DE', { 
-    weekday: 'long', 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
-})}
-Uhrzeit: ${startTime.toLocaleTimeString('de-DE', { 
-    hour: '2-digit', 
-    minute: '2-digit' 
-})} - ${endTime.toLocaleTimeString('de-DE', { 
-    hour: '2-digit', 
-    minute: '2-digit' 
-})}
-
-👤 **Kontakt:** ${name}
-📞 **Telefon:** ${phone}
-${topic ? `💬 **Anliegen:** ${topic}` : ''}
-
-**Was passiert als nächstes?**
-✓ Michael hat den Termin in seinem Kalender
-✓ Du erhältst ca. 5-10 Minuten vor dem Termin einen Anruf
-✓ Bei Fragen oder Änderungen: michael@designare.at
-
-**Termin-Erinnerung:** Bitte halte dich kurz vor dem Termin bereit!
-
-Freue mich auf unser Gespräch! 😊`;
-
+        // ===================================================================
+        // RESPONSE
+        // ===================================================================
+        
         res.status(200).json({ 
             success: true, 
-            message: confirmationMessage,
             eventId: result.data.id,
             eventLink: result.data.htmlLink,
+            qrCode: qrCodeDataUrl,
+            icsContent: icsContent,
             appointmentDetails: {
                 name: name,
                 phone: phone,
+                topic: topic || null,
                 start: startTime.toISOString(),
                 end: endTime.toISOString(),
-                localTime: `${startTime.toLocaleString('de-DE')} - ${endTime.toLocaleString('de-DE')}`,
-                duration: '60 Minuten'
+                formattedDate: startTime.toLocaleDateString('de-AT', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                }),
+                formattedTime: startTime.toLocaleTimeString('de-AT', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                })
             }
         });
 
