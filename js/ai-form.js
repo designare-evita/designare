@@ -670,15 +670,31 @@ export const initAiForm = () => {
                             ${topic ? `<p><strong>Anliegen:</strong> ${topic}</p>` : ''}
                         `;
                         
-                        // QR-Code hinzufügen wenn vorhanden
+                        // QR-Code + Download Button
+                        html += `<div class="calendar-save-section">`;
+                        
+                        // QR-Code (hauptsächlich für Desktop)
                         if (data.qrCode) {
                             html += `
-                                <div class="qr-code-section">
-                                    <p class="qr-code-hint">Scanne den QR-Code um den Termin in deinem Kalender zu speichern:</p>
+                                <div class="qr-code-wrapper">
                                     <img src="${data.qrCode}" alt="Termin QR-Code" class="qr-code-image" />
+                                    <p class="qr-code-hint">QR-Code scannen</p>
                                 </div>
                             `;
                         }
+                        
+                        // Download Button (für alle, besonders Mobile)
+                        if (data.icsContent) {
+                            const icsBlob = new Blob([data.icsContent], { type: 'text/calendar;charset=utf-8' });
+                            const icsUrl = URL.createObjectURL(icsBlob);
+                            html += `
+                                <a href="${icsUrl}" download="rueckruf-designare.ics" class="ics-download-btn">
+                                    📅 Im Kalender speichern
+                                </a>
+                            `;
+                        }
+                        
+                        html += `</div>`;
                         
                         confirmationDetails.innerHTML = html;
                     }
