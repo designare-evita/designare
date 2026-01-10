@@ -9,6 +9,9 @@
    Ergänze/ersetze in style.css den body.light-mode Block
    =================== */
 
+/* WICHTIG: html.light-mode für Flash Prevention (Script im head setzt Klasse auf html) */
+html.light-mode,
+html.light-mode body,
 html body.light-mode,
 body.light-mode {
     /* Hintergründe */
