@@ -12,7 +12,7 @@
 body.light-mode {
     /* Hintergründe */
     --bg-color: #f5f5f5;              /* Leicht getönt statt reines Weiß */
-    --bg-color-secondary: #e8e8e8;    /* Sekundärer Hintergrund */
+    --bg-color-secondary: #f2f2f2;    /* Sekundärer Hintergrund */
     --modal-bg: #ffffff;
     --card-bg: #ffffff;
     
