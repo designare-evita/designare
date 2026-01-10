@@ -1,4 +1,4 @@
-// js/main.js - KORRIGIERTE VERSION (Home-Button Bug Fix v2)
+// js/main.js - KORRIGIERTE VERSION (Build-Time Injection)
 
 // ✅ SOFORT ausführen - Browser Scroll-Restore deaktivieren
 if ('scrollRestoration' in history) {
@@ -24,27 +24,8 @@ import { setupSearchModal } from './search.js';
 
 // === 2. GLOBALE STATES ===
 let globalAiFormInstance = null;
-let contentLoaded = false;
 
-// === 3. CONTENT LOADING HELPER ===
-const loadContent = async (url, elementId) => {
-    const placeholder = document.getElementById(elementId);
-    if (!placeholder) {
-        console.warn(`⚠️ Placeholder #${elementId} nicht gefunden`);
-        return false; 
-    }
-    try {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error(`HTTP Error ${response.status} bei ${url}`);
-        const data = await response.text();
-        placeholder.innerHTML = data;
-        return true;
-    } catch (error) {
-        console.warn(`⚠️ Konnte ${url} nicht in #${elementId} laden:`, error);
-        return false;
-    }
-};
-
+// === 3. FEEDBACK LOADING (optional) ===
 const loadFeedback = async () => {
     const placeholder = document.getElementById('feedback-placeholder');
     if (!placeholder) return;
@@ -145,7 +126,7 @@ const setupSideMenu = () => {
     }
 };
 
-// === 5. EVITA CHAT LOGIK - KORRIGIERT ===
+// === 5. EVITA CHAT LOGIK ===
 const setupEvitaChatButton = () => {
     const evitaChatButton = document.getElementById('evita-chat-button');
     if (evitaChatButton) {
@@ -201,23 +182,6 @@ const ensureAiFormAvailable = async () => {
         return;
     }
     
-    // Warte auf Content wenn noch nicht geladen
-    if (!contentLoaded) {
-        await new Promise(resolve => {
-            const checkInterval = setInterval(() => {
-                if (contentLoaded || document.getElementById('ai-chat-form')) {
-                    clearInterval(checkInterval);
-                    resolve();
-                }
-            }, 50);
-            // Timeout nach 3 Sekunden
-            setTimeout(() => {
-                clearInterval(checkInterval);
-                resolve();
-            }, 3000);
-        });
-    }
-    
     try {
         await initAiForm();
         globalAiFormInstance = true;
@@ -241,7 +205,7 @@ const addWelcomeMessage = (message) => {
     console.log("✅ Begrüßungsnachricht hinzugefügt");
 };
 
-// === 6. HERO FLIP LOGIK - KOMPLETT NEU ===
+// === 6. HERO FLIP LOGIK ===
 const initHeroFlip = () => {
     const heroFlipWrapper = document.getElementById('hero-flip-wrapper');
     if (!heroFlipWrapper) return;
@@ -304,12 +268,11 @@ const initHeroFlip = () => {
             }, 300);
         }
         else {
-            // ✅ NEU: Startseite (kein Hash) - view-main anzeigen
+            // Startseite (kein Hash) - view-main anzeigen
             if(viewMain) viewMain.style.display = 'flex';
             if(viewThird) viewThird.style.display = 'none';
             heroFlipWrapper.classList.remove('flipped');
             
-            // ✅ FIX: Nur scrollTo(0,0) - kein scrollIntoView (versteckt Header)
             window.scrollTo(0, 0);
             
             setTimeout(() => {
@@ -343,7 +306,7 @@ const initHeroFlip = () => {
         });
     }
 
-    // ✅ FIX: Button "Home" → Zurück zur Startseite (Front-Face, view-main)
+    // Button "Home" → Zurück zur Startseite (Front-Face, view-main)
     if (btnBackToStart) {
         btnBackToStart.addEventListener('click', (e) => {
             e.preventDefault();
@@ -358,7 +321,6 @@ const initHeroFlip = () => {
             // Karte zurückdrehen
             heroFlipWrapper.classList.remove('flipped');
             
-            // ✅ FIX: scrollIntoView statt scrollTo!
             setTimeout(() => {
                 if(viewMain) {
                     viewMain.scrollIntoView({ behavior: 'instant', block: 'start' });
@@ -367,12 +329,12 @@ const initHeroFlip = () => {
         });
     }
     
-    // ✅ FIX: Button "Evita" → Flip zurück zur Front-Face und Evita-View anzeigen
+    // Button "Evita" → Flip zurück zur Front-Face und Evita-View anzeigen
     if (btnToThird) {
         btnToThird.addEventListener('click', (e) => {
             e.preventDefault();
             
-            // ✅ WICHTIG: Views VOR dem Flip setzen!
+            // Views VOR dem Flip setzen
             if (viewMain) viewMain.style.display = 'none';
             if (viewThird) viewThird.style.display = 'flex';
             
@@ -395,7 +357,7 @@ const initHeroFlip = () => {
                         behavior: 'smooth'
                     });
                 }
-            }, 850); // Warte auf Flip-Animation (0.8s) + Buffer
+            }, 850);
         });
     }
 
@@ -481,13 +443,11 @@ const initializeForms = async () => {
 
 // === UNLOCK SCROLL FALLBACK ===
 const unlockScrollFallback = () => {
-    // Entferne no-scroll wenn Seite geladen ist
     if (document.body.classList.contains('no-scroll')) {
         const modal = document.querySelector('.modal-overlay.visible');
         const sideMenu = document.getElementById('side-menu-panel');
         const sideMenuVisible = sideMenu?.classList.contains('visible');
         
-        // Nur entfernen wenn kein Modal/Menu offen ist
         if (!modal && !sideMenuVisible) {
             document.body.classList.remove('no-scroll');
             console.log("🔓 no-scroll Klasse entfernt (Fallback)");
@@ -499,7 +459,7 @@ const unlockScrollFallback = () => {
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("🚀 DOMContentLoaded - Starte Initialisierung...");
     
-    // ✅ SOFORT nach oben scrollen (verhindert Browser Scroll-Restore)
+    // SOFORT nach oben scrollen (verhindert Browser Scroll-Restore)
     if (!window.location.hash) {
         window.scrollTo(0, 0);
         document.documentElement.scrollTop = 0;
@@ -514,46 +474,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Statische Scripts initialisieren (Partikel, Typewriter)
     initializeStaticScripts();
 
-    try {
-        // Sequentielles Laden der Layout-Komponenten
-        console.log("📦 Lade Layout-Komponenten...");
-        
-        const results = await Promise.all([
-            loadContent('header.html', 'header-placeholder'),
-            loadContent('modals.html', 'modal-container'),
-            loadContent('footer.html', 'footer-placeholder'),
-            loadContent('side-menu.html', 'side-menu-placeholder')
-        ]);
-        
-        await loadFeedback();
-        
-        contentLoaded = true;
-        console.log("✅ Layout geladen:", results);
-        
-        // Warte auf nächsten Frame + zusätzliche Zeit für DOM-Updates
-        requestAnimationFrame(() => {
-            setTimeout(() => {
-                // Scripte initialisieren
-                initializeDynamicScripts();
-                initializeForms();
-                
-                // KRITISCH: no-scroll entfernen und Seite sichtbar machen
-                document.body.classList.remove('no-scroll');
-                document.body.classList.add('page-loaded');
-                
-                console.log("✅ Seite vollständig initialisiert");
-                
-            }, 200);
-        });
+    // Optional: Feedback laden (falls Placeholder existiert)
+    await loadFeedback();
 
-    } catch (error) {
-        console.error("❌ Fehler beim Laden der Komponenten:", error);
-        
-        // Fallback: Seite trotzdem bedienbar machen
-        contentLoaded = true;
-        document.body.classList.remove('no-scroll');
-        document.body.classList.add('page-loaded');
-    }
+    // Scripte initialisieren (Header, Footer, Modals, Side-Menu sind bereits im HTML via Build-Script)
+    requestAnimationFrame(() => {
+        setTimeout(() => {
+            initializeDynamicScripts();
+            initializeForms();
+            
+            // KRITISCH: no-scroll entfernen und Seite sichtbar machen
+            document.body.classList.remove('no-scroll');
+            document.body.classList.add('page-loaded');
+            
+            console.log("✅ Seite vollständig initialisiert");
+        }, 50);
+    });
     
     // Zusätzlicher Fallback-Timer
     setTimeout(unlockScrollFallback, 2000);
