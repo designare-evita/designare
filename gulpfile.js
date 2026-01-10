@@ -5,13 +5,14 @@ import cleanCSS from 'gulp-clean-css';
 const { src, dest, parallel } = gulp;
 
 // 1. CORE: Wird auf ALLEN Seiten geladen
+// WICHTIG: light-mode.css MUSS am Ende stehen!
 const coreFiles = [
     'css/style.css',              // Reset & Vars
     'css/header-footer.css',      // Globales Layout
     'css/side-menu.css',          // Navigation
     'css/menu-interactive.css',   // Interaktive Menüs
-    'css/light-mode.css',         // Dark/Light Mode Logik
-    'css/ai-styles.css'           // Scheint global für Evita/Chat zu sein
+    'css/ai-styles.css',          // Evita/Chat Styles
+    'css/light-mode.css'          // ← MUSS ZULETZT sein für Overrides!
 ];
 
 // 2. HOME: Nur für index.html
