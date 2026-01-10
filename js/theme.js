@@ -1,13 +1,17 @@
-// js/theme.js - UPDATED für neuen Toggle-Switch
+// js/theme.js - UPDATED mit Flash Prevention Support
 import { updateParticleColors } from './effects.js';
 
 function applyTheme(theme) {
+    const html = document.documentElement;
     const body = document.body;
     const themeToggle = document.getElementById('theme-toggle');
     
     if (theme === 'light') {
+        // Beide Elemente synchron halten für maximale Kompatibilität
+        html.classList.add('light-mode');
         body.classList.add('light-mode');
     } else {
+        html.classList.remove('light-mode');
         body.classList.remove('light-mode');
     }
     
@@ -31,7 +35,9 @@ function handleThemeToggle(e) {
         e.preventDefault();
     }
     
-    const isLight = document.body.classList.contains('light-mode');
+    // Prüfe beide Elemente (html hat Vorrang wegen Flash Prevention)
+    const isLight = document.documentElement.classList.contains('light-mode') || 
+                    document.body.classList.contains('light-mode');
     const newTheme = isLight ? 'dark' : 'light';
     localStorage.setItem('theme', newTheme);
     applyTheme(newTheme);
@@ -51,7 +57,16 @@ export function initTheme() {
         console.log("✅ Theme-Toggle gefunden.");
         
         // Gespeichertes Theme laden (Standard: dark)
+        // Prüfe ob html bereits die Klasse hat (vom inline Script)
+        const htmlHasLightMode = document.documentElement.classList.contains('light-mode');
         const savedTheme = localStorage.getItem('theme') || 'dark';
+        
+        // Synchronisiere body mit html (falls Flash Prevention Script aktiv war)
+        if (htmlHasLightMode && savedTheme === 'light') {
+            document.body.classList.add('light-mode');
+        }
+        
+        // Theme anwenden
         applyTheme(savedTheme);
         
         // Alte Event-Listener entfernen (falls vorhanden)
