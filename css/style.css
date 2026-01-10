@@ -27,17 +27,6 @@
     --header-height-mobile: 65px;
 }
 
-/* DAY MODE (Überschreibt die Farben) */
-body.light-mode {
-    --bg-color: #ffffff;      
-    --text-color: #333333; 
-    --border-color: #bbbbbb;
-    --card-bg: #ffffff;
-    --modal-bg: #ffffff;
-    --particle-color: #555555;
-    --particle-line-color: #cccccc;  
-    --accent-color: #D39A00;     
-}
 
 
 * {
