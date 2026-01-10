@@ -26,6 +26,7 @@
     "generate-articles-db": "node js/generate-articles-db.js",
     "generate-knowledge": "node js/generate-knowledge.js",
     "generate-sitemap": "node generate-sitemap.js",
+    "inject:header": "node js/inject-header.js",
     "inject-ratings": "node js/inject-ratings.js",
     "inject-footer": "node js/inject-footer.js",
     "inject-breadcrumb": "node js/inject-breadcrumb.js",
