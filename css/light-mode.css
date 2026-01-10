@@ -9,12 +9,17 @@
    Ergänze/ersetze in style.css den body.light-mode Block
    =================== */
 
+html body.light-mode,
 body.light-mode {
     /* Hintergründe */
-    --bg-color: #fafafa;              /* Minimal weißer */
-    --bg-color-secondary: #f7f7f7;    /* Sekundärer Hintergrund */
+    --bg-color: #ffffff;              /* Reines Weiß */
+    --bg-color-secondary: #fafafa;    /* Sekundärer Hintergrund */
     --modal-bg: #ffffff;
     --card-bg: #ffffff;
+    
+    /* Direkter Background Override mit maximaler Spezifität */
+    background-color: #ffffff !important;
+    background: #ffffff !important;
     
     /* Textfarben - DEUTLICH VERBESSERT */
     --text-color: #1a1a1a;            /* Fast Schwarz für maximalen Kontrast */
@@ -990,4 +995,101 @@ body.light-mode .cta-button-blog {
 
 body.light-mode .cta-button-blog:hover {
     background: var(--accent-color-hover);
+}
+
+/* ===================
+   17. FLIP CARD / STARTSEITE - LIGHT MODE FIXES
+   =================== */
+
+/* Hero & Flip Container Hintergrund */
+body.light-mode #hero,
+body.light-mode .flip-container,
+body.light-mode .flipper,
+body.light-mode .front-face,
+body.light-mode .back-face,
+body.light-mode .flip-panel,
+body.light-mode .flip-panel-content,
+body.light-mode #view-main,
+body.light-mode #view-third {
+    background-color: transparent !important;
+}
+
+/* Stelle sicher, dass der Body-Hintergrund durchscheint */
+body.light-mode #hero {
+    background: transparent !important;
+}
+
+/* Particles Container im Light Mode */
+body.light-mode #particles-js {
+    opacity: 0.25;
+}
+
+/* Text in Flip Cards */
+body.light-mode .flip-panel p,
+body.light-mode .flip-panel ul li,
+body.light-mode .flip-panel h2,
+body.light-mode .flip-panel h3 {
+    color: var(--text-color);
+}
+
+/* Flip Buttons */
+body.light-mode #flip-info-btn {
+    border-color: var(--accent-color) !important;
+    color: var(--accent-color) !important;
+    background: transparent !important;
+}
+
+body.light-mode #flip-info-btn:hover {
+    background-color: var(--accent-color) !important;
+    color: #ffffff !important;
+}
+
+/* Facts Card auf Startseite */
+body.light-mode .facts-card {
+    background: rgba(0, 0, 0, 0.03);
+    border-left-color: var(--accent-color);
+}
+
+body.light-mode .facts-card-label {
+    color: var(--accent-color);
+}
+
+body.light-mode .facts-card-content {
+    color: var(--text-color-muted);
+}
+
+/* Tech Terminal bleibt dunkel */
+body.light-mode .tech-terminal-wrapper {
+    background-color: #1e1e1e;
+    border-color: #333;
+}
+
+/* Expert FAQ */
+body.light-mode .expert-faq-wrapper {
+    border-top-color: var(--border-color);
+}
+
+body.light-mode details[name="expert-faq"] {
+    border-bottom-color: var(--border-color);
+}
+
+body.light-mode details[name="expert-faq"] summary {
+    color: var(--text-color);
+}
+
+body.light-mode details[name="expert-faq"] summary:hover {
+    color: var(--accent-color);
+}
+
+body.light-mode .faq-content p {
+    color: var(--text-color-muted);
+}
+
+/* Section Separator */
+body.light-mode .section-separator-title {
+    color: var(--accent-color);
+}
+
+body.light-mode .section-separator-title::after {
+    background: linear-gradient(to right, var(--accent-color), transparent);
 }
