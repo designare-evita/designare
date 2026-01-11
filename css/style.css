@@ -208,8 +208,8 @@ h1 b {
 
 .profile-picture {
     margin-top: 20px;
-    height: 274px;
-    width: 250px;
+    height: 250px;
+    width: 274px;
     margin-bottom: 1rem;
     object-fit: contain;
 }
