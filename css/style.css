@@ -208,11 +208,10 @@ h1 b {
 
 .profile-picture {
     margin-top: 20px;
-    height: 250px;
-    width: 274px;
-    margin-bottom: 0.1rem;
-    object-fit: contain;
-}
+    height: 230px;       /* Setzt die feste Höhe */
+    width: auto;         /* WICHTIG: Passt die Breite automatisch an, damit nichts verzerrt */
+    margin-bottom: 20px; 
+    }
 
 #hero h1 {
     font-size: 3rem;
