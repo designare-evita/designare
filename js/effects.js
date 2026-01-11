@@ -13,8 +13,8 @@ export function updateParticleColors() {
     
     if (isLightMode) {
         // Light Mode: Minimal dunkler für leichten Kontrast auf weißem Hintergrund
-    particleColor = '#666666';
-        lineColor = '#777777';
+    particleColor = '#555555';
+        lineColor = '#666666';
     } else {
         // Dark Mode: Sehr minimal heller für leichten Kontrast auf dunklem Hintergrund
     particleColor = '#777777';
