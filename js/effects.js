@@ -5,10 +5,21 @@
  * Wird beim Theme-Wechsel von der theme.js aufgerufen.
  */
 export function updateParticleColors() {
-    // Hole die aktuellen Werte der CSS-Variablen vom Root-Element
-    const rootStyles = getComputedStyle(document.documentElement);
-    const particleColor = rootStyles.getPropertyValue('--particle-color').trim() || '#bbbbbb';
-    const lineColor = rootStyles.getPropertyValue('--particle-line-color').trim() || '#555555';
+    const isLightMode = document.body.classList.contains('light-mode') || 
+                        document.documentElement.classList.contains('light-mode');
+    
+    // Partikel-Farben je nach Modus für besseren Kontrast
+    let particleColor, lineColor;
+    
+    if (isLightMode) {
+        // Light Mode: Minimal dunkler für leichten Kontrast auf weißem Hintergrund
+        particleColor = '#777777';
+        lineColor = '#999999';
+    } else {
+        // Dark Mode: Sehr minimal heller für leichten Kontrast auf dunklem Hintergrund
+        particleColor = '#555555';
+        lineColor = '#444444';
+    }
 
     // Prüfen, ob particles.js geladen und initialisiert ist
     if (window.pJSDom && window.pJSDom[0] && window.pJSDom[0].pJS) {
@@ -47,7 +58,7 @@ export function initEffects() {
                         }
                     },
                     "color": {
-                        "value": "#bbbbbb" // Fallback-Farbe
+                        "value": "#555555" // Dark Mode Default - sehr minimal sichtbar
                     },
                     "shape": {
                         "type": "circle",
@@ -73,7 +84,7 @@ export function initEffects() {
                     "line_linked": {
                         "enable": true,
                         "distance": 150,
-                        "color": "#555555", // Fallback-Farbe
+                        "color": "#444444", // Dark Mode Default - sehr minimal sichtbar
                         "opacity": 0.5,
                         "width": 1
                     },
@@ -132,7 +143,7 @@ export function initEffects() {
                 "retina_detect": true
             });
 
-            // Nach der Initialisierung sofort die korrekten Farben aus dem CSS laden
+            // Nach der Initialisierung sofort die korrekten Farben aus dem Theme laden
             updateParticleColors();
         }
     }
