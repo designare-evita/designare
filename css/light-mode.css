@@ -38,9 +38,6 @@ body.light-mode {
     --accent-color-hover: #996600;    /* Noch dunkler bei Hover */
     --accent-color-rgba: rgba(184, 134, 11, 0.9);
     
-    /* Partikel */
-    --particle-color: #888888;
-    --particle-line-color: #cccccc;
 }
 
 /* ===================
