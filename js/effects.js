@@ -18,7 +18,7 @@ export function updateParticleColors() {
     } else {
         // Dark Mode: Sehr minimal heller für leichten Kontrast auf dunklem Hintergrund
     particleColor = '#777777';
-        lineColor = '#666666'';
+        lineColor = '#666666';
     }
 
     // Prüfen, ob particles.js geladen und initialisiert ist
