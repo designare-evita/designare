@@ -58,7 +58,7 @@ export function initEffects() {
                         }
                     },
                     "color": {
-                        "value": "#555555" // Dark Mode Default - sehr minimal sichtbar
+                        "value": "#777777" // Dark Mode Default - sehr minimal sichtbar
                     },
                     "shape": {
                         "type": "circle",
@@ -84,7 +84,7 @@ export function initEffects() {
                     "line_linked": {
                         "enable": true,
                         "distance": 150,
-                        "color": "#444444", // Dark Mode Default - sehr minimal sichtbar
+                        "color": "#666666", // Dark Mode Default - sehr minimal sichtbar
                         "opacity": 0.5,
                         "width": 1
                     },
