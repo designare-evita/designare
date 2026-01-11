@@ -197,7 +197,7 @@ h1 b {
     top: 0;
     width: 100%;
     z-index: 1;
-    opacity: 0.4;
+    opacity: 0.5;
     pointer-events: none;
     margin: 0;
 }
@@ -207,7 +207,7 @@ h1 b {
    =================== */
 
 .profile-picture {
-    margin-top: 25px;
+    margin-top: 20px;
     height: 274px;
     width: 250px;
     margin-bottom: 1rem;
