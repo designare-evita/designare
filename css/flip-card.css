@@ -772,6 +772,24 @@ blockquote p:not(:last-child) {
 }
 
 /* ===================
+   1b. CITE INNERHALB BLOCKQUOTE
+   Alternative: <blockquote><p>...</p><cite>...</cite></blockquote>
+   =================== */
+
+blockquote cite {
+    display: block;
+    margin-top: 0.75rem;
+    font-style: normal;
+    font-size: 0.9rem;
+    color: var(--text-color-muted);
+}
+
+blockquote cite::before {
+    content: '— ';
+    color: var(--accent-color);
+}
+
+/* ===================
    2. FIGURE + BLOCKQUOTE (mit Quellenangabe)
    Für Zitate mit Autor/Quelle
    =================== */
