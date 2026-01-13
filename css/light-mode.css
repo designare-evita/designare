@@ -1095,6 +1095,202 @@ body.light-mode .section-separator-title::after {
 }
 
 
+/* ============================================================
+   BLOCKQUOTE STYLES
+   Semantische Zitat-Auszeichnung für Dark Mode & Light Mode
+   ============================================================ */
+
+/* ===================
+   1. STANDARD BLOCKQUOTE
+   Für einfache Zitate ohne Quellenangabe
+   =================== */
+
+blockquote {
+    position: relative;
+    margin: 1.5rem 0;
+    padding: 1.5rem 1.5rem 1.25rem 2.5rem;  /* Mehr Platz oben und links für das Symbol */
+    background: rgba(255, 255, 255, 0.03);
+    border-left: 3px solid var(--accent-color);
+    border-radius: 0 8px 8px 0;
+    font-style: italic;
+    color: var(--text-color);
+    line-height: 1.7;
+    overflow: visible;  /* Sicherstellen dass nichts abgeschnitten wird */
+}
+
+blockquote::before {
+    content: '"';
+    position: absolute;
+    top: 8px;           /* Innerhalb des Containers, nicht negativ */
+    left: 12px;
+    font-size: 2.5rem;  /* Etwas kleiner für bessere Proportionen */
+    font-family: Georgia, serif;
+    color: var(--accent-color);
+    opacity: 0.4;
+    line-height: 1;
+    pointer-events: none;
+}
+
+blockquote p {
+    margin: 0;
+    position: relative;
+    z-index: 1;
+}
+
+blockquote p:not(:last-child) {
+    margin-bottom: 0.75rem;
+}
+
+/* ===================
+   1b. CITE INNERHALB BLOCKQUOTE
+   Alternative: <blockquote><p>...</p><cite>...</cite></blockquote>
+   =================== */
+
+blockquote cite {
+    display: block;
+    margin-top: 0.75rem;
+    font-style: normal;
+    font-size: 0.9rem;
+    color: var(--text-color-muted);
+}
+
+blockquote cite::before {
+    content: '— ';
+    color: var(--accent-color);
+}
+
+/* ===================
+   2. FIGURE + BLOCKQUOTE (mit Quellenangabe)
+   Für Zitate mit Autor/Quelle
+   =================== */
+
+figure:has(blockquote) {
+    margin: 2rem 0;
+    padding: 0;
+}
+
+figure blockquote {
+    margin-bottom: 0;
+    border-radius: 0 8px 0 0;
+}
+
+figure figcaption {
+    padding: 0.75rem 1.5rem;
+    background: rgba(255, 255, 255, 0.02);
+    border-left: 3px solid var(--accent-color);
+    border-radius: 0 0 8px 0;
+    font-size: 0.9rem;
+    color: var(--text-color-muted);
+    font-style: normal;
+}
+
+figure figcaption cite {
+    font-style: normal;
+    font-weight: 500;
+    color: var(--accent-color);
+}
+
+/* Trennstrich vor dem Autor */
+figure figcaption::before {
+    content: none;
+}
+
+/* ===================
+   3. INLINE-ZITAT <q>
+   Für kurze Zitate im Fließtext
+   =================== */
+
+q {
+    quotes: '„' '"' '‚' ''';  /* Deutsche Anführungszeichen */
+    font-style: italic;
+    color: var(--text-color);
+}
+
+q::before {
+    content: open-quote;
+    color: var(--accent-color);
+}
+
+q::after {
+    content: close-quote;
+    color: var(--accent-color);
+}
+
+/* Verschachtelte Zitate */
+q q::before {
+    content: '‚';
+}
+
+q q::after {
+    content: ''';
+}
+
+/* ===================
+   4. PULL-QUOTE VARIANTE
+   Für hervorgehobene Zitate (optional)
+   =================== */
+
+blockquote.pull-quote {
+    border-left: none;
+    border-top: 2px solid var(--accent-color);
+    border-bottom: 2px solid var(--accent-color);
+    text-align: center;
+    padding: 2rem 1.5rem;
+    background: transparent;
+    font-size: 1.15rem;
+}
+
+blockquote.pull-quote::before {
+    position: static;
+    display: block;
+    font-size: 2.5rem;
+    margin-bottom: -0.5rem;
+    opacity: 0.5;
+}
+
+blockquote.pull-quote::after {
+    content: '"';
+    display: block;
+    font-size: 2.5rem;
+    font-family: Georgia, serif;
+    color: var(--accent-color);
+    opacity: 0.5;
+    margin-top: -0.5rem;
+    line-height: 1;
+}
+
+/* ===================
+   5. RESPONSIVE ANPASSUNGEN
+   =================== */
+
+@media (max-width: 768px) {
+    blockquote {
+        margin: 1rem 0;
+        padding: 1.25rem 1rem 1rem 2rem;
+        font-size: 0.95rem;
+    }
+
+    blockquote::before {
+        font-size: 2rem;
+        top: 6px;
+        left: 8px;
+    }
+
+    figure figcaption {
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
+    }
+
+    blockquote.pull-quote {
+        padding: 1.5rem 1rem;
+        font-size: 1rem;
+    }
+}
+
+/* ============================================================
+   LIGHT MODE ANPASSUNGEN
+   ============================================================ */
+
 body.light-mode blockquote {
     background: rgba(0, 0, 0, 0.03);
     color: var(--text-color);
@@ -1104,6 +1300,14 @@ body.light-mode blockquote {
 body.light-mode blockquote::before {
     color: var(--accent-color);
     opacity: 0.25;
+}
+
+body.light-mode blockquote cite {
+    color: var(--text-color-muted);
+}
+
+body.light-mode blockquote cite::before {
+    color: var(--accent-color);
 }
 
 body.light-mode figure figcaption {
