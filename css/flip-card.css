@@ -728,3 +728,171 @@ body.light-mode .facts-card {
         max-width: 300px;
     }
 }
+
+
+/* ===================
+   1. STANDARD BLOCKQUOTE
+   Für einfache Zitate ohne Quellenangabe
+   =================== */
+
+blockquote {
+    position: relative;
+    margin: 1.5rem 0;
+    padding: 1.25rem 1.5rem 1.25rem 2rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-left: 3px solid var(--accent-color);
+    border-radius: 0 8px 8px 0;
+    font-style: italic;
+    color: var(--text-color);
+    line-height: 1.7;
+}
+
+blockquote::before {
+    content: '"';
+    position: absolute;
+    top: -5px;
+    left: 10px;
+    font-size: 3.5rem;
+    font-family: Georgia, serif;
+    color: var(--accent-color);
+    opacity: 0.3;
+    line-height: 1;
+}
+
+blockquote p {
+    margin: 0;
+    position: relative;
+    z-index: 1;
+}
+
+blockquote p:not(:last-child) {
+    margin-bottom: 0.75rem;
+}
+
+/* ===================
+   2. FIGURE + BLOCKQUOTE (mit Quellenangabe)
+   Für Zitate mit Autor/Quelle
+   =================== */
+
+figure:has(blockquote) {
+    margin: 2rem 0;
+    padding: 0;
+}
+
+figure blockquote {
+    margin-bottom: 0;
+    border-radius: 0 8px 0 0;
+}
+
+figure figcaption {
+    padding: 0.75rem 1.5rem;
+    background: rgba(255, 255, 255, 0.02);
+    border-left: 3px solid var(--accent-color);
+    border-radius: 0 0 8px 0;
+    font-size: 0.9rem;
+    color: var(--text-color-muted);
+    font-style: normal;
+}
+
+figure figcaption cite {
+    font-style: normal;
+    font-weight: 500;
+    color: var(--accent-color);
+}
+
+/* Trennstrich vor dem Autor */
+figure figcaption::before {
+    content: none;
+}
+
+/* ===================
+   3. INLINE-ZITAT <q>
+   Für kurze Zitate im Fließtext
+   =================== */
+
+q {
+    quotes: '„' '"' '‚' ''';  /* Deutsche Anführungszeichen */
+    font-style: italic;
+    color: var(--text-color);
+}
+
+q::before {
+    content: open-quote;
+    color: var(--accent-color);
+}
+
+q::after {
+    content: close-quote;
+    color: var(--accent-color);
+}
+
+/* Verschachtelte Zitate */
+q q::before {
+    content: '‚';
+}
+
+q q::after {
+    content: ''';
+}
+
+/* ===================
+   4. PULL-QUOTE VARIANTE
+   Für hervorgehobene Zitate (optional)
+   =================== */
+
+blockquote.pull-quote {
+    border-left: none;
+    border-top: 2px solid var(--accent-color);
+    border-bottom: 2px solid var(--accent-color);
+    text-align: center;
+    padding: 2rem 1.5rem;
+    background: transparent;
+    font-size: 1.15rem;
+}
+
+blockquote.pull-quote::before {
+    position: static;
+    display: block;
+    font-size: 2.5rem;
+    margin-bottom: -0.5rem;
+    opacity: 0.5;
+}
+
+blockquote.pull-quote::after {
+    content: '"';
+    display: block;
+    font-size: 2.5rem;
+    font-family: Georgia, serif;
+    color: var(--accent-color);
+    opacity: 0.5;
+    margin-top: -0.5rem;
+    line-height: 1;
+}
+
+/* ===================
+   5. RESPONSIVE ANPASSUNGEN
+   =================== */
+
+@media (max-width: 768px) {
+    blockquote {
+        margin: 1rem 0;
+        padding: 1rem 1rem 1rem 1.5rem;
+        font-size: 0.95rem;
+    }
+
+    blockquote::before {
+        font-size: 2.5rem;
+        top: -3px;
+        left: 5px;
+    }
+
+    figure figcaption {
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
+    }
+
+    blockquote.pull-quote {
+        padding: 1.5rem 1rem;
+        font-size: 1rem;
+    }
+}
