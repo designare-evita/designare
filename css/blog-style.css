@@ -816,6 +816,7 @@ color: var(--text-color);
 
 .related-articles {
     margin-top: 4rem;
+    margin-bottom: 2rem;
     padding-top: 3rem;
     border-top: 1px solid var(--border-color-subtle);
 }
