@@ -7,12 +7,14 @@
 /* ===================
    1. HERO OVERRIDE
    Damit der Hero mit der Flip-Card wachsen kann
+   DYNAMISCH: padding-top skaliert mit Viewport-Höhe
    =================== */
 
 #hero:has(.flip-container) {
     align-items: flex-start !important;
-    padding-top: 35px !important; 
-    padding-bottom: 60px !important;
+    /* DYNAMISCH: 8vh = 8% der Viewport-Höhe, begrenzt zwischen 35px und 120px */
+    padding-top: clamp(35px, 8vh, 120px) !important; 
+    padding-bottom: clamp(40px, 6vh, 80px) !important;
     height: auto !important;
     min-height: 100vh;
     overflow: visible !important;
@@ -91,6 +93,7 @@
 
 /* ===================
    4. STARTSEITE (#view-main)
+   DYNAMISCH: Abstand skaliert mit Viewport-Höhe
    =================== */
 
 #view-main {
@@ -99,7 +102,8 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin-top: 0; 
+    /* DYNAMISCH: 5vh = 5% der Viewport-Höhe, begrenzt zwischen 0px und 80px */
+    margin-top: clamp(0px, 5vh, 80px); 
     margin-bottom: 20px;
     text-align: center;
 }
@@ -329,14 +333,21 @@
 
 /* ===================
    10. MOBILE RESPONSIVE
+   DYNAMISCH: Auch auf Mobile skaliert der Abstand mit
    =================== */
 
 @media (max-width: 768px) {
     
     #hero:has(.flip-container) {
-        padding-top: 40px !important;
+        /* DYNAMISCH: 6vh auf Mobile, begrenzt zwischen 25px und 60px */
+        padding-top: clamp(25px, 6vh, 60px) !important;
         height: auto !important;
         min-height: 100vh;
+    }
+
+    /* DYNAMISCH: #view-main margin-top für Mobile */
+    #view-main {
+        margin-top: clamp(0px, 3vh, 40px);
     }
 
     .flipper {
