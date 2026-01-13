@@ -730,7 +730,7 @@ body.light-mode .facts-card {
 }
 
 
-/* ===================
+* ===================
    1. STANDARD BLOCKQUOTE
    Für einfache Zitate ohne Quellenangabe
    =================== */
@@ -738,25 +738,27 @@ body.light-mode .facts-card {
 blockquote {
     position: relative;
     margin: 1.5rem 0;
-    padding: 1.25rem 1.5rem 1.25rem 2rem;
+    padding: 1.5rem 1.5rem 1.25rem 2.5rem;  /* Mehr Platz oben und links für das Symbol */
     background: rgba(255, 255, 255, 0.03);
     border-left: 3px solid var(--accent-color);
     border-radius: 0 8px 8px 0;
     font-style: italic;
     color: var(--text-color);
     line-height: 1.7;
+    overflow: visible;  /* Sicherstellen dass nichts abgeschnitten wird */
 }
 
 blockquote::before {
     content: '"';
     position: absolute;
-    top: -5px;
-    left: 10px;
-    font-size: 3.5rem;
+    top: 8px;           /* Innerhalb des Containers, nicht negativ */
+    left: 12px;
+    font-size: 2.5rem;  /* Etwas kleiner für bessere Proportionen */
     font-family: Georgia, serif;
     color: var(--accent-color);
-    opacity: 0.3;
+    opacity: 0.4;
     line-height: 1;
+    pointer-events: none;
 }
 
 blockquote p {
@@ -876,14 +878,14 @@ blockquote.pull-quote::after {
 @media (max-width: 768px) {
     blockquote {
         margin: 1rem 0;
-        padding: 1rem 1rem 1rem 1.5rem;
+        padding: 1.25rem 1rem 1rem 2rem;
         font-size: 0.95rem;
     }
 
     blockquote::before {
-        font-size: 2.5rem;
-        top: -3px;
-        left: 5px;
+        font-size: 2rem;
+        top: 6px;
+        left: 8px;
     }
 
     figure figcaption {
@@ -896,3 +898,4 @@ blockquote.pull-quote::after {
         font-size: 1rem;
     }
 }
+
