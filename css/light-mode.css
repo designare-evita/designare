@@ -1093,3 +1093,45 @@ body.light-mode .section-separator-title {
 body.light-mode .section-separator-title::after {
     background: linear-gradient(to right, var(--accent-color), transparent);
 }
+
+
+body.light-mode blockquote {
+    background: rgba(0, 0, 0, 0.03);
+    color: var(--text-color);
+    border-left-color: var(--accent-color);
+}
+
+body.light-mode blockquote::before {
+    color: var(--accent-color);
+    opacity: 0.25;
+}
+
+body.light-mode figure figcaption {
+    background: rgba(0, 0, 0, 0.02);
+    border-left-color: var(--accent-color);
+    color: var(--text-color-muted);
+}
+
+body.light-mode figure figcaption cite {
+    color: var(--accent-color);
+}
+
+body.light-mode q {
+    color: var(--text-color);
+}
+
+body.light-mode q::before,
+body.light-mode q::after {
+    color: var(--accent-color);
+}
+
+body.light-mode blockquote.pull-quote {
+    border-color: var(--accent-color);
+}
+
+body.light-mode blockquote.pull-quote::before,
+body.light-mode blockquote.pull-quote::after {
+    color: var(--accent-color);
+    opacity: 0.35;
+}
+
