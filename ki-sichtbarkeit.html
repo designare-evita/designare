@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content">
+    <title>KI-Sichtbarkeits-Check: Wirst du von ChatGPT & Gemini empfohlen? | Michael Kanda</title>
+    <meta name="description" content="Prüfe kostenlos, ob deine Website in KI-Antworten von ChatGPT, Gemini & Co. vorkommt. Live-Test mit Score, Empfehlungen und Konkurrenz-Analyse.">
+    <meta name="author" content="Michael Kanda">
+    <meta name="robots" content="index, follow">
+
+    <link rel="preload" href="font/poppins-regular.ttf" as="font" type="font/ttf" crossorigin="anonymous">
+    <link rel="preload" href="font/poppins-bold.ttf" as="font" type="font/ttf" crossorigin="anonymous">
+    <link rel="preload" href="font/poppins-semibold.ttf" as="font" type="font/ttf" crossorigin="anonymous">
+    <link rel="icon" href="images/favicon.webp" type="image/webp">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"></noscript>
+    
+    <link rel="stylesheet" href="css/core.min.css">
+    <link rel="stylesheet" href="css/article.min.css">
+    <link rel="stylesheet" href="css/ai-visibility.css">
+    
+    <link rel="canonical" href="https://designare.at/ki-sichtbarkeit"/>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://designare.at/ki-sichtbarkeit#app",
+      "name": "KI-Sichtbarkeits-Check",
+      "description": "Kostenloses Tool zur Analyse der Sichtbarkeit einer Website in KI-gestützten Suchsystemen wie ChatGPT, Gemini und Perplexity.",
+      "url": "https://designare.at/ki-sichtbarkeit",
+      "applicationCategory": "SEO Tool",
+      "operatingSystem": "Web Browser",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "EUR"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Michael Kanda",
+        "url": "https://designare.at"
+      }
+    },
+    {
+      "@type": "TechArticle",
+      "@id": "https://designare.at/ki-sichtbarkeit#article",
+      "headline": "KI-Sichtbarkeits-Check: Wirst du von ChatGPT & Gemini empfohlen?",
+      "description": "Prüfe kostenlos, ob deine Website in KI-Antworten vorkommt. Live-Test mit Gemini API.",
+      "url": "https://designare.at/ki-sichtbarkeit",
+      "datePublished": "2025-01-17",
+      "dateModified": "2025-01-17",
+      "author": {
+        "@type": "Person",
+        "name": "Michael Kanda",
+        "url": "https://designare.at",
+        "jobTitle": "Web & KI Entwickler"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://designare.at/ki-sichtbarkeit#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Was misst der KI-Sichtbarkeits-Check?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Das Tool prüft live mit der Gemini API, ob und wie deine Domain in KI-generierten Antworten erwähnt wird. Zusätzlich analysiert es technische Faktoren wie Schema.org Markup und E-E-A-T Signale."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Ist der Test kostenlos?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ja, der KI-Sichtbarkeits-Check ist komplett kostenlos nutzbar."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Warum variieren die Ergebnisse?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "KI-Modelle generieren bei jeder Anfrage leicht unterschiedliche Antworten. Der Test ist eine Momentaufnahme. Für langfristiges Monitoring empfehlen wir regelmäßige Checks."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js" defer></script>
+    <script type="module" src="js/main.js"></script>
+    <script src="js/ai-visibility.js" defer></script>
+    <script src="js/analytics-proxy.js" async></script>    
+</head>
+
+<body class="dark-mode page-loaded">
+
+    <div id="header-placeholder"></div>
+    <div id="side-menu-placeholder"></div>
+    <div id="modal-container"></div>
+    <div id="particles-js"></div>
+    
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <h3>Analysiere KI-Sichtbarkeit...</h3>
+            <p>Live-Abfragen an Gemini werden ausgeführt.<br>Das kann bis zu 30 Sekunden dauern.</p>
+        </div>
+    </div>
+    
+    <main id="blog-main">
+        
+        <article class="blog-article">
+            
+            <header class="article-header">
+                <div id="breadcrumb-placeholder"></div>
+                <h1>KI-Sichtbarkeits-Check: <span class="article-white">Wirst du von ChatGPT & Gemini empfohlen?</span></h1>
+                
+                <div class="article-meta">
+                    <time datetime="2025-01-17">17. Januar 2025</time>
+                    <span class="reading-time"><i class="fa-solid fa-robot"></i> Interaktives Tool</span>
+                    <address class="author">
+                        Von <a href="index.html#michael" rel="author">Michael Kanda</a>
+                    </address>
+                </div>
+            </header>
+
+            <section class="article-summary" aria-labelledby="summary-heading">
+                <h2 id="summary-heading" class="visually-hidden">Das Wichtigste in Kürze</h2>
+                
+                <div class="summary-box">
+                    <div class="summary-content">
+                        <h3>Was macht dieses Tool?</h3>
+                        <ul>
+                            <li><strong>Live-Test:</strong> Fragt Gemini direkt, ob und wie es deine Domain kennt und empfiehlt.</li>
+                            <li><strong>Technische Analyse:</strong> Prüft Schema.org Markup und E-E-A-T Signale auf deiner Website.</li>
+                            <li><strong>Konkurrenz-Check:</strong> Zeigt, welche Domains statt deiner genannt werden.</li>
+                            <li><strong>Actionable Score:</strong> Visibility-Score von 0-100 mit konkreten Empfehlungen.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========== TOOL SECTION ========== -->
+            <section aria-labelledby="tool-heading" class="ai-visibility-tool">
+                <h2 id="tool-heading"><i class="fa-solid fa-robot"></i> KI-Sichtbarkeits-Check</h2>
+                <p class="tool-intro">Gib deine Domain ein und erfahre, wie sichtbar du für KI-Assistenten bist.</p>
+
+                <form id="visibility-form" class="visibility-form">
+                    <div class="form-group">
+                        <label for="domain-input">
+                            <i class="fa-solid fa-globe"></i> Domain
+                        </label>
+                        <input 
+                            type="text" 
+                            id="domain-input" 
+                            class="form-input"
+                            placeholder="beispiel.at oder https://beispiel.at"
+                            required
+                        >
+                        <span class="form-hint">Ohne https:// möglich</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="industry-input">
+                            <i class="fa-solid fa-briefcase"></i> Branche (optional)
+                        </label>
+                        <input 
+                            type="text" 
+                            id="industry-input" 
+                            class="form-input"
+                            placeholder="z.B. Webentwicklung, Rechtsanwalt, Restaurant..."
+                        >
+                        
+                        <div class="industry-select">
+                            <span class="industry-label">Schnellauswahl:</span>
+                            <div class="industry-buttons">
+                                <button type="button" class="industry-btn" data-industry="Webentwicklung">Webentwicklung</button>
+                                <button type="button" class="industry-btn" data-industry="SEO Agentur">SEO Agentur</button>
+                                <button type="button" class="industry-btn" data-industry="Rechtsanwalt">Rechtsanwalt</button>
+                                <button type="button" class="industry-btn" data-industry="Restaurant">Restaurant</button>
+                                <button type="button" class="industry-btn" data-industry="Online Shop">Online Shop</button>
+                                <button type="button" class="industry-btn" data-industry="Arzt">Arzt</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="submit-btn" class="submit-btn">
+                        <i class="fa-solid fa-robot"></i> KI-Sichtbarkeit prüfen
+                    </button>
+                </form>
+
+                <!-- Results appear here -->
+                <div id="results-container" class="results-container"></div>
+            </section>
+
+            <!-- ========== HOW IT WORKS ========== -->
+            <section aria-labelledby="howitworks-heading">
+                <h2 id="howitworks-heading">So funktioniert der <span class="article-white">KI-Sichtbarkeits-Check</span></h2>
+                
+                <p>Dieses Tool kombiniert zwei Analyse-Methoden, um ein vollständiges Bild deiner KI-Präsenz zu liefern:</p>
+
+                <dl class="feature-list">
+                    <dt>1. Live-Test mit Gemini API</dt>
+                    <dd>Wir stellen der Google Gemini KI vier verschiedene Fragen über deine Domain: Kennt sie dich? Empfiehlt sie dich? Vertraut sie dir? Wer sind deine Konkurrenten in KI-Antworten?</dd>
+                    
+                    <dt>2. Technische Domain-Analyse</dt>
+                    <dd>Parallel crawlen wir deine Website und prüfen auf Schema.org JSON-LD, E-E-A-T Signale (Über-uns, Kontakt, Autoren) und andere Faktoren, die KIs bei der Bewertung nutzen.</dd>
+                    
+                    <dt>3. Score & Empfehlungen</dt>
+                    <dd>Aus beiden Analysen berechnen wir einen Visibility-Score (0-100) und geben dir konkrete Handlungsempfehlungen, wie du deine KI-Sichtbarkeit verbessern kannst.</dd>
+                </dl>
+
+                <aside class="expert-tip">
+                    <i class="fa-solid fa-lightbulb"></i>
+                    <div>
+                        <strong>Wichtig zu wissen:</strong>
+                        <p>KI-Antworten sind nicht deterministisch – sie variieren bei jeder Anfrage leicht. Dieser Test ist eine <strong>Momentaufnahme</strong>. Für ein aussagekräftiges Bild empfehle ich, den Check mehrfach über einen Zeitraum durchzuführen. Die Branche-Eingabe hilft der KI, relevante Empfehlungsfragen zu stellen.</p>
+                    </div>
+                </aside>
+            </section>
+
+            <!-- ========== FAQ ========== -->
+            <section aria-labelledby="faq-heading">
+                <h2 id="faq-heading">Häufig gestellte Fragen (FAQ)</h2>
+                
+                <div class="faq-accordion">
+                    <details name="faq-group" open>
+                        <summary>Was misst der KI-Sichtbarkeits-Check genau?</summary>
+                        <div class="faq-content">
+                            <p>Das Tool misst drei Dimensionen: (1) Ob Gemini deine Domain kennt und erwähnt, (2) wie die technische "KI-Readiness" deiner Website ist (Schema.org, E-E-A-T), und (3) welche Konkurrenten stattdessen genannt werden. Der Score gewichtet Erwähnungen zu 50%, technische Faktoren zu 30% und positives Sentiment zu 20%.</p>
+                        </div>
+                    </details>
+
+                    <details name="faq-group">
+                        <summary>Warum nur Gemini und nicht ChatGPT oder Perplexity?</summary>
+                        <div class="faq-content">
+                            <p>Aktuell nutzen wir nur die Gemini API, da diese bereits integriert ist. ChatGPT und Perplexity erfordern separate API-Keys und Kosten. Die Prinzipien sind aber ähnlich: Wer für Gemini sichtbar ist, hat auch bei anderen KIs gute Chancen.</p>
+                        </div>
+                    </details>
+
+                    <details name="faq-group">
+                        <summary>Wie kann ich meine KI-Sichtbarkeit verbessern?</summary>
+                        <div class="faq-content">
+                            <p>Die wichtigsten Hebel sind: <strong>1.</strong> Strukturierte Daten (Schema.org) implementieren, <strong>2.</strong> E-E-A-T Signale stärken (Autorenprofile, Über-uns, Impressum), <strong>3.</strong> Answer-First Content schreiben, der direkte Antworten liefert, <strong>4.</strong> Markenbekanntheit durch Erwähnungen auf anderen Seiten aufbauen. Mehr dazu im <a href="/geo-seo">GEO-Guide</a>.</p>
+                        </div>
+                    </details>
+
+                    <details name="faq-group">
+                        <summary>Ist das Tool kostenlos?</summary>
+                        <div class="faq-content">
+                            <p>Ja, der KI-Sichtbarkeits-Check ist komplett kostenlos. Die Gemini API-Kosten trägt Designare.at. Bei sehr hoher Nutzung kann es zu Rate-Limits kommen.</p>
+                        </div>
+                    </details>
+                </div>
+            </section>
+
+            <!-- ========== CTA ========== -->
+            <section class="blog-cta-wrapper">
+                <h2>KI-Sichtbarkeit professionell optimieren?</h2>
+                <p>Der Check zeigt nur den Ist-Zustand. Wenn du Unterstützung bei der Umsetzung der Empfehlungen brauchst – von Schema.org bis Content-Strategie:</p>
+                
+                <button onclick="document.getElementById('contact-modal').classList.add('visible')" class="cta-button-blog">
+                    <i class="fa-regular fa-paper-plane"></i> Frag Michael 
+                </button>
+            </section>
+
+            <div id="feedback-placeholder"></div>
+            <div id="related-placeholder"></div>
+        </article>
+
+    </main>
+
+    <div id="footer-placeholder"></div>
+    <script src="js/feedback.js"></script>
+</body>
+</html>
