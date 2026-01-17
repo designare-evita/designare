@@ -31,7 +31,7 @@ const articleFiles = [
     'css/blog-components.css',    // NEU: Blog-Komponenten
     'css/feedback-style.css',     // Feedback Formulare
     // 'css/silas.css',           // HIER ENTFERNT -> Eigener Task unten!
-    'css/lightbox.css'            // Falls genutzt
+    'css/lightbox.css',            // Falls genutzt
     'css/ai-visibility.css'
 ];
 
