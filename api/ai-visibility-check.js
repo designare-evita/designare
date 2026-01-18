@@ -7,22 +7,39 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 // HELPER: Markdown zu HTML formatieren (wie Evita)
 // =================================================================
 function formatResponseText(text) {
-  return text
+  let formatted = text
     // Fett: **text** → <strong>text</strong>
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
     // Kursiv: *text* → <em>text</em>
     .replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '<em>$1</em>')
-    // Aufzählungen: - Item oder • Item → <li>
-    .replace(/^[-•]\s+(.+)$/gm, '• $1')
-    // Nummerierte Listen behalten
-    .replace(/^\d+\.\s+/gm, (match) => match)
-    // Doppelte Zeilenumbrüche → Absätze
-    .replace(/\n\n+/g, '\n\n')
-    // Einfache Zeilenumbrüche behalten
-    .replace(/\n/g, '<br>')
-    // Clean up
-    .replace(/<br><br>/g, '<br><br>')
-    .trim();
+    // Aufzählungen: - Item oder • Item → mit Bullet
+    .replace(/^[-•]\s+(.+)$/gm, '• $1');
+  
+  // Zeilenumbrüche direkt nach </strong> entfernen (das Hauptproblem!)
+  formatted = formatted.replace(/<\/strong>\s*\n+/g, '</strong> ');
+  
+  // Zeilenumbrüche direkt vor <strong> entfernen
+  formatted = formatted.replace(/\n+\s*<strong>/g, ' <strong>');
+  
+  // Mehrfache Leerzeilen reduzieren
+  formatted = formatted.replace(/\n{3,}/g, '\n\n');
+  
+  // Nur echte Absätze (doppelte Zeilenumbrüche) werden zu <br><br>
+  formatted = formatted.replace(/\n\n/g, '<br><br>');
+  
+  // Einzelne Zeilenumbrüche nur bei Listen behalten
+  formatted = formatted.replace(/\n(•)/g, '<br>$1');
+  
+  // Restliche einzelne Zeilenumbrüche zu Leerzeichen (fließender Text)
+  formatted = formatted.replace(/\n/g, ' ');
+  
+  // Doppelte Leerzeichen entfernen
+  formatted = formatted.replace(/\s{2,}/g, ' ');
+  
+  // Leerzeichen vor Satzzeichen entfernen
+  formatted = formatted.replace(/\s+([.,!?:;])/g, '$1');
+  
+  return formatted.trim();
 }
 
 export default async function handler(req, res) {
