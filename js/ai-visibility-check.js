@@ -44,7 +44,7 @@ export default async function handler(req, res) {
 
     // --- MODELL MIT GOOGLE SEARCH GROUNDING ---
     const modelWithSearch = genAI.getGenerativeModel({ 
-      model: "gemini-2.0-flash",
+      model: "gemini-2.5-flash",
       generationConfig: { 
         temperature: 0.4,  // Etwas höher für natürlichere Antworten
         maxOutputTokens: 1500
