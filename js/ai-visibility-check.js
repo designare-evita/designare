@@ -42,14 +42,74 @@ export default async function handler(req, res) {
     const cleanDomain = domain.replace(/^https?:\/\//, '').replace(/\/$/, '').toLowerCase();
     console.log(`🔍 AI Visibility Check für: ${cleanDomain} (Branche: ${industry || 'nicht angegeben'})`);
 
-    // --- MODELL MIT GOOGLE SEARCH GROUNDING ---
-    const modelWithSearch = genAI.getGenerativeModel({ 
-      model: "gemini-2.5-flash",
-      generationConfig: { 
-        temperature: 0.4,  // Etwas höher für natürlichere Antworten
-        maxOutputTokens: 1500
+// =================================================================
+    // FALLBACK LOGIK DEFINITION
+    // =================================================================
+    
+    const generationConfig = {
+      temperature: 0.4,
+      maxOutputTokens: 1500
+    };
+
+    // WICHTIG: Grounding muss für beide Modelle aktiv sein
+    const tools = [{ googleSearch: {} }];
+
+    /**
+     * Führt den Prompt mit Fallback-Mechanismus aus
+     */
+    async function generateWithFallback(prompt) {
+      try {
+        // --- VERSUCH 1: PRIMÄRES MODELL (Gemini 2.5) ---
+        // console.log("Versuche Gemini 2.5 Flash..."); // Optionales Logging
+        const primaryModel = genAI.getGenerativeModel({ 
+          model: "gemini-2.5-flash",
+          generationConfig,
+          tools 
+        });
+        
+        return await primaryModel.generateContent(prompt);
+
+      } catch (error) {
+        // --- FEHLERBEHANDLUNG & FALLBACK ---
+        console.warn(`⚠️ Gemini 2.5 fehlgeschlagen (Switch zu 2.0). Grund: ${error.message}`);
+
+        // --- VERSUCH 2: FALLBACK MODELL (Gemini 2.0) ---
+        const fallbackModel = genAI.getGenerativeModel({ 
+          model: "gemini-2.0-flash", 
+          generationConfig,
+          tools 
+        });
+
+        return await fallbackModel.generateContent(prompt);
       }
-    });
+    }
+
+    // =================================================================
+    // 2. DURCHLAUF DER AI-TESTS (mit Fallback)
+    // =================================================================
+    
+    let score = 0;
+    const testResults = [];
+    const allCompetitors = [];
+    const recommendations = [];
+
+    // Hier nutzen wir nun die neue Funktion
+    for (const test of aiTests) {
+      try {
+        // Prompt erstellen
+        const prompt = `${test.prompt} "${cleanDomain}"? \n` +
+          `Bitte antworte kurz und prägnant. ` +
+          `Erwähne, ob die Domain namentlich genannt wird oder ob konkrete Dienstleistungen dieser Domain empfohlen werden. ` +
+          `Analysiere auch die Stimmung (positiv/neutral/negativ).`;
+
+        // -----------------------------------------------------------
+        // ÄNDERUNG: Aufruf der Fallback-Funktion statt direkt model.generateContent
+        const result = await generateWithFallback(prompt);
+        // -----------------------------------------------------------
+
+        const response = await result.response;
+        const text = response.text();
+
 
     // =================================================================
     // PHASE 1: Domain-Analyse (Crawling)
