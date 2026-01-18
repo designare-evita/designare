@@ -152,6 +152,39 @@
     cursor: not-allowed;
 }
 
+/* --- RATE LIMIT INFO --- */
+.limit-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: var(--text-color-muted);
+    margin-top: 1rem;
+}
+
+.limit-info i {
+    color: var(--accent-color);
+    font-size: 1rem;
+}
+
+.limit-info strong {
+    color: var(--accent-color);
+}
+
+.limit-info.limit-reached {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: #fca5a5;
+}
+
+.limit-info.limit-reached i {
+    color: #ef4444;
+}
+
 /* --- LOADING OVERLAY --- */
 .loading-overlay {
     display: none;
@@ -502,6 +535,18 @@
     font-size: 0.75rem;
     text-transform: uppercase;
     font-weight: 600;
+}
+
+/* Akkordeon Toggle Icon */
+.test-toggle {
+    color: var(--text-color-muted);
+    font-size: 0.9rem;
+    transition: transform 0.3s ease;
+    margin-left: 8px;
+}
+
+.test-item[open] .test-toggle {
+    transform: rotate(180deg);
 }
 
 .sentiment-positiv {
