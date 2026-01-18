@@ -1,7 +1,29 @@
-// api/ai-visibility-check.js - KI-Sichtbarkeits-Check Tool
+// api/ai-visibility-check.js - KI-Sichtbarkeits-Check mit Grounding + Formatierung
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+// =================================================================
+// HELPER: Markdown zu HTML formatieren (wie Evita)
+// =================================================================
+function formatResponseText(text) {
+  return text
+    // Fett: **text** → <strong>text</strong>
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    // Kursiv: *text* → <em>text</em>
+    .replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '<em>$1</em>')
+    // Aufzählungen: - Item oder • Item → <li>
+    .replace(/^[-•]\s+(.+)$/gm, '• $1')
+    // Nummerierte Listen behalten
+    .replace(/^\d+\.\s+/gm, (match) => match)
+    // Doppelte Zeilenumbrüche → Absätze
+    .replace(/\n\n+/g, '\n\n')
+    // Einfache Zeilenumbrüche behalten
+    .replace(/\n/g, '<br>')
+    // Clean up
+    .replace(/<br><br>/g, '<br><br>')
+    .trim();
+}
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -15,28 +37,17 @@ export default async function handler(req, res) {
       return res.status(400).json({ message: 'Domain ist erforderlich' });
     }
 
-    console.log(`🔍 AI Visibility Check für: ${domain} (Branche: ${industry || 'nicht angegeben'})`);
+    const cleanDomain = domain.replace(/^https?:\/\//, '').replace(/\/$/, '').toLowerCase();
+    console.log(`🔍 AI Visibility Check für: ${cleanDomain} (Branche: ${industry || 'nicht angegeben'})`);
 
-    // --- MODELL-KONFIGURATION (wie in ask-gemini.js) ---
-    const commonConfig = { temperature: 0.3 }; // Niedriger für konsistentere Ergebnisse
-    
-    const modelPrimary = genAI.getGenerativeModel({ 
-      model: "gemini-2.5-flash",
-      generationConfig: commonConfig 
-    });
-    const modelFallback = genAI.getGenerativeModel({ 
+    // --- MODELL MIT GOOGLE SEARCH GROUNDING ---
+    const modelWithSearch = genAI.getGenerativeModel({ 
       model: "gemini-2.0-flash",
-      generationConfig: commonConfig 
-    });
-
-    async function generateContentSafe(inputText) {
-      try { 
-        return await modelPrimary.generateContent(inputText); 
-      } catch (error) { 
-        console.log("Primary model failed, trying Fallback:", error.message);
-        return await modelFallback.generateContent(inputText);
+      generationConfig: { 
+        temperature: 0.4,  // Etwas höher für natürlichere Antworten
+        maxOutputTokens: 1500
       }
-    }
+    });
 
     // =================================================================
     // PHASE 1: Domain-Analyse (Crawling)
@@ -53,7 +64,7 @@ export default async function handler(req, res) {
     };
 
     try {
-      const urlToFetch = domain.startsWith('http') ? domain : `https://${domain}`;
+      const urlToFetch = `https://${cleanDomain}`;
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 10000);
       
@@ -90,52 +101,104 @@ export default async function handler(req, res) {
       }
       
       // E-E-A-T Signale prüfen
-      const htmlLower = html.toLowerCase();
-      domainAnalysis.hasAboutPage = /href=["'][^"']*(?:about|über-uns|ueber-uns|team)["']/i.test(html);
+      domainAnalysis.hasAboutPage = /href=["'][^"']*(?:about|über-uns|ueber-uns|team|wir)["']/i.test(html);
       domainAnalysis.hasContactPage = /href=["'][^"']*(?:contact|kontakt|impressum)["']/i.test(html);
-      domainAnalysis.hasAuthorInfo = /(?:author|autor|verfasser|geschrieben von)/i.test(html);
+      domainAnalysis.hasAuthorInfo = /(?:author|autor|verfasser|geschrieben von|inhaber|geschäftsführer)/i.test(html);
       
       // Title & Description
       const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
       domainAnalysis.title = titleMatch ? titleMatch[1].trim() : '';
       
-      const descMatch = html.match(/<meta[^>]*name=["']description["'][^>]*content=["']([^"']+)["']/i);
+      const descMatch = html.match(/<meta[^>]*name=["']description["'][^>]*content=["']([^"']+)["']/i) ||
+                        html.match(/<meta[^>]*content=["']([^"']+)["'][^>]*name=["']description["']/i);
       domainAnalysis.description = descMatch ? descMatch[1].trim() : '';
       
+      console.log('✅ Crawling erfolgreich:', domainAnalysis.title);
+      
     } catch (error) {
-      console.log('Crawl-Fehler:', error.message);
+      console.log('⚠️ Crawl-Fehler:', error.message);
       domainAnalysis.crawlError = error.message;
     }
 
     // =================================================================
-    // PHASE 2: Gemini Live-Tests
+    // PHASE 2: Gemini Tests MIT Google Search Grounding
     // =================================================================
-    const cleanDomain = domain.replace(/^https?:\/\//, '').replace(/\/$/, '');
     
+    // Test-Definitionen mit Prompts die formatierte Antworten erzeugen
     const testQueries = [
       {
         id: 'knowledge',
-        query: `Was weißt du über ${cleanDomain}? Ist dir diese Website bekannt?`,
-        description: 'Bekanntheit'
+        prompt: `Suche im Web nach der Website **${cleanDomain}** und beschreibe:
+
+1. Was bietet dieses Unternehmen/diese Website an?
+2. Wo ist der Standort (Stadt, Land)?
+3. Welche konkreten Informationen findest du?
+
+**Wichtig:** 
+- Schreibe den Firmennamen/Domain immer **fett**
+- Nutze kurze, klare Sätze
+- Wenn du nichts findest, sage klar: "Zu **${cleanDomain}** konnte ich keine Informationen im Web finden."
+
+Antworte auf Deutsch in 3-5 Sätzen.`,
+        description: 'Bekanntheit im Web',
+        useGrounding: true
       },
       {
         id: 'recommendation',
-        query: industry 
-          ? `Welche Anbieter oder Webseiten kannst du für "${industry}" in Österreich empfehlen?`
-          : `Welche Webseiten für Webentwicklung und SEO in Österreich kannst du empfehlen?`,
-        description: 'Empfehlungen'
+        prompt: industry 
+          ? `Suche nach den **besten Anbietern für "${industry}"** in Österreich.
+
+Nenne **5-8 empfehlenswerte Unternehmen/Websites**:
+- **Firmenname** – Website – kurze Beschreibung
+
+Prüfe auch: Wird **${cleanDomain}** in diesem Bereich erwähnt oder empfohlen?
+
+Antworte auf Deutsch. Formatiere die Liste übersichtlich.`
+          : `Suche nach empfehlenswerten **Webentwicklern und Digital-Agenturen** in Österreich.
+
+Nenne **5-8 bekannte Anbieter**:
+- **Firmenname** – Website – Spezialisierung
+
+Antworte auf Deutsch.`,
+        description: 'Empfehlungen in der Branche',
+        useGrounding: true
       },
       {
-        id: 'trust',
-        query: `Ist ${cleanDomain} eine vertrauenswürdige Quelle? Was weißt du über die Qualität dieser Website?`,
-        description: 'Vertrauen'
+        id: 'reviews',
+        prompt: `Suche nach **Bewertungen und Rezensionen** zu **${cleanDomain}**.
+
+Prüfe:
+- Google Reviews / Google Maps
+- Trustpilot, ProvenExpert oder ähnliche Plattformen
+- Erwähnungen in Foren oder Artikeln
+
+Fasse zusammen:
+- **Bewertung:** (z.B. "4.5 Sterne bei Google")
+- **Kundenmeinungen:** Was sagen Kunden?
+- **Anzahl:** Wie viele Bewertungen gibt es?
+
+Wenn keine Bewertungen vorhanden sind, sage: "Zu **${cleanDomain}** sind keine Online-Bewertungen zu finden."
+
+Antworte auf Deutsch.`,
+        description: 'Online-Reputation',
+        useGrounding: true
       },
       {
-        id: 'comparison',
-        query: industry
-          ? `Nenne mir die besten deutschsprachigen Webseiten und Experten für ${industry}.`
-          : `Nenne mir die besten deutschsprachigen Webseiten für Webentwicklung und KI-Integration.`,
-        description: 'Vergleich'
+        id: 'mentions',
+        prompt: `Suche nach **externen Erwähnungen** von **${cleanDomain}**:
+
+- Einträge in Branchenverzeichnissen (Herold, WKO, Gelbe Seiten, etc.)
+- Links von anderen Websites
+- Erwähnungen in Artikeln oder Blogs
+- Social Media Profile (Facebook, Instagram, LinkedIn)
+
+Liste gefundene Erwähnungen auf mit **fetten** Quellennamen.
+
+Wenn nichts gefunden wird: "Zu **${cleanDomain}** wurden keine externen Erwähnungen gefunden."
+
+Antworte auf Deutsch.`,
+        description: 'Externe Erwähnungen',
+        useGrounding: true
       }
     ];
 
@@ -143,77 +206,116 @@ export default async function handler(req, res) {
     
     for (const test of testQueries) {
       try {
-        const result = await generateContentSafe(test.query);
+        console.log(`🧪 Test: ${test.description}...`);
+        
+        let result;
+        
+        if (test.useGrounding) {
+          // MIT Google Search Grounding
+          result = await modelWithSearch.generateContent({
+            contents: [{ role: "user", parts: [{ text: test.prompt }] }],
+            tools: [{ googleSearch: {} }]  // Aktiviert Web-Suche!
+          });
+        } else {
+          result = await modelWithSearch.generateContent(test.prompt);
+        }
+        
         const response = await result.response;
-        const text = response.text();
+        let text = response.text();
         
-        // Prüfen ob Domain erwähnt wird
-        const domainMentioned = text.toLowerCase().includes(cleanDomain.toLowerCase()) ||
-                               text.toLowerCase().includes(cleanDomain.replace(/\.[^.]+$/, '').toLowerCase());
+        // Formatierung anwenden (Markdown → HTML-like)
+        text = formatResponseText(text);
         
-        // Sentiment analysieren
+        // Prüfen ob Domain erwähnt wird (auch Teilmatch)
+        const domainBase = cleanDomain.replace(/\.[^.]+$/, ''); // z.B. "stempel-lobenhofer"
+        const domainMentioned = text.toLowerCase().includes(cleanDomain) ||
+                               text.toLowerCase().includes(domainBase);
+        
+        // Sentiment analysieren (verbessert)
         let sentiment = 'neutral';
-        const positiveWords = ['empfehlenswert', 'qualität', 'vertrauenswürdig', 'professionell', 'experte', 'gut', 'ausgezeichnet', 'hilfreich'];
-        const negativeWords = ['nicht bekannt', 'keine information', 'unsicher', 'vorsicht', 'nicht empfehlenswert'];
-        
         const textLower = text.toLowerCase();
-        const hasPositive = positiveWords.some(w => textLower.includes(w));
-        const hasNegative = negativeWords.some(w => textLower.includes(w));
         
-        if (domainMentioned && hasPositive) sentiment = 'positiv';
-        else if (hasNegative) sentiment = 'negativ';
+        const positiveIndicators = [
+          'empfehlenswert', 'qualität', 'professionell', 'zuverlässig', 
+          'gute bewertungen', 'positive', 'zufrieden', 'top', 'ausgezeichnet',
+          'spezialist', 'experte', 'erfahren', 'hochwertig', 'vertrauenswürdig',
+          'sterne', '4,', '4.', '5,', '5.', 'sehr gut', 'hervorragend'
+        ];
+        const negativeIndicators = [
+          'keine informationen', 'nicht gefunden', 'keine ergebnisse', 
+          'keine bewertungen', 'nicht bekannt', 'keine erwähnungen',
+          'konnte ich keine', 'wurden keine', 'nichts gefunden', 'nicht zu finden'
+        ];
         
-        // Konkurrenten extrahieren (andere .at oder .de Domains)
-        const competitorMatches = text.match(/(?:https?:\/\/)?(?:www\.)?([a-zA-Z0-9-]+\.(?:at|de|com|ch))/gi) || [];
-        const competitors = [...new Set(competitorMatches)]
-          .filter(c => !c.toLowerCase().includes(cleanDomain.toLowerCase()))
-          .slice(0, 5);
+        const positiveScore = positiveIndicators.filter(w => textLower.includes(w)).length;
+        const negativeScore = negativeIndicators.filter(w => textLower.includes(w)).length;
+        
+        if (domainMentioned && positiveScore > negativeScore) {
+          sentiment = 'positiv';
+        } else if (negativeScore > positiveScore || !domainMentioned) {
+          sentiment = 'negativ';
+        }
+        
+        // Konkurrenten extrahieren (andere Domains in der Antwort)
+        const domainRegex = /(?:https?:\/\/)?(?:www\.)?([a-zA-Z0-9][-a-zA-Z0-9]*\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})?)/gi;
+        const matches = text.match(domainRegex) || [];
+        const competitors = [...new Set(matches)]
+          .map(d => d.replace(/^https?:\/\//, '').replace(/^www\./, '').toLowerCase())
+          .filter(c => !c.includes(domainBase) && !c.includes('google') && !c.includes('schema.org'))
+          .slice(0, 8);
         
         testResults.push({
           id: test.id,
           description: test.description,
-          query: test.query,
+          query: test.prompt.split('\n')[0].substring(0, 80) + '...', // Kurze Version für Anzeige
           mentioned: domainMentioned,
           sentiment,
           competitors,
-          response: text.substring(0, 500) + (text.length > 500 ? '...' : '')
+          response: text.length > 1000 ? text.substring(0, 1000) + '...' : text,
+          groundingUsed: test.useGrounding
         });
         
+        console.log(`   → ${domainMentioned ? '✅ Erwähnt' : '❌ Nicht erwähnt'} | Sentiment: ${sentiment}`);
+        
       } catch (error) {
-        console.log(`Test ${test.id} fehlgeschlagen:`, error.message);
+        console.log(`   → ❌ Test fehlgeschlagen:`, error.message);
         testResults.push({
           id: test.id,
           description: test.description,
-          query: test.query,
+          query: test.prompt.split('\n')[0].substring(0, 80),
           mentioned: false,
           sentiment: 'fehler',
           competitors: [],
-          response: 'Test fehlgeschlagen: ' + error.message
+          response: '❌ Test fehlgeschlagen: ' + error.message,
+          groundingUsed: test.useGrounding
         });
       }
+      
+      // Kurze Pause zwischen Requests (Rate Limit)
+      await new Promise(resolve => setTimeout(resolve, 800));
     }
 
     // =================================================================
-    // PHASE 3: Score-Berechnung
+    // PHASE 3: Score-Berechnung (angepasst)
     // =================================================================
     let score = 0;
     const scoreBreakdown = [];
     
-    // 1. Erwähnungsrate (max 50 Punkte)
+    // 1. Erwähnungsrate (max 40 Punkte)
     const mentionCount = testResults.filter(t => t.mentioned).length;
-    const mentionScore = Math.round((mentionCount / testResults.length) * 50);
+    const mentionScore = Math.round((mentionCount / testResults.length) * 40);
     score += mentionScore;
     scoreBreakdown.push({
-      category: 'KI-Erwähnungen',
+      category: 'Web-Präsenz (Grounding)',
       points: mentionScore,
-      maxPoints: 50,
-      detail: `${mentionCount} von ${testResults.length} Tests erwähnen die Domain`
+      maxPoints: 40,
+      detail: `${mentionCount} von ${testResults.length} Suchen finden die Domain`
     });
     
-    // 2. Technische Authority (max 30 Punkte)
+    // 2. Technische Authority (max 35 Punkte)
     let techScore = 0;
-    if (domainAnalysis.hasSchema) techScore += 10;
-    if (domainAnalysis.schemaTypes.length >= 3) techScore += 5;
+    if (domainAnalysis.hasSchema) techScore += 12;
+    if (domainAnalysis.schemaTypes.length >= 3) techScore += 8;
     if (domainAnalysis.hasAboutPage) techScore += 5;
     if (domainAnalysis.hasContactPage) techScore += 5;
     if (domainAnalysis.hasAuthorInfo) techScore += 5;
@@ -221,31 +323,32 @@ export default async function handler(req, res) {
     scoreBreakdown.push({
       category: 'Technische Authority',
       points: techScore,
-      maxPoints: 30,
-      detail: `Schema: ${domainAnalysis.hasSchema ? '✓' : '✗'}, About: ${domainAnalysis.hasAboutPage ? '✓' : '✗'}, Kontakt: ${domainAnalysis.hasContactPage ? '✓' : '✗'}, Autor: ${domainAnalysis.hasAuthorInfo ? '✓' : '✗'}`
+      maxPoints: 35,
+      detail: `Schema: ${domainAnalysis.hasSchema ? '✓' : '✗'} (${domainAnalysis.schemaTypes.length} Typen), E-E-A-T: ${[domainAnalysis.hasAboutPage, domainAnalysis.hasContactPage, domainAnalysis.hasAuthorInfo].filter(Boolean).length}/3`
     });
     
-    // 3. Sentiment Bonus (max 20 Punkte)
+    // 3. Sentiment & Reputation (max 25 Punkte)
     const positiveCount = testResults.filter(t => t.sentiment === 'positiv').length;
-    const sentimentScore = Math.round((positiveCount / testResults.length) * 20);
+    const neutralCount = testResults.filter(t => t.sentiment === 'neutral').length;
+    const sentimentScore = Math.round((positiveCount * 25 + neutralCount * 10) / testResults.length);
     score += sentimentScore;
     scoreBreakdown.push({
-      category: 'Sentiment',
+      category: 'Online-Reputation',
       points: sentimentScore,
-      maxPoints: 20,
-      detail: `${positiveCount} positive Erwähnungen`
+      maxPoints: 25,
+      detail: `${positiveCount} positiv, ${neutralCount} neutral, ${testResults.filter(t => t.sentiment === 'negativ').length} negativ/unbekannt`
     });
 
     // Score-Kategorie bestimmen
     let scoreCategory = 'niedrig';
-    let scoreCategoryLabel = 'Nicht sichtbar';
+    let scoreCategoryLabel = 'Kaum sichtbar';
     let scoreCategoryColor = '#ef4444';
     
-    if (score >= 70) {
+    if (score >= 65) {
       scoreCategory = 'hoch';
       scoreCategoryLabel = 'Gut sichtbar';
       scoreCategoryColor = '#22c55e';
-    } else if (score >= 40) {
+    } else if (score >= 35) {
       scoreCategory = 'mittel';
       scoreCategoryLabel = 'Ausbaufähig';
       scoreCategoryColor = '#f59e0b';
@@ -256,57 +359,59 @@ export default async function handler(req, res) {
     // =================================================================
     const recommendations = [];
     
-    if (!domainAnalysis.hasSchema) {
-      recommendations.push({
-        priority: 'hoch',
-        title: 'Schema.org Markup hinzufügen',
-        description: 'Strukturierte Daten (JSON-LD) helfen KI-Systemen, deine Inhalte besser zu verstehen.',
-        link: '/schema-org-meta-description'
-      });
-    }
-    
     if (mentionCount === 0) {
       recommendations.push({
         priority: 'hoch',
-        title: 'Markenbekanntheit aufbauen',
-        description: 'Deine Domain wird von Gemini nicht erkannt. Fokussiere auf E-E-A-T und Content-Marketing.',
+        title: 'Online-Präsenz aufbauen',
+        description: 'Deine Domain wird in Websuchen kaum gefunden. Fokussiere auf Google Business Profile, Branchenverzeichnisse und Content-Marketing.',
         link: '/geo-seo'
       });
     }
     
-    if (!domainAnalysis.hasAboutPage) {
+    if (!domainAnalysis.hasSchema) {
       recommendations.push({
-        priority: 'mittel',
-        title: 'Über-uns Seite erstellen',
-        description: 'Eine klare Über-uns Seite stärkt das Vertrauen und die E-E-A-T Signale.',
+        priority: 'hoch',
+        title: 'Schema.org Markup hinzufügen',
+        description: 'Strukturierte Daten (JSON-LD) helfen Suchmaschinen und KI, deine Inhalte zu verstehen. LocalBusiness, Organization oder Product Schema sind ein Muss.',
+        link: '/schema-org-meta-description'
+      });
+    }
+    
+    if (positiveCount === 0 && mentionCount > 0) {
+      recommendations.push({
+        priority: 'hoch',
+        title: 'Bewertungen sammeln',
+        description: 'Du wirst gefunden, aber es fehlen positive Signale. Bitte zufriedene Kunden aktiv um Google Reviews.',
         link: null
       });
     }
     
-    if (!domainAnalysis.hasAuthorInfo) {
+    if (!domainAnalysis.hasAboutPage || !domainAnalysis.hasAuthorInfo) {
       recommendations.push({
         priority: 'mittel',
-        title: 'Autoren-Informationen hinzufügen',
-        description: 'Zeige, wer hinter den Inhalten steht. Das verbessert die Expertise-Bewertung.',
+        title: 'E-E-A-T Signale stärken',
+        description: 'Füge eine "Über uns" Seite mit Fotos, Qualifikationen und Geschichte hinzu. Zeige wer hinter dem Unternehmen steht.',
         link: null
       });
     }
     
-    if (domainAnalysis.schemaTypes.length < 3) {
+    if (domainAnalysis.schemaTypes.length < 2 && domainAnalysis.hasSchema) {
       recommendations.push({
         priority: 'mittel',
         title: 'Mehr Schema-Typen nutzen',
-        description: `Aktuell: ${domainAnalysis.schemaTypes.length > 0 ? domainAnalysis.schemaTypes.join(', ') : 'Keine'}. Füge FAQPage, HowTo oder Article hinzu.`,
+        description: `Aktuell: ${domainAnalysis.schemaTypes.join(', ') || 'Keine'}. Ergänze FAQPage, Product, Service oder Review Schemas.`,
         link: '/schema-org-meta-description'
       });
     }
 
     // Alle Konkurrenten sammeln
-    const allCompetitors = [...new Set(testResults.flatMap(t => t.competitors))].slice(0, 10);
+    const allCompetitors = [...new Set(testResults.flatMap(t => t.competitors))].slice(0, 12);
 
     // =================================================================
     // RESPONSE
     // =================================================================
+    console.log(`\n📊 Ergebnis für ${cleanDomain}: Score ${score}/100 (${scoreCategoryLabel})`);
+    
     return res.status(200).json({
       success: true,
       domain: cleanDomain,
@@ -338,11 +443,16 @@ export default async function handler(req, res) {
       
       aiTests: testResults,
       competitors: allCompetitors,
-      recommendations
+      recommendations,
+      
+      meta: {
+        testsWithGrounding: testResults.filter(t => t.groundingUsed).length,
+        totalTests: testResults.length
+      }
     });
 
   } catch (error) {
-    console.error("AI Visibility Check Error:", error);
+    console.error("❌ AI Visibility Check Error:", error);
     return res.status(500).json({ 
       success: false,
       message: 'Fehler bei der Analyse: ' + error.message 
