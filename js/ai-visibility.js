@@ -171,12 +171,11 @@ document.addEventListener('DOMContentLoaded', function() {
                                 </span>
                                 <span class="test-name">${test.description}</span>
                                 <span class="test-sentiment sentiment-${test.sentiment}">${test.sentiment}</span>
+                                <span class="test-toggle"><i class="fa-solid fa-chevron-down"></i></span>
                             </summary>
                             <div class="test-content">
-                                <p class="test-query"><strong>Frage:</strong> "${test.query}"</p>
                                 <div class="test-response">
-                                    <strong>Antwort:</strong>
-                                    <p>${test.response}</p>
+                                    ${test.response}
                                 </div>
                                 ${test.competitors.length > 0 ? `
                                     <div class="test-competitors">
