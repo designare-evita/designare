@@ -542,13 +542,35 @@
     padding: 1rem;
     margin-top: 0.75rem;
     font-size: 0.9rem;
-    line-height: 1.6;
+    line-height: 1.7;
 }
 
 .test-response strong {
     color: var(--accent-color);
+}
+
+.test-response > strong:first-child {
     display: block;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.test-response p {
+    margin: 0;
+    color: var(--text-color);
+}
+
+/* Formatierte Antworten aus der API */
+.test-response strong {
+    color: var(--accent-color);
+    font-weight: 600;
+}
+
+.test-response em {
+    color: var(--text-color-muted);
+    font-style: italic;
 }
 
 .test-competitors {
