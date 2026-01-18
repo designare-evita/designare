@@ -8,6 +8,95 @@ document.addEventListener('DOMContentLoaded', function() {
     const resultsContainer = document.getElementById('results-container');
     const loadingOverlay = document.getElementById('loading-overlay');
 
+    // =================================================================
+    // RATE LIMITING - 3 Abfragen pro Tag
+    // =================================================================
+    const DAILY_LIMIT = 3;
+    const STORAGE_KEY = 'ai_visibility_usage';
+
+    function getUsageData() {
+        try {
+            const data = localStorage.getItem(STORAGE_KEY);
+            if (!data) return { date: null, count: 0 };
+            return JSON.parse(data);
+        } catch (e) {
+            return { date: null, count: 0 };
+        }
+    }
+
+    function setUsageData(data) {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        } catch (e) {
+            console.warn('localStorage nicht verfügbar');
+        }
+    }
+
+    function getTodayString() {
+        return new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    }
+
+    function getRemainingChecks() {
+        const usage = getUsageData();
+        const today = getTodayString();
+        
+        // Neuer Tag = Reset
+        if (usage.date !== today) {
+            return DAILY_LIMIT;
+        }
+        
+        return Math.max(0, DAILY_LIMIT - usage.count);
+    }
+
+    function incrementUsage() {
+        const today = getTodayString();
+        const usage = getUsageData();
+        
+        if (usage.date !== today) {
+            // Neuer Tag - Reset
+            setUsageData({ date: today, count: 1 });
+        } else {
+            // Gleicher Tag - Increment
+            setUsageData({ date: today, count: usage.count + 1 });
+        }
+    }
+
+    function canMakeRequest() {
+        return getRemainingChecks() > 0;
+    }
+
+    function updateLimitDisplay() {
+        const remaining = getRemainingChecks();
+        let limitInfo = document.getElementById('limit-info');
+        
+        if (!limitInfo) {
+            limitInfo = document.createElement('div');
+            limitInfo.id = 'limit-info';
+            limitInfo.className = 'limit-info';
+            form.insertBefore(limitInfo, submitBtn);
+        }
+        
+        if (remaining === 0) {
+            limitInfo.innerHTML = `
+                <i class="fa-solid fa-clock"></i>
+                <span>Tageslimit erreicht (${DAILY_LIMIT}/${DAILY_LIMIT}). Morgen wieder verfügbar!</span>
+            `;
+            limitInfo.classList.add('limit-reached');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-lock"></i> Limit erreicht';
+        } else {
+            limitInfo.innerHTML = `
+                <i class="fa-solid fa-circle-info"></i>
+                <span>Noch <strong>${remaining}</strong> von ${DAILY_LIMIT} Checks heute verfügbar</span>
+            `;
+            limitInfo.classList.remove('limit-reached');
+            submitBtn.disabled = false;
+        }
+    }
+
+    // Initial anzeigen
+    updateLimitDisplay();
+
     // Quick-Select Buttons für Branchen
     document.querySelectorAll('.industry-btn').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -21,6 +110,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Form Submit
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
+        
+        // Rate-Limit prüfen
+        if (!canMakeRequest()) {
+            showError('Du hast dein Tageslimit von 3 Checks erreicht. Probier es morgen wieder!');
+            return;
+        }
         
         const domain = domainInput.value.trim();
         if (!domain) {
@@ -46,18 +141,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const data = await response.json();
 
+            // Rate-Limit vom Server prüfen
+            if (response.status === 429) {
+                throw new Error(data.message || 'Tageslimit erreicht. Bitte morgen wieder versuchen.');
+            }
+
             if (!response.ok || !data.success) {
                 throw new Error(data.message || 'Analyse fehlgeschlagen');
             }
 
+            // Erfolg: Usage incrementieren
+            incrementUsage();
+            updateLimitDisplay();
+            
             renderResults(data);
 
         } catch (error) {
             console.error('Fehler:', error);
             showError(error.message || 'Ein Fehler ist aufgetreten.');
         } finally {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = '<i class="fa-solid fa-robot"></i> KI-Sichtbarkeit prüfen';
+            submitBtn.disabled = getRemainingChecks() === 0;
+            submitBtn.innerHTML = getRemainingChecks() === 0 
+                ? '<i class="fa-solid fa-lock"></i> Limit erreicht'
+                : '<i class="fa-solid fa-robot"></i> KI-Sichtbarkeit prüfen';
             loadingOverlay.classList.remove('visible');
         }
     });
