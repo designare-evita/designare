@@ -4,6 +4,59 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // =================================================================
+// RATE LIMITING - 3 Abfragen pro IP pro Tag (In-Memory für Vercel)
+// =================================================================
+const DAILY_LIMIT = 3;
+const rateLimitMap = new Map(); // IP -> { date: 'YYYY-MM-DD', count: number }
+
+function getTodayString() {
+  return new Date().toISOString().split('T')[0];
+}
+
+function checkRateLimit(ip) {
+  const today = getTodayString();
+  const usage = rateLimitMap.get(ip);
+  
+  if (!usage || usage.date !== today) {
+    // Neuer Tag oder neue IP
+    return { allowed: true, remaining: DAILY_LIMIT - 1 };
+  }
+  
+  if (usage.count >= DAILY_LIMIT) {
+    return { allowed: false, remaining: 0 };
+  }
+  
+  return { allowed: true, remaining: DAILY_LIMIT - usage.count - 1 };
+}
+
+function incrementRateLimit(ip) {
+  const today = getTodayString();
+  const usage = rateLimitMap.get(ip);
+  
+  if (!usage || usage.date !== today) {
+    rateLimitMap.set(ip, { date: today, count: 1 });
+  } else {
+    rateLimitMap.set(ip, { date: today, count: usage.count + 1 });
+  }
+  
+  // Cleanup: Alte Einträge entfernen (von gestern)
+  for (const [key, value] of rateLimitMap.entries()) {
+    if (value.date !== today) {
+      rateLimitMap.delete(key);
+    }
+  }
+}
+
+function getClientIP(req) {
+  // Vercel/Cloudflare Headers
+  return req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
+         req.headers['x-real-ip'] ||
+         req.headers['cf-connecting-ip'] ||
+         req.socket?.remoteAddress ||
+         'unknown';
+}
+
+// =================================================================
 // HELPER: Markdown zu HTML formatieren (wie Evita)
 // =================================================================
 function formatResponseText(text) {
@@ -47,6 +100,21 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
+  // =================================================================
+  // RATE LIMIT CHECK
+  // =================================================================
+  const clientIP = getClientIP(req);
+  const rateCheck = checkRateLimit(clientIP);
+  
+  if (!rateCheck.allowed) {
+    console.log(`⛔ Rate Limit erreicht für IP: ${clientIP}`);
+    return res.status(429).json({ 
+      success: false,
+      message: 'Tageslimit erreicht (3 Checks pro Tag). Bitte morgen wieder versuchen.',
+      remaining: 0
+    });
+  }
+
   try {
     const { domain, industry } = req.body;
     
@@ -55,7 +123,10 @@ export default async function handler(req, res) {
     }
 
     const cleanDomain = domain.replace(/^https?:\/\//, '').replace(/\/$/, '').toLowerCase();
-    console.log(`🔍 AI Visibility Check für: ${cleanDomain} (Branche: ${industry || 'nicht angegeben'})`);
+    console.log(`🔍 AI Visibility Check für: ${cleanDomain} (IP: ${clientIP}, Remaining: ${rateCheck.remaining})`);
+    
+    // Rate Limit incrementieren (vor der Analyse, damit auch Fehler zählen)
+    incrementRateLimit(clientIP);
 
     // --- MODELL MIT GOOGLE SEARCH GROUNDING ---
     const modelWithSearch = genAI.getGenerativeModel({ 
@@ -427,7 +498,8 @@ Antworte auf Deutsch.`,
     // =================================================================
     // RESPONSE
     // =================================================================
-    console.log(`\n📊 Ergebnis für ${cleanDomain}: Score ${score}/100 (${scoreCategoryLabel})`);
+    const remainingChecks = checkRateLimit(clientIP).remaining;
+    console.log(`\n📊 Ergebnis für ${cleanDomain}: Score ${score}/100 (${scoreCategoryLabel}) | Remaining: ${remainingChecks}`);
     
     return res.status(200).json({
       success: true,
@@ -464,7 +536,8 @@ Antworte auf Deutsch.`,
       
       meta: {
         testsWithGrounding: testResults.filter(t => t.groundingUsed).length,
-        totalTests: testResults.length
+        totalTests: testResults.length,
+        remainingChecks: remainingChecks
       }
     });
 
