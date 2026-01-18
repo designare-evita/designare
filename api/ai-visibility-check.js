@@ -9,6 +9,34 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const DAILY_LIMIT = 3;
 const rateLimitMap = new Map(); // IP -> { date: 'YYYY-MM-DD', count: number }
 
+// =================================================================
+// TRACKING - Alle Checks protokollieren
+// =================================================================
+
+/**
+ * Loggt Tracking-Daten in Vercel Logs
+ * Abrufbar unter: Vercel Dashboard → Projekt → Logs → Filter: [VISIBILITY]
+ */
+async function trackVisibilityCheck(data) {
+  const trackingData = {
+    timestamp: new Date().toISOString(),
+    domain: data.domain,
+    industry: data.industry || null,
+    score: data.score,
+    scoreLabel: data.scoreLabel,
+    mentionCount: data.mentionCount,
+    totalTests: data.totalTests,
+    hasSchema: data.hasSchema,
+    schemaTypes: data.schemaTypes || [],
+    country: data.country || 'unknown'
+  };
+
+  // Strukturierter Log für einfaches Filtern in Vercel
+  console.log('[VISIBILITY]', JSON.stringify(trackingData));
+
+  return trackingData;
+}
+
 function getTodayString() {
   return new Date().toISOString().split('T')[0];
 }
@@ -494,6 +522,21 @@ Antworte auf Deutsch.`,
 
     // Alle Konkurrenten sammeln
     const allCompetitors = [...new Set(testResults.flatMap(t => t.competitors))].slice(0, 12);
+
+    // =================================================================
+    // TRACKING (Vercel Logs)
+    // =================================================================
+    await trackVisibilityCheck({
+      domain: cleanDomain,
+      industry: industry,
+      score: score,
+      scoreLabel: scoreCategoryLabel,
+      mentionCount: mentionCount,
+      totalTests: testResults.length,
+      hasSchema: domainAnalysis.hasSchema,
+      schemaTypes: domainAnalysis.schemaTypes,
+      country: req.headers['cf-ipcountry'] || req.headers['x-vercel-ip-country'] || null
+    });
 
     // =================================================================
     // RESPONSE
