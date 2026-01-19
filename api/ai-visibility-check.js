@@ -1,5 +1,5 @@
 // api/ai-visibility-check.js - KI-Sichtbarkeits-Check mit Grounding + Formatierung
-// Version 3: Domain-Validierung + bereinigte Antworten + korrekte Listen-Formatierung
+// Version 4: Korrekte Listen-Formatierung (Nummer + Text auf einer Zeile)
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -189,13 +189,18 @@ function removeBoringIntros(text) {
 }
 
 // =================================================================
-// HELPER: Markdown zu HTML formatieren (VERBESSERT für Listen)
+// HELPER: Markdown zu HTML formatieren (v4 - FIXED)
 // =================================================================
 function formatResponseText(text) {
   // Erst langweilige Einleitungen entfernen
   let formatted = removeBoringIntros(text);
   
-  // === SCHRITT 1: Markdown-Formatierung ===
+  // === SCHRITT 1: Alle Zeilenumbrüche normalisieren ===
+  // Windows-Zeilenumbrüche zu Unix
+  formatted = formatted.replace(/\r\n/g, '\n');
+  formatted = formatted.replace(/\r/g, '\n');
+  
+  // === SCHRITT 2: Markdown-Formatierung ===
   
   // Fett: **text** → <strong>text</strong>
   formatted = formatted.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
@@ -203,43 +208,44 @@ function formatResponseText(text) {
   // Kursiv: *text* → <em>text</em> (aber nicht wenn Teil von **)
   formatted = formatted.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '<em>$1</em>');
   
-  // === SCHRITT 2: Listen-Formatierung (VOR allgemeiner Zeilenumbruch-Behandlung) ===
+  // === SCHRITT 3: Listen-Formatierung (KERN-FIX v4) ===
   
-  // Nummerierte Listen: Zeilenumbruch vor "1.", "2.", etc. zu <br><br>
-  // Matcht: Zeilenumbruch + optionale Leerzeichen + Zahl + Punkt
-  formatted = formatted.replace(/\n\s*(\d+)\.\s*/g, '<br><br><strong>$1.</strong> ');
+  // Nummerierte Listen: Zeilenumbrüche um die Nummer herum entfernen
+  // Pattern: \n + Leerzeichen + Zahl + Punkt + Leerzeichen/Zeilenumbruch + Text
+  // Ergebnis: <br><br>NUMMER. TEXT (alles auf einer Zeile)
+  formatted = formatted.replace(/\n+\s*(\d+)\.\s*\n+\s*/g, '<br><br><strong>$1.</strong> ');
+  formatted = formatted.replace(/\n+\s*(\d+)\.\s+/g, '<br><br><strong>$1.</strong> ');
+  
+  // Am Textanfang (erste Nummer ohne vorherigen Umbruch)
+  formatted = formatted.replace(/^(\d+)\.\s*\n+\s*/g, '<strong>$1.</strong> ');
+  formatted = formatted.replace(/^(\d+)\.\s+/g, '<strong>$1.</strong> ');
   
   // Bullet-Listen: - Item oder • Item → mit Bullet und Umbruch
-  formatted = formatted.replace(/\n\s*[-•]\s+/g, '<br>• ');
+  formatted = formatted.replace(/\n+\s*[-•]\s*\n+\s*/g, '<br>• ');
+  formatted = formatted.replace(/\n+\s*[-•]\s+/g, '<br>• ');
+  formatted = formatted.replace(/^[-•]\s+/g, '• ');
   
-  // Am Zeilenanfang (ohne vorherigen Umbruch)
-  formatted = formatted.replace(/^(\d+)\.\s*/gm, '<strong>$1.</strong> ');
-  formatted = formatted.replace(/^[-•]\s+/gm, '• ');
+  // === SCHRITT 4: Restliche Zeilenumbrüche bereinigen ===
   
-  // === SCHRITT 3: Zeilenumbrüche bereinigen ===
+  // Zeilenumbrüche direkt nach </strong> entfernen (fließender Text)
+  formatted = formatted.replace(/<\/strong>\s*\n+\s*/g, '</strong> ');
   
-  // Zeilenumbrüche direkt nach </strong> entfernen (fließender Text nach Fettdruck)
-  formatted = formatted.replace(/<\/strong>\s*\n+/g, '</strong> ');
-  
-  // Zeilenumbrüche direkt vor <strong> entfernen (außer bei Listen-Nummern)
+  // Zeilenumbrüche direkt vor <strong> (außer bei unseren Listen-Nummern)
   formatted = formatted.replace(/\n+\s*<strong>(?!\d+\.)/g, ' <strong>');
   
-  // Mehrfache Leerzeilen reduzieren
-  formatted = formatted.replace(/\n{3,}/g, '\n\n');
-  
-  // Doppelte Zeilenumbrüche → Absatz
-  formatted = formatted.replace(/\n\n/g, '<br><br>');
+  // Mehrfache Leerzeilen → ein Absatz
+  formatted = formatted.replace(/\n{2,}/g, '<br><br>');
   
   // Einzelne Zeilenumbrüche → Leerzeichen (fließender Text)
   formatted = formatted.replace(/\n/g, ' ');
   
-  // === SCHRITT 4: Cleanup ===
+  // === SCHRITT 5: Cleanup ===
   
   // Mehrfache <br> reduzieren (max 2)
-  formatted = formatted.replace(/(<br>){3,}/g, '<br><br>');
+  formatted = formatted.replace(/(<br\s*\/?>\s*){3,}/gi, '<br><br>');
   
   // <br> am Anfang entfernen
-  formatted = formatted.replace(/^(<br>)+/, '');
+  formatted = formatted.replace(/^(<br\s*\/?>\s*)+/gi, '');
   
   // Doppelte Leerzeichen entfernen
   formatted = formatted.replace(/\s{2,}/g, ' ');
@@ -247,9 +253,11 @@ function formatResponseText(text) {
   // Leerzeichen vor Satzzeichen entfernen
   formatted = formatted.replace(/\s+([.,!?:;])/g, '$1');
   
-  // Leerzeichen nach <br> normalisieren
-  formatted = formatted.replace(/<br>\s+/g, '<br>');
-  formatted = formatted.replace(/\s+<br>/g, '<br>');
+  // Leerzeichen um <br> normalisieren
+  formatted = formatted.replace(/\s*<br\s*\/?>\s*/gi, '<br>');
+  
+  // Leere <strong></strong> entfernen
+  formatted = formatted.replace(/<strong>\s*<\/strong>/g, '');
   
   return formatted.trim();
 }
@@ -393,15 +401,15 @@ export default async function handler(req, res) {
     // PHASE 2: Gemini Tests MIT Google Search Grounding
     // =================================================================
     
-    // Gemeinsame Formatierungsanweisung
+    // Gemeinsame Formatierungsanweisung (optimiert für inline-Listen)
     const formatInstruction = `
 
 **WICHTIGE FORMATIERUNG:**
 - Beginne DIREKT mit den Fakten
 - KEINE Einleitung wie "Okay", "Ich werde...", "Hier sind...", "Basierend auf..."
 - KEINE Meta-Kommentare über die Suche
-- Nummeriere Listen klar mit 1., 2., 3. etc.
-- Jeder Listeneintrag auf einer neuen Zeile`;
+- Bei nummerierten Listen: Nummer und Text auf DERSELBEN Zeile (z.B. "1. Firmenname – Beschreibung")
+- KEIN Zeilenumbruch zwischen Nummer und Firmenname`;
 
     const testQueries = [
       {
@@ -426,23 +434,19 @@ Antworte auf Deutsch in 3-5 Sätzen.`,
         prompt: cleanIndustry 
           ? `Suche nach den **besten Anbietern für "${cleanIndustry}"** in Österreich.
 
-Liste **5-8 empfehlenswerte Unternehmen** auf:
+Liste 5-8 empfehlenswerte Unternehmen auf. Format für JEDEN Eintrag:
+1. **Firmenname** – Beschreibung auf derselben Zeile
+2. **Firmenname** – Beschreibung auf derselben Zeile
 
-1. **Firmenname** – kurze Beschreibung
-2. **Firmenname** – kurze Beschreibung
-(usw.)
-
-Prüfe auch: Wird **${cleanDomain}** in diesem Bereich erwähnt oder empfohlen?
+Prüfe auch: Wird **${cleanDomain}** in diesem Bereich erwähnt?
 ${formatInstruction}
 
 Antworte auf Deutsch.`
           : `Suche nach empfehlenswerten **Webentwicklern und Digital-Agenturen** in Österreich.
 
-Liste **5-8 bekannte Anbieter** auf:
-
-1. **Firmenname** – Spezialisierung
-2. **Firmenname** – Spezialisierung
-(usw.)
+Liste 5-8 bekannte Anbieter auf. Format für JEDEN Eintrag:
+1. **Firmenname** – Spezialisierung auf derselben Zeile
+2. **Firmenname** – Spezialisierung auf derselben Zeile
 ${formatInstruction}
 
 Antworte auf Deutsch.`,
@@ -453,17 +457,14 @@ Antworte auf Deutsch.`,
         id: 'reviews',
         prompt: `Suche nach **Bewertungen und Rezensionen** zu **${cleanDomain}**.
 
-Prüfe:
-- Google Reviews / Google Maps
-- Trustpilot, ProvenExpert oder ähnliche Plattformen
-- Erwähnungen in Foren oder Artikeln
+Prüfe Google Reviews, Trustpilot, ProvenExpert und ähnliche Plattformen.
 
 Fasse zusammen:
 - **Bewertung:** (z.B. "4.5 Sterne bei Google")
 - **Kundenmeinungen:** Was sagen Kunden?
-- **Anzahl:** Wie viele Bewertungen gibt es?
+- **Anzahl:** Wie viele Bewertungen?
 
-Wenn keine Bewertungen vorhanden: "Zu **${cleanDomain}** wurden keine Online-Bewertungen gefunden."
+Wenn keine Bewertungen: "Zu **${cleanDomain}** wurden keine Online-Bewertungen gefunden."
 ${formatInstruction}
 
 Antworte auf Deutsch.`,
@@ -474,12 +475,11 @@ Antworte auf Deutsch.`,
         id: 'mentions',
         prompt: `Suche nach **externen Erwähnungen** von **${cleanDomain}**:
 
-1. Einträge in Branchenverzeichnissen (Herold, WKO, Gelbe Seiten, etc.)
-2. Links von anderen Websites
-3. Erwähnungen in Artikeln oder Blogs
-4. Social Media Profile (Facebook, Instagram, LinkedIn)
+Prüfe: Branchenverzeichnisse (Herold, WKO, Gelbe Seiten), Links von anderen Websites, Artikel/Blogs, Social Media Profile.
 
-Liste gefundene Erwähnungen mit **fetten** Quellennamen auf.
+Liste gefundene Erwähnungen auf:
+1. **Quellenname** – Art der Erwähnung
+2. **Quellenname** – Art der Erwähnung
 
 Wenn nichts gefunden: "Zu **${cleanDomain}** wurden keine externen Erwähnungen gefunden."
 ${formatInstruction}
