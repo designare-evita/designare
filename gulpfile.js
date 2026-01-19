@@ -12,8 +12,8 @@ const coreFiles = [
     'css/side-menu.css',          // Navigation
     'css/menu-interactive.css',   // Interaktive Menus
     'css/ai-styles.css',          // Evita/Chat Styles
-    'css/light-mode.css',         // MUSS ZULETZT sein fuer Overrides
-    'css/legal-style.css'    
+    'css/legal-style.css',    
+    'css/light-mode.css'         // MUSS ZULETZT sein fuer Overrides
 ];
 
 // 2. HOME: Nur fuer index.html
