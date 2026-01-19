@@ -10,6 +10,94 @@ const DAILY_LIMIT = 3;
 const rateLimitMap = new Map(); // IP -> { date: 'YYYY-MM-DD', count: number }
 
 // =================================================================
+// DOMAIN VALIDATION - Schutz vor Injection & ungültigen Eingaben
+// =================================================================
+
+/**
+ * Validiert und bereinigt eine Domain-Eingabe
+ * @param {string} input - Rohe Benutzereingabe
+ * @returns {{ valid: boolean, domain: string|null, error: string|null }}
+ */
+function validateAndCleanDomain(input) {
+  if (!input || typeof input !== 'string') {
+    return { valid: false, domain: null, error: 'Domain ist erforderlich' };
+  }
+
+  // Trimmen und Lowercase
+  let domain = input.trim().toLowerCase();
+
+  // Protokoll entfernen (http://, https://, ftp://, etc.)
+  domain = domain.replace(/^[a-z]+:\/\//, '');
+
+  // www. entfernen (optional, für Konsistenz)
+  domain = domain.replace(/^www\./, '');
+
+  // Trailing Slash und Pfade entfernen
+  domain = domain.replace(/\/.*$/, '');
+
+  // Port entfernen (z.B. :8080)
+  domain = domain.replace(/:\d+$/, '');
+
+  // Whitespace und gefährliche Zeichen prüfen
+  if (/\s/.test(domain)) {
+    return { valid: false, domain: null, error: 'Domain darf keine Leerzeichen enthalten' };
+  }
+
+  // SQL Injection / XSS Patterns blockieren
+  const dangerousPatterns = [
+    /[<>'"`;]/,           // HTML/SQL Sonderzeichen
+    /--/,                  // SQL Comment
+    /\/\*/,                // SQL Block Comment
+    /\.\./,                // Path Traversal
+    /\x00/,                // Null Byte
+    /javascript:/i,        // JS Protocol
+    /data:/i,              // Data URI
+    /vbscript:/i,          // VBScript
+  ];
+
+  for (const pattern of dangerousPatterns) {
+    if (pattern.test(domain)) {
+      console.warn(`⚠️ Blocked dangerous input: ${input}`);
+      return { valid: false, domain: null, error: 'Ungültige Zeichen in der Domain' };
+    }
+  }
+
+  // Längenprüfung (max 253 Zeichen für DNS)
+  if (domain.length > 253) {
+    return { valid: false, domain: null, error: 'Domain ist zu lang (max. 253 Zeichen)' };
+  }
+
+  if (domain.length < 4) {
+    return { valid: false, domain: null, error: 'Domain ist zu kurz' };
+  }
+
+  // Valides Domain-Format prüfen (RFC 1035 konform)
+  // Erlaubt: Buchstaben, Zahlen, Bindestriche, Punkte
+  // Muss mindestens eine TLD haben (.at, .com, .co.at, etc.)
+  const domainRegex = /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/;
+  
+  if (!domainRegex.test(domain)) {
+    return { 
+      valid: false, 
+      domain: null, 
+      error: 'Ungültiges Domain-Format. Beispiel: beispiel.at oder meine-firma.co.at' 
+    };
+  }
+
+  // Bekannte ungültige TLDs blockieren
+  const invalidTLDs = ['localhost', 'local', 'test', 'invalid', 'example'];
+  const tld = domain.split('.').pop();
+  if (invalidTLDs.includes(tld)) {
+    return { valid: false, domain: null, error: 'Test-Domains sind nicht erlaubt' };
+  }
+
+  // Punycode/IDN-Domains erlauben (z.B. für Umlaute)
+  // xn-- Prefix ist gültig für internationale Domains
+  
+  return { valid: true, domain: domain, error: null };
+}
+
+// =================================================================
 // TRACKING - Alle Checks protokollieren
 // =================================================================
 
@@ -123,6 +211,22 @@ function formatResponseText(text) {
   return formatted.trim();
 }
 
+// =================================================================
+// HELPER: Industry Input sanitizen
+// =================================================================
+function sanitizeIndustry(input) {
+  if (!input || typeof input !== 'string') return null;
+  
+  // Trimmen und auf 100 Zeichen begrenzen
+  let industry = input.trim().substring(0, 100);
+  
+  // Gefährliche Zeichen entfernen
+  industry = industry.replace(/[<>'"`;\\]/g, '');
+  
+  // Nur wenn noch was übrig ist
+  return industry.length > 0 ? industry : null;
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });
@@ -146,11 +250,22 @@ export default async function handler(req, res) {
   try {
     const { domain, industry } = req.body;
     
-    if (!domain) {
-      return res.status(400).json({ message: 'Domain ist erforderlich' });
+    // =================================================================
+    // INPUT VALIDATION (NEU!)
+    // =================================================================
+    const domainValidation = validateAndCleanDomain(domain);
+    
+    if (!domainValidation.valid) {
+      console.log(`⚠️ Invalid domain input: "${domain}" → ${domainValidation.error}`);
+      return res.status(400).json({ 
+        success: false,
+        message: domainValidation.error 
+      });
     }
 
-    const cleanDomain = domain.replace(/^https?:\/\//, '').replace(/\/$/, '').toLowerCase();
+    const cleanDomain = domainValidation.domain;
+    const cleanIndustry = sanitizeIndustry(industry);
+    
     console.log(`🔍 AI Visibility Check für: ${cleanDomain} (IP: ${clientIP}, Remaining: ${rateCheck.remaining})`);
     
     // Rate Limit incrementieren (vor der Analyse, damit auch Fehler zählen)
@@ -261,8 +376,8 @@ Antworte auf Deutsch in 3-5 Sätzen.`,
       },
       {
         id: 'recommendation',
-        prompt: industry 
-          ? `Suche nach den **besten Anbietern für "${industry}"** in Österreich.
+        prompt: cleanIndustry 
+          ? `Suche nach den **besten Anbietern für "${cleanIndustry}"** in Österreich.
 
 Nenne **5-8 empfehlenswerte Unternehmen/Websites**:
 - **Firmenname** – Website – kurze Beschreibung
@@ -528,7 +643,7 @@ Antworte auf Deutsch.`,
     // =================================================================
     await trackVisibilityCheck({
       domain: cleanDomain,
-      industry: industry,
+      industry: cleanIndustry,
       score: score,
       scoreLabel: scoreCategoryLabel,
       mentionCount: mentionCount,
@@ -547,7 +662,7 @@ Antworte auf Deutsch.`,
     return res.status(200).json({
       success: true,
       domain: cleanDomain,
-      industry: industry || null,
+      industry: cleanIndustry || null,
       timestamp: new Date().toISOString(),
       
       score: {
