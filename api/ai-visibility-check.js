@@ -1,5 +1,5 @@
 // api/ai-visibility-check.js - KI-Sichtbarkeits-Check mit Grounding + Formatierung
-// Version 2: Domain-Validierung + bereinigte Gemini-Antworten
+// Version 3: Domain-Validierung + bereinigte Antworten + korrekte Listen-Formatierung
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -8,52 +8,36 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 // RATE LIMITING - 3 Abfragen pro IP pro Tag (In-Memory für Vercel)
 // =================================================================
 const DAILY_LIMIT = 3;
-const rateLimitMap = new Map(); // IP -> { date: 'YYYY-MM-DD', count: number }
+const rateLimitMap = new Map();
 
 // =================================================================
 // DOMAIN VALIDATION - Schutz vor Injection & ungültigen Eingaben
 // =================================================================
 
-/**
- * Validiert und bereinigt eine Domain-Eingabe
- * @param {string} input - Rohe Benutzereingabe
- * @returns {{ valid: boolean, domain: string|null, error: string|null }}
- */
 function validateAndCleanDomain(input) {
   if (!input || typeof input !== 'string') {
     return { valid: false, domain: null, error: 'Domain ist erforderlich' };
   }
 
-  // Trimmen und Lowercase
   let domain = input.trim().toLowerCase();
-
-  // Protokoll entfernen (http://, https://, ftp://, etc.)
   domain = domain.replace(/^[a-z]+:\/\//, '');
-
-  // www. entfernen (optional, für Konsistenz)
   domain = domain.replace(/^www\./, '');
-
-  // Trailing Slash und Pfade entfernen
   domain = domain.replace(/\/.*$/, '');
-
-  // Port entfernen (z.B. :8080)
   domain = domain.replace(/:\d+$/, '');
 
-  // Whitespace und gefährliche Zeichen prüfen
   if (/\s/.test(domain)) {
     return { valid: false, domain: null, error: 'Domain darf keine Leerzeichen enthalten' };
   }
 
-  // SQL Injection / XSS Patterns blockieren
   const dangerousPatterns = [
-    /[<>'"`;]/,           // HTML/SQL Sonderzeichen
-    /--/,                  // SQL Comment
-    /\/\*/,                // SQL Block Comment
-    /\.\./,                // Path Traversal
-    /\x00/,                // Null Byte
-    /javascript:/i,        // JS Protocol
-    /data:/i,              // Data URI
-    /vbscript:/i,          // VBScript
+    /[<>'"`;]/,
+    /--/,
+    /\/\*/,
+    /\.\./,
+    /\x00/,
+    /javascript:/i,
+    /data:/i,
+    /vbscript:/i,
   ];
 
   for (const pattern of dangerousPatterns) {
@@ -63,7 +47,6 @@ function validateAndCleanDomain(input) {
     }
   }
 
-  // Längenprüfung (max 253 Zeichen für DNS)
   if (domain.length > 253) {
     return { valid: false, domain: null, error: 'Domain ist zu lang (max. 253 Zeichen)' };
   }
@@ -72,7 +55,6 @@ function validateAndCleanDomain(input) {
     return { valid: false, domain: null, error: 'Domain ist zu kurz' };
   }
 
-  // Valides Domain-Format prüfen (RFC 1035 konform)
   const domainRegex = /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/;
   
   if (!domainRegex.test(domain)) {
@@ -83,7 +65,6 @@ function validateAndCleanDomain(input) {
     };
   }
 
-  // Bekannte ungültige TLDs blockieren
   const invalidTLDs = ['localhost', 'local', 'test', 'invalid', 'example'];
   const tld = domain.split('.').pop();
   if (invalidTLDs.includes(tld)) {
@@ -94,7 +75,7 @@ function validateAndCleanDomain(input) {
 }
 
 // =================================================================
-// TRACKING - Alle Checks protokollieren
+// TRACKING
 // =================================================================
 
 async function trackVisibilityCheck(data) {
@@ -144,7 +125,6 @@ function incrementRateLimit(ip) {
     rateLimitMap.set(ip, { date: today, count: usage.count + 1 });
   }
   
-  // Cleanup: Alte Einträge entfernen
   for (const [key, value] of rateLimitMap.entries()) {
     if (value.date !== today) {
       rateLimitMap.delete(key);
@@ -164,9 +144,7 @@ function getClientIP(req) {
 // HELPER: Langweilige Gemini-Einleitungen entfernen
 // =================================================================
 function removeBoringIntros(text) {
-  // Patterns für typische KI-Einleitungen (Deutsch & Englisch)
   const boringPatterns = [
-    // Deutsche Patterns
     /^okay[,.\s]*/i,
     /^ok[,.\s]+/i,
     /^ich werde[^.]*\.\s*/i,
@@ -185,7 +163,6 @@ function removeBoringIntros(text) {
     /^natürlich[,!.\s]*/i,
     /^selbstverständlich[,!.\s]*/i,
     /^klar[,!.\s]*/i,
-    // Englische Patterns (falls Gemini manchmal Englisch antwortet)
     /^sure[,.\s]*/i,
     /^certainly[,.\s]*/i,
     /^of course[,.\s]*/i,
@@ -195,8 +172,6 @@ function removeBoringIntros(text) {
   ];
 
   let cleaned = text;
-  
-  // Mehrfach durchlaufen, falls mehrere Einleitungen hintereinander
   let iterations = 0;
   let previousLength;
   
@@ -208,51 +183,73 @@ function removeBoringIntros(text) {
     iterations++;
   } while (cleaned.length !== previousLength && iterations < 5);
 
-  // Führende Leerzeichen/Zeilenumbrüche entfernen
   cleaned = cleaned.replace(/^[\s\n]+/, '');
 
   return cleaned;
 }
 
 // =================================================================
-// HELPER: Markdown zu HTML formatieren
+// HELPER: Markdown zu HTML formatieren (VERBESSERT für Listen)
 // =================================================================
 function formatResponseText(text) {
   // Erst langweilige Einleitungen entfernen
   let formatted = removeBoringIntros(text);
   
-  // Markdown-Formatierung
-  formatted = formatted
-    // Fett: **text** → <strong>text</strong>
-    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-    // Kursiv: *text* → <em>text</em>
-    .replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '<em>$1</em>')
-    // Aufzählungen: - Item oder • Item → mit Bullet
-    .replace(/^[-•]\s+(.+)$/gm, '• $1');
+  // === SCHRITT 1: Markdown-Formatierung ===
   
-  // Zeilenumbrüche direkt nach </strong> entfernen
+  // Fett: **text** → <strong>text</strong>
+  formatted = formatted.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  
+  // Kursiv: *text* → <em>text</em> (aber nicht wenn Teil von **)
+  formatted = formatted.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '<em>$1</em>');
+  
+  // === SCHRITT 2: Listen-Formatierung (VOR allgemeiner Zeilenumbruch-Behandlung) ===
+  
+  // Nummerierte Listen: Zeilenumbruch vor "1.", "2.", etc. zu <br><br>
+  // Matcht: Zeilenumbruch + optionale Leerzeichen + Zahl + Punkt
+  formatted = formatted.replace(/\n\s*(\d+)\.\s*/g, '<br><br><strong>$1.</strong> ');
+  
+  // Bullet-Listen: - Item oder • Item → mit Bullet und Umbruch
+  formatted = formatted.replace(/\n\s*[-•]\s+/g, '<br>• ');
+  
+  // Am Zeilenanfang (ohne vorherigen Umbruch)
+  formatted = formatted.replace(/^(\d+)\.\s*/gm, '<strong>$1.</strong> ');
+  formatted = formatted.replace(/^[-•]\s+/gm, '• ');
+  
+  // === SCHRITT 3: Zeilenumbrüche bereinigen ===
+  
+  // Zeilenumbrüche direkt nach </strong> entfernen (fließender Text nach Fettdruck)
   formatted = formatted.replace(/<\/strong>\s*\n+/g, '</strong> ');
   
-  // Zeilenumbrüche direkt vor <strong> entfernen
-  formatted = formatted.replace(/\n+\s*<strong>/g, ' <strong>');
+  // Zeilenumbrüche direkt vor <strong> entfernen (außer bei Listen-Nummern)
+  formatted = formatted.replace(/\n+\s*<strong>(?!\d+\.)/g, ' <strong>');
   
   // Mehrfache Leerzeilen reduzieren
   formatted = formatted.replace(/\n{3,}/g, '\n\n');
   
-  // Nur echte Absätze werden zu <br><br>
+  // Doppelte Zeilenumbrüche → Absatz
   formatted = formatted.replace(/\n\n/g, '<br><br>');
   
-  // Einzelne Zeilenumbrüche nur bei Listen behalten
-  formatted = formatted.replace(/\n(•)/g, '<br>$1');
-  
-  // Restliche einzelne Zeilenumbrüche zu Leerzeichen
+  // Einzelne Zeilenumbrüche → Leerzeichen (fließender Text)
   formatted = formatted.replace(/\n/g, ' ');
+  
+  // === SCHRITT 4: Cleanup ===
+  
+  // Mehrfache <br> reduzieren (max 2)
+  formatted = formatted.replace(/(<br>){3,}/g, '<br><br>');
+  
+  // <br> am Anfang entfernen
+  formatted = formatted.replace(/^(<br>)+/, '');
   
   // Doppelte Leerzeichen entfernen
   formatted = formatted.replace(/\s{2,}/g, ' ');
   
   // Leerzeichen vor Satzzeichen entfernen
   formatted = formatted.replace(/\s+([.,!?:;])/g, '$1');
+  
+  // Leerzeichen nach <br> normalisieren
+  formatted = formatted.replace(/<br>\s+/g, '<br>');
+  formatted = formatted.replace(/\s+<br>/g, '<br>');
   
   return formatted.trim();
 }
@@ -396,14 +393,15 @@ export default async function handler(req, res) {
     // PHASE 2: Gemini Tests MIT Google Search Grounding
     // =================================================================
     
-    // Gemeinsame Formatierungsanweisung für alle Prompts
+    // Gemeinsame Formatierungsanweisung
     const formatInstruction = `
 
 **WICHTIGE FORMATIERUNG:**
 - Beginne DIREKT mit den Fakten
-- KEINE Einleitung wie "Okay", "Ich werde...", "Hier sind...", "Basierend auf..." oder ähnliches
-- KEINE Meta-Kommentare über die Suche selbst
-- Schreibe professionell und direkt`;
+- KEINE Einleitung wie "Okay", "Ich werde...", "Hier sind...", "Basierend auf..."
+- KEINE Meta-Kommentare über die Suche
+- Nummeriere Listen klar mit 1., 2., 3. etc.
+- Jeder Listeneintrag auf einer neuen Zeile`;
 
     const testQueries = [
       {
@@ -416,7 +414,7 @@ export default async function handler(req, res) {
 
 - Schreibe den Firmennamen/Domain immer **fett**
 - Nutze kurze, klare Sätze
-- Wenn du nichts findest, sage: "Zu **${cleanDomain}** wurden keine Informationen gefunden."
+- Wenn du nichts findest: "Zu **${cleanDomain}** wurden keine Informationen gefunden."
 ${formatInstruction}
 
 Antworte auf Deutsch in 3-5 Sätzen.`,
@@ -428,17 +426,23 @@ Antworte auf Deutsch in 3-5 Sätzen.`,
         prompt: cleanIndustry 
           ? `Suche nach den **besten Anbietern für "${cleanIndustry}"** in Österreich.
 
-Nenne **5-8 empfehlenswerte Unternehmen/Websites**:
-- **Firmenname** – Website – kurze Beschreibung
+Liste **5-8 empfehlenswerte Unternehmen** auf:
+
+1. **Firmenname** – kurze Beschreibung
+2. **Firmenname** – kurze Beschreibung
+(usw.)
 
 Prüfe auch: Wird **${cleanDomain}** in diesem Bereich erwähnt oder empfohlen?
 ${formatInstruction}
 
-Antworte auf Deutsch. Formatiere die Liste übersichtlich.`
+Antworte auf Deutsch.`
           : `Suche nach empfehlenswerten **Webentwicklern und Digital-Agenturen** in Österreich.
 
-Nenne **5-8 bekannte Anbieter**:
-- **Firmenname** – Website – Spezialisierung
+Liste **5-8 bekannte Anbieter** auf:
+
+1. **Firmenname** – Spezialisierung
+2. **Firmenname** – Spezialisierung
+(usw.)
 ${formatInstruction}
 
 Antworte auf Deutsch.`,
@@ -470,10 +474,10 @@ Antworte auf Deutsch.`,
         id: 'mentions',
         prompt: `Suche nach **externen Erwähnungen** von **${cleanDomain}**:
 
-- Einträge in Branchenverzeichnissen (Herold, WKO, Gelbe Seiten, etc.)
-- Links von anderen Websites
-- Erwähnungen in Artikeln oder Blogs
-- Social Media Profile (Facebook, Instagram, LinkedIn)
+1. Einträge in Branchenverzeichnissen (Herold, WKO, Gelbe Seiten, etc.)
+2. Links von anderen Websites
+3. Erwähnungen in Artikeln oder Blogs
+4. Social Media Profile (Facebook, Instagram, LinkedIn)
 
 Liste gefundene Erwähnungen mit **fetten** Quellennamen auf.
 
@@ -506,7 +510,7 @@ Antworte auf Deutsch.`,
         const response = await result.response;
         let text = response.text();
         
-        // Formatierung anwenden (inkl. Entfernung langweiliger Einleitungen)
+        // Formatierung anwenden
         text = formatResponseText(text);
         
         // Prüfen ob Domain erwähnt wird
@@ -583,7 +587,6 @@ Antworte auf Deutsch.`,
     let score = 0;
     const scoreBreakdown = [];
     
-    // 1. Erwähnungsrate (max 40 Punkte)
     const mentionCount = testResults.filter(t => t.mentioned).length;
     const mentionScore = Math.round((mentionCount / testResults.length) * 40);
     score += mentionScore;
@@ -594,7 +597,6 @@ Antworte auf Deutsch.`,
       detail: `${mentionCount} von ${testResults.length} Suchen finden die Domain`
     });
     
-    // 2. Technische Authority (max 35 Punkte)
     let techScore = 0;
     if (domainAnalysis.hasSchema) techScore += 12;
     if (domainAnalysis.schemaTypes.length >= 3) techScore += 8;
@@ -609,7 +611,6 @@ Antworte auf Deutsch.`,
       detail: `Schema: ${domainAnalysis.hasSchema ? '✓' : '✗'} (${domainAnalysis.schemaTypes.length} Typen), E-E-A-T: ${[domainAnalysis.hasAboutPage, domainAnalysis.hasContactPage, domainAnalysis.hasAuthorInfo].filter(Boolean).length}/3`
     });
     
-    // 3. Sentiment & Reputation (max 25 Punkte)
     const positiveCount = testResults.filter(t => t.sentiment === 'positiv').length;
     const neutralCount = testResults.filter(t => t.sentiment === 'neutral').length;
     const sentimentScore = Math.round((positiveCount * 25 + neutralCount * 10) / testResults.length);
@@ -621,7 +622,6 @@ Antworte auf Deutsch.`,
       detail: `${positiveCount} positiv, ${neutralCount} neutral, ${testResults.filter(t => t.sentiment === 'negativ').length} negativ/unbekannt`
     });
 
-    // Score-Kategorie
     let scoreCategory = 'niedrig';
     let scoreCategoryLabel = 'Kaum sichtbar';
     let scoreCategoryColor = '#ef4444';
