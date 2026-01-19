@@ -12,8 +12,8 @@ const coreFiles = [
     'css/side-menu.css',          // Navigation
     'css/menu-interactive.css',   // Interaktive Menüs
     'css/ai-styles.css',          // Evita/Chat Styles
-    'css/light-mode.css'          // ← MUSS ZULETZT sein für Overrides
-     'css/legal-style.css'    
+    'css/light-mode.css',          // ← MUSS ZULETZT sein für Overrides
+    'css/legal-style.css'    
 ];
 
 // 2. HOME: Nur für index.html
@@ -21,7 +21,7 @@ const homeFiles = [
     'css/flip-card.css',          // Nur Startseite
     'css/booking.css',            // Nur Startseite (oder Kontakt)
     'css/terminal-fix.css',       // Nur Startseite
-    'css/homepage-scroll-fix.css',// Nur Startseite
+    'css/homepage-scroll-fix.css' // Nur Startseite
 ];
 
 // 3. ARTICLE: Für Blogposts (OHNE Silas)
