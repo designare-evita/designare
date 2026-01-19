@@ -12,6 +12,7 @@ const coreFiles = [
     'css/side-menu.css',          // Navigation
     'css/menu-interactive.css',   // Interaktive Menus
     'css/ai-styles.css',          // Evita/Chat Styles
+    'css/booking.css',      
     'css/legal-style.css',    
     'css/light-mode.css'         // MUSS ZULETZT sein fuer Overrides
 ];
@@ -19,7 +20,6 @@ const coreFiles = [
 // 2. HOME: Nur fuer index.html
 const homeFiles = [
     'css/flip-card.css',          // Nur Startseite
-    'css/booking.css',            // Nur Startseite (oder Kontakt)
     'css/terminal-fix.css',       // Nur Startseite
     'css/homepage-scroll-fix.css' // Nur Startseite
 ];
