@@ -1,17 +1,17 @@
 // api/ai-visibility-check.js - KI-Sichtbarkeits-Check mit Grounding + Formatierung
-// Version 4: Korrekte Listen-Formatierung (Nummer + Text auf einer Zeile)
+// Version 5: RADIKALER Listen-Fix - Alle Umbrüche weg, dann gezielt einfügen
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // =================================================================
-// RATE LIMITING - 3 Abfragen pro IP pro Tag (In-Memory für Vercel)
+// RATE LIMITING
 // =================================================================
 const DAILY_LIMIT = 3;
 const rateLimitMap = new Map();
 
 // =================================================================
-// DOMAIN VALIDATION - Schutz vor Injection & ungültigen Eingaben
+// DOMAIN VALIDATION
 // =================================================================
 
 function validateAndCleanDomain(input) {
@@ -42,33 +42,22 @@ function validateAndCleanDomain(input) {
 
   for (const pattern of dangerousPatterns) {
     if (pattern.test(domain)) {
-      console.warn(`⚠️ Blocked dangerous input: ${input}`);
       return { valid: false, domain: null, error: 'Ungültige Zeichen in der Domain' };
     }
   }
 
-  if (domain.length > 253) {
-    return { valid: false, domain: null, error: 'Domain ist zu lang (max. 253 Zeichen)' };
-  }
-
-  if (domain.length < 4) {
-    return { valid: false, domain: null, error: 'Domain ist zu kurz' };
+  if (domain.length > 253 || domain.length < 4) {
+    return { valid: false, domain: null, error: 'Ungültige Domain-Länge' };
   }
 
   const domainRegex = /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/;
-  
   if (!domainRegex.test(domain)) {
-    return { 
-      valid: false, 
-      domain: null, 
-      error: 'Ungültiges Domain-Format. Beispiel: beispiel.at oder meine-firma.co.at' 
-    };
+    return { valid: false, domain: null, error: 'Ungültiges Domain-Format' };
   }
 
   const invalidTLDs = ['localhost', 'local', 'test', 'invalid', 'example'];
-  const tld = domain.split('.').pop();
-  if (invalidTLDs.includes(tld)) {
-    return { valid: false, domain: null, error: 'Test-Domains sind nicht erlaubt' };
+  if (invalidTLDs.includes(domain.split('.').pop())) {
+    return { valid: false, domain: null, error: 'Test-Domains nicht erlaubt' };
   }
 
   return { valid: true, domain: domain, error: null };
@@ -79,7 +68,7 @@ function validateAndCleanDomain(input) {
 // =================================================================
 
 async function trackVisibilityCheck(data) {
-  const trackingData = {
+  console.log('[VISIBILITY]', JSON.stringify({
     timestamp: new Date().toISOString(),
     domain: data.domain,
     industry: data.industry || null,
@@ -88,12 +77,8 @@ async function trackVisibilityCheck(data) {
     mentionCount: data.mentionCount,
     totalTests: data.totalTests,
     hasSchema: data.hasSchema,
-    schemaTypes: data.schemaTypes || [],
     country: data.country || 'unknown'
-  };
-
-  console.log('[VISIBILITY]', JSON.stringify(trackingData));
-  return trackingData;
+  }));
 }
 
 function getTodayString() {
@@ -107,11 +92,9 @@ function checkRateLimit(ip) {
   if (!usage || usage.date !== today) {
     return { allowed: true, remaining: DAILY_LIMIT - 1 };
   }
-  
   if (usage.count >= DAILY_LIMIT) {
     return { allowed: false, remaining: 0 };
   }
-  
   return { allowed: true, remaining: DAILY_LIMIT - usage.count - 1 };
 }
 
@@ -125,10 +108,9 @@ function incrementRateLimit(ip) {
     rateLimitMap.set(ip, { date: today, count: usage.count + 1 });
   }
   
+  // Cleanup alte Einträge
   for (const [key, value] of rateLimitMap.entries()) {
-    if (value.date !== today) {
-      rateLimitMap.delete(key);
-    }
+    if (value.date !== today) rateLimitMap.delete(key);
   }
 }
 
@@ -136,157 +118,132 @@ function getClientIP(req) {
   return req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
          req.headers['x-real-ip'] ||
          req.headers['cf-connecting-ip'] ||
-         req.socket?.remoteAddress ||
          'unknown';
 }
 
 // =================================================================
-// HELPER: Langweilige Gemini-Einleitungen entfernen
+// HELPER: Langweilige Einleitungen entfernen
 // =================================================================
 function removeBoringIntros(text) {
-  const boringPatterns = [
+  const patterns = [
     /^okay[,.\s]*/i,
     /^ok[,.\s]+/i,
     /^ich werde[^.]*\.\s*/i,
     /^ich habe[^.]*gesucht[^.]*\.\s*/i,
-    /^ich suche[^.]*\.\s*/i,
     /^hier (sind|ist)[^:]*:\s*/i,
-    /^hier (sind|ist)[^.]*\.\s*/i,
     /^basierend auf[^:]*:\s*/i,
-    /^basierend auf[^.]*[,.]\s*/i,
-    /^laut (den |meinen |der )?suchergebnissen?[^:]*:\s*/i,
-    /^laut (den |meinen |der )?suchergebnissen?[^.]*[,.]\s*/i,
-    /^nach meiner suche[^:]*:\s*/i,
-    /^die suche ergab[^:]*:\s*/i,
-    /^meine suche[^.]*\.\s*/i,
+    /^laut[^:]*suchergebnissen?[^:]*:\s*/i,
     /^gerne[,!.\s]*/i,
     /^natürlich[,!.\s]*/i,
     /^selbstverständlich[,!.\s]*/i,
-    /^klar[,!.\s]*/i,
-    /^sure[,.\s]*/i,
-    /^certainly[,.\s]*/i,
-    /^of course[,.\s]*/i,
-    /^i('ll| will)[^.]*\.\s*/i,
-    /^here (are|is)[^:]*:\s*/i,
-    /^based on[^:]*:\s*/i,
   ];
 
   let cleaned = text;
-  let iterations = 0;
-  let previousLength;
-  
-  do {
-    previousLength = cleaned.length;
-    for (const pattern of boringPatterns) {
+  for (let i = 0; i < 3; i++) {
+    for (const pattern of patterns) {
       cleaned = cleaned.replace(pattern, '');
     }
-    iterations++;
-  } while (cleaned.length !== previousLength && iterations < 5);
-
-  cleaned = cleaned.replace(/^[\s\n]+/, '');
-
-  return cleaned;
+  }
+  return cleaned.trim();
 }
 
 // =================================================================
-// HELPER: Markdown zu HTML formatieren (v4 - FIXED)
+// HELPER: Text formatieren (v5 - RADIKALER ANSATZ)
 // =================================================================
 function formatResponseText(text) {
-  // Erst langweilige Einleitungen entfernen
   let formatted = removeBoringIntros(text);
   
-  // === SCHRITT 1: Alle Zeilenumbrüche normalisieren ===
-  // Windows-Zeilenumbrüche zu Unix
-  formatted = formatted.replace(/\r\n/g, '\n');
-  formatted = formatted.replace(/\r/g, '\n');
-  
-  // === SCHRITT 2: Markdown-Formatierung ===
-  
-  // Fett: **text** → <strong>text</strong>
+  // ============================================================
+  // SCHRITT 1: Markdown Fett → HTML
+  // ============================================================
   formatted = formatted.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
   
-  // Kursiv: *text* → <em>text</em> (aber nicht wenn Teil von **)
-  formatted = formatted.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '<em>$1</em>');
-  
-  // === SCHRITT 3: Listen-Formatierung (KERN-FIX v4) ===
-  
-  // Nummerierte Listen: Zeilenumbrüche um die Nummer herum entfernen
-  // Pattern: \n + Leerzeichen + Zahl + Punkt + Leerzeichen/Zeilenumbruch + Text
-  // Ergebnis: <br><br>NUMMER. TEXT (alles auf einer Zeile)
-  formatted = formatted.replace(/\n+\s*(\d+)\.\s*\n+\s*/g, '<br><br><strong>$1.</strong> ');
-  formatted = formatted.replace(/\n+\s*(\d+)\.\s+/g, '<br><br><strong>$1.</strong> ');
-  
-  // Am Textanfang (erste Nummer ohne vorherigen Umbruch)
-  formatted = formatted.replace(/^(\d+)\.\s*\n+\s*/g, '<strong>$1.</strong> ');
-  formatted = formatted.replace(/^(\d+)\.\s+/g, '<strong>$1.</strong> ');
-  
-  // Bullet-Listen: - Item oder • Item → mit Bullet und Umbruch
-  formatted = formatted.replace(/\n+\s*[-•]\s*\n+\s*/g, '<br>• ');
-  formatted = formatted.replace(/\n+\s*[-•]\s+/g, '<br>• ');
-  formatted = formatted.replace(/^[-•]\s+/g, '• ');
-  
-  // === SCHRITT 4: Restliche Zeilenumbrüche bereinigen ===
-  
-  // Zeilenumbrüche direkt nach </strong> entfernen (fließender Text)
-  formatted = formatted.replace(/<\/strong>\s*\n+\s*/g, '</strong> ');
-  
-  // Zeilenumbrüche direkt vor <strong> (außer bei unseren Listen-Nummern)
-  formatted = formatted.replace(/\n+\s*<strong>(?!\d+\.)/g, ' <strong>');
-  
-  // Mehrfache Leerzeilen → ein Absatz
-  formatted = formatted.replace(/\n{2,}/g, '<br><br>');
-  
-  // Einzelne Zeilenumbrüche → Leerzeichen (fließender Text)
+  // ============================================================
+  // SCHRITT 2: ALLE Zeilenumbrüche zu Leerzeichen (RADIKAL!)
+  // Das löst das Problem, dass Gemini überall Umbrüche einbaut
+  // ============================================================
+  formatted = formatted.replace(/\r\n/g, ' ');
+  formatted = formatted.replace(/\r/g, ' ');
   formatted = formatted.replace(/\n/g, ' ');
   
-  // === SCHRITT 5: Cleanup ===
-  
-  // Mehrfache <br> reduzieren (max 2)
-  formatted = formatted.replace(/(<br\s*\/?>\s*){3,}/gi, '<br><br>');
-  
-  // <br> am Anfang entfernen
-  formatted = formatted.replace(/^(<br\s*\/?>\s*)+/gi, '');
-  
-  // Doppelte Leerzeichen entfernen
+  // ============================================================
+  // SCHRITT 3: Mehrfache Leerzeichen reduzieren
+  // ============================================================
   formatted = formatted.replace(/\s{2,}/g, ' ');
   
-  // Leerzeichen vor Satzzeichen entfernen
-  formatted = formatted.replace(/\s+([.,!?:;])/g, '$1');
+  // ============================================================
+  // SCHRITT 4: Nummerierte Listen - Umbruch VOR der Nummer
+  // Pattern: Satzende (. oder :) + Leerzeichen + Nummer + Punkt
+  // NICHT am Textanfang, nur wenn davor ein Satz endet
+  // ============================================================
   
-  // Leerzeichen um <br> normalisieren
-  formatted = formatted.replace(/\s*<br\s*\/?>\s*/gi, '<br>');
+  // Nach Satzzeichen + Nummer → Umbruch einfügen
+  formatted = formatted.replace(/([.!?:])(\s+)(\d+)\.\s+/g, '$1<br><br><strong>$3.</strong> ');
   
-  // Leere <strong></strong> entfernen
-  formatted = formatted.replace(/<strong>\s*<\/strong>/g, '');
+  // Spezialfall: "– 2." oder "- 2." (Gedankenstrich vor Nummer)
+  formatted = formatted.replace(/([–-])(\s+)(\d+)\.\s+/g, '$1<br><br><strong>$3.</strong> ');
+  
+  // ============================================================
+  // SCHRITT 5: Erste Nummer am Textanfang (ohne <br> davor)
+  // ============================================================
+  formatted = formatted.replace(/^\s*(\d+)\.\s+/g, '<strong>$1.</strong> ');
+  
+  // ============================================================
+  // SCHRITT 6: Bullet Points
+  // ============================================================
+  formatted = formatted.replace(/([.!?:])(\s+)[•\-]\s+/g, '$1<br>• ');
+  formatted = formatted.replace(/^\s*[•\-]\s+/g, '• ');
+  
+  // ============================================================
+  // SCHRITT 7: "Zu DOMAIN wurden keine..." Fix
+  // Das "Zu" und die Domain sollen auf einer Zeile bleiben
+  // ============================================================
+  formatted = formatted.replace(/Zu\s+<strong>/gi, 'Zu <strong>');
+  
+  // ============================================================
+  // SCHRITT 8: Cleanup
+  // ============================================================
+  
+  // <br> am Anfang entfernen
+  formatted = formatted.replace(/^(<br>\s*)+/gi, '');
+  
+  // Mehrfache <br> reduzieren
+  formatted = formatted.replace(/(<br>\s*){3,}/gi, '<br><br>');
+  
+  // Leerzeichen vor Satzzeichen
+  formatted = formatted.replace(/\s+([.!?,:;])/g, '$1');
+  
+  // Leerzeichen nach <br> normalisieren
+  formatted = formatted.replace(/<br>\s+/gi, '<br>');
+  
+  // Doppelte Leerzeichen nochmal
+  formatted = formatted.replace(/\s{2,}/g, ' ');
   
   return formatted.trim();
 }
 
 // =================================================================
-// HELPER: Industry Input sanitizen
+// HELPER: Industry sanitizen
 // =================================================================
 function sanitizeIndustry(input) {
   if (!input || typeof input !== 'string') return null;
-  
   let industry = input.trim().substring(0, 100);
   industry = industry.replace(/[<>'"`;\\]/g, '');
-  
   return industry.length > 0 ? industry : null;
 }
 
+// =================================================================
+// MAIN HANDLER
+// =================================================================
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
-  // =================================================================
-  // RATE LIMIT CHECK
-  // =================================================================
   const clientIP = getClientIP(req);
   const rateCheck = checkRateLimit(clientIP);
   
   if (!rateCheck.allowed) {
-    console.log(`⛔ Rate Limit erreicht für IP: ${clientIP}`);
     return res.status(429).json({ 
       success: false,
       message: 'Tageslimit erreicht (3 Checks pro Tag). Bitte morgen wieder versuchen.',
@@ -297,37 +254,24 @@ export default async function handler(req, res) {
   try {
     const { domain, industry } = req.body;
     
-    // =================================================================
-    // INPUT VALIDATION
-    // =================================================================
     const domainValidation = validateAndCleanDomain(domain);
-    
     if (!domainValidation.valid) {
-      console.log(`⚠️ Invalid domain input: "${domain}" → ${domainValidation.error}`);
-      return res.status(400).json({ 
-        success: false,
-        message: domainValidation.error 
-      });
+      return res.status(400).json({ success: false, message: domainValidation.error });
     }
 
     const cleanDomain = domainValidation.domain;
     const cleanIndustry = sanitizeIndustry(industry);
     
-    console.log(`🔍 AI Visibility Check für: ${cleanDomain} (IP: ${clientIP}, Remaining: ${rateCheck.remaining})`);
-    
+    console.log(`🔍 AI Visibility Check: ${cleanDomain}`);
     incrementRateLimit(clientIP);
 
-    // --- MODELL MIT GOOGLE SEARCH GROUNDING ---
     const modelWithSearch = genAI.getGenerativeModel({ 
       model: "gemini-2.0-flash",
-      generationConfig: { 
-        temperature: 0.4,
-        maxOutputTokens: 1500
-      }
+      generationConfig: { temperature: 0.4, maxOutputTokens: 1500 }
     });
 
     // =================================================================
-    // PHASE 1: Domain-Analyse (Crawling)
+    // PHASE 1: Domain-Analyse
     // =================================================================
     let domainAnalysis = {
       hasSchema: false,
@@ -341,150 +285,86 @@ export default async function handler(req, res) {
     };
 
     try {
-      const urlToFetch = `https://${cleanDomain}`;
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 10000);
       
-      const response = await fetch(urlToFetch, {
+      const response = await fetch(`https://${cleanDomain}`, {
         signal: controller.signal,
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (compatible; AIVisibilityBot/1.0)'
-        }
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; AIVisibilityBot/1.0)' }
       });
       clearTimeout(timeout);
       
       const html = await response.text();
       
-      // Schema.org JSON-LD extrahieren
       const schemaMatches = html.match(/<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi);
       if (schemaMatches) {
         domainAnalysis.hasSchema = true;
         schemaMatches.forEach(match => {
           try {
-            const jsonContent = match.replace(/<script[^>]*>|<\/script>/gi, '');
-            const parsed = JSON.parse(jsonContent);
+            const parsed = JSON.parse(match.replace(/<script[^>]*>|<\/script>/gi, ''));
             const extractTypes = (obj) => {
               if (obj['@type']) {
                 const types = Array.isArray(obj['@type']) ? obj['@type'] : [obj['@type']];
                 domainAnalysis.schemaTypes.push(...types);
               }
-              if (obj['@graph']) {
-                obj['@graph'].forEach(item => extractTypes(item));
-              }
+              if (obj['@graph']) obj['@graph'].forEach(extractTypes);
             };
             extractTypes(parsed);
-          } catch (e) { /* Ignore parse errors */ }
+          } catch (e) {}
         });
       }
       
-      // E-E-A-T Signale prüfen
       domainAnalysis.hasAboutPage = /href=["'][^"']*(?:about|über-uns|ueber-uns|team|wir)["']/i.test(html);
       domainAnalysis.hasContactPage = /href=["'][^"']*(?:contact|kontakt|impressum)["']/i.test(html);
       domainAnalysis.hasAuthorInfo = /(?:author|autor|verfasser|geschrieben von|inhaber|geschäftsführer)/i.test(html);
       
-      // Title & Description
       const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
       domainAnalysis.title = titleMatch ? titleMatch[1].trim() : '';
       
-      const descMatch = html.match(/<meta[^>]*name=["']description["'][^>]*content=["']([^"']+)["']/i) ||
-                        html.match(/<meta[^>]*content=["']([^"']+)["'][^>]*name=["']description["']/i);
+      const descMatch = html.match(/<meta[^>]*name=["']description["'][^>]*content=["']([^"']+)["']/i);
       domainAnalysis.description = descMatch ? descMatch[1].trim() : '';
       
-      console.log('✅ Crawling erfolgreich:', domainAnalysis.title);
-      
     } catch (error) {
-      console.log('⚠️ Crawl-Fehler:', error.message);
       domainAnalysis.crawlError = error.message;
     }
 
     // =================================================================
-    // PHASE 2: Gemini Tests MIT Google Search Grounding
+    // PHASE 2: Gemini Tests
     // =================================================================
     
-    // Gemeinsame Formatierungsanweisung (optimiert für inline-Listen)
+    // Formatierungsanweisung - NOCH STRIKTER
     const formatInstruction = `
 
-**WICHTIGE FORMATIERUNG:**
-- Beginne DIREKT mit den Fakten
-- KEINE Einleitung wie "Okay", "Ich werde...", "Hier sind...", "Basierend auf..."
-- KEINE Meta-Kommentare über die Suche
-- Bei nummerierten Listen: Nummer und Text auf DERSELBEN Zeile (z.B. "1. Firmenname – Beschreibung")
-- KEIN Zeilenumbruch zwischen Nummer und Firmenname`;
+STRIKTE FORMATIERUNG:
+- Beginne DIREKT mit Inhalt, KEINE Einleitung
+- Schreibe ALLES als Fließtext OHNE Zeilenumbrüche
+- Bei Listen: "1. Name – Beschreibung 2. Name – Beschreibung" (alles in einer Zeile)
+- NIEMALS Zeilenumbrüche zwischen Nummer und Text`;
 
     const testQueries = [
       {
         id: 'knowledge',
-        prompt: `Suche im Web nach der Website **${cleanDomain}** und beschreibe:
-
-1. Was bietet dieses Unternehmen/diese Website an?
-2. Wo ist der Standort (Stadt, Land)?
-3. Welche konkreten Informationen findest du?
-
-- Schreibe den Firmennamen/Domain immer **fett**
-- Nutze kurze, klare Sätze
-- Wenn du nichts findest: "Zu **${cleanDomain}** wurden keine Informationen gefunden."
-${formatInstruction}
-
-Antworte auf Deutsch in 3-5 Sätzen.`,
+        prompt: `Suche nach **${cleanDomain}** und beschreibe in 3-5 Sätzen: Was bietet das Unternehmen? Wo ist der Standort? Welche Infos findest du? Schreibe Firmennamen **fett**. Falls nichts gefunden: "Zu **${cleanDomain}** wurden keine Informationen gefunden."${formatInstruction}`,
         description: 'Bekanntheit im Web',
         useGrounding: true
       },
       {
         id: 'recommendation',
         prompt: cleanIndustry 
-          ? `Suche nach den **besten Anbietern für "${cleanIndustry}"** in Österreich.
-
-Liste 5-8 empfehlenswerte Unternehmen auf. Format für JEDEN Eintrag:
-1. **Firmenname** – Beschreibung auf derselben Zeile
-2. **Firmenname** – Beschreibung auf derselben Zeile
-
-Prüfe auch: Wird **${cleanDomain}** in diesem Bereich erwähnt?
-${formatInstruction}
-
-Antworte auf Deutsch.`
-          : `Suche nach empfehlenswerten **Webentwicklern und Digital-Agenturen** in Österreich.
-
-Liste 5-8 bekannte Anbieter auf. Format für JEDEN Eintrag:
-1. **Firmenname** – Spezialisierung auf derselben Zeile
-2. **Firmenname** – Spezialisierung auf derselben Zeile
-${formatInstruction}
-
-Antworte auf Deutsch.`,
+          ? `Suche die besten Anbieter für "${cleanIndustry}" in Österreich. Liste 5-8 Unternehmen als Fließtext: "1. **Name** – Beschreibung 2. **Name** – Beschreibung" usw. Prüfe ob **${cleanDomain}** erwähnt wird.${formatInstruction}`
+          : `Suche empfehlenswerte Webentwickler/Digital-Agenturen in Österreich. Liste 5-8 als Fließtext: "1. **Name** – Beschreibung 2. **Name** – Beschreibung" usw.${formatInstruction}`,
         description: 'Empfehlungen in der Branche',
         useGrounding: true
       },
       {
         id: 'reviews',
-        prompt: `Suche nach **Bewertungen und Rezensionen** zu **${cleanDomain}**.
-
-Prüfe Google Reviews, Trustpilot, ProvenExpert und ähnliche Plattformen.
-
-Fasse zusammen:
-- **Bewertung:** (z.B. "4.5 Sterne bei Google")
-- **Kundenmeinungen:** Was sagen Kunden?
-- **Anzahl:** Wie viele Bewertungen?
-
-Wenn keine Bewertungen: "Zu **${cleanDomain}** wurden keine Online-Bewertungen gefunden."
-${formatInstruction}
-
-Antworte auf Deutsch.`,
+        prompt: `Suche Bewertungen zu **${cleanDomain}** (Google Reviews, Trustpilot, etc.). Fasse zusammen: Bewertung (Sterne), Kundenmeinungen, Anzahl. Falls keine: "Zu **${cleanDomain}** wurden keine Online-Bewertungen gefunden."${formatInstruction}`,
         description: 'Online-Reputation',
         useGrounding: true
       },
       {
         id: 'mentions',
-        prompt: `Suche nach **externen Erwähnungen** von **${cleanDomain}**:
-
-Prüfe: Branchenverzeichnisse (Herold, WKO, Gelbe Seiten), Links von anderen Websites, Artikel/Blogs, Social Media Profile.
-
-Liste gefundene Erwähnungen auf:
-1. **Quellenname** – Art der Erwähnung
-2. **Quellenname** – Art der Erwähnung
-
-Wenn nichts gefunden: "Zu **${cleanDomain}** wurden keine externen Erwähnungen gefunden."
-${formatInstruction}
-
-Antworte auf Deutsch.`,
+        prompt: `Suche externe Erwähnungen von **${cleanDomain}**: Branchenverzeichnisse (Herold, WKO), Links, Artikel, Social Media. Liste als Fließtext. Falls keine: "Zu **${cleanDomain}** wurden keine externen Erwähnungen gefunden."${formatInstruction}`,
         description: 'Externe Erwähnungen',
         useGrounding: true
       }
@@ -494,56 +374,31 @@ Antworte auf Deutsch.`,
     
     for (const test of testQueries) {
       try {
-        console.log(`🧪 Test: ${test.description}...`);
+        console.log(`🧪 ${test.description}...`);
         
-        let result;
+        const result = await modelWithSearch.generateContent({
+          contents: [{ role: "user", parts: [{ text: test.prompt }] }],
+          tools: [{ googleSearch: {} }]
+        });
         
-        if (test.useGrounding) {
-          result = await modelWithSearch.generateContent({
-            contents: [{ role: "user", parts: [{ text: test.prompt }] }],
-            tools: [{ googleSearch: {} }]
-          });
-        } else {
-          result = await modelWithSearch.generateContent(test.prompt);
-        }
-        
-        const response = await result.response;
-        let text = response.text();
-        
-        // Formatierung anwenden
+        let text = result.response.text();
         text = formatResponseText(text);
         
-        // Prüfen ob Domain erwähnt wird
         const domainBase = cleanDomain.replace(/\.[^.]+$/, '');
         const domainMentioned = text.toLowerCase().includes(cleanDomain) ||
                                text.toLowerCase().includes(domainBase);
         
-        // Sentiment analysieren
-        let sentiment = 'neutral';
         const textLower = text.toLowerCase();
+        const positiveIndicators = ['empfehlenswert', 'qualität', 'professionell', 'zuverlässig', 'gute bewertungen', 'zufrieden', 'top', 'ausgezeichnet', 'spezialist', 'experte', 'sterne', '4.', '4,', '5.', '5,'];
+        const negativeIndicators = ['keine informationen', 'nicht gefunden', 'keine bewertungen', 'nicht bekannt', 'keine erwähnungen', 'wurden keine', 'nichts gefunden'];
         
-        const positiveIndicators = [
-          'empfehlenswert', 'qualität', 'professionell', 'zuverlässig', 
-          'gute bewertungen', 'positive', 'zufrieden', 'top', 'ausgezeichnet',
-          'spezialist', 'experte', 'erfahren', 'hochwertig', 'vertrauenswürdig',
-          'sterne', '4,', '4.', '5,', '5.', 'sehr gut', 'hervorragend'
-        ];
-        const negativeIndicators = [
-          'keine informationen', 'nicht gefunden', 'keine ergebnisse', 
-          'keine bewertungen', 'nicht bekannt', 'keine erwähnungen',
-          'konnte ich keine', 'wurden keine', 'nichts gefunden', 'nicht zu finden'
-        ];
+        const posScore = positiveIndicators.filter(w => textLower.includes(w)).length;
+        const negScore = negativeIndicators.filter(w => textLower.includes(w)).length;
         
-        const positiveScore = positiveIndicators.filter(w => textLower.includes(w)).length;
-        const negativeScore = negativeIndicators.filter(w => textLower.includes(w)).length;
+        let sentiment = 'neutral';
+        if (domainMentioned && posScore > negScore) sentiment = 'positiv';
+        else if (negScore > posScore || !domainMentioned) sentiment = 'negativ';
         
-        if (domainMentioned && positiveScore > negativeScore) {
-          sentiment = 'positiv';
-        } else if (negativeScore > positiveScore || !domainMentioned) {
-          sentiment = 'negativ';
-        }
-        
-        // Konkurrenten extrahieren
         const domainRegex = /(?:https?:\/\/)?(?:www\.)?([a-zA-Z0-9][-a-zA-Z0-9]*\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})?)/gi;
         const matches = text.match(domainRegex) || [];
         const competitors = [...new Set(matches)]
@@ -554,27 +409,22 @@ Antworte auf Deutsch.`,
         testResults.push({
           id: test.id,
           description: test.description,
-          query: test.prompt.split('\n')[0].substring(0, 80) + '...',
           mentioned: domainMentioned,
           sentiment,
           competitors,
           response: text.length > 1000 ? text.substring(0, 1000) + '...' : text,
-          groundingUsed: test.useGrounding
+          groundingUsed: true
         });
         
-        console.log(`   → ${domainMentioned ? '✅ Erwähnt' : '❌ Nicht erwähnt'} | Sentiment: ${sentiment}`);
-        
       } catch (error) {
-        console.log(`   → ❌ Test fehlgeschlagen:`, error.message);
         testResults.push({
           id: test.id,
           description: test.description,
-          query: test.prompt.split('\n')[0].substring(0, 80),
           mentioned: false,
           sentiment: 'fehler',
           competitors: [],
           response: '❌ Test fehlgeschlagen: ' + error.message,
-          groundingUsed: test.useGrounding
+          groundingUsed: true
         });
       }
       
@@ -582,7 +432,7 @@ Antworte auf Deutsch.`,
     }
 
     // =================================================================
-    // PHASE 3: Score-Berechnung
+    // PHASE 3: Score
     // =================================================================
     let score = 0;
     const scoreBreakdown = [];
@@ -608,7 +458,7 @@ Antworte auf Deutsch.`,
       category: 'Technische Authority',
       points: techScore,
       maxPoints: 35,
-      detail: `Schema: ${domainAnalysis.hasSchema ? '✓' : '✗'} (${domainAnalysis.schemaTypes.length} Typen), E-E-A-T: ${[domainAnalysis.hasAboutPage, domainAnalysis.hasContactPage, domainAnalysis.hasAuthorInfo].filter(Boolean).length}/3`
+      detail: `Schema: ${domainAnalysis.hasSchema ? '✓' : '✗'}, E-E-A-T: ${[domainAnalysis.hasAboutPage, domainAnalysis.hasContactPage, domainAnalysis.hasAuthorInfo].filter(Boolean).length}/3`
     });
     
     const positiveCount = testResults.filter(t => t.sentiment === 'positiv').length;
@@ -619,141 +469,65 @@ Antworte auf Deutsch.`,
       category: 'Online-Reputation',
       points: sentimentScore,
       maxPoints: 25,
-      detail: `${positiveCount} positiv, ${neutralCount} neutral, ${testResults.filter(t => t.sentiment === 'negativ').length} negativ/unbekannt`
+      detail: `${positiveCount} positiv, ${neutralCount} neutral`
     });
 
-    let scoreCategory = 'niedrig';
-    let scoreCategoryLabel = 'Kaum sichtbar';
-    let scoreCategoryColor = '#ef4444';
-    
-    if (score >= 65) {
-      scoreCategory = 'hoch';
-      scoreCategoryLabel = 'Gut sichtbar';
-      scoreCategoryColor = '#22c55e';
-    } else if (score >= 35) {
-      scoreCategory = 'mittel';
-      scoreCategoryLabel = 'Ausbaufähig';
-      scoreCategoryColor = '#f59e0b';
-    }
+    let scoreCategory = 'niedrig', scoreCategoryLabel = 'Kaum sichtbar', scoreCategoryColor = '#ef4444';
+    if (score >= 65) { scoreCategory = 'hoch'; scoreCategoryLabel = 'Gut sichtbar'; scoreCategoryColor = '#22c55e'; }
+    else if (score >= 35) { scoreCategory = 'mittel'; scoreCategoryLabel = 'Ausbaufähig'; scoreCategoryColor = '#f59e0b'; }
 
     // =================================================================
-    // PHASE 4: Empfehlungen generieren
+    // PHASE 4: Empfehlungen
     // =================================================================
     const recommendations = [];
     
     if (mentionCount === 0) {
-      recommendations.push({
-        priority: 'hoch',
-        title: 'Online-Präsenz aufbauen',
-        description: 'Deine Domain wird in Websuchen kaum gefunden. Fokussiere auf Google Business Profile, Branchenverzeichnisse und Content-Marketing.',
-        link: '/geo-seo'
-      });
+      recommendations.push({ priority: 'hoch', title: 'Online-Präsenz aufbauen', description: 'Deine Domain wird kaum gefunden. Fokussiere auf Google Business Profile und Branchenverzeichnisse.', link: '/geo-seo' });
     }
-    
     if (!domainAnalysis.hasSchema) {
-      recommendations.push({
-        priority: 'hoch',
-        title: 'Schema.org Markup hinzufügen',
-        description: 'Strukturierte Daten (JSON-LD) helfen Suchmaschinen und KI, deine Inhalte zu verstehen. LocalBusiness, Organization oder Product Schema sind ein Muss.',
-        link: '/schema-org-meta-description'
-      });
+      recommendations.push({ priority: 'hoch', title: 'Schema.org Markup hinzufügen', description: 'Strukturierte Daten helfen KI deine Inhalte zu verstehen.', link: '/schema-org-meta-description' });
     }
-    
     if (positiveCount === 0 && mentionCount > 0) {
-      recommendations.push({
-        priority: 'hoch',
-        title: 'Bewertungen sammeln',
-        description: 'Du wirst gefunden, aber es fehlen positive Signale. Bitte zufriedene Kunden aktiv um Google Reviews.',
-        link: null
-      });
+      recommendations.push({ priority: 'hoch', title: 'Bewertungen sammeln', description: 'Du wirst gefunden, aber es fehlen positive Signale.', link: null });
     }
-    
     if (!domainAnalysis.hasAboutPage || !domainAnalysis.hasAuthorInfo) {
-      recommendations.push({
-        priority: 'mittel',
-        title: 'E-E-A-T Signale stärken',
-        description: 'Füge eine "Über uns" Seite mit Fotos, Qualifikationen und Geschichte hinzu. Zeige wer hinter dem Unternehmen steht.',
-        link: null
-      });
-    }
-    
-    if (domainAnalysis.schemaTypes.length < 2 && domainAnalysis.hasSchema) {
-      recommendations.push({
-        priority: 'mittel',
-        title: 'Mehr Schema-Typen nutzen',
-        description: `Aktuell: ${domainAnalysis.schemaTypes.join(', ') || 'Keine'}. Ergänze FAQPage, Product, Service oder Review Schemas.`,
-        link: '/schema-org-meta-description'
-      });
+      recommendations.push({ priority: 'mittel', title: 'E-E-A-T Signale stärken', description: 'Füge eine "Über uns" Seite mit Qualifikationen hinzu.', link: null });
     }
 
     const allCompetitors = [...new Set(testResults.flatMap(t => t.competitors))].slice(0, 12);
 
-    // =================================================================
-    // TRACKING
-    // =================================================================
     await trackVisibilityCheck({
       domain: cleanDomain,
       industry: cleanIndustry,
-      score: score,
+      score,
       scoreLabel: scoreCategoryLabel,
-      mentionCount: mentionCount,
+      mentionCount,
       totalTests: testResults.length,
       hasSchema: domainAnalysis.hasSchema,
-      schemaTypes: domainAnalysis.schemaTypes,
-      country: req.headers['cf-ipcountry'] || req.headers['x-vercel-ip-country'] || null
+      country: req.headers['cf-ipcountry'] || null
     });
 
-    // =================================================================
-    // RESPONSE
-    // =================================================================
-    const remainingChecks = checkRateLimit(clientIP).remaining;
-    console.log(`\n📊 Ergebnis für ${cleanDomain}: Score ${score}/100 (${scoreCategoryLabel}) | Remaining: ${remainingChecks}`);
-    
     return res.status(200).json({
       success: true,
       domain: cleanDomain,
       industry: cleanIndustry || null,
       timestamp: new Date().toISOString(),
-      
-      score: {
-        total: score,
-        category: scoreCategory,
-        label: scoreCategoryLabel,
-        color: scoreCategoryColor,
-        breakdown: scoreBreakdown
-      },
-      
+      score: { total: score, category: scoreCategory, label: scoreCategoryLabel, color: scoreCategoryColor, breakdown: scoreBreakdown },
       domainAnalysis: {
         title: domainAnalysis.title,
         description: domainAnalysis.description,
-        schema: {
-          found: domainAnalysis.hasSchema,
-          types: [...new Set(domainAnalysis.schemaTypes)]
-        },
-        eeat: {
-          aboutPage: domainAnalysis.hasAboutPage,
-          contactPage: domainAnalysis.hasContactPage,
-          authorInfo: domainAnalysis.hasAuthorInfo
-        },
+        schema: { found: domainAnalysis.hasSchema, types: [...new Set(domainAnalysis.schemaTypes)] },
+        eeat: { aboutPage: domainAnalysis.hasAboutPage, contactPage: domainAnalysis.hasContactPage, authorInfo: domainAnalysis.hasAuthorInfo },
         crawlError: domainAnalysis.crawlError
       },
-      
       aiTests: testResults,
       competitors: allCompetitors,
       recommendations,
-      
-      meta: {
-        testsWithGrounding: testResults.filter(t => t.groundingUsed).length,
-        totalTests: testResults.length,
-        remainingChecks: remainingChecks
-      }
+      meta: { testsWithGrounding: testResults.length, totalTests: testResults.length, remainingChecks: checkRateLimit(clientIP).remaining }
     });
 
   } catch (error) {
-    console.error("❌ AI Visibility Check Error:", error);
-    return res.status(500).json({ 
-      success: false,
-      message: 'Fehler bei der Analyse: ' + error.message 
-    });
+    console.error("❌ Error:", error);
+    return res.status(500).json({ success: false, message: 'Fehler: ' + error.message });
   }
 }
