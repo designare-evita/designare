@@ -1,4 +1,5 @@
 // api/ai-visibility-check.js - KI-Sichtbarkeits-Check mit Grounding + Formatierung
+// Version 2: Domain-Validierung + bereinigte Gemini-Antworten
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -72,8 +73,6 @@ function validateAndCleanDomain(input) {
   }
 
   // Valides Domain-Format prüfen (RFC 1035 konform)
-  // Erlaubt: Buchstaben, Zahlen, Bindestriche, Punkte
-  // Muss mindestens eine TLD haben (.at, .com, .co.at, etc.)
   const domainRegex = /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/;
   
   if (!domainRegex.test(domain)) {
@@ -91,9 +90,6 @@ function validateAndCleanDomain(input) {
     return { valid: false, domain: null, error: 'Test-Domains sind nicht erlaubt' };
   }
 
-  // Punycode/IDN-Domains erlauben (z.B. für Umlaute)
-  // xn-- Prefix ist gültig für internationale Domains
-  
   return { valid: true, domain: domain, error: null };
 }
 
@@ -101,10 +97,6 @@ function validateAndCleanDomain(input) {
 // TRACKING - Alle Checks protokollieren
 // =================================================================
 
-/**
- * Loggt Tracking-Daten in Vercel Logs
- * Abrufbar unter: Vercel Dashboard → Projekt → Logs → Filter: [VISIBILITY]
- */
 async function trackVisibilityCheck(data) {
   const trackingData = {
     timestamp: new Date().toISOString(),
@@ -119,9 +111,7 @@ async function trackVisibilityCheck(data) {
     country: data.country || 'unknown'
   };
 
-  // Strukturierter Log für einfaches Filtern in Vercel
   console.log('[VISIBILITY]', JSON.stringify(trackingData));
-
   return trackingData;
 }
 
@@ -134,7 +124,6 @@ function checkRateLimit(ip) {
   const usage = rateLimitMap.get(ip);
   
   if (!usage || usage.date !== today) {
-    // Neuer Tag oder neue IP
     return { allowed: true, remaining: DAILY_LIMIT - 1 };
   }
   
@@ -155,7 +144,7 @@ function incrementRateLimit(ip) {
     rateLimitMap.set(ip, { date: today, count: usage.count + 1 });
   }
   
-  // Cleanup: Alte Einträge entfernen (von gestern)
+  // Cleanup: Alte Einträge entfernen
   for (const [key, value] of rateLimitMap.entries()) {
     if (value.date !== today) {
       rateLimitMap.delete(key);
@@ -164,7 +153,6 @@ function incrementRateLimit(ip) {
 }
 
 function getClientIP(req) {
-  // Vercel/Cloudflare Headers
   return req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
          req.headers['x-real-ip'] ||
          req.headers['cf-connecting-ip'] ||
@@ -173,10 +161,68 @@ function getClientIP(req) {
 }
 
 // =================================================================
-// HELPER: Markdown zu HTML formatieren (wie Evita)
+// HELPER: Langweilige Gemini-Einleitungen entfernen
+// =================================================================
+function removeBoringIntros(text) {
+  // Patterns für typische KI-Einleitungen (Deutsch & Englisch)
+  const boringPatterns = [
+    // Deutsche Patterns
+    /^okay[,.\s]*/i,
+    /^ok[,.\s]+/i,
+    /^ich werde[^.]*\.\s*/i,
+    /^ich habe[^.]*gesucht[^.]*\.\s*/i,
+    /^ich suche[^.]*\.\s*/i,
+    /^hier (sind|ist)[^:]*:\s*/i,
+    /^hier (sind|ist)[^.]*\.\s*/i,
+    /^basierend auf[^:]*:\s*/i,
+    /^basierend auf[^.]*[,.]\s*/i,
+    /^laut (den |meinen |der )?suchergebnissen?[^:]*:\s*/i,
+    /^laut (den |meinen |der )?suchergebnissen?[^.]*[,.]\s*/i,
+    /^nach meiner suche[^:]*:\s*/i,
+    /^die suche ergab[^:]*:\s*/i,
+    /^meine suche[^.]*\.\s*/i,
+    /^gerne[,!.\s]*/i,
+    /^natürlich[,!.\s]*/i,
+    /^selbstverständlich[,!.\s]*/i,
+    /^klar[,!.\s]*/i,
+    // Englische Patterns (falls Gemini manchmal Englisch antwortet)
+    /^sure[,.\s]*/i,
+    /^certainly[,.\s]*/i,
+    /^of course[,.\s]*/i,
+    /^i('ll| will)[^.]*\.\s*/i,
+    /^here (are|is)[^:]*:\s*/i,
+    /^based on[^:]*:\s*/i,
+  ];
+
+  let cleaned = text;
+  
+  // Mehrfach durchlaufen, falls mehrere Einleitungen hintereinander
+  let iterations = 0;
+  let previousLength;
+  
+  do {
+    previousLength = cleaned.length;
+    for (const pattern of boringPatterns) {
+      cleaned = cleaned.replace(pattern, '');
+    }
+    iterations++;
+  } while (cleaned.length !== previousLength && iterations < 5);
+
+  // Führende Leerzeichen/Zeilenumbrüche entfernen
+  cleaned = cleaned.replace(/^[\s\n]+/, '');
+
+  return cleaned;
+}
+
+// =================================================================
+// HELPER: Markdown zu HTML formatieren
 // =================================================================
 function formatResponseText(text) {
-  let formatted = text
+  // Erst langweilige Einleitungen entfernen
+  let formatted = removeBoringIntros(text);
+  
+  // Markdown-Formatierung
+  formatted = formatted
     // Fett: **text** → <strong>text</strong>
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
     // Kursiv: *text* → <em>text</em>
@@ -184,7 +230,7 @@ function formatResponseText(text) {
     // Aufzählungen: - Item oder • Item → mit Bullet
     .replace(/^[-•]\s+(.+)$/gm, '• $1');
   
-  // Zeilenumbrüche direkt nach </strong> entfernen (das Hauptproblem!)
+  // Zeilenumbrüche direkt nach </strong> entfernen
   formatted = formatted.replace(/<\/strong>\s*\n+/g, '</strong> ');
   
   // Zeilenumbrüche direkt vor <strong> entfernen
@@ -193,13 +239,13 @@ function formatResponseText(text) {
   // Mehrfache Leerzeilen reduzieren
   formatted = formatted.replace(/\n{3,}/g, '\n\n');
   
-  // Nur echte Absätze (doppelte Zeilenumbrüche) werden zu <br><br>
+  // Nur echte Absätze werden zu <br><br>
   formatted = formatted.replace(/\n\n/g, '<br><br>');
   
   // Einzelne Zeilenumbrüche nur bei Listen behalten
   formatted = formatted.replace(/\n(•)/g, '<br>$1');
   
-  // Restliche einzelne Zeilenumbrüche zu Leerzeichen (fließender Text)
+  // Restliche einzelne Zeilenumbrüche zu Leerzeichen
   formatted = formatted.replace(/\n/g, ' ');
   
   // Doppelte Leerzeichen entfernen
@@ -217,13 +263,9 @@ function formatResponseText(text) {
 function sanitizeIndustry(input) {
   if (!input || typeof input !== 'string') return null;
   
-  // Trimmen und auf 100 Zeichen begrenzen
   let industry = input.trim().substring(0, 100);
-  
-  // Gefährliche Zeichen entfernen
   industry = industry.replace(/[<>'"`;\\]/g, '');
   
-  // Nur wenn noch was übrig ist
   return industry.length > 0 ? industry : null;
 }
 
@@ -251,7 +293,7 @@ export default async function handler(req, res) {
     const { domain, industry } = req.body;
     
     // =================================================================
-    // INPUT VALIDATION (NEU!)
+    // INPUT VALIDATION
     // =================================================================
     const domainValidation = validateAndCleanDomain(domain);
     
@@ -268,14 +310,13 @@ export default async function handler(req, res) {
     
     console.log(`🔍 AI Visibility Check für: ${cleanDomain} (IP: ${clientIP}, Remaining: ${rateCheck.remaining})`);
     
-    // Rate Limit incrementieren (vor der Analyse, damit auch Fehler zählen)
     incrementRateLimit(clientIP);
 
     // --- MODELL MIT GOOGLE SEARCH GROUNDING ---
     const modelWithSearch = genAI.getGenerativeModel({ 
       model: "gemini-2.0-flash",
       generationConfig: { 
-        temperature: 0.4,  // Etwas höher für natürlichere Antworten
+        temperature: 0.4,
         maxOutputTokens: 1500
       }
     });
@@ -355,7 +396,15 @@ export default async function handler(req, res) {
     // PHASE 2: Gemini Tests MIT Google Search Grounding
     // =================================================================
     
-    // Test-Definitionen mit Prompts die formatierte Antworten erzeugen
+    // Gemeinsame Formatierungsanweisung für alle Prompts
+    const formatInstruction = `
+
+**WICHTIGE FORMATIERUNG:**
+- Beginne DIREKT mit den Fakten
+- KEINE Einleitung wie "Okay", "Ich werde...", "Hier sind...", "Basierend auf..." oder ähnliches
+- KEINE Meta-Kommentare über die Suche selbst
+- Schreibe professionell und direkt`;
+
     const testQueries = [
       {
         id: 'knowledge',
@@ -365,10 +414,10 @@ export default async function handler(req, res) {
 2. Wo ist der Standort (Stadt, Land)?
 3. Welche konkreten Informationen findest du?
 
-**Wichtig:** 
 - Schreibe den Firmennamen/Domain immer **fett**
 - Nutze kurze, klare Sätze
-- Wenn du nichts findest, sage klar: "Zu **${cleanDomain}** konnte ich keine Informationen im Web finden."
+- Wenn du nichts findest, sage: "Zu **${cleanDomain}** wurden keine Informationen gefunden."
+${formatInstruction}
 
 Antworte auf Deutsch in 3-5 Sätzen.`,
         description: 'Bekanntheit im Web',
@@ -383,12 +432,14 @@ Nenne **5-8 empfehlenswerte Unternehmen/Websites**:
 - **Firmenname** – Website – kurze Beschreibung
 
 Prüfe auch: Wird **${cleanDomain}** in diesem Bereich erwähnt oder empfohlen?
+${formatInstruction}
 
 Antworte auf Deutsch. Formatiere die Liste übersichtlich.`
           : `Suche nach empfehlenswerten **Webentwicklern und Digital-Agenturen** in Österreich.
 
 Nenne **5-8 bekannte Anbieter**:
 - **Firmenname** – Website – Spezialisierung
+${formatInstruction}
 
 Antworte auf Deutsch.`,
         description: 'Empfehlungen in der Branche',
@@ -408,7 +459,8 @@ Fasse zusammen:
 - **Kundenmeinungen:** Was sagen Kunden?
 - **Anzahl:** Wie viele Bewertungen gibt es?
 
-Wenn keine Bewertungen vorhanden sind, sage: "Zu **${cleanDomain}** sind keine Online-Bewertungen zu finden."
+Wenn keine Bewertungen vorhanden: "Zu **${cleanDomain}** wurden keine Online-Bewertungen gefunden."
+${formatInstruction}
 
 Antworte auf Deutsch.`,
         description: 'Online-Reputation',
@@ -423,9 +475,10 @@ Antworte auf Deutsch.`,
 - Erwähnungen in Artikeln oder Blogs
 - Social Media Profile (Facebook, Instagram, LinkedIn)
 
-Liste gefundene Erwähnungen auf mit **fetten** Quellennamen.
+Liste gefundene Erwähnungen mit **fetten** Quellennamen auf.
 
-Wenn nichts gefunden wird: "Zu **${cleanDomain}** wurden keine externen Erwähnungen gefunden."
+Wenn nichts gefunden: "Zu **${cleanDomain}** wurden keine externen Erwähnungen gefunden."
+${formatInstruction}
 
 Antworte auf Deutsch.`,
         description: 'Externe Erwähnungen',
@@ -442,10 +495,9 @@ Antworte auf Deutsch.`,
         let result;
         
         if (test.useGrounding) {
-          // MIT Google Search Grounding
           result = await modelWithSearch.generateContent({
             contents: [{ role: "user", parts: [{ text: test.prompt }] }],
-            tools: [{ googleSearch: {} }]  // Aktiviert Web-Suche!
+            tools: [{ googleSearch: {} }]
           });
         } else {
           result = await modelWithSearch.generateContent(test.prompt);
@@ -454,15 +506,15 @@ Antworte auf Deutsch.`,
         const response = await result.response;
         let text = response.text();
         
-        // Formatierung anwenden (Markdown → HTML-like)
+        // Formatierung anwenden (inkl. Entfernung langweiliger Einleitungen)
         text = formatResponseText(text);
         
-        // Prüfen ob Domain erwähnt wird (auch Teilmatch)
-        const domainBase = cleanDomain.replace(/\.[^.]+$/, ''); // z.B. "stempel-lobenhofer"
+        // Prüfen ob Domain erwähnt wird
+        const domainBase = cleanDomain.replace(/\.[^.]+$/, '');
         const domainMentioned = text.toLowerCase().includes(cleanDomain) ||
                                text.toLowerCase().includes(domainBase);
         
-        // Sentiment analysieren (verbessert)
+        // Sentiment analysieren
         let sentiment = 'neutral';
         const textLower = text.toLowerCase();
         
@@ -487,7 +539,7 @@ Antworte auf Deutsch.`,
           sentiment = 'negativ';
         }
         
-        // Konkurrenten extrahieren (andere Domains in der Antwort)
+        // Konkurrenten extrahieren
         const domainRegex = /(?:https?:\/\/)?(?:www\.)?([a-zA-Z0-9][-a-zA-Z0-9]*\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})?)/gi;
         const matches = text.match(domainRegex) || [];
         const competitors = [...new Set(matches)]
@@ -498,7 +550,7 @@ Antworte auf Deutsch.`,
         testResults.push({
           id: test.id,
           description: test.description,
-          query: test.prompt.split('\n')[0].substring(0, 80) + '...', // Kurze Version für Anzeige
+          query: test.prompt.split('\n')[0].substring(0, 80) + '...',
           mentioned: domainMentioned,
           sentiment,
           competitors,
@@ -522,12 +574,11 @@ Antworte auf Deutsch.`,
         });
       }
       
-      // Kurze Pause zwischen Requests (Rate Limit)
       await new Promise(resolve => setTimeout(resolve, 800));
     }
 
     // =================================================================
-    // PHASE 3: Score-Berechnung (angepasst)
+    // PHASE 3: Score-Berechnung
     // =================================================================
     let score = 0;
     const scoreBreakdown = [];
@@ -570,7 +621,7 @@ Antworte auf Deutsch.`,
       detail: `${positiveCount} positiv, ${neutralCount} neutral, ${testResults.filter(t => t.sentiment === 'negativ').length} negativ/unbekannt`
     });
 
-    // Score-Kategorie bestimmen
+    // Score-Kategorie
     let scoreCategory = 'niedrig';
     let scoreCategoryLabel = 'Kaum sichtbar';
     let scoreCategoryColor = '#ef4444';
@@ -635,11 +686,10 @@ Antworte auf Deutsch.`,
       });
     }
 
-    // Alle Konkurrenten sammeln
     const allCompetitors = [...new Set(testResults.flatMap(t => t.competitors))].slice(0, 12);
 
     // =================================================================
-    // TRACKING (Vercel Logs)
+    // TRACKING
     // =================================================================
     await trackVisibilityCheck({
       domain: cleanDomain,
