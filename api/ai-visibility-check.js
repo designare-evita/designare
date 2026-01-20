@@ -1,5 +1,5 @@
 // api/ai-visibility-check.js - KI-Sichtbarkeits-Check mit Grounding + Formatierung
-// Version 6: Fix für erste Listennummer "1." am Textanfang
+// Version 7: Branche auto-erkennen + Einfache Absatz-Formatierung (keine Nummern)
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -147,7 +147,7 @@ function removeBoringIntros(text) {
 }
 
 // =================================================================
-// HELPER: Text formatieren (v6 - FIX FÜR ERSTE NUMMER)
+// HELPER: Text formatieren (v7 - EINFACH: Absätze statt Listen)
 // =================================================================
 function formatResponseText(text) {
   let formatted = removeBoringIntros(text);
@@ -158,52 +158,36 @@ function formatResponseText(text) {
   formatted = formatted.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
   
   // ============================================================
-  // SCHRITT 2: ALLE Zeilenumbrüche zu Leerzeichen
+  // SCHRITT 2: Zeilenumbrüche normalisieren
   // ============================================================
-  formatted = formatted.replace(/\r\n/g, ' ');
-  formatted = formatted.replace(/\r/g, ' ');
+  formatted = formatted.replace(/\r\n/g, '\n');
+  formatted = formatted.replace(/\r/g, '\n');
+  
+  // ============================================================
+  // SCHRITT 3: Nummerierte Listen → Absätze mit fetten Namen
+  // "1. Name" → "<br><br><strong>Name</strong>"
+  // ============================================================
+  formatted = formatted.replace(/\n\s*\d+\.\s+/g, '\n\n');
+  formatted = formatted.replace(/^\s*\d+\.\s+/g, '');
+  
+  // ============================================================
+  // SCHRITT 4: Bullet Points → Absätze
+  // ============================================================
+  formatted = formatted.replace(/\n\s*[•\-\*]\s+/g, '\n\n');
+  formatted = formatted.replace(/^\s*[•\-\*]\s+/g, '');
+  
+  // ============================================================
+  // SCHRITT 5: Doppelte Zeilenumbrüche → <br><br>
+  // ============================================================
+  formatted = formatted.replace(/\n{2,}/g, '<br><br>');
+  
+  // ============================================================
+  // SCHRITT 6: Einzelne Zeilenumbrüche → Leerzeichen
+  // ============================================================
   formatted = formatted.replace(/\n/g, ' ');
   
   // ============================================================
-  // SCHRITT 3: Mehrfache Leerzeichen reduzieren
-  // ============================================================
-  formatted = formatted.replace(/\s{2,}/g, ' ');
-  formatted = formatted.trim();
-  
-  // ============================================================
-  // SCHRITT 4: ERSTE Nummer "1." am Textanfang (v6 FIX!)
-  // Muss VOR den anderen Nummern-Regeln kommen
-  // ============================================================
-  
-  // Pattern: Textanfang + optional Whitespace + "1." + Whitespace
-  // Ergebnis: Fette Nummer direkt am Anfang, KEIN <br> davor
-  formatted = formatted.replace(/^\s*1\.\s+/, '<strong>1.</strong> ');
-  
-  // ============================================================
-  // SCHRITT 5: Restliche Nummern (2., 3., etc.) - Umbruch davor
-  // Pattern: Nach Satzende oder nach Text + Nummer
-  // ============================================================
-  
-  // Nach Satzzeichen + Nummer → Umbruch einfügen
-  formatted = formatted.replace(/([.!?:,])(\s+)(\d+)\.\s+/g, '$1<br><br><strong>$3.</strong> ');
-  
-  // Nach Wort + Leerzeichen + Nummer (ohne Satzzeichen davor)
-  // z.B. "...anbietet 2. kraftWerk" → "...anbietet<br><br>2. kraftWerk"
-  formatted = formatted.replace(/([a-zA-ZäöüßÄÖÜ])(\s+)(\d+)\.\s+/g, '$1<br><br><strong>$3.</strong> ');
-  
-  // ============================================================
-  // SCHRITT 6: Bullet Points
-  // ============================================================
-  formatted = formatted.replace(/([.!?:])(\s+)[•\-]\s+/g, '$1<br>• ');
-  formatted = formatted.replace(/^\s*[•\-]\s+/g, '• ');
-  
-  // ============================================================
-  // SCHRITT 7: "Zu DOMAIN wurden keine..." zusammenhalten
-  // ============================================================
-  formatted = formatted.replace(/Zu\s+<strong>/gi, 'Zu <strong>');
-  
-  // ============================================================
-  // SCHRITT 8: Cleanup
+  // SCHRITT 7: Cleanup
   // ============================================================
   
   // <br> am Anfang entfernen
@@ -212,17 +196,17 @@ function formatResponseText(text) {
   // Mehrfache <br> reduzieren (max 2)
   formatted = formatted.replace(/(<br>\s*){3,}/gi, '<br><br>');
   
+  // Doppelte Leerzeichen
+  formatted = formatted.replace(/\s{2,}/g, ' ');
+  
   // Leerzeichen vor Satzzeichen
   formatted = formatted.replace(/\s+([.!?,:;])/g, '$1');
   
-  // Leerzeichen um <br> normalisieren
+  // Leerzeichen um <br>
   formatted = formatted.replace(/\s*<br>\s*/gi, '<br>');
   
-  // Doppelte Leerzeichen nochmal
-  formatted = formatted.replace(/\s{2,}/g, ' ');
-  
-  // Leere <strong></strong> entfernen
-  formatted = formatted.replace(/<strong>\s*<\/strong>/g, '');
+  // "Zu DOMAIN" zusammenhalten
+  formatted = formatted.replace(/Zu\s+<strong>/gi, 'Zu <strong>');
   
   return formatted.trim();
 }
@@ -267,7 +251,7 @@ export default async function handler(req, res) {
     const cleanDomain = domainValidation.domain;
     const cleanIndustry = sanitizeIndustry(industry);
     
-    console.log(`🔍 AI Visibility Check: ${cleanDomain}`);
+    console.log(`🔍 AI Visibility Check: ${cleanDomain} (Branche: ${cleanIndustry || 'auto'})`);
     incrementRateLimit(clientIP);
 
     const modelWithSearch = genAI.getGenerativeModel({ 
@@ -276,7 +260,7 @@ export default async function handler(req, res) {
     });
 
     // =================================================================
-    // PHASE 1: Domain-Analyse
+    // PHASE 1: Domain-Analyse (Crawling)
     // =================================================================
     let domainAnalysis = {
       hasSchema: false,
@@ -334,121 +318,272 @@ export default async function handler(req, res) {
     }
 
     // =================================================================
-    // PHASE 2: Gemini Tests
+    // PHASE 2: Gemini Tests (NEU: Sequentiell für Branchenerkennung)
     // =================================================================
     
-    const formatInstruction = `
-
-STRIKTE FORMATIERUNG:
-- Beginne DIREKT mit "1. **Firmenname**" - KEINE Einleitung
-- Schreibe kompakt: "1. **Name** – Beschreibung 2. **Name** – Beschreibung"
-- NIEMALS Zeilenumbrüche zwischen Nummer und Firmenname
-- Die Nummer und der Firmenname MÜSSEN direkt hintereinander stehen`;
-
-    const testQueries = [
-      {
-        id: 'knowledge',
-        prompt: `Suche nach **${cleanDomain}** und beschreibe in 3-5 Sätzen: Was bietet das Unternehmen? Wo ist der Standort? Welche Infos findest du? Schreibe Firmennamen **fett**. Falls nichts gefunden: "Zu **${cleanDomain}** wurden keine Informationen gefunden."
-
-FORMATIERUNG: Beginne DIREKT mit dem Inhalt, keine Einleitung.`,
-        description: 'Bekanntheit im Web',
-        useGrounding: true
-      },
-      {
-        id: 'recommendation',
-        prompt: cleanIndustry 
-          ? `Suche die besten Anbieter für "${cleanIndustry}" in Österreich. 
-
-WICHTIG - Formatiere EXAKT so (Nummer direkt vor Firmenname):
-1. **Firmenname** – Beschreibung 2. **Firmenname** – Beschreibung 3. **Firmenname** – Beschreibung
-
-Liste 5-8 Unternehmen. Prüfe ob **${cleanDomain}** erwähnt wird.${formatInstruction}`
-          : `Suche empfehlenswerte Webentwickler/Digital-Agenturen in Österreich.
-
-WICHTIG - Formatiere EXAKT so (Nummer direkt vor Firmenname):
-1. **Firmenname** – Beschreibung 2. **Firmenname** – Beschreibung 3. **Firmenname** – Beschreibung
-
-Liste 5-8 Unternehmen.${formatInstruction}`,
-        description: 'Empfehlungen in der Branche',
-        useGrounding: true
-      },
-      {
-        id: 'reviews',
-        prompt: `Suche Bewertungen zu **${cleanDomain}** (Google Reviews, Trustpilot, etc.). Fasse zusammen: Bewertung (Sterne), Kundenmeinungen, Anzahl. Falls keine: "Zu **${cleanDomain}** wurden keine Online-Bewertungen gefunden."
-
-FORMATIERUNG: Beginne DIREKT mit dem Inhalt, keine Einleitung.`,
-        description: 'Online-Reputation',
-        useGrounding: true
-      },
-      {
-        id: 'mentions',
-        prompt: `Suche externe Erwähnungen von **${cleanDomain}**: Branchenverzeichnisse (Herold, WKO), Links, Artikel, Social Media. Falls keine: "Zu **${cleanDomain}** wurden keine externen Erwähnungen gefunden."
-
-FORMATIERUNG: Beginne DIREKT mit dem Inhalt, keine Einleitung.`,
-        description: 'Externe Erwähnungen',
-        useGrounding: true
-      }
-    ];
-
     const testResults = [];
+    let detectedIndustry = cleanIndustry; // Wird ggf. aus Test 1 überschrieben
+
+    // ==================== TEST 1: Bekanntheit ====================
+    console.log(`🧪 Test 1: Bekanntheit im Web...`);
     
-    for (const test of testQueries) {
-      try {
-        console.log(`🧪 ${test.description}...`);
-        
-        const result = await modelWithSearch.generateContent({
-          contents: [{ role: "user", parts: [{ text: test.prompt }] }],
-          tools: [{ googleSearch: {} }]
-        });
-        
-        let text = result.response.text();
-        text = formatResponseText(text);
-        
-        const domainBase = cleanDomain.replace(/\.[^.]+$/, '');
-        const domainMentioned = text.toLowerCase().includes(cleanDomain) ||
-                               text.toLowerCase().includes(domainBase);
-        
-        const textLower = text.toLowerCase();
-        const positiveIndicators = ['empfehlenswert', 'qualität', 'professionell', 'zuverlässig', 'gute bewertungen', 'zufrieden', 'top', 'ausgezeichnet', 'spezialist', 'experte', 'sterne', '4.', '4,', '5.', '5,'];
-        const negativeIndicators = ['keine informationen', 'nicht gefunden', 'keine bewertungen', 'nicht bekannt', 'keine erwähnungen', 'wurden keine', 'nichts gefunden'];
-        
-        const posScore = positiveIndicators.filter(w => textLower.includes(w)).length;
-        const negScore = negativeIndicators.filter(w => textLower.includes(w)).length;
-        
-        let sentiment = 'neutral';
-        if (domainMentioned && posScore > negScore) sentiment = 'positiv';
-        else if (negScore > posScore || !domainMentioned) sentiment = 'negativ';
-        
-        const domainRegex = /(?:https?:\/\/)?(?:www\.)?([a-zA-Z0-9][-a-zA-Z0-9]*\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})?)/gi;
-        const matches = text.match(domainRegex) || [];
-        const competitors = [...new Set(matches)]
-          .map(d => d.replace(/^https?:\/\//, '').replace(/^www\./, '').toLowerCase())
-          .filter(c => !c.includes(domainBase) && !c.includes('google') && !c.includes('schema.org'))
-          .slice(0, 8);
-        
-        testResults.push({
-          id: test.id,
-          description: test.description,
-          mentioned: domainMentioned,
-          sentiment,
-          competitors,
-          response: text.length > 1000 ? text.substring(0, 1000) + '...' : text,
-          groundingUsed: true
-        });
-        
-      } catch (error) {
-        testResults.push({
-          id: test.id,
-          description: test.description,
-          mentioned: false,
-          sentiment: 'fehler',
-          competitors: [],
-          response: '❌ Test fehlgeschlagen: ' + error.message,
-          groundingUsed: true
-        });
+    let knowledgeResponse = '';
+    try {
+      const knowledgePrompt = `Suche nach **${cleanDomain}** und beschreibe kurz:
+- Was bietet dieses Unternehmen an? (Produkte/Dienstleistungen)
+- In welcher Branche ist es tätig?
+- Wo ist der Standort?
+
+Antworte in 3-5 Sätzen. Schreibe Firmennamen **fett**. 
+Falls nichts gefunden: "Zu **${cleanDomain}** wurden keine Informationen gefunden."
+
+WICHTIG: Beginne DIREKT mit dem Inhalt, keine Einleitung.`;
+
+      const result = await modelWithSearch.generateContent({
+        contents: [{ role: "user", parts: [{ text: knowledgePrompt }] }],
+        tools: [{ googleSearch: {} }]
+      });
+      
+      knowledgeResponse = result.response.text();
+      const formattedKnowledge = formatResponseText(knowledgeResponse);
+      
+      const domainBase = cleanDomain.replace(/\.[^.]+$/, '');
+      const mentioned = formattedKnowledge.toLowerCase().includes(cleanDomain) ||
+                        formattedKnowledge.toLowerCase().includes(domainBase);
+      
+      testResults.push({
+        id: 'knowledge',
+        description: 'Bekanntheit im Web',
+        mentioned,
+        sentiment: mentioned ? 'neutral' : 'negativ',
+        competitors: [],
+        response: formattedKnowledge,
+        groundingUsed: true
+      });
+      
+      // Branche aus der Antwort extrahieren, falls nicht angegeben
+      if (!cleanIndustry && mentioned) {
+        detectedIndustry = await detectIndustryFromResponse(modelWithSearch, knowledgeResponse, cleanDomain);
+        console.log(`   → Branche erkannt: ${detectedIndustry || 'unbekannt'}`);
       }
       
-      await new Promise(resolve => setTimeout(resolve, 800));
+    } catch (error) {
+      testResults.push({
+        id: 'knowledge',
+        description: 'Bekanntheit im Web',
+        mentioned: false,
+        sentiment: 'fehler',
+        competitors: [],
+        response: '❌ Test fehlgeschlagen: ' + error.message,
+        groundingUsed: true
+      });
+    }
+    
+    await new Promise(resolve => setTimeout(resolve, 800));
+
+    // ==================== TEST 2: Empfehlungen (mit erkannter Branche) ====================
+    console.log(`🧪 Test 2: Empfehlungen in der Branche (${detectedIndustry || 'auto'})...`);
+    
+    try {
+      // Prompt basierend auf Branche ODER Domain-basierte Konkurrenzsuche
+      const recommendationPrompt = detectedIndustry
+        ? `Suche nach den besten Anbietern für "${detectedIndustry}" in Österreich.
+
+Nenne 5-8 empfehlenswerte Unternehmen. Für jedes Unternehmen schreibe einen kurzen Absatz:
+**Firmenname** – Was sie anbieten und was sie auszeichnet.
+
+Prüfe auch: Wird **${cleanDomain}** in diesem Bereich erwähnt oder empfohlen?
+
+WICHTIG: 
+- Beginne DIREKT mit dem ersten Unternehmen
+- KEINE Nummerierung (1., 2., etc.)
+- Jedes Unternehmen als eigener Absatz
+- Firmennamen immer **fett**`
+
+        : `Suche zuerst, was **${cleanDomain}** anbietet.
+Dann finde 5-8 ähnliche Unternehmen/Konkurrenten, die DIESELBEN oder ähnliche Produkte/Dienstleistungen anbieten.
+
+Für jedes Unternehmen schreibe einen kurzen Absatz:
+**Firmenname** – Was sie anbieten und warum sie relevant sind.
+
+WICHTIG:
+- Beginne DIREKT mit dem ersten Unternehmen
+- KEINE Nummerierung (1., 2., etc.)
+- Jedes Unternehmen als eigener Absatz
+- Firmennamen immer **fett**
+- Suche Konkurrenten in DERSELBEN Branche wie ${cleanDomain}`;
+
+      const result = await modelWithSearch.generateContent({
+        contents: [{ role: "user", parts: [{ text: recommendationPrompt }] }],
+        tools: [{ googleSearch: {} }]
+      });
+      
+      let text = formatResponseText(result.response.text());
+      
+      const domainBase = cleanDomain.replace(/\.[^.]+$/, '');
+      const mentioned = text.toLowerCase().includes(cleanDomain) ||
+                        text.toLowerCase().includes(domainBase);
+      
+      // Konkurrenten extrahieren
+      const domainRegex = /(?:https?:\/\/)?(?:www\.)?([a-zA-Z0-9][-a-zA-Z0-9]*\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})?)/gi;
+      const matches = text.match(domainRegex) || [];
+      const competitors = [...new Set(matches)]
+        .map(d => d.replace(/^https?:\/\//, '').replace(/^www\./, '').toLowerCase())
+        .filter(c => !c.includes(domainBase) && !c.includes('google') && !c.includes('schema.org'))
+        .slice(0, 8);
+      
+      testResults.push({
+        id: 'recommendation',
+        description: 'Empfehlungen in der Branche',
+        mentioned,
+        sentiment: mentioned ? 'positiv' : 'negativ',
+        competitors,
+        response: text.length > 1200 ? text.substring(0, 1200) + '...' : text,
+        groundingUsed: true
+      });
+      
+    } catch (error) {
+      testResults.push({
+        id: 'recommendation',
+        description: 'Empfehlungen in der Branche',
+        mentioned: false,
+        sentiment: 'fehler',
+        competitors: [],
+        response: '❌ Test fehlgeschlagen: ' + error.message,
+        groundingUsed: true
+      });
+    }
+    
+    await new Promise(resolve => setTimeout(resolve, 800));
+
+    // ==================== TEST 3: Bewertungen ====================
+    console.log(`🧪 Test 3: Online-Reputation...`);
+    
+    try {
+      const reviewsPrompt = `Suche nach Bewertungen und Rezensionen zu **${cleanDomain}**.
+
+Prüfe: Google Reviews, Trustpilot, ProvenExpert, Kununu und ähnliche Plattformen.
+
+Fasse zusammen:
+- Bewertung (Sterne/Score)
+- Was sagen Kunden?
+- Wie viele Bewertungen gibt es?
+
+Falls keine Bewertungen gefunden: "Zu **${cleanDomain}** wurden keine Online-Bewertungen gefunden."
+
+WICHTIG: Beginne DIREKT mit dem Inhalt, keine Einleitung wie "Okay" oder "Ich werde".`;
+
+      const result = await modelWithSearch.generateContent({
+        contents: [{ role: "user", parts: [{ text: reviewsPrompt }] }],
+        tools: [{ googleSearch: {} }]
+      });
+      
+      let text = formatResponseText(result.response.text());
+      
+      const domainBase = cleanDomain.replace(/\.[^.]+$/, '');
+      const mentioned = text.toLowerCase().includes(cleanDomain) ||
+                        text.toLowerCase().includes(domainBase);
+      
+      // Sentiment basierend auf Bewertungen
+      const textLower = text.toLowerCase();
+      const hasPositive = /\b[4-5][.,]\d?\s*(sterne|stars|von\s*5)/i.test(text) ||
+                          textLower.includes('empfehlen') ||
+                          textLower.includes('zufrieden') ||
+                          textLower.includes('positiv');
+      const hasNegative = textLower.includes('keine bewertungen') ||
+                          textLower.includes('nicht gefunden') ||
+                          textLower.includes('wurden keine');
+      
+      let sentiment = 'neutral';
+      if (hasPositive && !hasNegative) sentiment = 'positiv';
+      else if (hasNegative) sentiment = 'negativ';
+      
+      testResults.push({
+        id: 'reviews',
+        description: 'Online-Reputation',
+        mentioned,
+        sentiment,
+        competitors: [],
+        response: text,
+        groundingUsed: true
+      });
+      
+    } catch (error) {
+      testResults.push({
+        id: 'reviews',
+        description: 'Online-Reputation',
+        mentioned: false,
+        sentiment: 'fehler',
+        competitors: [],
+        response: '❌ Test fehlgeschlagen: ' + error.message,
+        groundingUsed: true
+      });
+    }
+    
+    await new Promise(resolve => setTimeout(resolve, 800));
+
+    // ==================== TEST 4: Externe Erwähnungen ====================
+    console.log(`🧪 Test 4: Externe Erwähnungen...`);
+    
+    try {
+      const mentionsPrompt = `Suche nach externen Erwähnungen von **${cleanDomain}**:
+
+Prüfe:
+- Branchenverzeichnisse (Herold, WKO, Gelbe Seiten, etc.)
+- Artikel und Blogs
+- Social Media Profile
+- Andere Websites, die auf ${cleanDomain} verlinken
+
+Liste die gefundenen Erwähnungen auf. Schreibe Quellennamen **fett**.
+
+Falls nichts gefunden: "Zu **${cleanDomain}** wurden keine externen Erwähnungen gefunden."
+
+WICHTIG: Beginne DIREKT mit dem Inhalt, keine Einleitung.`;
+
+      const result = await modelWithSearch.generateContent({
+        contents: [{ role: "user", parts: [{ text: mentionsPrompt }] }],
+        tools: [{ googleSearch: {} }]
+      });
+      
+      let text = formatResponseText(result.response.text());
+      
+      const domainBase = cleanDomain.replace(/\.[^.]+$/, '');
+      const mentioned = text.toLowerCase().includes(cleanDomain) ||
+                        text.toLowerCase().includes(domainBase);
+      
+      const textLower = text.toLowerCase();
+      const hasNegative = textLower.includes('keine erwähnungen') ||
+                          textLower.includes('nicht gefunden') ||
+                          textLower.includes('wurden keine');
+      
+      // Erwähnte Domains extrahieren
+      const domainRegex = /(?:https?:\/\/)?(?:www\.)?([a-zA-Z0-9][-a-zA-Z0-9]*\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})?)/gi;
+      const matches = text.match(domainRegex) || [];
+      const mentionedDomains = [...new Set(matches)]
+        .map(d => d.replace(/^https?:\/\//, '').replace(/^www\./, '').toLowerCase())
+        .filter(c => !c.includes(domainBase) && !c.includes('google') && !c.includes('schema.org'))
+        .slice(0, 8);
+      
+      testResults.push({
+        id: 'mentions',
+        description: 'Externe Erwähnungen',
+        mentioned,
+        sentiment: hasNegative ? 'negativ' : 'neutral',
+        competitors: mentionedDomains,
+        response: text,
+        groundingUsed: true
+      });
+      
+    } catch (error) {
+      testResults.push({
+        id: 'mentions',
+        description: 'Externe Erwähnungen',
+        mentioned: false,
+        sentiment: 'fehler',
+        competitors: [],
+        response: '❌ Test fehlgeschlagen: ' + error.message,
+        groundingUsed: true
+      });
     }
 
     // =================================================================
@@ -518,7 +653,7 @@ FORMATIERUNG: Beginne DIREKT mit dem Inhalt, keine Einleitung.`,
 
     await trackVisibilityCheck({
       domain: cleanDomain,
-      industry: cleanIndustry,
+      industry: detectedIndustry || cleanIndustry,
       score,
       scoreLabel: scoreCategoryLabel,
       mentionCount,
@@ -530,7 +665,7 @@ FORMATIERUNG: Beginne DIREKT mit dem Inhalt, keine Einleitung.`,
     return res.status(200).json({
       success: true,
       domain: cleanDomain,
-      industry: cleanIndustry || null,
+      industry: detectedIndustry || cleanIndustry || null,
       timestamp: new Date().toISOString(),
       score: { total: score, category: scoreCategory, label: scoreCategoryLabel, color: scoreCategoryColor, breakdown: scoreBreakdown },
       domainAnalysis: {
@@ -549,5 +684,33 @@ FORMATIERUNG: Beginne DIREKT mit dem Inhalt, keine Einleitung.`,
   } catch (error) {
     console.error("❌ Error:", error);
     return res.status(500).json({ success: false, message: 'Fehler: ' + error.message });
+  }
+}
+
+// =================================================================
+// HELPER: Branche aus Antwort extrahieren
+// =================================================================
+async function detectIndustryFromResponse(model, knowledgeText, domain) {
+  try {
+    const extractPrompt = `Basierend auf diesem Text über ${domain}:
+
+"${knowledgeText.substring(0, 500)}"
+
+In welcher Branche ist dieses Unternehmen tätig? 
+Antworte mit NUR 1-3 Wörtern (z.B. "Luftfracht Transport", "Webentwicklung", "Gastronomie", "E-Commerce").
+Keine Erklärung, nur die Branche.`;
+
+    const result = await model.generateContent(extractPrompt);
+    const industry = result.response.text().trim();
+    
+    // Validierung: Max 50 Zeichen, keine Sätze
+    if (industry.length > 50 || industry.includes('.')) {
+      return null;
+    }
+    
+    return industry;
+  } catch (e) {
+    console.log('Branchenerkennung fehlgeschlagen:', e.message);
+    return null;
   }
 }
