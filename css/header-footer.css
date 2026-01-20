@@ -95,7 +95,7 @@
     height: 40px;
     width: 40px;
     font-size: 1.2rem;
-    color: var(--text-color-muted);
+    color: var(--text-color);
     opacity: 0.7;
     transition: all 0.3s ease;
     text-decoration: none;
