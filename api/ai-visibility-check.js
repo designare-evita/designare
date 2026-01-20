@@ -1,5 +1,5 @@
 // api/ai-visibility-check.js - KI-Sichtbarkeits-Check mit Grounding + Formatierung
-// Version 5: RADIKALER Listen-Fix - Alle Umbrüche weg, dann gezielt einfügen
+// Version 6: Fix für erste Listennummer "1." am Textanfang
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -108,7 +108,6 @@ function incrementRateLimit(ip) {
     rateLimitMap.set(ip, { date: today, count: usage.count + 1 });
   }
   
-  // Cleanup alte Einträge
   for (const [key, value] of rateLimitMap.entries()) {
     if (value.date !== today) rateLimitMap.delete(key);
   }
@@ -148,7 +147,7 @@ function removeBoringIntros(text) {
 }
 
 // =================================================================
-// HELPER: Text formatieren (v5 - RADIKALER ANSATZ)
+// HELPER: Text formatieren (v6 - FIX FÜR ERSTE NUMMER)
 // =================================================================
 function formatResponseText(text) {
   let formatted = removeBoringIntros(text);
@@ -159,8 +158,7 @@ function formatResponseText(text) {
   formatted = formatted.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
   
   // ============================================================
-  // SCHRITT 2: ALLE Zeilenumbrüche zu Leerzeichen (RADIKAL!)
-  // Das löst das Problem, dass Gemini überall Umbrüche einbaut
+  // SCHRITT 2: ALLE Zeilenumbrüche zu Leerzeichen
   // ============================================================
   formatted = formatted.replace(/\r\n/g, ' ');
   formatted = formatted.replace(/\r/g, ' ');
@@ -170,23 +168,28 @@ function formatResponseText(text) {
   // SCHRITT 3: Mehrfache Leerzeichen reduzieren
   // ============================================================
   formatted = formatted.replace(/\s{2,}/g, ' ');
+  formatted = formatted.trim();
   
   // ============================================================
-  // SCHRITT 4: Nummerierte Listen - Umbruch VOR der Nummer
-  // Pattern: Satzende (. oder :) + Leerzeichen + Nummer + Punkt
-  // NICHT am Textanfang, nur wenn davor ein Satz endet
+  // SCHRITT 4: ERSTE Nummer "1." am Textanfang (v6 FIX!)
+  // Muss VOR den anderen Nummern-Regeln kommen
+  // ============================================================
+  
+  // Pattern: Textanfang + optional Whitespace + "1." + Whitespace
+  // Ergebnis: Fette Nummer direkt am Anfang, KEIN <br> davor
+  formatted = formatted.replace(/^\s*1\.\s+/, '<strong>1.</strong> ');
+  
+  // ============================================================
+  // SCHRITT 5: Restliche Nummern (2., 3., etc.) - Umbruch davor
+  // Pattern: Nach Satzende oder nach Text + Nummer
   // ============================================================
   
   // Nach Satzzeichen + Nummer → Umbruch einfügen
-  formatted = formatted.replace(/([.!?:])(\s+)(\d+)\.\s+/g, '$1<br><br><strong>$3.</strong> ');
+  formatted = formatted.replace(/([.!?:,])(\s+)(\d+)\.\s+/g, '$1<br><br><strong>$3.</strong> ');
   
-  // Spezialfall: "– 2." oder "- 2." (Gedankenstrich vor Nummer)
-  formatted = formatted.replace(/([–-])(\s+)(\d+)\.\s+/g, '$1<br><br><strong>$3.</strong> ');
-  
-  // ============================================================
-  // SCHRITT 5: Erste Nummer am Textanfang (ohne <br> davor)
-  // ============================================================
-  formatted = formatted.replace(/^\s*(\d+)\.\s+/g, '<strong>$1.</strong> ');
+  // Nach Wort + Leerzeichen + Nummer (ohne Satzzeichen davor)
+  // z.B. "...anbietet 2. kraftWerk" → "...anbietet<br><br>2. kraftWerk"
+  formatted = formatted.replace(/([a-zA-ZäöüßÄÖÜ])(\s+)(\d+)\.\s+/g, '$1<br><br><strong>$3.</strong> ');
   
   // ============================================================
   // SCHRITT 6: Bullet Points
@@ -195,8 +198,7 @@ function formatResponseText(text) {
   formatted = formatted.replace(/^\s*[•\-]\s+/g, '• ');
   
   // ============================================================
-  // SCHRITT 7: "Zu DOMAIN wurden keine..." Fix
-  // Das "Zu" und die Domain sollen auf einer Zeile bleiben
+  // SCHRITT 7: "Zu DOMAIN wurden keine..." zusammenhalten
   // ============================================================
   formatted = formatted.replace(/Zu\s+<strong>/gi, 'Zu <strong>');
   
@@ -207,17 +209,20 @@ function formatResponseText(text) {
   // <br> am Anfang entfernen
   formatted = formatted.replace(/^(<br>\s*)+/gi, '');
   
-  // Mehrfache <br> reduzieren
+  // Mehrfache <br> reduzieren (max 2)
   formatted = formatted.replace(/(<br>\s*){3,}/gi, '<br><br>');
   
   // Leerzeichen vor Satzzeichen
   formatted = formatted.replace(/\s+([.!?,:;])/g, '$1');
   
-  // Leerzeichen nach <br> normalisieren
-  formatted = formatted.replace(/<br>\s+/gi, '<br>');
+  // Leerzeichen um <br> normalisieren
+  formatted = formatted.replace(/\s*<br>\s*/gi, '<br>');
   
   // Doppelte Leerzeichen nochmal
   formatted = formatted.replace(/\s{2,}/g, ' ');
+  
+  // Leere <strong></strong> entfernen
+  formatted = formatted.replace(/<strong>\s*<\/strong>/g, '');
   
   return formatted.trim();
 }
@@ -332,39 +337,54 @@ export default async function handler(req, res) {
     // PHASE 2: Gemini Tests
     // =================================================================
     
-    // Formatierungsanweisung - NOCH STRIKTER
     const formatInstruction = `
 
 STRIKTE FORMATIERUNG:
-- Beginne DIREKT mit Inhalt, KEINE Einleitung
-- Schreibe ALLES als Fließtext OHNE Zeilenumbrüche
-- Bei Listen: "1. Name – Beschreibung 2. Name – Beschreibung" (alles in einer Zeile)
-- NIEMALS Zeilenumbrüche zwischen Nummer und Text`;
+- Beginne DIREKT mit "1. **Firmenname**" - KEINE Einleitung
+- Schreibe kompakt: "1. **Name** – Beschreibung 2. **Name** – Beschreibung"
+- NIEMALS Zeilenumbrüche zwischen Nummer und Firmenname
+- Die Nummer und der Firmenname MÜSSEN direkt hintereinander stehen`;
 
     const testQueries = [
       {
         id: 'knowledge',
-        prompt: `Suche nach **${cleanDomain}** und beschreibe in 3-5 Sätzen: Was bietet das Unternehmen? Wo ist der Standort? Welche Infos findest du? Schreibe Firmennamen **fett**. Falls nichts gefunden: "Zu **${cleanDomain}** wurden keine Informationen gefunden."${formatInstruction}`,
+        prompt: `Suche nach **${cleanDomain}** und beschreibe in 3-5 Sätzen: Was bietet das Unternehmen? Wo ist der Standort? Welche Infos findest du? Schreibe Firmennamen **fett**. Falls nichts gefunden: "Zu **${cleanDomain}** wurden keine Informationen gefunden."
+
+FORMATIERUNG: Beginne DIREKT mit dem Inhalt, keine Einleitung.`,
         description: 'Bekanntheit im Web',
         useGrounding: true
       },
       {
         id: 'recommendation',
         prompt: cleanIndustry 
-          ? `Suche die besten Anbieter für "${cleanIndustry}" in Österreich. Liste 5-8 Unternehmen als Fließtext: "1. **Name** – Beschreibung 2. **Name** – Beschreibung" usw. Prüfe ob **${cleanDomain}** erwähnt wird.${formatInstruction}`
-          : `Suche empfehlenswerte Webentwickler/Digital-Agenturen in Österreich. Liste 5-8 als Fließtext: "1. **Name** – Beschreibung 2. **Name** – Beschreibung" usw.${formatInstruction}`,
+          ? `Suche die besten Anbieter für "${cleanIndustry}" in Österreich. 
+
+WICHTIG - Formatiere EXAKT so (Nummer direkt vor Firmenname):
+1. **Firmenname** – Beschreibung 2. **Firmenname** – Beschreibung 3. **Firmenname** – Beschreibung
+
+Liste 5-8 Unternehmen. Prüfe ob **${cleanDomain}** erwähnt wird.${formatInstruction}`
+          : `Suche empfehlenswerte Webentwickler/Digital-Agenturen in Österreich.
+
+WICHTIG - Formatiere EXAKT so (Nummer direkt vor Firmenname):
+1. **Firmenname** – Beschreibung 2. **Firmenname** – Beschreibung 3. **Firmenname** – Beschreibung
+
+Liste 5-8 Unternehmen.${formatInstruction}`,
         description: 'Empfehlungen in der Branche',
         useGrounding: true
       },
       {
         id: 'reviews',
-        prompt: `Suche Bewertungen zu **${cleanDomain}** (Google Reviews, Trustpilot, etc.). Fasse zusammen: Bewertung (Sterne), Kundenmeinungen, Anzahl. Falls keine: "Zu **${cleanDomain}** wurden keine Online-Bewertungen gefunden."${formatInstruction}`,
+        prompt: `Suche Bewertungen zu **${cleanDomain}** (Google Reviews, Trustpilot, etc.). Fasse zusammen: Bewertung (Sterne), Kundenmeinungen, Anzahl. Falls keine: "Zu **${cleanDomain}** wurden keine Online-Bewertungen gefunden."
+
+FORMATIERUNG: Beginne DIREKT mit dem Inhalt, keine Einleitung.`,
         description: 'Online-Reputation',
         useGrounding: true
       },
       {
         id: 'mentions',
-        prompt: `Suche externe Erwähnungen von **${cleanDomain}**: Branchenverzeichnisse (Herold, WKO), Links, Artikel, Social Media. Liste als Fließtext. Falls keine: "Zu **${cleanDomain}** wurden keine externen Erwähnungen gefunden."${formatInstruction}`,
+        prompt: `Suche externe Erwähnungen von **${cleanDomain}**: Branchenverzeichnisse (Herold, WKO), Links, Artikel, Social Media. Falls keine: "Zu **${cleanDomain}** wurden keine externen Erwähnungen gefunden."
+
+FORMATIERUNG: Beginne DIREKT mit dem Inhalt, keine Einleitung.`,
         description: 'Externe Erwähnungen',
         useGrounding: true
       }
