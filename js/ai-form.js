@@ -238,12 +238,12 @@ export const initAiForm = () => {
             
             const bookingTriggers = [
                 'termin', 'buchung', 'buchen', 'rückruf', 'anrufen', 
-                'sprechen', 'kontakt', 'meeting', 'appointment', 'erreichen'
+                'sprechen', 'kontakt', 'meeting', 'appointment', 'erreichen', 'treffen', 'call', 'telefonat', 'beratung', 'projekt besprechen'
             ];
             
             const confirmationKeywords = [
                 'ja', 'gerne', 'okay', 'ok', 'bitte', 'genau', 'richtig', 
-                'korrekt', 'stimmt', 'passt', 'mach das', 'hilf mir'
+                'korrekt', 'stimmt', 'passt', 'mach das', 'hilf mir', 'super', 'perfekt', 'natürlich', 'klar', 'unbedingt'
             ];
             
             const hasBookingIntent = bookingTriggers.some(trigger => 
@@ -254,38 +254,23 @@ export const initAiForm = () => {
                 userInput.toLowerCase().includes(keyword)
             );
             
+            // Suche letzte KI-Nachricht (flexibel für assistant oder model)
             const lastAiMessage = state.chatHistory
-                .filter(msg => msg.role === 'assistant')
+                .filter(msg => msg.role === 'assistant' || msg.role === 'model')
                 .pop();
             
             const wasBookingQuestion = lastAiMessage && 
-                lastAiMessage.content.includes('[BOOKING_CONFIRM_REQUEST]');
+                (lastAiMessage.content.includes('[BOOKING_CONFIRM_REQUEST]') || 
+                 lastAiMessage.content.toLowerCase().includes('rückruf-termin schauen'));
 
-            if (hasConfirmation && wasBookingQuestion) {
-                const requestData = {
-                    history: state.chatHistory,
-                    message: userInput,
-                    checkBookingIntent: true,
-                    isConfirmation: true
-                };
-                
-                try {
-                    return await this.safeFetch('/api/ask-gemini', {
-                        method: 'POST',
-                        body: JSON.stringify(requestData)
-                    });
-                } catch (error) {
-                    return {
-                        answer: FallbackResponses.responses.booking[0],
-                        isFallback: true
-                    };
-                }
-            }
+            // KORREKTUR: checkBookingIntent muss true sein, wenn es eine Bestätigung ist!
+            const checkIntent = hasBookingIntent || (wasBookingQuestion && hasConfirmation);
 
             const requestData = {
                 history: state.chatHistory,
                 message: userInput,
-                checkBookingIntent: hasBookingIntent
+                checkBookingIntent: checkIntent,
+                isConfirmation: wasBookingQuestion && hasConfirmation
             };
             
             try {
@@ -731,16 +716,19 @@ export const initAiForm = () => {
         if (chatInput) chatInput.disabled = true;
         if (submitButton) submitButton.disabled = true;
 
+        // Kontext VOR der Antwort prüfen (War die letzte Nachricht eine Buchungs-Frage?)
+        const lastAiBefore = state.chatHistory
+            .filter(msg => msg.role === 'assistant' || msg.role === 'model')
+            .pop();
+        const wasBookingQuestionBefore = lastAiBefore && (
+            lastAiBefore.content.includes('[BOOKING_CONFIRM_REQUEST]') ||
+            lastAiBefore.content.toLowerCase().includes('rückruf-termin schauen')
+        );
+
         ChatUI.addMessage(userInput, 'user');
         ChatUI.showTypingIndicator();
 
         try {
-            const lastAiMessageBeforeReply = state.chatHistory
-                .filter(msg => msg.role === 'assistant')
-                .pop();
-            const wasBookingQuestion = lastAiMessageBeforeReply &&
-                lastAiMessageBeforeReply.content.includes('[BOOKING_CONFIRM_REQUEST]');
-
             const data = await ApiHandler.sendToEvita(userInput);
             ChatUI.removeTypingIndicator();
 
@@ -760,10 +748,6 @@ export const initAiForm = () => {
                 answer = data.message;
             }
 
-            if (isFallback) {
-                console.log("ℹ️ Fallback-Antwort verwendet");
-            }
-
             const textToAnimate = answer
                 .replace(/\[BOOKING_CONFIRM_REQUEST\]/g, '')
                 .replace(/\[buchung_starten\]/g, '')
@@ -775,12 +759,13 @@ export const initAiForm = () => {
                 await typeWriterEffect(aiMsgElement, textToAnimate, 25);
             }
 
-            const shouldLaunchAfterConfirmation = wasBookingQuestion && (
+            // Trigger Booking Modal (falls Bestätigung erfolgt ist)
+            const shouldLaunch = wasBookingQuestionBefore && (
                 answer.includes('[buchung_starten]') ||
                 answer.includes('[booking_starten]')
             );
 
-            if (shouldLaunchAfterConfirmation) {
+            if (shouldLaunch) {
                 setTimeout(() => {
                     BookingModal.launch();
                 }, 800);
@@ -831,42 +816,34 @@ export const initAiForm = () => {
     }
 
     // ===================================================================
-    // EVENT LISTENERS SETUP - MIT DIREKTEM MODAL-ÖFFNEN
+    // EVENT LISTENERS SETUP
     // ===================================================================
     function initializeEventListeners() {
         console.log("🔧 Initialisiere Event-Listener");
         
         DOM = getDOM();
 
-        // ✅ NEU: Klick/Focus auf #ai-question öffnet direkt das Modal
         const aiQuestionInput = document.getElementById('ai-question');
         if (aiQuestionInput && !aiQuestionInput.hasAttribute('data-modal-listener-added')) {
             aiQuestionInput.setAttribute('data-modal-listener-added', 'true');
             
-            // Bei Klick: Modal öffnen
             aiQuestionInput.addEventListener('click', (e) => {
                 e.preventDefault();
                 openEvitaChatWithWelcome();
             });
             
-            // Bei Focus (Tab-Navigation): Modal öffnen
             aiQuestionInput.addEventListener('focus', (e) => {
                 e.preventDefault();
-                // Blur das Input sofort wieder
                 aiQuestionInput.blur();
                 openEvitaChatWithWelcome();
             });
             
-            // Bei Touch (Mobile): Modal öffnen
             aiQuestionInput.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 openEvitaChatWithWelcome();
             }, { passive: false });
-            
-            console.log("✅ #ai-question öffnet jetzt direkt das Modal");
         }
 
-        // Haupt-Formular auf der Startseite (Submit mit Text)
         if (DOM.aiForm && !DOM.aiForm.hasAttribute('data-listener-added')) {
             DOM.aiForm.setAttribute('data-listener-added', 'true');
             DOM.aiForm.addEventListener('submit', (e) => {
@@ -876,23 +853,19 @@ export const initAiForm = () => {
                 ChatUI.resetChat();
                 ModalController.openChatModal();
                 
-                // Wenn Text eingegeben wurde, diesen als erste Nachricht senden
                 if (userInput) {
                     setTimeout(() => {
                         handleUserMessage(userInput);
                     }, 150);
                     if (DOM.aiQuestionInput) DOM.aiQuestionInput.value = '';
                 } else {
-                    // Nur Begrüßung zeigen
                     setTimeout(() => {
                         addWelcomeMessageToChat();
                     }, 300);
                 }
             });
-            console.log("✅ Haupt-Formular Listener hinzugefügt");
         }
 
-        // Chat-Formular im Modal
         const setupChatFormListener = () => {
             const chatForm = document.getElementById('ai-chat-form');
             if (chatForm && !chatForm.hasAttribute('data-listener-added')) {
@@ -909,11 +882,9 @@ export const initAiForm = () => {
                         }
                     }
                 });
-                console.log("✅ Chat-Form Listener hinzugefügt");
             }
         };
 
-        // MutationObserver für dynamisch geladene Elemente
         const observer = new MutationObserver((mutations) => {
             for (const mutation of mutations) {
                 if (mutation.addedNodes.length) {
@@ -925,7 +896,6 @@ export const initAiForm = () => {
         observer.observe(document.body, { childList: true, subtree: true });
         setupChatFormListener();
 
-        // Header-Chat-Button
         const headerChatButton = document.getElementById('evita-chat-button');
         if (headerChatButton && !headerChatButton.hasAttribute('data-listener-added')) {
             headerChatButton.setAttribute('data-listener-added', 'true');
@@ -933,10 +903,8 @@ export const initAiForm = () => {
                 e.preventDefault();
                 openEvitaChatWithWelcome();
             });
-            console.log("✅ Header-Chat-Button Listener hinzugefügt");
         }
 
-        // Modal schließen
         const closeButtons = document.querySelectorAll('#close-ai-response-modal-top, #close-ai-response-modal-bottom');
         closeButtons.forEach(button => {
             if (button && !button.hasAttribute('data-listener-added')) {
@@ -956,15 +924,10 @@ export const initAiForm = () => {
         }
 
         state.initialized = true;
-        console.log("✅ Event-Listener initialisiert");
     }
 
-    // ===================================================================
-    // HELPER: Chat mit Begrüßung öffnen
-    // ===================================================================
-    
     const welcomeMessages = [
-       "Hallo! Ich bin Evita, Michaels KI-Assistentin. Womit kann ich dir heute helfen?",
+        "Hallo! Ich bin Evita, Michaels KI-Assistentin. Womit kann ich dir heute helfen?",
         "Hey! Schön, dass du da bist. Ich bin Evita – Michaels KI-Assistentin. Womit kann ich dir heute helfen?",
         "Servus! Evita hier, Michaels digitale Komplizin. Was möchtest du wissen?",
         "Hi! Ich bin Evita. Michael ist gerade beschäftigt, aber ich kann dir sicher weiterhelfen. Was liegt an?",
@@ -976,14 +939,9 @@ export const initAiForm = () => {
         "Servus! Evita hier. Ich bin die KI-Assistenz , Michael schreibt den Code und der Hund ist für die gute Laune zuständig. Wobei kann ich dir heute helfen?"
     ];
     
-    function getRandomWelcomeMessage() {
-        return welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
-    }
-    
     function openEvitaChatWithWelcome() {
         ChatUI.resetChat();
         ModalController.openChatModal();
-        
         setTimeout(() => {
             addWelcomeMessageToChat();
         }, 300);
@@ -992,13 +950,11 @@ export const initAiForm = () => {
     async function addWelcomeMessageToChat() {
         const chatHistory = document.getElementById('ai-chat-history');
         if (chatHistory && chatHistory.children.length === 0) {
-            const randomGreeting = getRandomWelcomeMessage();
-            // Erstelle leere Message-Bubble, dann streame den Text
+            const randomGreeting = welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
             const msgElement = ChatUI.addMessage(randomGreeting, 'ai', false);
             if (msgElement) {
                 await typeWriterEffect(msgElement, randomGreeting, 20);
             }
-            console.log("✅ Begrüßung gestreamt:", randomGreeting);
         }
     }
 
