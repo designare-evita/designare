@@ -133,67 +133,57 @@ export default async function handler(req, res) {
     // =================================================================
     // BOOKING INTENT-ERKENNUNG
     // =================================================================
-    if (checkBookingIntent === true) {
-        console.log('📅 Booking-Intent Prüfung für:', userMessage);
+if (checkBookingIntent === true) {
+    console.log('📅 Booking-Intent Prüfung für:', userMessage);
+    
+    // Wir suchen die letzte Nachricht der KI (flexibel für 'assistant' oder 'model')
+    const lastAiMessage = history && Array.isArray(history) 
+        ? [...history].reverse().find(msg => msg.role === 'assistant' || msg.role === 'model') 
+        : null;
+    
+    // Prüfe auf das Tag oder den spezifischen Wortlaut der Rückfrage
+    const wasBookingQuestion = lastAiMessage && 
+        (lastAiMessage.content.includes('[BOOKING_CONFIRM_REQUEST]') || 
+         lastAiMessage.content.toLowerCase().includes('rückruf-termin schauen'));
+    
+    // ===== FALL 1: User bestätigt eine vorherige Booking-Rückfrage =====
+    if (wasBookingQuestion) {
+        const confirmationKeywords = [
+            'ja', 'gerne', 'okay', 'ok', 'bitte', 'genau', 'richtig', 
+            'korrekt', 'stimmt', 'passt', 'mach das', 'hilf mir', 
+            'super', 'perfekt', 'natürlich', 'klar', 'unbedingt',
+            'auf jeden fall', 'sicher', 'gern', 'würde ich', 'bitte sehr'
+        ];
         
-        // Prüfe ob die letzte AI-Nachricht eine Booking-Rückfrage war
-        const lastAiMessage = history && history.length > 0 
-            ? history.filter(msg => msg.role === 'assistant').pop() 
-            : null;
+        const userConfirmed = confirmationKeywords.some(keyword => 
+            userMessage.toLowerCase().includes(keyword)
+        );
         
-        const wasBookingQuestion = lastAiMessage && 
-            lastAiMessage.content.includes('[BOOKING_CONFIRM_REQUEST]');
-        
-        console.log('War letzte Nachricht eine Booking-Rückfrage?', wasBookingQuestion);
-        
-        // ===== FALL 1: User bestätigt eine vorherige Booking-Rückfrage =====
-        if (wasBookingQuestion) {
-            const confirmationKeywords = [
-                'ja', 'gerne', 'okay', 'ok', 'bitte', 'genau', 'richtig', 
-                'korrekt', 'stimmt', 'passt', 'mach das', 'hilf mir', 
-                'super', 'perfekt', 'natürlich', 'klar', 'unbedingt',
-                'auf jeden fall', 'sicher', 'gern', 'würde ich', 'bitte sehr'
-            ];
-            
-            const userConfirmed = confirmationKeywords.some(keyword => 
-                userMessage.toLowerCase().includes(keyword)
-            );
-            
-            if (userConfirmed) {
-                console.log('✅ User hat Booking bestätigt - öffne Modal');
-                
-                // DIREKT das Modal öffnen - keine weitere Konversation!
-                return res.status(200).json({
-                    answer: "Gerne, ich öffne jetzt Michaels Kalender für dich! [buchung_starten]"
-                });
-            } else {
-                console.log('❌ User hat nicht bestätigt, normale Antwort');
-            }
-        } 
-        // ===== FALL 2: Neue Kontakt/Termin-Anfrage - stelle Rückfrage =====
-        else {
-            const contactKeywords = [
-                'termin', 'buchung', 'buchen', 'rückruf', 'anrufen', 
-                'sprechen', 'kontakt', 'meeting', 'gespräch', 'erreichen',
-                'treffen', 'call', 'telefonat', 'beratung', 'projekt besprechen'
-            ];
-            
-            const hasContactIntent = contactKeywords.some(keyword => 
-                userMessage.toLowerCase().includes(keyword)
-            );
-            
-            if (hasContactIntent) {
-                console.log('📞 Kontakt-Intent erkannt - stelle Rückfrage');
-                
-                // Einfache, direkte Rückfrage - KEINE Terminvorschläge!
-                return res.status(200).json({
-                    answer: "Kein Problem! Soll ich in Michaels Kalender nach einem passenden Rückruf-Termin schauen? [BOOKING_CONFIRM_REQUEST]"
-                });
-            }
+        if (userConfirmed) {
+            return res.status(200).json({
+                answer: "Gerne, ich öffne jetzt Michaels Kalender für dich! [buchung_starten]"
+            });
         }
+    } 
+    // ===== FALL 2: Neue Kontakt/Termin-Anfrage (DEINE VOLLSTÄNDIGE LISTE) =====
+    else {
+        const contactKeywords = [
+            'termin', 'buchung', 'buchen', 'rückruf', 'anrufen', 
+            'sprechen', 'kontakt', 'meeting', 'gespräch', 'erreichen',
+            'treffen', 'call', 'telefonat', 'beratung', 'projekt besprechen'
+        ];
         
-        console.log('💬 Kein Booking-Intent - normale Evita-Antwort');
+        const hasContactIntent = contactKeywords.some(keyword => 
+            userMessage.toLowerCase().includes(keyword)
+        );
+        
+        if (hasContactIntent) {
+            return res.status(200).json({
+                answer: "Kein Problem! Soll ich in Michaels Kalender nach einem passenden Rückruf-Termin schauen? [BOOKING_CONFIRM_REQUEST]"
+            });
+        }
     }
+}
 
     // =================================================================
     // NORMALE CHAT-ANTWORTEN
