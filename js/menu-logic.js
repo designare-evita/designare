@@ -66,6 +66,8 @@ function generateDynamicTOC() {
             // Filter: Bestimmte Überschriften ignorieren
             if (rawText.includes("feedback geben") || 
                 rawText.includes("weiterlesen") || 
+                rawText.includes("bereit") || 
+                rawText.includes("?") || 
                 rawText === "") {
                 return;
             }
