@@ -88,8 +88,8 @@ function generateDynamicTOC() {
             // 2. Mobile Kürzung auf 3 Wörter (bei Bildschirmbreite <= 768px)
             if (window.innerWidth <= 768) {
                 const words = buttonText.split(/\s+/);
-                if (words.length > 3) {
-                    buttonText = words.slice(0, 3).join(' ') + '...';
+                if (words.length > 5) {
+                    buttonText = words.slice(0, 5).join(' ') + '...';
                 }
             }
             
