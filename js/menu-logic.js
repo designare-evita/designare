@@ -68,6 +68,7 @@ function generateDynamicTOC() {
                 rawText.includes("weiterlesen") || 
                 rawText.includes("bereit") || 
                 rawText.includes("?") || 
+                rawText.includes("fazit") || 
                 rawText === "") {
                 return;
             }
