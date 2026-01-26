@@ -301,7 +301,7 @@ export const initAiForm = () => {
         },
         
         bookAppointment(bookingData) {
-            return this.safeFetch('/api/book-appointment-phone', {
+            return this.safeFetch('/api/create-appointment', {
                 method: 'POST',
                 body: JSON.stringify(bookingData)
             });
@@ -645,9 +645,9 @@ export const initAiForm = () => {
 
             try {
                 const data = await ApiHandler.bookAppointment({
-                    slot: state.selectedCallbackData.fullDateTime,
+                    slot: state.selectedCallbackData.formattedString, // Verwende formattedString statt fullDateTime
                     name, 
-                    phone, 
+                    email: phone, // API erwartet "email", wir senden die Telefonnummer
                     topic
                 });
 
