@@ -407,6 +407,8 @@ export const initAiForm = () => {
     // MODAL CONTROLLER
     // ===================================================================
     const ModalController = {
+        isProcessing: false, // Flag um ungewolltes Schließen zu verhindern
+        
         openChatModal() {
             const modalOverlay = document.getElementById('ai-response-modal');
             if (!modalOverlay) {
@@ -436,7 +438,13 @@ export const initAiForm = () => {
             }, 10);
         },
         
-        closeChatModal() {
+        closeChatModal(force = false) {
+            // Verhindere versehentliches Schließen während der Verarbeitung
+            if (this.isProcessing && !force) {
+                console.log("⚠️ Modal-Schließen blockiert - Verarbeitung läuft");
+                return;
+            }
+            
             const modalOverlay = document.getElementById('ai-response-modal');
             if (!modalOverlay) return;
             
@@ -467,7 +475,7 @@ export const initAiForm = () => {
             console.log("📞 Booking-Modal wird geöffnet");
             
             try {
-                ModalController.closeChatModal();
+                ModalController.closeChatModal(true); // force=true für beabsichtigtes Schließen
                 await new Promise(resolve => setTimeout(resolve, 300));
 
                 this.remove();
@@ -709,6 +717,9 @@ export const initAiForm = () => {
     async function handleUserMessage(userInput) {
         console.log("💬 Verarbeite User-Nachricht:", userInput);
 
+        // Verhindere versehentliches Modal-Schließen während der Verarbeitung
+        ModalController.isProcessing = true;
+
         const chatInput = document.getElementById('ai-chat-input');
         const chatForm = document.getElementById('ai-chat-form');
         const submitButton = chatForm?.querySelector('button[type="submit"]');
@@ -759,6 +770,9 @@ export const initAiForm = () => {
                 await typeWriterEffect(aiMsgElement, textToAnimate, 25);
             }
 
+            // Verarbeitung abgeschlossen
+            ModalController.isProcessing = false;
+
             // Trigger Booking Modal (falls Bestätigung erfolgt ist)
             const shouldLaunch = wasBookingQuestionBefore && (
                 answer.includes('[buchung_starten]') ||
@@ -783,6 +797,9 @@ export const initAiForm = () => {
             
             if (chatInput) chatInput.disabled = false;
             if (submitButton) submitButton.disabled = false;
+            
+            // Auch bei Fehler die Verarbeitung als abgeschlossen markieren
+            ModalController.isProcessing = false;
         }
     }
 
@@ -872,6 +889,7 @@ export const initAiForm = () => {
                 chatForm.setAttribute('data-listener-added', 'true');
                 chatForm.addEventListener('submit', async (e) => {
                     e.preventDefault();
+                    e.stopPropagation(); // Verhindert Event-Bubbling zum Modal-Overlay
                     const chatInput = document.getElementById('ai-chat-input');
                     const userInput = chatInput?.value?.trim();
                     if (userInput) {
@@ -909,7 +927,7 @@ export const initAiForm = () => {
         closeButtons.forEach(button => {
             if (button && !button.hasAttribute('data-listener-added')) {
                 button.setAttribute('data-listener-added', 'true');
-                button.addEventListener('click', ModalController.closeChatModal);
+                button.addEventListener('click', () => ModalController.closeChatModal(true)); // force=true für explizites Schließen
             }
         });
 
@@ -917,7 +935,9 @@ export const initAiForm = () => {
         if (modalOverlay && !modalOverlay.hasAttribute('data-listener-added')) {
             modalOverlay.setAttribute('data-listener-added', 'true');
             modalOverlay.addEventListener('click', (e) => {
-                if (e.target === modalOverlay) {
+                // Nur schließen wenn GENAU auf den Overlay-Hintergrund geklickt wird
+                // und nicht auf irgendein Kind-Element (Form, Input, etc.)
+                if (e.target === modalOverlay && e.target.classList.contains('visible')) {
                     ModalController.closeChatModal();
                 }
             });
