@@ -26,7 +26,7 @@ export default async function handler(req, res) {
     const commonConfig = { temperature: 0.7 };
     // HYBRID: Preview + Paid Fallback
     const modelPrimary = genAI.getGenerativeModel({ 
-        model: "gemini-flash-latest",  // Gratis solange es geht
+        model: "gemini-3-flash-preview",  // Gratis solange es geht
         generationConfig: commonConfig 
     });
     const modelFallback1 = genAI.getGenerativeModel({ 
