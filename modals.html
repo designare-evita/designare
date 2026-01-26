@@ -79,54 +79,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // FALLBACK: Stelle sicher, dass Chat-Submit-Events verarbeitet werden
-    let chatSubmitBackup = false;
+    // HINWEIS: Der Chat-Handler wird vollständig von ai-form.js gesteuert.
+    // Dieser Backup-Handler ist NICHT mehr nötig und wurde entfernt,
+    // da er Konflikte mit dem Haupt-Handler verursachte (Page Reload).
+    // 
+    // Falls ai-form.js nicht lädt, wird der Chat einfach nicht funktionieren,
+    // was besser ist als ein Page-Reload der die UX zerstört.
     
-    const setupChatBackup = () => {
-        const chatForm = document.getElementById('ai-chat-form');
-        const chatInput = document.getElementById('ai-chat-input');
-        
-        if (chatForm && chatInput && !chatSubmitBackup) {
-            console.log('🔧 Richte Chat-Backup-Handler ein...');
-            
-            // Backup Submit Handler
-            chatForm.addEventListener('submit', function(e) {
-                console.log('🔧 Chat-Backup-Submit ausgelöst');
-            });
-            
-            // Backup Enter-Handler
-            chatInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    console.log('🔧 Chat-Backup-Enter ausgelöst');
-                    e.preventDefault();
-                    chatForm.dispatchEvent(new Event('submit', {bubbles: true}));
-                }
-            });
-            
-            chatSubmitBackup = true;
-        }
-    };
-    
-    // Versuche Chat-Backup sofort und nach kurzer Verzögerung
-    setupChatBackup();
-    setTimeout(setupChatBackup, 500);
-    setTimeout(setupChatBackup, 1000);
-    
-    // Überwache Modal-Änderungen für dynamisch geladene Inhalte
-    const observer = new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutation) {
-            if (mutation.type === 'childList') {
-                setupChatBackup();
-            }
-        });
-    });
-    
-    const modalContainer = document.getElementById('modal-container');
-    if (modalContainer) {
-        observer.observe(modalContainer, {
-            childList: true,
-            subtree: true
-        });
-    }
+    console.log('✅ Modal-Events bereit (Chat wird von ai-form.js gesteuert)');
 });
 </script>
