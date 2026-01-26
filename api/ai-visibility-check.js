@@ -255,7 +255,7 @@ export default async function handler(req, res) {
     incrementRateLimit(clientIP);
 
     const modelWithSearch = genAI.getGenerativeModel({ 
-      model: "gemini-2.0-flash",
+      model: "gemini-flash-latest",
       generationConfig: { temperature: 0.4, maxOutputTokens: 1500 }
     });
 
