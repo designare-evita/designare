@@ -1087,14 +1087,17 @@ body.homepage-scroll-enabled {
 }
 
 /* ===================
-   TERMINAL TEXT - LIGHT MODE FIX
+   TERMINAL TEXT - LIGHT MODE FIX (höhere Spezifität)
    =================== */
 
-body.light-mode .cmd-text,
-body.light-mode .output-text {
+body.light-mode .tech-terminal-wrapper .cmd-text,
+body.light-mode .tech-terminal-wrapper .output-text,
+body.light-mode .tech-fact-item .cmd-text,
+body.light-mode .tech-fact-item .output-text {
     color: #e0e0e0 !important;
 }
 
-body.light-mode .output-text strong {
+body.light-mode .tech-terminal-wrapper .output-text strong,
+body.light-mode .tech-fact-item .output-text strong {
     color: #ffffff !important;
 }
