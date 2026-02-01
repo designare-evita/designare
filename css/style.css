@@ -1085,3 +1085,16 @@ body.homepage-scroll-enabled {
     /* Optional: Kurzer visueller Feedback */
     border-color: var(--accent-color);
 }
+
+/* ===================
+   TERMINAL TEXT - LIGHT MODE FIX
+   =================== */
+
+body.light-mode .cmd-text,
+body.light-mode .output-text {
+    color: #e0e0e0 !important;
+}
+
+body.light-mode .output-text strong {
+    color: #ffffff !important;
+}
