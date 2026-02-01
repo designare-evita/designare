@@ -1,96 +1,182 @@
 /* ============================================================
    TERMINAL-FIX.CSS
    Diese Datei GANZ AM ENDE nach allen anderen CSS laden!
+   MAXIMALE SPEZIFITÄT für Light Mode Terminal-Styles
    ============================================================ */
 
 /* Terminal muss IMMER dunkel bleiben mit heller Schrift */
 /* Maximale Spezifität um alle anderen Regeln zu überschreiben */
 
 body.light-mode .tech-terminal-wrapper,
-html body.light-mode .tech-terminal-wrapper {
+html body.light-mode .tech-terminal-wrapper,
+html body.light-mode .flipper .tech-terminal-wrapper,
+html body.light-mode .flip-panel .tech-terminal-wrapper,
+html body.light-mode .evita-text-bottom .tech-terminal-wrapper {
     background-color: #1e1e1e !important;
     border-color: #333 !important;
 }
 
 body.light-mode .terminal-body-content,
 html body.light-mode .terminal-body-content,
-body.light-mode .flipper .terminal-body-content,
-body.light-mode .flip-panel .terminal-body-content {
+html body.light-mode .flipper .terminal-body-content,
+html body.light-mode .flip-panel .terminal-body-content,
+html body.light-mode .tech-terminal-wrapper .terminal-body-content {
     background-color: #1e1e1e !important;
     color: #e0e0e0 !important;
 }
 
-/* Output Text - MUSS helle Schrift haben */
-body.light-mode .output-text,
-html body.light-mode .output-text,
-body.light-mode .flipper .output-text,
-body.light-mode .flipper p.output-text,
-body.light-mode .flip-panel .output-text,
-body.light-mode .flip-panel p.output-text,
-body.light-mode .terminal-body-content .output-text,
-body.light-mode .terminal-body-content p.output-text,
-body.light-mode .tech-terminal-wrapper .output-text,
-body.light-mode .tech-fact-item .output-text,
-body.light-mode .tech-fact-item p.output-text {
+/* ===================
+   OUTPUT TEXT - KRITISCH!
+   Diese Regeln MÜSSEN die allgemeinen .flipper p Regeln überschreiben
+   =================== */
+
+html body.light-mode .tech-terminal-wrapper p,
+html body.light-mode .tech-terminal-wrapper .output-text,
+html body.light-mode .tech-terminal-wrapper p.output-text,
+html body.light-mode .tech-fact-item p,
+html body.light-mode .tech-fact-item .output-text,
+html body.light-mode .tech-fact-item p.output-text,
+html body.light-mode .terminal-body-content p,
+html body.light-mode .terminal-body-content .output-text,
+html body.light-mode .terminal-body-content p.output-text,
+html body.light-mode .flipper .tech-terminal-wrapper p,
+html body.light-mode .flipper .tech-terminal-wrapper .output-text,
+html body.light-mode .flipper .tech-fact-item p,
+html body.light-mode .flipper .tech-fact-item .output-text,
+html body.light-mode .flip-panel .tech-terminal-wrapper p,
+html body.light-mode .flip-panel .tech-terminal-wrapper .output-text,
+html body.light-mode .flip-panel .tech-fact-item p,
+html body.light-mode .flip-panel .tech-fact-item .output-text,
+html body.light-mode .evita-text-bottom .tech-terminal-wrapper p,
+html body.light-mode .evita-text-bottom .tech-fact-item p,
+html body.light-mode .evita-grid-wrapper .tech-terminal-wrapper p,
+html body.light-mode .evita-grid-wrapper .tech-fact-item p {
     color: #e0e0e0 !important;
 }
 
-body.light-mode .output-text strong,
-html body.light-mode .output-text strong,
-body.light-mode .flipper .output-text strong,
-body.light-mode .terminal-body-content .output-text strong,
-body.light-mode .tech-fact-item .output-text strong {
+/* Strong innerhalb Output Text */
+html body.light-mode .tech-terminal-wrapper strong,
+html body.light-mode .tech-terminal-wrapper .output-text strong,
+html body.light-mode .tech-fact-item strong,
+html body.light-mode .tech-fact-item .output-text strong,
+html body.light-mode .terminal-body-content strong,
+html body.light-mode .terminal-body-content .output-text strong,
+html body.light-mode .flipper .tech-terminal-wrapper strong,
+html body.light-mode .flipper .tech-fact-item strong,
+html body.light-mode .flip-panel .tech-terminal-wrapper strong,
+html body.light-mode .flip-panel .tech-fact-item strong,
+html body.light-mode .evita-text-bottom .tech-terminal-wrapper strong,
+html body.light-mode .evita-grid-wrapper .tech-terminal-wrapper strong {
     color: #ffffff !important;
 }
 
-/* CMD Text */
-body.light-mode .cmd-text,
+/* ===================
+   CMD TEXT
+   =================== */
+
 html body.light-mode .cmd-text,
-body.light-mode .flipper .cmd-text,
-body.light-mode .flipper p.cmd-text,
-body.light-mode .terminal-body-content .cmd-text,
-body.light-mode .tech-fact-item .cmd-text {
+html body.light-mode p.cmd-text,
+html body.light-mode .tech-terminal-wrapper .cmd-text,
+html body.light-mode .tech-terminal-wrapper p.cmd-text,
+html body.light-mode .tech-fact-item .cmd-text,
+html body.light-mode .tech-fact-item p.cmd-text,
+html body.light-mode .terminal-body-content .cmd-text,
+html body.light-mode .terminal-body-content p.cmd-text,
+html body.light-mode .flipper .cmd-text,
+html body.light-mode .flipper p.cmd-text,
+html body.light-mode .flipper .tech-fact-item .cmd-text,
+html body.light-mode .flip-panel .cmd-text,
+html body.light-mode .flip-panel .tech-fact-item .cmd-text,
+html body.light-mode .evita-text-bottom .cmd-text,
+html body.light-mode .evita-grid-wrapper .cmd-text {
     color: #8ab4f8 !important;
 }
 
-/* Prompt Sign */
-body.light-mode .prompt-sign,
+/* ===================
+   PROMPT SIGN ($)
+   =================== */
+
 html body.light-mode .prompt-sign,
-body.light-mode .terminal-body-content .prompt-sign {
-    color: var(--accent-color) !important;
+html body.light-mode .tech-terminal-wrapper .prompt-sign,
+html body.light-mode .terminal-body-content .prompt-sign,
+html body.light-mode .tech-fact-item .prompt-sign,
+html body.light-mode .flipper .prompt-sign,
+html body.light-mode .flip-panel .prompt-sign,
+html body.light-mode .evita-text-bottom .prompt-sign {
+    color: #c4a35a !important;
 }
 
-/* Terminal Links */
-body.light-mode .terminal-link,
+/* ===================
+   TERMINAL LINKS
+   =================== */
+
 html body.light-mode .terminal-link,
-body.light-mode .terminal-body-content .terminal-link {
-    color: var(--accent-color) !important;
+html body.light-mode .tech-terminal-wrapper .terminal-link,
+html body.light-mode .terminal-body-content .terminal-link,
+html body.light-mode .tech-fact-item .terminal-link,
+html body.light-mode .flipper .terminal-link,
+html body.light-mode .flip-panel .terminal-link,
+html body.light-mode .evita-text-bottom .terminal-link {
+    color: #c4a35a !important;
     background: rgba(196, 163, 90, 0.15) !important;
 }
 
-body.light-mode .terminal-link:hover {
-    background: var(--accent-color) !important;
+html body.light-mode .terminal-link:hover,
+html body.light-mode .tech-terminal-wrapper .terminal-link:hover,
+html body.light-mode .tech-fact-item .terminal-link:hover {
+    background: #c4a35a !important;
     color: #000 !important;
 }
 
-/* Tech Fact Items */
-body.light-mode .tech-fact-item,
-html body.light-mode .tech-fact-item {
+/* ===================
+   TECH FACT ITEMS (Rahmen links)
+   =================== */
+
+html body.light-mode .tech-fact-item,
+html body.light-mode .tech-terminal-wrapper .tech-fact-item,
+html body.light-mode .terminal-body-content .tech-fact-item,
+html body.light-mode .flipper .tech-fact-item,
+html body.light-mode .flip-panel .tech-fact-item,
+html body.light-mode .evita-text-bottom .tech-fact-item {
     border-left-color: #444 !important;
 }
 
-body.light-mode .tech-fact-item:hover {
-    border-left-color: var(--accent-color) !important;
+html body.light-mode .tech-fact-item:hover,
+html body.light-mode .tech-terminal-wrapper .tech-fact-item:hover {
+    border-left-color: #c4a35a !important;
 }
 
-/* Header Bar */
-body.light-mode .terminal-header-bar,
-html body.light-mode .terminal-header-bar {
+/* ===================
+   HEADER BAR (Titelleiste)
+   =================== */
+
+html body.light-mode .terminal-header-bar,
+html body.light-mode .tech-terminal-wrapper .terminal-header-bar,
+html body.light-mode .flipper .terminal-header-bar,
+html body.light-mode .flip-panel .terminal-header-bar,
+html body.light-mode .evita-text-bottom .terminal-header-bar {
     background-color: #2d2d2d !important;
     border-bottom-color: #333 !important;
 }
 
-body.light-mode .terminal-title-text,
-html body.light-mode .terminal-title-text {
+html body.light-mode .terminal-title-text,
+html body.light-mode .tech-terminal-wrapper .terminal-title-text,
+html body.light-mode .terminal-header-bar .terminal-title-text {
     color: #888 !important;
+}
+
+/* ===================
+   CONTROL DOTS (rot/gelb/grün)
+   =================== */
+
+html body.light-mode .control-dot.red {
+    background-color: #ff5f56 !important;
+}
+
+html body.light-mode .control-dot.yellow {
+    background-color: #ffbd2e !important;
+}
+
+html body.light-mode .control-dot.green {
+    background-color: #27c93f !important;
 }
