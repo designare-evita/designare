@@ -1,36 +1,58 @@
-<header class="main-header">
-   <a href="index.html" id="top-left-logo-link">
-    <img src="images/favicon.webp" alt="Zur Startseite - Michael Kanda" id="top-left-logo-img" width="40" height="40">
-</a>
+<header class="main-header" role="banner">
+    <a href="index.html" id="top-left-logo-link" aria-label="Zur Startseite">
+        <img src="images/favicon.webp" alt="Michael Kanda Logo" id="top-left-logo-img" width="40" height="40" loading="eager">
+    </a>
     
-    <div class="header-right-controls">
+    <nav class="header-right-controls" aria-label="Schnellzugriff">
         <!-- Theme Toggle: Mond | Switch | Sonne -->
-        <div class="theme-toggle-wrapper">
+        <div class="theme-toggle-wrapper" role="group" aria-label="Farbschema wählen">
             <span class="toggle-icon-left" aria-hidden="true">
                 <i class="fas fa-moon"></i>
             </span>
-            <button class="theme-toggle" id="theme-toggle" aria-label="Tag/Nacht Modus umschalten" role="switch" aria-checked="false">
+            <button 
+                class="theme-toggle" 
+                id="theme-toggle" 
+                type="button"
+                aria-label="Farbschema umschalten" 
+                aria-describedby="theme-status"
+                role="switch" 
+                aria-checked="false">
                 <span class="toggle-knob"></span>
             </button>
+            <span id="theme-status" class="visually-hidden">Aktuell: Dunkelmodus</span>
             <span class="toggle-icon-right" aria-hidden="true">
                 <i class="fas fa-sun"></i>
             </span>
         </div>
         
-        <button id="evita-chat-button" aria-label="Evita Chat öffnen">
-            <i class="fa-solid fa-robot"></i>
+        <button 
+            id="evita-chat-button" 
+            type="button"
+            aria-label="Evita Chat öffnen"
+            aria-haspopup="dialog">
+            <i class="fa-solid fa-robot" aria-hidden="true"></i>
         </button>
  
         <a href="https://designare.at/blog" id="blog-link" aria-label="Zum Blog">
-            <i class="fa-solid fa-blog"></i>
+            <i class="fa-solid fa-blog" aria-hidden="true"></i>
         </a>
         
-        <button id="contact-button" aria-label="Kontaktformular öffnen">
-            <i class="fa-solid fa-envelopes-bulk"></i>
+        <button 
+            id="contact-button" 
+            type="button"
+            aria-label="Kontaktformular öffnen"
+            aria-haspopup="dialog">
+            <i class="fa-solid fa-envelopes-bulk" aria-hidden="true"></i>
         </button>
 
-        <button id="menu-toggle-button" aria-label="Menü öffnen">
-            <i class="fa-solid fa-bars"></i>
+        <button 
+            id="menu-toggle-button" 
+            type="button"
+            aria-label="Hauptmenü öffnen"
+            aria-expanded="false"
+            aria-controls="main-navigation"
+            aria-haspopup="menu">
+            <i class="fa-solid fa-bars" aria-hidden="true"></i>
         </button>
-    </div>
+    </nav>
 </header>
