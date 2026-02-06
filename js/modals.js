@@ -1,4 +1,4 @@
-// js/modals.js - FINAL (Bereinigt: Keine Such-Logik und About-Me mehr!)
+// js/modals.js - Bereinigt & Korrigiert
 
 export const openModal = (modalElement) => {
     if (modalElement) {
@@ -16,7 +16,7 @@ export const closeModal = (modalElement) => {
     }
 };
 
-// Diese Funktion wird von `ai-form.js` aufgerufen
+// Wird von ai-form.js aufgerufen
 export function showAIResponse(content, isHTML = false) {
     const modal = document.getElementById('ai-response-modal');
     const contentArea = document.getElementById('ai-chat-history');
@@ -103,17 +103,28 @@ function setupContactModal() {
     if (contactForm) {
         contactForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const formData = new FormData(contactForm);
             const submitButton = contactForm.querySelector('button[type="submit"]');
-            
+
             submitButton.disabled = true;
             submitButton.textContent = 'Wird gesendet...';
 
             try {
+                // FormData → JSON für Vercel Serverless Function
+                const formData = new FormData(contactForm);
+                const data = Object.fromEntries(formData.entries());
+
                 const response = await fetch('/api/contact', {
                     method: 'POST',
-                    body: formData
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
                 });
+
+                // Prüfe ob Response tatsächlich JSON ist
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    throw new Error(`Server-Fehler: ${response.status} ${response.statusText}`);
+                }
+
                 const result = await response.json();
 
                 if (result.success) {
@@ -139,7 +150,7 @@ function setupContactModal() {
 // ===================================================================
 function loadLegalContentWithPagination(page) {
     console.log('📄 Lade Legal Content:', page);
-    
+
     const legalModal = document.getElementById('legal-modal');
     const contentArea = document.getElementById('legal-modal-content-area');
 
@@ -156,10 +167,10 @@ function loadLegalContentWithPagination(page) {
         .then(html => {
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
-            const mainContent = doc.querySelector('main .legal-container') || 
-                               doc.querySelector('.legal-container') || 
-                               doc.querySelector('main') ||
-                               doc.querySelector('body');
+            const mainContent = doc.querySelector('main .legal-container')
+                || doc.querySelector('.legal-container')
+                || doc.querySelector('main')
+                || doc.querySelector('body');
 
             if (mainContent) {
                 contentArea.style.opacity = '0';
@@ -192,57 +203,57 @@ function addPaginationButtons(contentArea, currentPage) {
         'datenschutz.html': {
             totalPages: 3,
             pages: [
-                { title: "Seite 1: Grundlagen & Rechte", sections: [0, 1] },
-                { title: "Seite 2: Datenverarbeitung", sections: [2, 3] }, 
-                { title: "Seite 3: Cookies & KI", sections: [4, 6] }
+                { title: 'Seite 1: Grundlagen & Rechte', sections: [0, 1] },
+                { title: 'Seite 2: Datenverarbeitung', sections: [2, 3] },
+                { title: 'Seite 3: Cookies & KI', sections: [4, 6] }
             ]
         },
         'impressum.html': {
             totalPages: 2,
             pages: [
-                { title: "Seite 1: Kontakt & Grundlagen", sections: [0, 2] },
-                { title: "Seite 2: Haftungsausschluss", sections: [3, 5] }
+                { title: 'Seite 1: Kontakt & Grundlagen', sections: [0, 2] },
+                { title: 'Seite 2: Haftungsausschluss', sections: [3, 5] }
             ]
         },
         'disclaimer.html': {
             totalPages: 2,
             pages: [
-                { title: "Seite 1: Abgrenzung & Urheberrecht", sections: [0, 1] },
-                { title: "Seite 2: Haftungsausschluss", sections: [2, 3] }
+                { title: 'Seite 1: Abgrenzung & Urheberrecht', sections: [0, 1] },
+                { title: 'Seite 2: Haftungsausschluss', sections: [2, 3] }
             ]
         }
     };
-    
-    let config = pageConfigs[currentPage];
+
+    const config = pageConfigs[currentPage];
     if (!config) return;
-    
+
     const paginationState = {
         currentPage: 0,
         pages: config.pages
     };
-    
+
     function createPaginationHTML(pageIndex) {
         const isFirstPage = pageIndex === 0;
         const isLastPage = pageIndex === config.totalPages - 1;
         return `
             <div class="legal-modal-pagination-buttons">
-                <button id="legal-prev-btn" ${isFirstPage ? 'disabled' : ''}>← ${isFirstPage ? 'Erste' : 'Vorherige'}</button>
+                <button id="legal-prev-btn" ${isFirstPage ? 'disabled' : ''}>\u2190 ${isFirstPage ? 'Erste' : 'Vorherige'}</button>
                 <span style="color: var(--text-color); font-weight: 500; padding: 10px; text-align: center; font-size: 0.9rem;">
                     ${paginationState.pages[pageIndex].title}<br>
                     <small style="opacity: 0.7;">(${pageIndex + 1}/${config.totalPages})</small>
                 </span>
-                <button id="legal-next-btn" ${isLastPage ? 'disabled' : ''}>${isLastPage ? 'Letzte' : 'Nächste'} →</button>
+                <button id="legal-next-btn" ${isLastPage ? 'disabled' : ''}>${isLastPage ? 'Letzte' : 'Nächste'} \u2192</button>
             </div>`;
     }
-    
+
     function updatePagination() {
         const existing = contentArea.querySelector('.legal-modal-pagination-buttons');
         if (existing) existing.remove();
         contentArea.insertAdjacentHTML('beforeend', createPaginationHTML(paginationState.currentPage));
-        
+
         const prevBtn = document.getElementById('legal-prev-btn');
         const nextBtn = document.getElementById('legal-next-btn');
-        
+
         if (prevBtn && !prevBtn.disabled) {
             prevBtn.addEventListener('click', () => {
                 if (paginationState.currentPage > 0) {
@@ -260,43 +271,43 @@ function addPaginationButtons(contentArea, currentPage) {
             });
         }
     }
-    
+
     function showPage(pageIndex) {
         const allElements = contentArea.querySelectorAll('h1, h2, h3, h4, p, ul, ol, li, div:not(.legal-modal-pagination-buttons)');
         allElements.forEach(el => el.style.display = 'none');
-        
+
         const title = contentArea.querySelector('h1');
         if (title) title.style.display = 'block';
-        
+
         if (currentPage === 'impressum.html') handleImpressumPagination(pageIndex);
         else if (currentPage === 'disclaimer.html') handleDisclaimerPagination(pageIndex);
         else if (currentPage === 'datenschutz.html') handleDatenschutzPagination(pageIndex);
-        
+
         updatePagination();
         contentArea.scrollTop = 0;
     }
-    
+
     function handleImpressumPagination(pageIndex) {
         const h3Elements = Array.from(contentArea.querySelectorAll('h3'));
         if (pageIndex === 0) showH3SectionsRange(h3Elements, 0, 2);
         else if (pageIndex === 1) showH3SectionsRange(h3Elements, 3, h3Elements.length - 1);
     }
-    
+
     function handleDisclaimerPagination(pageIndex) {
         const h3Elements = Array.from(contentArea.querySelectorAll('h3'));
         if (pageIndex === 0) showH3SectionsRange(h3Elements, 0, 1);
         else if (pageIndex === 1) showH3SectionsRange(h3Elements, 2, h3Elements.length - 1);
     }
-    
+
     function handleDatenschutzPagination(pageIndex) {
         const standInfo = contentArea.querySelector('p');
         if (standInfo && standInfo.textContent.includes('Stand:')) standInfo.style.display = 'block';
-        
+
         const h3Elements = Array.from(contentArea.querySelectorAll('h3'));
         const pageConfig = paginationState.pages[pageIndex];
         if (pageConfig.sections) showH3SectionsRange(h3Elements, pageConfig.sections[0], pageConfig.sections[1]);
     }
-    
+
     function showH3SectionsRange(h3Elements, startIndex, endIndex) {
         for (let i = startIndex; i <= endIndex && i < h3Elements.length; i++) {
             const h3 = h3Elements[i];
@@ -310,6 +321,7 @@ function addPaginationButtons(contentArea, currentPage) {
             }
         }
     }
+
     showPage(0);
 }
 
@@ -336,8 +348,8 @@ function setupModalBackgroundClose() {
     });
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
-            const openModal = document.querySelector('.modal-overlay.visible');
-            if (openModal) closeModal(openModal);
+            const visibleModal = document.querySelector('.modal-overlay.visible');
+            if (visibleModal) closeModal(visibleModal);
         }
     });
 }
@@ -354,8 +366,8 @@ function setupLegalModalCloseButton() {
 // INIT
 // ===================================================================
 export function initModals() {
-    console.log('🚀 Initialisiere Modals (Bereinigt)...');
-    
+    console.log('🚀 Initialisiere Modals...');
+
     setTimeout(() => {
         setupCookieModal();
         setupContactModal();
