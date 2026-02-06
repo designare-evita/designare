@@ -1,6 +1,6 @@
-const brevo = require('@getbrevo/brevo');
+import * as brevo from '@getbrevo/brevo';
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
     res.setHeader('Content-Type', 'application/json');
 
     if (req.method !== 'POST') {
@@ -10,15 +10,13 @@ module.exports = async function handler(req, res) {
     try {
         const { name, email, _subject, message } = req.body;
 
-        // Validierung
         if (!name || !email || !message) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'Bitte fülle alle Pflichtfelder aus.' 
+            return res.status(400).json({
+                success: false,
+                message: 'Bitte fülle alle Pflichtfelder aus.'
             });
         }
 
-        // Brevo API Setup
         const apiInstance = new brevo.TransactionalEmailsApi();
         apiInstance.setApiKey(
             brevo.TransactionalEmailsApiApiKeys.apiKey,
@@ -46,9 +44,9 @@ module.exports = async function handler(req, res) {
 
     } catch (error) {
         console.error('Brevo API Fehler:', error?.body || error?.message || error);
-        return res.status(500).json({ 
-            success: false, 
-            message: 'Fehler beim Senden. Bitte später erneut versuchen.' 
+        return res.status(500).json({
+            success: false,
+            message: 'Fehler beim Senden. Bitte später erneut versuchen.'
         });
     }
-};
+}
