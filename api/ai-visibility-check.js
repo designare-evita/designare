@@ -673,10 +673,73 @@ export default async function handler(req, res) {
         });
       }
       
-      domainAnalysis.hasAboutPage = /href=["'][^"']*(?:about|über-uns|ueber-uns|team|wir)["']/i.test(html);
-      domainAnalysis.hasContactPage = /href=["'][^"']*(?:contact|kontakt|impressum)["']/i.test(html);
-      domainAnalysis.hasAuthorInfo = /(?:author|autor|verfasser|geschrieben von|inhaber|geschäftsführer)/i.test(html);
+      // =============================================================
+      // E-E-A-T SIGNALE ERKENNEN (Multi-Signal-Ansatz)
+      // Prüft Links, Schema.org, sichtbaren Text & Meta-Daten
+      // =============================================================
       
+      // Sichtbaren Text extrahieren (ohne Script/Style/Head)
+      const visibleText = html
+        .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+        .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+        .replace(/<noscript[\s\S]*?<\/noscript>/gi, ' ')
+        .replace(/<head[\s\S]*?<\/head>/gi, ' ')
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/\s+/g, ' ')
+        .toLowerCase();
+      
+      // Schema-Typen (bereits extrahiert)
+      const schemaTypesLower = domainAnalysis.schemaTypes.map(t => t.toLowerCase());
+      
+      // --- ABOUT / ÜBER-UNS ---
+      // Signal 1: Navigation-Links – prüft ob der href-Wert ein About-Schlüsselwort enthält
+      const allHrefs = (html.match(/href=["']([^"']+)["']/gi) || []).map(h => h.toLowerCase());
+      const aboutKeywords = ['about', 'über-uns', 'ueber-uns', 'about-us', 'who-we-are', 'unser-team', 'das-sind-wir', '/team'];
+      const hasAboutLink = allHrefs.some(href => aboutKeywords.some(kw => href.includes(kw)));
+      // Signal 2: Schema.org AboutPage
+      const hasAboutSchema = schemaTypesLower.includes('aboutpage');
+      // Signal 3: Sichtbarer Text
+      const hasAboutText = /über uns|about us|unser team/i.test(visibleText);
+      // Ergebnis: Link ODER (Schema + Text)
+      domainAnalysis.hasAboutPage = hasAboutLink || (hasAboutSchema && hasAboutText);
+      
+      // --- KONTAKT / IMPRESSUM ---
+      // Signal 1: Navigation-Links
+      const contactKeywords = ['kontakt', 'contact', 'impressum', 'imprint', 'legal-notice', 'contact-us'];
+      const hasContactLink = allHrefs.some(href => contactKeywords.some(kw => href.includes(kw)));
+      // Signal 2: Schema.org ContactPage
+      const hasContactSchema = schemaTypesLower.includes('contactpage');
+      // Signal 3: Sichtbarer Text mit Kontaktdaten (Telefon, E-Mail-Muster)
+      const hasContactInfo = /(?:tel:|mailto:|(?:\+\d{2}|\b0\d{3,4})[\s/-]?\d)/.test(html);
+      // Signal 4: Impressum im Footer-Bereich (auch in dynamisch geladenen Inhalten)
+      const hasImpressumText = /\bimpressum\b|\bkontakt\b|\bcontact\b/.test(visibleText);
+      // Ergebnis: Link ODER Schema ODER (Kontaktdaten + Impressum-Text)
+      domainAnalysis.hasContactPage = hasContactLink || hasContactSchema || (hasContactInfo && hasImpressumText);
+      
+      // --- AUTOREN-INFORMATIONEN ---
+      // Signal 1: Schema.org Person/Author
+      const hasAuthorSchema = schemaTypesLower.includes('person') || 
+                              schemaTypesLower.includes('author') ||
+                              schemaTypesLower.includes('profilepage');
+      // Signal 2: Schema.org mit author/creator Feldern
+      const hasAuthorInSchema = /"(?:author|creator)":\s*\{/.test(html);
+      // Signal 3: Sichtbarer Text mit Rollen-Bezeichnungen
+      const hasAuthorText = /\b(?:geschäftsführer|inhaber|gründer|founder|ceo|geschäftsleitung|managing director)\b/.test(visibleText);
+      // Signal 4: Autoren-Byline in Artikeln (z.B. "von Michael Kanda", "by Jane Doe")
+      // Erfordert Vorname + Nachname (2 Wörter mit Großbuchstabe)
+      const strippedHtml = html.replace(/<script[\s\S]*?<\/script>/gi, '').replace(/<style[\s\S]*?<\/style>/gi, '');
+      const hasByline = /(?:verfasst von|geschrieben von|autor:\s*)\s*[A-ZÄÖÜ][a-zäöüß]+\s+[A-ZÄÖÜ]/i.test(strippedHtml) ||
+                        /class=["'][^"']*(?:author|byline|writer)[^"']*["']/i.test(html);
+      // Ergebnis: Schema UND (Text ODER Byline) – Schema allein reicht nicht
+      //           ODER Text-Rolle gefunden (Geschäftsführer etc.)
+      domainAnalysis.hasAuthorInfo = (hasAuthorSchema && (hasAuthorText || hasByline)) || hasAuthorText;
+      
+      // Debug-Logging
+      console.log(`   E-E-A-T Signals:`);
+      console.log(`     About: link=${hasAboutLink}, schema=${hasAboutSchema}, text=${hasAboutText} → ${domainAnalysis.hasAboutPage}`);
+      console.log(`     Contact: link=${hasContactLink}, schema=${hasContactSchema}, contactInfo=${hasContactInfo}, text=${hasImpressumText} → ${domainAnalysis.hasContactPage}`);
+      console.log(`     Author: schema=${hasAuthorSchema}, schemaField=${hasAuthorInSchema}, text=${hasAuthorText}, byline=${hasByline} → ${domainAnalysis.hasAuthorInfo}`);
+
       const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
       domainAnalysis.title = titleMatch ? titleMatch[1].trim() : '';
       
