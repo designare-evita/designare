@@ -348,7 +348,10 @@ async function sendCheckNotification({ domain, industry, score, scoreLabel, scor
 
   } catch (error) {
     // E-Mail-Fehler soll den Check NICHT blockieren
-    console.error('⚠️ E-Mail-Benachrichtigung fehlgeschlagen:', error?.body || error?.message || error);
+    console.error('⚠️ E-Mail-Benachrichtigung fehlgeschlagen:');
+    console.error('  Message:', error?.message);
+    console.error('  Body:', JSON.stringify(error?.body || error?.response?.body || 'keine Details'));
+    console.error('  Status:', error?.statusCode || error?.response?.statusCode || 'unbekannt');
   }
 }
 
@@ -1013,9 +1016,9 @@ WICHTIG: Beginne DIREKT mit dem Inhalt, keine Einleitung.`;
     });
 
     // =================================================================
-    // E-MAIL-BENACHRICHTIGUNG SENDEN (async, blockiert nicht die Response)
+    // E-MAIL-BENACHRICHTIGUNG SENDEN (muss vor Response abgeschlossen sein auf Vercel)
     // =================================================================
-    sendCheckNotification({
+    await sendCheckNotification({
       domain: cleanDomain,
       industry: detectedIndustry || cleanIndustry,
       score,
