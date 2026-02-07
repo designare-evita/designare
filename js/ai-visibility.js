@@ -436,10 +436,37 @@ document.addEventListener('DOMContentLoaded', function() {
         // CHATGPT TESTS (wenn vorhanden)
         // =================================================================
         if (hasChatGPT) {
+            const chatgptKnown = chatgptTests.find(t => t.id === 'chatgpt_knowledge')?.mentioned;
+            const chatgptRecommended = chatgptTests.find(t => t.id === 'chatgpt_recommendation')?.mentioned;
+            
+            // Kontext-Hinweis generieren
+            let chatgptInsight = '';
+            if (!chatgptKnown && !chatgptRecommended) {
+                chatgptInsight = `
+                    <div style="background:rgba(239,68,68,0.08);border-left:3px solid #ef4444;padding:12px 16px;border-radius:0 8px 8px 0;margin-bottom:1rem;font-size:0.9rem;color:#ccc;">
+                        <strong style="color:#ef4444;">⚠ Nicht in ChatGPTs Wissensbasis</strong><br>
+                        ChatGPT kennt deine Domain nicht und empfiehlt dich auch nicht. Das bedeutet, dass Nutzer von ChatGPT bei Branchenanfragen nur deine Konkurrenten sehen.
+                    </div>`;
+            } else if (!chatgptKnown && chatgptRecommended) {
+                chatgptInsight = `
+                    <div style="background:rgba(245,158,11,0.08);border-left:3px solid #f59e0b;padding:12px 16px;border-radius:0 8px 8px 0;margin-bottom:1rem;font-size:0.9rem;color:#ccc;">
+                        <strong style="color:#f59e0b;">🔶 Teilweise bekannt</strong><br>
+                        ChatGPT kennt deine Domain nicht direkt, erwähnt dich aber bei Branchenempfehlungen. Das ist ein guter Anfang!
+                    </div>`;
+            } else if (chatgptKnown && chatgptRecommended) {
+                chatgptInsight = `
+                    <div style="background:rgba(34,197,94,0.08);border-left:3px solid #22c55e;padding:12px 16px;border-radius:0 8px 8px 0;margin-bottom:1rem;font-size:0.9rem;color:#ccc;">
+                        <strong style="color:#22c55e;">✅ In ChatGPTs Wissensbasis</strong><br>
+                        ChatGPT kennt dein Unternehmen und empfiehlt es aktiv. Du bist auch für ChatGPT-Nutzer sichtbar.
+                    </div>`;
+            }
+
             html += `
                 <div class="result-section">
                     <h3><span class="engine-badge engine-chatgpt">ChatGPT</span> Wissens-Check</h3>
                     <p class="section-intro">ChatGPT antwortet aus seinem Trainings&shy;wissen – ohne Live-Suche:</p>
+                    
+                    ${chatgptInsight}
                     
                     <div class="tests-accordion">
                         ${chatgptTests.map((test, index) => `
