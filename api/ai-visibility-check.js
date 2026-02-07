@@ -227,15 +227,15 @@ async function sendCheckNotification({ domain, industry, score, scoreLabel, scor
     }).join('');
 
     // Schema-Info
-    const schemaInfo = domainAnalysis?.schema?.found
-      ? `✅ Vorhanden (${domainAnalysis.schema.types.join(', ') || 'unbekannte Typen'})`
+    const schemaInfo = domainAnalysis?.hasSchema
+      ? `✅ Vorhanden (${(domainAnalysis.schemaTypes || []).join(', ') || 'unbekannte Typen'})`
       : '❌ Nicht vorhanden';
 
     // E-E-A-T Info
     const eeatItems = [];
-    if (domainAnalysis?.eeat?.aboutPage) eeatItems.push('Über-uns');
-    if (domainAnalysis?.eeat?.contactPage) eeatItems.push('Kontakt');
-    if (domainAnalysis?.eeat?.authorInfo) eeatItems.push('Autor-Info');
+    if (domainAnalysis?.hasAboutPage) eeatItems.push('Über-uns');
+    if (domainAnalysis?.hasContactPage) eeatItems.push('Kontakt');
+    if (domainAnalysis?.hasAuthorInfo) eeatItems.push('Autor-Info');
     const eeatInfo = eeatItems.length > 0 ? `✅ ${eeatItems.join(', ')}` : '❌ Keine gefunden';
 
     // Empfehlungen
