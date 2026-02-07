@@ -1,4 +1,4 @@
-// js/ai-visibility.js - Frontend für KI-Sichtbarkeits-Check
+// js/ai-visibility.js - Frontend für KI-Sichtbarkeits-Check (Dual-KI: Gemini + ChatGPT)
 
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('visibility-form');
@@ -33,30 +33,22 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function getTodayString() {
-        return new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+        return new Date().toISOString().split('T')[0];
     }
 
     function getRemainingChecks() {
         const usage = getUsageData();
         const today = getTodayString();
-        
-        // Neuer Tag = Reset
-        if (usage.date !== today) {
-            return DAILY_LIMIT;
-        }
-        
+        if (usage.date !== today) return DAILY_LIMIT;
         return Math.max(0, DAILY_LIMIT - usage.count);
     }
 
     function incrementUsage() {
         const today = getTodayString();
         const usage = getUsageData();
-        
         if (usage.date !== today) {
-            // Neuer Tag - Reset
             setUsageData({ date: today, count: 1 });
         } else {
-            // Gleicher Tag - Increment
             setUsageData({ date: today, count: usage.count + 1 });
         }
     }
@@ -94,14 +86,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Initial anzeigen
     updateLimitDisplay();
 
     // Quick-Select Buttons für Branchen
     document.querySelectorAll('.industry-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             industryInput.value = this.dataset.industry;
-            // Highlight aktiven Button
             document.querySelectorAll('.industry-btn').forEach(b => b.classList.remove('active'));
             this.classList.add('active');
         });
@@ -111,7 +101,6 @@ document.addEventListener('DOMContentLoaded', function() {
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
         
-        // Rate-Limit prüfen
         if (!canMakeRequest()) {
             showError('Du hast dein Tageslimit von 3 Checks erreicht. Probier es morgen wieder!');
             return;
@@ -123,7 +112,6 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Loading State
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Analysiere...';
         loadingOverlay.classList.add('visible');
@@ -141,7 +129,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const data = await response.json();
 
-            // Rate-Limit vom Server prüfen
             if (response.status === 429) {
                 throw new Error(data.message || 'Tageslimit erreicht. Bitte morgen wieder versuchen.');
             }
@@ -150,10 +137,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 throw new Error(data.message || 'Analyse fehlgeschlagen');
             }
 
-            // Erfolg: Usage incrementieren
             incrementUsage();
             updateLimitDisplay();
-            
             renderResults(data);
 
         } catch (error) {
@@ -177,12 +162,62 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
     }
 
+    // =================================================================
+    // HELPER: Engine Badge HTML
+    // =================================================================
+    function engineBadge(engine) {
+        if (engine === 'chatgpt') {
+            return '<span class="engine-badge engine-chatgpt">ChatGPT</span>';
+        }
+        return '<span class="engine-badge engine-gemini">Gemini</span>';
+    }
+
+    // =================================================================
+    // HELPER: Vergleichs-Übersicht für gleiche Test-Typen
+    // =================================================================
+    function renderComparisonRow(geminiTest, chatgptTest) {
+        if (!geminiTest && !chatgptTest) return '';
+        
+        const label = geminiTest?.description?.replace(' (ChatGPT)', '').replace('Bekanntheit im Web', 'Bekanntheit').replace('Empfehlungen in der Branche', 'Empfehlungen') || 
+                      chatgptTest?.description?.replace(' (ChatGPT)', '').replace('Bekanntheit (ChatGPT)', 'Bekanntheit').replace('Empfehlungen (ChatGPT)', 'Empfehlungen');
+        
+        const geminiStatus = geminiTest 
+            ? `<span class="compare-status ${geminiTest.mentioned ? 'status-good' : 'status-bad'}">
+                 <i class="fa-solid ${geminiTest.mentioned ? 'fa-check' : 'fa-xmark'}"></i>
+                 ${geminiTest.mentioned ? 'Erwähnt' : 'Nicht erwähnt'}
+               </span>`
+            : '<span class="compare-status status-na">–</span>';
+        
+        const chatgptStatus = chatgptTest 
+            ? `<span class="compare-status ${chatgptTest.mentioned ? 'status-good' : 'status-bad'}">
+                 <i class="fa-solid ${chatgptTest.mentioned ? 'fa-check' : 'fa-xmark'}"></i>
+                 ${chatgptTest.mentioned ? 'Erwähnt' : 'Nicht erwähnt'}
+               </span>`
+            : '<span class="compare-status status-na">–</span>';
+        
+        return `
+            <div class="compare-row">
+                <div class="compare-label">${label}</div>
+                <div class="compare-cell">${geminiStatus}</div>
+                <div class="compare-cell">${chatgptStatus}</div>
+            </div>
+        `;
+    }
+
+    // =================================================================
+    // RENDER RESULTS
+    // =================================================================
     function renderResults(data) {
         const { score, domainAnalysis, aiTests, competitors, recommendations } = data;
 
-        // Score Ring Color
+        // Tests nach Engine trennen
+        const geminiTests = aiTests.filter(t => !t.engine || t.engine === 'gemini');
+        const chatgptTests = aiTests.filter(t => t.engine === 'chatgpt');
+        const hasChatGPT = chatgptTests.length > 0;
+
+        // Score Ring
         const scoreColor = score.color;
-        const circumference = 2 * Math.PI * 54; // radius 54
+        const circumference = 2 * Math.PI * 54;
         const offset = circumference - (score.total / 100) * circumference;
 
         let html = `
@@ -203,6 +238,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <h3 style="color: ${scoreColor}">${score.label}</h3>
                     <p class="score-domain">${data.domain}</p>
                     ${data.industry ? `<p class="score-industry"><i class="fa-solid fa-tag"></i> ${data.industry}</p>` : ''}
+                    ${hasChatGPT ? '<p class="score-engines"><i class="fa-solid fa-robot"></i> Geprüft mit Gemini + ChatGPT</p>' : ''}
                 </div>
             </div>
 
@@ -210,22 +246,60 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="result-section">
                 <h3><i class="fa-solid fa-chart-pie"></i> Score-Zusammensetzung</h3>
                 <div class="breakdown-grid">
-                    ${score.breakdown.map(item => `
-                        <div class="breakdown-item">
-                            <div class="breakdown-header">
-                                <span class="breakdown-label">${item.category}</span>
-                                <span class="breakdown-points">${item.points}/${item.maxPoints}</span>
+                    ${score.breakdown.map(item => {
+                        // Engine-Icon für Breakdown-Zeile
+                        let icon = '';
+                        if (item.category.includes('Gemini')) icon = '<span class="breakdown-engine engine-gemini">G</span>';
+                        else if (item.category.includes('ChatGPT')) icon = '<span class="breakdown-engine engine-chatgpt">C</span>';
+                        
+                        return `
+                            <div class="breakdown-item">
+                                <div class="breakdown-header">
+                                    <span class="breakdown-label">${icon} ${item.category}</span>
+                                    <span class="breakdown-points">${item.points}/${item.maxPoints}</span>
+                                </div>
+                                <div class="breakdown-bar">
+                                    <div class="breakdown-fill" style="width: ${(item.points / item.maxPoints) * 100}%"></div>
+                                </div>
+                                <p class="breakdown-detail">${item.detail}</p>
                             </div>
-                            <div class="breakdown-bar">
-                                <div class="breakdown-fill" style="width: ${(item.points / item.maxPoints) * 100}%"></div>
-                            </div>
-                            <p class="breakdown-detail">${item.detail}</p>
-                        </div>
-                    `).join('')}
+                        `;
+                    }).join('')}
                 </div>
             </div>
+        `;
 
-            <!-- Domain Analysis -->
+        // =================================================================
+        // KI-VERGLEICH (wenn ChatGPT vorhanden)
+        // =================================================================
+        if (hasChatGPT) {
+            const geminiKnowledge = geminiTests.find(t => t.id === 'knowledge');
+            const chatgptKnowledge = chatgptTests.find(t => t.id === 'chatgpt_knowledge');
+            const geminiRecommendation = geminiTests.find(t => t.id === 'recommendation');
+            const chatgptRecommendation = chatgptTests.find(t => t.id === 'chatgpt_recommendation');
+
+            html += `
+                <div class="result-section">
+                    <h3><i class="fa-solid fa-code-compare"></i> KI-Vergleich: Gemini vs. ChatGPT</h3>
+                    <p class="section-intro">Wie sehen verschiedene KI-Systeme deine Domain?</p>
+                    
+                    <div class="compare-table">
+                        <div class="compare-row compare-header">
+                            <div class="compare-label">Test</div>
+                            <div class="compare-cell"><span class="engine-badge engine-gemini">Gemini</span></div>
+                            <div class="compare-cell"><span class="engine-badge engine-chatgpt">ChatGPT</span></div>
+                        </div>
+                        ${renderComparisonRow(geminiKnowledge, chatgptKnowledge)}
+                        ${renderComparisonRow(geminiRecommendation, chatgptRecommendation)}
+                    </div>
+                </div>
+            `;
+        }
+
+        // =================================================================
+        // DOMAIN ANALYSE
+        // =================================================================
+        html += `
             <div class="result-section">
                 <h3><i class="fa-solid fa-magnifying-glass-chart"></i> Domain-Analyse</h3>
                 
@@ -262,14 +336,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 </div>
             </div>
+        `;
 
-            <!-- AI Test Results -->
+        // =================================================================
+        // GEMINI TESTS
+        // =================================================================
+        html += `
             <div class="result-section">
-                <h3><i class="fa-solid fa-robot"></i> Gemini Live-Tests</h3>
-                <p class="section-intro">Diese Fragen wurden live an Gemini gestellt:</p>
+                <h3><span class="engine-badge engine-gemini">Gemini</span> Live-Tests mit Google-Suche</h3>
+                <p class="section-intro">Gemini durchsucht das Web live (Grounding) und prüft deine Sichtbarkeit:</p>
                 
                 <div class="tests-accordion">
-                    ${aiTests.map((test, index) => `
+                    ${geminiTests.map((test, index) => `
                         <details class="test-item ${test.mentioned ? 'mentioned' : 'not-mentioned'}" ${index === 0 ? 'open' : ''}>
                             <summary>
                                 <span class="test-status">
@@ -280,9 +358,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <span class="test-toggle"><i class="fa-solid fa-chevron-down"></i></span>
                             </summary>
                             <div class="test-content">
-                                <div class="test-response">
-                                    ${test.response}
-                                </div>
+                                <div class="test-response">${test.response}</div>
                                 ${test.competitors.length > 0 ? `
                                     <div class="test-competitors">
                                         <strong>Erwähnte Alternativen:</strong>
@@ -294,9 +370,49 @@ document.addEventListener('DOMContentLoaded', function() {
                     `).join('')}
                 </div>
             </div>
+        `;
 
-            <!-- Competitors -->
-            ${competitors.length > 0 ? `
+        // =================================================================
+        // CHATGPT TESTS (wenn vorhanden)
+        // =================================================================
+        if (hasChatGPT) {
+            html += `
+                <div class="result-section">
+                    <h3><span class="engine-badge engine-chatgpt">ChatGPT</span> Wissens-Check</h3>
+                    <p class="section-intro">ChatGPT antwortet aus seinem Trainings&shy;wissen – ohne Live-Suche:</p>
+                    
+                    <div class="tests-accordion">
+                        ${chatgptTests.map((test, index) => `
+                            <details class="test-item ${test.mentioned ? 'mentioned' : 'not-mentioned'}" ${index === 0 ? 'open' : ''}>
+                                <summary>
+                                    <span class="test-status">
+                                        <i class="fa-solid ${test.mentioned ? 'fa-check-circle' : 'fa-times-circle'}"></i>
+                                    </span>
+                                    <span class="test-name">${test.description}</span>
+                                    <span class="test-sentiment sentiment-${test.sentiment}">${test.sentiment}</span>
+                                    <span class="test-toggle"><i class="fa-solid fa-chevron-down"></i></span>
+                                </summary>
+                                <div class="test-content">
+                                    <div class="test-response">${test.response}</div>
+                                    ${test.competitors.length > 0 ? `
+                                        <div class="test-competitors">
+                                            <strong>Erwähnte Alternativen:</strong>
+                                            ${test.competitors.map(c => `<span class="competitor-tag">${c}</span>`).join('')}
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            </details>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // =================================================================
+        // KONKURRENTEN
+        // =================================================================
+        if (competitors.length > 0) {
+            html += `
                 <div class="result-section">
                     <h3><i class="fa-solid fa-users"></i> Konkurrenten in KI-Antworten</h3>
                     <p class="section-intro">Diese Domains werden statt deiner erwähnt:</p>
@@ -308,10 +424,14 @@ document.addEventListener('DOMContentLoaded', function() {
                         `).join('')}
                     </div>
                 </div>
-            ` : ''}
+            `;
+        }
 
-            <!-- Recommendations -->
-            ${recommendations.length > 0 ? `
+        // =================================================================
+        // EMPFEHLUNGEN
+        // =================================================================
+        if (recommendations.length > 0) {
+            html += `
                 <div class="result-section">
                     <h3><i class="fa-solid fa-lightbulb"></i> Empfehlungen</h3>
                     <div class="recommendations-list">
@@ -325,12 +445,16 @@ document.addEventListener('DOMContentLoaded', function() {
                         `).join('')}
                     </div>
                 </div>
-            ` : ''}
+            `;
+        }
 
-            <!-- Timestamp -->
+        // =================================================================
+        // FOOTER
+        // =================================================================
+        html += `
             <div class="result-footer">
                 <p><i class="fa-solid fa-clock"></i> Analyse vom ${new Date(data.timestamp).toLocaleString('de-AT')}</p>
-                <p class="disclaimer">Hinweis: KI-Antworten variieren. Dieser Test ist eine Momentaufnahme.</p>
+                <p class="disclaimer">Hinweis: KI-Antworten variieren. Dieser Test ist eine Momentaufnahme.${hasChatGPT ? ' ChatGPT nutzt Trainingswissen, Gemini durchsucht das Web live.' : ''}</p>
             </div>
         `;
 
@@ -341,7 +465,6 @@ document.addEventListener('DOMContentLoaded', function() {
             document.querySelector('.score-ring-progress')?.classList.add('animated');
         }, 100);
 
-        // Scroll to results
         resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 });
