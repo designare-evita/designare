@@ -31,7 +31,6 @@ async function sendBookingNotification({ name, email, startTime, endTime, eventI
     const sendSmtpEmail = new brevo.SendSmtpEmail();
     sendSmtpEmail.subject = `💬 Beratungstermin: ${name} – ${formattedDate}, ${formattedTime}`;
     sendSmtpEmail.to = [{ email: 'michael@designare.at', name: 'Michael Kanda' }];
-    sendSmtpEmail.replyTo = { email: email, name: name };
     sendSmtpEmail.sender = { email: 'noreply@designare.at', name: 'Evita Terminbuchung' };
     sendSmtpEmail.htmlContent = `
 <!DOCTYPE html>
