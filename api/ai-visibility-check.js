@@ -828,89 +828,8 @@ WICHTIG: Beginne DIREKT mit dem Inhalt, keine Einleitung.`;
     
     await new Promise(resolve => setTimeout(resolve, 800));
 
-    // ==================== TEST 2: EMPFEHLUNGEN ====================
-    console.log(`🧪 Test 2: Empfehlungen in der Branche (${detectedIndustry || 'auto'})...`);
-    
-    try {
-      const recommendationPrompt = detectedIndustry
-        ? `Suche nach den besten Anbietern für "${detectedIndustry}" in Österreich.
-WICHTIG: Es geht um DIREKTE KONKURRENTEN – also Unternehmen, die DIESELBEN Produkte/Dienstleistungen anbieten wie ${cleanDomain}.
-Es geht NICHT um Agenturen, Plattformen oder Software-Anbieter, sondern um Shops/Anbieter für Endkunden.
-
-Nenne 5-8 empfehlenswerte Unternehmen. Für jedes Unternehmen schreibe einen kurzen Absatz:
-**Firmenname** – Was sie anbieten und was sie auszeichnet.
-
-Prüfe auch: Wird **${cleanDomain}** in diesem Bereich erwähnt oder empfohlen?
-
-WICHTIG: 
-- Beginne DIREKT mit dem ersten Unternehmen
-- KEINE Nummerierung (1., 2., etc.)
-- Jedes Unternehmen als eigener Absatz
-- Firmennamen immer **fett**`
-
-        : `Suche zuerst, was **${cleanDomain}** anbietet.
-Dann finde 5-8 ähnliche Unternehmen/Konkurrenten, die DIESELBEN oder ähnliche Produkte/Dienstleistungen anbieten.
-WICHTIG: Suche DIREKTE KONKURRENTEN – keine Agenturen, Plattformen oder Software-Anbieter.
-
-Für jedes Unternehmen schreibe einen kurzen Absatz:
-**Firmenname** – Was sie anbieten und warum sie relevant sind.
-
-WICHTIG:
-- Beginne DIREKT mit dem ersten Unternehmen
-- KEINE Nummerierung (1., 2., etc.)
-- Jedes Unternehmen als eigener Absatz
-- Firmennamen immer **fett**
-- Suche Konkurrenten in DERSELBEN Branche wie ${cleanDomain}`;
-
-      const result = await modelWithSearch.generateContent({
-        contents: [{ role: "user", parts: [{ text: recommendationPrompt }] }],
-        tools: [{ googleSearch: {} }]
-      });
-      
-      let text = formatResponseText(result.response.text());
-      
-      const mentioned = isDomainMentioned(text, cleanDomain);
-      
-      const sentiment = analyzeSentiment(text, 'recommendation', mentioned);
-      
-      const domainBase = cleanDomain.replace(/\.[^.]+$/, '');
-      const domainRegex = /(?:https?:\/\/)?(?:www\.)?([a-zA-Z0-9][-a-zA-Z0-9]*\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})?)/gi;
-      const matches = text.match(domainRegex) || [];
-      const competitors = [...new Set(matches)]
-        .map(d => d.replace(/^https?:\/\//, '').replace(/^www\./, '').toLowerCase())
-        .filter(c => !c.includes(domainBase) && !c.includes('google') && !c.includes('schema.org'))
-        .slice(0, 8);
-      
-      testResults.push({
-        id: 'recommendation',
-        description: 'Empfehlungen in der Branche',
-        mentioned,
-        sentiment,
-        competitors,
-        response: text.length > 1200 ? text.substring(0, 1200) + '...' : text,
-        groundingUsed: true,
-        engine: 'gemini'
-      });
-      
-      console.log(`   → ${mentioned ? '✅ Erwähnt' : '❌ Nicht erwähnt'} | Sentiment: ${sentiment}`);
-      
-    } catch (error) {
-      testResults.push({
-        id: 'recommendation',
-        description: 'Empfehlungen in der Branche',
-        mentioned: false,
-        sentiment: 'fehler',
-        competitors: [],
-        response: '❌ Test fehlgeschlagen: ' + error.message,
-        groundingUsed: true,
-        engine: 'gemini'
-      });
-    }
-    
-    await new Promise(resolve => setTimeout(resolve, 800));
-
-    // ==================== TEST 3: BEWERTUNGEN ====================
-    console.log(`🧪 Test 3: Online-Reputation...`);
+    // ==================== TEST 2: BEWERTUNGEN ====================
+    console.log(`🧪 Test 2: Online-Reputation...`);
     
     try {
       const reviewsPrompt = `Suche nach Bewertungen und Rezensionen zu **${cleanDomain}**.
@@ -965,8 +884,8 @@ WICHTIG: Beginne DIREKT mit dem Inhalt, keine Einleitung wie "Okay" oder "Ich we
     
     await new Promise(resolve => setTimeout(resolve, 800));
 
-    // ==================== TEST 4: EXTERNE ERWÄHNUNGEN ====================
-    console.log(`🧪 Test 4: Externe Erwähnungen...`);
+    // ==================== TEST 3: EXTERNE ERWÄHNUNGEN ====================
+    console.log(`🧪 Test 3: Externe Erwähnungen...`);
     
     try {
       const mentionsPrompt = `Suche nach externen Erwähnungen von **${cleanDomain}**:
@@ -1049,31 +968,6 @@ Antworte in 3-5 Sätzen auf Deutsch. Schreibe Firmennamen **fett**.
 Falls du nichts weißt: "Zu **${cleanDomain}** habe ich keine Informationen."
 
 WICHTIG: Beginne DIREKT mit dem Inhalt.`
-        },
-        {
-          id: 'chatgpt_recommendation',
-          description: 'Empfehlungen (ChatGPT)',
-          prompt: detectedIndustry
-            ? `Nenne 5-8 empfehlenswerte Anbieter für "${detectedIndustry}" in Österreich.
-WICHTIG: Es geht um DIREKTE KONKURRENTEN von ${cleanDomain} – also Unternehmen, die dieselben oder sehr ähnliche Produkte/Dienstleistungen anbieten.
-Suche nach Unternehmen in einer VERGLEICHBAREN Größenordnung, nicht nur Großkonzerne.
-Nenne KEINE Software-Plattformen, Agenturen oder E-Commerce-Tools.
-
-Für jedes Unternehmen schreibe einen kurzen Absatz:
-**Firmenname** – Was sie anbieten und was sie auszeichnet.
-
-Am Ende: Schreibe einen separaten Absatz ob du **${cleanDomain}** in diesem Bereich kennst und empfehlen würdest. Falls nicht, schreibe klar: "**${cleanDomain}** ist mir nicht bekannt und wird daher nicht empfohlen."
-
-WICHTIG: Beginne DIREKT, keine Nummerierung, Firmennamen **fett**, auf Deutsch.`
-            : `Was bietet **${cleanDomain}** an? Nenne dann 5-8 DIREKTE Konkurrenten in Österreich – also Unternehmen, die dieselben Produkte/Dienstleistungen anbieten.
-Suche nach Unternehmen in einer VERGLEICHBAREN Größenordnung, nicht nur Großkonzerne.
-Nenne KEINE Software-Plattformen, Agenturen oder Tools.
-
-**Firmenname** – Was sie anbieten und warum sie relevant sind.
-
-Am Ende: Schreibe einen separaten Absatz ob du **${cleanDomain}** kennst und empfehlen würdest.
-
-WICHTIG: Beginne DIREKT, keine Nummerierung, Firmennamen **fett**, auf Deutsch.`
         }
       ];
       
