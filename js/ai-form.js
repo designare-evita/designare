@@ -85,7 +85,7 @@ export const initAiForm = () => {
             contact: ['kontakt', 'erreichen', 'mail', 'email', 'anrufen', 'telefon', 'schreiben', 'melden'],
             services: ['angebot', 'service', 'leistung', 'macht ihr', 'machst du', 'bietet', 'können', 'hilfe bei', 'wordpress', 'website', 'webseite', 'homepage'],
             pricing: ['preis', 'kosten', 'kostet', 'budget', 'teuer', 'günstig', 'zahlen', 'euro', 'geld'],
-            booking: ['termin', 'buchung', 'buchen', 'rückruf', 'treffen', 'gespräch', 'call', 'meeting', 'vereinbaren'],
+            booking: ['termin', 'buchung', 'buchen', 'rückruf', 'anrufen', 'sprechen', 'kontakt', 'meeting', 'appointment', 'erreichen', 'treffen', 'call', 'telefonat', 'beratung', 'projekt besprechen'],
             about: ['wer ist', 'über michael', 'michael kanda', 'wer bist', 'erzähl', 'hintergrund', 'erfahrung'],
             evita: ['evita', 'ki', 'chatbot', 'assistent', 'wie funktionierst', 'bist du', 'was bist'],
             tools: ['tool', 'datapeak', 'silas', 'dashboard', 'seo tool', 'entwickelt']
@@ -300,7 +300,16 @@ export const initAiForm = () => {
             return this.safeFetch('/api/suggest-appointments');
         },
         
-        bookAppointment(bookingData) {
+        // ✅ FIX: Nutze book-appointment-phone API für Rückruf-Buchungen (mit QR-Code + ICS)
+        bookPhoneAppointment(bookingData) {
+            return this.safeFetch('/api/book-appointment-phone', {
+                method: 'POST',
+                body: JSON.stringify(bookingData)
+            });
+        },
+
+        // E-Mail-basierte Buchung (falls benötigt)
+        bookEmailAppointment(bookingData) {
             return this.safeFetch('/api/create-appointment', {
                 method: 'POST',
                 body: JSON.stringify(bookingData)
@@ -644,10 +653,11 @@ export const initAiForm = () => {
             submitButton.textContent = 'Wird gebucht...';
 
             try {
-                const data = await ApiHandler.bookAppointment({
-                    slot: state.selectedCallbackData.formattedString, // Verwende formattedString statt fullDateTime
-                    name, 
-                    email: phone, // API erwartet "email", wir senden die Telefonnummer
+                // ✅ FIX: Nutze book-appointment-phone API (gibt QR-Code + ICS zurück)
+                const data = await ApiHandler.bookPhoneAppointment({
+                    slot: state.selectedCallbackData.fullDateTime,
+                    name,
+                    phone,
                     topic
                 });
 
@@ -954,7 +964,6 @@ export const initAiForm = () => {
         "Willkommen! Ich bin Evita, Michaels digitale Komplizin. Stell mir deine Fragen!",
         "Hey, schön dich zu sehen! Ich bin Evita. Egal, ob WordPress, KI oder Kuchenrezepte – ich bin für dich da!",
         "Hi! Evita hier. Ich freue mich dich kennenzulernen – frag einfach drauf los!",
-        "Grüß dich! Ich bin Evita, die digitale Version an Michaels Seite. Die vierbeinige schläft gerade. Was kann ich für dich tun?",
         "Grüß dich! Ich bin Evita, Michaels digitale Unterstützung. Der Hund schnarcht, Michael codet – und ich bin für dich da. Was liegt an?",
         "Servus! Evita hier. Ich bin die KI-Assistenz , Michael schreibt den Code und der Hund ist für die gute Laune zuständig. Wobei kann ich dir heute helfen?"
     ];
