@@ -992,19 +992,23 @@ WICHTIG: Beginne DIREKT mit dem Inhalt.`
           description: 'Empfehlungen (ChatGPT)',
           prompt: detectedIndustry
             ? `Nenne 5-8 empfehlenswerte Anbieter für "${detectedIndustry}" in Österreich.
-WICHTIG: Es geht um DIREKTE KONKURRENTEN von ${cleanDomain} – also Unternehmen/Shops, die dieselben Produkte oder Dienstleistungen an Endkunden verkaufen.
-Nenne KEINE Software-Plattformen (Shopware, Magento etc.), keine Agenturen und keine E-Commerce-Tools.
+WICHTIG: Es geht um DIREKTE KONKURRENTEN von ${cleanDomain} – also Unternehmen, die dieselben oder sehr ähnliche Produkte/Dienstleistungen anbieten.
+Suche nach Unternehmen in einer VERGLEICHBAREN Größenordnung, nicht nur Großkonzerne.
+Nenne KEINE Software-Plattformen, Agenturen oder E-Commerce-Tools.
 
 Für jedes Unternehmen schreibe einen kurzen Absatz:
 **Firmenname** – Was sie anbieten und was sie auszeichnet.
 
-Prüfe auch: Würdest du **${cleanDomain}** in diesem Bereich empfehlen?
+Am Ende: Schreibe einen separaten Absatz ob du **${cleanDomain}** in diesem Bereich kennst und empfehlen würdest. Falls nicht, schreibe klar: "**${cleanDomain}** ist mir nicht bekannt und wird daher nicht empfohlen."
 
 WICHTIG: Beginne DIREKT, keine Nummerierung, Firmennamen **fett**, auf Deutsch.`
-            : `Was bietet **${cleanDomain}** an? Nenne dann 5-8 DIREKTE Konkurrenten in Österreich – also Unternehmen, die dieselben Produkte/Dienstleistungen an Endkunden anbieten.
+            : `Was bietet **${cleanDomain}** an? Nenne dann 5-8 DIREKTE Konkurrenten in Österreich – also Unternehmen, die dieselben Produkte/Dienstleistungen anbieten.
+Suche nach Unternehmen in einer VERGLEICHBAREN Größenordnung, nicht nur Großkonzerne.
 Nenne KEINE Software-Plattformen, Agenturen oder Tools.
 
 **Firmenname** – Was sie anbieten und warum sie relevant sind.
+
+Am Ende: Schreibe einen separaten Absatz ob du **${cleanDomain}** kennst und empfehlen würdest.
 
 WICHTIG: Beginne DIREKT, keine Nummerierung, Firmennamen **fett**, auf Deutsch.`
         }
