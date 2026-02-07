@@ -268,8 +268,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (hasChatGPT) {
             const geminiKnowledge = geminiTests.find(t => t.id === 'knowledge');
             const chatgptKnowledge = chatgptTests.find(t => t.id === 'chatgpt_knowledge');
-            const geminiRecommendation = geminiTests.find(t => t.id === 'recommendation');
-            const chatgptRecommendation = chatgptTests.find(t => t.id === 'chatgpt_recommendation');
             const geminiReputation = geminiTests.find(t => t.id === 'reviews');
             const geminiExternal = geminiTests.find(t => t.id === 'mentions');
 
@@ -283,7 +281,7 @@ document.addEventListener('DOMContentLoaded', function() {
             html += `
                 <div class="result-section">
                     <h3><i class="fa-solid fa-code-compare"></i> KI-Vergleich: Gemini vs. ChatGPT</h3>
-                    <p class="section-intro">Wie sehen verschiedene KI-Systeme deine Domain?</p>
+                    <p class="section-intro">Kennen die großen KI-Systeme deine Domain?</p>
                     
                     <div style="overflow-x:auto;margin-top:1rem;">
                         <table style="width:100%;border-collapse:collapse;background:rgba(255,255,255,0.02);border-radius:10px;overflow:hidden;">
@@ -307,20 +305,6 @@ document.addEventListener('DOMContentLoaded', function() {
                                     <td style="${tdStyle}">
                                         ${statusPill(chatgptKnowledge)}
                                         <br>${sentimentDot(chatgptKnowledge)}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style="${tdLeftStyle}">
-                                        <i class="fa-solid fa-ranking-star" style="color:#c4a35a;margin-right:6px;width:16px;"></i>
-                                        Empfehlungen
-                                    </td>
-                                    <td style="${tdStyle}">
-                                        ${statusPill(geminiRecommendation)}
-                                        <br>${sentimentDot(geminiRecommendation)}
-                                    </td>
-                                    <td style="${tdStyle}">
-                                        ${statusPill(chatgptRecommendation)}
-                                        <br>${sentimentDot(chatgptRecommendation)}
                                     </td>
                                 </tr>
                                 <tr>
@@ -437,27 +421,20 @@ document.addEventListener('DOMContentLoaded', function() {
         // =================================================================
         if (hasChatGPT) {
             const chatgptKnown = chatgptTests.find(t => t.id === 'chatgpt_knowledge')?.mentioned;
-            const chatgptRecommended = chatgptTests.find(t => t.id === 'chatgpt_recommendation')?.mentioned;
             
             // Kontext-Hinweis generieren
             let chatgptInsight = '';
-            if (!chatgptKnown && !chatgptRecommended) {
+            if (!chatgptKnown) {
                 chatgptInsight = `
                     <div style="background:rgba(239,68,68,0.08);border-left:3px solid #ef4444;padding:12px 16px;border-radius:0 8px 8px 0;margin-bottom:1rem;font-size:0.9rem;color:#ccc;">
                         <strong style="color:#ef4444;">⚠ Nicht in ChatGPTs Wissensbasis</strong><br>
-                        ChatGPT kennt deine Domain nicht und empfiehlt dich auch nicht. Das bedeutet, dass Nutzer von ChatGPT bei Branchenanfragen nur deine Konkurrenten sehen.
+                        ChatGPT kennt deine Domain nicht. Nutzer von ChatGPT sehen bei Branchenanfragen nur deine Konkurrenten. Mehr externe Erwähnungen und strukturierte Daten können helfen.
                     </div>`;
-            } else if (!chatgptKnown && chatgptRecommended) {
-                chatgptInsight = `
-                    <div style="background:rgba(245,158,11,0.08);border-left:3px solid #f59e0b;padding:12px 16px;border-radius:0 8px 8px 0;margin-bottom:1rem;font-size:0.9rem;color:#ccc;">
-                        <strong style="color:#f59e0b;">🔶 Teilweise bekannt</strong><br>
-                        ChatGPT kennt deine Domain nicht direkt, erwähnt dich aber bei Branchenempfehlungen. Das ist ein guter Anfang!
-                    </div>`;
-            } else if (chatgptKnown && chatgptRecommended) {
+            } else {
                 chatgptInsight = `
                     <div style="background:rgba(34,197,94,0.08);border-left:3px solid #22c55e;padding:12px 16px;border-radius:0 8px 8px 0;margin-bottom:1rem;font-size:0.9rem;color:#ccc;">
                         <strong style="color:#22c55e;">✅ In ChatGPTs Wissensbasis</strong><br>
-                        ChatGPT kennt dein Unternehmen und empfiehlt es aktiv. Du bist auch für ChatGPT-Nutzer sichtbar.
+                        ChatGPT kennt dein Unternehmen. Du bist auch für ChatGPT-Nutzer sichtbar.
                     </div>`;
             }
 
