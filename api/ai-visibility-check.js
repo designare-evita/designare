@@ -1,9 +1,36 @@
 // api/ai-visibility-check.js - KI-Sichtbarkeits-Check mit Grounding + Formatierung
-// Version 9: + Brevo E-Mail-Benachrichtigung bei jedem Check
+// Version 10: + ChatGPT Cross-Check (Dual-KI)
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import * as brevo from '@getbrevo/brevo';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+// =================================================================
+// OPENAI / CHATGPT CLIENT
+// =================================================================
+async function chatGPTQuery(prompt) {
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+    },
+    body: JSON.stringify({
+      model: 'gpt-4o-mini',
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.4,
+      max_tokens: 1500
+    })
+  });
+  
+  if (!response.ok) {
+    const errBody = await response.text();
+    throw new Error(`OpenAI API ${response.status}: ${errBody}`);
+  }
+  
+  const data = await response.json();
+  return data.choices?.[0]?.message?.content || '';
+}
 
 // =================================================================
 // RATE LIMITING
@@ -213,11 +240,13 @@ async function sendCheckNotification({ domain, industry, score, scoreLabel, scor
     const testRows = (testResults || []).map(t => {
       const statusIcon = t.mentioned ? '✅' : '❌';
       const sentimentIcon = t.sentiment === 'positiv' ? '🟢' : t.sentiment === 'negativ' ? '🔴' : '🟡';
-      // HTML-Tags aus Response entfernen für E-Mail-Sicherheit
+      const engineBadge = t.engine === 'chatgpt' 
+        ? '<span style="background:#10a37f;color:#fff;padding:1px 6px;border-radius:3px;font-size:10px;margin-left:4px;">GPT</span>' 
+        : '<span style="background:#4285f4;color:#fff;padding:1px 6px;border-radius:3px;font-size:10px;margin-left:4px;">Gemini</span>';
       const cleanResponse = (t.response || '').replace(/<[^>]*>/g, '').substring(0, 300);
       return `
         <tr>
-          <td style="padding:8px 12px;border-bottom:1px solid #333;color:#ccc;">${t.description}</td>
+          <td style="padding:8px 12px;border-bottom:1px solid #333;color:#ccc;">${t.description} ${engineBadge}</td>
           <td style="padding:8px 12px;border-bottom:1px solid #333;text-align:center;">${statusIcon}</td>
           <td style="padding:8px 12px;border-bottom:1px solid #333;text-align:center;">${sentimentIcon} ${t.sentiment}</td>
         </tr>
@@ -675,7 +704,8 @@ WICHTIG: Beginne DIREKT mit dem Inhalt, keine Einleitung.`;
         sentiment,
         competitors: [],
         response: formattedKnowledge,
-        groundingUsed: true
+        groundingUsed: true,
+        engine: 'gemini'
       });
       
       console.log(`   → ${mentioned ? '✅ Erwähnt' : '❌ Nicht erwähnt'} | Sentiment: ${sentiment}`);
@@ -693,7 +723,8 @@ WICHTIG: Beginne DIREKT mit dem Inhalt, keine Einleitung.`;
         sentiment: 'fehler',
         competitors: [],
         response: '❌ Test fehlgeschlagen: ' + error.message,
-        groundingUsed: true
+        groundingUsed: true,
+        engine: 'gemini'
       });
     }
     
@@ -757,7 +788,8 @@ WICHTIG:
         sentiment,
         competitors,
         response: text.length > 1200 ? text.substring(0, 1200) + '...' : text,
-        groundingUsed: true
+        groundingUsed: true,
+        engine: 'gemini'
       });
       
       console.log(`   → ${mentioned ? '✅ Erwähnt' : '❌ Nicht erwähnt'} | Sentiment: ${sentiment}`);
@@ -770,7 +802,8 @@ WICHTIG:
         sentiment: 'fehler',
         competitors: [],
         response: '❌ Test fehlgeschlagen: ' + error.message,
-        groundingUsed: true
+        groundingUsed: true,
+        engine: 'gemini'
       });
     }
     
@@ -813,7 +846,8 @@ WICHTIG: Beginne DIREKT mit dem Inhalt, keine Einleitung wie "Okay" oder "Ich we
         sentiment,
         competitors: [],
         response: text,
-        groundingUsed: true
+        groundingUsed: true,
+        engine: 'gemini'
       });
       
       console.log(`   → ${mentioned ? '✅ Erwähnt' : '❌ Nicht erwähnt'} | Sentiment: ${sentiment}`);
@@ -826,7 +860,8 @@ WICHTIG: Beginne DIREKT mit dem Inhalt, keine Einleitung wie "Okay" oder "Ich we
         sentiment: 'fehler',
         competitors: [],
         response: '❌ Test fehlgeschlagen: ' + error.message,
-        groundingUsed: true
+        groundingUsed: true,
+        engine: 'gemini'
       });
     }
     
@@ -877,7 +912,8 @@ WICHTIG: Beginne DIREKT mit dem Inhalt, keine Einleitung.`;
         sentiment,
         competitors: mentionedDomains,
         response: text,
-        groundingUsed: true
+        groundingUsed: true,
+        engine: 'gemini'
       });
       
       console.log(`   → ${mentioned ? '✅ Erwähnt' : '❌ Nicht erwähnt'} | Sentiment: ${sentiment}`);
@@ -890,8 +926,111 @@ WICHTIG: Beginne DIREKT mit dem Inhalt, keine Einleitung.`;
         sentiment: 'fehler',
         competitors: [],
         response: '❌ Test fehlgeschlagen: ' + error.message,
-        groundingUsed: true
+        groundingUsed: true,
+        engine: 'gemini'
       });
+    }
+
+    // =================================================================
+    // PHASE 2b: ChatGPT Cross-Check (2 Tests parallel)
+    // =================================================================
+    const chatGptResults = [];
+    
+    if (process.env.OPENAI_API_KEY) {
+      console.log(`🤖 ChatGPT Cross-Check startet...`);
+      
+      const chatGptTests = [
+        {
+          id: 'chatgpt_knowledge',
+          description: 'Bekanntheit (ChatGPT)',
+          prompt: `Was weißt du über die Website ${cleanDomain}? Beschreibe kurz:
+- Was bietet dieses Unternehmen an?
+- In welcher Branche ist es tätig?
+- Wo ist der Standort?
+
+Antworte in 3-5 Sätzen auf Deutsch. Schreibe Firmennamen **fett**.
+Falls du nichts weißt: "Zu **${cleanDomain}** habe ich keine Informationen."
+
+WICHTIG: Beginne DIREKT mit dem Inhalt.`
+        },
+        {
+          id: 'chatgpt_recommendation',
+          description: 'Empfehlungen (ChatGPT)',
+          prompt: detectedIndustry
+            ? `Nenne 5-8 empfehlenswerte Anbieter für "${detectedIndustry}" in Österreich.
+
+Für jedes Unternehmen schreibe einen kurzen Absatz:
+**Firmenname** – Was sie anbieten und was sie auszeichnet.
+
+Prüfe auch: Würdest du **${cleanDomain}** in diesem Bereich empfehlen?
+
+WICHTIG: Beginne DIREKT, keine Nummerierung, Firmennamen **fett**, auf Deutsch.`
+            : `Was bietet **${cleanDomain}** an? Nenne dann 5-8 ähnliche Unternehmen/Konkurrenten in Österreich.
+
+**Firmenname** – Was sie anbieten und warum sie relevant sind.
+
+WICHTIG: Beginne DIREKT, keine Nummerierung, Firmennamen **fett**, auf Deutsch.`
+        }
+      ];
+      
+      // Parallel ausführen für Speed
+      const chatGptPromises = chatGptTests.map(async (test) => {
+        try {
+          console.log(`🤖 ChatGPT Test: ${test.description}...`);
+          
+          const rawText = await chatGPTQuery(test.prompt);
+          const text = formatResponseText(rawText);
+          
+          const domainBase = cleanDomain.replace(/\.[^.]+$/, '');
+          const mentioned = text.toLowerCase().includes(cleanDomain) ||
+                            text.toLowerCase().includes(domainBase);
+          
+          const testType = test.id.includes('knowledge') ? 'knowledge' : 'recommendation';
+          const sentiment = analyzeSentiment(text, testType, mentioned);
+          
+          // Konkurrenten extrahieren
+          const domainRegex = /(?:https?:\/\/)?(?:www\.)?([a-zA-Z0-9][-a-zA-Z0-9]*\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})?)/gi;
+          const matches = text.match(domainRegex) || [];
+          const competitors = [...new Set(matches)]
+            .map(d => d.replace(/^https?:\/\//, '').replace(/^www\./, '').toLowerCase())
+            .filter(c => !c.includes(domainBase) && !c.includes('google') && !c.includes('openai') && !c.includes('schema.org'))
+            .slice(0, 8);
+          
+          console.log(`   → ${mentioned ? '✅ Erwähnt' : '❌ Nicht erwähnt'} | Sentiment: ${sentiment}`);
+          
+          return {
+            id: test.id,
+            description: test.description,
+            mentioned,
+            sentiment,
+            competitors,
+            response: text.length > 1200 ? text.substring(0, 1200) + '...' : text,
+            engine: 'chatgpt'
+          };
+          
+        } catch (error) {
+          console.error(`   → ❌ ChatGPT Test fehlgeschlagen:`, error.message);
+          return {
+            id: test.id,
+            description: test.description,
+            mentioned: false,
+            sentiment: 'fehler',
+            competitors: [],
+            response: '❌ ChatGPT-Test fehlgeschlagen: ' + error.message,
+            engine: 'chatgpt'
+          };
+        }
+      });
+      
+      const results = await Promise.all(chatGptPromises);
+      chatGptResults.push(...results);
+      
+      // ChatGPT-Ergebnisse auch in testResults aufnehmen
+      testResults.push(...chatGptResults);
+      
+      console.log(`✅ ChatGPT Cross-Check abgeschlossen (${chatGptResults.length} Tests)`);
+    } else {
+      console.log('⚠️ OPENAI_API_KEY nicht gesetzt, ChatGPT Cross-Check übersprungen');
     }
 
     // =================================================================
@@ -900,18 +1039,38 @@ WICHTIG: Beginne DIREKT mit dem Inhalt, keine Einleitung.`;
     let score = 0;
     const scoreBreakdown = [];
     
-    // 1. Erwähnungsrate (max 40 Punkte)
-    const mentionCount = testResults.filter(t => t.mentioned).length;
-    const mentionScore = Math.round((mentionCount / testResults.length) * 40);
-    score += mentionScore;
+    // Ergebnisse nach Engine trennen
+    const geminiTests = testResults.filter(t => !t.engine || t.engine === 'gemini');
+    const chatgptTests = testResults.filter(t => t.engine === 'chatgpt');
+    const allTests = testResults.filter(t => t.sentiment !== 'fehler');
+    
+    // 1. Gemini Web-Präsenz (max 30 Punkte) 
+    const geminiMentions = geminiTests.filter(t => t.mentioned).length;
+    const geminiMentionScore = geminiTests.length > 0 
+      ? Math.round((geminiMentions / geminiTests.length) * 30) 
+      : 0;
+    score += geminiMentionScore;
     scoreBreakdown.push({
-      category: 'Web-Präsenz (Grounding)',
-      points: mentionScore,
-      maxPoints: 40,
-      detail: `${mentionCount} von ${testResults.length} Suchen finden die Domain`
+      category: 'Gemini Sichtbarkeit',
+      points: geminiMentionScore,
+      maxPoints: 30,
+      detail: `${geminiMentions} von ${geminiTests.length} Gemini-Suchen finden die Domain`
     });
     
-    // 2. Technische Authority (max 35 Punkte)
+    // 2. ChatGPT Cross-Check (max 10 Punkte)
+    if (chatgptTests.length > 0) {
+      const chatgptMentions = chatgptTests.filter(t => t.mentioned).length;
+      const chatgptScore = Math.round((chatgptMentions / chatgptTests.length) * 10);
+      score += chatgptScore;
+      scoreBreakdown.push({
+        category: 'ChatGPT Sichtbarkeit',
+        points: chatgptScore,
+        maxPoints: 10,
+        detail: `${chatgptMentions} von ${chatgptTests.length} ChatGPT-Tests finden die Domain`
+      });
+    }
+    
+    // 3. Technische Authority (max 35 Punkte)
     let techScore = 0;
     if (domainAnalysis.hasSchema) techScore += 12;
     if (domainAnalysis.schemaTypes.length >= 3) techScore += 8;
@@ -955,6 +1114,7 @@ WICHTIG: Beginne DIREKT mit dem Inhalt, keine Einleitung.`;
     // =================================================================
     // PHASE 4: Empfehlungen generieren
     // =================================================================
+    const mentionCount = testResults.filter(t => t.mentioned).length;
     const recommendations = [];
     
     if (mentionCount === 0) {
@@ -999,6 +1159,28 @@ WICHTIG: Beginne DIREKT mit dem Inhalt, keine Einleitung.`;
         title: 'E-E-A-T Signale stärken', 
         description: 'Füge eine "Über uns" Seite mit Qualifikationen hinzu.', 
         link: null 
+      });
+    }
+    
+    // ChatGPT-spezifische Empfehlungen
+    const chatgptMentionCount = chatGptResults.filter(t => t.mentioned).length;
+    const geminiMentionCount = geminiTests.filter(t => t.mentioned).length;
+    
+    if (chatGptResults.length > 0 && chatgptMentionCount === 0 && geminiMentionCount > 0) {
+      recommendations.push({ 
+        priority: 'mittel', 
+        title: 'ChatGPT-Sichtbarkeit verbessern', 
+        description: 'Gemini kennt dich, aber ChatGPT nicht. Mehr externe Erwähnungen, Wikipedia-Einträge und strukturierte Daten helfen.', 
+        link: null 
+      });
+    }
+    
+    if (chatGptResults.length > 0 && chatgptMentionCount > 0 && geminiMentionCount === 0) {
+      recommendations.push({ 
+        priority: 'mittel', 
+        title: 'Google/Gemini-Sichtbarkeit verbessern', 
+        description: 'ChatGPT kennt dich, aber Gemini nicht. Google Business Profile und Schema.org Markup sind entscheidend.', 
+        link: '/schema-org-meta-description'
       });
     }
 
@@ -1061,7 +1243,8 @@ WICHTIG: Beginne DIREKT mit dem Inhalt, keine Einleitung.`;
       competitors: allCompetitors,
       recommendations,
       meta: { 
-        testsWithGrounding: testResults.length, 
+        geminiTests: geminiTests.length,
+        chatgptTests: chatgptTests.length,
         totalTests: testResults.length, 
         remainingChecks: checkRateLimit(clientIP).remaining 
       }
