@@ -1,6 +1,7 @@
 // api/ai-visibility-check.js - KI-Sichtbarkeits-Check mit Grounding + Formatierung
-// Version 8: KORRIGIERTE Sentiment-Logik
+// Version 9: + Brevo E-Mail-Benachrichtigung bei jedem Check
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import * as brevo from '@getbrevo/brevo';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
@@ -195,6 +196,163 @@ function sanitizeIndustry(input) {
 }
 
 // =================================================================
+// NEU: E-MAIL-BENACHRICHTIGUNG via Brevo
+// =================================================================
+async function sendCheckNotification({ domain, industry, score, scoreLabel, scoreColor, mentionCount, totalTests, testResults, domainAnalysis, competitors, recommendations }) {
+  try {
+    const apiInstance = new brevo.TransactionalEmailsApi();
+    apiInstance.setApiKey(
+      brevo.TransactionalEmailsApiApiKeys.apiKey,
+      process.env.BREVO_API_KEY
+    );
+
+    // Score-Badge Farbe
+    const badgeColor = scoreColor || '#f59e0b';
+
+    // Test-Ergebnisse als HTML-Tabelle
+    const testRows = (testResults || []).map(t => {
+      const statusIcon = t.mentioned ? '✅' : '❌';
+      const sentimentIcon = t.sentiment === 'positiv' ? '🟢' : t.sentiment === 'negativ' ? '🔴' : '🟡';
+      // HTML-Tags aus Response entfernen für E-Mail-Sicherheit
+      const cleanResponse = (t.response || '').replace(/<[^>]*>/g, '').substring(0, 300);
+      return `
+        <tr>
+          <td style="padding:8px 12px;border-bottom:1px solid #333;color:#ccc;">${t.description}</td>
+          <td style="padding:8px 12px;border-bottom:1px solid #333;text-align:center;">${statusIcon}</td>
+          <td style="padding:8px 12px;border-bottom:1px solid #333;text-align:center;">${sentimentIcon} ${t.sentiment}</td>
+        </tr>
+        <tr>
+          <td colspan="3" style="padding:6px 12px 12px;border-bottom:1px solid #444;color:#999;font-size:12px;">${cleanResponse}${cleanResponse.length >= 300 ? '...' : ''}</td>
+        </tr>`;
+    }).join('');
+
+    // Schema-Info
+    const schemaInfo = domainAnalysis?.schema?.found
+      ? `✅ Vorhanden (${domainAnalysis.schema.types.join(', ') || 'unbekannte Typen'})`
+      : '❌ Nicht vorhanden';
+
+    // E-E-A-T Info
+    const eeatItems = [];
+    if (domainAnalysis?.eeat?.aboutPage) eeatItems.push('Über-uns');
+    if (domainAnalysis?.eeat?.contactPage) eeatItems.push('Kontakt');
+    if (domainAnalysis?.eeat?.authorInfo) eeatItems.push('Autor-Info');
+    const eeatInfo = eeatItems.length > 0 ? `✅ ${eeatItems.join(', ')}` : '❌ Keine gefunden';
+
+    // Empfehlungen
+    const recoHtml = (recommendations || []).map(r => {
+      const prioColor = r.priority === 'hoch' ? '#ef4444' : '#f59e0b';
+      return `<div style="margin-bottom:8px;padding:8px 12px;background:#1a1a2e;border-left:3px solid ${prioColor};border-radius:4px;">
+        <strong style="color:#fff;">${r.title}</strong><br>
+        <span style="color:#aaa;font-size:13px;">${r.description}</span>
+      </div>`;
+    }).join('');
+
+    // Konkurrenten
+    const competitorList = (competitors || []).length > 0
+      ? competitors.slice(0, 10).join(', ')
+      : 'Keine gefunden';
+
+    const sendSmtpEmail = new brevo.SendSmtpEmail();
+    sendSmtpEmail.subject = `🤖 KI-Check: ${domain} → ${score}/100 (${scoreLabel})`;
+    sendSmtpEmail.to = [{ email: 'michael@designare.at', name: 'Michael Kanda' }];
+    sendSmtpEmail.sender = { email: 'noreply@designare.at', name: 'KI-Sichtbarkeits-Check' };
+    sendSmtpEmail.htmlContent = `
+<!DOCTYPE html>
+<html>
+<body style="margin:0;padding:0;background:#0a0a1a;color:#fff;font-family:Arial,Helvetica,sans-serif;">
+  <div style="max-width:600px;margin:0 auto;padding:20px;">
+    
+    <!-- Header -->
+    <div style="text-align:center;padding:20px 0;border-bottom:1px solid #333;">
+      <h1 style="margin:0;font-size:20px;color:#fff;">🤖 KI-Sichtbarkeits-Check</h1>
+      <p style="margin:5px 0 0;color:#888;">Neuer Check durchgeführt</p>
+    </div>
+
+    <!-- Score Badge -->
+    <div style="text-align:center;padding:30px 0;">
+      <div style="display:inline-block;width:100px;height:100px;border-radius:50%;background:${badgeColor};line-height:100px;font-size:32px;font-weight:bold;color:#fff;">
+        ${score}
+      </div>
+      <p style="margin:10px 0 0;font-size:18px;color:${badgeColor};font-weight:bold;">${scoreLabel}</p>
+    </div>
+
+    <!-- Domain & Branche -->
+    <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
+      <tr>
+        <td style="padding:8px 12px;color:#888;width:120px;">Domain:</td>
+        <td style="padding:8px 12px;color:#fff;font-weight:bold;font-size:16px;">${domain}</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 12px;color:#888;">Branche:</td>
+        <td style="padding:8px 12px;color:#ccc;">${industry || 'Nicht angegeben'}</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 12px;color:#888;">Zeitpunkt:</td>
+        <td style="padding:8px 12px;color:#ccc;">${new Date().toLocaleString('de-AT', { timeZone: 'Europe/Vienna' })}</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 12px;color:#888;">Erwähnungen:</td>
+        <td style="padding:8px 12px;color:#ccc;">${mentionCount} von ${totalTests} Tests</td>
+      </tr>
+    </table>
+
+    <!-- Technische Analyse -->
+    <div style="background:#111;border-radius:8px;padding:16px;margin-bottom:20px;">
+      <h3 style="margin:0 0 10px;color:#fff;font-size:14px;">📊 Technische Analyse</h3>
+      <p style="margin:4px 0;color:#ccc;font-size:13px;">Schema.org: ${schemaInfo}</p>
+      <p style="margin:4px 0;color:#ccc;font-size:13px;">E-E-A-T: ${eeatInfo}</p>
+      <p style="margin:4px 0;color:#ccc;font-size:13px;">Title: ${domainAnalysis?.title || '–'}</p>
+    </div>
+
+    <!-- Test-Ergebnisse -->
+    <div style="background:#111;border-radius:8px;padding:16px;margin-bottom:20px;">
+      <h3 style="margin:0 0 10px;color:#fff;font-size:14px;">🧪 KI-Test-Ergebnisse</h3>
+      <table style="width:100%;border-collapse:collapse;">
+        <thead>
+          <tr style="border-bottom:2px solid #444;">
+            <th style="padding:8px 12px;text-align:left;color:#888;font-size:12px;">TEST</th>
+            <th style="padding:8px 12px;text-align:center;color:#888;font-size:12px;">ERWÄHNT</th>
+            <th style="padding:8px 12px;text-align:center;color:#888;font-size:12px;">SENTIMENT</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${testRows}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Konkurrenten -->
+    <div style="background:#111;border-radius:8px;padding:16px;margin-bottom:20px;">
+      <h3 style="margin:0 0 10px;color:#fff;font-size:14px;">🏢 Genannte Konkurrenten</h3>
+      <p style="color:#ccc;font-size:13px;margin:0;">${competitorList}</p>
+    </div>
+
+    <!-- Empfehlungen -->
+    ${recoHtml ? `
+    <div style="background:#111;border-radius:8px;padding:16px;margin-bottom:20px;">
+      <h3 style="margin:0 0 10px;color:#fff;font-size:14px;">💡 Empfehlungen</h3>
+      ${recoHtml}
+    </div>` : ''}
+
+    <!-- Footer -->
+    <div style="text-align:center;padding:20px 0;border-top:1px solid #333;color:#666;font-size:11px;">
+      KI-Sichtbarkeits-Check · designare.at
+    </div>
+
+  </div>
+</body>
+</html>`;
+
+    await apiInstance.sendTransacEmail(sendSmtpEmail);
+    console.log(`📧 Benachrichtigung gesendet für ${domain}`);
+
+  } catch (error) {
+    // E-Mail-Fehler soll den Check NICHT blockieren
+    console.error('⚠️ E-Mail-Benachrichtigung fehlgeschlagen:', error?.body || error?.message || error);
+  }
+}
+
+// =================================================================
 // NEU: VERBESSERTE SENTIMENT-ANALYSE
 // =================================================================
 function analyzeSentiment(text, testType, domainMentioned) {
@@ -228,7 +386,6 @@ function analyzeSentiment(text, testType, domainMentioned) {
       return 'negativ';
     }
     
-    // Prüfe ob substantielle Informationen gefunden wurden
     const hasSubstantialInfo = 
       textLower.includes('bietet') ||
       textLower.includes('anbieter') ||
@@ -245,16 +402,16 @@ function analyzeSentiment(text, testType, domainMentioned) {
       textLower.includes('service');
     
     if (hasSubstantialInfo) {
-      return 'positiv';  // Domain bekannt UND beschrieben = positiv!
+      return 'positiv';
     }
     
-    return 'neutral';  // Domain erwähnt aber kaum Info
+    return 'neutral';
   }
   
   // --- TEST 2: EMPFEHLUNGEN ---
   if (testType === 'recommendation') {
     if (!domainMentioned) {
-      return 'negativ';  // Nicht in Empfehlungen = schlecht
+      return 'negativ';
     }
     
     const positiveRecommendation = [
@@ -278,7 +435,6 @@ function analyzeSentiment(text, testType, domainMentioned) {
   
   // --- TEST 3: REPUTATION / BEWERTUNGEN ---
   if (testType === 'reviews') {
-    // Keine Bewertungen gefunden
     const noBewertungen = [
       'keine bewertungen',
       'keine rezensionen',
@@ -291,7 +447,6 @@ function analyzeSentiment(text, testType, domainMentioned) {
       return 'negativ';
     }
     
-    // KRITISCH: Prüfe auf NIEDRIGE Bewertungen (1-2 Sterne)
     const lowRatingPatterns = [
       /\b[1-2][.,]\d?\s*(sterne|stars|von\s*5)/i,
       /\b1\s*von\s*5/i,
@@ -304,10 +459,9 @@ function analyzeSentiment(text, testType, domainMentioned) {
     const hasLowRating = lowRatingPatterns.some(pattern => pattern.test(text));
     
     if (hasLowRating) {
-      return 'negativ';  // Schlechte Bewertung = negativ!
+      return 'negativ';
     }
     
-    // Prüfe auf HOHE Bewertungen (4-5 Sterne)
     const highRatingPatterns = [
       /\b[4-5][.,]\d?\s*(sterne|stars|von\s*5)/i,
       /\b4\s*von\s*5/i,
@@ -319,7 +473,6 @@ function analyzeSentiment(text, testType, domainMentioned) {
     
     const hasHighRating = highRatingPatterns.some(pattern => pattern.test(text));
     
-    // Prüfe auf positive Wörter
     const positiveReviewWords = [
       'zufrieden',
       'empfehlen',
@@ -334,7 +487,6 @@ function analyzeSentiment(text, testType, domainMentioned) {
     
     const hasPositiveWords = positiveReviewWords.some(word => textLower.includes(word));
     
-    // Prüfe auf mittlere Bewertungen (3 Sterne)
     const midRatingPatterns = [
       /\b3[.,]\d?\s*(sterne|stars|von\s*5)/i,
       /\b3\s*von\s*5/i
@@ -348,11 +500,9 @@ function analyzeSentiment(text, testType, domainMentioned) {
       return 'neutral';
     }
     
-    // Nur eine Bewertung = eher negativ (nicht repräsentativ)
     if (/nur\s*(eine|1)\s*bewertung/i.test(text) || /1\s*bewertung/i.test(text)) {
-      // Wenn die eine Bewertung schlecht ist, definitiv negativ
       if (hasLowRating) return 'negativ';
-      return 'neutral';  // Zu wenig Daten
+      return 'neutral';
     }
     
     return 'neutral';
@@ -364,7 +514,6 @@ function analyzeSentiment(text, testType, domainMentioned) {
       return 'negativ';
     }
     
-    // Zähle Erwähnungsquellen (mehr = besser)
     const sourceIndicators = [
       'herold', 'wko', 'gelbe seiten', 'facebook', 'instagram', 
       'linkedin', 'twitter', 'xing', 'trustpilot', 'provenexpert',
@@ -374,10 +523,10 @@ function analyzeSentiment(text, testType, domainMentioned) {
     const sourceCount = sourceIndicators.filter(source => textLower.includes(source)).length;
     
     if (sourceCount >= 4) {
-      return 'positiv';  // Viele externe Erwähnungen = gut
+      return 'positiv';
     }
     
-    return 'neutral';  // Einige Erwähnungen
+    return 'neutral';
   }
   
   // Fallback
@@ -514,7 +663,6 @@ WICHTIG: Beginne DIREKT mit dem Inhalt, keine Einleitung.`;
       const mentioned = formattedKnowledge.toLowerCase().includes(cleanDomain) ||
                         formattedKnowledge.toLowerCase().includes(domainBase);
       
-      // NEU: Verbesserte Sentiment-Analyse
       const sentiment = analyzeSentiment(formattedKnowledge, 'knowledge', mentioned);
       
       testResults.push({
@@ -529,7 +677,6 @@ WICHTIG: Beginne DIREKT mit dem Inhalt, keine Einleitung.`;
       
       console.log(`   → ${mentioned ? '✅ Erwähnt' : '❌ Nicht erwähnt'} | Sentiment: ${sentiment}`);
       
-      // Branche aus der Antwort extrahieren, falls nicht angegeben
       if (!cleanIndustry && mentioned) {
         detectedIndustry = await detectIndustryFromResponse(modelWithSearch, knowledgeResponse, cleanDomain);
         console.log(`   → Branche erkannt: ${detectedIndustry || 'unbekannt'}`);
@@ -591,10 +738,8 @@ WICHTIG:
       const mentioned = text.toLowerCase().includes(cleanDomain) ||
                         text.toLowerCase().includes(domainBase);
       
-      // NEU: Verbesserte Sentiment-Analyse
       const sentiment = analyzeSentiment(text, 'recommendation', mentioned);
       
-      // Konkurrenten extrahieren
       const domainRegex = /(?:https?:\/\/)?(?:www\.)?([a-zA-Z0-9][-a-zA-Z0-9]*\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})?)/gi;
       const matches = text.match(domainRegex) || [];
       const competitors = [...new Set(matches)]
@@ -656,7 +801,6 @@ WICHTIG: Beginne DIREKT mit dem Inhalt, keine Einleitung wie "Okay" oder "Ich we
       const mentioned = text.toLowerCase().includes(cleanDomain) ||
                         text.toLowerCase().includes(domainBase);
       
-      // NEU: Verbesserte Sentiment-Analyse für Bewertungen
       const sentiment = analyzeSentiment(text, 'reviews', mentioned);
       
       testResults.push({
@@ -714,10 +858,8 @@ WICHTIG: Beginne DIREKT mit dem Inhalt, keine Einleitung.`;
       const mentioned = text.toLowerCase().includes(cleanDomain) ||
                         text.toLowerCase().includes(domainBase);
       
-      // NEU: Verbesserte Sentiment-Analyse für Erwähnungen
       const sentiment = analyzeSentiment(text, 'mentions', mentioned);
       
-      // Erwähnte Domains extrahieren
       const domainRegex = /(?:https?:\/\/)?(?:www\.)?([a-zA-Z0-9][-a-zA-Z0-9]*\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})?)/gi;
       const matches = text.match(domainRegex) || [];
       const mentionedDomains = [...new Set(matches)]
@@ -786,7 +928,6 @@ WICHTIG: Beginne DIREKT mit dem Inhalt, keine Einleitung.`;
     const neutralCount = testResults.filter(t => t.sentiment === 'neutral').length;
     const negativeCount = testResults.filter(t => t.sentiment === 'negativ').length;
     
-    // Positiv = volle Punkte, Neutral = halbe Punkte, Negativ = 0
     const sentimentScore = Math.round((positiveCount * 25 + neutralCount * 12.5) / testResults.length);
     score += sentimentScore;
     scoreBreakdown.push({
@@ -831,7 +972,6 @@ WICHTIG: Beginne DIREKT mit dem Inhalt, keine Einleitung.`;
       });
     }
     
-    // NEU: Empfehlung bei negativer Reputation
     if (negativeCount >= 2) {
       recommendations.push({ 
         priority: 'hoch', 
@@ -870,6 +1010,23 @@ WICHTIG: Beginne DIREKT mit dem Inhalt, keine Einleitung.`;
       totalTests: testResults.length,
       hasSchema: domainAnalysis.hasSchema,
       country: req.headers['cf-ipcountry'] || null
+    });
+
+    // =================================================================
+    // E-MAIL-BENACHRICHTIGUNG SENDEN (async, blockiert nicht die Response)
+    // =================================================================
+    sendCheckNotification({
+      domain: cleanDomain,
+      industry: detectedIndustry || cleanIndustry,
+      score,
+      scoreLabel: scoreCategoryLabel,
+      scoreColor: scoreCategoryColor,
+      mentionCount,
+      totalTests: testResults.length,
+      testResults,
+      domainAnalysis,
+      competitors: allCompetitors,
+      recommendations
     });
 
     console.log(`\n📊 Ergebnis für ${cleanDomain}: Score ${score}/100 (${scoreCategoryLabel})`);
