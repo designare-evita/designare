@@ -33,6 +33,32 @@ async function chatGPTQuery(prompt) {
 }
 
 // =================================================================
+// HELPER: Domain-Erwähnung erkennen (flexibel)
+// Erkennt auch "Stempel Lobenhofer" für "stempel-lobenhofer.at"
+// =================================================================
+function isDomainMentioned(text, cleanDomain) {
+  const lower = text.toLowerCase();
+  
+  // Exakte Domain (stempel-lobenhofer.at)
+  if (lower.includes(cleanDomain)) return true;
+  
+  // Domain ohne TLD (stempel-lobenhofer)
+  const domainBase = cleanDomain.replace(/\.[^.]+$/, '');
+  if (lower.includes(domainBase)) return true;
+  
+  // Bindestriche durch Leerzeichen ersetzen (stempel lobenhofer)
+  const domainWords = domainBase.replace(/-/g, ' ');
+  if (domainWords !== domainBase && lower.includes(domainWords)) return true;
+  
+  // Einzelteile prüfen: Wenn alle signifikanten Teile vorkommen
+  // z.B. "stempel" UND "lobenhofer" im Text
+  const parts = domainBase.split(/[-.]/).filter(p => p.length >= 4);
+  if (parts.length >= 2 && parts.every(part => lower.includes(part))) return true;
+  
+  return false;
+}
+
+// =================================================================
 // RATE LIMITING
 // =================================================================
 const DAILY_LIMIT = 3;
@@ -667,6 +693,14 @@ export default async function handler(req, res) {
     
     const testResults = [];
     let detectedIndustry = cleanIndustry;
+    
+    // Generische Branchen-Eingaben, bei denen Auto-Detection trotzdem laufen soll
+    const genericIndustries = [
+      'online shop', 'onlineshop', 'webshop', 'shop', 'e-commerce', 'ecommerce',
+      'webseite', 'website', 'homepage', 'firma', 'unternehmen', 'dienstleistung',
+      'dienstleister', 'handel', 'geschäft', 'gewerbe', 'betrieb'
+    ];
+    const isGenericIndustry = cleanIndustry && genericIndustries.includes(cleanIndustry.toLowerCase().trim());
 
     // ==================== TEST 1: BEKANNTHEIT ====================
     console.log(`🧪 Test 1: Bekanntheit im Web...`);
@@ -691,9 +725,7 @@ WICHTIG: Beginne DIREKT mit dem Inhalt, keine Einleitung.`;
       knowledgeResponse = result.response.text();
       const formattedKnowledge = formatResponseText(knowledgeResponse);
       
-      const domainBase = cleanDomain.replace(/\.[^.]+$/, '');
-      const mentioned = formattedKnowledge.toLowerCase().includes(cleanDomain) ||
-                        formattedKnowledge.toLowerCase().includes(domainBase);
+      const mentioned = isDomainMentioned(formattedKnowledge, cleanDomain);
       
       const sentiment = analyzeSentiment(formattedKnowledge, 'knowledge', mentioned);
       
@@ -710,9 +742,12 @@ WICHTIG: Beginne DIREKT mit dem Inhalt, keine Einleitung.`;
       
       console.log(`   → ${mentioned ? '✅ Erwähnt' : '❌ Nicht erwähnt'} | Sentiment: ${sentiment}`);
       
-      if (!cleanIndustry && mentioned) {
-        detectedIndustry = await detectIndustryFromResponse(modelWithSearch, knowledgeResponse, cleanDomain);
-        console.log(`   → Branche erkannt: ${detectedIndustry || 'unbekannt'}`);
+      if ((!cleanIndustry || isGenericIndustry) && mentioned) {
+        const autoDetected = await detectIndustryFromResponse(modelWithSearch, knowledgeResponse, cleanDomain);
+        if (autoDetected) {
+          detectedIndustry = autoDetected;
+          console.log(`   → Branche erkannt: ${detectedIndustry} (${isGenericIndustry ? 'generische Eingabe überschrieben' : 'auto-detected'})`);
+        }
       }
       
     } catch (error) {
@@ -736,6 +771,8 @@ WICHTIG: Beginne DIREKT mit dem Inhalt, keine Einleitung.`;
     try {
       const recommendationPrompt = detectedIndustry
         ? `Suche nach den besten Anbietern für "${detectedIndustry}" in Österreich.
+WICHTIG: Es geht um DIREKTE KONKURRENTEN – also Unternehmen, die DIESELBEN Produkte/Dienstleistungen anbieten wie ${cleanDomain}.
+Es geht NICHT um Agenturen, Plattformen oder Software-Anbieter, sondern um Shops/Anbieter für Endkunden.
 
 Nenne 5-8 empfehlenswerte Unternehmen. Für jedes Unternehmen schreibe einen kurzen Absatz:
 **Firmenname** – Was sie anbieten und was sie auszeichnet.
@@ -750,6 +787,7 @@ WICHTIG:
 
         : `Suche zuerst, was **${cleanDomain}** anbietet.
 Dann finde 5-8 ähnliche Unternehmen/Konkurrenten, die DIESELBEN oder ähnliche Produkte/Dienstleistungen anbieten.
+WICHTIG: Suche DIREKTE KONKURRENTEN – keine Agenturen, Plattformen oder Software-Anbieter.
 
 Für jedes Unternehmen schreibe einen kurzen Absatz:
 **Firmenname** – Was sie anbieten und warum sie relevant sind.
@@ -768,12 +806,11 @@ WICHTIG:
       
       let text = formatResponseText(result.response.text());
       
-      const domainBase = cleanDomain.replace(/\.[^.]+$/, '');
-      const mentioned = text.toLowerCase().includes(cleanDomain) ||
-                        text.toLowerCase().includes(domainBase);
+      const mentioned = isDomainMentioned(text, cleanDomain);
       
       const sentiment = analyzeSentiment(text, 'recommendation', mentioned);
       
+      const domainBase = cleanDomain.replace(/\.[^.]+$/, '');
       const domainRegex = /(?:https?:\/\/)?(?:www\.)?([a-zA-Z0-9][-a-zA-Z0-9]*\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})?)/gi;
       const matches = text.match(domainRegex) || [];
       const competitors = [...new Set(matches)]
@@ -833,9 +870,7 @@ WICHTIG: Beginne DIREKT mit dem Inhalt, keine Einleitung wie "Okay" oder "Ich we
       
       let text = formatResponseText(result.response.text());
       
-      const domainBase = cleanDomain.replace(/\.[^.]+$/, '');
-      const mentioned = text.toLowerCase().includes(cleanDomain) ||
-                        text.toLowerCase().includes(domainBase);
+      const mentioned = isDomainMentioned(text, cleanDomain);
       
       const sentiment = analyzeSentiment(text, 'reviews', mentioned);
       
@@ -892,12 +927,11 @@ WICHTIG: Beginne DIREKT mit dem Inhalt, keine Einleitung.`;
       
       let text = formatResponseText(result.response.text());
       
-      const domainBase = cleanDomain.replace(/\.[^.]+$/, '');
-      const mentioned = text.toLowerCase().includes(cleanDomain) ||
-                        text.toLowerCase().includes(domainBase);
+      const mentioned = isDomainMentioned(text, cleanDomain);
       
       const sentiment = analyzeSentiment(text, 'mentions', mentioned);
       
+      const domainBase = cleanDomain.replace(/\.[^.]+$/, '');
       const domainRegex = /(?:https?:\/\/)?(?:www\.)?([a-zA-Z0-9][-a-zA-Z0-9]*\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})?)/gi;
       const matches = text.match(domainRegex) || [];
       const mentionedDomains = [...new Set(matches)]
@@ -958,6 +992,8 @@ WICHTIG: Beginne DIREKT mit dem Inhalt.`
           description: 'Empfehlungen (ChatGPT)',
           prompt: detectedIndustry
             ? `Nenne 5-8 empfehlenswerte Anbieter für "${detectedIndustry}" in Österreich.
+WICHTIG: Es geht um DIREKTE KONKURRENTEN von ${cleanDomain} – also Unternehmen/Shops, die dieselben Produkte oder Dienstleistungen an Endkunden verkaufen.
+Nenne KEINE Software-Plattformen (Shopware, Magento etc.), keine Agenturen und keine E-Commerce-Tools.
 
 Für jedes Unternehmen schreibe einen kurzen Absatz:
 **Firmenname** – Was sie anbieten und was sie auszeichnet.
@@ -965,7 +1001,8 @@ Für jedes Unternehmen schreibe einen kurzen Absatz:
 Prüfe auch: Würdest du **${cleanDomain}** in diesem Bereich empfehlen?
 
 WICHTIG: Beginne DIREKT, keine Nummerierung, Firmennamen **fett**, auf Deutsch.`
-            : `Was bietet **${cleanDomain}** an? Nenne dann 5-8 ähnliche Unternehmen/Konkurrenten in Österreich.
+            : `Was bietet **${cleanDomain}** an? Nenne dann 5-8 DIREKTE Konkurrenten in Österreich – also Unternehmen, die dieselben Produkte/Dienstleistungen an Endkunden anbieten.
+Nenne KEINE Software-Plattformen, Agenturen oder Tools.
 
 **Firmenname** – Was sie anbieten und warum sie relevant sind.
 
@@ -981,14 +1018,13 @@ WICHTIG: Beginne DIREKT, keine Nummerierung, Firmennamen **fett**, auf Deutsch.`
           const rawText = await chatGPTQuery(test.prompt);
           const text = formatResponseText(rawText);
           
-          const domainBase = cleanDomain.replace(/\.[^.]+$/, '');
-          const mentioned = text.toLowerCase().includes(cleanDomain) ||
-                            text.toLowerCase().includes(domainBase);
+          const mentioned = isDomainMentioned(text, cleanDomain);
           
           const testType = test.id.includes('knowledge') ? 'knowledge' : 'recommendation';
           const sentiment = analyzeSentiment(text, testType, mentioned);
           
           // Konkurrenten extrahieren
+          const domainBase = cleanDomain.replace(/\.[^.]+$/, '');
           const domainRegex = /(?:https?:\/\/)?(?:www\.)?([a-zA-Z0-9][-a-zA-Z0-9]*\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})?)/gi;
           const matches = text.match(domainRegex) || [];
           const competitors = [...new Set(matches)]
