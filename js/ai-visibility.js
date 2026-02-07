@@ -173,35 +173,28 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // =================================================================
-    // HELPER: Vergleichs-Übersicht für gleiche Test-Typen
+    // HELPER: Status-Pill HTML
     // =================================================================
-    function renderComparisonRow(geminiTest, chatgptTest) {
-        if (!geminiTest && !chatgptTest) return '';
-        
-        const label = geminiTest?.description?.replace(' (ChatGPT)', '').replace('Bekanntheit im Web', 'Bekanntheit').replace('Empfehlungen in der Branche', 'Empfehlungen') || 
-                      chatgptTest?.description?.replace(' (ChatGPT)', '').replace('Bekanntheit (ChatGPT)', 'Bekanntheit').replace('Empfehlungen (ChatGPT)', 'Empfehlungen');
-        
-        const geminiStatus = geminiTest 
-            ? `<span class="compare-status ${geminiTest.mentioned ? 'status-good' : 'status-bad'}">
-                 <i class="fa-solid ${geminiTest.mentioned ? 'fa-check' : 'fa-xmark'}"></i>
-                 ${geminiTest.mentioned ? 'Erwähnt' : 'Nicht erwähnt'}
-               </span>`
-            : '<span class="compare-status status-na">–</span>';
-        
-        const chatgptStatus = chatgptTest 
-            ? `<span class="compare-status ${chatgptTest.mentioned ? 'status-good' : 'status-bad'}">
-                 <i class="fa-solid ${chatgptTest.mentioned ? 'fa-check' : 'fa-xmark'}"></i>
-                 ${chatgptTest.mentioned ? 'Erwähnt' : 'Nicht erwähnt'}
-               </span>`
-            : '<span class="compare-status status-na">–</span>';
-        
-        return `
-            <div class="compare-row">
-                <div class="compare-label">${label}</div>
-                <div class="compare-cell">${geminiStatus}</div>
-                <div class="compare-cell">${chatgptStatus}</div>
-            </div>
-        `;
+    function statusPill(test) {
+        if (!test) return '<span style="color:#555;">–</span>';
+        if (test.mentioned) {
+            return `<span style="display:inline-flex;align-items:center;gap:5px;background:rgba(34,197,94,0.15);color:#22c55e;padding:4px 12px;border-radius:20px;font-size:0.85rem;font-weight:500;">
+                <i class="fa-solid fa-check" style="font-size:0.7rem;"></i> Erwähnt
+            </span>`;
+        }
+        return `<span style="display:inline-flex;align-items:center;gap:5px;background:rgba(239,68,68,0.15);color:#ef4444;padding:4px 12px;border-radius:20px;font-size:0.85rem;font-weight:500;">
+            <i class="fa-solid fa-xmark" style="font-size:0.7rem;"></i> Nicht erwähnt
+        </span>`;
+    }
+
+    function sentimentDot(test) {
+        if (!test) return '';
+        const colors = { positiv: '#22c55e', neutral: '#f59e0b', negativ: '#ef4444', fehler: '#666' };
+        const color = colors[test.sentiment] || '#666';
+        return `<span style="display:inline-flex;align-items:center;gap:4px;font-size:0.8rem;color:${color};margin-top:4px;">
+            <span style="width:8px;height:8px;border-radius:50%;background:${color};display:inline-block;"></span>
+            ${test.sentiment}
+        </span>`;
     }
 
     // =================================================================
@@ -277,20 +270,87 @@ document.addEventListener('DOMContentLoaded', function() {
             const chatgptKnowledge = chatgptTests.find(t => t.id === 'chatgpt_knowledge');
             const geminiRecommendation = geminiTests.find(t => t.id === 'recommendation');
             const chatgptRecommendation = chatgptTests.find(t => t.id === 'chatgpt_recommendation');
+            const geminiReputation = geminiTests.find(t => t.id === 'reviews');
+            const geminiExternal = geminiTests.find(t => t.id === 'mentions');
+
+            const thStyle = 'padding:12px 16px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1);font-weight:400;color:#999;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.5px;';
+            const thLeftStyle = 'padding:12px 16px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.1);font-weight:400;color:#999;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.5px;';
+            const tdStyle = 'padding:14px 16px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05);';
+            const tdLeftStyle = 'padding:14px 16px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.05);color:#e0e0e0;font-weight:500;';
+            const geminiLogo = '<span style="display:inline-flex;align-items:center;gap:6px;"><span style="background:#4285f4;color:#fff;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">G</span> Gemini</span>';
+            const chatgptLogo = '<span style="display:inline-flex;align-items:center;gap:6px;"><span style="background:#10a37f;color:#fff;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">C</span> ChatGPT</span>';
 
             html += `
                 <div class="result-section">
                     <h3><i class="fa-solid fa-code-compare"></i> KI-Vergleich: Gemini vs. ChatGPT</h3>
                     <p class="section-intro">Wie sehen verschiedene KI-Systeme deine Domain?</p>
                     
-                    <div class="compare-table">
-                        <div class="compare-row compare-header">
-                            <div class="compare-label">Test</div>
-                            <div class="compare-cell"><span class="engine-badge engine-gemini">Gemini</span></div>
-                            <div class="compare-cell"><span class="engine-badge engine-chatgpt">ChatGPT</span></div>
-                        </div>
-                        ${renderComparisonRow(geminiKnowledge, chatgptKnowledge)}
-                        ${renderComparisonRow(geminiRecommendation, chatgptRecommendation)}
+                    <div style="overflow-x:auto;margin-top:1rem;">
+                        <table style="width:100%;border-collapse:collapse;background:rgba(255,255,255,0.02);border-radius:10px;overflow:hidden;">
+                            <thead>
+                                <tr style="background:rgba(255,255,255,0.04);">
+                                    <th style="${thLeftStyle}">Test</th>
+                                    <th style="${thStyle}">${geminiLogo}</th>
+                                    <th style="${thStyle}">${chatgptLogo}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="${tdLeftStyle}">
+                                        <i class="fa-solid fa-magnifying-glass" style="color:#c4a35a;margin-right:6px;width:16px;"></i>
+                                        Bekanntheit
+                                    </td>
+                                    <td style="${tdStyle}">
+                                        ${statusPill(geminiKnowledge)}
+                                        <br>${sentimentDot(geminiKnowledge)}
+                                    </td>
+                                    <td style="${tdStyle}">
+                                        ${statusPill(chatgptKnowledge)}
+                                        <br>${sentimentDot(chatgptKnowledge)}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="${tdLeftStyle}">
+                                        <i class="fa-solid fa-ranking-star" style="color:#c4a35a;margin-right:6px;width:16px;"></i>
+                                        Empfehlungen
+                                    </td>
+                                    <td style="${tdStyle}">
+                                        ${statusPill(geminiRecommendation)}
+                                        <br>${sentimentDot(geminiRecommendation)}
+                                    </td>
+                                    <td style="${tdStyle}">
+                                        ${statusPill(chatgptRecommendation)}
+                                        <br>${sentimentDot(chatgptRecommendation)}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="${tdLeftStyle}">
+                                        <i class="fa-solid fa-star" style="color:#c4a35a;margin-right:6px;width:16px;"></i>
+                                        Reputation
+                                    </td>
+                                    <td style="${tdStyle}">
+                                        ${statusPill(geminiReputation)}
+                                        <br>${sentimentDot(geminiReputation)}
+                                    </td>
+                                    <td style="${tdStyle}">
+                                        <span style="color:#555;font-size:0.8rem;">nur Gemini</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="${tdLeftStyle}">
+                                        <i class="fa-solid fa-link" style="color:#c4a35a;margin-right:6px;width:16px;"></i>
+                                        Ext. Erwähnungen
+                                    </td>
+                                    <td style="${tdStyle}">
+                                        ${statusPill(geminiExternal)}
+                                        <br>${sentimentDot(geminiExternal)}
+                                    </td>
+                                    <td style="${tdStyle}">
+                                        <span style="color:#555;font-size:0.8rem;">nur Gemini</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             `;
