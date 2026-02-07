@@ -1,6 +1,99 @@
-// api/create-appointment.js (VERBESSERTE VERSION mit besserem Doppelbuchungsschutz)
+// api/create-appointment.js - VERBESSERTE VERSION + E-Mail-Benachrichtigung
 import { google } from 'googleapis';
+import * as brevo from '@getbrevo/brevo';
 
+// =================================================================
+// E-MAIL-BENACHRICHTIGUNG
+// =================================================================
+async function sendBookingNotification({ name, email, startTime, endTime, eventId, originalSlot }) {
+  try {
+    const apiInstance = new brevo.TransactionalEmailsApi();
+    apiInstance.setApiKey(
+      brevo.TransactionalEmailsApiApiKeys.apiKey,
+      process.env.BREVO_API_KEY
+    );
+
+    const formattedDate = startTime.toLocaleDateString('de-AT', {
+      weekday: 'long',
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
+    });
+    const formattedTime = startTime.toLocaleTimeString('de-AT', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+    const formattedEnd = endTime.toLocaleTimeString('de-AT', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
+    const sendSmtpEmail = new brevo.SendSmtpEmail();
+    sendSmtpEmail.subject = `💬 Beratungstermin: ${name} – ${formattedDate}, ${formattedTime}`;
+    sendSmtpEmail.to = [{ email: 'michael@designare.at', name: 'Michael Kanda' }];
+    sendSmtpEmail.replyTo = { email: email, name: name };
+    sendSmtpEmail.sender = { email: 'noreply@designare.at', name: 'Evita Terminbuchung' };
+    sendSmtpEmail.htmlContent = `
+<!DOCTYPE html>
+<html>
+<body style="margin:0;padding:0;background:#0a0a1a;color:#fff;font-family:Arial,Helvetica,sans-serif;">
+  <div style="max-width:600px;margin:0 auto;padding:20px;">
+    
+    <div style="text-align:center;padding:20px 0;border-bottom:1px solid #333;">
+      <h1 style="margin:0;font-size:22px;color:#c4a35a;">💬 Neuer Beratungstermin</h1>
+      <p style="margin:5px 0 0;color:#888;">Gebucht über Evita Chat-Assistent</p>
+    </div>
+
+    <div style="text-align:center;padding:25px 0;">
+      <div style="display:inline-block;background:#1a1a2e;border:2px solid #c4a35a;border-radius:12px;padding:20px 30px;">
+        <div style="font-size:24px;font-weight:bold;color:#c4a35a;">${formattedTime} – ${formattedEnd}</div>
+        <div style="font-size:16px;color:#ccc;margin-top:6px;">${formattedDate}</div>
+      </div>
+    </div>
+
+    <div style="background:#111;border-radius:8px;padding:20px;margin-bottom:20px;">
+      <h3 style="margin:0 0 15px;color:#c4a35a;font-size:14px;text-transform:uppercase;letter-spacing:1px;">Kontaktdaten</h3>
+      <table style="width:100%;border-collapse:collapse;">
+        <tr>
+          <td style="padding:8px 0;color:#888;width:100px;">Name:</td>
+          <td style="padding:8px 0;color:#fff;font-weight:bold;font-size:16px;">${name}</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 0;color:#888;">E-Mail:</td>
+          <td style="padding:8px 0;">
+            <a href="mailto:${email}" style="color:#c4a35a;font-weight:bold;font-size:16px;text-decoration:none;">${email}</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <div style="background:#111;border-radius:8px;padding:16px;margin-bottom:20px;">
+      <h3 style="margin:0 0 10px;color:#fff;font-size:14px;">💡 Nächster Schritt</h3>
+      <p style="margin:0;color:#ccc;font-size:13px;">Kontaktiere <strong>${name}</strong> per E-Mail unter <a href="mailto:${email}" style="color:#c4a35a;">${email}</a> für weitere Details zum Beratungsgespräch.</p>
+    </div>
+
+    <div style="text-align:center;padding:15px 0;border-top:1px solid #333;color:#666;font-size:11px;">
+      Gebucht am ${new Date().toLocaleString('de-AT', { timeZone: 'Europe/Vienna' })} · Event-ID: ${eventId}<br>
+      Evita AI-Assistent · designare.at
+    </div>
+
+  </div>
+</body>
+</html>`;
+
+    await apiInstance.sendTransacEmail(sendSmtpEmail);
+    console.log(`📧 Beratungstermin-Benachrichtigung gesendet für ${name}`);
+
+  } catch (error) {
+    console.error('⚠️ E-Mail-Benachrichtigung fehlgeschlagen:');
+    console.error('  Message:', error?.message);
+    console.error('  Body:', JSON.stringify(error?.body || error?.response?.body || 'keine Details'));
+  }
+}
+
+// =================================================================
+// MAIN HANDLER
+// =================================================================
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed' });
@@ -70,7 +163,6 @@ export default async function handler(req, res) {
       
       console.log('Converted to English:', englishSlot);
       
-      // Regex für "Wochentag, DD. Monat YYYY HH:MM" Format
       const regex1 = /(\w+),?\s*(\d{1,2})\.\s*(\w+)\s*(\d{4}),?\s*(\d{1,2}):(\d{2})/i;
       const match1 = englishSlot.match(regex1);
       
@@ -102,7 +194,6 @@ export default async function handler(req, res) {
       });
     }
 
-    // Termindauer auf 60 Minuten setzen
     const endTime = new Date(startTime.getTime() + 60 * 60000);
 
     console.log('Event times:', {
@@ -117,8 +208,7 @@ export default async function handler(req, res) {
     // ===================================================================
     console.log('Checking for conflicts in extended time range...');
     
-    // Prüfe einen größeren Zeitbereich um sicherzustellen, dass keine Überschneidungen auftreten
-    const bufferMinutes = 15; // 15 Minuten Puffer vor und nach dem Termin
+    const bufferMinutes = 15;
     const extendedStart = new Date(startTime.getTime() - bufferMinutes * 60000);
     const extendedEnd = new Date(endTime.getTime() + bufferMinutes * 60000);
     
@@ -130,23 +220,15 @@ export default async function handler(req, res) {
       orderBy: 'startTime',
     });
 
-    console.log(`Checking conflicts between ${extendedStart.toLocaleString('de-DE')} and ${extendedEnd.toLocaleString('de-DE')}`);
     console.log(`Found ${conflictCheck.data.items.length} existing events in extended range`);
 
-    // Prüfe jedes gefundene Event auf tatsächliche Überschneidung
     const conflicts = conflictCheck.data.items.filter(event => {
       const eventStart = new Date(event.start.dateTime || event.start.date);
       const eventEnd = new Date(event.end.dateTime || event.end.date);
-      
-      console.log(`Checking event: ${event.summary} | ${eventStart.toLocaleString('de-DE')} - ${eventEnd.toLocaleString('de-DE')}`);
-      
-      // Überschneidung: (Start1 < Ende2) UND (Ende1 > Start2)
       const hasOverlap = startTime < eventEnd && endTime > eventStart;
-      
       if (hasOverlap) {
         console.log(`❌ CONFLICT DETECTED with event: ${event.summary}`);
       }
-      
       return hasOverlap;
     });
 
@@ -180,7 +262,6 @@ export default async function handler(req, res) {
         timeZone: 'Europe/Vienna',
       },
       reminders: { 'useDefault': true },
-      // Zusätzliche Metadaten für bessere Nachverfolgung
       extendedProperties: {
         private: {
           'booked_via': 'evita_ai',
@@ -190,7 +271,7 @@ export default async function handler(req, res) {
       }
     };
 
-    console.log('Creating calendar event:', JSON.stringify(event, null, 2));
+    console.log('Creating calendar event...');
 
     const result = await calendar.events.insert({
       calendarId: 'designare.design@gmail.com',
@@ -200,7 +281,7 @@ export default async function handler(req, res) {
 
     console.log('✅ Calendar event created successfully:', result.data.id);
 
-    // FINALE VERIFIKATION: Prüfe ob der Termin wirklich erstellt wurde
+    // Verifikation
     const verificationCheck = await calendar.events.get({
       calendarId: 'designare.design@gmail.com',
       eventId: result.data.id
@@ -209,6 +290,18 @@ export default async function handler(req, res) {
     if (verificationCheck.data) {
       console.log('✅ Appointment verified in calendar');
     }
+
+    // ===================================================================
+    // E-MAIL-BENACHRICHTIGUNG SENDEN
+    // ===================================================================
+    await sendBookingNotification({
+      name,
+      email,
+      startTime,
+      endTime,
+      eventId: result.data.id,
+      originalSlot: slot
+    });
 
     res.status(200).json({ 
       success: true, 
