@@ -14,20 +14,14 @@ async function sendBookingNotification({ name, phone, topic, startTime, endTime,
       process.env.BREVO_API_KEY
     );
 
-    const formattedDate = startTime.toLocaleDateString('de-AT', {
-      weekday: 'long',
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric'
-    });
-    const formattedTime = startTime.toLocaleTimeString('de-AT', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-    const formattedEnd = endTime.toLocaleTimeString('de-AT', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    // Manuelle Formatierung (Vercel hat oft keine de-AT Locale)
+    const wochentage = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
+    const monate = ['Jänner', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+    
+    const pad = (n) => String(n).padStart(2, '0');
+    const formattedDate = `${wochentage[startTime.getUTCDay()]}, ${pad(startTime.getUTCDate())}. ${monate[startTime.getUTCMonth()]} ${startTime.getUTCFullYear()}`;
+    const formattedTime = `${pad(startTime.getUTCHours())}:${pad(startTime.getUTCMinutes())}`;
+    const formattedEnd = `${pad(endTime.getUTCHours())}:${pad(endTime.getUTCMinutes())}`;
 
     const sendSmtpEmail = new brevo.SendSmtpEmail();
     sendSmtpEmail.subject = `📞 Rückruf-Termin: ${name} – ${formattedDate}, ${formattedTime}`;
@@ -78,7 +72,7 @@ async function sendBookingNotification({ name, phone, topic, startTime, endTime,
     </div>
 
     <div style="text-align:center;padding:15px 0;border-top:1px solid #333;color:#666;font-size:11px;">
-      Gebucht am ${new Date().toLocaleString('de-AT', { timeZone: 'Europe/Vienna' })} · Event-ID: ${eventId}<br>
+      Gebucht am ${pad(new Date().getUTCDate())}.${pad(new Date().getUTCMonth()+1)}.${new Date().getUTCFullYear()} ${pad(new Date().getUTCHours())}:${pad(new Date().getUTCMinutes())} · Event-ID: ${eventId}<br>
       Evita AI-Assistent · designare.at
     </div>
 
