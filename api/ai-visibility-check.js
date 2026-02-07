@@ -1085,7 +1085,31 @@ WICHTIG: Beginne DIREKT, keine Nummerierung, Firmennamen **fett**, auf Deutsch.`
           const rawText = await chatGPTQuery(test.prompt);
           const text = formatResponseText(rawText);
           
-          const mentioned = isDomainMentioned(text, cleanDomain);
+          let mentioned = isDomainMentioned(text, cleanDomain);
+          
+          // ChatGPT Bekanntheit: Prüfe ob die Erwähnung eine NEGATION ist
+          // z.B. "Zu wattaul.eu habe ich keine Informationen"
+          if (mentioned && test.id === 'chatgpt_knowledge') {
+            const negationPatterns = [
+              /keine informationen/i,
+              /nicht bekannt/i,
+              /nichts bekannt/i,
+              /keine daten/i,
+              /keine kenntnis/i,
+              /nicht gefunden/i,
+              /keine ergebnisse/i,
+              /mir nicht bekannt/i,
+              /habe ich keine/i,
+              /kann ich keine/i,
+              /no information/i,
+              /not familiar/i,
+              /don't have.*information/i
+            ];
+            if (negationPatterns.some(p => p.test(text))) {
+              mentioned = false;
+              console.log(`   → Negation erkannt: Domain wird erwähnt aber als "nicht bekannt" markiert`);
+            }
+          }
           
           const testType = test.id.includes('knowledge') ? 'knowledge' : 'recommendation';
           const sentiment = analyzeSentiment(text, testType, mentioned);
@@ -1256,11 +1280,17 @@ WICHTIG: Beginne DIREKT, keine Nummerierung, Firmennamen **fett**, auf Deutsch.`
       });
     }
     
-    if (!domainAnalysis.hasAboutPage || !domainAnalysis.hasAuthorInfo) {
+    // E-E-A-T Empfehlungen – spezifisch für fehlende Signale
+    const missingEEAT = [];
+    if (!domainAnalysis.hasAboutPage) missingEEAT.push('"Über uns" Seite');
+    if (!domainAnalysis.hasContactPage) missingEEAT.push('Kontakt/Impressum Seite');
+    if (!domainAnalysis.hasAuthorInfo) missingEEAT.push('Autoren-Info (Geschäftsführer, Team, Qualifikationen)');
+    
+    if (missingEEAT.length > 0) {
       recommendations.push({ 
-        priority: 'mittel', 
+        priority: missingEEAT.length >= 2 ? 'hoch' : 'mittel', 
         title: 'E-E-A-T Signale stärken', 
-        description: 'Füge eine "Über uns" Seite mit Qualifikationen hinzu.', 
+        description: `Fehlend: ${missingEEAT.join(', ')}. Diese Informationen helfen KI-Systemen, dein Unternehmen als vertrauenswürdig einzustufen.`, 
         link: null 
       });
     }
