@@ -1,7 +1,104 @@
-// api/book-appointment-phone.js - MIT QR-CODE ICS FEATURE
+// api/book-appointment-phone.js - MIT QR-CODE ICS FEATURE + E-Mail-Benachrichtigung
 import { google } from 'googleapis';
 import QRCode from 'qrcode';
+import * as brevo from '@getbrevo/brevo';
 
+// =================================================================
+// E-MAIL-BENACHRICHTIGUNG
+// =================================================================
+async function sendBookingNotification({ name, phone, topic, startTime, endTime, eventId }) {
+  try {
+    const apiInstance = new brevo.TransactionalEmailsApi();
+    apiInstance.setApiKey(
+      brevo.TransactionalEmailsApiApiKeys.apiKey,
+      process.env.BREVO_API_KEY
+    );
+
+    const formattedDate = startTime.toLocaleDateString('de-AT', {
+      weekday: 'long',
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
+    });
+    const formattedTime = startTime.toLocaleTimeString('de-AT', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+    const formattedEnd = endTime.toLocaleTimeString('de-AT', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
+    const sendSmtpEmail = new brevo.SendSmtpEmail();
+    sendSmtpEmail.subject = `📞 Rückruf-Termin: ${name} – ${formattedDate}, ${formattedTime}`;
+    sendSmtpEmail.to = [{ email: 'michael@designare.at', name: 'Michael Kanda' }];
+    sendSmtpEmail.sender = { email: 'noreply@designare.at', name: 'Evita Terminbuchung' };
+    sendSmtpEmail.htmlContent = `
+<!DOCTYPE html>
+<html>
+<body style="margin:0;padding:0;background:#0a0a1a;color:#fff;font-family:Arial,Helvetica,sans-serif;">
+  <div style="max-width:600px;margin:0 auto;padding:20px;">
+    
+    <div style="text-align:center;padding:20px 0;border-bottom:1px solid #333;">
+      <h1 style="margin:0;font-size:22px;color:#c4a35a;">📞 Neuer Rückruf-Termin</h1>
+      <p style="margin:5px 0 0;color:#888;">Gebucht über Evita Chat-Assistent</p>
+    </div>
+
+    <div style="text-align:center;padding:25px 0;">
+      <div style="display:inline-block;background:#1a1a2e;border:2px solid #c4a35a;border-radius:12px;padding:20px 30px;">
+        <div style="font-size:24px;font-weight:bold;color:#c4a35a;">${formattedTime} – ${formattedEnd}</div>
+        <div style="font-size:16px;color:#ccc;margin-top:6px;">${formattedDate}</div>
+      </div>
+    </div>
+
+    <div style="background:#111;border-radius:8px;padding:20px;margin-bottom:20px;">
+      <h3 style="margin:0 0 15px;color:#c4a35a;font-size:14px;text-transform:uppercase;letter-spacing:1px;">Kontaktdaten</h3>
+      <table style="width:100%;border-collapse:collapse;">
+        <tr>
+          <td style="padding:8px 0;color:#888;width:100px;">Name:</td>
+          <td style="padding:8px 0;color:#fff;font-weight:bold;font-size:16px;">${name}</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 0;color:#888;">Telefon:</td>
+          <td style="padding:8px 0;">
+            <a href="tel:${phone}" style="color:#c4a35a;font-weight:bold;font-size:16px;text-decoration:none;">${phone}</a>
+          </td>
+        </tr>
+        ${topic ? `
+        <tr>
+          <td style="padding:8px 0;color:#888;vertical-align:top;">Anliegen:</td>
+          <td style="padding:8px 0;color:#ccc;">${topic}</td>
+        </tr>` : ''}
+      </table>
+    </div>
+
+    <div style="background:#111;border-radius:8px;padding:16px;margin-bottom:20px;">
+      <h3 style="margin:0 0 10px;color:#fff;font-size:14px;">⏰ Erinnerung</h3>
+      <p style="margin:0;color:#ccc;font-size:13px;">Bitte 5–10 Minuten vor dem Termin <strong>${name}</strong> unter <a href="tel:${phone}" style="color:#c4a35a;">${phone}</a> anrufen.</p>
+    </div>
+
+    <div style="text-align:center;padding:15px 0;border-top:1px solid #333;color:#666;font-size:11px;">
+      Gebucht am ${new Date().toLocaleString('de-AT', { timeZone: 'Europe/Vienna' })} · Event-ID: ${eventId}<br>
+      Evita AI-Assistent · designare.at
+    </div>
+
+  </div>
+</body>
+</html>`;
+
+    await apiInstance.sendTransacEmail(sendSmtpEmail);
+    console.log(`📧 Rückruf-Benachrichtigung gesendet für ${name}`);
+
+  } catch (error) {
+    console.error('⚠️ E-Mail-Benachrichtigung fehlgeschlagen:');
+    console.error('  Message:', error?.message);
+    console.error('  Body:', JSON.stringify(error?.body || error?.response?.body || 'keine Details'));
+  }
+}
+
+// =================================================================
+// MAIN HANDLER
+// =================================================================
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method Not Allowed' });
@@ -146,7 +243,6 @@ Automatisch erstellt durch Evita AI-Assistent`,
         // QR-CODE MIT ICS GENERIEREN
         // ===================================================================
         
-        // ICS-Datetime Format: YYYYMMDDTHHMMSS
         const formatICSDate = (date) => {
             return date.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
         };
@@ -164,22 +260,32 @@ LOCATION:Telefonat
 END:VEVENT
 END:VCALENDAR`;
 
-        // QR-Code als Data-URL generieren
         let qrCodeDataUrl = null;
         try {
             qrCodeDataUrl = await QRCode.toDataURL(icsContent, {
                 width: 200,
                 margin: 2,
                 color: {
-                    dark: '#c4a35a',  // Gold (Accent Color)
-                    light: '#0a0a0a'  // Dunkel (Background)
+                    dark: '#c4a35a',
+                    light: '#0a0a0a'
                 }
             });
             console.log('✅ QR-Code generiert');
         } catch (qrError) {
             console.error('QR-Code Fehler:', qrError);
-            // Kein Abbruch - Buchung war erfolgreich
         }
+
+        // ===================================================================
+        // E-MAIL-BENACHRICHTIGUNG SENDEN
+        // ===================================================================
+        await sendBookingNotification({
+            name,
+            phone,
+            topic,
+            startTime,
+            endTime,
+            eventId: result.data.id
+        });
 
         // ===================================================================
         // RESPONSE
