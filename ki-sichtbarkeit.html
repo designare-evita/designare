@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+<html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content">
@@ -48,7 +50,7 @@
       "@type": "TechArticle",
       "@id": "https://designare.at/ki-sichtbarkeit#article",
       "headline": "KI-Sichtbarkeits-Check: Wirst du von ChatGPT & Gemini empfohlen?",
-      "description": "Prüfe kostenlos, ob deine Website in KI-Antworten vorkommt. Live-Test mit Gemini API.",
+      "description": "Prüfe kostenlos, ob deine Website in KI-Antworten vorkommt. Dualer Live-Test mit Gemini und ChatGPT.",
       "url": "https://designare.at/ki-sichtbarkeit",
       "datePublished": "2026-01-17",
       "dateModified": "2026-01-17",
@@ -77,7 +79,7 @@
           "name": "Ist der Test kostenlos?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Ja. Die API-Kosten für Google und OpenAI übernehme ich. Da ich echte Enterprise-Modelle nutzen (keine billigen Mockups), gibt es ein faires Limit von 3 Abfragen pro Tag pro Nutzer."
+            "text": "Ja. Die API-Kosten für Google und OpenAI übernehme ich. Da ich echte Enterprise-Modelle nutze (keine billigen Mockups), gibt es ein faires Limit von 3 Abfragen pro Tag pro Nutzer."
           }
         },
         {
@@ -85,7 +87,7 @@
           "name": "Warum variieren die Ergebnisse?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Das liegt an der Natur der KIs. Gemini hat oft Zugriff auf aktuelle Live-Daten aus dem Google-Index. ChatGPT basiert stärker auf Trainingsdaten. Unser Tool zeigt dir genau diese Diskrepanz auf: Wirst du schon "gelernt" oder nur "gefunden"?"
+            "text": "Das liegt an der Natur der KIs. Gemini hat oft Zugriff auf aktuelle Live-Daten aus dem Google-Index. ChatGPT basiert stärker auf Trainingsdaten. Unser Tool zeigt dir genau diese Diskrepanz auf: Wirst du schon \"gelernt\" oder nur \"gefunden\"?"
           }
         }
       ]
@@ -107,12 +109,11 @@
     <div id="modal-container"></div>
     <div id="particles-js"></div>
     
-    <!-- Loading Overlay -->
     <div id="loading-overlay" class="loading-overlay">
         <div class="loading-content">
             <div class="loading-spinner"></div>
             <h3>Analysiere KI-Sichtbarkeit...</h3>
-            <p>Live-Abfragen an Gemini & ChatgGPT werden ausgeführt.<br>Das kann bis zu 30 Sekunden dauern.</p>
+            <p>Live-Abfragen an Gemini & ChatGPT werden ausgeführt.<br>Das kann bis zu 30 Sekunden dauern.</p>
         </div>
     </div>
     
@@ -140,16 +141,15 @@
                     <div class="summary-content">
                         <h3>Was macht dieses Tool?</h3>
                         <ul>
-                            <li><strong>Live-Test:</strong> Fragt Gemini direkt, ob und wie es deine Domain kennt und empfiehlt.</li>
+                            <li><strong>Dual-Engine Test:</strong> Prüft live bei Gemini UND ChatGPT, ob deine Domain empfohlen wird.</li>
+                            <li><strong>Gap-Analyse:</strong> Zeigt, ob du schon "gelernt" (ChatGPT) oder nur "gefunden" (Gemini) wirst.</li>
                             <li><strong>Technische Analyse:</strong> Prüft Schema.org Markup und E-E-A-T Signale auf deiner Website.</li>
-                            <li><strong>Konkurrenz-Check:</strong> Zeigt, welche Domains statt deiner genannt werden.</li>
                             <li><strong>Actionable Score:</strong> Visibility-Score von 0-100 mit konkreten Empfehlungen.</li>
                         </ul>
                     </div>
                 </div>
             </section>
 
-            <!-- ========== TOOL SECTION ========== -->
             <section aria-labelledby="tool-heading" class="ai-visibility-tool">
                 <h2 id="tool-heading"><i class="fa-solid fa-robot"></i> KI-Sichtbarkeits-Check</h2>
                 <p class="tool-intro">Gib deine Domain ein und erfahre, wie sichtbar du für KI-Assistenten bist.</p>
@@ -198,19 +198,17 @@
                     </button>
                 </form>
 
-                <!-- Results appear here -->
                 <div id="results-container" class="results-container"></div>
             </section>
 
-            <!-- ========== HOW IT WORKS ========== -->
             <section aria-labelledby="howitworks-heading">
                 <h2 id="howitworks-heading">So funktioniert der <span class="article-white">KI-Sichtbarkeits-Check</span></h2>
                 
                 <p>Dieses Tool kombiniert zwei Analyse-Methoden, um ein vollständiges Bild deiner KI-Präsenz zu liefern:</p>
 
                 <dl class="feature-list">
-                    <dt>1. Live-Test mit Gemini API</dt>
-                    <dd>Wir stellen der Google Gemini KI vier verschiedene Fragen über deine Domain: Kennt sie dich? Empfiehlt sie dich? Vertraut sie dir? Wer sind deine Konkurrenten in KI-Antworten?</dd>
+                    <dt>1. Dualer Live-Test (Google & OpenAI)</dt>
+                    <dd>Wir stellen sowohl Gemini (Google) als auch ChatGPT (OpenAI) gezielte Fragen zu deiner Domain. Das deckt auf, ob deine Marke im Trainingswissen verankert ist oder nur über die Live-Suche gefunden wird.</dd>
                     
                     <dt>2. Technische Domain-Analyse</dt>
                     <dd>Parallel crawlen wir deine Website und prüfen auf Schema.org JSON-LD, E-E-A-T Signale (Über-uns, Kontakt, Autoren) und andere Faktoren, die KIs bei der Bewertung nutzen.</dd>
@@ -228,35 +226,33 @@
                 </aside>
             </section>
 
-            <!-- ========== FAQ ========== -->
             <section aria-labelledby="faq-heading">
                 <h2 id="faq-heading">Häufig gestellte Fragen (FAQ)</h2>
                 
                 <div class="faq-accordion">
                     <details name="faq-group">
-    <summary>Was misst der KI-Sichtbarkeits-Check?</summary>
-    <div class="faq-content">
-        <p>Das Tool führt einen <strong>Dual-Check</strong> durch: Es fragt live sowohl <strong>Google Gemini</strong> als auch <strong>ChatGPT (OpenAI)</strong> ab. So siehst du sofort, ob du nur in einer oder in beiden KI-Welten als Marke wahrgenommen wirst. Zusätzlich prüfen wir technische Faktoren wie Schema.org und Crawlability.</p>
-    </div>
-</details>
+                        <summary>Was misst der KI-Sichtbarkeits-Check?</summary>
+                        <div class="faq-content">
+                            <p>Das Tool führt einen <strong>Dual-Check</strong> durch: Es fragt live sowohl <strong>Google Gemini</strong> als auch <strong>ChatGPT (OpenAI)</strong> ab. So siehst du sofort, ob du nur in einer oder in beiden KI-Welten als Marke wahrgenommen wirst. Zusätzlich prüfen wir technische Faktoren wie Schema.org und Crawlability.</p>
+                        </div>
+                    </details>
 
-<details name="faq-group">
-    <summary>Ist das Tool kostenlos?</summary>
-    <div class="faq-content">
-        <p>Ja. Die API-Kosten für <strong>Google und OpenAI</strong> übernehme ich. Da ich echte Enterprise-Modelle nutzen (keine billigen Mockups), gibt es ein faires Limit von <strong>3 Abfragen pro Tag</strong> pro Nutzer.</p>
-    </div>
-</details>
+                    <details name="faq-group">
+                        <summary>Ist das Tool kostenlos?</summary>
+                        <div class="faq-content">
+                            <p>Ja. Die API-Kosten für <strong>Google und OpenAI</strong> übernehme ich. Da ich echte Enterprise-Modelle nutze (keine billigen Mockups), gibt es ein faires Limit von <strong>3 Abfragen pro Tag</strong> pro Nutzer.</p>
+                        </div>
+                    </details>
 
-<details name="faq-group">
-    <summary>Warum variieren die Ergebnisse?</summary>
-    <div class="faq-content">
-        <p>Das liegt an der Natur der KIs. <strong>Gemini</strong> hat oft Zugriff auf aktuelle Live-Daten aus dem Google-Index. <strong>ChatGPT</strong> basiert stärker auf Trainingsdaten. Unser Tool zeigt dir genau diese Diskrepanz auf: Wirst du schon "gelernt" oder nur "gefunden"?</p>
-    </div>
-</details>
+                    <details name="faq-group">
+                        <summary>Warum variieren die Ergebnisse?</summary>
+                        <div class="faq-content">
+                            <p>Das liegt an der Natur der KIs. <strong>Gemini</strong> hat oft Zugriff auf aktuelle Live-Daten aus dem Google-Index. <strong>ChatGPT</strong> basiert stärker auf Trainingsdaten. Unser Tool zeigt dir genau diese Diskrepanz auf: Wirst du schon "gelernt" oder nur "gefunden"?</p>
+                        </div>
+                    </details>
                 </div>
             </section>
 
-            <!-- ========== CTA ========== -->
             <section class="blog-cta-wrapper">
                 <h2>KI-Sichtbarkeit professionell optimieren?</h2>
                 <p>Der Check zeigt nur den Ist-Zustand. Wenn du Unterstützung bei der Umsetzung der Empfehlungen brauchst – von Schema.org bis Content-Strategie:</p>
