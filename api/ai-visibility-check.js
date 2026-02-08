@@ -1,7 +1,8 @@
 // api/ai-visibility-check.js - KI-Sichtbarkeits-Check mit Grounding + Formatierung
-// Version 10: + ChatGPT Cross-Check (Dual-KI)
+// Version 11: Cheerio HTML-Parser, E-E-A-T Rewrite, ohne Empfehlungstests
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import * as brevo from '@getbrevo/brevo';
+import * as cheerio from 'cheerio';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
@@ -676,100 +677,95 @@ export default async function handler(req, res) {
       clearTimeout(timeout);
       
       const html = await response.text();
-      
-      const schemaMatches = html.match(/<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi);
-      if (schemaMatches) {
-        domainAnalysis.hasSchema = true;
-        schemaMatches.forEach(match => {
-          try {
-            const parsed = JSON.parse(match.replace(/<script[^>]*>|<\/script>/gi, ''));
-            const extractTypes = (obj) => {
-              if (obj['@type']) {
-                const types = Array.isArray(obj['@type']) ? obj['@type'] : [obj['@type']];
-                domainAnalysis.schemaTypes.push(...types);
-              }
-              if (obj['@graph']) obj['@graph'].forEach(extractTypes);
-            };
-            extractTypes(parsed);
-          } catch (e) {}
-        });
-      }
+      const $ = cheerio.load(html);
       
       // =============================================================
-      // E-E-A-T SIGNALE ERKENNEN (Multi-Signal-Ansatz)
-      // Prüft Links, Schema.org, sichtbaren Text & Meta-Daten
+      // SCHEMA.ORG (JSON-LD)
       // =============================================================
+      $('script[type="application/ld+json"]').each((_, el) => {
+        try {
+          const parsed = JSON.parse($(el).html());
+          domainAnalysis.hasSchema = true;
+          const extractTypes = (obj) => {
+            if (obj['@type']) {
+              const types = Array.isArray(obj['@type']) ? obj['@type'] : [obj['@type']];
+              domainAnalysis.schemaTypes.push(...types);
+            }
+            if (obj['@graph']) obj['@graph'].forEach(extractTypes);
+          };
+          extractTypes(parsed);
+        } catch (e) {}
+      });
       
-      // Sichtbaren Text extrahieren (ohne Script/Style/Head)
-      const visibleText = html
-        .replace(/<script[\s\S]*?<\/script>/gi, ' ')
-        .replace(/<style[\s\S]*?<\/style>/gi, ' ')
-        .replace(/<noscript[\s\S]*?<\/noscript>/gi, ' ')
-        .replace(/<head[\s\S]*?<\/head>/gi, ' ')
-        .replace(/<[^>]+>/g, ' ')
-        .replace(/\s+/g, ' ')
-        .toLowerCase();
-      
-      // Schema-Typen (bereits extrahiert)
+      // =============================================================
+      // E-E-A-T SIGNALE (Multi-Signal mit Cheerio)
+      // =============================================================
       const schemaTypesLower = domainAnalysis.schemaTypes.map(t => t.toLowerCase());
       
+      // Alle href-Werte sammeln
+      const allHrefs = [];
+      $('a[href]').each((_, el) => allHrefs.push($(el).attr('href').toLowerCase()));
+      
+      // Sichtbarer Text (ohne Script/Style)
+      $('script, style, noscript').remove();
+      const visibleText = $('body').text().replace(/\s+/g, ' ').toLowerCase();
+      
       // --- ABOUT / ÜBER-UNS ---
-      // Signal 1: Navigation-Links – prüft ob der href-Wert ein About-Schlüsselwort enthält
-      const allHrefs = (html.match(/href=["']([^"']+)["']/gi) || []).map(h => h.toLowerCase());
       const aboutKeywords = ['about', 'über-uns', 'ueber-uns', 'about-us', 'who-we-are', 'unser-team', 'das-sind-wir', '/team', '#about', '#über-uns', '#ueber-uns', '#team', '#michael', '#founder', '#gruender'];
       const hasAboutLink = allHrefs.some(href => aboutKeywords.some(kw => href.includes(kw)));
-      // Signal 2: Schema.org AboutPage
       const hasAboutSchema = schemaTypesLower.includes('aboutpage');
-      // Signal 3: Sichtbarer Text mit About-Abschnitt
-      const hasAboutText = /über uns|about us|unser team|über michael|über den gründer|about the founder/i.test(visibleText);
-      // Signal 4: Sichtbare Sektion mit ID/class die auf About hinweist
-      const hasAboutSection = /id=["'](?:about|ueber-uns|über-uns|team|michael|founder|gruender)["']/i.test(html);
-      // Ergebnis: Link ODER Section ODER (Schema + Text)
+      const hasAboutText = /über uns|about us|unser team|über michael|über den gründer|about the founder/.test(visibleText);
+      const hasAboutSection = $('[id]').toArray().some(el => 
+        /^(about|ueber-uns|über-uns|team|michael|founder|gruender)$/i.test($(el).attr('id'))
+      );
       domainAnalysis.hasAboutPage = hasAboutLink || hasAboutSection || (hasAboutSchema && hasAboutText);
       
       // --- KONTAKT / IMPRESSUM ---
-      // Signal 1: Navigation-Links
       const contactKeywords = ['kontakt', 'contact', 'impressum', 'imprint', 'legal-notice', 'contact-us'];
       const hasContactLink = allHrefs.some(href => contactKeywords.some(kw => href.includes(kw)));
-      // Signal 2: Schema.org ContactPage
       const hasContactSchema = schemaTypesLower.includes('contactpage');
-      // Signal 3: Sichtbarer Text mit Kontaktdaten (Telefon, E-Mail-Muster)
-      const hasContactInfo = /(?:tel:|mailto:|(?:\+\d{2}|\b0\d{3,4})[\s/-]?\d)/.test(html);
-      // Signal 4: Impressum im Footer-Bereich (auch in dynamisch geladenen Inhalten)
-      const hasImpressumText = /\bimpressum\b|\bkontakt\b|\bcontact\b/.test(visibleText);
-      // Ergebnis: Link ODER Schema ODER (Kontaktdaten + Impressum-Text)
+      const hasContactInfo = $('a[href^="tel:"], a[href^="mailto:"]').length > 0;
+      const hasImpressumText = /impressum|kontakt|contact/.test(visibleText);
       domainAnalysis.hasContactPage = hasContactLink || hasContactSchema || (hasContactInfo && hasImpressumText);
       
       // --- AUTOREN-INFORMATIONEN ---
-      // Signal 1: Schema.org Person/Author mit echten Daten
-      const hasAuthorSchema = schemaTypesLower.includes('person') || 
-                              schemaTypesLower.includes('author') ||
-                              schemaTypesLower.includes('profilepage');
-      // Signal 2: Schema.org mit author/creator Feldern oder Person mit jobTitle/name
-      const hasAuthorInSchema = /"(?:author|creator)":\s*\{/.test(html) ||
-                                (schemaTypesLower.includes('person') && /"(?:jobTitle|name|familyName)"/.test(html));
-      // Signal 3: Sichtbarer Text mit Rollen-Bezeichnungen
+      const hasAuthorSchema = ['person', 'author', 'profilepage'].some(t => schemaTypesLower.includes(t));
+      
+      // Schema.org Person mit echten Daten (jobTitle, name etc.)
+      let hasAuthorInSchema = false;
+      $('script[type="application/ld+json"]').each((_, el) => {
+        try {
+          const data = JSON.parse($(el).html());
+          const checkPerson = (obj) => {
+            if (!obj) return;
+            const type = Array.isArray(obj['@type']) ? obj['@type'] : [obj['@type'] || ''];
+            if (type.some(t => t.toLowerCase() === 'person') && (obj.jobTitle || obj.name || obj.familyName)) {
+              hasAuthorInSchema = true;
+            }
+            if (obj.author && typeof obj.author === 'object') hasAuthorInSchema = true;
+            if (obj.creator && typeof obj.creator === 'object') hasAuthorInSchema = true;
+            if (obj['@graph']) obj['@graph'].forEach(checkPerson);
+          };
+          checkPerson(data);
+        } catch (e) {}
+      });
+      
       const hasAuthorText = /\b(?:geschäftsführer|inhaber|gründer|founder|ceo|geschäftsleitung|managing director)\b/.test(visibleText);
-      // Signal 4: <meta name="author"> Tag
-      const hasMetaAuthor = /<meta[^>]*name=["']author["'][^>]*content=["'][^"']+["']/i.test(html);
-      // Signal 5: Autoren-Byline oder CSS-Klasse
-      const strippedHtml = html.replace(/<script[\s\S]*?<\/script>/gi, '').replace(/<style[\s\S]*?<\/style>/gi, '');
-      const hasByline = /(?:verfasst von|geschrieben von|autor:\s*)\s*[A-ZÄÖÜ][a-zäöüß]+\s+[A-ZÄÖÜ]/i.test(strippedHtml) ||
-                        /class=["'][^"']*(?:author|byline|writer)[^"']*["']/i.test(html);
-      // Ergebnis: Schema mit echten Daten (jobTitle etc.) ODER Meta-Author ODER Text-Rolle ODER (Schema + Byline)
+      const hasMetaAuthor = $('meta[name="author"]').attr('content')?.trim().length > 0;
+      const hasByline = $('[class*="author"], [class*="byline"], [class*="writer"]').length > 0;
+      
       domainAnalysis.hasAuthorInfo = hasAuthorInSchema || hasMetaAuthor || hasAuthorText || (hasAuthorSchema && hasByline);
       
       // Debug-Logging
-      console.log(`   E-E-A-T Signals:`);
+      console.log(`   E-E-A-T Signals (Cheerio):`);
       console.log(`     About: link=${hasAboutLink}, section=${hasAboutSection}, schema=${hasAboutSchema}, text=${hasAboutText} → ${domainAnalysis.hasAboutPage}`);
-      console.log(`     Contact: link=${hasContactLink}, schema=${hasContactSchema}, contactInfo=${hasContactInfo}, text=${hasImpressumText} → ${domainAnalysis.hasContactPage}`);
+      console.log(`     Contact: link=${hasContactLink}, schema=${hasContactSchema}, tel/mailto=${hasContactInfo}, text=${hasImpressumText} → ${domainAnalysis.hasContactPage}`);
       console.log(`     Author: schema=${hasAuthorSchema}, schemaData=${hasAuthorInSchema}, meta=${hasMetaAuthor}, text=${hasAuthorText}, byline=${hasByline} → ${domainAnalysis.hasAuthorInfo}`);
 
-      const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
-      domainAnalysis.title = titleMatch ? titleMatch[1].trim() : '';
-      
-      const descMatch = html.match(/<meta[^>]*name=["']description["'][^>]*content=["']([^"']+)["']/i);
-      domainAnalysis.description = descMatch ? descMatch[1].trim() : '';
+      // Reload $ for title/description (we removed scripts above)
+      const $full = cheerio.load(html);
+      domainAnalysis.title = $full('title').first().text().trim();
+      domainAnalysis.description = $full('meta[name="description"]').attr('content')?.trim() || '';
       
     } catch (error) {
       domainAnalysis.crawlError = error.message;
