@@ -1,8 +1,9 @@
 // api/ai-visibility-check.js - KI-Sichtbarkeits-Check mit Grounding + Formatierung
-// Version 11: Cheerio HTML-Parser, E-E-A-T Rewrite, ohne Empfehlungstests
+// Version 12: Cheerio, Redis Rate-Limiting, ohne Empfehlungstests
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import * as brevo from '@getbrevo/brevo';
 import * as cheerio from 'cheerio';
+import { checkRateLimit, incrementRateLimit, getClientIP } from './rate-limiter.js';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
@@ -60,10 +61,9 @@ function isDomainMentioned(text, cleanDomain) {
 }
 
 // =================================================================
-// RATE LIMITING
+// RATE LIMITING (via Redis – siehe rate-limiter.js)
 // =================================================================
 const DAILY_LIMIT = 3;
-const rateLimitMap = new Map();
 
 // =================================================================
 // DOMAIN VALIDATION
@@ -134,45 +134,6 @@ async function trackVisibilityCheck(data) {
     hasSchema: data.hasSchema,
     country: data.country || 'unknown'
   }));
-}
-
-function getTodayString() {
-  return new Date().toISOString().split('T')[0];
-}
-
-function checkRateLimit(ip) {
-  const today = getTodayString();
-  const usage = rateLimitMap.get(ip);
-  
-  if (!usage || usage.date !== today) {
-    return { allowed: true, remaining: DAILY_LIMIT - 1 };
-  }
-  if (usage.count >= DAILY_LIMIT) {
-    return { allowed: false, remaining: 0 };
-  }
-  return { allowed: true, remaining: DAILY_LIMIT - usage.count - 1 };
-}
-
-function incrementRateLimit(ip) {
-  const today = getTodayString();
-  const usage = rateLimitMap.get(ip);
-  
-  if (!usage || usage.date !== today) {
-    rateLimitMap.set(ip, { date: today, count: 1 });
-  } else {
-    rateLimitMap.set(ip, { date: today, count: usage.count + 1 });
-  }
-  
-  for (const [key, value] of rateLimitMap.entries()) {
-    if (value.date !== today) rateLimitMap.delete(key);
-  }
-}
-
-function getClientIP(req) {
-  return req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
-         req.headers['x-real-ip'] ||
-         req.headers['cf-connecting-ip'] ||
-         'unknown';
 }
 
 // =================================================================
@@ -598,7 +559,7 @@ export default async function handler(req, res) {
   }
 
   const clientIP = getClientIP(req);
-  const rateCheck = checkRateLimit(clientIP);
+  const rateCheck = await checkRateLimit(clientIP, 'visibility', DAILY_LIMIT);
   
   if (!rateCheck.allowed) {
     return res.status(429).json({ 
@@ -620,7 +581,7 @@ export default async function handler(req, res) {
     const cleanIndustry = sanitizeIndustry(industry);
     
     console.log(`🔍 AI Visibility Check: ${cleanDomain} (Branche: ${cleanIndustry || 'auto'})`);
-    incrementRateLimit(clientIP);
+    await incrementRateLimit(clientIP, 'visibility');
 
     const modelWithSearch = genAI.getGenerativeModel({ 
       model: "gemini-2.5-flash",
@@ -1273,7 +1234,7 @@ WICHTIG: Beginne DIREKT mit dem Inhalt.`
         geminiTests: geminiTests.length,
         chatgptTests: chatgptTests.length,
         totalTests: testResults.length, 
-        remainingChecks: checkRateLimit(clientIP).remaining 
+        remainingChecks: (await checkRateLimit(clientIP, 'visibility', DAILY_LIMIT)).remaining 
       }
     });
 
