@@ -78,3 +78,57 @@ h3 .engine-badge {
         padding: 2px 8px;
     }
 }
+
+/* ================================================
+   TEST RESPONSE: Kompakte, saubere Darstellung
+   ================================================ */
+.test-response {
+    font-size: 0.92rem;
+    line-height: 1.6;
+    color: #ccc;
+}
+
+.test-response p {
+    margin: 0 0 0.75em 0;
+}
+
+.test-response p:last-child {
+    margin-bottom: 0;
+}
+
+.test-response ul.ai-list {
+    list-style: none;
+    padding: 0;
+    margin: 0.5em 0;
+}
+
+.test-response ul.ai-list li {
+    position: relative;
+    padding: 0.35em 0 0.35em 1.2em;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    line-height: 1.5;
+}
+
+.test-response ul.ai-list li:last-child {
+    border-bottom: none;
+}
+
+.test-response ul.ai-list li::before {
+    content: '›';
+    position: absolute;
+    left: 0;
+    color: #c4a35a;
+    font-weight: 600;
+    font-size: 1.1em;
+}
+
+.test-response strong {
+    color: #c4a35a;
+    font-weight: 600;
+}
+
+.test-response br + br {
+    display: block;
+    content: '';
+    margin-top: 0.4em;
+}
