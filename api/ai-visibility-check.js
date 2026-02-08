@@ -213,29 +213,44 @@ function formatResponseText(text) {
   formatted = formatted.replace(/\r\n/g, '\n');
   formatted = formatted.replace(/\r/g, '\n');
   
-  // Nummerierte Listen → Absätze
-  formatted = formatted.replace(/\n\s*\d+\.\s+/g, '\n\n');
-  formatted = formatted.replace(/^\s*\d+\.\s+/g, '');
+  // Absätze erkennen (Doppel-Zeilenumbrüche)
+  const blocks = formatted.split(/\n{2,}/);
   
-  // Bullet Points → Absätze
-  formatted = formatted.replace(/\n\s*[•\-\*]\s+/g, '\n\n');
-  formatted = formatted.replace(/^\s*[•\-\*]\s+/g, '');
+  const htmlBlocks = blocks.map(block => {
+    block = block.trim();
+    if (!block) return '';
+    
+    // Prüfe ob Block eine Liste ist (Bullets oder Nummern)
+    const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
+    const isList = lines.length > 1 && lines.every(l => /^[\d]+[.)]\s|^[•\-\*]\s/.test(l));
+    
+    if (isList) {
+      const items = lines.map(l => l.replace(/^[\d]+[.)]\s*|^[•\-\*]\s*/, '').trim());
+      return '<ul class="ai-list">' + items.map(i => `<li>${i}</li>`).join('') + '</ul>';
+    }
+    
+    // Einzelne Bullet/Nummer-Zeilen in Fließtext → kompakt
+    block = block.replace(/\n\s*\d+[.)]\s+/g, '<br>');
+    block = block.replace(/\n\s*[•\-\*]\s+/g, '<br>');
+    block = block.replace(/^\s*\d+[.)]\s+/, '');
+    block = block.replace(/^\s*[•\-\*]\s+/, '');
+    
+    // Restliche einzelne Zeilenumbrüche → <br>
+    block = block.replace(/\n/g, '<br>');
+    
+    return `<p>${block}</p>`;
+  }).filter(Boolean);
   
-  // Doppelte Zeilenumbrüche → <br><br>
-  formatted = formatted.replace(/\n{2,}/g, '<br><br>');
-  
-  // Einzelne Zeilenumbrüche → Leerzeichen
-  formatted = formatted.replace(/\n/g, ' ');
+  let result = htmlBlocks.join('');
   
   // Cleanup
-  formatted = formatted.replace(/^(<br>\s*)+/gi, '');
-  formatted = formatted.replace(/(<br>\s*){3,}/gi, '<br><br>');
-  formatted = formatted.replace(/\s{2,}/g, ' ');
-  formatted = formatted.replace(/\s+([.!?,:;])/g, '$1');
-  formatted = formatted.replace(/\s*<br>\s*/gi, '<br>');
-  formatted = formatted.replace(/Zu\s+<strong>/gi, 'Zu <strong>');
+  result = result.replace(/<p>\s*<\/p>/g, '');
+  result = result.replace(/(<br>\s*){3,}/gi, '<br><br>');
+  result = result.replace(/\s{2,}/g, ' ');
+  result = result.replace(/\s+([.!?,:;])/g, '$1');
+  result = result.replace(/Zu\s+<strong>/gi, 'Zu <strong>');
   
-  return formatted.trim();
+  return result.trim();
 }
 
 // =================================================================
