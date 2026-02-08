@@ -1,107 +1,226 @@
-// api/generate.js
+// api/generate.js – Silas Content Generator
+// Version 2: Clean rewrite mit Brevo-Benachrichtigung
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { FactChecker } from './fact-checker.js'; 
+import { FactChecker } from './fact-checker.js';
+import * as brevo from '@getbrevo/brevo';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const factChecker = new FactChecker();
 
-// === HILFSFUNKTION FÜR SEMANTISCHE OPTIMIERUNG ===
-async function fetchSemanticTerms(keyword) {
-    return null;
-}
+// =================================================================
+// CONFIG
+// =================================================================
+const MODELS = {
+  master: ['gemini-2.5-pro', 'gemini-3-flash-preview', 'gemini-2.5-flash'],
+  demo:   ['gemini-3-flash-preview', 'gemini-2.5-flash', 'gemini-1.5-flash']
+};
 
-function cleanJsonString(str) {
-    // Falls das Modell dank JSON-Mode schon reines JSON liefert, fangen wir das hier ab
-    if (typeof str !== 'string') return JSON.stringify(str);
+const GENERATION_CONFIG = {
+  responseMimeType: 'application/json',
+  maxOutputTokens: 8192,
+  temperature: 0.7
+};
 
-    let cleaned = str
-        .replace(/```json\s*/gi, '')
-        .replace(/```javascript\s*/gi, '')
-        .replace(/```\s*/g, '')
-        .trim();
-    
-    const firstBrace = cleaned.indexOf('{');
-    const lastBrace = cleaned.lastIndexOf('}');
-    
-    if (firstBrace !== -1 && lastBrace !== -1 && firstBrace < lastBrace) {
-        cleaned = cleaned.substring(firstBrace, lastBrace + 1);
-    }
-    
-    return cleaned.trim();
-}
+const MAX_RETRIES = 3;
 
+// =================================================================
+// HELPERS
+// =================================================================
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-async function generateContentWithRetry(prompt, preferredModel, maxRetries = 3) {
-    let modelsToTry = [];
+/**
+ * Extrahiert valides JSON aus der Modell-Antwort
+ */
+function extractJson(raw) {
+  if (typeof raw !== 'string') return raw;
 
-    if (preferredModel === "gemini-2.5-pro") {
-        modelsToTry = ["gemini-2.5-pro", "gemini-3-flash-preview", "gemini-2.5-flash"];
-    } else {
-        modelsToTry = [
-            "gemini-3-flash-preview", 
-            "gemini-2.5-flash",
-            "gemini-1.5-flash"
-        ];
-    }
-    
-    let lastError = null;
-    
-    for (const modelName of modelsToTry) {
-        for (let attempt = 1; attempt <= maxRetries; attempt++) {
-            try {
-                console.log(`[ATTEMPT] Modell: ${modelName}, Versuch: ${attempt}/${maxRetries}`);
-                
-                // --- WICHTIGE ÄNDERUNG HIER ---
-                // Wir konfigurieren das Modell explizit für lange JSON-Antworten
-                const model = genAI.getGenerativeModel({ 
-                    model: modelName,
-                    generationConfig: {
-                        responseMimeType: "application/json", // Erzwingt JSON-Format (Verhindert Abbruch)
-                        maxOutputTokens: 8192,               // Erlaubt sehr lange Texte (Verhindert Abschneiden)
-                        temperature: 0.7                     // Kreativität (0.0 - 1.0)
-                    }
-                });
-                
-                const result = await model.generateContent(prompt);
-                const response = await result.response;
-                const text = await response.text();
-                
-                // Check, ob die Antwort leer ist
-                if (!text || text.length < 50) {
-                    throw new Error("Antwort war zu kurz oder leer.");
-                }
+  let text = raw
+    .replace(/```(?:json|javascript)?\s*/gi, '')
+    .replace(/```\s*/g, '')
+    .trim();
 
-                console.log(`✅ Erfolg mit Modell: ${modelName} (Länge: ${text.length} Zeichen)`);
-                return { text, modelUsed: modelName };
-                
-            } catch (error) {
-                lastError = error;
-                const errorMessage = error.message || String(error);
-                
-                console.warn(`⚠️ Fehler mit ${modelName} (Versuch ${attempt}/${maxRetries}):`, errorMessage);
-                
-                if (errorMessage.includes('503') || errorMessage.includes('overloaded') || 
-                    errorMessage.includes('429') || errorMessage.includes('quota')) {
-                    
-                    if (attempt < maxRetries) {
-                        const waitTime = Math.pow(2, attempt) * 1000;
-                        console.log(`⏳ Warte ${waitTime/1000}s vor erneutem Versuch...`);
-                        await delay(waitTime);
-                    } else {
-                        console.log(`⏭️ Wechsle zum nächsten Modell...`);
-                        break; 
-                    }
-                } else {
-                    break;
-                }
-            }
-        }
-    }
-    
-    throw new Error(`Alle Modelle fehlgeschlagen. Letzter Fehler: ${lastError?.message || lastError}`);
+  const first = text.indexOf('{');
+  const last = text.lastIndexOf('}');
+  if (first !== -1 && last > first) {
+    text = text.substring(first, last + 1);
+  }
+
+  return JSON.parse(text);
 }
 
+// =================================================================
+// MODELL-AUFRUF MIT FALLBACK-KETTE
+// =================================================================
+/**
+ * Versucht die Generierung über eine Kette von Modellen mit Retry-Logik
+ * @returns {{ data: Object, model: string }}
+ */
+async function generate(prompt, isMaster) {
+  const models = isMaster ? MODELS.master : MODELS.demo;
+  let lastError = null;
+
+  for (const modelName of models) {
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        console.log(`   [${modelName}] Versuch ${attempt}/${MAX_RETRIES}`);
+
+        const model = genAI.getGenerativeModel({
+          model: modelName,
+          generationConfig: GENERATION_CONFIG
+        });
+
+        const result = await model.generateContent(prompt);
+        const text = await result.response.text();
+
+        if (!text || text.length < 50) {
+          throw new Error('Antwort zu kurz oder leer');
+        }
+
+        const data = extractJson(text);
+
+        // Plausibilitäts-Check
+        const missing = ['faq_1', 'testimonial_1', 'guarantee_text'].filter(f => !data[f]);
+        if (missing.length > 0) {
+          console.warn(`   ⚠️ Fehlende Felder: ${missing.join(', ')}`);
+        }
+
+        console.log(`   ✅ Erfolg (${modelName}, ${text.length} Zeichen)`);
+        return { data, model: modelName };
+
+      } catch (error) {
+        lastError = error;
+        const msg = error.message || String(error);
+        console.warn(`   ❌ ${modelName} #${attempt}: ${msg}`);
+
+        const isRetryable = /503|overloaded|429|quota|Too Many/i.test(msg);
+
+        if (isRetryable && attempt < MAX_RETRIES) {
+          const wait = Math.pow(2, attempt) * 1000;
+          console.log(`   ⏳ Warte ${wait / 1000}s...`);
+          await delay(wait);
+        } else {
+          break; // Nächstes Modell
+        }
+      }
+    }
+  }
+
+  throw new Error(`Alle Modelle fehlgeschlagen: ${lastError?.message || lastError}`);
+}
+
+// =================================================================
+// BREVO E-MAIL-BENACHRICHTIGUNG
+// =================================================================
+async function sendNotification(keywords, results, isMaster) {
+  try {
+    if (!process.env.BREVO_API_KEY) return;
+
+    const apiInstance = new brevo.TransactionalEmailsApi();
+    apiInstance.setApiKey(brevo.TransactionalEmailsApiApiKeys.apiKey, process.env.BREVO_API_KEY);
+
+    const success = results.filter(r => !r.error).length;
+    const total = results.length;
+    const config = keywords[0] || {};
+
+    const timestamp = new Date().toLocaleString('de-AT', {
+      timeZone: 'Europe/Vienna',
+      day: '2-digit', month: '2-digit', year: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
+
+    const modeBadge = isMaster
+      ? '<span style="background:#22c55e;color:#000;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">MASTER</span>'
+      : '<span style="background:#f59e0b;color:#000;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">DEMO</span>';
+
+    // Keyword-Tabelle
+    const rows = results.map(r => {
+      const ok = !r.error;
+      const title = ok ? (r.post_title || '-') : r.error.substring(0, 80);
+      const model = ok ? `<span style="color:#666;font-size:11px;">${r._meta?.model_used || ''}</span>` : '';
+      return `
+        <tr>
+          <td style="padding:8px 12px;border-bottom:1px solid #333;color:#c4a35a;font-weight:600;">${r.keyword || '-'}</td>
+          <td style="padding:8px 12px;border-bottom:1px solid #333;text-align:center;">${ok ? '✅' : '❌'}</td>
+          <td style="padding:8px 12px;border-bottom:1px solid #333;color:#aaa;font-size:13px;">${title} ${model}</td>
+        </tr>`;
+    }).join('');
+
+    // Einstellungen-Tags
+    const tags = [
+      config.brand && `Brand: ${config.brand}`,
+      config.domain && `Domain: ${config.domain}`,
+      config.zielgruppe && `Zielgruppe: ${config.zielgruppe}`,
+      config.tonalitaet && `Tonalität: ${config.tonalitaet}`,
+      config.usp && `USP: ${config.usp}`,
+      config.intent && `Intent: ${config.intent}`,
+      config.readability && `Niveau: ${config.readability}`,
+      config.grammaticalPerson && `Perspektive: ${config.grammaticalPerson}`
+    ].filter(Boolean);
+
+    const tagsHtml = tags.length > 0
+      ? tags.map(t => `<span style="display:inline-block;background:#1a1a2e;padding:3px 10px;border-radius:4px;margin:2px 4px 2px 0;font-size:12px;color:#aaa;">${t}</span>`).join('')
+      : '<span style="color:#666;">Keine Zusatzinfos</span>';
+
+    const mail = new brevo.SendSmtpEmail();
+    mail.subject = `📝 Silas: ${success}/${total} Landingpages erstellt ${isMaster ? '(Master)' : '(Demo)'}`;
+    mail.to = [{ email: 'michael@designare.at', name: 'Michael Kanda' }];
+    mail.sender = { email: 'noreply@designare.at', name: 'Silas Content Generator' };
+    mail.htmlContent = `
+<!DOCTYPE html>
+<html>
+<body style="margin:0;padding:0;background:#0a0a1a;color:#fff;font-family:Arial,Helvetica,sans-serif;">
+  <div style="max-width:600px;margin:0 auto;padding:20px;">
+
+    <div style="text-align:center;padding:20px 0;border-bottom:1px solid #333;">
+      <h1 style="margin:0;font-size:20px;color:#fff;">📝 Silas Content Generator</h1>
+      <p style="margin:5px 0 0;color:#888;">${timestamp} ${modeBadge}</p>
+    </div>
+
+    <div style="padding:20px 0;text-align:center;">
+      <div style="display:inline-block;background:#111;border:1px solid #333;border-radius:8px;padding:16px 30px;">
+        <span style="font-size:32px;font-weight:700;color:${success === total ? '#22c55e' : '#f59e0b'};">${success}</span>
+        <span style="font-size:16px;color:#888;"> / ${total} erstellt</span>
+      </div>
+    </div>
+
+    <div style="padding:15px 0;">
+      <h3 style="color:#c4a35a;font-size:14px;text-transform:uppercase;letter-spacing:1px;margin:0 0 10px;">Keywords & Ergebnisse</h3>
+      <table style="width:100%;border-collapse:collapse;">
+        <thead>
+          <tr style="border-bottom:2px solid #444;">
+            <th style="padding:8px 12px;text-align:left;color:#888;font-size:11px;text-transform:uppercase;">Keyword</th>
+            <th style="padding:8px 12px;text-align:center;color:#888;font-size:11px;width:40px;">OK</th>
+            <th style="padding:8px 12px;text-align:left;color:#888;font-size:11px;text-transform:uppercase;">Titel / Fehler</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+
+    <div style="padding:15px 0;border-top:1px solid #333;">
+      <h3 style="color:#c4a35a;font-size:14px;text-transform:uppercase;letter-spacing:1px;margin:0 0 10px;">Einstellungen</h3>
+      <div>${tagsHtml}</div>
+    </div>
+
+    <div style="text-align:center;padding:15px 0;border-top:1px solid #333;margin-top:10px;">
+      <a href="https://designare.at/silas" style="color:#c4a35a;text-decoration:none;font-size:13px;">designare.at/silas</a>
+    </div>
+
+  </div>
+</body>
+</html>`;
+
+    await apiInstance.sendTransacEmail(mail);
+    console.log(`📧 Silas-Mail gesendet (${success}/${total})`);
+
+  } catch (error) {
+    console.error('⚠️ Silas-Mail fehlgeschlagen:', error.message);
+  }
+}
+
+// =================================================================
+// HANDLER
+// =================================================================
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed' });
@@ -109,106 +228,83 @@ export default async function handler(req, res) {
 
   try {
     const { keywords } = req.body;
-    const isMasterRequest = req.headers['x-silas-master'] === process.env.SILAS_MASTER_PASSWORD;
 
-    console.log(`[START] Beginne Verarbeitung für ${keywords.length} Keywords. Master-Modus: ${isMasterRequest}`);
+    if (!keywords || !Array.isArray(keywords) || keywords.length === 0) {
+      return res.status(400).json({ error: 'Keine Keywords übergeben' });
+    }
+
+    const isMaster = req.headers['x-silas-master'] === process.env.SILAS_MASTER_PASSWORD;
+
+    console.log(`\n🚀 Silas: ${keywords.length} Keywords (${isMaster ? 'Master' : 'Demo'})`);
 
     const results = [];
-    
+
     for (const keywordData of keywords) {
       const { keyword, intent, domain, email, phone, brand, address } = keywordData;
-      console.log(`\n[PROCESSING] Keyword: '${keyword}'`);
+      console.log(`\n📝 "${keyword}"`);
 
       try {
-        const preferredModel = isMasterRequest ? "gemini-2.5-pro" : "gemini-3-flash-preview";
-        
-        const semanticTerms = await fetchSemanticTerms(keyword);
-        
-        const enhancedKeywordData = { 
-            ...keywordData, 
-            semanticTerms 
-        };
+        // Prompt bauen (via FactChecker)
+        const prompt = factChecker.generateResponsiblePrompt(keywordData);
 
-        const prompt = factChecker.generateResponsiblePrompt(enhancedKeywordData);
-        const { text, modelUsed } = await generateContentWithRetry(prompt, preferredModel);
+        // Generieren mit Fallback-Kette
+        const { data, model } = await generate(prompt, isMaster);
 
-        let jsonData = {};
-        let parseError = false;
-        
+        // Fact-Check
+        let factCheckResult = null;
         try {
-            const cleanedText = cleanJsonString(text);
-            jsonData = JSON.parse(cleanedText);
-            
-            // Plausibilitäts-Check: Fehlen wichtige Felder?
-            const requiredFields = ['faq_1', 'testimonial_1', 'guarantee_text'];
-            const missingFields = requiredFields.filter(f => !jsonData[f]);
-            
-            if (missingFields.length > 0) {
-                console.warn(`[WARN] Antwort unvollständig. Fehlende Felder: ${missingFields.join(', ')}`);
-                // Optional: Hier könnte man einen Fehler werfen, um einen Retry auszulösen
-            }
-
+          factCheckResult = await factChecker.checkContent(data, keyword);
         } catch (e) {
-            console.warn(`[WARN] JSON-Parsing für '${keyword}' fehlgeschlagen:`, e.message);
-            parseError = true;
-            jsonData = {
-                post_title: `Fehler bei der Inhalts-Erstellung für: ${keyword}`,
-                meta_description: "Der von der KI generierte Inhalt war kein valides JSON.",
-                h1: `Verarbeitungsfehler für: ${keyword}`,
-                content: "<p>Die KI-Antwort konnte nicht korrekt verarbeitet werden.</p>",
-                _fallback_used: true,
-                _parse_error: e.message
-            };
+          console.warn(`   ⚠️ Fact-Check übersprungen: ${e.message}`);
         }
 
-        if (!parseError) {
-            const factCheckResult = await factChecker.checkContent(jsonData, keyword);
-            jsonData._factCheck = factCheckResult;
-        }
+        // Ergebnis zusammenbauen
+        results.push({
+          ...data,
+          keyword,
+          intent,
+          domain,
+          email,
+          phone,
+          brand,
+          address,
+          _factCheck: factCheckResult,
+          _meta: {
+            model_used: model,
+            generated_at: new Date().toISOString(),
+            master_mode: isMaster,
+            success: true
+          }
+        });
 
-        jsonData.keyword = keyword;
-        jsonData.intent = intent;
-        jsonData.domain = domain;
-        jsonData.email = email;
-        jsonData.phone = phone;
-        jsonData.brand = brand;
-        jsonData.address = address;
-
-        jsonData._seo = {
-            semantic_terms_used: semanticTerms || "Deaktiviert (Sprach-Konflikt)"
-        };
-        jsonData._meta = { 
-            model_used: modelUsed,
-            model_requested: preferredModel,
-            generation_time: new Date().toISOString(), 
-            master_mode: isMasterRequest, 
-            success: !parseError 
-        };
-
-        console.log(`✅ Antwort für '${keyword}' bereit (Modell: ${modelUsed})`);
-        results.push(jsonData);
+        console.log(`   ✅ → "${data.post_title || '(kein Titel)'}"`);
 
       } catch (error) {
-        console.error(`💥 Fehler bei '${keyword}':`, error.message);
-        results.push({ 
-            keyword, 
-            intent, 
-            brand, 
-            error: error.message,
-            error_type: error.name,
-            _meta: { success: false } 
+        console.error(`   💥 Fehlgeschlagen: ${error.message}`);
+        results.push({
+          keyword,
+          intent,
+          brand,
+          error: error.message,
+          _meta: { success: false }
         });
       }
 
-      await delay(isMasterRequest ? 200 : 1500);
+      // Rate-Limit-Pause zwischen Keywords
+      await delay(isMaster ? 200 : 1500);
     }
 
-    console.log('\n✅ Alle Antworten bereit, sende zum Client.');
+    // Benachrichtigung senden (fire-and-forget)
+    sendNotification(keywords, results, isMaster).catch(() => {});
+
+    const success = results.filter(r => !r.error).length;
+    console.log(`\n✅ Fertig: ${success}/${results.length} erfolgreich\n`);
+
     return res.status(200).json(results);
 
   } catch (error) {
-    console.error('💥 Kritischer Fehler im Handler:', error);
-    res.status(500).json({
+    console.error('💥 Kritischer Fehler:', error);
+    return res.status(500).json({
       error: 'Interner Server-Fehler',
       details: error.message
     });
