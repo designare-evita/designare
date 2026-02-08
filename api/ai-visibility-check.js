@@ -440,7 +440,7 @@ function analyzeSentiment(text, testType, domainMentioned) {
   
   // --- TEST 1: BEKANNTHEIT ---
   if (testType === 'knowledge') {
-    if (!domainMentioned || hasNotFound) {
+    if (!domainMentioned) {
       return 'negativ';
     }
     
@@ -459,8 +459,14 @@ function analyzeSentiment(text, testType, domainMentioned) {
       textLower.includes('agentur') ||
       textLower.includes('service');
     
+    // Domain erwähnt + substanzielle Informationen = positiv
     if (hasSubstantialInfo) {
       return 'positiv';
+    }
+    
+    // Domain erwähnt, aber nur "nicht gefunden" o.ä. = negativ
+    if (hasNotFound && !hasSubstantialInfo) {
+      return 'negativ';
     }
     
     return 'neutral';
@@ -498,7 +504,8 @@ function analyzeSentiment(text, testType, domainMentioned) {
       'keine rezensionen',
       'keine online-bewertungen',
       'wurden keine bewertungen',
-      'nicht gefunden'
+      'keine bewertungen gefunden',
+      'keine rezensionen gefunden'
     ];
     
     if (noBewertungen.some(phrase => textLower.includes(phrase))) {
