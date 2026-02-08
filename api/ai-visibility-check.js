@@ -694,14 +694,16 @@ export default async function handler(req, res) {
       // --- ABOUT / ÜBER-UNS ---
       // Signal 1: Navigation-Links – prüft ob der href-Wert ein About-Schlüsselwort enthält
       const allHrefs = (html.match(/href=["']([^"']+)["']/gi) || []).map(h => h.toLowerCase());
-      const aboutKeywords = ['about', 'über-uns', 'ueber-uns', 'about-us', 'who-we-are', 'unser-team', 'das-sind-wir', '/team'];
+      const aboutKeywords = ['about', 'über-uns', 'ueber-uns', 'about-us', 'who-we-are', 'unser-team', 'das-sind-wir', '/team', '#about', '#über-uns', '#ueber-uns', '#team', '#michael', '#founder', '#gruender'];
       const hasAboutLink = allHrefs.some(href => aboutKeywords.some(kw => href.includes(kw)));
       // Signal 2: Schema.org AboutPage
       const hasAboutSchema = schemaTypesLower.includes('aboutpage');
-      // Signal 3: Sichtbarer Text
-      const hasAboutText = /über uns|about us|unser team/i.test(visibleText);
-      // Ergebnis: Link ODER (Schema + Text)
-      domainAnalysis.hasAboutPage = hasAboutLink || (hasAboutSchema && hasAboutText);
+      // Signal 3: Sichtbarer Text mit About-Abschnitt
+      const hasAboutText = /über uns|about us|unser team|über michael|über den gründer|about the founder/i.test(visibleText);
+      // Signal 4: Sichtbare Sektion mit ID/class die auf About hinweist
+      const hasAboutSection = /id=["'](?:about|ueber-uns|über-uns|team|michael|founder|gruender)["']/i.test(html);
+      // Ergebnis: Link ODER Section ODER (Schema + Text)
+      domainAnalysis.hasAboutPage = hasAboutLink || hasAboutSection || (hasAboutSchema && hasAboutText);
       
       // --- KONTAKT / IMPRESSUM ---
       // Signal 1: Navigation-Links
@@ -717,28 +719,29 @@ export default async function handler(req, res) {
       domainAnalysis.hasContactPage = hasContactLink || hasContactSchema || (hasContactInfo && hasImpressumText);
       
       // --- AUTOREN-INFORMATIONEN ---
-      // Signal 1: Schema.org Person/Author
+      // Signal 1: Schema.org Person/Author mit echten Daten
       const hasAuthorSchema = schemaTypesLower.includes('person') || 
                               schemaTypesLower.includes('author') ||
                               schemaTypesLower.includes('profilepage');
-      // Signal 2: Schema.org mit author/creator Feldern
-      const hasAuthorInSchema = /"(?:author|creator)":\s*\{/.test(html);
+      // Signal 2: Schema.org mit author/creator Feldern oder Person mit jobTitle/name
+      const hasAuthorInSchema = /"(?:author|creator)":\s*\{/.test(html) ||
+                                (schemaTypesLower.includes('person') && /"(?:jobTitle|name|familyName)"/.test(html));
       // Signal 3: Sichtbarer Text mit Rollen-Bezeichnungen
       const hasAuthorText = /\b(?:geschäftsführer|inhaber|gründer|founder|ceo|geschäftsleitung|managing director)\b/.test(visibleText);
-      // Signal 4: Autoren-Byline in Artikeln (z.B. "von Michael Kanda", "by Jane Doe")
-      // Erfordert Vorname + Nachname (2 Wörter mit Großbuchstabe)
+      // Signal 4: <meta name="author"> Tag
+      const hasMetaAuthor = /<meta[^>]*name=["']author["'][^>]*content=["'][^"']+["']/i.test(html);
+      // Signal 5: Autoren-Byline oder CSS-Klasse
       const strippedHtml = html.replace(/<script[\s\S]*?<\/script>/gi, '').replace(/<style[\s\S]*?<\/style>/gi, '');
       const hasByline = /(?:verfasst von|geschrieben von|autor:\s*)\s*[A-ZÄÖÜ][a-zäöüß]+\s+[A-ZÄÖÜ]/i.test(strippedHtml) ||
                         /class=["'][^"']*(?:author|byline|writer)[^"']*["']/i.test(html);
-      // Ergebnis: Schema UND (Text ODER Byline) – Schema allein reicht nicht
-      //           ODER Text-Rolle gefunden (Geschäftsführer etc.)
-      domainAnalysis.hasAuthorInfo = (hasAuthorSchema && (hasAuthorText || hasByline)) || hasAuthorText;
+      // Ergebnis: Schema mit echten Daten (jobTitle etc.) ODER Meta-Author ODER Text-Rolle ODER (Schema + Byline)
+      domainAnalysis.hasAuthorInfo = hasAuthorInSchema || hasMetaAuthor || hasAuthorText || (hasAuthorSchema && hasByline);
       
       // Debug-Logging
       console.log(`   E-E-A-T Signals:`);
-      console.log(`     About: link=${hasAboutLink}, schema=${hasAboutSchema}, text=${hasAboutText} → ${domainAnalysis.hasAboutPage}`);
+      console.log(`     About: link=${hasAboutLink}, section=${hasAboutSection}, schema=${hasAboutSchema}, text=${hasAboutText} → ${domainAnalysis.hasAboutPage}`);
       console.log(`     Contact: link=${hasContactLink}, schema=${hasContactSchema}, contactInfo=${hasContactInfo}, text=${hasImpressumText} → ${domainAnalysis.hasContactPage}`);
-      console.log(`     Author: schema=${hasAuthorSchema}, schemaField=${hasAuthorInSchema}, text=${hasAuthorText}, byline=${hasByline} → ${domainAnalysis.hasAuthorInfo}`);
+      console.log(`     Author: schema=${hasAuthorSchema}, schemaData=${hasAuthorInSchema}, meta=${hasMetaAuthor}, text=${hasAuthorText}, byline=${hasByline} → ${domainAnalysis.hasAuthorInfo}`);
 
       const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
       domainAnalysis.title = titleMatch ? titleMatch[1].trim() : '';
@@ -888,17 +891,22 @@ WICHTIG: Beginne DIREKT mit dem Inhalt, keine Einleitung wie "Okay" oder "Ich we
     console.log(`🧪 Test 3: Externe Erwähnungen...`);
     
     try {
-      const mentionsPrompt = `Suche nach externen Erwähnungen von **${cleanDomain}**:
+      const mentionsPrompt = `Suche nach EXTERNEN Erwähnungen von **${cleanDomain}** auf ANDEREN Websites.
+
+WICHTIG: 
+- NUR Erwähnungen auf FREMDEN Domains zählen!
+- Unterseiten, Blogbeiträge oder Artikel AUF ${cleanDomain} selbst sind KEINE externen Erwähnungen und dürfen NICHT aufgelistet werden.
+- Auch Subdomains von ${cleanDomain} (z.B. blog.${cleanDomain}) zählen NICHT.
 
 Prüfe:
 - Branchenverzeichnisse (Herold, WKO, Gelbe Seiten, etc.)
-- Artikel und Blogs
-- Social Media Profile
+- Artikel und Blogs auf ANDEREN Websites
+- Social Media Profile (LinkedIn, XING, Facebook, etc.)
 - Andere Websites, die auf ${cleanDomain} verlinken
 
-Liste die gefundenen Erwähnungen auf. Schreibe Quellennamen **fett**.
+Liste nur die gefundenen EXTERNEN Erwähnungen auf. Schreibe Quellennamen **fett**.
 
-Falls nichts gefunden: "Zu **${cleanDomain}** wurden keine externen Erwähnungen gefunden."
+Falls nichts auf fremden Websites gefunden: "Zu **${cleanDomain}** wurden keine externen Erwähnungen auf anderen Websites gefunden."
 
 WICHTIG: Beginne DIREKT mit dem Inhalt, keine Einleitung.`;
 
