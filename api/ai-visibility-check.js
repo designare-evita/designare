@@ -488,32 +488,7 @@ function analyzeSentiment(text, testType, domainMentioned) {
     return 'neutral';
   }
   
-  // --- TEST 2: EMPFEHLUNGEN ---
-  if (testType === 'recommendation') {
-    if (!domainMentioned) {
-      return 'negativ';
-    }
-    
-    const positiveRecommendation = [
-      'empfehlenswert',
-      'erfolgreich',
-      'erfahren',
-      'spezialist',
-      'experte',
-      'führend',
-      'renommiert',
-      'etabliert',
-      'professionell',
-      'hochwertig',
-      'umfangreich',
-      'bekannt'
-    ];
-    
-    const hasPositive = positiveRecommendation.some(word => textLower.includes(word));
-    return hasPositive ? 'positiv' : 'neutral';
-  }
-  
-  // --- TEST 3: REPUTATION / BEWERTUNGEN ---
+  // --- TEST 2: REPUTATION / BEWERTUNGEN ---
   if (testType === 'reviews') {
     const noBewertungen = [
       'keine bewertungen',
@@ -1031,8 +1006,7 @@ WICHTIG: Beginne DIREKT mit dem Inhalt.`
             }
           }
           
-          const testType = test.id.includes('knowledge') ? 'knowledge' : 'recommendation';
-          const sentiment = analyzeSentiment(text, testType, mentioned);
+          const sentiment = analyzeSentiment(text, 'knowledge', mentioned);
           
           // Konkurrenten extrahieren
           const domainBase = cleanDomain.replace(/\.[^.]+$/, '');
