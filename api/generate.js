@@ -294,11 +294,11 @@ export default async function handler(req, res) {
       await delay(isMaster ? 200 : 1500);
     }
 
-    // Benachrichtigung senden (fire-and-forget)
-    sendNotification(keywords, results, isMaster).catch(() => {});
-
     const success = results.filter(r => !r.error).length;
-    console.log(`\n✅ Fertig: ${success}/${results.length} erfolgreich\n`);
+    console.log(`\n✅ Fertig: ${success}/${results.length} erfolgreich`);
+
+    // Benachrichtigung senden (vor Response, da Serverless nach res.json() den Prozess beendet)
+    await sendNotification(keywords, results, isMaster);
 
     return res.status(200).json(results);
 
