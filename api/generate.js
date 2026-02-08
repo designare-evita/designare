@@ -1,8 +1,9 @@
 // api/generate.js – Silas Content Generator
-// Version 2: Clean rewrite mit Brevo-Benachrichtigung
+// Version 2: Clean rewrite mit Brevo-Benachrichtigung + Redis Rate-Limiting
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { FactChecker } from './fact-checker.js';
 import * as brevo from '@getbrevo/brevo';
+import { checkRateLimit, incrementRateLimit, getClientIP } from './rate-limiter.js';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const factChecker = new FactChecker();
@@ -14,6 +15,8 @@ const MODELS = {
   master: ['gemini-2.5-pro', 'gemini-3-flash-preview', 'gemini-2.5-flash'],
   demo:   ['gemini-3-flash-preview', 'gemini-2.5-flash', 'gemini-1.5-flash']
 };
+
+const SILAS_DAILY_LIMIT = 10; // Max Generierungen pro IP pro Tag (Demo)
 
 const GENERATION_CONFIG = {
   responseMimeType: 'application/json',
@@ -235,6 +238,18 @@ export default async function handler(req, res) {
 
     const isMaster = req.headers['x-silas-master'] === process.env.SILAS_MASTER_PASSWORD;
 
+    // Server-seitiges Rate-Limit (nur für Demo-User)
+    if (!isMaster) {
+      const clientIP = getClientIP(req);
+      const rateCheck = await checkRateLimit(clientIP, 'silas', SILAS_DAILY_LIMIT);
+      
+      if (!rateCheck.allowed) {
+        return res.status(429).json({ 
+          error: `Tageslimit erreicht (${SILAS_DAILY_LIMIT} Generierungen pro Tag). Bitte morgen wieder versuchen.`
+        });
+      }
+    }
+
     console.log(`\n🚀 Silas: ${keywords.length} Keywords (${isMaster ? 'Master' : 'Demo'})`);
 
     const results = [];
@@ -296,6 +311,12 @@ export default async function handler(req, res) {
 
     const success = results.filter(r => !r.error).length;
     console.log(`\n✅ Fertig: ${success}/${results.length} erfolgreich`);
+
+    // Rate-Limit Zähler erhöhen (nur Demo)
+    if (!isMaster) {
+      const clientIP = getClientIP(req);
+      await incrementRateLimit(clientIP, 'silas');
+    }
 
     // Benachrichtigung senden (vor Response, da Serverless nach res.json() den Prozess beendet)
     await sendNotification(keywords, results, isMaster);
