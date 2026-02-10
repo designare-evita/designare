@@ -13,24 +13,26 @@
             </div>
             <button type="submit" class="cta-button">Ab die Post!</button>
         </form>
-<div id="contact-success-message" class="contact-success-hidden">
-    
-    <!-- Animated SVG Checkmark -->
-    <div class="success-checkmark">
-        <svg viewBox="0 0 52 52" class="checkmark-svg">
-            <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
-            <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
-        </svg>
-    </div>
 
-    <h2 class="success-title">Zack, ist raus! 🚀</h2>
-    <p class="success-text">
-        Deine Nachricht hat Evitas Spam-Radar überlebt – Glückwunsch!<br>
-        Michael antwortet schneller als du „KI-Drama" sagen kannst.
-    </p>
-    <p class="success-close-wrapper">
-        <a href="#" id="close-success-message" class="cta-button">Alles klar!</a>
-    </p>
+        <div id="contact-success-message" class="contact-success-hidden">
+            <!-- Animated SVG Checkmark -->
+            <div class="success-checkmark">
+                <svg viewBox="0 0 52 52" class="checkmark-svg">
+                    <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+                    <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                </svg>
+            </div>
+
+            <h2 class="success-title">Zack, ist raus! 🚀</h2>
+            <p class="success-text">
+                Deine Nachricht hat Evitas Spam-Radar überlebt – Glückwunsch!<br>
+                Michael antwortet schneller als du „KI-Drama" sagen kannst.
+            </p>
+            <p class="success-close-wrapper">
+                <a href="#" id="close-success-message" class="cta-button">Alles klar!</a>
+            </p>
+        </div>
+    </div>
 </div>
 
 <div id="cookie-info-lightbox" class="modal-overlay">
@@ -55,8 +57,7 @@
     <div class="modal-content">
         <button id="close-ai-response-modal-top" class="close-button">&times;</button>
         
-        <div id="ai-chat-history">
-            </div>
+        <div id="ai-chat-history"></div>
 
         <form id="ai-chat-form" autocomplete="off">
             <input type="text" 
@@ -83,20 +84,12 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🔧 Modal-Ereignis-Setup wird geladen...');
     
-    // Zeige Debug-Button in Entwicklungsumgebung
     if (window.location.hostname === 'localhost' || window.location.hostname.includes('127.0.0.1') || window.location.search.includes('debug=true')) {
         const debugButton = document.getElementById('debug-booking-trigger');
         if (debugButton) {
             debugButton.style.display = 'block';
         }
     }
-    
-    // HINWEIS: Der Chat-Handler wird vollständig von ai-form.js gesteuert.
-    // Dieser Backup-Handler ist NICHT mehr nötig und wurde entfernt,
-    // da er Konflikte mit dem Haupt-Handler verursachte (Page Reload).
-    // 
-    // Falls ai-form.js nicht lädt, wird der Chat einfach nicht funktionieren,
-    // was besser ist als ein Page-Reload der die UX zerstört.
     
     console.log('✅ Modal-Events bereit (Chat wird von ai-form.js gesteuert)');
 });
