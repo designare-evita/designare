@@ -20,7 +20,7 @@ async function chatGPTQuery(prompt) {
     body: JSON.stringify({
       model: 'gpt-4o-mini',
       messages: [{ role: 'user', content: prompt }],
-      temperature: 0.4,
+      temperature: 0.2,
       max_tokens: 1500
     })
   });
@@ -644,7 +644,7 @@ export default async function handler(req, res) {
 
     const modelWithSearch = genAI.getGenerativeModel({ 
       model: "gemini-2.5-flash",
-      generationConfig: { temperature: 0.4, maxOutputTokens: 1500 }
+      generationConfig: { temperature: 0.2, maxOutputTokens: 1500 }
     });
 
     // =================================================================
