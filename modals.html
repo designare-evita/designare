@@ -13,12 +13,24 @@
             </div>
             <button type="submit" class="cta-button">Ab die Post!</button>
         </form>
-        <div id="contact-success-message" class="contact-success-hidden">
-            <h2>Nachricht empfangen! </h2>
-            <p>Michael (oder Evita, wenn er zu sehr bastelt) meldet sich in Kürze.</p>
-            <p class="success-close-wrapper"><a href="#" id="close-success-message" class="cta-button">Schließen</a></p>
-        </div>
+<div id="contact-success-message" class="contact-success-hidden">
+    
+    <!-- Animated SVG Checkmark -->
+    <div class="success-checkmark">
+        <svg viewBox="0 0 52 52" class="checkmark-svg">
+            <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+            <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+        </svg>
     </div>
+
+    <h2 class="success-title">Zack, ist raus! 🚀</h2>
+    <p class="success-text">
+        Deine Nachricht hat Evitas Spam-Radar überlebt – Glückwunsch!<br>
+        Michael antwortet schneller als du „KI-Drama" sagen kannst.
+    </p>
+    <p class="success-close-wrapper">
+        <a href="#" id="close-success-message" class="cta-button">Alles klar!</a>
+    </p>
 </div>
 
 <div id="cookie-info-lightbox" class="modal-overlay">
