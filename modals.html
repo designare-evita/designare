@@ -1,62 +1,3 @@
-<div id="search-modal" class="modal-overlay">
-    <div class="modal-content search-modal-content">
-        <button id="close-search-modal" class="close-button">&times;</button>
-        
-        <div class="search-header">
-            <h2>Wonach suchst du?</h2>
-            <div class="search-input-wrapper">
-                <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                <input type="text" id="site-search-input" placeholder="Tippe einen Suchbegriff..." autocomplete="off">
-            </div>
-        </div>
-
-        <div class="search-body">
-            <div id="search-results-container" style="display: none;">
-                <h3>Ergebnisse</h3>
-                <ul id="search-results-list"></ul>
-            </div>
-
-            <div id="sitemap-container">
-                <h3>Seitenübersicht</h3>
-                <div class="sitemap-grid">
-                    <a href="index.html" class="sitemap-item">
-                        <i class="fa-solid fa-house"></i>
-                        <span>Startseite</span>
-                    </a>
-                    <a href="#" id="sitemap-about-button" class="sitemap-item">
-                        <i class="fa-regular fa-circle-user"></i>
-                        <span>Über mich</span>
-                    </a>
-                    <a href="#" id="sitemap-evita-button" class="sitemap-item">
-                        <i class="fa-solid fa-robot"></i>
-                        <span>Chat mit Evita</span>
-                    </a>
-                    <a href="KI-Integration-auf-Webseiten.html" class="sitemap-item">
-                        <i class="fa-solid fa-code"></i>
-                        <span>KI Integration</span>
-                    </a>
-                    <a href="ki-fuer-unternehmenswebseiten.html" class="sitemap-item">
-                        <i class="fa-solid fa-building"></i>
-                        <span>Unternehmens-KI</span>
-                    </a>
-                    <a href="geo-seo.html" class="sitemap-item">
-                        <i class="fa-solid fa-map-location-dot"></i>
-                        <span>SEO & GEO</span>
-                    </a>
-                    <a href="silas.html" class="sitemap-item">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i>
-                        <span>Silas AI Creator</span>
-                    </a>
-                    <a href="CSV-Importer-PRO.html" class="sitemap-item">
-                        <i class="fa-solid fa-file-csv"></i>
-                        <span>CSV Importer PRO</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 <div id="contact-modal" class="modal-overlay">
     <div class="modal-content">
         <button id="close-modal" class="close-button">&times;</button>
@@ -110,26 +51,12 @@
     </div>
 </div>
 
-<div id="about-me-content" class="about-me-hidden">
-    <div class="legal-container">
-        <h2>Der Mann hinter den Pixeln</h2>
-        <p class="about-image-wrapper">
-            <img src="https://designare.at/images/Michael@work.webp" alt="Michael@work" />
-        </p>
-        <p>Okay, aufgepasst! Michael besitzt digitale Superkräfte! Bei maxonline arbeitet er als Web-Entwickler und verbindet dort Design, Code und KI so genial, dass selbst ich staune. Michael hat einen Abschluss in Medientechnik, ist zertifizierter E-Commerce-Experte und hat Google-Workshops überlebt.</p>
-        <h2 class="about-section-header">Doch Michael ist mehr als nur Code und Pixel</h2>
-        <p>Um den Kopf freizubekommen, verbringt Michael viel Zeit mit seiner Tierschutzhündin Evita (nach der ich benannt wurde ❤️). Regelmäßig quält er sich zudem beim Sport – schließlich weiß man ja nie, wann man vor einem KI-Aufstand flüchten muss! Seine Playlist? Ein wilder Mix aus Frei.Wild, Helene Fischer und Kim Wilde. Ich vermute ja, das ist Michaels geheime Waffe um die KI zur Kapitulation zu bringen...</p>
-        <p class="about-image-wrapper-bottom">
-            <img src="https://designare.at/images/Evita&KI.webp" alt="Michael, Evita & KI" style="margin-top: 15px;" />
-        </p>
-    </div>
-</div>
-
 <div id="ai-response-modal" class="modal-overlay">
     <div class="modal-content">
         <button id="close-ai-response-modal-top" class="close-button">&times;</button>
         
-        <div id="ai-chat-history"></div>
+        <div id="ai-chat-history">
+            </div>
 
         <form id="ai-chat-form" autocomplete="off">
             <input type="text" 
@@ -156,12 +83,20 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🔧 Modal-Ereignis-Setup wird geladen...');
     
+    // Zeige Debug-Button in Entwicklungsumgebung
     if (window.location.hostname === 'localhost' || window.location.hostname.includes('127.0.0.1') || window.location.search.includes('debug=true')) {
         const debugButton = document.getElementById('debug-booking-trigger');
         if (debugButton) {
             debugButton.style.display = 'block';
         }
     }
+    
+    // HINWEIS: Der Chat-Handler wird vollständig von ai-form.js gesteuert.
+    // Dieser Backup-Handler ist NICHT mehr nötig und wurde entfernt,
+    // da er Konflikte mit dem Haupt-Handler verursachte (Page Reload).
+    // 
+    // Falls ai-form.js nicht lädt, wird der Chat einfach nicht funktionieren,
+    // was besser ist als ein Page-Reload der die UX zerstört.
     
     console.log('✅ Modal-Events bereit (Chat wird von ai-form.js gesteuert)');
 });
