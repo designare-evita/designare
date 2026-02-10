@@ -83,7 +83,8 @@ function setupContactModal() {
             e.preventDefault();
             if (contactModal) {
                 contactForm.style.display = 'block';
-                contactSuccessMessage.className = 'contact-success-hidden';
+                contactSuccessMessage.classList.remove('contact-success-visible');
+                contactSuccessMessage.classList.add('contact-success-hidden');
                 openModal(contactModal);
             }
         });
@@ -127,7 +128,8 @@ function setupContactModal() {
 
                 if (result.success) {
                     contactForm.style.display = 'none';
-                    contactSuccessMessage.className = 'contact-success-visible';
+                    contactSuccessMessage.classList.remove('contact-success-hidden');
+                    contactSuccessMessage.classList.add('contact-success-visible');
                     contactForm.reset();
                 } else {
                     throw new Error(result.message || 'Unbekannter Fehler');
