@@ -479,17 +479,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Scripte initialisieren (Header, Footer, Modals, Side-Menu sind bereits im HTML via Build-Script)
     requestAnimationFrame(() => {
-        setTimeout(() => {
-            initializeDynamicScripts();
-            initializeForms();
-            
-            // KRITISCH: no-scroll entfernen und Seite sichtbar machen
-            document.body.classList.remove('no-scroll');
+    setTimeout(() => {
+        initializeDynamicScripts();
+        initializeForms();
+        
+        document.body.classList.remove('no-scroll');
+        
+        requestAnimationFrame(() => {
             document.body.classList.add('page-loaded');
-            
-            console.log("✅ Seite vollständig initialisiert");
-        }, 50);
-    });
+        });
+        
+        console.log("✅ Seite vollständig initialisiert");
+    }, 50);
+});
     
     // Zusätzlicher Fallback-Timer
     setTimeout(unlockScrollFallback, 2000);
