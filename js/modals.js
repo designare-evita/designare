@@ -83,7 +83,7 @@ function setupContactModal() {
             e.preventDefault();
             if (contactModal) {
                 contactForm.style.display = 'block';
-                contactSuccessMessage.style.display = 'none';
+                contactSuccessMessage.className = 'contact-success-hidden';
                 openModal(contactModal);
             }
         });
@@ -109,7 +109,6 @@ function setupContactModal() {
             submitButton.textContent = 'Wird gesendet...';
 
             try {
-                // FormData → JSON für Vercel Serverless Function
                 const formData = new FormData(contactForm);
                 const data = Object.fromEntries(formData.entries());
 
@@ -119,7 +118,6 @@ function setupContactModal() {
                     body: JSON.stringify(data)
                 });
 
-                // Prüfe ob Response tatsächlich JSON ist
                 const contentType = response.headers.get('content-type');
                 if (!contentType || !contentType.includes('application/json')) {
                     throw new Error(`Server-Fehler: ${response.status} ${response.statusText}`);
@@ -129,7 +127,7 @@ function setupContactModal() {
 
                 if (result.success) {
                     contactForm.style.display = 'none';
-                    contactSuccessMessage.style.display = 'block';
+                    contactSuccessMessage.className = 'contact-success-visible';
                     contactForm.reset();
                 } else {
                     throw new Error(result.message || 'Unbekannter Fehler');
