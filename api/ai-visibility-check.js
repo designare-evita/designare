@@ -42,22 +42,81 @@ function isDomainMentioned(text, cleanDomain) {
   const lower = text.toLowerCase();
   
   // Exakte Domain (stempel-lobenhofer.at)
-  if (lower.includes(cleanDomain)) return true;
+  if (lower.includes(cleanDomain)) {
+    // Prüfe ob die Erwähnung eine NEGATION ist
+    if (isNegationContext(lower)) return false;
+    return true;
+  }
   
   // Domain ohne TLD (stempel-lobenhofer)
   const domainBase = cleanDomain.replace(/\.[^.]+$/, '');
-  if (lower.includes(domainBase)) return true;
+  if (lower.includes(domainBase)) {
+    if (isNegationContext(lower)) return false;
+    return true;
+  }
   
   // Bindestriche durch Leerzeichen ersetzen (stempel lobenhofer)
   const domainWords = domainBase.replace(/-/g, ' ');
-  if (domainWords !== domainBase && lower.includes(domainWords)) return true;
+  if (domainWords !== domainBase && lower.includes(domainWords)) {
+    if (isNegationContext(lower)) return false;
+    return true;
+  }
   
   // Einzelteile prüfen: Wenn alle signifikanten Teile vorkommen
-  // z.B. "stempel" UND "lobenhofer" im Text
   const parts = domainBase.split(/[-.]/).filter(p => p.length >= 4);
-  if (parts.length >= 2 && parts.every(part => lower.includes(part))) return true;
+  if (parts.length >= 2 && parts.every(part => lower.includes(part))) {
+    if (isNegationContext(lower)) return false;
+    return true;
+  }
   
   return false;
+}
+
+/**
+ * Prüft ob der Text eine Negation enthält die bedeutet, dass die Domain NICHT bekannt ist.
+ * Wird von isDomainMentioned aufgerufen.
+ * 
+ * Wichtig: Nur reine "nicht gefunden"-Texte matchen. 
+ * Wenn substanzielle Infos vorhanden sind ("bietet an", "Unternehmen ist tätig"),
+ * wird die Negation ignoriert – denn dann wurde die Domain inhaltlich beschrieben.
+ */
+function isNegationContext(textLower) {
+  const negationPatterns = [
+    'keine informationen',
+    'nicht bekannt',
+    'nichts bekannt',
+    'keine daten',
+    'keine kenntnis',
+    'nicht gefunden',
+    'keine ergebnisse',
+    'mir nicht bekannt',
+    'habe ich keine',
+    'kann ich keine',
+    'wurden keine informationen',
+    'no information',
+    'not familiar',
+  ];
+  
+  const hasNegation = negationPatterns.some(p => textLower.includes(p));
+  if (!hasNegation) return false;
+  
+  // Substanz-Check: Wenn echte Infos da sind, ist die Negation nur ein Nebensatz
+  const hasSubstance = 
+    textLower.includes('bietet') ||
+    textLower.includes('dienstleistung') ||
+    textLower.includes('unternehmen') ||
+    textLower.includes('spezialisiert') ||
+    textLower.includes('tätig') ||
+    textLower.includes('anbieter') ||
+    textLower.includes('standort') ||
+    textLower.includes('bewertung') ||     // Reviews: Domain wurde gesucht
+    textLower.includes('rezension') ||     // Reviews: Domain wurde gesucht
+    textLower.includes('erwähnung') ||     // Mentions: Domain wurde gefunden
+    textLower.includes('gelistet') ||      // Mentions: Domain in Verzeichnis
+    textLower.includes('profil');           // Mentions: Social Media Profil
+  
+  // Negation + keine Substanz = Domain ist wirklich nicht bekannt
+  return !hasSubstance;
 }
 
 // =================================================================
@@ -943,30 +1002,6 @@ WICHTIG: Beginne DIREKT mit dem Inhalt.`
           
           let mentioned = isDomainMentioned(text, cleanDomain);
           
-          // ChatGPT Bekanntheit: Prüfe ob die Erwähnung eine NEGATION ist
-          // z.B. "Zu wattaul.eu habe ich keine Informationen"
-          if (mentioned && test.id === 'chatgpt_knowledge') {
-            const negationPatterns = [
-              /keine informationen/i,
-              /nicht bekannt/i,
-              /nichts bekannt/i,
-              /keine daten/i,
-              /keine kenntnis/i,
-              /nicht gefunden/i,
-              /keine ergebnisse/i,
-              /mir nicht bekannt/i,
-              /habe ich keine/i,
-              /kann ich keine/i,
-              /no information/i,
-              /not familiar/i,
-              /don't have.*information/i
-            ];
-            if (negationPatterns.some(p => p.test(text))) {
-              mentioned = false;
-              console.log(`   → Negation erkannt: Domain wird erwähnt aber als "nicht bekannt" markiert`);
-            }
-          }
-          
           const sentiment = analyzeSentiment(text, 'knowledge', mentioned);
           
           // Konkurrenten extrahieren
@@ -1026,58 +1061,65 @@ WICHTIG: Beginne DIREKT mit dem Inhalt.`
     const chatgptTests = testResults.filter(t => t.engine === 'chatgpt');
     const allTests = testResults.filter(t => t.sentiment !== 'fehler');
     
-    // 1. Gemini Web-Präsenz (max 30 Punkte) 
+    // 1. Gemini Web-Präsenz (max 35 Punkte) 
     const geminiMentions = geminiTests.filter(t => t.mentioned).length;
     const geminiMentionScore = geminiTests.length > 0 
-      ? Math.round((geminiMentions / geminiTests.length) * 30) 
+      ? Math.round((geminiMentions / geminiTests.length) * 35) 
       : 0;
     score += geminiMentionScore;
     scoreBreakdown.push({
       category: 'Gemini Sichtbarkeit',
       points: geminiMentionScore,
-      maxPoints: 30,
+      maxPoints: 35,
       detail: `${geminiMentions} von ${geminiTests.length} Gemini-Suchen finden die Domain`
     });
     
-    // 2. ChatGPT Cross-Check (max 10 Punkte)
+    // 2. ChatGPT Cross-Check (max 15 Punkte)
     if (chatgptTests.length > 0) {
       const chatgptMentions = chatgptTests.filter(t => t.mentioned).length;
-      const chatgptScore = Math.round((chatgptMentions / chatgptTests.length) * 10);
+      const chatgptScore = Math.round((chatgptMentions / chatgptTests.length) * 15);
       score += chatgptScore;
       scoreBreakdown.push({
         category: 'ChatGPT Sichtbarkeit',
         points: chatgptScore,
-        maxPoints: 10,
+        maxPoints: 15,
         detail: `${chatgptMentions} von ${chatgptTests.length} ChatGPT-Tests finden die Domain`
       });
     }
     
-    // 3. Technische Authority (max 35 Punkte)
+    // 3. Technische Authority (max 30 Punkte)
     let techScore = 0;
-    if (domainAnalysis.hasSchema) techScore += 12;
-    if (domainAnalysis.schemaTypes.length >= 3) techScore += 8;
+    if (domainAnalysis.hasSchema) techScore += 10;
+    if (domainAnalysis.schemaTypes.length >= 3) techScore += 6;
     if (domainAnalysis.hasAboutPage) techScore += 5;
     if (domainAnalysis.hasContactPage) techScore += 5;
     if (domainAnalysis.hasAuthorInfo) techScore += 5;
+    // Cap bei 30 (falls alle Signale da sind: 10+6+5+5+5 = 31)
+    techScore = Math.min(techScore, 30);
     score += techScore;
     scoreBreakdown.push({
       category: 'Technische Authority',
       points: techScore,
-      maxPoints: 35,
+      maxPoints: 30,
       detail: `Schema: ${domainAnalysis.hasSchema ? '✓' : '✗'}, E-E-A-T: ${[domainAnalysis.hasAboutPage, domainAnalysis.hasContactPage, domainAnalysis.hasAuthorInfo].filter(Boolean).length}/3`
     });
     
-    // 3. Sentiment & Reputation (max 25 Punkte)
-    const positiveCount = testResults.filter(t => t.sentiment === 'positiv').length;
-    const neutralCount = testResults.filter(t => t.sentiment === 'neutral').length;
-    const negativeCount = testResults.filter(t => t.sentiment === 'negativ').length;
+    // 4. Sentiment & Reputation (max 20 Punkte)
+    // Fairere Bewertung: negativ ≠ 0, sondern anteilig
+    // positiv = volle Punkte, neutral = 60%, negativ = 20%
+    const positiveCount = allTests.filter(t => t.sentiment === 'positiv').length;
+    const neutralCount = allTests.filter(t => t.sentiment === 'neutral').length;
+    const negativeCount = allTests.filter(t => t.sentiment === 'negativ').length;
     
-    const sentimentScore = Math.round((positiveCount * 25 + neutralCount * 12.5) / testResults.length);
+    const maxRepPoints = 20;
+    const sentimentScore = allTests.length > 0
+      ? Math.round((positiveCount * maxRepPoints + neutralCount * maxRepPoints * 0.6 + negativeCount * maxRepPoints * 0.2) / allTests.length)
+      : 0;
     score += sentimentScore;
     scoreBreakdown.push({
       category: 'Online-Reputation',
       points: sentimentScore,
-      maxPoints: 25,
+      maxPoints: maxRepPoints,
       detail: `${positiveCount} positiv, ${neutralCount} neutral, ${negativeCount} negativ`
     });
 
