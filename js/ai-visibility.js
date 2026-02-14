@@ -153,22 +153,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-function showError(message) {
-    const errorBox = document.createElement('div');
-    errorBox.className = 'error-box';
-    
-    const icon = document.createElement('i');
-    icon.className = 'fa-solid fa-triangle-exclamation';
-    
-    const p = document.createElement('p');
-    p.textContent = message; // textContent statt innerHTML = automatisch escaped
-    
-    errorBox.appendChild(icon);
-    errorBox.appendChild(p);
-    
-    resultsContainer.innerHTML = '';
-    resultsContainer.appendChild(errorBox);
-}
+    function showError(message) {
+        resultsContainer.innerHTML = `
+            <div class="error-box">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <p>${message}</p>
+            </div>
+        `;
+    }
 
     // =================================================================
     // HELPER: Engine Badge HTML
