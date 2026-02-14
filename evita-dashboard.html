@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Evita Dashboard – designare.at</title>
+  <meta name="robots" content="noindex, nofollow">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
+
+    :root {
+      --bg-primary: #08080f;
+      --bg-card: #111119;
+      --bg-card-hover: #16161f;
+      --border: #1e1e2e;
+      --text-primary: #e8e8ed;
+      --text-secondary: #8888a0;
+      --text-muted: #555566;
+      --accent: #6c5ce7;
+      --accent-glow: rgba(108, 92, 231, 0.15);
+      --green: #00d68f;
+      --green-bg: rgba(0, 214, 143, 0.1);
+      --red: #ff6b6b;
+      --red-bg: rgba(255, 107, 107, 0.1);
+      --orange: #ffa502;
+      --orange-bg: rgba(255, 165, 2, 0.1);
+      --blue: #4facfe;
+      --blue-bg: rgba(79, 172, 254, 0.1);
+      --radius: 12px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'DM Sans', -apple-system, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    /* ============================================ */
+    /* HEADER                                       */
+    /* ============================================ */
+    .dashboard-header {
+      padding: 24px 32px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .dashboard-header h1 {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.3rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .dashboard-header h1 .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .range-select {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .refresh-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .refresh-btn:hover { opacity: 0.85; }
+
+    .last-updated {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* ============================================ */
+    /* MAIN GRID                                    */
+    /* ============================================ */
+    .dashboard-main {
+      padding: 24px 32px;
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+
+    /* KPI CARDS ROW */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .kpi-card:hover {
+      border-color: var(--accent);
+      background: var(--bg-card-hover);
+    }
+
+    .kpi-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+
+    .kpi-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 2rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .kpi-sub {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 6px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .kpi-value.green { color: var(--green); }
+    .kpi-value.red { color: var(--red); }
+    .kpi-value.orange { color: var(--orange); }
+    .kpi-value.blue { color: var(--blue); }
+    .kpi-value.accent { color: var(--accent); }
+
+    /* CHART GRID */
+    .chart-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .chart-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+
+    .chart-card.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .chart-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 260px;
+    }
+
+    /* LIST CARDS */
+    .list-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .list-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      max-height: 420px;
+      overflow-y: auto;
+    }
+
+    .list-card::-webkit-scrollbar { width: 4px; }
+    .list-card::-webkit-scrollbar-track { background: transparent; }
+    .list-card::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .list-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .list-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 12px;
+      border-radius: 8px;
+      margin-bottom: 4px;
+      transition: background 0.15s;
+    }
+
+    .list-item:hover { background: var(--bg-card-hover); }
+
+    .list-item-text {
+      font-size: 0.85rem;
+      color: var(--text-primary);
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-right: 12px;
+    }
+
+    .list-item-count {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--accent);
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .list-item-bar {
+      height: 3px;
+      background: var(--accent);
+      border-radius: 2px;
+      margin-top: 6px;
+      opacity: 0.3;
+    }
+
+    /* VISIBILITY SECTION */
+    .visibility-section {
+      margin-bottom: 24px;
+    }
+
+    .section-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-primary);
+    }
+
+    .visibility-grid {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 16px;
+    }
+
+    .vis-check-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      background: var(--bg-card-hover);
+      border-radius: 8px;
+      margin-bottom: 6px;
+    }
+
+    .vis-domain {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--text-primary);
+    }
+
+    .vis-score {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 2px 10px;
+      border-radius: 6px;
+    }
+
+    .vis-score.hoch { background: var(--green-bg); color: var(--green); }
+    .vis-score.mittel { background: var(--orange-bg); color: var(--orange); }
+    .vis-score.niedrig { background: var(--red-bg); color: var(--red); }
+
+    .vis-industry {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    /* FALLBACK LIST */
+    .fallback-item {
+      padding: 10px 14px;
+      background: var(--red-bg);
+      border-left: 3px solid var(--red);
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 6px;
+    }
+
+    .fallback-msg {
+      font-size: 0.82rem;
+      color: var(--text-primary);
+    }
+
+    .fallback-time {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+      margin-top: 4px;
+    }
+
+    /* HEATMAP */
+    .heatmap-grid {
+      display: grid;
+      grid-template-columns: 40px repeat(24, 1fr);
+      gap: 2px;
+      font-size: 0.65rem;
+    }
+
+    .heatmap-label {
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .heatmap-cell {
+      aspect-ratio: 1;
+      border-radius: 3px;
+      background: var(--bg-card-hover);
+      min-height: 16px;
+    }
+
+    .heatmap-hour-labels {
+      display: grid;
+      grid-template-columns: 40px repeat(24, 1fr);
+      gap: 2px;
+      margin-bottom: 4px;
+    }
+
+    .heatmap-hour {
+      text-align: center;
+      font-size: 0.6rem;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* LOADING & ERROR STATES */
+    .loading-overlay {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 60vh;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-box {
+      background: var(--red-bg);
+      border: 1px solid var(--red);
+      border-radius: var(--radius);
+      padding: 20px;
+      text-align: center;
+      max-width: 500px;
+      margin: 40px auto;
+    }
+
+    .error-box h3 { color: var(--red); margin-bottom: 8px; }
+
+    #auth-form {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 12px;
+    }
+
+    #auth-form input {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      width: 250px;
+    }
+
+    .no-data {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      text-align: center;
+      padding: 30px 0;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .dashboard-main { padding: 16px; }
+      .chart-grid, .list-grid, .visibility-grid { grid-template-columns: 1fr; }
+      .kpi-row { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+      .dashboard-header { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="dashboard-header">
+    <h1><span class="dot"></span> Evita Dashboard</h1>
+    <div class="header-controls">
+      <select class="range-select" id="rangeSelect" onchange="loadDashboard()">
+        <option value="7">7 Tage</option>
+        <option value="14">14 Tage</option>
+        <option value="30" selected>30 Tage</option>
+        <option value="90">90 Tage</option>
+      </select>
+      <button class="refresh-btn" onclick="loadDashboard()">↻ Refresh</button>
+      <span class="last-updated" id="lastUpdated"></span>
+    </div>
+  </header>
+
+  <!-- CONTENT -->
+  <main class="dashboard-main" id="dashboardContent">
+    <div class="loading-overlay" id="loadingState">
+      <div class="spinner"></div>
+      <span style="color: var(--text-secondary); font-size: 0.9rem;">Lade Dashboard-Daten...</span>
+    </div>
+  </main>
+
+  <script>
+    // ============================================================
+    // CONFIG
+    // ============================================================
+    let TOKEN = localStorage.getItem('evita_dashboard_token') || new URLSearchParams(window.location.search).get('token') || '';
+    let chartInstances = {};
+
+    if (TOKEN) {
+      localStorage.setItem('evita_dashboard_token', TOKEN);
+      loadDashboard();
+    } else {
+      showAuthForm();
+    }
+
+    // ============================================================
+    // AUTH
+    // ============================================================
+    function showAuthForm() {
+      document.getElementById('dashboardContent').innerHTML = `
+        <div class="error-box">
+          <h3>🔐 Authentifizierung erforderlich</h3>
+          <p style="color: var(--text-secondary); margin-bottom: 12px;">Dashboard-Token eingeben:</p>
+          <form id="auth-form" onsubmit="submitToken(event)">
+            <input type="password" id="tokenInput" placeholder="Token" autofocus>
+            <button type="submit" class="refresh-btn">→</button>
+          </form>
+        </div>
+      `;
+    }
+
+    function submitToken(e) {
+      e.preventDefault();
+      TOKEN = document.getElementById('tokenInput').value.trim();
+      if (TOKEN) {
+        localStorage.setItem('evita_dashboard_token', TOKEN);
+        document.getElementById('dashboardContent').innerHTML = `
+          <div class="loading-overlay"><div class="spinner"></div></div>
+        `;
+        loadDashboard();
+      }
+    }
+
+    // ============================================================
+    // LOAD DATA
+    // ============================================================
+    async function loadDashboard() {
+      const range = document.getElementById('rangeSelect')?.value || 30;
+      
+      try {
+        const res = await fetch(`/api/evita-dashboard?range=${range}&token=${TOKEN}`);
+        
+        if (res.status === 401) {
+          localStorage.removeItem('evita_dashboard_token');
+          TOKEN = '';
+          showAuthForm();
+          return;
+        }
+        
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        
+        const data = await res.json();
+        renderDashboard(data);
+        
+        document.getElementById('lastUpdated').textContent = 
+          `Aktualisiert: ${new Date().toLocaleTimeString('de-AT')}`;
+          
+      } catch (error) {
+        document.getElementById('dashboardContent').innerHTML = `
+          <div class="error-box">
+            <h3>❌ Fehler beim Laden</h3>
+            <p style="color: var(--text-secondary);">${error.message}</p>
+            <button class="refresh-btn" onclick="loadDashboard()" style="margin-top: 12px;">Erneut versuchen</button>
+          </div>
+        `;
+      }
+    }
+
+    // ============================================================
+    // RENDER
+    // ============================================================
+    function renderDashboard(data) {
+      const s = data.summary;
+      const p = s.period;
+      const t = s.today;
+      
+      // Destroy old charts
+      Object.values(chartInstances).forEach(c => c.destroy());
+      chartInstances = {};
+
+      let html = '';
+
+      // ===== KPI ROW =====
+      html += `<div class="kpi-row">
+        <div class="kpi-card">
+          <div class="kpi-label">Gespräche heute</div>
+          <div class="kpi-value accent">${t.chats}</div>
+          <div class="kpi-sub">${p.total_chats} im Zeitraum</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Nachrichten heute</div>
+          <div class="kpi-value">${t.messages}</div>
+          <div class="kpi-sub">⌀ ${p.avg_messages_per_chat} pro Chat</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Unique Besucher</div>
+          <div class="kpi-value blue">${t.unique_visitors}</div>
+          <div class="kpi-sub">${p.unique_visitors} im Zeitraum</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Booking Conversion</div>
+          <div class="kpi-value green">${p.booking_conversion}%</div>
+          <div class="kpi-sub">${p.booking_completions}/${p.booking_intents} Intents</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Fallback-Rate</div>
+          <div class="kpi-value ${p.fallback_rate > 10 ? 'red' : p.fallback_rate > 5 ? 'orange' : 'green'}">${p.fallback_rate}%</div>
+          <div class="kpi-sub">${p.fallback_count} Fallbacks</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Wiederkehrende</div>
+          <div class="kpi-value orange">${p.returning_rate}%</div>
+          <div class="kpi-sub">${p.returning_users} / ${p.new_users + p.returning_users}</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Visibility Checks</div>
+          <div class="kpi-value">${p.visibility_checks}</div>
+          <div class="kpi-sub">${t.visibility_checks} heute</div>
+        </div>
+      </div>`;
+
+      // ===== CHART ROW 1: Messages Trend + Modell-Nutzung =====
+      html += `<div class="chart-grid">
+        <div class="chart-card">
+          <div class="chart-title">📈 Nachrichten & Chats</div>
+          <div class="chart-container"><canvas id="msgChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">🤖 Modell-Nutzung</div>
+          <div class="chart-container"><canvas id="modelChart"></canvas></div>
+        </div>
+      </div>`;
+
+      // ===== LIST ROW: Top-Fragen + Top-Themen =====
+      html += `<div class="list-grid">
+        <div class="list-card">
+          <div class="list-title">🔥 Top-Fragen</div>
+          ${data.topQuestions.length > 0 
+            ? data.topQuestions.map((q, i) => `
+              <div class="list-item">
+                <span class="list-item-text">${i+1}. ${escHTML(q.question)}</span>
+                <span class="list-item-count">${q.count}×</span>
+              </div>
+            `).join('')
+            : '<div class="no-data">Noch keine Daten</div>'
+          }
+        </div>
+        <div class="list-card">
+          <div class="list-title">📌 Top-Themen</div>
+          ${data.topTopics.length > 0
+            ? data.topTopics.map(t => {
+              const maxCount = data.topTopics[0]?.count || 1;
+              const pct = Math.round((t.count / maxCount) * 100);
+              return `
+                <div class="list-item" style="flex-direction:column;align-items:stretch;">
+                  <div style="display:flex;justify-content:space-between;">
+                    <span class="list-item-text">${escHTML(t.topic)}</span>
+                    <span class="list-item-count">${t.count}</span>
+                  </div>
+                  <div class="list-item-bar" style="width:${pct}%"></div>
+                </div>
+              `;
+            }).join('')
+            : '<div class="no-data">Noch keine Daten</div>'
+          }
+        </div>
+      </div>`;
+
+      // ===== HEATMAP =====
+      html += `<div class="chart-card full-width" style="margin-bottom:24px;">
+        <div class="chart-title">🕐 Aktivitäts-Heatmap</div>
+        ${renderHeatmap(data.heatmap)}
+      </div>`;
+
+      // ===== VISIBILITY SECTION =====
+      if (data.visibility) {
+        const vd = data.visibility.scoreDistribution;
+        const total = vd.hoch + vd.mittel + vd.niedrig;
+        
+        html += `<div class="visibility-section">
+          <div class="section-title">🔍 KI-Sichtbarkeits-Checks</div>
+          <div class="visibility-grid">
+            <div class="chart-card">
+              <div class="chart-title">Score-Verteilung</div>
+              ${total > 0
+                ? `<div class="chart-container" style="height:200px;"><canvas id="visChart"></canvas></div>`
+                : '<div class="no-data">Noch keine Checks</div>'
+              }
+            </div>
+            <div class="list-card">
+              <div class="list-title">Letzte Checks</div>
+              ${data.visibility.recentChecks.length > 0
+                ? data.visibility.recentChecks.map(c => {
+                  const cat = c.score >= 65 ? 'hoch' : c.score >= 35 ? 'mittel' : 'niedrig';
+                  return `
+                    <div class="vis-check-item">
+                      <div>
+                        <div class="vis-domain">${escHTML(c.domain)}</div>
+                        <div class="vis-industry">${escHTML(c.industry || '–')} · ${c.mentionCount}/${c.totalTests} Mentions</div>
+                      </div>
+                      <span class="vis-score ${cat}">${c.score}/100</span>
+                    </div>
+                  `;
+                }).join('')
+                : '<div class="no-data">Noch keine Checks</div>'
+              }
+            </div>
+          </div>
+        </div>`;
+      }
+
+      // ===== FALLBACKS =====
+      html += `<div class="chart-card full-width">
+        <div class="chart-title">⚠️ Letzte Fallbacks <span style="font-weight:400;color:var(--text-muted);font-size:0.75rem;">(Wo Evita nicht weiter wusste)</span></div>
+        ${data.recentFallbacks.length > 0
+          ? data.recentFallbacks.map(f => `
+            <div class="fallback-item">
+              <div class="fallback-msg">"${escHTML(f.message)}"</div>
+              ${f.timestamp ? `<div class="fallback-time">${new Date(f.timestamp).toLocaleString('de-AT')}</div>` : ''}
+            </div>
+          `).join('')
+          : '<div class="no-data">Keine Fallbacks – Evita läuft perfekt 🎉</div>'
+        }
+      </div>`;
+
+      // Inject HTML
+      document.getElementById('dashboardContent').innerHTML = html;
+
+      // ===== RENDER CHARTS =====
+      renderMessageChart(data.daily);
+      renderModelChart(data.modelUsage);
+      
+      if (data.visibility) {
+        const vd = data.visibility.scoreDistribution;
+        if (vd.hoch + vd.mittel + vd.niedrig > 0) {
+          renderVisibilityChart(vd);
+        }
+      }
+    }
+
+    // ============================================================
+    // CHARTS
+    // ============================================================
+    const chartDefaults = {
+      color: '#8888a0',
+      borderColor: '#1e1e2e',
+      font: { family: "'JetBrains Mono', monospace", size: 11 }
+    };
+
+    Chart.defaults.color = chartDefaults.color;
+    Chart.defaults.borderColor = chartDefaults.borderColor;
+    Chart.defaults.font = chartDefaults.font;
+
+    function renderMessageChart(daily) {
+      const ctx = document.getElementById('msgChart');
+      if (!ctx) return;
+
+      chartInstances.msg = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: daily.map(d => {
+            const dt = new Date(d.date + 'T00:00:00');
+            return dt.toLocaleDateString('de-AT', { day: '2-digit', month: '2-digit' });
+          }),
+          datasets: [
+            {
+              label: 'Nachrichten',
+              data: daily.map(d => d.total_messages),
+              borderColor: '#6c5ce7',
+              backgroundColor: 'rgba(108, 92, 231, 0.1)',
+              fill: true,
+              tension: 0.3,
+              pointRadius: 2,
+              pointHoverRadius: 5
+            },
+            {
+              label: 'Chats',
+              data: daily.map(d => d.total_chats),
+              borderColor: '#4facfe',
+              backgroundColor: 'rgba(79, 172, 254, 0.05)',
+              fill: true,
+              tension: 0.3,
+              pointRadius: 2,
+              pointHoverRadius: 5
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: { legend: { position: 'top', labels: { boxWidth: 12, padding: 16 } } },
+          scales: {
+            x: { grid: { display: false }, ticks: { maxTicksLimit: 10 } },
+            y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.03)' } }
+          }
+        }
+      });
+    }
+
+    function renderModelChart(modelUsage) {
+      const ctx = document.getElementById('modelChart');
+      if (!ctx) return;
+
+      const labels = Object.keys(modelUsage);
+      const values = Object.values(modelUsage).map(Number);
+
+      if (labels.length === 0) {
+        ctx.parentElement.innerHTML = '<div class="no-data">Noch keine Daten</div>';
+        return;
+      }
+
+      const colors = ['#6c5ce7', '#4facfe', '#00d68f', '#ffa502', '#ff6b6b'];
+
+      chartInstances.model = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: labels.map(l => l.replace('gemini-', '').replace('-preview', ' ⚡')),
+          datasets: [{
+            data: values,
+            backgroundColor: colors.slice(0, labels.length),
+            borderWidth: 0,
+            hoverOffset: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '65%',
+          plugins: {
+            legend: { position: 'right', labels: { boxWidth: 12, padding: 12 } }
+          }
+        }
+      });
+    }
+
+    function renderVisibilityChart(scoreDistribution) {
+      const ctx = document.getElementById('visChart');
+      if (!ctx) return;
+
+      chartInstances.vis = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Gut sichtbar (65+)', 'Ausbaufähig (35-64)', 'Kaum sichtbar (<35)'],
+          datasets: [{
+            data: [scoreDistribution.hoch, scoreDistribution.mittel, scoreDistribution.niedrig],
+            backgroundColor: ['#00d68f', '#ffa502', '#ff6b6b'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '60%',
+          plugins: {
+            legend: { position: 'bottom', labels: { boxWidth: 10, padding: 10, font: { size: 10 } } }
+          }
+        }
+      });
+    }
+
+    // ============================================================
+    // HEATMAP
+    // ============================================================
+    function renderHeatmap(heatmapData) {
+      const dayNames = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+      
+      // Max-Wert finden für Farbskalierung
+      let maxVal = 0;
+      Object.values(heatmapData || {}).forEach(v => {
+        const n = parseInt(v);
+        if (n > maxVal) maxVal = n;
+      });
+
+      if (maxVal === 0) return '<div class="no-data">Noch keine Aktivitätsdaten</div>';
+
+      // Hour labels
+      let html = '<div class="heatmap-hour-labels"><div></div>';
+      for (let h = 0; h < 24; h++) {
+        html += `<div class="heatmap-hour">${h}</div>`;
+      }
+      html += '</div>';
+
+      // Grid
+      html += '<div class="heatmap-grid">';
+      for (let day = 0; day < 7; day++) {
+        html += `<div class="heatmap-label">${dayNames[day]}</div>`;
+        for (let hour = 0; hour < 24; hour++) {
+          const key = `${day}-${hour}`;
+          const val = parseInt(heatmapData[key] || 0);
+          const intensity = maxVal > 0 ? val / maxVal : 0;
+          const bg = intensity === 0 
+            ? 'var(--bg-card-hover)' 
+            : `rgba(108, 92, 231, ${0.15 + intensity * 0.85})`;
+          html += `<div class="heatmap-cell" style="background:${bg}" title="${dayNames[day]} ${hour}:00 – ${val} Nachrichten"></div>`;
+        }
+      }
+      html += '</div>';
+
+      return html;
+    }
+
+    // ============================================================
+    // HELPERS
+    // ============================================================
+    function escHTML(str) {
+      if (!str) return '';
+      const d = document.createElement('div');
+      d.textContent = str;
+      return d.innerHTML;
+    }
+
+    // Auto-Refresh alle 5 Minuten
+    setInterval(() => {
+      if (TOKEN) loadDashboard();
+    }, 5 * 60 * 1000);
+  </script>
+</body>
+</html>
