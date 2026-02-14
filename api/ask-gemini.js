@@ -145,6 +145,7 @@ export default async function handler(req, res) {
 
     // --- RAG KONTEXT-ABRUF ---
     let additionalContext = "";
+    let availableLinks = []; // NEU: Für Link-Empfehlungen
     const knowledgePath = path.join(process.cwd(), 'knowledge.json');
     
     if (fs.existsSync(knowledgePath)) {
@@ -194,6 +195,9 @@ export default async function handler(req, res) {
             if (matchedPages.length > 0) {
                 additionalContext = matchedPages.map(page => {
                     let context = `\n📄 QUELLE: ${page.title}`;
+                    if (page.url) {
+                      context += ` (URL: ${page.url})`;
+                    }
                     
                     if (page.sections && page.sections.length > 0) {
                         const relevantSections = page.sections
@@ -218,8 +222,16 @@ export default async function handler(req, res) {
                     
                     return context;
                 }).join('\n\n');
+
+                // Verfügbare Links aus den matched Pages extrahieren
+                availableLinks = matchedPages
+                  .filter(page => page.url)
+                  .map(page => ({
+                    url: page.url,
+                    title: page.title
+                  }));
                 
-                console.log(`RAG: ${matchedPages.length} relevante Seiten gefunden`);
+                console.log(`RAG: ${matchedPages.length} relevante Seiten gefunden, ${availableLinks.length} Links verfügbar`);
             }
         } catch (error) {
             console.error('RAG Fehler:', error.message);
@@ -435,6 +447,18 @@ ${additionalContext ? `--- RELEVANTER KONTEXT VON DER WEBSEITE ---
 ${additionalContext}
 --- ENDE KONTEXT ---
 
+${availableLinks.length > 0 ? `--- VERFÜGBARE LINKS ---
+${availableLinks.map(l => `• ${l.url} → "${l.title}"`).join('\n')}
+--- ENDE LINKS ---
+
+LINK-REGELN:
+- Wenn deine Antwort thematisch zu einer der obigen Seiten passt, füge AM ENDE deiner Antwort einen Link-Tag hinzu.
+- Format: [LINK:url|Linktext]
+- Beispiel: [LINK:/geo-seo|Mehr über GEO & KI-Sichtbarkeit]
+- Maximal 1 Link pro Antwort. NUR setzen wenn er wirklich relevant ist.
+- KEIN Link bei Smalltalk, Begrüßungen oder wenn keiner der Artikel zur Frage passt.
+- Der Linktext soll neugierig machen, NICHT einfach den Seitentitel kopieren.
+` : ''}
 Nutze diesen Kontext für präzise Antworten. Verweise bei Bedarf auf die Quelle.
 ` : ''}
 
