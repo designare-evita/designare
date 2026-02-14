@@ -178,16 +178,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // =================================================================
-    // HELPER: Engine Badge HTML
-    // =================================================================
-    function engineBadge(engine) {
-        if (engine === 'chatgpt') {
-            return '<span class="engine-badge engine-chatgpt">ChatGPT</span>';
-        }
-        return '<span class="engine-badge engine-gemini">Gemini</span>';
-    }
-
-    // =================================================================
     // HELPER: Status-Pill HTML
     // =================================================================
     function statusPill(test) {
