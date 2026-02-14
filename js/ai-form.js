@@ -895,6 +895,7 @@ export const initAiForm = () => {
         return text
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
             .replace(/^\* (.*$)/gm, '<li>$1</li>')
+            .replace(/\[LINK:([^\]|]+)\|([^\]]+)\]/g, '<a href="$1" class="evita-link" target="_blank" rel="noopener">$2 →</a>')
             .replace(/\n/g, '<br>');
     }
 
