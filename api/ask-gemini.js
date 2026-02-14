@@ -1,6 +1,8 @@
-// api/ask-gemini.js - MIT MEMORY-SYSTEM (Redis + Session-basiert)
+// api/ask-gemini.js - MIT MEMORY-SYSTEM + DASHBOARD-TRACKING
+// Version: Memory + Dashboard Integration
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { Redis } from "@upstash/redis";
+import { trackChatMessage, trackChatSession, trackQuestion, trackFallback, trackTopics } from './evita-track.js';
 import fs from 'fs';
 import path from 'path';
 
@@ -24,7 +26,6 @@ async function getMemory(sessionId) {
   try {
     const data = await redis.get(`evita:session:${sessionId}`);
     if (!data) return null;
-    // Upstash gibt bereits geparstes JSON zurück
     return typeof data === 'string' ? JSON.parse(data) : data;
   } catch (error) {
     console.error('Redis GET Fehler:', error.message);
@@ -46,11 +47,9 @@ async function saveMemory(sessionId, memoryData) {
 }
 
 function extractNameFromResponse(aiResponse) {
-  // Suche nach dem internen Tag [USER_NAME:Xyz] am Ende der Antwort
   const match = aiResponse.match(/\[USER_NAME:([^\]]+)\]/);
   if (match) {
     const name = match[1].trim();
-    // Validierung: Nur echte Vornamen (2-20 Zeichen, keine Sonderzeichen)
     if (name.length >= 2 && name.length <= 20 && /^[A-Za-zÄÖÜäöüß\-]+$/.test(name)) {
       return name;
     }
@@ -59,7 +58,6 @@ function extractNameFromResponse(aiResponse) {
 }
 
 function cleanAiResponse(text) {
-  // Entferne interne Tags aus der sichtbaren Antwort
   return text
     .replace(/\[USER_NAME:[^\]]+\]/g, '')
     .replace(/\[BOOKING_CONFIRM_REQUEST\]/g, '')
@@ -68,6 +66,14 @@ function cleanAiResponse(text) {
     .trim();
 }
 
+// ===================================================================
+// THEMEN-KEYWORDS FÜR TRACKING (zentral definiert)
+// ===================================================================
+const TOPIC_REGEX = /(?:wordpress|seo|performance|ki|api|website|plugin|theme|speed|hosting|security|schema|css|html|javascript|react|php|python|datapeak|silas|evita|kuchen|rezept|blog|shop|woocommerce|dsgvo|daten|backup|ssl|domain|analytics|tracking|caching|cdn|responsive|mobile|design|ux|ui|server|deployment|git|docker|nginx|apache|core web vitals|pagespeed|lighthouse|sitemap|robots|meta|snippet|featured|backlinks?|keywords?|ranking|indexierung|crawl|search console)/g;
+
+// ===================================================================
+// MAIN HANDLER
+// ===================================================================
 export default async function handler(req, res) {
   // CORS-Header
   res.setHeader('Access-Control-Allow-Credentials', true);
@@ -97,8 +103,17 @@ export default async function handler(req, res) {
 
     console.log(`🧠 Memory: Session=${sessionId?.substring(0,8)}... | Name=${knownName} | Visits=${visitCount} | Returning=${isReturningUser}`);
 
-    // --- MODELL-KONFIGURATION ---
+    // ===================================================================
+    // 📊 DASHBOARD: Neue Chat-Session tracken
+    // ===================================================================
+    if (!history || history.length === 0) {
+      trackChatSession(sessionId); // Fire-and-forget
+    }
+
+    // --- MODELL-KONFIGURATION MIT TRACKING ---
+    let usedModel = 'gemini-3-flash-preview';
     const commonConfig = { temperature: 0.7 };
+
     const modelPrimary = genAI.getGenerativeModel({ 
         model: "gemini-3-flash-preview",
         generationConfig: commonConfig 
@@ -117,10 +132,12 @@ export default async function handler(req, res) {
         return await modelPrimary.generateContent(inputText); 
       } catch (error) { 
         console.log("Primary model failed, trying Fallback 1:", error.message);
+        usedModel = 'gemini-2.5-flash';
         try {
           return await modelFallback1.generateContent(inputText);
         } catch (error1) {
           console.log("Fallback 1 failed, trying Fallback 2:", error1.message);
+          usedModel = 'gemini-2.0-flash';
           return await modelFallback2.generateContent(inputText);
         }
       }
@@ -210,7 +227,7 @@ export default async function handler(req, res) {
     }
 
     // =================================================================
-    // BOOKING INTENT-ERKENNUNG (unverändert)
+    // BOOKING INTENT-ERKENNUNG
     // =================================================================
     if (checkBookingIntent === true) {
       console.log('📅 Booking-Intent Prüfung für:', userMessage);
@@ -236,6 +253,9 @@ export default async function handler(req, res) {
           );
           
           if (userConfirmed) {
+              // 📊 DASHBOARD: Booking-Completion tracken
+              trackChatMessage({ sessionId, userMessage, isReturningUser, usedFallback: false, modelUsed: 'booking', bookingIntent: true, bookingCompleted: true });
+              
               return res.status(200).json({
                   answer: "Gerne, ich öffne jetzt Michaels Kalender für dich! [buchung_starten]"
               });
@@ -252,6 +272,9 @@ export default async function handler(req, res) {
           );
           
           if (hasContactIntent) {
+              // 📊 DASHBOARD: Booking-Intent tracken
+              trackChatMessage({ sessionId, userMessage, isReturningUser, usedFallback: false, modelUsed: 'booking-intent', bookingIntent: true, bookingCompleted: false });
+              
               return res.status(200).json({
                   answer: "Kein Problem! Soll ich in Michaels Kalender nach einem passenden Rückruf-Termin schauen? [BOOKING_CONFIRM_REQUEST]"
               });
@@ -298,7 +321,6 @@ export default async function handler(req, res) {
       let memoryContext = '';
       
       if (isReturningUser && knownName) {
-        // Wiederkehrender User MIT bekanntem Namen
         const timeSince = lastVisit 
           ? getTimeSinceText(new Date(lastVisit))
           : 'einiger Zeit';
@@ -318,7 +340,6 @@ VERHALTEN:
 --- ENDE MEMORY ---
 `;
       } else if (isReturningUser && !knownName) {
-        // Wiederkehrender User OHNE bekannten Namen
         memoryContext = `
 --- MEMORY / GEDÄCHTNIS ---
 ⚡ WIEDERKEHRENDER BESUCHER (Name unbekannt)
@@ -332,7 +353,6 @@ VERHALTEN:
 --- ENDE MEMORY ---
 `;
       } else {
-        // Komplett neuer User
         memoryContext = `
 --- MEMORY / GEDÄCHTNIS ---
 🆕 NEUER BESUCHER (erster Besuch)
@@ -434,20 +454,16 @@ Nutze diesen Kontext für präzise Antworten. Verweise bei Bedarf auf die Quelle
     // POST-PROCESSING: Name extrahieren & Memory speichern
     // =================================================================
     if (source !== 'silas' && sessionId) {
-      // Name aus Antwort extrahieren
       const detectedName = extractNameFromResponse(text);
       
-      // Einfache Themen-Extraktion aus der User-Nachricht
-      const topicKeywords = userMessage
-        .toLowerCase()
-        .match(/(?:wordpress|seo|performance|ki|api|website|plugin|theme|speed|hosting|security|schema|css|html|javascript|react|php|python|datapeak|silas|evita|kuchen|rezept|blog|shop|woocommerce|dsgvo|daten|backup|ssl|domain|analytics|tracking|caching|cdn|responsive|mobile|design|ux|ui|server|deployment|git|docker|nginx|apache|core web vitals|pagespeed|lighthouse|sitemap|robots|meta|snippet|featured|backlinks?|keywords?|ranking|indexierung|crawl|search console)/g) || [];
+      const topicKeywords = userMessage.toLowerCase().match(TOPIC_REGEX) || [];
       
       // Memory aktualisieren
       const updatedMemory = {
         name: detectedName || knownName || null,
         visitCount: visitCount,
         lastVisit: new Date().toISOString(),
-        topics: [...new Set([...previousTopics, ...topicKeywords])].slice(-15), // Max 15 Topics
+        topics: [...new Set([...previousTopics, ...topicKeywords])].slice(-15),
         lastMessages: [
           ...(memory?.lastMessages || []).slice(-8),
           { role: 'user', content: userMessage.substring(0, 200), timestamp: new Date().toISOString() }
@@ -459,7 +475,24 @@ Nutze diesen Kontext für präzise Antworten. Verweise bei Bedarf auf die Quelle
       if (detectedName) {
         console.log(`🧠 Name erkannt und gespeichert: ${detectedName}`);
       }
-      
+
+      // ===============================================================
+      // 📊 DASHBOARD: Chat-Nachricht + Frage + Themen tracken
+      // ===============================================================
+      trackChatMessage({
+        sessionId,
+        userMessage,
+        isReturningUser,
+        usedFallback: false,
+        modelUsed: usedModel,
+        bookingIntent: checkBookingIntent || false,
+        bookingCompleted: false
+      });
+      trackQuestion(userMessage);
+      if (topicKeywords.length > 0) {
+        trackTopics(topicKeywords);
+      }
+
       // Interne Tags aus Antwort entfernen
       text = cleanAiResponse(text);
     }
@@ -467,7 +500,6 @@ Nutze diesen Kontext für präzise Antworten. Verweise bei Bedarf auf die Quelle
     if (source === 'silas') {
       res.status(200).send(text);
     } else {
-      // Sende auch den erkannten/bekannten Namen zurück ans Frontend
       const responsePayload = { answer: text };
       const finalName = extractNameFromResponse(response.text()) || knownName;
       if (finalName) {
@@ -478,6 +510,15 @@ Nutze diesen Kontext für präzise Antworten. Verweise bei Bedarf auf die Quelle
 
   } catch (error) {
     console.error("API Error:", error);
+
+    // ===============================================================
+    // 📊 DASHBOARD: Fallback tracken
+    // ===============================================================
+    const { sessionId, message, prompt } = req.body || {};
+    const userMsg = message || prompt || '';
+    trackChatMessage({ sessionId, userMessage: userMsg, isReturningUser: false, usedFallback: true, modelUsed: 'fallback', bookingIntent: false, bookingCompleted: false });
+    trackFallback(userMsg);
+
     res.status(500).json({ answer: 'Pixelfehler im System! Michael ist dran.' });
   }
 }
