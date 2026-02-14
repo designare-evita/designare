@@ -1,9 +1,10 @@
-// api/ai-visibility-check.js - KI-Sichtbarkeits-Check mit Grounding + Formatierung
-// Version 12: Cheerio, Redis Rate-Limiting, ohne Empfehlungstests
+// api/ai-visibility-check.js - KI-Sichtbarkeits-Check mit Grounding + Formatierung + Dashboard-Tracking
+// Version 13: Cheerio, Redis Rate-Limiting, Dashboard-Integration
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import * as brevo from '@getbrevo/brevo';
 import * as cheerio from 'cheerio';
 import { checkRateLimit, incrementRateLimit, getClientIP } from './rate-limiter.js';
+import { trackVisibilityCheckStats } from './evita-track.js';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
@@ -1286,6 +1287,19 @@ WICHTIG: Beginne DIREKT mit dem Inhalt.`
       totalTests: testResults.length,
       hasSchema: domainAnalysis.hasSchema,
       country: req.headers['cf-ipcountry'] || null
+    });
+
+    // =================================================================
+    // 📊 DASHBOARD: Visibility-Check in Redis tracken
+    // =================================================================
+    await trackVisibilityCheckStats({
+      domain: cleanDomain,
+      score,
+      scoreLabel: scoreCategoryLabel,
+      mentionCount,
+      totalTests: testResults.length,
+      hasSchema: domainAnalysis.hasSchema,
+      industry: detectedIndustry || cleanIndustry
     });
 
     // =================================================================
