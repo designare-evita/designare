@@ -224,8 +224,9 @@ export default async function handler(req, res) {
                 }).join('\n\n');
 
                 // Verfügbare Links aus den matched Pages extrahieren
+                const linkBlacklist = ['CSV-Creator', 'CSV-Importer-PRO'];
                 availableLinks = matchedPages
-                  .filter(page => page.url)
+                  .filter(page => page.url && !linkBlacklist.some(slug => page.url.includes(slug)))
                   .map(page => ({
                     url: page.url,
                     title: page.title
