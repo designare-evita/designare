@@ -8,6 +8,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const resultsContainer = document.getElementById('results-container');
     const loadingOverlay = document.getElementById('loading-overlay');
 
+    // Accessibility: Screenreader informieren wenn Ergebnisse geladen
+    resultsContainer.setAttribute('aria-live', 'polite');
+
     // =================================================================
     // RATE LIMITING - 3 Abfragen pro Tag
     // =================================================================
@@ -153,13 +156,25 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // =================================================================
+    // XSS-SICHER: showError mit textContent statt innerHTML
+    // =================================================================
     function showError(message) {
-        resultsContainer.innerHTML = `
-            <div class="error-box">
-                <i class="fa-solid fa-triangle-exclamation"></i>
-                <p>${message}</p>
-            </div>
-        `;
+        const errorBox = document.createElement('div');
+        errorBox.className = 'error-box';
+        errorBox.setAttribute('role', 'alert');
+
+        const icon = document.createElement('i');
+        icon.className = 'fa-solid fa-triangle-exclamation';
+
+        const p = document.createElement('p');
+        p.textContent = message;
+
+        errorBox.appendChild(icon);
+        errorBox.appendChild(p);
+
+        resultsContainer.innerHTML = '';
+        resultsContainer.appendChild(errorBox);
     }
 
     // =================================================================
@@ -199,6 +214,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // =================================================================
     // RENDER RESULTS
+    // Hinweis: Die KI-Antworten (test.response) werden bereits im Backend
+    // durch escapeHTML() sanitized. Das Frontend rendert nur bereits
+    // bereinigte HTML-Fragmente (<strong>, <p>, <br>, <ul>, <li>).
     // =================================================================
     function renderResults(data) {
         const { score, domainAnalysis, aiTests, competitors, recommendations } = data;
@@ -240,7 +258,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 <h3><i class="fa-solid fa-chart-pie"></i> Score-Zusammensetzung</h3>
                 <div class="breakdown-grid">
                     ${score.breakdown.map(item => {
-                        // Engine-Icon für Breakdown-Zeile
                         let icon = '';
                         if (item.category.includes('Gemini')) icon = '<span class="breakdown-engine engine-gemini">G</span>';
                         else if (item.category.includes('ChatGPT')) icon = '<span class="breakdown-engine engine-chatgpt">C</span>';
@@ -422,7 +439,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (hasChatGPT) {
             const chatgptKnown = chatgptTests.find(t => t.id === 'chatgpt_knowledge')?.mentioned;
             
-            // Kontext-Hinweis generieren
             let chatgptInsight = '';
             if (!chatgptKnown) {
                 chatgptInsight = `
