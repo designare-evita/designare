@@ -371,7 +371,7 @@ async function sendCheckNotification({ domain, industry, score, scoreLabel, scor
 
     const sendSmtpEmail = new brevo.SendSmtpEmail();
     sendSmtpEmail.subject = `🤖 KI-Check: ${domain} → ${score}/100 (${scoreLabel})`;
-    sendSmtpEmail.to = [{ email: 'michael@designare.at', name: 'Michael Kanda' }];
+    sendSmtpEmail.to = [{ email: process.env.NOTIFICATION_EMAIL || 'michael@designare.at', name: 'Michael Kanda' }];
     sendSmtpEmail.sender = { email: 'noreply@designare.at', name: 'KI-Sichtbarkeits-Check' };
     sendSmtpEmail.htmlContent = `
 <!DOCTYPE html>
@@ -687,7 +687,7 @@ export default async function handler(req, res) {
       crawlError: null
     };
 
-try {
+    try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 10000);
       
@@ -897,7 +897,7 @@ WICHTIG: Beginne DIREKT mit dem Inhalt, keine Einleitung.`;
         mentioned: false,
         sentiment: 'fehler',
         competitors: [],
-        response: '❌ Test fehlgeschlagen: ' + error.message,
+        response: '❌ Test fehlgeschlagen: ' + escapeHTML(error.message),
         groundingUsed: true,
         engine: 'gemini'
       });
@@ -953,7 +953,7 @@ WICHTIG: Beginne DIREKT mit dem Inhalt, keine Einleitung wie "Okay" oder "Ich we
         mentioned: false,
         sentiment: 'fehler',
         competitors: [],
-        response: '❌ Test fehlgeschlagen: ' + error.message,
+        response: '❌ Test fehlgeschlagen: ' + escapeHTML(error.message),
         groundingUsed: true,
         engine: 'gemini'
       });
@@ -1023,7 +1023,7 @@ WICHTIG: Beginne DIREKT mit dem Inhalt, keine Einleitung.`;
         mentioned: false,
         sentiment: 'fehler',
         competitors: [],
-        response: '❌ Test fehlgeschlagen: ' + error.message,
+        response: '❌ Test fehlgeschlagen: ' + escapeHTML(error.message),
         groundingUsed: true,
         engine: 'gemini'
       });
@@ -1094,7 +1094,7 @@ WICHTIG: Beginne DIREKT mit dem Inhalt.`
             mentioned: false,
             sentiment: 'fehler',
             competitors: [],
-            response: '❌ ChatGPT-Test fehlgeschlagen: ' + error.message,
+            response: '❌ ChatGPT-Test fehlgeschlagen: ' + escapeHTML(error.message),
             engine: 'chatgpt'
           };
         }
@@ -1352,9 +1352,16 @@ WICHTIG: Beginne DIREKT mit dem Inhalt.`
 // =================================================================
 async function detectIndustryFromResponse(model, knowledgeText, domain) {
   try {
+    // KI-Antwort bereinigen: Nur Klartext, keine Steuerzeichen/Quotes
+    const cleanText = knowledgeText
+      .substring(0, 500)
+      .replace(/["`\\]/g, '')
+      .replace(/\n+/g, ' ')
+      .trim();
+
     const extractPrompt = `Basierend auf diesem Text über ${domain}:
 
-"${knowledgeText.substring(0, 500)}"
+"${cleanText}"
 
 In welcher Branche ist dieses Unternehmen tätig? 
 Antworte mit NUR 1-3 Wörtern (z.B. "Luftfracht Transport", "Webentwicklung", "Gastronomie", "E-Commerce").
