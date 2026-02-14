@@ -1,14 +1,77 @@
-// api/ask-gemini.js - REPARIERT: Booking-Flow wie ursprünglich
+// api/ask-gemini.js - MIT MEMORY-SYSTEM (Redis + Session-basiert)
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { Redis } from "@upstash/redis";
 import fs from 'fs';
 import path from 'path';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
+// ===================================================================
+// REDIS-INITIALISIERUNG
+// ===================================================================
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN,
+});
+
+// ===================================================================
+// MEMORY-HELPER FUNKTIONEN
+// ===================================================================
+const MEMORY_TTL = 60 * 60 * 24 * 30; // 30 Tage in Sekunden
+
+async function getMemory(sessionId) {
+  if (!sessionId) return null;
+  try {
+    const data = await redis.get(`evita:session:${sessionId}`);
+    if (!data) return null;
+    // Upstash gibt bereits geparstes JSON zurück
+    return typeof data === 'string' ? JSON.parse(data) : data;
+  } catch (error) {
+    console.error('Redis GET Fehler:', error.message);
+    return null;
+  }
+}
+
+async function saveMemory(sessionId, memoryData) {
+  if (!sessionId) return;
+  try {
+    await redis.set(
+      `evita:session:${sessionId}`,
+      JSON.stringify(memoryData),
+      { ex: MEMORY_TTL }
+    );
+  } catch (error) {
+    console.error('Redis SET Fehler:', error.message);
+  }
+}
+
+function extractNameFromResponse(aiResponse) {
+  // Suche nach dem internen Tag [USER_NAME:Xyz] am Ende der Antwort
+  const match = aiResponse.match(/\[USER_NAME:([^\]]+)\]/);
+  if (match) {
+    const name = match[1].trim();
+    // Validierung: Nur echte Vornamen (2-20 Zeichen, keine Sonderzeichen)
+    if (name.length >= 2 && name.length <= 20 && /^[A-Za-zÄÖÜäöüß\-]+$/.test(name)) {
+      return name;
+    }
+  }
+  return null;
+}
+
+function cleanAiResponse(text) {
+  // Entferne interne Tags aus der sichtbaren Antwort
+  return text
+    .replace(/\[USER_NAME:[^\]]+\]/g, '')
+    .replace(/\[BOOKING_CONFIRM_REQUEST\]/g, '')
+    .replace(/\[buchung_starten\]/g, '')
+    .replace(/\[booking_starten\]/g, '')
+    .trim();
+}
+
 export default async function handler(req, res) {
-  // CORS-Header hinzufügen
+  // CORS-Header
   res.setHeader('Access-Control-Allow-Credentials', true);
-  res.setHeader('Access-Control-Allow-Origin', '*'); // Oder deine spezifische Domain
+  res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
   res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
 
@@ -19,18 +82,29 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ message: 'Method not allowed' });
 
   try {
-    const { prompt, source, checkBookingIntent, history, message } = req.body;
+    const { prompt, source, checkBookingIntent, history, message, sessionId, userName } = req.body;
     const userMessage = message || prompt;
 
-    // --- MODELL-KONFIGURATION (ERWEITERT UM 3. FALLBACK) ---
+    // ===================================================================
+    // MEMORY LADEN
+    // ===================================================================
+    let memory = await getMemory(sessionId);
+    const isReturningUser = memory !== null;
+    const knownName = userName || memory?.name || null;
+    const previousTopics = memory?.topics || [];
+    const visitCount = (memory?.visitCount || 0) + 1;
+    const lastVisit = memory?.lastVisit || null;
+
+    console.log(`🧠 Memory: Session=${sessionId?.substring(0,8)}... | Name=${knownName} | Visits=${visitCount} | Returning=${isReturningUser}`);
+
+    // --- MODELL-KONFIGURATION ---
     const commonConfig = { temperature: 0.7 };
-    // HYBRID: Preview + Paid Fallback
     const modelPrimary = genAI.getGenerativeModel({ 
-        model: "gemini-3-flash-preview",  // Gratis solange es geht
+        model: "gemini-3-flash-preview",
         generationConfig: commonConfig 
     });
     const modelFallback1 = genAI.getGenerativeModel({ 
-        model: "gemini-2.5-flash",  // Paid Fallback
+        model: "gemini-2.5-flash",
         generationConfig: commonConfig 
     });
     const modelFallback2 = genAI.getGenerativeModel({ 
@@ -40,18 +114,13 @@ export default async function handler(req, res) {
 
     async function generateContentSafe(inputText) {
       try { 
-        // 1. Versuch: Primary Model
         return await modelPrimary.generateContent(inputText); 
       } catch (error) { 
         console.log("Primary model failed, trying Fallback 1:", error.message);
-        
         try {
-          // 2. Versuch: Fallback 1
           return await modelFallback1.generateContent(inputText);
         } catch (error1) {
-          console.log("Fallback 1 failed, trying Fallback 2 (Gemini 2.0):", error1.message);
-          
-          // 3. Versuch: Fallback 2 (Gemini 2.0 Flash - stabilste Option)
+          console.log("Fallback 1 failed, trying Fallback 2:", error1.message);
           return await modelFallback2.generateContent(inputText);
         }
       }
@@ -141,59 +210,54 @@ export default async function handler(req, res) {
     }
 
     // =================================================================
-    // BOOKING INTENT-ERKENNUNG
+    // BOOKING INTENT-ERKENNUNG (unverändert)
     // =================================================================
-if (checkBookingIntent === true) {
-    console.log('📅 Booking-Intent Prüfung für:', userMessage);
-    
-    // Wir suchen die letzte Nachricht der KI (flexibel für 'assistant' oder 'model')
-    const lastAiMessage = history && Array.isArray(history) 
-        ? [...history].reverse().find(msg => msg.role === 'assistant' || msg.role === 'model') 
-        : null;
-    
-    // Prüfe auf das Tag oder den spezifischen Wortlaut der Rückfrage
-    const wasBookingQuestion = lastAiMessage && 
-        (lastAiMessage.content.includes('[BOOKING_CONFIRM_REQUEST]') || 
-         lastAiMessage.content.toLowerCase().includes('rückruf-termin schauen'));
-    
-    // ===== FALL 1: User bestätigt eine vorherige Booking-Rückfrage =====
-    if (wasBookingQuestion) {
-        const confirmationKeywords = [
-            'ja', 'gerne', 'okay', 'ok', 'bitte', 'genau', 'richtig', 
-            'korrekt', 'stimmt', 'passt', 'mach das', 'hilf mir', 
-            'super', 'perfekt', 'natürlich', 'klar', 'unbedingt',
-            'auf jeden fall', 'sicher', 'gern', 'würde ich', 'bitte sehr'
-        ];
-        
-        const userConfirmed = confirmationKeywords.some(keyword => 
-            userMessage.toLowerCase().includes(keyword)
-        );
-        
-        if (userConfirmed) {
-            return res.status(200).json({
-                answer: "Gerne, ich öffne jetzt Michaels Kalender für dich! [buchung_starten]"
-            });
-        }
-    } 
-    // ===== FALL 2: Neue Kontakt/Termin-Anfrage (DEINE VOLLSTÄNDIGE LISTE) =====
-    else {
-        const contactKeywords = [
-            'termin', 'buchung', 'buchen', 'rückruf', 'anrufen', 
-            'sprechen', 'kontakt', 'meeting', 'gespräch', 'erreichen',
-            'treffen', 'call', 'telefonat', 'beratung', 'projekt besprechen'
-        ];
-        
-        const hasContactIntent = contactKeywords.some(keyword => 
-            userMessage.toLowerCase().includes(keyword)
-        );
-        
-        if (hasContactIntent) {
-            return res.status(200).json({
-                answer: "Kein Problem! Soll ich in Michaels Kalender nach einem passenden Rückruf-Termin schauen? [BOOKING_CONFIRM_REQUEST]"
-            });
-        }
+    if (checkBookingIntent === true) {
+      console.log('📅 Booking-Intent Prüfung für:', userMessage);
+      
+      const lastAiMessage = history && Array.isArray(history) 
+          ? [...history].reverse().find(msg => msg.role === 'assistant' || msg.role === 'model') 
+          : null;
+      
+      const wasBookingQuestion = lastAiMessage && 
+          (lastAiMessage.content.includes('[BOOKING_CONFIRM_REQUEST]') || 
+           lastAiMessage.content.toLowerCase().includes('rückruf-termin schauen'));
+      
+      if (wasBookingQuestion) {
+          const confirmationKeywords = [
+              'ja', 'gerne', 'okay', 'ok', 'bitte', 'genau', 'richtig', 
+              'korrekt', 'stimmt', 'passt', 'mach das', 'hilf mir', 
+              'super', 'perfekt', 'natürlich', 'klar', 'unbedingt',
+              'auf jeden fall', 'sicher', 'gern', 'würde ich', 'bitte sehr'
+          ];
+          
+          const userConfirmed = confirmationKeywords.some(keyword => 
+              userMessage.toLowerCase().includes(keyword)
+          );
+          
+          if (userConfirmed) {
+              return res.status(200).json({
+                  answer: "Gerne, ich öffne jetzt Michaels Kalender für dich! [buchung_starten]"
+              });
+          }
+      } else {
+          const contactKeywords = [
+              'termin', 'buchung', 'buchen', 'rückruf', 'anrufen', 
+              'sprechen', 'kontakt', 'meeting', 'gespräch', 'erreichen',
+              'treffen', 'call', 'telefonat', 'beratung', 'projekt besprechen'
+          ];
+          
+          const hasContactIntent = contactKeywords.some(keyword => 
+              userMessage.toLowerCase().includes(keyword)
+          );
+          
+          if (hasContactIntent) {
+              return res.status(200).json({
+                  answer: "Kein Problem! Soll ich in Michaels Kalender nach einem passenden Rückruf-Termin schauen? [BOOKING_CONFIRM_REQUEST]"
+              });
+          }
+      }
     }
-}
 
     // =================================================================
     // NORMALE CHAT-ANTWORTEN
@@ -204,7 +268,6 @@ if (checkBookingIntent === true) {
       finalPrompt = userMessage;
       console.log("Silas-Prompt verwendet");
     } else {
-      // Evita-Prompt
       const today = new Date();
       const optionsDate = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'Europe/Vienna' };
       const formattedDate = today.toLocaleDateString('de-AT', optionsDate);
@@ -219,15 +282,83 @@ if (checkBookingIntent === true) {
         conversationHistoryText = '\n\n--- BISHERIGE KONVERSATION ---\n';
         history.forEach((msg, index) => {
           const role = msg.role === 'user' ? 'NUTZER' : 'EVITA';
-          // Entferne interne Tags aus der Historie
           const cleanContent = msg.content
             .replace(/\[BOOKING_CONFIRM_REQUEST\]/g, '')
             .replace(/\[buchung_starten\]/g, '')
-            .replace(/\[booking_starten\]/g, '');
+            .replace(/\[booking_starten\]/g, '')
+            .replace(/\[USER_NAME:[^\]]+\]/g, '');
           conversationHistoryText += `${role}: ${cleanContent}\n`;
         });
         conversationHistoryText += '--- ENDE KONVERSATION ---\n\n';
       }
+
+      // =================================================================
+      // MEMORY-KONTEXT FÜR DEN PROMPT
+      // =================================================================
+      let memoryContext = '';
+      
+      if (isReturningUser && knownName) {
+        // Wiederkehrender User MIT bekanntem Namen
+        const timeSince = lastVisit 
+          ? getTimeSinceText(new Date(lastVisit))
+          : 'einiger Zeit';
+        
+        memoryContext = `
+--- MEMORY / GEDÄCHTNIS ---
+⚡ WIEDERKEHRENDER BESUCHER!
+- Name: ${knownName}
+- Besuch Nr.: ${visitCount}
+- Letzter Besuch: vor ${timeSince}
+${previousTopics.length > 0 ? `- Frühere Themen: ${previousTopics.slice(-5).join(', ')}` : ''}
+
+VERHALTEN: 
+- Begrüße ${knownName} NATÜRLICH beim Namen (nicht übertrieben)
+- Knüpfe an frühere Themen an, wenn es passt
+- Du brauchst NICHT nach dem Namen zu fragen
+--- ENDE MEMORY ---
+`;
+      } else if (isReturningUser && !knownName) {
+        // Wiederkehrender User OHNE bekannten Namen
+        memoryContext = `
+--- MEMORY / GEDÄCHTNIS ---
+⚡ WIEDERKEHRENDER BESUCHER (Name unbekannt)
+- Besuch Nr.: ${visitCount}
+${previousTopics.length > 0 ? `- Frühere Themen: ${previousTopics.slice(-5).join(', ')}` : ''}
+
+VERHALTEN:
+- Beziehe dich bei Gelegenheit auf frühere Gespräche
+- Frage BEILÄUFIG nach dem Namen, wenn es natürlich passt (z.B. "Übrigens, wie darf ich dich nennen?")
+- NICHT in der ersten Nachricht fragen, erst ab der 3. Nachricht im aktuellen Chat
+--- ENDE MEMORY ---
+`;
+      } else {
+        // Komplett neuer User
+        memoryContext = `
+--- MEMORY / GEDÄCHTNIS ---
+🆕 NEUER BESUCHER (erster Besuch)
+
+VERHALTEN:
+- Falls der Nutzer sich vorstellt oder seinen Namen nennt, merke dir den Namen
+- Wenn der Nutzer seinen Namen nennt, füge UNSICHTBAR am Ende deiner Antwort hinzu: [USER_NAME:Vorname]
+- Frage NICHT aktiv nach dem Namen in den ersten 2 Nachrichten
+--- ENDE MEMORY ---
+`;
+      }
+
+      // =================================================================
+      // NAMENS-ERKENNUNG INSTRUKTION (immer aktiv)
+      // =================================================================
+      const nameDetectionInstruction = `
+--- NAMENS-ERKENNUNG (INTERN - UNSICHTBAR FÜR DEN NUTZER) ---
+Wenn der Nutzer in seiner Nachricht seinen Vornamen nennt oder sich vorstellt:
+→ Füge am ENDE deiner Antwort den Tag [USER_NAME:Vorname] hinzu
+Beispiele: "Ich bin der Lukas" → [USER_NAME:Lukas]
+           "Mein Name ist Anna" → [USER_NAME:Anna]  
+           "Hi, Tom hier" → [USER_NAME:Tom]
+WICHTIG: Nur bei ECHTEN Vornamen des Nutzers, NICHT bei erwähnten Personen!
+"Wie geht es Lukas Podolski?" → KEIN Tag!
+--- ENDE NAMENS-ERKENNUNG ---
+`;
 
       finalPrompt = `
 --- ANWEISUNGEN FÜR DIE KI ---
@@ -254,7 +385,7 @@ Du bist Expertin für:
 
 --- TERMINE & BUCHUNGEN (ABSOLUTE VERBOTE!) ---
 ⛔ Du darfst NIEMALS:
-- Termine vorschlagen oder erfinden ("Montag 9 Uhr wäre frei...")
+- Termine vorschlagen oder erfinden
 - So tun als hättest du Zugriff auf den Kalender
 - Behaupten du hättest etwas gebucht
 - Nach E-Mail, Telefonnummer oder Namen für Buchungen fragen
@@ -273,6 +404,10 @@ Du bist Expertin für:
 --- AKTUELLE DATEN ---
 Datum: ${formattedDate}
 Uhrzeit: ${formattedTime}
+
+${memoryContext}
+
+${nameDetectionInstruction}
 
 ${conversationHistoryText}
 
@@ -293,16 +428,76 @@ Nutze diesen Kontext für präzise Antworten. Verweise bei Bedarf auf die Quelle
     // =================================================================
     const result = await generateContentSafe(finalPrompt);
     const response = await result.response;
-    const text = response.text();
+    let text = response.text();
+
+    // =================================================================
+    // POST-PROCESSING: Name extrahieren & Memory speichern
+    // =================================================================
+    if (source !== 'silas' && sessionId) {
+      // Name aus Antwort extrahieren
+      const detectedName = extractNameFromResponse(text);
+      
+      // Einfache Themen-Extraktion aus der User-Nachricht
+      const topicKeywords = userMessage
+        .toLowerCase()
+        .match(/(?:wordpress|seo|performance|ki|api|website|plugin|theme|speed|hosting|security|schema|css|html|javascript|react|php|python|datapeak|silas|evita|kuchen|rezept|blog|shop|woocommerce|dsgvo|daten|backup|ssl|domain|analytics|tracking|caching|cdn|responsive|mobile|design|ux|ui|server|deployment|git|docker|nginx|apache|core web vitals|pagespeed|lighthouse|sitemap|robots|meta|snippet|featured|backlinks?|keywords?|ranking|indexierung|crawl|search console)/g) || [];
+      
+      // Memory aktualisieren
+      const updatedMemory = {
+        name: detectedName || knownName || null,
+        visitCount: visitCount,
+        lastVisit: new Date().toISOString(),
+        topics: [...new Set([...previousTopics, ...topicKeywords])].slice(-15), // Max 15 Topics
+        lastMessages: [
+          ...(memory?.lastMessages || []).slice(-8),
+          { role: 'user', content: userMessage.substring(0, 200), timestamp: new Date().toISOString() }
+        ]
+      };
+      
+      await saveMemory(sessionId, updatedMemory);
+      
+      if (detectedName) {
+        console.log(`🧠 Name erkannt und gespeichert: ${detectedName}`);
+      }
+      
+      // Interne Tags aus Antwort entfernen
+      text = cleanAiResponse(text);
+    }
 
     if (source === 'silas') {
       res.status(200).send(text);
     } else {
-      res.status(200).json({ answer: text });
+      // Sende auch den erkannten/bekannten Namen zurück ans Frontend
+      const responsePayload = { answer: text };
+      const finalName = extractNameFromResponse(response.text()) || knownName;
+      if (finalName) {
+        responsePayload.detectedName = finalName;
+      }
+      res.status(200).json(responsePayload);
     }
 
   } catch (error) {
     console.error("API Error:", error);
     res.status(500).json({ answer: 'Pixelfehler im System! Michael ist dran.' });
   }
+}
+
+// ===================================================================
+// HILFSFUNKTION: Zeitdifferenz als lesbarer Text
+// ===================================================================
+function getTimeSinceText(lastDate) {
+  const now = new Date();
+  const diffMs = now - lastDate;
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMins / 60);
+  const diffDays = Math.floor(diffHours / 24);
+  
+  if (diffMins < 5) return 'wenigen Minuten';
+  if (diffMins < 60) return `${diffMins} Minuten`;
+  if (diffHours < 24) return `${diffHours} Stunden`;
+  if (diffDays === 1) return 'einem Tag';
+  if (diffDays < 7) return `${diffDays} Tagen`;
+  if (diffDays < 14) return 'einer Woche';
+  if (diffDays < 30) return `${Math.floor(diffDays / 7)} Wochen`;
+  return `${Math.floor(diffDays / 30)} Monaten`;
 }
