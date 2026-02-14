@@ -222,19 +222,45 @@ function removeBoringIntros(text) {
 }
 
 // =================================================================
-// HELPER: Text formatieren (Absätze statt Listen)
+// HELPER: Text formatieren (Absätze statt Listen) — MIT XSS-SCHUTZ
 // =================================================================
+
+// HTML-Entities escapen (MUSS vor jeder HTML-Erzeugung laufen)
+function escapeHTML(str) {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
+
 function formatResponseText(text) {
+  // SCHRITT 1: Boring Intros entfernen (noch auf Rohtext)
   let formatted = removeBoringIntros(text);
   
-  // Markdown Fett → HTML
-  formatted = formatted.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  // SCHRITT 2: Markdown-Fett extrahieren BEVOR wir escapen
+  // Wir merken uns die fetten Stellen mit einem Platzhalter
+  const boldParts = [];
+  formatted = formatted.replace(/\*\*([^*]+)\*\*/g, (_, content) => {
+    const index = boldParts.length;
+    boldParts.push(content);
+    return `%%BOLD_${index}%%`;
+  });
   
-  // Zeilenumbrüche normalisieren
+  // SCHRITT 3: ALLES escapen (XSS-Schutz!)
+  formatted = escapeHTML(formatted);
+  
+  // SCHRITT 4: Bold-Platzhalter durch <strong> ersetzen (escaped content!)
+  formatted = formatted.replace(/%%BOLD_(\d+)%%/g, (_, index) => {
+    return `<strong>${escapeHTML(boldParts[parseInt(index)])}</strong>`;
+  });
+  
+  // SCHRITT 5: Zeilenumbrüche normalisieren
   formatted = formatted.replace(/\r\n/g, '\n');
   formatted = formatted.replace(/\r/g, '\n');
   
-  // Absätze erkennen (Doppel-Zeilenumbrüche)
+  // SCHRITT 6: Absätze erkennen (Doppel-Zeilenumbrüche)
   const blocks = formatted.split(/\n{2,}/);
   
   const htmlBlocks = blocks.map(block => {
@@ -247,6 +273,7 @@ function formatResponseText(text) {
     
     if (isList) {
       const items = lines.map(l => l.replace(/^[\d]+[.)]\s*|^[•\-\*]\s*/, '').trim());
+      // Content ist bereits escaped!
       return '<ul class="ai-list">' + items.map(i => `<li>${i}</li>`).join('') + '</ul>';
     }
     
@@ -273,7 +300,6 @@ function formatResponseText(text) {
   
   return result.trim();
 }
-
 // =================================================================
 // HELPER: Industry sanitizen
 // =================================================================
