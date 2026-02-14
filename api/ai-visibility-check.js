@@ -687,7 +687,7 @@ export default async function handler(req, res) {
       crawlError: null
     };
 
-    try {
+try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 10000);
       
@@ -697,7 +697,42 @@ export default async function handler(req, res) {
       });
       clearTimeout(timeout);
       
-      const html = await response.text();
+      // ============================================================
+      // NEU: Größenlimit (5 MB) — Schutz vor Speicher-Overflow
+      // ============================================================
+      const MAX_HTML_SIZE = 5 * 1024 * 1024; // 5 MB
+      
+      // Variante A: Content-Length Header prüfen (schnell, aber nicht immer vorhanden)
+      const contentLength = parseInt(response.headers.get('content-length') || '0');
+      if (contentLength > MAX_HTML_SIZE) {
+        throw new Error(`Seite zu groß (${Math.round(contentLength / 1024 / 1024)} MB). Max: 5 MB.`);
+      }
+      
+      // Variante B: Stream lesen mit Byte-Limit (funktioniert immer)
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder('utf-8');
+      let html = '';
+      let totalBytes = 0;
+      
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        
+        totalBytes += value.length;
+        if (totalBytes > MAX_HTML_SIZE) {
+          reader.cancel();
+          // Wir brechen ab, verwenden aber was wir haben — 
+          // die ersten 5 MB reichen für Schema.org + E-E-A-T
+          console.log(`⚠️ HTML abgeschnitten bei ${Math.round(totalBytes / 1024)} KB`);
+          break;
+        }
+        
+        html += decoder.decode(value, { stream: true });
+      }
+      
+      // Finales Flush des Decoders
+      html += decoder.decode();
+      
       const $ = cheerio.load(html);
       
       // =============================================================
