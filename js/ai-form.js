@@ -14,8 +14,54 @@ export const initAiForm = () => {
         animationRunning: false,
         apiFailureCount: 0,
         lastApiError: null,
-        initialized: false
+        initialized: false,
+        sessionId: null,
+        userName: null
     };
+
+    // ===================================================================
+    // SESSION / MEMORY MANAGEMENT
+    // ===================================================================
+    const SessionManager = {
+        init() {
+            // Session-ID aus localStorage laden oder neu erstellen
+            let sid = localStorage.getItem('evita_session_id');
+            if (!sid) {
+                sid = crypto.randomUUID();
+                localStorage.setItem('evita_session_id', sid);
+                console.log('🆕 Neue Session erstellt:', sid.substring(0, 8) + '...');
+            } else {
+                console.log('🔄 Bestehende Session geladen:', sid.substring(0, 8) + '...');
+            }
+            state.sessionId = sid;
+
+            // Bekannten Namen aus localStorage laden
+            const savedName = localStorage.getItem('evita_user_name');
+            if (savedName) {
+                state.userName = savedName;
+                console.log('🧠 Bekannter Name geladen:', savedName);
+            }
+        },
+
+        setUserName(name) {
+            if (name && name.length >= 2) {
+                state.userName = name;
+                localStorage.setItem('evita_user_name', name);
+                console.log('🧠 Name gespeichert:', name);
+            }
+        },
+
+        getUserName() {
+            return state.userName;
+        },
+
+        getSessionId() {
+            return state.sessionId;
+        }
+    };
+
+    // Session sofort initialisieren
+    SessionManager.init();
 
     // ===================================================================
     // FALLBACK-ANTWORTEN SYSTEM
@@ -270,7 +316,9 @@ export const initAiForm = () => {
                 history: state.chatHistory,
                 message: userInput,
                 checkBookingIntent: checkIntent,
-                isConfirmation: wasBookingQuestion && hasConfirmation
+                isConfirmation: wasBookingQuestion && hasConfirmation,
+                sessionId: SessionManager.getSessionId(),
+                userName: SessionManager.getUserName()
             };
             
             try {
@@ -337,6 +385,7 @@ export const initAiForm = () => {
                     .replace(/\[BOOKING_CONFIRM_REQUEST\]/g, '')
                     .replace(/\[buchung_starten\]/g, '')
                     .replace(/\[booking_starten\]/g, '')
+                    .replace(/\[USER_NAME:[^\]]+\]/g, '')
                     .trim();
             }
 
@@ -409,6 +458,8 @@ export const initAiForm = () => {
             state.chatHistory = [];
             state.apiFailureCount = 0;
             state.lastApiError = null;
+            // sessionId und userName bleiben erhalten!
+            console.log(`🔄 Chat zurückgesetzt (Session: ${state.sessionId?.substring(0,8)}... | Name: ${state.userName || 'unbekannt'})`);
         }
     };
 
@@ -765,6 +816,10 @@ export const initAiForm = () => {
             } else if (data?.answer) {
                 answer = data.answer;
                 isFallback = data.isFallback || false;
+                // Name vom Backend erkannt? → lokal speichern
+                if (data.detectedName) {
+                    SessionManager.setUserName(data.detectedName);
+                }
             } else if (data?.message) {
                 answer = data.message;
             }
@@ -773,6 +828,7 @@ export const initAiForm = () => {
                 .replace(/\[BOOKING_CONFIRM_REQUEST\]/g, '')
                 .replace(/\[buchung_starten\]/g, '')
                 .replace(/\[booking_starten\]/g, '')
+                .replace(/\[USER_NAME:[^\]]+\]/g, '')
                 .trim();
 
             const aiMsgElement = ChatUI.addMessage(answer, 'ai');
@@ -967,6 +1023,24 @@ export const initAiForm = () => {
         "Grüß dich! Ich bin Evita, Michaels digitale Unterstützung. Der Hund schnarcht, Michael codet – und ich bin für dich da. Was liegt an?",
         "Servus! Evita hier. Ich bin die KI-Assistenz , Michael schreibt den Code und der Hund ist für die gute Laune zuständig. Wobei kann ich dir heute helfen?"
     ];
+
+    const returningWelcomeMessages = [
+        "Hey {name}, schön dich wiederzusehen! 👋 Was kann ich heute für dich tun?",
+        "Hallo {name}! Da bist du ja wieder. Womit kann ich dir diesmal helfen?",
+        "Servus {name}! Schön, dass du wieder vorbeischaust. Was liegt an?",
+        "{name}! Willkommen zurück. Ich bin bereit – schieß los!",
+        "Hey {name}, na, was gibt's Neues? Ich bin ganz Ohr!"
+    ];
+    
+    function getWelcomeMessage() {
+        const name = SessionManager.getUserName();
+        if (name) {
+            const msgs = returningWelcomeMessages;
+            const msg = msgs[Math.floor(Math.random() * msgs.length)];
+            return msg.replace('{name}', name);
+        }
+        return welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
+    }
     
     function openEvitaChatWithWelcome() {
         ChatUI.resetChat();
@@ -979,7 +1053,7 @@ export const initAiForm = () => {
     async function addWelcomeMessageToChat() {
         const chatHistory = document.getElementById('ai-chat-history');
         if (chatHistory && chatHistory.children.length === 0) {
-            const randomGreeting = welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
+            const randomGreeting = getWelcomeMessage();
             const msgElement = ChatUI.addMessage(randomGreeting, 'ai', false);
             if (msgElement) {
                 await typeWriterEffect(msgElement, randomGreeting, 20);
