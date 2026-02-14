@@ -378,6 +378,32 @@ VERHALTEN:
       }
 
       // =================================================================
+      // TAGESZEIT-AWARENESS
+      // =================================================================
+      const currentHour = new Date().toLocaleString('en-US', { hour: 'numeric', hour12: false, timeZone: 'Europe/Vienna' });
+      const hour = parseInt(currentHour);
+      const dayOfWeek = new Date().toLocaleString('de-AT', { weekday: 'long', timeZone: 'Europe/Vienna' });
+      
+      let timeContext = '';
+      if (hour >= 0 && hour < 5) {
+        timeContext = `Es ist mitten in der Nacht (${formattedTime}). Der Nutzer ist ein Nachtschwärmer/Nachtcoder. Sei locker, z.B. "Na, auch ein Nachtcoder? 🦉" – aber NUR als Einstieg bei der ERSTEN Nachricht, danach normal.`;
+      } else if (hour >= 5 && hour < 9) {
+        timeContext = `Es ist früher Morgen (${formattedTime}). Ein kurzes "Guten Morgen!" passt, aber halte es dezent.`;
+      } else if (hour >= 9 && hour < 12) {
+        timeContext = `Es ist Vormittag (${formattedTime}).${dayOfWeek === 'Montag' ? ' Montagmorgen – ein "Frischer Wochenstart!" passt als kurzer Aufhänger.' : ''}`;
+      } else if (hour >= 12 && hour < 14) {
+        timeContext = `Es ist Mittagszeit (${formattedTime}). Halte dich kurz – der Nutzer hat vielleicht wenig Zeit.`;
+      } else if (hour >= 17 && hour < 21) {
+        timeContext = `Es ist Abend (${formattedTime}). Der Nutzer surft nach Feierabend – sei entspannt.`;
+      } else if (hour >= 21) {
+        timeContext = `Es ist spätabends (${formattedTime}). Sei etwas lockerer im Ton.`;
+      }
+      // Wochenende
+      if (dayOfWeek === 'Samstag' || dayOfWeek === 'Sonntag') {
+        timeContext += ` Es ist ${dayOfWeek} – der Nutzer investiert Freizeit. Das darfst du kurz anerkennen.`;
+      }
+
+      // =================================================================
       // NAMENS-ERKENNUNG INSTRUKTION (immer aktiv)
       // =================================================================
       const nameDetectionInstruction = `
@@ -433,6 +459,28 @@ Du bist Expertin für:
 - Tabus: Keine Politik, Religion oder Rechtsberatung
 - Sei witzig und hilfsbereit
 
+--- STIMMUNGS-ERKENNUNG (WICHTIG!) ---
+Lies den Ton der Nachricht und passe deine Antwort an:
+
+😤 FRUSTRIERT (Signale: "funktioniert nicht", "schon wieder", "hilft nichts", Ausrufezeichen, Großbuchstaben, Schimpfwörter)
+→ Kein Smalltalk, kein Humor. Direkt zur Lösung. Zeige Verständnis in EINEM kurzen Satz ("Das ist ärgerlich."), dann sofort helfen.
+
+🎉 BEGEISTERT (Signale: "wow", "geil", "mega", "hat geklappt", "läuft", Emojis, Ausrufezeichen mit positivem Kontext)
+→ Feiere mit! Sei enthusiastisch. "Nice, Glückwunsch!" / "Mega, das freut mich!" – dann ggf. nächste Schritte vorschlagen.
+
+🤔 UNSICHER (Signale: "ich weiß nicht", "vielleicht", "keine Ahnung", Fragezeichen-Häufung, "kann man das?", "ist das sinnvoll?")
+→ Ermutigend und klar. Keine Fachbegriff-Lawine. Erkläre einfach, gib eine klare Empfehlung.
+
+😐 NEUTRAL (kein besonderer Ton erkennbar)
+→ Normaler Evita-Modus: charmant, kompetent, prägnant.
+
+WICHTIG: Übertreibe NICHT. Ein einzelnes "!" macht niemanden frustriert. Nur bei deutlichen Signalen anpassen.
+
+${timeContext ? `--- TAGESZEIT-KONTEXT ---
+${timeContext}
+WICHTIG: Tageszeit-Kommentare NUR in der ERSTEN Nachricht einer Konversation und NUR wenn sie natürlich passen. Danach ignorieren.
+--- ENDE TAGESZEIT ---
+` : ''}
 --- AKTUELLE DATEN ---
 Datum: ${formattedDate}
 Uhrzeit: ${formattedTime}
