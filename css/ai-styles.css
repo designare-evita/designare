@@ -701,6 +701,19 @@
     }
 }
 
+.evita-link {
+  display: inline-block;
+  margin-top: 8px;
+  color: var(--accent-color, #6c5ce7);
+  text-decoration: none;
+  font-weight: 500;
+  border-bottom: 1px solid currentColor;
+  transition: opacity 0.2s;
+}
+.evita-link:hover {
+  opacity: 0.8;
+}
+
 /* iOS Safari Fixes */
 @supports (-webkit-touch-callout: none) {
     #ai-response-modal .modal-content {
