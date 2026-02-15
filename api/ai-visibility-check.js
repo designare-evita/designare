@@ -12,26 +12,45 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 // OPENAI / CHATGPT CLIENT
 // =================================================================
 async function chatGPTQuery(prompt) {
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
-    },
-    body: JSON.stringify({
-      model: 'gpt-5-nano',
-      messages: [{ role: 'user', content: prompt }],
-      max_completion_tokens: 1500
-    })
-  });
-  
-  if (!response.ok) {
-    const errBody = await response.text();
-    throw new Error(`OpenAI API ${response.status}: ${errBody}`);
+  const models = [
+    { model: 'gpt-4o-mini', body: { temperature: 0.2, max_tokens: 1500 } },
+    { model: 'gpt-5-nano', body: { max_completion_tokens: 1500 } }
+  ];
+
+  for (const { model, body } of models) {
+    try {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+        },
+        body: JSON.stringify({
+          model,
+          messages: [{ role: 'user', content: prompt }],
+          ...body
+        })
+      });
+
+      if (!response.ok) {
+        const errBody = await response.text();
+        console.warn(`⚠️ ${model} fehlgeschlagen (${response.status}), versuche Fallback...`);
+        continue;
+      }
+
+      const data = await response.json();
+      const content = data.choices?.[0]?.message?.content || '';
+      if (content) {
+        console.log(`✅ ChatGPT-Antwort via ${model}`);
+        return content;
+      }
+    } catch (err) {
+      console.warn(`⚠️ ${model} Fehler: ${err.message}, versuche Fallback...`);
+      continue;
+    }
   }
-  
-  const data = await response.json();
-  return data.choices?.[0]?.message?.content || '';
+
+  throw new Error('Alle OpenAI-Modelle fehlgeschlagen (gpt-4o-mini, gpt-5-nano)');
 }
 
 // =================================================================
