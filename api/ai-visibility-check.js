@@ -19,10 +19,9 @@ async function chatGPTQuery(prompt) {
       'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
     },
     body: JSON.stringify({
-      model: 'gpt-4o-mini',
+      model: 'gpt-5-nano',
       messages: [{ role: 'user', content: prompt }],
-      temperature: 0.2,
-      max_tokens: 1500
+      max_completion_tokens: 1500
     })
   });
   
